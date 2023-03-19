@@ -143,7 +143,13 @@ namespace gip.bso.manufacturing
                 }
                 else
                 {
-                    UserAckPWNode.ValueT.ExecuteMethod(PWNodeUserAck.MN_AckStartClient);
+                    if (typeof(PWNodeDecisionMsg).IsAssignableFrom(UserAckPWNode.ValueT.ComponentClass.ObjectType))
+                    {
+                        Global.MsgResult result = UserAckPWNode.ValueT.Messages.YesNoCancel(_BSOManualWeighing, Message, Global.MsgResult.Cancel, true);
+                        UserAckPWNode.ValueT.ExecuteMethod(nameof(PWNodeDecisionMsg.OnMessageBoxResult), result);
+                    }
+                    else
+                        UserAckPWNode.ValueT.ExecuteMethod(nameof(PWNodeUserAck.AckStartClient));
                 }
             }
         }

@@ -699,20 +699,33 @@ namespace gip.bso.manufacturing
             }
         }
 
-        protected core.datamodel.ACClass[] _PWUserAckClasses;
-        public virtual core.datamodel.ACClass[] PWUserAckClasses
+        protected List<core.datamodel.ACClass> _PWUserAckClasses = null;
+        public virtual IEnumerable<core.datamodel.ACClass> PWUserAckClasses
         {
             get
             {
                 if (_PWUserAckClasses == null)
                 {
+                    List<core.datamodel.ACClass> pwUserAckClasses = new List<core.datamodel.ACClass>();
                     var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PWNodeUserAck));
                     if (acClass != null)
                     {
+                        pwUserAckClasses.Add(acClass);
                         var derivedClasses = acClass.DerivedClasses;
-                        derivedClasses.Add(acClass);
-                        _PWUserAckClasses = derivedClasses.ToArray();
+                        if (derivedClasses.Any())
+                            pwUserAckClasses.AddRange(derivedClasses);
                     }
+
+                    acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PWNodeDecisionMsg));
+                    if (acClass != null)
+                    {
+                        pwUserAckClasses.Add(acClass);
+                        var derivedClasses = acClass.DerivedClasses;
+                        if (derivedClasses.Any())
+                            pwUserAckClasses.AddRange(derivedClasses);
+                    }
+
+                    _PWUserAckClasses = pwUserAckClasses;
                 }
                 return _PWUserAckClasses;
             }
