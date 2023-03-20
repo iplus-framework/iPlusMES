@@ -954,7 +954,13 @@ namespace gip.bso.manufacturing
                 if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing ||
                     SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
                 {
-                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.StartWeighing), SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID,
+                    Guid posID = Guid.Empty;
+                    if (SelectedWeighingMaterial.PosRelation != null)
+                        posID = SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID;
+                    else if (SelectedWeighingMaterial.PickingPosition != null)
+                        posID = SelectedWeighingMaterial.PickingPosition.PickingPosID;
+
+                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.StartWeighing), posID,
                                                                              SelectedFacilityCharge?.FacilityChargeID, null, forceSetFC_F) as Msg;
                     return msg;
                 }
@@ -1856,25 +1862,47 @@ namespace gip.bso.manufacturing
                             {
                                 using (ACMonitor.Lock(db.QueryLock_1X000))
                                 {
-                                    vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
-                                                                                 .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
-                                    if (posRelation != null)
+                                    if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null)
                                     {
-                                        try
+                                        vd.PickingPos pickingPos = db.PickingPos.Include(c => c.PickingMaterial).FirstOrDefault(c => c.PickingPosID == PLPosRel);
+                                        if (pickingPos != null)
                                         {
-                                            posRelation.AutoRefresh();
+                                            try
+                                            {
+                                                pickingPos.AutoRefresh();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                            }
+                                            weighingMaterials.Add(new WeighingMaterial(pickingPos, (WeighingComponentState)weighingState, iconDesign));
                                         }
-                                        catch (Exception e)
+                                    }
+                                    else
+                                    {
+                                        vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
+                                                                                     .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
+                                        if (posRelation != null)
                                         {
-                                            Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                            try
+                                            {
+                                                posRelation.AutoRefresh();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                            }
+                                            weighingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                                         }
-                                        weighingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                                     }
                                 }
                             }
                         }
                     }
                 }
+
+                if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null)
+                    return weighingMaterials.OrderBy(c => c.PickingPosition.Sequence).ToList();
 
                 return weighingMaterials.OrderBy(c => c.PosRelation.Sequence).ToList();
             }
@@ -2290,7 +2318,12 @@ namespace gip.bso.manufacturing
                 {
                     case WeighingComponentInfoType.State:
                         {
-                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = null;
+                            if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null && compInfo.PickingPos != Guid.Empty)
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PickingPosition.PickingPosID == compInfo.PickingPos);
+                            else
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            
                             if (comp != null)
                             {
                                 comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
@@ -2300,7 +2333,12 @@ namespace gip.bso.manufacturing
                         }
                     case WeighingComponentInfoType.StateSelectCompAndFC_F:
                         {
-                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = null;
+                            if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null && compInfo.PickingPos != Guid.Empty)
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PickingPosition.PickingPosID == compInfo.PickingPos);
+                            else
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+
                             if (comp == null)
                                 return;
 
@@ -2324,7 +2362,12 @@ namespace gip.bso.manufacturing
                         }
                     case WeighingComponentInfoType.SelectCompReturnFC_F:
                         {
-                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = null;
+                            if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null && compInfo.PickingPos != Guid.Empty)
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PickingPosition.PickingPosID == compInfo.PickingPos);
+                            else
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+
                             if (SelectedWeighingMaterial != comp)
                             {
                                 SelectedWeighingMaterial = comp;
@@ -2337,7 +2380,11 @@ namespace gip.bso.manufacturing
                     case WeighingComponentInfoType.StateSelectFC_F:
                     case WeighingComponentInfoType.SelectFC_F:
                         {
-                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = null;
+                            if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null && compInfo.PickingPos != Guid.Empty)
+                                comp = WeighingMaterialList.FirstOrDefault(c => c.PickingPosition.PickingPosID == compInfo.PickingPos);
+                            else
+                                comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
 
                             if ((WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
                             && SelectedWeighingMaterial == null)
@@ -2346,7 +2393,9 @@ namespace gip.bso.manufacturing
                                     SelectedWeighingMaterial = comp;
                             }
 
-                            if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation)
+                            if (SelectedWeighingMaterial != null && 
+                                ((compInfo.PLPosRelation != Guid.Empty && SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation)
+                                || compInfo.PickingPos != Guid.Empty && SelectedWeighingMaterial.PickingPosition.PickingPosID == compInfo.PickingPos))
                             {
                                 if (SelectedWeighingMaterial.WeighingMatState != (WeighingComponentState)compInfo.WeighingComponentState)
                                 {
@@ -2665,8 +2714,17 @@ namespace gip.bso.manufacturing
 
                 if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
                 {
+                    Guid posID = Guid.Empty;
+                    if (SelectedWeighingMaterial != null)
+                    {
+                        if (SelectedWeighingMaterial.PosRelation != null)
+                            posID = SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID;
+                        else if (SelectedWeighingMaterial.PickingPosition != null)
+                            posID = SelectedWeighingMaterial.PickingPosition.PickingPosID;
+                    }
+
                     ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
-                                                                            SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
+                                                                            posID) as ACValueList;
 
                     var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
                     if (facilityIDs == null)
@@ -2688,6 +2746,8 @@ namespace gip.bso.manufacturing
 
                         if (SelectedWeighingMaterial.PosRelation != null)
                             _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
+                        else if (SelectedWeighingMaterial.PickingPosition != null)
+                            _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PickingPosition.Material.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
 
                         FacilityChargeListCount = _FacilityChargeList.Count();
                     }

@@ -87,6 +87,12 @@ namespace gip.mes.processapplication
                                                              || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
                                                     .OrderBy(c => c.Sequence).ToArray();
 
+                if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && openPickings != null && openPickings.Any())
+                    openPickings = openPickings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                               .OrderBy(c => c.Sequence)
+                                               .ToArray();
+
+
                 if (!DoseAllPosFromPicking)
                 {
                     if (pickingPosFromPWMethod == null)

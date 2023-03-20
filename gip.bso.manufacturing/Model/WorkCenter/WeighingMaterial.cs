@@ -30,7 +30,7 @@ namespace gip.bso.manufacturing
             WeighingMatState = state;
             MaterialIconDesign = materialIconDesign;
             _ParentACObject = parent;
-            OnPropertyChanged("MaterialUnitList");
+            OnPropertyChanged(nameof(MaterialUnitList));
         }
 
         public WeighingMaterial(vd.PickingPos pickingPos, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign)
@@ -41,12 +41,13 @@ namespace gip.bso.manufacturing
             MaterialNo = pickingPos.Material.MaterialNo;
             IsLotManaged = pickingPos.Material.IsLotManaged;
             UnitName = pickingPos.Material?.BaseMDUnit?.MDUnitName;
+            Sequence = pickingPos.Sequence;
 
             MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
             WeighingMatState = state;
             MaterialIconDesign = materialIconDesign;
             //_ParentACObject = parent;
-            OnPropertyChanged("MaterialUnitList");
+            OnPropertyChanged(nameof(MaterialUnitList));
         }
 
         #endregion
@@ -92,6 +93,9 @@ namespace gip.bso.manufacturing
                         TargetQtyInUnits = PosRelation.RemainingDosingQuantityUOM;
                         ActualQtyInUnits = 0;
                     }
+
+                    Sequence = _PosRelation.Sequence;
+
                 }
                 OnPropertyChanged();
             }
@@ -99,6 +103,13 @@ namespace gip.bso.manufacturing
 
         [ACPropertyInfo(100)]
         public vd.PickingPos PickingPosition
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(100)]
+        public int Sequence
         {
             get;
             set;
@@ -438,8 +449,21 @@ namespace gip.bso.manufacturing
                 {
                     using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                     {
-                        PosRelation.AutoRefresh();
-                        ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
+                        double remainingDosingWeight = 0;
+
+                        if (PosRelation != null)
+                        {
+                            PosRelation.AutoRefresh();
+                            remainingDosingWeight = PosRelation.RemainingDosingWeight;
+                        }
+                        else if (PickingPosition != null)
+                        {
+                            PickingPosition.AutoRefresh();
+                            PickingPosition.OnLocalPropertyChanged(nameof(PickingPosition.ActualQuantityUOM));
+                            remainingDosingWeight = PickingPosition.RemainingDosingWeight;
+                        }
+
+                        ActualQuantity = TargetQuantity + remainingDosingWeight;
                     }
                 }
                 catch
@@ -454,9 +478,23 @@ namespace gip.bso.manufacturing
                 {
                     using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                     {
-                        PosRelation.AutoRefresh();
-                        PosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
-                        TargetQuantity = Math.Abs(PosRelation.RemainingDosingWeight);
+                        double remainingDosingWeight = 0;
+
+                        if (PosRelation != null)
+                        {
+                            PosRelation.AutoRefresh();
+                            PosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
+                            remainingDosingWeight = PosRelation.RemainingDosingWeight;
+                        }
+                        else if (PickingPosition != null)
+                        {
+                            PickingPosition.AutoRefresh();
+                            PickingPosition.OnLocalPropertyChanged(nameof(PickingPosition.ActualQuantityUOM));
+                            PickingPosition.FacilityBooking_PickingPos.AutoLoad();
+                            remainingDosingWeight = PickingPosition.RemainingDosingWeight;
+                        }
+
+                        TargetQuantity = Math.Abs(remainingDosingWeight);
                     }
                     ActualQuantity = 0;
                 }

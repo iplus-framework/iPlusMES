@@ -617,6 +617,11 @@ namespace gip.mes.datamodel
                 this.PickingActualUOM = sumActualQuantityUOM;
         }
 
+        public void OnLocalPropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(propertyName);
+        }
+
         public void OnRefreshCompleteFactor()
         {
             OnPropertyChanged(nameof(CompleteFactor));
