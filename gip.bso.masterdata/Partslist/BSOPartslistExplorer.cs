@@ -105,6 +105,34 @@ namespace gip.bso.masterdata
 
         #region Properties -> Filters
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _FilterPartslistSelectAll;
+        [ACPropertyInfo(505, "", ConstApp.SelectAll)]
+        public bool FilterPartslistSelectAll
+        {
+            get
+            {
+                return _FilterPartslistSelectAll;
+            }
+            set
+            {
+                if (_FilterPartslistSelectAll != value)
+                {
+                    _FilterPartslistSelectAll = value;
+                    if (PartslistList != null && PartslistList.Any())
+                    {
+                        foreach (Partslist pl in PartslistList)
+                        {
+                            pl.IsSelected = value;
+                        }
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool? filterIsEnabled;
         [ACPropertyInfo(9999, "Filter", "en{'Enabled'}de{'Freigegeben'}")]
         public bool? FilterIsEnabled
