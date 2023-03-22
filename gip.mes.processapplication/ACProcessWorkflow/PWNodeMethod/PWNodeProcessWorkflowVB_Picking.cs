@@ -118,13 +118,13 @@ namespace gip.mes.processapplication
                 //if (queryOrderRelatedPickingLines.Any())
                 //{
                     pickingPos = picking.PickingPos_Picking
-                        .Where(c => c.TargetQuantityUOM > 0.000001 && (!c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad))
+                        .Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                         .OrderBy(c => c.Sequence)
                         .FirstOrDefault();
                     if (pickingPos == null)
                     {
                         pickingPos = picking.PickingPos_Picking
-                        .Where(c => c.TargetQuantityUOM > 0.000001 && c.MDDelivPosLoadStateID.HasValue && c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
+                        .Where(c => c.MDDelivPosLoadStateID.HasValue && c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
                         .OrderBy(c => c.Sequence)
                         .FirstOrDefault();
                     }
