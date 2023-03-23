@@ -2366,6 +2366,7 @@ namespace gip.bso.manufacturing
                 return;
             SelectedProdOrderPartslistPos.TargetQuantityUOM = ChangeViaPartslistNewOrderTargetQuantityUOM;
             CloseTopDialog();
+            ChangeViaPartslistNewTargetQuantityUOM = 0;
             OnPropertyChanged("SelectedProdOrderPartslistPos");
             OnPropertyChanged("SelectedProdOrderPartslistPos\\TargetQuantityUOM");
         }

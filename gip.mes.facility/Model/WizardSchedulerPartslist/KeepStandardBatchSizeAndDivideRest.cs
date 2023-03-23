@@ -41,18 +41,30 @@ namespace gip.mes.facility
             else
             {
                 calcBatchSize = standardBatchSize;
-                int tempBatchCount = (int)(totalSize / standardBatchSize);
+                calcBatchCount = 1;
                 Rest = totalSize - (calcBatchCount * calcBatchSize);
-
-                for (int i = 1; i <= tempBatchCount; i++)
+                while (Math.Round(Rest - minBatchSize, 6) > FacilityConst.C_ZeroCompare)
                 {
-                    Rest = totalSize - (i * calcBatchSize);
-                    if(Rest < maxBatchSize)
+                    if ((totalSize - ((calcBatchCount + 1) * calcBatchSize)) < FacilityConst.C_ZeroCompare)
                     {
-                        calcBatchCount = i;
                         break;
                     }
+                    calcBatchCount++;
+                    Rest = totalSize - (calcBatchCount * calcBatchSize);
                 }
+                //int tempBatchCount = (int)(totalSize / standardBatchSize);
+                //Rest = totalSize - (calcBatchCount * calcBatchSize);
+                //tempBatchCount++;
+                //for (int i = 1; i <= tempBatchCount; i++)
+                //{
+                //    Rest = totalSize - (i * calcBatchSize);
+                //    bool fitIntoStandardSize = Math.Round(Rest, 6)
+                //    if (Rest < maxBatchSize)
+                //    {
+                //        calcBatchCount = i;
+                //        break;
+                //    }
+                //}
             }
 
             calcBatchSize = wizardSchedulerPartslist.CorrectQuantityWithProductionUnits(calcBatchSize);
