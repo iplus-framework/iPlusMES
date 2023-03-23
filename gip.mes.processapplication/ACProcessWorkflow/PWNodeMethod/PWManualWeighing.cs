@@ -3752,6 +3752,8 @@ namespace gip.mes.processapplication
                         //Error50376: The quant {0} doesn't exist in the database!
                         return new Msg(this, eMsgLevel.Error, PWClassName, "DoFacilityChargeZeroBooking(20)", 2146, "Error50376", facilityCharge);
                     }
+                    if (fc.NotAvailable)
+                        return null;
 
                     return DoFacilityChargeZeroBooking(fc, dbApp);
                 }
