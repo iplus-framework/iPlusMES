@@ -60,12 +60,9 @@ namespace gip.bso.manufacturing
 
         public override ScaleBackgroundState? OnDetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
-            short? quantQuantity = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.PostingQuantitySuggestion;
-
-            if (quantQuantity.HasValue && quantQuantity.Value > 0 && actual > 0)
-            {
+            bool? suggestQOnPosting = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.SuggestQuantQOnPosting;
+            if (suggestQOnPosting.HasValue && suggestQOnPosting.Value && actual > 0)
                 return ScaleBackgroundState.InTolerance;
-            }
 
             return null;
         }
@@ -131,9 +128,8 @@ namespace gip.bso.manufacturing
 
                         double diff = SelectedWeighingMaterial.TargetQuantity;
 
-                        short? quantQuantity = SelectedWeighingMaterial.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.PostingQuantitySuggestion;
-
-                        if (quantQuantity.HasValue && quantQuantity.Value > 0)
+                        bool? suggestQOnPosting = SelectedWeighingMaterial.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.SuggestQuantQOnPosting;
+                        if (suggestQOnPosting.HasValue && suggestQOnPosting.Value)
                         {
                             diff = value.StockQuantityUOM;
                             SelectedWeighingMaterial.AddValue = diff;

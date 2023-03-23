@@ -3133,7 +3133,7 @@ namespace gip.mes.processapplication
                 {
                     try
                     {
-                        bool? skipTol = weighingComponent.PLPosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.PostingQuantitySuggestion > 0;
+                        bool? skipTol = weighingComponent.PLPosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.SuggestQuantQOnPosting;
                         acMethod["SkipToleranceCheck"] = skipTol != null ? skipTol : false;
                     }
                     catch (Exception e)
@@ -3633,6 +3633,17 @@ namespace gip.mes.processapplication
                                             ActivateProcessAlarmWithLog(msg, false);
                                         }
 
+                                        if (  !facilityCharge.NotAvailable 
+                                            && Math.Abs(facilityCharge.Material.ZeroBookingTolerance) > double.Epsilon
+                                            && facilityCharge.StockQuantityUOM < facilityCharge.Material.ZeroBookingTolerance)
+                                        {
+                                            bool? suggestQOnPosting = weighingPosRelation.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.SuggestQuantQOnPosting;
+                                            if (suggestQOnPosting.HasValue && suggestQOnPosting.Value)
+                                            {
+                                                DoFacilityChargeZeroBooking(facilityCharge, dbApp);
+                                            }
+                                        }
+
                                         //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - changePosState value: " + changePosState.ToString());
 
                                         if (changePosState)
@@ -3731,14 +3742,6 @@ namespace gip.mes.processapplication
 
         public Msg DoFacilityChargeZeroBooking(Guid facilityCharge)
         {
-            ACMethodBooking fbtZeroBooking = ZeroBookingFacilityCharge as ACMethodBooking;
-
-            if (fbtZeroBooking == null)
-            {
-                //Error50364: Can not find the zero booking ACMethod!
-                return new Msg(this, eMsgLevel.Error, PWClassName, "DoFacilityChargeZeroBooking(10)", 2133, "Error50364");
-            }
-
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -3750,21 +3753,7 @@ namespace gip.mes.processapplication
                         return new Msg(this, eMsgLevel.Error, PWClassName, "DoFacilityChargeZeroBooking(20)", 2146, "Error50376", facilityCharge);
                     }
 
-                    fbtZeroBooking.InwardFacilityCharge = fc;
-                    fbtZeroBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
-
-                    ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref fbtZeroBooking, dbApp);
-                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
-                    {
-                        if (String.IsNullOrEmpty(resultBooking.ValidMessage.Message))
-                            resultBooking.ValidMessage.Message = resultBooking.ResultState.ToString();
-                        return resultBooking.ValidMessage;
-                    }
-                    else
-                    {
-                        if (!fbtZeroBooking.ValidMessage.IsSucceded() || fbtZeroBooking.ValidMessage.HasWarnings())
-                            return fbtZeroBooking.ValidMessage;
-                    }
+                    return DoFacilityChargeZeroBooking(fc, dbApp);
                 }
                 catch (Exception e)
                 {
@@ -3775,6 +3764,43 @@ namespace gip.mes.processapplication
                         message = e.Message;
                     return new MsgWithDetails(message, this, eMsgLevel.Exception, PWClassName, "DoFacilityChargeZeroBooking", 2166);
                 }
+            }
+        }
+
+        public Msg DoFacilityChargeZeroBooking(FacilityCharge fc, DatabaseApp dbApp)
+        {
+            try
+            {
+                ACMethodBooking fbtZeroBooking = ZeroBookingFacilityCharge as ACMethodBooking;
+                if (fbtZeroBooking == null)
+                {
+                    //Error50364: Can not find the zero booking ACMethod!
+                    return new Msg(this, eMsgLevel.Error, PWClassName, "DoFacilityChargeZeroBooking(10)", 2133, "Error50364");
+                }
+                fbtZeroBooking.InwardFacilityCharge = fc;
+                fbtZeroBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref fbtZeroBooking, dbApp);
+                if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                {
+                    if (String.IsNullOrEmpty(resultBooking.ValidMessage.Message))
+                        resultBooking.ValidMessage.Message = resultBooking.ResultState.ToString();
+                    return resultBooking.ValidMessage;
+                }
+                else
+                {
+                    if (!fbtZeroBooking.ValidMessage.IsSucceded() || fbtZeroBooking.ValidMessage.HasWarnings())
+                        return fbtZeroBooking.ValidMessage;
+                }
+            }
+            catch (Exception e)
+            {
+                string message = "";
+                if (e.InnerException != null)
+                    message = String.Format("{0}, {1}", e.Message, e.InnerException.Message);
+                else
+                    message = e.Message;
+                return new MsgWithDetails(message, this, eMsgLevel.Exception, PWClassName, "DoFacilityChargeZeroBooking", 2166);
             }
             return null;
         }

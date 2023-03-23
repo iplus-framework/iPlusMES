@@ -346,12 +346,18 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Suggest quant quantity on posting'}de{'Vorschlagsmenge bei der Buchung'}")]
+        /// <summary>
+        /// If this property is set, then the entire quantity of the selected quant will be suggested when the user has to enter the quantity in the class PWManualAddtition.
+        /// In this case the quant will be set automatically to "NotAvailable" after posting because the stock was exactly zero.
+        /// If this component is used with PWManualWeighing, then the Material.ZeroBookingTolerance is used to compare if the complete quant was used up. 
+        /// If its in tolerance then the quant will be posted to zero stock.
+        /// </summary>
+        [ACPropertyInfo(9999, "", "en{'Consume entire quant quantity'}de{'Vollständige Quantmenge verbrauchen'}")]
         public bool SuggestQuantQOnPosting
         {
             get
             {
-                return PostingQuantitySuggestion > 0;
+                return PostingQuantitySuggestion.HasValue && PostingQuantitySuggestion.Value > 0;
             }
             set
             {
