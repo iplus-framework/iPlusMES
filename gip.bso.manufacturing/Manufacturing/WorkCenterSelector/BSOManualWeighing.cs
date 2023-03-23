@@ -1105,26 +1105,33 @@ namespace gip.bso.manufacturing
                 _IsLotConsumed = false;
                 if (SelectedWeighingMaterial.IsLotManaged)
                 {
-                    //Question50047: Was the material with the lot number {0} used up?
-                    // Wurde das Material mit der Chargennummer{0} aufgebraucht?
-                    Global.MsgResult result = Messages.Question(this, "Question50047", Global.MsgResult.Cancel, false, SelectedFacilityCharge.FacilityChargeNo);
-                    if (result == Global.MsgResult.Yes)
+                    double? zeroBookTolerance = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.Material?.ZeroBookingTolerance;
+                    if (zeroBookTolerance.HasValue && Math.Abs(zeroBookTolerance.Value) > double.Epsilon)
                     {
-                        var zeroBookTolerance = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.Material?.ZeroBookingTolerance;
-                        if (zeroBookTolerance.HasValue && zeroBookTolerance.Value < SelectedFacilityCharge.StockQuantityUOM)
+                        double stockAfterBooking = SelectedFacilityCharge.StockQuantityUOM - ScaleActualWeight;
+                        if (zeroBookTolerance > stockAfterBooking)
+                        {
+                            _IsLotConsumed = true;
+                        }
+                    }
+
+                    if (!_IsLotConsumed)
+                    {
+                        //Question50047: Was the material with the lot number {0} used up?
+                        // Wurde das Material mit der Chargennummer{0} aufgebraucht?
+                        Global.MsgResult result = Messages.Question(this, "Question50047", Global.MsgResult.Cancel, false, SelectedFacilityCharge.FacilityChargeNo);
+                        if (result == Global.MsgResult.Yes)
                         {
                             //Question50048: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
                             // Der Restbestand der Charge (Quant) ist zu groß. Sind Sie sicher dass die Charge aufgebraucht ist?
                             if (Messages.Question(this, "Question50048", Global.MsgResult.Cancel) == Global.MsgResult.Yes)
                                 _IsLotConsumed = true;
                         }
-                        else
-                            _IsLotConsumed = true;
-                    }
-                    else if (result == Global.MsgResult.Cancel)
-                    {
-                        ShowSelectFacilityLotInfo = false;
-                        _CallPWLotChange = false;
+                        else if (result == Global.MsgResult.Cancel)
+                        {
+                            ShowSelectFacilityLotInfo = false;
+                            _CallPWLotChange = false;
+                        }
                     }
                 }
             }
