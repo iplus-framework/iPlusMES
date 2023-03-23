@@ -1151,14 +1151,11 @@ namespace gip.bso.manufacturing
 
                     ApplicationQueue?.Add(() => InitFunctionMonitor());
 
-                    //if (CurrentVBContent == FunctionMonitorTabVBContent)
-                    //{
-                    //_MainSyncContext?.Send((object state) => InitFunctionMonitor(), new object());
-                    //}
-
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
                     if (entry != null)
                     {
+                        CurrentPicking = null;
+
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
                             var pb = dbApp.ProdOrderBatch.Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
