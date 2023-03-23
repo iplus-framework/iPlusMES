@@ -52,6 +52,7 @@
     <Compile Include="BSOTest.cs" />
     <Compile Include="BSOTest_RemoteFM.cs" />
     <Compile Include="Manager\RemoteFMHelper.cs" />
+    <Compile Include="Model\RemoteFacilityModel.cs" />
     <Compile Include="VXBSOMethodTest.cs" />
     <Compile Include="VXBSOFacilityTest.cs" />
     <Compile Include="VXBSOPropertyTest.cs" />

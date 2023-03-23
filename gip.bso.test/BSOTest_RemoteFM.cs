@@ -55,13 +55,13 @@ namespace gip.bso.test
             }
         }
 
-        private RemoteFacilityManagerInfo _SelectedRemoteFacilityManagerInfo;
+        private RemoteFacilityModel _SelectedRemoteFacilityManagerInfo;
         /// <summary>
         /// Selected property for RemoteFacilityManagerInfo
         /// </summary>
         /// <value>The selected RemoteFacilityManagerInfo</value>
         [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: RemoteFacilityManagerInfo'}de{'TODO: RemoteFacilityManagerInfo'}")]
-        public RemoteFacilityManagerInfo SelectedRemoteFacilityManagerInfo
+        public RemoteFacilityModel SelectedRemoteFacilityManagerInfo
         {
             get
             {
@@ -78,13 +78,13 @@ namespace gip.bso.test
         }
 
 
-        private List<RemoteFacilityManagerInfo> _RemoteFacilityManagerInfoList;
+        private List<RemoteFacilityModel> _RemoteFacilityManagerInfoList;
         /// <summary>
         /// List property for RemoteFacilityManagerInfo
         /// </summary>
         /// <value>The RemoteFacilityManagerInfo list</value>
         [ACPropertyList(9999, "PropertyGroupName")]
-        public List<RemoteFacilityManagerInfo> RemoteFacilityManagerInfoList
+        public List<RemoteFacilityModel> RemoteFacilityManagerInfoList
         {
             get
             {
@@ -107,7 +107,7 @@ namespace gip.bso.test
             IACComponent component = Root.ACUrlCommand(InputRemoteFM) as IACComponent;
             if (component != null && component is ACComponent)
             {
-                RemoteFacilityManagerInfo info = new RemoteFacilityManagerInfo(component as ACComponent);
+                RemoteFacilityModel info = new RemoteFacilityModel(component as ACComponent);
                 RemoteFacilityManagerInfoList.Add(info);
                 OnPropertyChanged(nameof(RemoteFacilityManagerInfoList));
                 SelectedRemoteFacilityManagerInfo = info;
@@ -154,9 +154,9 @@ namespace gip.bso.test
             return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
         }
 
-        private List<RemoteFacilityManagerInfo> LoadRemoteFacilityManagerInfoList()
+        private List<RemoteFacilityModel> LoadRemoteFacilityManagerInfoList()
         {
-            List<RemoteFacilityManagerInfo> rmList = new List<RemoteFacilityManagerInfo>();
+            List<RemoteFacilityModel> rmList = new List<RemoteFacilityModel>();
 
             gip.core.datamodel.ACClass rmClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == "RemoteFacilityManager");
 
@@ -174,7 +174,7 @@ namespace gip.bso.test
             foreach (ACComponent remoteFacilityManager in remoteFacilityManagers)
             {
 
-                RemoteFacilityManagerInfo rm = new RemoteFacilityManagerInfo(remoteFacilityManager);
+                RemoteFacilityModel rm = new RemoteFacilityModel(remoteFacilityManager);
                 rmList.Add(rm);
             }
 
