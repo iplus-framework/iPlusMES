@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\iPlusConfigSetCmdlet.cs" />
+    <Compile Include="ControlScript\ControlSyncEntireClass.cs" />
     <Compile Include="ControlScript\ControlSyncScriptClearCmdlet.cs" />
     <Compile Include="ControlScript\ControlSyncScriptNewCmdlet.cs" />
     <Compile Include="DBSync\DbSyncerInfo.cs" />
