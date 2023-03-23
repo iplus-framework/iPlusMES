@@ -1789,25 +1789,28 @@ namespace gip.mes.processapplication
                             FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
                             if (currentFC != null)
                             {
-                                //Question50089: Was the material with the lot number {0} used up?
-                                return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo,
-                                               currentFC.FacilityLot.LotNo);
+                                double? zeroBookTolerance = currentFC.Material?.ZeroBookingTolerance;
+                                if (zeroBookTolerance.HasValue && Math.Abs(zeroBookTolerance.Value) > double.Epsilon)
+                                {
+                                    double stockAfterBooking = currentFC.StockQuantityUOM - actualQuantity;
+                                    if (zeroBookTolerance > stockAfterBooking)
+                                    {
+                                        isLotConsumed = true;
+                                    }
+                                }
+
+                                if (!isLotConsumed)
+                                {
+                                    //Question50089: Was the material with the lot number {0} used up?
+                                    return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo,
+                                                   currentFC.FacilityLot.LotNo);
+                                }
                             }
                         }
                         else if (isConsumed == LotUsedUpEnum.Yes)
                         {
-                            FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot)
-                                                                           .Include(c => c.Material).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
-                            if (currentFC != null)
-                            {
-                                if (currentFC.StockQuantityUOM > currentFC.Material.ZeroBookingTolerance)
-                                {
-                                    //Question50090: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
-                                    return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo,
-                                                   currentFC.FacilityLot.LotNo);
-                                }
-                                isLotConsumed = true;
-                            }
+                            //Question50090: Are you sure the batch is used up?
+                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo);
                         }
                         else
                         {
@@ -4015,7 +4018,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACMethodInfo("", "en{'Weigh difference'}de{'Unterschiedliche Gewichte'}", 999)]
+        [ACMethodInfo("", "en{'Weigh difference'}de{'Unterschiedliche Gewichte'}", 9999)]
         public virtual Msg WeighDifference()
         {
             Msg msg = null;
