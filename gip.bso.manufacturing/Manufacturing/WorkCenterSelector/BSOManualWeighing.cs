@@ -1122,8 +1122,8 @@ namespace gip.bso.manufacturing
                         Global.MsgResult result = Messages.Question(this, "Question50047", Global.MsgResult.Cancel, false, SelectedFacilityCharge.FacilityChargeNo);
                         if (result == Global.MsgResult.Yes)
                         {
-                            //Question50048: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
-                            // Der Restbestand der Charge (Quant) ist zu groß. Sind Sie sicher dass die Charge aufgebraucht ist?
+                            //Question50048: Are you sure the batch is used up?
+                            // Sind Sie sicher dass die Charge aufgebraucht ist?
                             if (Messages.Question(this, "Question50048", Global.MsgResult.Cancel) == Global.MsgResult.Yes)
                                 _IsLotConsumed = true;
                         }

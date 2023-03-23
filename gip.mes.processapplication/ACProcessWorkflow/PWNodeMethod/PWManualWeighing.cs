@@ -1809,9 +1809,8 @@ namespace gip.mes.processapplication
                         }
                         else if (isConsumed == LotUsedUpEnum.Yes)
                         {
-                            //Question50090: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
-                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo,
-                                            "");
+                            //Question50090: Are you sure the batch is used up?
+                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo);
                         }
                         else
                         {
