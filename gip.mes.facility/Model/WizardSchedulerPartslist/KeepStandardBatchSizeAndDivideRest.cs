@@ -45,7 +45,8 @@ namespace gip.mes.facility
                 Rest = totalSize - (calcBatchCount * calcBatchSize);
                 while (Math.Round(Rest - minBatchSize, 6) > FacilityConst.C_ZeroCompare)
                 {
-                    if ((totalSize - ((calcBatchCount + 1) * calcBatchSize)) < FacilityConst.C_ZeroCompare)
+                    // check for overflow
+                    if (Math.Round((totalSize - ((calcBatchCount + 1) * calcBatchSize)), 6) < 0)
                     {
                         break;
                     }
