@@ -1361,16 +1361,6 @@ namespace gip.bso.manufacturing
         {
             if (_CurrentBatch != null)
             {
-                //try
-                //{
-                //    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoLoad();
-                //    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
-                //}
-                //catch (Exception e)
-                //{
-                //    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist), e);
-                //}
-
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
                     var currentBatch = _CurrentBatch.FromAppContext<ProdOrderBatch>(dbApp);
@@ -1399,16 +1389,6 @@ namespace gip.bso.manufacturing
             }
             else if (_CurrentPicking != null)
             {
-                //try
-                //{
-                //    _CurrentPicking.PickingPos_Picking.AutoLoad();
-                //    _CurrentPicking.PickingPos_Picking.AutoRefresh();
-                //}
-                //catch (Exception e)
-                //{
-                //    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist) + "10", e);
-                //}
-
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
                     var currentPicking = _CurrentPicking.FromAppContext<Picking>(dbApp);
