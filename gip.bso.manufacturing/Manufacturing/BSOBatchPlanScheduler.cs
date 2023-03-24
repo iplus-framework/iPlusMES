@@ -185,6 +185,21 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private ACPropertyConfigValue<double> _RoundingQuantity;
+        [ACPropertyConfig("en{'Rounding Quantity'}de{'Rundungsmenge'}")]
+        public double RoundingQuantity
+        {
+            get
+            {
+                return _RoundingQuantity.ValueT;
+            }
+            set
+            {
+                _RoundingQuantity.ValueT = value;
+            }
+        }
+
+
         #endregion
 
         #region c´tors
@@ -198,8 +213,8 @@ namespace gip.bso.manufacturing
             _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
             _ValidateBatchPlanBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBatchPlanBeforeStart), false);
             _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
-            _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, "PABatchPlanSchedulerURL", "");
-
+            _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, nameof(PABatchPlanSchedulerURL), "");
+            _RoundingQuantity = new ACPropertyConfigValue<double>(this, nameof(RoundingQuantity), 0);
         }
 
         #region c´tors -> ACInit
@@ -229,6 +244,7 @@ namespace gip.bso.manufacturing
             _ = ValidateBatchPlanBeforeStart;
             _ = BSOBatchPlanSchedulerRules;
             _ = PABatchPlanSchedulerURL;
+            _ = RoundingQuantity;
 
             if (ShowImages)
             {
@@ -2956,6 +2972,7 @@ namespace gip.bso.manufacturing
                     DatabaseApp,
                     ProdOrderManager,
                     LocalBSOBatchPlan.VarioConfigManager,
+                    RoundingQuantity,
                     prodOrderBatchPlan.ProdOrderPartslist.Partslist,
                     totalSize,
                     sn,
@@ -2985,6 +3002,7 @@ namespace gip.bso.manufacturing
                 new WizardSchedulerPartslist(DatabaseApp,
                     ProdOrderManager,
                     LocalBSOBatchPlan.VarioConfigManager,
+                    RoundingQuantity,
                     prodOrderBatchPlan.ProdOrderPartslist.Partslist,
                     moveQuantity,
                     sn,
@@ -3073,6 +3091,7 @@ namespace gip.bso.manufacturing
                         DatabaseApp,
                         ProdOrderManager,
                         LocalBSOBatchPlan.VarioConfigManager,
+                        RoundingQuantity,
                         partslist,
                         moveQuantity,
                         1,
@@ -4830,6 +4849,7 @@ namespace gip.bso.manufacturing
                                 DatabaseApp,
                                 ProdOrderManager,
                                 LocalBSOBatchPlan.VarioConfigManager,
+                                RoundingQuantity,
                                 partslistExpand.Partslist,
                                 partslistExpand.TargetQuantityUOM,
                                 sn,
@@ -4843,6 +4863,7 @@ namespace gip.bso.manufacturing
                                 DatabaseApp,
                                 ProdOrderManager,
                                 LocalBSOBatchPlan.VarioConfigManager,
+                                RoundingQuantity,
                                 partslistExpand.Partslist,
                                 partslistExpand.TargetQuantityUOM,
                                 sn,
@@ -4878,6 +4899,7 @@ namespace gip.bso.manufacturing
                             DatabaseApp,
                             ProdOrderManager,
                             LocalBSOBatchPlan.VarioConfigManager,
+                            RoundingQuantity,
                             prodOrderPartslist.Partslist,
                             prodOrderPartslist.TargetQuantity,
                             prodOrderPartslist.Sequence,
@@ -4915,6 +4937,7 @@ namespace gip.bso.manufacturing
                         DatabaseApp,
                         ProdOrderManager,
                         LocalBSOBatchPlan.VarioConfigManager,
+                        RoundingQuantity,
                         partslist,
                         targetQuantity,
                         1,
@@ -4928,6 +4951,7 @@ namespace gip.bso.manufacturing
                                         DatabaseApp,
                                         ProdOrderManager,
                                         LocalBSOBatchPlan.VarioConfigManager,
+                                        RoundingQuantity,
                                         partslist,
                                         targetQuantity,
                                         1,
@@ -5656,7 +5680,7 @@ namespace gip.bso.manufacturing
                     using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
                     {
                         List<ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
-                        e.Result = ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
+                        e.Result = ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, RoundingQuantity, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
                     }
                     break;
                 case BGWorkerMehtod_DoMergeOrders:

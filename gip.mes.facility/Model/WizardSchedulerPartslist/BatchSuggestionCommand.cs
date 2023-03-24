@@ -5,7 +5,7 @@ namespace gip.mes.facility
     public class BatchSuggestionCommand
     {
         #region ctor's
-        public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, double toleranceQuantity)
+        public BatchSuggestionCommand(double roundingQuantity, WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, double toleranceQuantity)
         {
             wizardSchedulerPartslist.BatchPlanSuggestion = new BatchPlanSuggestion(wizardSchedulerPartslist);
             wizardSchedulerPartslist.BatchPlanSuggestion.RestQuantityToleranceUOM = toleranceQuantity;
@@ -24,7 +24,7 @@ namespace gip.mes.facility
                         KeepStandardBatchSizeAndDivideRest suggestion1 = null;
                         do
                         {
-                            suggestion1 = new KeepStandardBatchSizeAndDivideRest(wizardSchedulerPartslist, nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
+                            suggestion1 = new KeepStandardBatchSizeAndDivideRest(roundingQuantity, wizardSchedulerPartslist, nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
                             if (suggestion1 != null)
                             {
                                 if (suggestion1.Suggestion != null)

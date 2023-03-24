@@ -25,18 +25,21 @@ namespace gip.mes.facility
         public DatabaseApp DatabaseApp { get; private set; }
         public ACProdOrderManager ProdOrderManager { get; private set; }
         public ConfigManagerIPlus VarioConfigManager { get; private set; }
+
+        public double RoundingQuantity { get; set; }
         #endregion
 
         #region ctor's
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager)
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity)
         {
             DatabaseApp = databaseApp;
             ProdOrderManager = prodOrderManager;
             VarioConfigManager = configManager;
+            RoundingQuantity = roundingQuantity;
         }
 
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager,
-            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups, MDSchedulingGroup selectedSchedulingGroup = null) : this(databaseApp, prodOrderManager, configManager)
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity,
+            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups, MDSchedulingGroup selectedSchedulingGroup = null) : this(databaseApp, prodOrderManager, configManager, roundingQuantity)
         {
             Partslist = partslist;
             PartslistNo = partslist.PartslistNo;
@@ -58,10 +61,10 @@ namespace gip.mes.facility
         {
             MDSchedulingGroup firstGroupInList = MDSchedulingGroupList.FirstOrDefault();
             if (
-                firstGroupInList != null 
-                && selectedSchedulingGroup != null 
+                firstGroupInList != null
+                && selectedSchedulingGroup != null
                 && MDSchedulingGroupList != null
-                && MDSchedulingGroupList.Select(c=>c.MDSchedulingGroupID).Contains(selectedSchedulingGroup.MDSchedulingGroupID))
+                && MDSchedulingGroupList.Select(c => c.MDSchedulingGroupID).Contains(selectedSchedulingGroup.MDSchedulingGroupID))
             {
                 SelectedMDSchedulingGroup = SortSchedulingGroup(firstGroupInList, selectedSchedulingGroup);
             }
@@ -126,9 +129,9 @@ namespace gip.mes.facility
             return selectedGroup;
         }
 
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager,
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity,
             Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups,
-            ProdOrderPartslist prodOrderPartslist) : this(databaseApp, prodOrderManager, configManager, partslist, targetQuantityUOM, sn, schedulingGroups)
+            ProdOrderPartslist prodOrderPartslist) : this(databaseApp, prodOrderManager, configManager, roundingQuantity, partslist, targetQuantityUOM, sn, schedulingGroups)
         {
             ProgramNo = prodOrderPartslist.ProdOrder.ProgramNo;
             MDProdOrderState = prodOrderPartslist.MDProdOrderState;
@@ -860,7 +863,7 @@ namespace gip.mes.facility
             }
             else if (BatchSuggestionMode != null)
             {
-                BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, BatchSuggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
+                BatchSuggestionCommand cmd = new BatchSuggestionCommand(RoundingQuantity, this, BatchSuggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
             }
             else
             {

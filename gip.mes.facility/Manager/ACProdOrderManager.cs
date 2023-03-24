@@ -1052,12 +1052,12 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, List<ProdOrderPartslist> plsForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, double roundingQuantity, ACComponent routingService, string pwClassName, List<ProdOrderPartslist> plsForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderPartslist item in plsForBatchGenerate)
             {
-                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, routingService, pwClassName, item);
+                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, roundingQuantity, routingService, pwClassName, item);
                 if (tmp != null && tmp.MsgDetails.Any())
                     foreach (Msg msg in tmp.MsgDetails)
                         msgWithDetails.AddDetailMessage(msg);
@@ -1065,7 +1065,7 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, double roundingQuantity, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
@@ -1122,7 +1122,7 @@ namespace gip.mes.facility
                 if (!plHaveBatchPlanOrBatch || differentQuantity)
                 {
                     List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, prodOrderPartslist.Partslist,
+                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, roundingQuantity, prodOrderPartslist.Partslist,
                         prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups, prodOrderPartslist);
 
                     item.LoadConfiguration();

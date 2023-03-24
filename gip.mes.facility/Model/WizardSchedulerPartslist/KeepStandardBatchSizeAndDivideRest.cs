@@ -6,7 +6,7 @@ namespace gip.mes.facility
     {
 
         #region ctor's
-        public KeepStandardBatchSizeAndDivideRest(WizardSchedulerPartslist wizardSchedulerPartslist, int nr, double totalSize, int batchCount, double standardBatchSize, double minBatchSize, double maxBatchSize)
+        public KeepStandardBatchSizeAndDivideRest(double roundingQuantity, WizardSchedulerPartslist wizardSchedulerPartslist, int nr, double totalSize, int batchCount, double standardBatchSize, double minBatchSize, double maxBatchSize)
         {
             int calcBatchCount = 0;
             double calcBatchSize = 0;
@@ -43,10 +43,16 @@ namespace gip.mes.facility
                 calcBatchSize = standardBatchSize;
                 calcBatchCount = 1;
                 Rest = totalSize - (calcBatchCount * calcBatchSize);
-                while (Math.Round(Rest - minBatchSize, 6) > FacilityConst.C_ZeroCompare)
+                double infValue = FacilityConst.C_ZeroCompare;
+                if (roundingQuantity > 0)
                 {
+                    infValue = roundingQuantity;
+                }
+                while (Math.Round(Rest - minBatchSize, 6) > infValue)
+                {
+                    double checkValue = Math.Round((totalSize - ((calcBatchCount + 1) * calcBatchSize)), 6);
                     // check for overflow
-                    if (Math.Round((totalSize - ((calcBatchCount + 1) * calcBatchSize)), 6) < 0)
+                    if (checkValue < 0 && Math.Abs(checkValue) > infValue)
                     {
                         break;
                     }
