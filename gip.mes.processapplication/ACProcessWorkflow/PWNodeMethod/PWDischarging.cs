@@ -47,6 +47,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("SkipPredCount", "en{'Search limit predecessors (- outside of group)'}de{'Begrenzung Vorgängersuche (- ausserhalb von Gruppe)'}");
             method.ParameterValueList.Add(new ACValue("PostingBehaviour", typeof(PostingBehaviourEnum), PostingBehaviourEnum.NotSet, Global.ParamOption.Optional));
             paramTranslation.Add("PostingBehaviour", "en{'Posting behaviour'}de{'Buchungsverhalten'}");
+            method.ParameterValueList.Add(new ACValue("IgnorePredecessors", typeof(string), null, Global.ParamOption.Optional));
+            paramTranslation.Add("IgnorePredecessors", "en{'Ignore predecessor groups'}de{'Ignoriere Vorgangsgruppen'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
@@ -390,6 +392,23 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected string IgnorePredecessors
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("IgnorePredecessors");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsString;
+                    }
+                }
+                return null;
+            }
+        }
+
         protected bool LimitToMaxCapOfDest
         {
             get
@@ -540,7 +559,7 @@ namespace gip.mes.processapplication
             if (SkipIfNoComp)
             {
                 bool hasRunSomeDosings = false;
-                List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this, Math.Abs(SkipPredCount) == 0 ? 40 : SkipPredCount, SkipPredCount >= 0);
+                List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this, SkipPredCount == 0 ? 40 : Math.Abs(SkipPredCount), SkipPredCount >= 0, IgnorePredecessors);
                 if (previousDosings != null)
                     hasRunSomeDosings = previousDosings.Where(c => c.HasRunSomeDosings).Any();
                 if (!hasRunSomeDosings)

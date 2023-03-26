@@ -126,6 +126,7 @@ namespace gip.mes.processapplication
                         if (!posFound)
                             return true;
 
+                        DosingSkipMode skipComponentsMode = SkipComponentsMode;
                         ProdOrderPartslistPosRelation[] queryOpenDosings = OnGetOpenDosingsForNextComponent(dbIPlus, dbApp, intermediateChildPos);
                         if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && queryOpenDosings != null && queryOpenDosings.Any())
                             queryOpenDosings = queryOpenDosings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
@@ -155,6 +156,22 @@ namespace gip.mes.processapplication
                                     OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                     null, null, ExcludedSilos);
                                 IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, module, out possibleSilos);
+
+                                // #SKIPMALZERS
+                                // TODO: This is a temporary solution (Malzers) to prevent skipping dosings and afterwards it will be detected that the other node cannot dose the material.
+                                // See also code below #SKIPMALZERS
+                                if (   (routes == null || !routes.Any())
+                                    && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
+                                {
+                                    RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos);
+                                    IList<Facility> possibleSilos2;
+                                    IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, module, out possibleSilos2);
+                                    if (routes2 != null && routes2.Any())
+                                    {
+                                        routes = routes2;
+                                        possibleSilos = possibleSilos2;
+                                    }
+                                }
 
                                 if (routes != null && routes.Any())
                                 {
@@ -541,7 +558,22 @@ namespace gip.mes.processapplication
                                         }
                                     }
 
+                                    // #SKIPMALZERS
+                                    // This is a temporary solution (Malzers) to prevent skipping dosings and afterwards it will be detected that the other node cannot dose the material.
+                                    // This temporaray solution checks if there are silos where the material is blocked, than the node should wait.
+                                    // TODO: Better solution:
+                                    // Check these other DosingsWF's if they are able to dose this material by checking their Routes.
+                                    // Therefore it has to be determined which Processmodules will be mapped and then checked if the can dose from one of this possible silos
+                                    // if not, then this Dosing node should not be completed, because the dosing has to happen here first.
                                     hasOtherStartableDosingNodes = otherDosingWFs.Any();
+                                    if (hasOtherStartableDosingNodes && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
+                                    {
+                                        RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos);
+                                        IList<Facility> possibleSilos2;
+                                        IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, null, out possibleSilos2);
+                                        if (routes2 != null && routes2.Any())
+                                            hasOtherStartableDosingNodes = false;
+                                    }
                                 }
 
                                 // Versuche nächste Komponente, wenn es noch andere Dosierschritte gibt

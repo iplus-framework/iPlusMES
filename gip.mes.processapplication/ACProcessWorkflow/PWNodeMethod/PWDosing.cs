@@ -1728,13 +1728,14 @@ namespace gip.mes.processapplication
         /// <param name="searchStartsFromNode"></param>
         /// <param name="stopSearchAtType">If null, then search stops at PWNodeOr</param>
         /// <returns></returns>
-        public static List<T> FindPreviousDosingsInPWGroup<T>(PWBase searchStartsFromNode, int maxRecursionDepth = 40, bool onlyInSameGroup = true) where T : IPWNodeReceiveMaterial
+        public static List<T> FindPreviousDosingsInPWGroup<T>(PWBase searchStartsFromNode, int maxRecursionDepth = 40, bool onlyInSameGroup = true, string ignorePredecessorGroups = null) where T : IPWNodeReceiveMaterial
         {
             if (searchStartsFromNode == null)
                 return new List<T>();
             return searchStartsFromNode.FindPredecessors<T>(onlyInSameGroup,
                                                     c => c is T,
-                                                    c => c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any(),
+                                                    c => (  (c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
+                                                         || (!String.IsNullOrEmpty(ignorePredecessorGroups) && c.ACUrl.Contains(ignorePredecessorGroups))),
                                                     maxRecursionDepth);
         }
 

@@ -1152,11 +1152,16 @@ namespace gip.mes.facility
 
             if (onlyContainer)
             {
-                possibleSilos = facilityQuery.FoundSilos
-                                .ToList()
-                                .Distinct()
-                                .Where(c => !c.QryHasBlockedQuants.Any())
-                                .ToList();
+                if (searchMode != SearchMode.AllSilos)
+                {
+                    possibleSilos = facilityQuery.FoundSilos
+                                    .ToList()
+                                    .Distinct()
+                                    .Where(c => !c.QryHasBlockedQuants.Any())
+                                    .ToList();
+                }
+                else
+                    possibleSilos = facilityQuery.FoundSilos.ToList().Distinct().ToList();
             }
             else
             {
