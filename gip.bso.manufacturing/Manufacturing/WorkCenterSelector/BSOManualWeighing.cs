@@ -1489,8 +1489,6 @@ namespace gip.bso.manufacturing
             return temp;
         }
 
-
-
         protected void ActivateScale(IACComponent scale)
         {
             if (scale == null)
@@ -1627,6 +1625,12 @@ namespace gip.bso.manufacturing
                         if (pwNodes == null)
                         {
                             pwNodes = pwGroup.GetChildInstanceInfo(1, new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, TypeOfRoots = refClass });
+                            
+                            if (pwNodes == null)
+                            {
+                                Thread.Sleep(500);
+                                pwNodes = pwGroup.GetChildInstanceInfo(1, new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, TypeOfRoots = refClass });
+                            }
                         }
 
                         refClass.Detach();
@@ -1637,7 +1641,7 @@ namespace gip.bso.manufacturing
                         using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
                         {
                             _CurrentOrderInfoValue = null;
-                            Messages.LogError(this.GetACUrl(), nameof(LoadWFNode) + "(30)", "Returned");
+                            Messages.LogError(this.GetACUrl(), nameof(LoadWFNode) + "(30)", "Returned - pwNodes is null = " + (pwNodes == null) as string);
                             return;
                         }
                     }
@@ -1832,9 +1836,17 @@ namespace gip.bso.manufacturing
                         {
                             queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
+                            Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials) + "(10)", ex);
+                            try
+                            {
+                                queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
+                            }
+                            catch (Exception exc)
+                            {
+                                Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials) + "(15)", exc);
+                            }
                         }
 
                         foreach (vd.ProdOrderPartslistPosRelation rel in queryOpenDosings)
@@ -1845,7 +1857,7 @@ namespace gip.bso.manufacturing
                             }
                             catch (Exception e)
                             {
-                                Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials) + "(20)", e);
                             }
 
                             var valueItem = valueList.FirstOrDefault(c => c.Key == rel.ProdOrderPartslistPosRelationID.ToString());
