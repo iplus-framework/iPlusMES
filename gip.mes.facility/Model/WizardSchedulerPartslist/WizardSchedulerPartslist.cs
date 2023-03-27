@@ -30,7 +30,7 @@ namespace gip.mes.facility
         #endregion
 
         #region ctor's
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity)
+        private WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity)
         {
             DatabaseApp = databaseApp;
             ProdOrderManager = prodOrderManager;
@@ -38,8 +38,17 @@ namespace gip.mes.facility
             RoundingQuantity = roundingQuantity;
         }
 
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity,
-            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups, MDSchedulingGroup selectedSchedulingGroup = null) : this(databaseApp, prodOrderManager, configManager, roundingQuantity)
+        public WizardSchedulerPartslist(DatabaseApp databaseApp,
+                                        ACProdOrderManager prodOrderManager,
+                                        ConfigManagerIPlus configManager,
+                                        double roundingQuantity,
+                                        Partslist partslist,
+                                        double targetQuantityUOM,
+                                        int sn,
+                                        MDBatchPlanGroup selectedBatchPlanGroup,
+                                        List<MDSchedulingGroup> schedulingGroups,
+                                        MDSchedulingGroup selectedSchedulingGroup = null)
+            : this(databaseApp, prodOrderManager, configManager, roundingQuantity)
         {
             Partslist = partslist;
             PartslistNo = partslist.PartslistNo;
@@ -55,6 +64,7 @@ namespace gip.mes.facility
             MDSchedulingGroupList = schedulingGroups;
             DefineSelectedSchedulingGroup(selectedSchedulingGroup);
             ProductionUnitsUOM = partslist.ProductionUnits;
+            SelectedBatchPlanGroup = selectedBatchPlanGroup;
         }
 
         private void DefineSelectedSchedulingGroup(MDSchedulingGroup selectedSchedulingGroup)
@@ -129,9 +139,17 @@ namespace gip.mes.facility
             return selectedGroup;
         }
 
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity,
-            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups,
-            ProdOrderPartslist prodOrderPartslist) : this(databaseApp, prodOrderManager, configManager, roundingQuantity, partslist, targetQuantityUOM, sn, schedulingGroups)
+        public WizardSchedulerPartslist(DatabaseApp databaseApp,
+                                        ACProdOrderManager prodOrderManager,
+                                        ConfigManagerIPlus configManager,
+                                        double roundingQuantity,
+                                        Partslist partslist,
+                                        double targetQuantityUOM,
+                                        int sn,
+                                        List<MDSchedulingGroup> schedulingGroups,
+                                        ProdOrderPartslist prodOrderPartslist)
+            : this(databaseApp, prodOrderManager, configManager, roundingQuantity, partslist,
+                  targetQuantityUOM, sn, null, schedulingGroups)
         {
             ProgramNo = prodOrderPartslist.ProdOrder.ProgramNo;
             MDProdOrderState = prodOrderPartslist.MDProdOrderState;

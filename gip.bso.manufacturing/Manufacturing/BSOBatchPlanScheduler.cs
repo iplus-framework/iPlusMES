@@ -2976,6 +2976,7 @@ namespace gip.bso.manufacturing
                     prodOrderBatchPlan.ProdOrderPartslist.Partslist,
                     totalSize,
                     sn,
+                    SelectedFilterBatchPlanGroup,
                     new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
             wizardSchedulerPartslist.MDProdOrderState = prodOrderBatchPlan.ProdOrderPartslist.MDProdOrderState;
             wizardSchedulerPartslist.ProdOrderPartslistPos = prodOrderBatchPlan.ProdOrderPartslistPos;
@@ -3006,6 +3007,7 @@ namespace gip.bso.manufacturing
                     prodOrderBatchPlan.ProdOrderPartslist.Partslist,
                     moveQuantity,
                     sn,
+                    SelectedFilterBatchPlanGroup,
                     new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
             if (wizardSchedulerPartslist.SelectedMDSchedulingGroup != null)
                 wizardSchedulerPartslist.LoadConfiguration();
@@ -3095,6 +3097,7 @@ namespace gip.bso.manufacturing
                         partslist,
                         moveQuantity,
                         1,
+                        SelectedFilterBatchPlanGroup,
                         new List<MDSchedulingGroup>() { SelectedTargetScheduleForPWNode.MDSchedulingGroup });
                 if (tmpWizardPl.SelectedMDSchedulingGroup != null)
                     tmpWizardPl.LoadConfiguration();
@@ -4867,6 +4870,7 @@ namespace gip.bso.manufacturing
                                 partslistExpand.Partslist,
                                 partslistExpand.TargetQuantityUOM,
                                 sn,
+                                SelectedFilterBatchPlanGroup,
                                 schedulingGroups,
                                 schedulingGroup);
                     }
@@ -4955,6 +4959,7 @@ namespace gip.bso.manufacturing
                                         partslist,
                                         targetQuantity,
                                         1,
+                                        SelectedFilterBatchPlanGroup,
                                         schedulingGroups,
                                         selectedMDSchedulingGroup);
 

@@ -845,7 +845,7 @@ namespace gip.mes.facility
                 prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
 
             //prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
-
+            prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
             return prodOrderBatchPlan;
         }
 
