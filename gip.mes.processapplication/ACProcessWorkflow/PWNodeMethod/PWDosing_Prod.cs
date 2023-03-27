@@ -152,6 +152,8 @@ namespace gip.mes.processapplication
                                 IList<Facility> possibleSilos;
 
                                 PAProcessModule module = ParentPWGroup.AccessedProcessModule != null ? ParentPWGroup.AccessedProcessModule : ParentPWGroup.FirstAvailableProcessModule;
+                                if (module == null && ParentPWGroup.ProcessModuleList != null) // If all occupied, then use first that is generally possible 
+                                    module = ParentPWGroup.ProcessModuleList.FirstOrDefault();
                                 RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                     OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                     null, null, ExcludedSilos);
