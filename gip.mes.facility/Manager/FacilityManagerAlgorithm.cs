@@ -748,6 +748,7 @@ namespace gip.mes.facility
                             inwardFacilityCharge.CloneFrom(BP.ParamsAdjusted.OutwardFacilityCharge, false);
                             if (!BP.IsLotManaged && inwardFacilityCharge.FacilityLot != null)
                                 inwardFacilityCharge.FacilityLot = null;
+                            UpdateExpirationInfo(BP, inwardFacilityCharge);
                             inwardFacilityCharge.Facility = BP.ParamsAdjusted.InwardFacility;
                             inwardFacilityCharge.NotAvailable = false;
                             inwardFacilityCharge.AddToParentsList();
@@ -843,6 +844,7 @@ namespace gip.mes.facility
                             inwardFacilityCharge.CloneFrom(BP.ParamsAdjusted.OutwardFacilityCharge, false);
                             if (!BP.IsLotManaged && inwardFacilityCharge.FacilityLot != null)
                                 inwardFacilityCharge.FacilityLot = null;
+                            UpdateExpirationInfo(BP, inwardFacilityCharge);
                             inwardFacilityCharge.Facility = BP.ParamsAdjusted.InwardFacilityLocation.Facility1_IncomingFacility;
                             inwardFacilityCharge.NotAvailable = false;
                             inwardFacilityCharge.AddToParentsList();
@@ -929,6 +931,7 @@ namespace gip.mes.facility
                         if (BP.InwardPartslist != null)
                             inwardFacilityCharge.Partslist = BP.InwardPartslist;
                         inwardFacilityCharge.AddToParentsList();
+                        UpdateExpirationInfo(BP, inwardFacilityCharge);
                     }
                     else if (inwardFacilityCharge.NotAvailable)
                         inwardFacilityCharge.NotAvailable = false;
@@ -1607,6 +1610,7 @@ namespace gip.mes.facility
                         if (BP.InwardPartslist != null)
                             inwardFacilityCharge.Partslist = BP.InwardPartslist;
                         inwardFacilityCharge.AddToParentsList();
+                        UpdateExpirationInfo(BP, inwardFacilityCharge);
                     }
                     else if (inwardFacilityCharge.NotAvailable)
                         inwardFacilityCharge.NotAvailable = false;
@@ -1639,24 +1643,25 @@ namespace gip.mes.facility
                     // Wenn keine FacilityCharge mit FacilityLot vorhanden
                     if (!facilityInwardChargeSubList.Any())
                     {
-                        FacilityCharge InwardFacilityCharge = null;
+                        FacilityCharge inwardFacilityCharge = null;
                         // Falls alte FacilityCharge rückgesetzt werden kann, wenn im Lager als Nichtvorhanden vorliegt
                         if (BP.IsAutoResetNotAvailable || !BP.ParamsAdjusted.IsLotManaged)
-                            InwardFacilityCharge = TryReactivateInwardFacilityCharge(BP);
+                            inwardFacilityCharge = TryReactivateInwardFacilityCharge(BP);
                         // dann Neuanlage FacilityCharge aus local-Material(B) entweder mit oder ohne FacilityLot (AnonymeCharge)
-                        if (InwardFacilityCharge == null)
-                            InwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
-                        InwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.InwardMaterial, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardFacilityLot, BP.ParamsAdjusted.InwardPartslist, true);
-                        InwardFacilityCharge.NotAvailable = false;
-                        InwardFacilityCharge.Partslist = BP.ParamsAdjusted.InwardPartslist;
+                        if (inwardFacilityCharge == null)
+                            inwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
+                        inwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.InwardMaterial, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardFacilityLot, BP.ParamsAdjusted.InwardPartslist, true);
+                        inwardFacilityCharge.NotAvailable = false;
+                        inwardFacilityCharge.Partslist = BP.ParamsAdjusted.InwardPartslist;
                         // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
-                        InwardFacilityCharge.FillingDate = DateTime.Now;
-                        InwardFacilityCharge.FacilityChargeSortNo = InwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                        inwardFacilityCharge.FillingDate = DateTime.Now;
+                        inwardFacilityCharge.FacilityChargeSortNo = inwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
                         if (BP.InwardSplitNo.HasValue)
-                            InwardFacilityCharge.SplitNo = BP.InwardSplitNo.Value;
+                            inwardFacilityCharge.SplitNo = BP.InwardSplitNo.Value;
+                        UpdateExpirationInfo(BP, inwardFacilityCharge);
 
                         FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
-                        bookingResult = InitFacilityBookingCharge_FromBookingParameter_Inward(BP, FBC, InwardFacilityCharge);
+                        bookingResult = InitFacilityBookingCharge_FromBookingParameter_Inward(BP, FBC, inwardFacilityCharge);
                         if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                             return bookingResult;
 
@@ -1664,9 +1669,9 @@ namespace gip.mes.facility
                         if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                             return bookingResult;
 
-                        facilityInwardChargeSubList.Add(InwardFacilityCharge);
+                        facilityInwardChargeSubList.Add(inwardFacilityCharge);
                         if (cellInwardChargeList != null)
-                            cellInwardChargeList.Add(InwardFacilityCharge);
+                            cellInwardChargeList.Add(inwardFacilityCharge);
                     }
                     // FacilityChargen vorhanden
                     else
@@ -1736,22 +1741,23 @@ namespace gip.mes.facility
                     // Wenn keine FacilityCharge mit FacilityLot vorhanden
                     if (!facilityOutwardChargeSubList.Any())
                     {
-                        FacilityCharge OutwardFacilityCharge = null;
+                        FacilityCharge outwardFacilityCharge = null;
                         // Falls alte FacilityCharge rückgesetzt werden kann, wenn im Lager als Nichtvorhanden vorliegt
                         if (BP.IsAutoResetNotAvailable || !BP.ParamsAdjusted.IsLotManaged)
-                            OutwardFacilityCharge = TryReactivateOutwardFacilityCharge(BP);
+                            outwardFacilityCharge = TryReactivateOutwardFacilityCharge(BP);
                         // dann Neuanlage FacilityCharge aus local-Material(B) entweder mit oder ohne FacilityLot (AnonymeCharge)
-                        if (OutwardFacilityCharge == null)
-                            OutwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
-                        OutwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.OutwardMaterial, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardFacilityLot, BP.ParamsAdjusted.OutwardPartslist, true);
-                        OutwardFacilityCharge.NotAvailable = false;
-                        OutwardFacilityCharge.Partslist = BP.ParamsAdjusted.OutwardPartslist;
+                        if (outwardFacilityCharge == null)
+                            outwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
+                        outwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.OutwardMaterial, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardFacilityLot, BP.ParamsAdjusted.OutwardPartslist, true);
+                        outwardFacilityCharge.NotAvailable = false;
+                        outwardFacilityCharge.Partslist = BP.ParamsAdjusted.OutwardPartslist;
                         // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
-                        OutwardFacilityCharge.FillingDate = DateTime.Now;
-                        OutwardFacilityCharge.FacilityChargeSortNo = OutwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                        outwardFacilityCharge.FillingDate = DateTime.Now;
+                        outwardFacilityCharge.FacilityChargeSortNo = outwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                        UpdateExpirationInfo(BP, outwardFacilityCharge);
 
                         FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
-                        bookingResult = InitFacilityBookingCharge_FromBookingParameter_Outward(BP, FBC, OutwardFacilityCharge);
+                        bookingResult = InitFacilityBookingCharge_FromBookingParameter_Outward(BP, FBC, outwardFacilityCharge);
                         if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                             return bookingResult;
 
@@ -1760,9 +1766,9 @@ namespace gip.mes.facility
                             return bookingResult;
 
                         if (facilityOutwardChargeSubList != null)
-                            facilityOutwardChargeSubList.Add(OutwardFacilityCharge);
+                            facilityOutwardChargeSubList.Add(outwardFacilityCharge);
                         if (cellOutwardChargeList != null)
-                            cellOutwardChargeList.Add(OutwardFacilityCharge);
+                            cellOutwardChargeList.Add(outwardFacilityCharge);
                     }
                     // FacilityChargen vorhanden
                     else
@@ -1848,6 +1854,7 @@ namespace gip.mes.facility
                     // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
                     outwardFacilityCharge.FillingDate = DateTime.Now;
                     outwardFacilityCharge.FacilityChargeSortNo = outwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                    UpdateExpirationInfo(BP, outwardFacilityCharge);
                     facilityOutwardChargeSubList.Add(outwardFacilityCharge);
                 }
                 if (inwardFCListWasEmpty && !BP.ParamsAdjusted.IsLotManaged)
@@ -1866,6 +1873,7 @@ namespace gip.mes.facility
                     // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
                     inwardFacilityCharge.FillingDate = DateTime.Now;
                     inwardFacilityCharge.FacilityChargeSortNo = inwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                    UpdateExpirationInfo(BP, inwardFacilityCharge);
                     facilityInwardChargeSubList.Add(inwardFacilityCharge);
                 }
 

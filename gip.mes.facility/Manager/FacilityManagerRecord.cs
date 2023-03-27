@@ -707,8 +707,18 @@ namespace gip.mes.facility
 
             return Global.ACMethodResultState.Succeeded;
         }
-        
+
         #endregion
         #endregion
+
+        public virtual void UpdateExpirationInfo(ACMethodBooking BP, FacilityCharge facilityCharge)
+        {
+            if (BP.ProductionDate.HasValue)
+                facilityCharge.ProductionDate = BP.ProductionDate.Value;
+            if (BP.ExpirationDate.HasValue)
+                facilityCharge.ExpirationDate = BP.ExpirationDate;
+            if (BP.MinimumDurability.HasValue)
+                facilityCharge.StorageLife = (short) BP.MinimumDurability.Value;
+        }
     }
 }

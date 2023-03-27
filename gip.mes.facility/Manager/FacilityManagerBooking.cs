@@ -1874,6 +1874,7 @@ namespace gip.mes.facility
                     facilityChargeToBook.CloneFrom(stackItem.FacilityCharge, false);
                     facilityChargeToBook.Facility = BP.ParamsAdjusted.InwardFacility;
                     facilityChargeToBook.NotAvailable = false;
+                    UpdateExpirationInfo(BP, facilityChargeToBook);
                     facilityChargeToBook.AddToParentsList();
                     // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
                     facilityChargeToBook.FillingDate = DateTime.Now;
@@ -1940,6 +1941,7 @@ namespace gip.mes.facility
                     facilityChargeToBook.CloneFrom(stackItem.FacilityCharge, false);
                     facilityChargeToBook.Facility = BP.ParamsAdjusted.OutwardFacility;
                     facilityChargeToBook.NotAvailable = false;
+                    UpdateExpirationInfo(BP, facilityChargeToBook);
                     facilityChargeToBook.AddToParentsList();
                     // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
                     facilityChargeToBook.FillingDate = DateTime.Now;

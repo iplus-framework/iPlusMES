@@ -1255,6 +1255,7 @@ namespace gip.mes.processapplication
                             facilityLot = FacilityLot.NewACObject(dbApp, null, secondaryKey);
                             currentBatchPos.FacilityLot = facilityLot;
                         }
+                        facilityLot.UpdateExpirationInfo(currentBatchPos.BookingMaterial);
                     }
 
                     FacilityPreBooking facilityPreBooking = ParentPWMethod<PWMethodProduction>().ProdOrderManager.NewInwardFacilityPreBooking(ParentPWMethod<PWMethodProduction>().ACFacilityManager, dbApp, currentBatchPos);

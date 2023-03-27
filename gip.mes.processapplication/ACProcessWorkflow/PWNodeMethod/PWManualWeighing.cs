@@ -2863,6 +2863,7 @@ namespace gip.mes.processapplication
                                     {
                                         string secondaryKey = Root.NoManager.GetNewNo(db, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
                                         FacilityLot fl = FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                                        fl.UpdateExpirationInfo(material);
                                         fl.Material = material;
                                         bookingParam.InwardFacilityLot = fl;
                                     }
