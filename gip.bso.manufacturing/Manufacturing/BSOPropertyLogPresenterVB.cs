@@ -98,18 +98,17 @@ namespace gip.bso.manufacturing
         {
             if (SelectedItemInTimeline == null || SelectedItemInTimeline.ProgramLog == null)
                 return;
-            OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == SelectedItemInTimeline.ProgramLog.ACProgramLogID);
-            if (currentOrderLog == null)
+            OrderLog orderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == SelectedItemInTimeline.ProgramLog.ACProgramLogID);
+            if (orderLog == null)
             {
                 var programLog = SelectedItemInTimeline.ProgramLog.FromAppContext<gip.mes.datamodel.ACProgramLog>(DatabaseApp);
-                while (currentOrderLog == null && programLog.ACProgramLog1_ParentACProgramLog != null)
+                while (orderLog == null && programLog.ACProgramLog1_ParentACProgramLog != null)
                 {
-                    currentOrderLog = programLog.OrderLog_VBiACProgramLog;
+                    orderLog = programLog.OrderLog_VBiACProgramLog;
                     programLog = programLog.ACProgramLog1_ParentACProgramLog;
                 }
             }
-            if (currentOrderLog == null
-                || (currentOrderLog.ProdOrderPartslistPos == null && currentOrderLog.ProdOrderPartslistPosRelation == null))
+            if (orderLog == null)
                 return;
 
 
@@ -117,7 +116,48 @@ namespace gip.bso.manufacturing
             if (service != null)
             {
                 PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(OrderLog.ClassName, currentOrderLog.VBiACProgramLogID));
+                if (orderLog.ProdOrderPartslistPosID.HasValue)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = orderLog.ProdOrderPartslistPosID.Value,
+                        EntityName = ProdOrderPartslistPos.ClassName
+                    });
+                }
+                if (orderLog.ProdOrderPartslistPosRelationID.HasValue)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = orderLog.ProdOrderPartslistPosRelationID.Value,
+                        EntityName = ProdOrderPartslistPosRelation.ClassName
+                    });
+                }
+                if (orderLog.PickingPosID.HasValue)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = orderLog.PickingPosID.Value,
+                        EntityName = PickingPos.ClassName
+                    });
+                }
+                if (orderLog.FacilityBookingID.HasValue)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = orderLog.FacilityBookingID.Value,
+                        EntityName = FacilityBooking.ClassName
+                    });
+                }
+                if (orderLog.DeliveryNotePosID.HasValue)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = orderLog.DeliveryNotePosID.Value,
+                        EntityName = DeliveryNotePos.ClassName
+                    });
+                }
+                if (!info.Entities.Any())
+                    info.Entities.Add(new PAOrderInfoEntry(OrderLog.ClassName, orderLog.VBiACProgramLogID));
                 service.ShowDialogOrder(this, info);
             }
         }

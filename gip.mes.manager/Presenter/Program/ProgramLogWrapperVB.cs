@@ -55,6 +55,12 @@ namespace gip.mes.manager
                     return orderlog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
                 else if (orderlog.ProdOrderPartslistPosRelation != null)
                     return orderlog.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                else if (orderlog.PickingPos != null)
+                    return orderlog.PickingPos.Picking.PickingNo;
+                else if (orderlog.FacilityBooking != null)
+                    return orderlog.FacilityBooking.FacilityBookingNo;
+                else if (orderlog.DeliveryNotePos != null)
+                    return orderlog.DeliveryNotePos.DeliveryNote.DeliveryNoteNo;
                 return "";
             }
             set
