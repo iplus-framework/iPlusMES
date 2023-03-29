@@ -8,7 +8,7 @@ namespace gip.mes.datamodel
     /// <summary>
     /// 
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'PartslistExpand'}de{'PartslistExpand'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'PartslistExpand'}de{'PartslistExpand'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, true)]
     public class PartslistExpand : ExpandBase
     {
 

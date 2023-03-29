@@ -352,7 +352,7 @@ namespace gip.mes.datamodel
         /// If this component is used with PWManualWeighing, then the Material.ZeroBookingTolerance is used to compare if the complete quant was used up. 
         /// If its in tolerance then the quant will be posted to zero stock.
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Consume entire quant quantity'}de{'Vollständige Quantmenge verbrauchen'}")]
+        [ACPropertyInfo(9999, "", "en{'Consume entire quant quantity'}de{'Vollständige Quantmenge verbrauchen'}", "", true)]
         public bool SuggestQuantQOnPosting
         {
             get

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'ProdOrderPartslistExpand'}de{'ProdOrderPartslistExpand'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'ProdOrderPartslistExpand'}de{'ProdOrderPartslistExpand'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, true)]
     public class ProdOrderPartslistExpand : ExpandBase
     {
 

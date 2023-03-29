@@ -1282,7 +1282,7 @@ namespace gip.bso.masterdata
         #region MaterialWF Selection -> Select, (Current,) List
 
         private MaterialWF _selectedMaterialWF;
-        [ACPropertySelected(9999, MaterialWF.ClassName)]
+        [ACPropertySelected(9999, MaterialWF.ClassName, "en{'Select Workflow'}de{'Workflow auswählen'}", "", true)]
         public MaterialWF SelectedMaterialWF
         {
             get
@@ -1313,7 +1313,7 @@ namespace gip.bso.masterdata
 
         #region MaterialWF Selection -> Methods
 
-        [ACMethodCommand(MaterialWF.ClassName, "en{'Assign Materialworkflow'}de{'Materialworkflow zuweisen'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MaterialWF.ClassName, "en{'Assign Materialworkflow'}de{'Materialworkflow zuweisen'}", (short)MISort.Save, true, Global.ACKinds.MSMethodPrePost)]
         public void SetMaterialWF()
         {
             if (!PreExecute()) return;
@@ -1350,7 +1350,7 @@ namespace gip.bso.masterdata
             PostExecute();
         }
 
-        [ACMethodCommand(MaterialWF.ClassName, "en{'Unassign Materialworkflow'}de{'Materialworkflow entfernen'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MaterialWF.ClassName, "en{'Unassign Materialworkflow'}de{'Materialworkflow entfernen'}", (short)MISort.Save, true, Global.ACKinds.MSMethodPrePost)]
         public void UnSetMaterialWF()
         {
             if (!PreExecute()) return;
@@ -1807,7 +1807,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyCurrent(9999, MDUnit.ClassName)]
+        [ACPropertyCurrent(9999, MDUnit.ClassName, "en{'Unit'}de{'Einheit'}", "", true)]
         public MDUnit CurrentMDUnit
         {
             get
@@ -1828,7 +1828,7 @@ namespace gip.bso.masterdata
         }
 
         MaterialUnit _SelectedMaterialUnit;
-        [ACPropertySelected(9999, "MaterialUnit")]
+        [ACPropertySelected(9999, "MaterialUnit", "en{'Unit'}de{'Einheit'}", "", true)]
         public MaterialUnit SelectedMaterialUnit
         {
             get
@@ -1879,7 +1879,7 @@ namespace gip.bso.masterdata
         }
 
         MDUnit _CurrentProdMDUnit;
-        [ACPropertyCurrent(501, "ProdUnitsMD")]
+        [ACPropertyCurrent(501, "ProdUnitsMD", "en{'Units of Prod'}de{'Einheit Prod'}", "", true)]
         public MDUnit CurrentProdMDUnit
         {
             get
@@ -1897,7 +1897,7 @@ namespace gip.bso.masterdata
         #endregion
 
 
-        [ACPropertySelected(502, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}")]
+        [ACPropertyInfo(502, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}", "", true)]
         public double? ProductionUnits
         {
             get
