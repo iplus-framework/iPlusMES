@@ -197,15 +197,15 @@ namespace gip.mes.processapplication
             }
         }
 
-        public override ACMethod ExecutingACMethod
-        {
-            get
-            {
-                if (_ExecutingACMethod != null)
-                    return _ExecutingACMethod;
-                return base.ExecutingACMethod;
-            }
-        }
+        //public override ACMethod ExecutingACMethod
+        //{
+        //    get
+        //    {
+        //        if (_ExecutingACMethod != null)
+        //            return _ExecutingACMethod;
+        //        return base.ExecutingACMethod;
+        //    }
+        //}
 
         public virtual bool IsManualWeighing => true;
 
