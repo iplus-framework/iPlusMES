@@ -562,6 +562,7 @@ namespace gip.mes.facility
                                             && typeReceiveMat.IsAssignableFrom(c.PWObjectType));
                         if (nodes2CheckForRouting.Any())
                         {
+                            List<IPartslistPosRelation> dosableRelations = new List<IPartslistPosRelation>();
                             foreach (var node2Check in nodes2CheckForRouting)
                             {
                                 if (!node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.Any())
@@ -569,36 +570,40 @@ namespace gip.mes.facility
                                 // Has Parent-PWGroup
                                 if (node2Check.PWNode.ACClassWF1_ParentACClassWF != null)
                                 {
-                                    // Find mappingInfo for PWGroup (which ProcessModules could be used)
-                                    var pwGroup2Check = mapPWGroup2Modules.Where(c => c.PWGroup == node2Check.PWNode.ACClassWF1_ParentACClassWF).FirstOrDefault();
-                                    if (pwGroup2Check != null)
+                                    IPartslistPosRelation[] materialsToCheck = node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.ToArray();
+                                    foreach (var mat4Dosing in materialsToCheck)
                                     {
-                                        IPartslistPosRelation[] materialsToCheck = node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.ToArray();
-                                        foreach (var mat4Dosing in materialsToCheck)
+                                        if (dosableRelations.Contains(mat4Dosing))
+                                            continue;
+                                        if (!IsRouteValidationNeededForPos(mat4Dosing, dbApp, dbIPlus, pList, configStores, mapPosToWFConn, validationBehaviour, detailMessages))
+                                            continue;
+                                        IEnumerable<Route> routes = null;
+                                        // Find mappingInfo for PWGroup (which ProcessModules could be used)
+                                        foreach (var pwGroup2Check in mapPWGroup2Modules.Where(c => c.PWGroup == node2Check.PWNode.ACClassWF1_ParentACClassWF))
                                         {
-                                            if (!IsRouteValidationNeededForPos(mat4Dosing, dbApp, dbIPlus, pList, configStores, mapPosToWFConn, validationBehaviour, detailMessages))
-                                                continue;
-                                            IEnumerable<Route> routes = null;
                                             foreach (var acClassPM in pwGroup2Check.ProcessModuleList)
                                             {
                                                 IList<Facility> possibleSilos;
                                                 routes = GetRoutes(mat4Dosing, dbApp, dbIPlus, acClassPM, SearchMode.AllSilos, null, out possibleSilos, null, null);
                                                 if (routes != null && routes.Any())
-                                                    break;
-                                            }
-                                            if (routes == null || !routes.Any())
-                                            {
-                                                // Keine Route gefunden über die Material {0} {1} dosiert werden könnte.
-                                                detailMessages.AddDetailMessage(new Msg
                                                 {
-                                                    Source = GetACUrl(),
-                                                    MessageLevel = eMsgLevel.Warning,
-                                                    ACIdentifier = "CheckResourcesAndRouting(20)",
-                                                    Message = Root.Environment.TranslateMessage(this, "Warning50016",
-                                                                    mat4Dosing.I_SourcePartslistPos.Material.MaterialNo,
-                                                                    mat4Dosing.I_SourcePartslistPos.Material.MaterialName1)
-                                                });
+                                                    dosableRelations.Add(mat4Dosing);
+                                                    break;
+                                                }
                                             }
+                                        }
+                                        if (routes == null || !routes.Any())
+                                        {
+                                            // Keine Route gefunden über die Material {0} {1} dosiert werden könnte.
+                                            detailMessages.AddDetailMessage(new Msg
+                                            {
+                                                Source = GetACUrl(),
+                                                MessageLevel = eMsgLevel.Warning,
+                                                ACIdentifier = "CheckResourcesAndRouting(20)",
+                                                Message = Root.Environment.TranslateMessage(this, "Warning50016",
+                                                                mat4Dosing.I_SourcePartslistPos.Material.MaterialNo,
+                                                                mat4Dosing.I_SourcePartslistPos.Material.MaterialName1)
+                                            });
                                         }
                                     }
                                 }

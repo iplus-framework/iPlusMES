@@ -1730,13 +1730,76 @@ namespace gip.mes.processapplication
             return base.GetPAOrderInfo();
         }
 
-#endregion
 
-#region Interaction
-        /// <summary>
-        /// Method is named "Stopp" (StopProcess) because Stop()-MEthod already exists in ACComponent
-        /// </summary>
-        [ACMethodInteraction("Process", "en{'Stop'}de{'Stoppen'}", (short)MISort.Stop, true, "", Global.ACKinds.MSMethod, false, Global.ContextMenuCategory.ProcessCommands)]
+        protected void ResetPlanningWaitOnFollowingPlanningNode()
+        {
+            gip.core.datamodel.ACClass refPAAClass = RefACClassOfContentWF;
+            if (refPAAClass == null)
+                return;
+
+            PWNodeProcessWorkflowVB[] otherPlanningNodes = null;
+            var query = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
+            if (query == null || !query.Any())
+                return;
+            query = query.Where(c => c.InitState == ACInitState.Initialized);
+            Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) =>
+            {
+                return RefACClassOfContentWF?.ACProjectID == refPAAClass.ACProjectID;
+            };
+
+            // Search for other Planning-Nodes which can be considered for priorization
+            otherPlanningNodes = query.Where(c => c != this
+                        // 1. Compare RootPW: If there are more Planning-Nodes inside this Planning-Worflow, than ignore them because the mustn't be compared, because they starts other subworkflows:
+                        && c.RootPW != this.RootPW
+                        // 2. Compares Applicationdefinition-Project: If subworkflow that should be started is from another application-definition than this one, than priorisation-check makes no sense:
+                        && safeAccessToAppDefinition(c)
+                        // 3. Wether SchedulingGroup ist assigned to node, then priorization is done via SchedulingGroup
+                        //    else Compares if the planning node produces another Intermediate-product. If yes, than the subworkflow needs other resources to start. 
+                        //    Therefore the planning node can also be ignored for prirorization
+                        && ((this.MDSchedulingGroup != null
+                                && c.MDSchedulingGroup != null
+                                && this.MDSchedulingGroup.MDSchedulingGroupID == c.MDSchedulingGroup.MDSchedulingGroupID)
+                            || (this.MDSchedulingGroup == null
+                                && this.MaterialWFConnection != null
+                                && c.MaterialWFConnection != null
+                                && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID)
+                            || (this.CurrentPicking != null
+                                && this.CurrentPicking.ACClassMethodID.HasValue
+                                && c.CurrentPicking != null
+                                && c.CurrentPicking.ACClassMethodID.HasValue
+                                && c.CurrentPicking.ACClassMethodID == c.CurrentPicking.ACClassMethodID))
+                        ).ToArray();
+
+            if (otherPlanningNodes == null || !otherPlanningNodes.Any())
+                return;
+            var rootPW = this.RootPW;
+
+            var thisAppProject4Starting = this.FirstInvokableTaskExecutor;
+            if (thisAppProject4Starting == null)
+                return;
+
+            bool canStartIfPredecessorIsStopping = this.CanStartIfPredecessorIsStopping;
+            bool compareOnlySameACIdentifers = CompareOnlySameACIdentifers;
+            var sortedPlanningNodes = otherPlanningNodes
+                .Where(c =>     // 1. Consider only which should run on the same application-project
+                                c.FirstInvokableTaskExecutor == thisAppProject4Starting
+                            // 2. Consider only those that was not started
+                            && (c.IterationCount.ValueT <= 0
+                                // 3. And those that are currently running and have started already one subworkflow
+                                || (c.CurrentACState != ACStateEnum.SMIdle && c.CurrentACState != ACStateEnum.SMBreakPoint && c.CurrentACState != ACStateEnum.SMBreakPointStart)
+                            && (!compareOnlySameACIdentifers || c.ACIdentifier == this.ACIdentifier)
+                            )
+                )
+                .OrderBy(c => c.PriorityTime)
+                .ToArray();
+        }
+        #endregion
+
+        #region Interaction
+            /// <summary>
+            /// Method is named "Stopp" (StopProcess) because Stop()-MEthod already exists in ACComponent
+            /// </summary>
+            [ACMethodInteraction("Process", "en{'Stop'}de{'Stoppen'}", (short)MISort.Stop, true, "", Global.ACKinds.MSMethod, false, Global.ContextMenuCategory.ProcessCommands)]
         public virtual void Stopp()
         {
             if (!IsEnabledStopp())
