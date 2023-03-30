@@ -6,8 +6,7 @@ using System.Runtime.Serialization;
 
 namespace gip.mes.datamodel
 {
-    [DataContract]
-    [Serializable]
+    [CollectionDataContract]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioSystem, "en{'OperationLogItemList'}de{'OperationLogItemList'}", Global.ACKinds.TACClass)]
     public class OperationLogItemList : ObservableCollection<OperationLogItem>, ICyclicRefreshableCollection

@@ -114,6 +114,16 @@ namespace gip.mes.datamodel
             }
         }
 
+        [IgnoreDataMember]
+        [ACPropertyInfo(12, nameof(OperationitemTimeStatusShort), ConstApp.OperationitemTimeStatus)]
+        public short OperationitemTimeStatusShort
+        {
+            get
+            {
+                return (short)OperationitemTimeStatus;
+            }
+        }
+
         #endregion
 
         #region INotifyPropertyChanged
