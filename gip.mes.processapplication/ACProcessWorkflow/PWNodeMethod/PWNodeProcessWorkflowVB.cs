@@ -41,6 +41,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("BatchSizeLoss", "en{'Batchsize inputdependant (Lossreduction)'}de{'Batchgröße einsatzabhängig (reduziert um Verlust)'}");
             method.ParameterValueList.Add(new ACValue("AlarmOnCompleted", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AlarmOnCompleted", "en{'Alarm on completed batch plan'}de{'Alarmmeldung wenn Batchplan abgearbeitet'}");
+            method.ParameterValueList.Add(new ACValue("MaxIteration", typeof(UInt32), false, Global.ParamOption.Optional));
+            paramTranslation.Add("MaxIteration", "en{'Max. iterations'}de{'Maximale Wiederholungen'}");
 
 
             #region Batch Duration Planning - Forecast Scheduler - Params
@@ -474,6 +476,22 @@ namespace gip.mes.processapplication
             }
         }
 
+        public UInt32 MaxIteration
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("MaxIteration");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsUInt32;
+                    }
+                }
+                return 0;
+            }
+        }
 
         #endregion  
 
@@ -1335,178 +1353,183 @@ namespace gip.mes.processapplication
 
             ResetPlanningWait();
 
-            if (!IgnoreFIFO && !WillReadAndStartNextBatchCompleteNode())
-            {
-                gip.core.datamodel.ACClass refPAAClass = RefACClassOfContentWF;
-
-                if (refPAAClass == null)
-                {
-                    //Error50169: ContentACClassWF.RefPAACClass is null.
-                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "HandleStartNextBatch(0)", 1000, "Error50169");
-                    
-                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                        Messages.LogError(this.GetACUrl(), "HandleStartNextBatch(0)", msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-
-                    return;
-                }
-
-                //perfEvent = vbDump != null ? vbDump.PerfLoggerStart(loggerInstance, 100) : null;
-
-                bool canStartIfPredecessorIsStopping = this.CanStartIfPredecessorIsStopping;
-                bool compareOnlySameACIdentifers = CompareOnlySameACIdentifers;
-                PWNodeProcessWorkflowVB[] otherPlanningNodes = null;
-                /// Überprüfe ob es Planungsschritte in anderen Planungsworkflows gibt, die eine höhere Priorität haben
-                // Finde alle Planungsschritte die nicht meinem Auftrag angehören 
-                var query = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
-                if (query != null && query.Any())
-                {
-                    query = query.Where(c => c.InitState == ACInitState.Initialized);
-                    Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) => {
-                        return RefACClassOfContentWF?.ACProjectID == refPAAClass.ACProjectID;
-                        //using (ACMonitor.Lock(ContextLockForACClassWF))
-                        //{
-                        //    return     c.ContentACClassWF.RefPAACClass != null
-                        //            && c.ContentACClassWF.RefPAACClass.ACProjectID == refPAAClass.ACProjectID;
-                        //}
-                    };
-
-                    // Search for other Planning-Nodes which can be considered for priorization
-                    otherPlanningNodes = query.Where(c => c != this
-                                // 1. Compare RootPW: If there are more Planning-Nodes inside this Planning-Worflow, than ignore them because the mustn't be compared, because they starts other subworkflows:
-                                && c.RootPW != this.RootPW
-                                // 2. Compares Applicationdefinition-Project: If subworkflow that should be started is from another application-definition than this one, than priorisation-check makes no sense:
-                                && safeAccessToAppDefinition(c)
-                                // 3. Wether SchedulingGroup ist assigned to node, then priorization is done via SchedulingGroup
-                                //    else Compares if the planning node produces another Intermediate-product. If yes, than the subworkflow needs other resources to start. 
-                                //    Therefore the planning node can also be ignored for prirorization
-                                && (  (    this.MDSchedulingGroup != null 
-                                        && c.MDSchedulingGroup != null 
-                                        && this.MDSchedulingGroup.MDSchedulingGroupID == c.MDSchedulingGroup.MDSchedulingGroupID)
-                                   || (    this.MDSchedulingGroup == null 
-                                        && this.MaterialWFConnection != null
-                                        && c.MaterialWFConnection != null 
-                                        && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID)
-                                   || (    this.CurrentPicking != null 
-                                        && this.CurrentPicking.ACClassMethodID.HasValue
-                                        && c.CurrentPicking != null
-                                        && c.CurrentPicking.ACClassMethodID.HasValue
-                                        && c.CurrentPicking.ACClassMethodID == c.CurrentPicking.ACClassMethodID) )
-                                ).ToArray();
-
-                }
-
-                // Priorization-Check only if there other other nodes. Else subworkflow can be started.
-                if (otherPlanningNodes != null && otherPlanningNodes.Any())
-                {
-                    var rootPW = this.RootPW;
-
-                    // Determine the Application-Project, where Subworkflow must be started depending on the Routing-Rules (Which Production-Line) 
-                    var thisAppProject4Starting = this.FirstInvokableTaskExecutor;
-                    // If this Reference is null, then ConfigStores are not loaded completely => wait!
-                    if (thisAppProject4Starting == null)
-                    {
-                        SubscribeToProjectWorkCycle();
-                        return;
-                    }
-
-                    // Make a priorized List that's sorted by PriorityTime
-                    // Consider only the not started nodes (IterationCount.ValueT <= 0) and which are active (This means: Ignore Planing nodes that are completed (IterationCount.ValueT >= 1)
-                    // and active planning nodes
-                    var sortedPlanningNodes = otherPlanningNodes
-                        .Where(c =>     // 1. Consider only which should run on the same application-project
-                                        c.FirstInvokableTaskExecutor == thisAppProject4Starting
-                                    // 2. Consider only those that was not started
-                                    && (c.IterationCount.ValueT <= 0
-                                        // 3. And those that are currently running and have started already one subworkflow
-                                        || (c.CurrentACState != ACStateEnum.SMIdle && c.CurrentACState != ACStateEnum.SMBreakPoint && c.CurrentACState != ACStateEnum.SMBreakPointStart))
-                        )
-                        .OrderBy(c => c.PriorityTime)
-                        .ToArray();
-                    foreach (var otherPriorPlanningNode in sortedPlanningNodes)
-                    {
-                        // Dieser Knoten darf nur dann gestartet werden, wenn es keinen früher gestarteten Knoten gibt der nocht nicht alle seiner Batche gestartet hat
-                        if (otherPriorPlanningNode != null
-                            && otherPriorPlanningNode.PriorityTime < this.PriorityTime
-                            && !otherPriorPlanningNode.CurrentACSubState.HasFlag(ACSubStateEnum.SMAllowFollowingNode2Start))
-                        {
-                            // Option "compareOnlySameACIdentifers": If other node has another ACIdentifier, than ignore it for priorization
-                            if (compareOnlySameACIdentifers && otherPriorPlanningNode.ACIdentifier != this.ACIdentifier)
-                                continue;
-
-                            // Option "canStartIfPredecessorIsStopping": If other node is in Stopping-State, than this node can start.
-                            if (   canStartIfPredecessorIsStopping 
-                                && (   (otherPriorPlanningNode.CurrentACState >= ACStateEnum.SMCompleted && otherPriorPlanningNode.CurrentACState <= ACStateEnum.SMResetting) // Node has already started it's batches an waits till last subworkflow has completed
-                                    || (otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IterationCount.ValueT > 0)) // Node has already started it's batches an waits for a new batchplan
-                               )
-                               continue;
-
-                            // Option "SkipWaitingNodes":  If other node waits, because no batchplan was defined for it, than this node can be priorized
-                            if ( (   (otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IsInPlanningWait)
-                                   || otherPriorPlanningNode.CurrentACState == ACStateEnum.SMPaused)
-                                && SkipWaitingNodes)
-                                continue;
-
-                            using (ACMonitor.Lock(_20015_LockValue))
-                            {
-                                _PlanningWait = DateTime.Now.AddSeconds(30);
-                            }
-                            SubscribeToProjectWorkCycle();
-                            // TODO: Message for user
-                            return;
-                        }
-                    }
-                }
-            }
-
             ProdOrderBatchPlan batchPlanToStart = null;
             ProdOrderBatch nextBatch = null;
             ProdOrderPartslistPos newChildPosForBatch = null;
             PickingPos nextPickingPos = null;
-
             StartNextBatchResult result = StartNextBatchResult.Done;
-            if (IsProduction)
-            {
-                bool isLastBatch = false;
-                Guid? startNextBatchAtProjectID1;
-                result = ReadAndStartNextBatch(out batchPlanToStart, out nextBatch, out newChildPosForBatch, out startNextBatchAtProjectID1, out isLastBatch);
-                StartNextBatchAtProjectID1 = startNextBatchAtProjectID1;
-                if (newChildPosForBatch != null)
-                {
-                    NewChildPosForBatch_ProdOrderPartslistPosID = newChildPosForBatch.ProdOrderPartslistPosID;
-                    IsLastBatch2Start = isLastBatch ? (Int16)PADosingLastBatchEnum.LastBatch : (Int16)PADosingLastBatchEnum.None;
-                }
-            }
-            else if (IsTransport)
-            {
-                Picking picking = CurrentPicking;
-                bool isLastBatch = false;
-                if (picking != null)
-                {
-                    Guid? startNextBatchAtProjectID1;
-                    Guid? startNextBatchAtProjectID2;
 
-                    result = ReadAndStartNextBatch(picking, out nextPickingPos, out startNextBatchAtProjectID1, out startNextBatchAtProjectID2, out isLastBatch);
-                    StartNextBatchAtProjectID1 = startNextBatchAtProjectID1;
-                    StartNextBatchAtProjectID2 = startNextBatchAtProjectID2;
-                    if (nextPickingPos != null)
+            bool maxIterationsReached = MaxIteration > 0 && IterationCount.ValueT >= MaxIteration;
+            if (!maxIterationsReached)
+            {
+                if (!IgnoreFIFO && !WillReadAndStartNextBatchCompleteNode())
+                {
+                    gip.core.datamodel.ACClass refPAAClass = RefACClassOfContentWF;
+
+                    if (refPAAClass == null)
                     {
-                        NewChildPosForBatch_PickingPosID = nextPickingPos.PickingPosID;
+                        //Error50169: ContentACClassWF.RefPAACClass is null.
+                        Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "HandleStartNextBatch(0)", 1000, "Error50169");
+
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogError(this.GetACUrl(), "HandleStartNextBatch(0)", msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+
+                        return;
+                    }
+
+                    //perfEvent = vbDump != null ? vbDump.PerfLoggerStart(loggerInstance, 100) : null;
+
+                    bool canStartIfPredecessorIsStopping = this.CanStartIfPredecessorIsStopping;
+                    bool compareOnlySameACIdentifers = CompareOnlySameACIdentifers;
+                    PWNodeProcessWorkflowVB[] otherPlanningNodes = null;
+                    /// Überprüfe ob es Planungsschritte in anderen Planungsworkflows gibt, die eine höhere Priorität haben
+                    // Finde alle Planungsschritte die nicht meinem Auftrag angehören 
+                    var query = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
+                    if (query != null && query.Any())
+                    {
+                        query = query.Where(c => c.InitState == ACInitState.Initialized);
+                        Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) =>
+                        {
+                            return RefACClassOfContentWF?.ACProjectID == refPAAClass.ACProjectID;
+                            //using (ACMonitor.Lock(ContextLockForACClassWF))
+                            //{
+                            //    return     c.ContentACClassWF.RefPAACClass != null
+                            //            && c.ContentACClassWF.RefPAACClass.ACProjectID == refPAAClass.ACProjectID;
+                            //}
+                        };
+
+                        // Search for other Planning-Nodes which can be considered for priorization
+                        otherPlanningNodes = query.Where(c => c != this
+                                    // 1. Compare RootPW: If there are more Planning-Nodes inside this Planning-Worflow, than ignore them because the mustn't be compared, because they starts other subworkflows:
+                                    && c.RootPW != this.RootPW
+                                    // 2. Compares Applicationdefinition-Project: If subworkflow that should be started is from another application-definition than this one, than priorisation-check makes no sense:
+                                    && safeAccessToAppDefinition(c)
+                                    // 3. Wether SchedulingGroup ist assigned to node, then priorization is done via SchedulingGroup
+                                    //    else Compares if the planning node produces another Intermediate-product. If yes, than the subworkflow needs other resources to start. 
+                                    //    Therefore the planning node can also be ignored for prirorization
+                                    && ((this.MDSchedulingGroup != null
+                                            && c.MDSchedulingGroup != null
+                                            && this.MDSchedulingGroup.MDSchedulingGroupID == c.MDSchedulingGroup.MDSchedulingGroupID)
+                                       || (this.MDSchedulingGroup == null
+                                            && this.MaterialWFConnection != null
+                                            && c.MaterialWFConnection != null
+                                            && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID)
+                                       || (this.CurrentPicking != null
+                                            && this.CurrentPicking.ACClassMethodID.HasValue
+                                            && c.CurrentPicking != null
+                                            && c.CurrentPicking.ACClassMethodID.HasValue
+                                            && c.CurrentPicking.ACClassMethodID == c.CurrentPicking.ACClassMethodID))
+                                    ).ToArray();
+
+                    }
+
+                    // Priorization-Check only if there other other nodes. Else subworkflow can be started.
+                    if (otherPlanningNodes != null && otherPlanningNodes.Any())
+                    {
+                        var rootPW = this.RootPW;
+
+                        // Determine the Application-Project, where Subworkflow must be started depending on the Routing-Rules (Which Production-Line) 
+                        var thisAppProject4Starting = this.FirstInvokableTaskExecutor;
+                        // If this Reference is null, then ConfigStores are not loaded completely => wait!
+                        if (thisAppProject4Starting == null)
+                        {
+                            SubscribeToProjectWorkCycle();
+                            return;
+                        }
+
+                        // Make a priorized List that's sorted by PriorityTime
+                        // Consider only the not started nodes (IterationCount.ValueT <= 0) and which are active (This means: Ignore Planing nodes that are completed (IterationCount.ValueT >= 1)
+                        // and active planning nodes
+                        var sortedPlanningNodes = otherPlanningNodes
+                            .Where(c =>     // 1. Consider only which should run on the same application-project
+                                            c.FirstInvokableTaskExecutor == thisAppProject4Starting
+                                        // 2. Consider only those that was not started
+                                        && (c.IterationCount.ValueT <= 0
+                                            // 3. And those that are currently running and have started already one subworkflow
+                                            || (c.CurrentACState != ACStateEnum.SMIdle && c.CurrentACState != ACStateEnum.SMBreakPoint && c.CurrentACState != ACStateEnum.SMBreakPointStart))
+                            )
+                            .OrderBy(c => c.PriorityTime)
+                            .ToArray();
+                        foreach (var otherPriorPlanningNode in sortedPlanningNodes)
+                        {
+                            // Dieser Knoten darf nur dann gestartet werden, wenn es keinen früher gestarteten Knoten gibt der nocht nicht alle seiner Batche gestartet hat
+                            if (otherPriorPlanningNode != null
+                                && otherPriorPlanningNode.PriorityTime < this.PriorityTime
+                                && !otherPriorPlanningNode.CurrentACSubState.HasFlag(ACSubStateEnum.SMAllowFollowingNode2Start))
+                            {
+                                // Option "compareOnlySameACIdentifers": If other node has another ACIdentifier, than ignore it for priorization
+                                if (compareOnlySameACIdentifers && otherPriorPlanningNode.ACIdentifier != this.ACIdentifier)
+                                    continue;
+
+                                // Option "canStartIfPredecessorIsStopping": If other node is in Stopping-State, than this node can start.
+                                if (canStartIfPredecessorIsStopping
+                                    && ((otherPriorPlanningNode.CurrentACState >= ACStateEnum.SMCompleted && otherPriorPlanningNode.CurrentACState <= ACStateEnum.SMResetting) // Node has already started it's batches an waits till last subworkflow has completed
+                                        || (otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IterationCount.ValueT > 0)) // Node has already started it's batches an waits for a new batchplan
+                                   )
+                                    continue;
+
+                                // Option "SkipWaitingNodes":  If other node waits, because no batchplan was defined for it, than this node can be priorized
+                                if (((otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IsInPlanningWait)
+                                       || otherPriorPlanningNode.CurrentACState == ACStateEnum.SMPaused)
+                                    && SkipWaitingNodes)
+                                    continue;
+
+                                using (ACMonitor.Lock(_20015_LockValue))
+                                {
+                                    _PlanningWait = DateTime.Now.AddSeconds(30);
+                                }
+                                SubscribeToProjectWorkCycle();
+                                // TODO: Message for user
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (IsProduction)
+                {
+                    bool isLastBatch = false;
+                    Guid? startNextBatchAtProjectID1;
+                    result = ReadAndStartNextBatch(out batchPlanToStart, out nextBatch, out newChildPosForBatch, out startNextBatchAtProjectID1, out isLastBatch);
+                    StartNextBatchAtProjectID1 = startNextBatchAtProjectID1;
+                    if (newChildPosForBatch != null)
+                    {
+                        NewChildPosForBatch_ProdOrderPartslistPosID = newChildPosForBatch.ProdOrderPartslistPosID;
                         IsLastBatch2Start = isLastBatch ? (Int16)PADosingLastBatchEnum.LastBatch : (Int16)PADosingLastBatchEnum.None;
                     }
                 }
-            }
-
-            if (result == StartNextBatchResult.CycleWait)
-            {
-                CurrentACSubState = ACSubStateEnum.SMIdle;
-
-                using (ACMonitor.Lock(_20015_LockValue))
+                else if (IsTransport)
                 {
-                    _PlanningWait = DateTime.Now.AddSeconds(30);
+                    Picking picking = CurrentPicking;
+                    bool isLastBatch = false;
+                    if (picking != null)
+                    {
+                        Guid? startNextBatchAtProjectID1;
+                        Guid? startNextBatchAtProjectID2;
+
+                        result = ReadAndStartNextBatch(picking, out nextPickingPos, out startNextBatchAtProjectID1, out startNextBatchAtProjectID2, out isLastBatch);
+                        StartNextBatchAtProjectID1 = startNextBatchAtProjectID1;
+                        StartNextBatchAtProjectID2 = startNextBatchAtProjectID2;
+                        if (nextPickingPos != null)
+                        {
+                            NewChildPosForBatch_PickingPosID = nextPickingPos.PickingPosID;
+                            IsLastBatch2Start = isLastBatch ? (Int16)PADosingLastBatchEnum.LastBatch : (Int16)PADosingLastBatchEnum.None;
+                        }
+                    }
                 }
-                SubscribeToProjectWorkCycle();
-                return;
+
+                if (result == StartNextBatchResult.CycleWait)
+                {
+                    CurrentACSubState = ACSubStateEnum.SMIdle;
+
+                    using (ACMonitor.Lock(_20015_LockValue))
+                    {
+                        _PlanningWait = DateTime.Now.AddSeconds(30);
+                    }
+                    SubscribeToProjectWorkCycle();
+                    return;
+                }
             }
             UnSubscribeToProjectWorkCycle();
 
@@ -1522,13 +1545,16 @@ namespace gip.mes.processapplication
                     else
                         InformSchedulerOnStateChange();
 
-                    if (   (StartNextStage == StartNextStageMode.StartImmediately && this.IterationCount.ValueT == 1)
-                        || (StartNextStage == StartNextStageMode.StartOnStartSecondBatch && this.IterationCount.ValueT == 2)
-                        || (StartNextStage == StartNextStageMode.StartOnFirstBatchCompleted && _LastCallbackResult != null && this.IterationCount.ValueT == 2)
+                    if (IsProduction 
+                        && (   (StartNextStage == StartNextStageMode.StartImmediately && this.IterationCount.ValueT == 1)
+                            || (StartNextStage == StartNextStageMode.StartOnStartSecondBatch && this.IterationCount.ValueT == 2)
+                            || (StartNextStage == StartNextStageMode.StartOnFirstBatchCompleted && _LastCallbackResult != null && this.IterationCount.ValueT == 2))
                         )
                     {
                         StartPOListOfNextStage(nextBatch, newChildPosForBatch);
                     }
+                    if (MaxIteration > 0 && IterationCount.ValueT >= MaxIteration)
+                        Stopp();
                     return;
                 }
                 else
@@ -1585,7 +1611,7 @@ namespace gip.mes.processapplication
                 {
                     ParallelNodeStats stats = GetParallelNodeStats();
                     CurrentACSubState = ACSubStateEnum.SMIdle;
-                    if (!stats.AreOtherParallelNodesCompletable && IsProduction)
+                    if (!maxIterationsReached && !stats.AreOtherParallelNodesCompletable && IsProduction)
                     {
                         using (ACMonitor.Lock(_20015_LockValue))
                         {
@@ -1632,6 +1658,8 @@ namespace gip.mes.processapplication
 
         public override void SMCompleted()
         {
+            if (LastACState != ACStateEnum.SMStarting)
+                ResetPlanningWaitOnFollowingPlanningNodes();
             base.SMCompleted();
         }
 
@@ -1731,80 +1759,95 @@ namespace gip.mes.processapplication
         }
 
 
-        protected void ResetPlanningWaitOnFollowingPlanningNode()
+        protected void ResetPlanningWaitOnFollowingPlanningNodes()
         {
-            gip.core.datamodel.ACClass refPAAClass = RefACClassOfContentWF;
-            if (refPAAClass == null)
-                return;
-
-            PWNodeProcessWorkflowVB[] otherPlanningNodes = null;
-            var query = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
-            if (query == null || !query.Any())
-                return;
-            query = query.Where(c => c.InitState == ACInitState.Initialized);
-            Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) =>
+            try
             {
-                return RefACClassOfContentWF?.ACProjectID == refPAAClass.ACProjectID;
-            };
+                gip.core.datamodel.ACClass refPAAClass = RefACClassOfContentWF;
+                if (refPAAClass == null)
+                    return;
 
-            // Search for other Planning-Nodes which can be considered for priorization
-            otherPlanningNodes = query.Where(c => c != this
-                        // 1. Compare RootPW: If there are more Planning-Nodes inside this Planning-Worflow, than ignore them because the mustn't be compared, because they starts other subworkflows:
-                        && c.RootPW != this.RootPW
-                        // 2. Compares Applicationdefinition-Project: If subworkflow that should be started is from another application-definition than this one, than priorisation-check makes no sense:
-                        && safeAccessToAppDefinition(c)
-                        // 3. Wether SchedulingGroup ist assigned to node, then priorization is done via SchedulingGroup
-                        //    else Compares if the planning node produces another Intermediate-product. If yes, than the subworkflow needs other resources to start. 
-                        //    Therefore the planning node can also be ignored for prirorization
-                        && ((this.MDSchedulingGroup != null
-                                && c.MDSchedulingGroup != null
-                                && this.MDSchedulingGroup.MDSchedulingGroupID == c.MDSchedulingGroup.MDSchedulingGroupID)
-                            || (this.MDSchedulingGroup == null
-                                && this.MaterialWFConnection != null
-                                && c.MaterialWFConnection != null
-                                && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID)
-                            || (this.CurrentPicking != null
-                                && this.CurrentPicking.ACClassMethodID.HasValue
-                                && c.CurrentPicking != null
-                                && c.CurrentPicking.ACClassMethodID.HasValue
-                                && c.CurrentPicking.ACClassMethodID == c.CurrentPicking.ACClassMethodID))
-                        ).ToArray();
+                PWNodeProcessWorkflowVB[] otherPlanningNodes = null;
+                var query = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
+                if (query == null || !query.Any())
+                    return;
+                query = query.Where(c => c.InitState == ACInitState.Initialized);
+                Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) =>
+                {
+                    return RefACClassOfContentWF?.ACProjectID == refPAAClass.ACProjectID;
+                };
 
-            if (otherPlanningNodes == null || !otherPlanningNodes.Any())
-                return;
-            var rootPW = this.RootPW;
+                // Search for other Planning-Nodes which can be considered for priorization
+                otherPlanningNodes = query.Where(c => c != this
+                            // 1. Compare RootPW: If there are more Planning-Nodes inside this Planning-Worflow, than ignore them because the mustn't be compared, because they starts other subworkflows:
+                            && c.RootPW != this.RootPW
+                            // 2. Compares Applicationdefinition-Project: If subworkflow that should be started is from another application-definition than this one, than priorisation-check makes no sense:
+                            && safeAccessToAppDefinition(c)
+                            // 3. Wether SchedulingGroup ist assigned to node, then priorization is done via SchedulingGroup
+                            //    else Compares if the planning node produces another Intermediate-product. If yes, than the subworkflow needs other resources to start. 
+                            //    Therefore the planning node can also be ignored for prirorization
+                            && ((this.MDSchedulingGroup != null
+                                    && c.MDSchedulingGroup != null
+                                    && this.MDSchedulingGroup.MDSchedulingGroupID == c.MDSchedulingGroup.MDSchedulingGroupID)
+                                || (this.MDSchedulingGroup == null
+                                    && this.MaterialWFConnection != null
+                                    && c.MaterialWFConnection != null
+                                    && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID)
+                                || (this.CurrentPicking != null
+                                    && this.CurrentPicking.ACClassMethodID.HasValue
+                                    && c.CurrentPicking != null
+                                    && c.CurrentPicking.ACClassMethodID.HasValue
+                                    && c.CurrentPicking.ACClassMethodID == c.CurrentPicking.ACClassMethodID))
+                            ).ToArray();
 
-            var thisAppProject4Starting = this.FirstInvokableTaskExecutor;
-            if (thisAppProject4Starting == null)
-                return;
+                if (otherPlanningNodes == null || !otherPlanningNodes.Any())
+                    return;
+                var rootPW = this.RootPW;
 
-            bool canStartIfPredecessorIsStopping = this.CanStartIfPredecessorIsStopping;
-            bool compareOnlySameACIdentifers = CompareOnlySameACIdentifers;
-            var sortedPlanningNodes = otherPlanningNodes
-                .Where(c =>     // 1. Consider only which should run on the same application-project
-                                c.FirstInvokableTaskExecutor == thisAppProject4Starting
-                            // 2. Consider only those that was not started
-                            && (c.IterationCount.ValueT <= 0
-                                // 3. And those that are currently running and have started already one subworkflow
-                                || (c.CurrentACState != ACStateEnum.SMIdle && c.CurrentACState != ACStateEnum.SMBreakPoint && c.CurrentACState != ACStateEnum.SMBreakPointStart)
-                            && (!compareOnlySameACIdentifers || c.ACIdentifier == this.ACIdentifier)
-                            )
-                )
-                .OrderBy(c => c.PriorityTime)
-                .ToArray();
+                var thisAppProject4Starting = this.FirstInvokableTaskExecutor;
+                if (thisAppProject4Starting == null)
+                    return;
+
+                bool canStartIfPredecessorIsStopping = this.CanStartIfPredecessorIsStopping;
+                bool compareOnlySameACIdentifers = CompareOnlySameACIdentifers;
+                PWNodeProcessWorkflowVB[] sortedPlanningNodes = otherPlanningNodes
+                    .Where(c =>     // 1. Consider only which should run on the same application-project
+                                    c.FirstInvokableTaskExecutor == thisAppProject4Starting
+                                // 2. Consider only those that was not started
+                                && (c.IterationCount.ValueT <= 0
+                                    // 3. And those that are currently running and have started already one subworkflow
+                                    || (c.CurrentACState != ACStateEnum.SMIdle && c.CurrentACState != ACStateEnum.SMBreakPoint && c.CurrentACState != ACStateEnum.SMBreakPointStart)
+                                && (!compareOnlySameACIdentifers || c.ACIdentifier == this.ACIdentifier)
+                                )
+                    )
+                    .OrderBy(c => c.PriorityTime)
+                    .ToArray();
+                if (sortedPlanningNodes != null && sortedPlanningNodes.Any())
+                {
+                    foreach (PWNodeProcessWorkflowVB node in sortedPlanningNodes)
+                    {
+                        node.ResetPlanningWait();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Messages.LogException(GetACUrl(), nameof(ResetPlanningWaitOnFollowingPlanningNodes), ex);
+            }
         }
         #endregion
 
         #region Interaction
-            /// <summary>
-            /// Method is named "Stopp" (StopProcess) because Stop()-MEthod already exists in ACComponent
-            /// </summary>
-            [ACMethodInteraction("Process", "en{'Stop'}de{'Stoppen'}", (short)MISort.Stop, true, "", Global.ACKinds.MSMethod, false, Global.ContextMenuCategory.ProcessCommands)]
+        /// <summary>
+        /// Method is named "Stopp" (StopProcess) because Stop()-MEthod already exists in ACComponent
+        /// </summary>
+        [ACMethodInteraction("Process", "en{'Stop'}de{'Stoppen'}", (short)MISort.Stop, true, "", Global.ACKinds.MSMethod, false, Global.ContextMenuCategory.ProcessCommands)]
         public virtual void Stopp()
         {
             if (!IsEnabledStopp())
                 return;
             CurrentACState = ACStateEnum.SMStopping;
+            ResetPlanningWaitOnFollowingPlanningNodes();
         }
 
         public virtual bool IsEnabledStopp()
@@ -1876,6 +1919,7 @@ namespace gip.mes.processapplication
         public virtual void SetIgnoreFIFO()
         {
             IgnoreFIFO = true;
+            ResetPlanningWait();
         }
 
         public virtual bool IsEnabledSetIgnoreFIFO()

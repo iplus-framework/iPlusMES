@@ -439,6 +439,12 @@ namespace gip.mes.processapplication
                     UpdateCurrentACMethod();
 
                     CachedEmptySiloHandlingOption = null;
+                    if (pwMethodTransport is PWMethodSingleDosing && lastBatchMode == PADosingLastBatchEnum.LastBatch && DoseAllPosFromPicking)
+                    {
+                        var posState2 = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                        if (posState2 != null)
+                            posState = posState2;
+                    }
                     pickingPos.MDDelivPosLoadState = posState;
                     MsgWithDetails msg2 = dbApp.ACSaveChanges();
                     if (msg2 != null)
@@ -657,7 +663,9 @@ namespace gip.mes.processapplication
                 if (picking == null)
                     return null;
                 PickingPos pickingPos = null;
-                if (pwMethodTransport.CurrentPickingPos != null)
+                if (CurrentDosingPos != null && CurrentDosingPos.ValueT != Guid.Empty)
+                    pickingPos = dbApp.PickingPos.Where(c => c.PickingPosID == CurrentDosingPos.ValueT).FirstOrDefault();
+                if (pickingPos == null && pwMethodTransport.CurrentPickingPos != null)
                     pickingPos = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
                 if (pickingPos == null)
                 {
