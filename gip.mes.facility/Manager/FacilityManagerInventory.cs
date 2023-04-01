@@ -90,11 +90,10 @@ namespace gip.mes.facility
 
                     List<FacilityInventoryPos> positions = facilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
 
-
                     bool isNotAllowedClosing =
                         facilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex != (short)FacilityInventoryStateEnum.InProgress
                         ||
-                         positions.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)FacilityInventoryPosStateEnum.Finished);
+                         positions.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished);
                     if (isNotAllowedClosing)
                     {
                         Msg msErrorNotAllowedClosing = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = Const_Inventory_NotAllowedClosing };
