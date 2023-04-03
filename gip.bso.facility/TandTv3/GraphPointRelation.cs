@@ -22,6 +22,7 @@ namespace gip.bso.facility
         public GraphPoint<T> Target { get; set; }
 
         public bool IsPassed { get; set; }
+        public int IsUsedNrTime { get; set; }
 
 
         public GraphPointRelationTypeEnum RelationType { get; set; }
