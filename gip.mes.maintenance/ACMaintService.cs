@@ -185,12 +185,18 @@ namespace gip.mes.maintenance
             set;
         }
 
+        [ACPropertyBindingSource(210, "Error", "en{'On new warning alarm'}de{'On new warning alarm'}", "", false, false)]
+        public IACContainerTNet<PANotifyState> OnNewWarningAlarm { get; set; }
+
         [ACPropertyBindingSource(210, "Error", "en{'Alarm'}de{'Alarm'}", "", false, false)]
         public IACContainerTNet<PANotifyState> MaintAlarm { get; set; }
         #endregion
 
 
         #region Maintenance Configuration Cache
+
+        [ACPropertyBindingSource(210, "Error", "en{'On new maintenance order alarm'}de{'On new maintenance order alarm'}", "", false, false)]
+        public IACContainerTNet<PANotifyState> OnNewMaintOrderAlarm { get; set; }
 
         /// <summary>
         /// Shared Dictionary with all configured Maintenance-Rules over all ACProjects
@@ -628,7 +634,7 @@ namespace gip.mes.maintenance
                         if (warningValue == null)
                             return;
                         if (changedValue.CompareTo(warningValue) >= 0)
-                            SetMaintenanceWarning(component, item.Value, propertyUrl, changedValue);
+                            SetMaintenanceWarning(component, item.Value, propertyUrl, changedValue, true);
                     }
                 }
                 _manualResetEventSlim.Dispose();
@@ -721,6 +727,9 @@ namespace gip.mes.maintenance
         protected void SetNewMaintOrder(Guid maintACClassID, ACComponent acComponent, vd.DatabaseApp dbApp)
         {
             GenerateMaintOrder(maintACClassID, acComponent, dbApp);
+
+
+            
             ACMaintWarning warning = null;
 
             using (ACMonitor.Lock(_60010_WarningLock))
@@ -796,6 +805,9 @@ namespace gip.mes.maintenance
                     Messages.LogError(this.GetACUrl(), "GenerateMaintOrder(1)", msg.Message);
                 OnNewAlarmOccurred(MaintAlarm, new Msg(msg.Message, this, eMsgLevel.Error, ClassName, "GenerateMaintOrder", 1000), true);
             }
+
+            OnNewAlarmOccurred(OnNewMaintOrderAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace order {0} is generated for {1} {2}", maintOrder.MaintOrderNo, acComponent.ACCaption, acComponent.ACUrl)));
+
             IsMaintenanceWarning.ValueT = true;
         }
 
@@ -807,7 +819,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Create Warning for maintenance relevant property
         /// </summary>
-        private void SetMaintenanceWarning(ACComponent acComponent, gip.mes.datamodel.MaintACClassProperty maintACClassProperty, string propertyACIdentifier, IComparable changedValue)
+        private void SetMaintenanceWarning(ACComponent acComponent, gip.mes.datamodel.MaintACClassProperty maintACClassProperty, string propertyACIdentifier, IComparable changedValue, bool onInit = false)
         {
             ACMaintWarning warning = GetOrCreateWarningFor(acComponent);
             ACMaintDetailsWarning warningDetail = warning.DetailsList.FirstOrDefault(c => c.ACIdentifier == maintACClassProperty.VBiACClassProperty.ACIdentifier);
@@ -825,8 +837,14 @@ namespace gip.mes.maintenance
             }
             else
                 warningDetail.ActualValue = acComponent.GetValue(maintACClassProperty.VBiACClassProperty.ACIdentifier).ToString();
+
+            var tempList = ComponentsWarningList.ValueT;
             ComponentsWarningList.ValueT = CompWarningList.ToList();
             IsMaintenanceWarning.ValueT = true;
+
+            
+            if (!onInit && (tempList == null || !tempList.Contains(warning)))
+                OnNewAlarmOccurred(OnNewWarningAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace warning ({0}) is appeard for {1} {2}", warning.Text, acComponent.ACCaption, acComponent.ACUrl)));
         }
 
         /// <summary>
@@ -846,8 +864,13 @@ namespace gip.mes.maintenance
                 };
                 warning.DetailsList.Add(warningDetail);
             }
+
+            var tempList = ComponentsWarningList.ValueT;
             ComponentsWarningList.ValueT = CompWarningList.ToList();
             IsMaintenanceWarning.ValueT = true;
+
+            if (tempList == null || !tempList.Contains(warning))
+                OnNewAlarmOccurred(OnNewWarningAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace warning ({0}) is appeard for {1} {2}", warning.Text, acComponent.ACCaption, acComponent.ACUrl)));
         }
 
         /// <summary>
