@@ -132,26 +132,9 @@ namespace gip.bso.test
 
         public bool IsEnabledRecieveRemotePicking()
         {
-            return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
-        }
-
-        /// <summary>
-        /// Source Property: ReciveRemotePicking
-        /// </summary>
-        [ACMethodInfo("ReciveRemotePickingLocal", "en{'Recive remote Picking local'}de{'Recive remote Picking local'}", 999)]
-        public void ReciveRemotePickingLocal()
-        {
-            if (!IsEnabledReciveRemotePickingLocal())
-                return;
-            RemoteFMHelper fm = new RemoteFMHelper();
-            RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
-            fm.SynchronizeFacility(this, Messages, PickingManager, SelectedRemoteFacilityManagerInfo.RemoteConnString, remoteStorePostingData);
-
-        }
-
-        public bool IsEnabledReciveRemotePickingLocal()
-        {
-            return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
+            return 
+                !string.IsNullOrEmpty(RemotePickingNo) 
+                && SelectedRemoteFacilityManagerInfo != null;
         }
 
         private List<RemoteFacilityModel> LoadRemoteFacilityManagerInfoList()
@@ -181,18 +164,6 @@ namespace gip.bso.test
             return rmList;
         }
 
-        private string GetRemoteFacilityManagerConnectionString(RemoteFacilityManager remoteFacilityManager1)
-        {
-            List<string> hierarchy = ACUrlHelper.ResolveParents(remoteFacilityManager1.ACUrl);
-            string remoteProxyACurl = hierarchy.FirstOrDefault();
-            if (String.IsNullOrEmpty(remoteProxyACurl))
-                return null;
-            ACComponent remoteAppManager = ACUrlCommand(remoteProxyACurl) as ACComponent;
-            if (remoteAppManager == null)
-                return null;
-            return remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
-        }
-
         private void CallRemoteFacilityManagerForPicking(ACComponent remoteFacilityManager, string pickingNo, string remoteConnString)
         {
             RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(pickingNo, remoteConnString);
@@ -202,7 +173,6 @@ namespace gip.bso.test
                 remoteFacilityManager.ACUrlCommand("!SynchronizeFacility", remoteFacilityManager.ACUrl, remoteConnString, remoteStorePostingData, false);
             }
         }
-
 
         private RemoteStorePostingData GetRemoteStorePostingData(string pickingNo, string remoteConnString)
         {
