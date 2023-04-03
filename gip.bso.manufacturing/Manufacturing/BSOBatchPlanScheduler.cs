@@ -3795,13 +3795,19 @@ namespace gip.bso.manufacturing
                     maintainOrderInfo.PO = prodOrderPartslist.ProdOrder;
                     maintainOrderInfos.Add(maintainOrderInfo);
                 }
-
+                
                 if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
                     || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
                 {
                     batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
                     if (autoDeleteDependingBatchPlans)
                         maintainOrderInfo.DeactivateAll = true;
+                    else
+                    {
+                        var mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
+                        if (prodOrderPartslist.MDProdOrderState.ProdOrderState != mDProdOrderStateCancelled.ProdOrderState)
+                            SetProdorderPartslistState(mDProdOrderStateCancelled, null, prodOrderPartslist);
+                    }
                 }
                 else if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
                 {
@@ -5408,7 +5414,7 @@ namespace gip.bso.manufacturing
                 partslist.MDProdOrderState = mDProdOrderStateCancelled;
                 isSetState = true;
             }
-            else if (!anyNotCompleted)
+            else if (!anyNotCompleted && mDProdOrderStateCompleted != null)
             {
                 partslist.MDProdOrderState = mDProdOrderStateCompleted;
                 isSetState = true;
