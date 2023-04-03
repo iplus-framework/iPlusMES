@@ -35,16 +35,16 @@ namespace gip.bso.facility
         {
 
             List<GraphPointRelation<IACObject>> calculatedRelations = new List<GraphPointRelation<IACObject>>();
-            
+
             calculatedRelations.AddRange(
-                    filteredRelations.Where(c => 
+                    filteredRelations.Where(c =>
                         filter.ItemsForShow.Contains(c.Source.ItemType) &&
                         filter.ItemsForShow.Contains(c.Target.ItemType)
                     )
-                    
+
             );
 
-            if(!filter.IsMixPointStart || filter.IsMixPointFacilityWithoutMaterial)
+            if (!filter.IsMixPointStart || filter.IsMixPointFacilityWithoutMaterial)
             {
                 filteredRelations.RemoveAll(c => calculatedRelations.Contains(c));
                 IEnumerable<GraphPoint<IACObject>> forProcess =
@@ -56,7 +56,7 @@ namespace gip.bso.facility
 
                 foreach (var item in forProcess)
                 {
-                    WihleBuildNewRelationsv2(filter, calculatedRelations, item, item, filteredRelations);
+                    WhileBuildNewRelationsv2(filter, calculatedRelations, item, item, filteredRelations);
                 }
 
             }
@@ -64,30 +64,34 @@ namespace gip.bso.facility
             return calculatedRelations;
         }
 
-        private void WihleBuildNewRelationsv2(GraphFilterHelper filter, List<GraphPointRelation<IACObject>> calculatedRelations,
+        private void WhileBuildNewRelationsv2(GraphFilterHelper filter, List<GraphPointRelation<IACObject>> calculatedRelations,
             GraphPoint<IACObject> startPoint, GraphPoint<IACObject> searchPoint, List<GraphPointRelation<IACObject>> filteredRelations)
         {
             IEnumerable<GraphPointRelation<IACObject>> tmpRelations = filteredRelations.Where(c => c.Source == searchPoint && !c.IsPassed);
             foreach (var tmpRelation in tmpRelations)
             {
-                //tmpRelation.IsPassed = true;
+                tmpRelation.IsUsedNrTime++;
+                if(tmpRelation.IsUsedNrTime > 9)
+                {
+                    tmpRelation.IsPassed = true;
+                }
                 if (
-                        !startPoint.IsVirtual 
+                        !startPoint.IsVirtual
                         && !tmpRelation.Target.IsVirtual
-                        && filter.ItemsForShow.Contains(startPoint.ItemType) 
+                        && filter.ItemsForShow.Contains(startPoint.ItemType)
                         && filter.ItemsForShow.Contains(tmpRelation.Target.ItemType)
                         && !(
-                                (   startPoint.ItemType == MDTrackingStartItemTypeEnum.TandTv3PointPosGrouped || startPoint.ItemType == MDTrackingStartItemTypeEnum.TandTv3Point) 
+                                (startPoint.ItemType == MDTrackingStartItemTypeEnum.TandTv3PointPosGrouped || startPoint.ItemType == MDTrackingStartItemTypeEnum.TandTv3Point)
                                     && (tmpRelation.Target.ItemType == MDTrackingStartItemTypeEnum.TandTv3PointPosGrouped || tmpRelation.Target.ItemType == MDTrackingStartItemTypeEnum.TandTv3Point))
                     )
                 {
                     GraphPointRelation<IACObject> relation = new GraphPointRelation<IACObject>(startPoint, tmpRelation.Target, GraphPointRelationTypeEnum.MixPoint);
                     if (!calculatedRelations.Contains(relation))
                         calculatedRelations.Add(relation);
-                    //WihleBuildNewRelationsv2(filter, calculatedRelations, tmpRelation.Target, tmpRelation.Target, filteredRelations);
+                    //WhileBuildNewRelationsv2(filter, calculatedRelations, tmpRelation.Target, tmpRelation.Target, filteredRelations);
                 }
                 else
-                    WihleBuildNewRelationsv2(filter, calculatedRelations, startPoint, tmpRelation.Target, filteredRelations);
+                    WhileBuildNewRelationsv2(filter, calculatedRelations, startPoint, tmpRelation.Target, filteredRelations);
             }
         }
         #endregion
