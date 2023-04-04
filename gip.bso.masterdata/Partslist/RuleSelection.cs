@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using mesDB = gip.mes.datamodel;
 using System.Collections.Generic;
+using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
@@ -9,11 +10,13 @@ namespace gip.bso.masterdata
     {
 
         [ACPropertyInfo(100, "", Const.Workflow)]
-        public ACClassWF WF { get; set; }
+        public MapPosToWFConn WF { get; set; }
 
 
         [ACPropertyInfo(101, "", Const.ProcessModule)]
-        public List<ACClass> ProcessModules { get; set; }
+        public List<ACClass> AvailableValues { get; set; } = new List<ACClass>();
 
+        [ACPropertyInfo(102, "", Const.ProcessModule)]
+        public List<ACClass> SelectedValues { get; internal set; } = new List<ACClass>();
     }
 }

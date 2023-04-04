@@ -1,5 +1,4 @@
 ﻿using gip.core.datamodel;
-using mesDB = gip.mes.datamodel;
 using System.Collections.Generic;
 
 namespace gip.bso.masterdata
@@ -8,17 +7,12 @@ namespace gip.bso.masterdata
     public class RuleGroup
     {
 
-        public RuleGroup()
-        {
-            RuleSelections = new List<RuleSelection>();
-        }
-
         [ACPropertyInfo(100, "", Const.ACGroup)]
         public ACClass RefPAACClass { get; set; }
 
 
         [ACPropertyInfo(101, "", Const.ACGroup)]
-        public List<RuleSelection> RuleSelections { get; set; }
+        public List<RuleSelection> RuleSelections { get; set; } = new List<RuleSelection>();
 
     }
 }
