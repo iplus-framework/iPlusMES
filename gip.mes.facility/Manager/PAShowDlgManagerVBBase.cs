@@ -17,16 +17,16 @@ namespace gip.mes.facility
         public PAShowDlgManagerVBBase(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _C_BSONameForShowReservation = new ACPropertyConfigValue<string>(this, "BSONameForShowReservation", "");
-            _C_BSONameForShowProgramLog = new ACPropertyConfigValue<string>(this, "BSONameForShowProgamLog", "");
-            _C_BSONameForShowPicking = new ACPropertyConfigValue<string>(this, "BSONameForShowPicking", "");
-            _C_BSONameForShowInDeliveryNote = new ACPropertyConfigValue<string>(this, "BSONameForShowInDeliveryNote", "");
-            _C_BSONameForShowOutDeliveryNote = new ACPropertyConfigValue<string>(this, "BSONameForShowOutDeliveryNote", "");
-            _C_BSONameForShowLabOrder = new ACPropertyConfigValue<string>(this, "BSONameForShowLabOrder", "");
-            _C_BSONameForShowFacilityBookCell = new ACPropertyConfigValue<string>(this, "BSONameForShowFacilityBookCell", "");
-            _C_BSONameForShowFacilityOverview = new ACPropertyConfigValue<string>(this, "BSONameForShowFacilityOverview", "");
-            _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, "BSONameForShowOrder", "");
-            _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, "BSOProdOrderBatchComponents", "");
+            _C_BSONameForShowReservation = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowReservation), "");
+            _C_BSONameForShowProgramLog = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowProgamLog), "");
+            _C_BSONameForShowPicking = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowPicking), "");
+            _C_BSONameForShowInDeliveryNote = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowInDeliveryNote), "");
+            _C_BSONameForShowOutDeliveryNote = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOutDeliveryNote), "");
+            _C_BSONameForShowLabOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowLabOrder), "");
+            _C_BSONameForShowFacilityBookCell = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityBookCell), "");
+            _C_BSONameForShowFacilityOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityOverview), "");
+            _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOrder), "");
+            _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowComponent), "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -133,9 +133,7 @@ namespace gip.mes.facility
             }
         }
 
-        private ACPropertyConfigValue<string> _C_BSONameForShowProgramLog;
-        [ACPropertyConfig("en{'Classname and ACIdentifier for ShowProgramLogDlg'}de{'Klassenname und ACIdentifier für ShowProgramLogDlg'}")]
-        public string BSONameForShowProgamLog
+        public override string BSONameForShowProgamLog
         {
             get
             {
@@ -163,6 +161,21 @@ namespace gip.mes.facility
             set
             {
                 _C_BSONameForShowProgramLog.ValueT = value;
+            }
+        }
+
+        public override string BSONameForShowPropertyLog
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(_C_BSONameForShowPropertyLog.ValueT))
+                    return _C_BSONameForShowPropertyLog.ValueT;
+                _C_BSONameForShowPropertyLog.ValueT = "BSOPropertyLogPresenterVB";
+                return _C_BSONameForShowPropertyLog.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowPropertyLog.ValueT = value;
             }
         }
 
@@ -620,23 +633,6 @@ namespace gip.mes.facility
             ACComponent _this = acComponent as ACComponent;
             string reservation = _this.ACUrlCommand("ReservationInfo") as string;
             return !String.IsNullOrEmpty(reservation);
-        }
-
-        public override void ShowProgramLogViewer(IACComponent caller, ACValueList param)
-        {
-            if (caller == null)
-                return;
-            string bsoName = BSONameForShowProgamLog;
-            if (String.IsNullOrEmpty(bsoName))
-                bsoName = "PresenterProgramLogVB";
-            ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
-            if (childBSO == null)
-                childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
-            if (childBSO == null)
-                return;
-            childBSO.ACUrlCommand("!ShowACProgramLog", param);
-            childBSO.Stop();
-            return;
         }
 
         public virtual void ShowLabOrder(IACComponent caller, LabOrder labOrder = null)
