@@ -13,17 +13,17 @@ namespace gip.mes.facility
 
         #region Final product
 
-        [ACPropertyInfo(301, "General", "en{'Final MaterialNo'}de{'Endgültiger MaterialNr.'}")]
+        [ACPropertyInfo(301, "General", "en{'Final product No.'}de{'Endprodukt Nr.'}")]
         public string FinalProductMaterialNo { get; set; }
 
-        [ACPropertyInfo(302, "General", "en{'Final Material name'}de{'Endgültiger Produktname'}")]
+        [ACPropertyInfo(302, "General", "en{'Final productname'}de{'Endproduktname'}")]
         public string FinalProductMaterialName { get; set; }
 
         #endregion
 
         #region General
 
-        [ACPropertyInfo(101, "General", "en{'MaterialNo'}de{'MaterialNo.'}")]
+        [ACPropertyInfo(101, "General", "en{'Material-No.'}de{'Material-Nr.'}")]
         public string MaterialNo { get; set; }
 
         [ACPropertyInfo(102, "General", "en{'Material name'}de{'Materialname'}")]

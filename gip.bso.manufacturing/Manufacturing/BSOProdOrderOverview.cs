@@ -868,7 +868,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search", "en{'Search (ProdOrder/Mat)'}de{'Suchen (ProdOrder/Mat)'}", 999)]
+        [ACMethodInfo("Search", "en{'Show Orders & Materials'}de{'Aufträge & Materialien anzeigen'}", 100)]
         public void Search()
         {
             if (!IsEnabledSearch())
@@ -887,7 +887,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search2", "en{'Search (All)'}de{'Search (All)'}", 999)]
+        [ACMethodInfo("Search2", "en{'Show all'}de{'Alles anzeigen'}", 101)]
         public void Search2()
         {
             if (!IsEnabledSearch())
@@ -969,7 +969,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 102)]
         public void ShowDlgInputFilterFacility()
         {
             if (!IsEnabledShowDlgFilterToFacility())
@@ -989,7 +989,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 103)]
         public void ShowDlgFinalInputFilterFacility()
         {
             if (!IsEnabledShowDlgFinalInputFilterFacility())
@@ -1013,7 +1013,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("SearchInputs", "en{'Search (Inputs)'}de{'Suchen (Inputs)'}", 999)]
+        [ACMethodInfo("SearchInputs", "en{'Sum material inputs'}de{'Materialeinsatz summieren'}", 104)]
         public void SearchInputs()
         {
             if (!IsEnabledSearchInputs())
@@ -1035,7 +1035,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("FilterFacilityInputs", "en{'Filter'}de{'Filter'}", 999)]
+        [ACMethodInfo("FilterFacilityInputs", "en{'Filter'}de{'Filter'}", 105)]
         public void FilterFacilityInputs()
         {
             if (!IsEnabledFilterFacilityInputs())
@@ -1056,7 +1056,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("FilterFacilityFinalInputs", "en{'Filter'}de{'Filter'}", 999)]
+        [ACMethodInfo("FilterFacilityFinalInputs", "en{'Filter'}de{'Filter'}", 106)]
         public void FilterFacilityFinalInputs()
         {
             if (!IsEnabledFilterFacilityInputs())
@@ -1078,7 +1078,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> RecalculateAllStats
 
-        [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Recalculate Statistics'}", 999, true)]
+        [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Statistiken neu berechnen'}", 107, true)]
         public void RecalculateAllStats()
         {
             if (!IsEnabledShowDlgFilterToFacility())

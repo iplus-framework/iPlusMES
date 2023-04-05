@@ -23,13 +23,13 @@ namespace gip.mes.facility
         [ACPropertyInfo(100, Const_General, ConstApp.ProdOrderProgramNo)]
         public string ProgramNo { get; set; }
 
-        [ACPropertyInfo(101, Const_General, "en{'MaterialNo'}de{'MaterialNo.'}")]
+        [ACPropertyInfo(101, Const_General, "en{'Material-No.'}de{'Material-Nr.'}")]
         public string MaterialNo { get; set; }
 
         [ACPropertyInfo(102, Const_General, "en{'Material name'}de{'Materialname'}")]
         public string MaterialName { get; set; }
 
-        [ACPropertyInfo(103, Const_General, "en{'Department'}de{'Abteilung.'}")]
+        [ACPropertyInfo(103, Const_General, "en{'Department'}de{'Abteilung'}")]
         public string DepartmentUserName { get; set; }
 
         [ACPropertyInfo(104, Const_General, ConstApp.MDUnit)]

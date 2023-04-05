@@ -14,7 +14,7 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(100, "Sn", "en{'No'}de{'Nr'}")]
         public int Sn { get; set; }
 
-        [ACPropertyInfo(101, "MaterialNo", "en{'MaterialNo'}de{'MaterialNo.'}")]
+        [ACPropertyInfo(101, "MaterialNo", "en{'Material-No.'}de{'Material-Nr.'}")]
         public string MaterialNo { get; set; }
 
         [ACPropertyInfo(102, "MaterialName", "en{'Material name'}de{'Materialname'}")]
