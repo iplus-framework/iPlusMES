@@ -28,14 +28,44 @@ namespace gip.bso.masterdata
         [ACMethodInfo("Dialog", "en{'Select Sources'}de{'Quellen auswählen'}", (short)MISort.QueryPreviewDlg)]
         public void ShowDialogSelectSources(Guid acClassWFID, Guid partslistID)
         {
-            using (Database database = new Database())
-            using (dbMes.DatabaseApp databaseApp = new dbMes.DatabaseApp())
+            Console.WriteLine(acClassWFID.ToString());
+            BSOPartslist partslist = ParentACComponent as BSOPartslist;
+            List<IACConfigStore> configStores = partslist.MandatoryConfigStores;
+            _RuleGroupList = LoadRuleGroupList(DatabaseApp.ContextIPlus, DatabaseApp, configStores, acClassWFID, partslistID);
+            foreach (RuleGroup ruleGroup in _RuleGroupList)
             {
-                Console.WriteLine(acClassWFID.ToString());
-                BSOPartslist partslist = ParentACComponent as BSOPartslist;
-                List<IACConfigStore> configStores = partslist.MandatoryConfigStores;
-                List<RuleGroup> list = LoadRuleGroupList(database, databaseApp, configStores, acClassWFID, partslistID);
+                ruleGroup.PropertyChanged += RuleGroup_PropertyChanged;
             }
+            ShowDialog(this, "DlgSelectSources");
+        }
+
+        private void RuleGroup_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(RuleGroup.CurrentRuleSelection))
+            {
+                RuleGroup ruleGroup = sender as RuleGroup;
+                if (ruleGroup != null)
+                {
+                    CurrentRuleSelection = ruleGroup.CurrentRuleSelection;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: DlgSelectSourcesOk
+        /// </summary>
+        [ACMethodInfo("DlgSelectSourcesOk", Const.Ok, 500)]
+        public void DlgSelectSourcesOk()
+        {
+            if (!IsEnabledDlgSelectSourcesOk())
+                return;
+
+            this.CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgSelectSourcesOk()
+        {
+            return true;
         }
 
         #endregion
@@ -79,17 +109,38 @@ namespace gip.bso.masterdata
             }
         }
 
-        private List<RuleGroup> LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, Guid acClassWFID, Guid partslistID)
+
+        private RuleSelection _CurrentRuleSelection;
+
+        [ACPropertyInfo(102, "", Const.ACGroup)]
+        public RuleSelection CurrentRuleSelection
+
         {
-            List<ACClassWF> dischargingItems = GetAllDischargingItems(database, databaseApp, acClassWFID, partslistID);
-            List<RuleGroup> grouped = GroupDischargingItems(database, databaseApp, configStores, dischargingItems);
-            return grouped;
+            get
+            {
+                return _CurrentRuleSelection;
+            }
+            set
+            {
+                if (_CurrentRuleSelection != value)
+                {
+
+                    _CurrentRuleSelection = value;
+                    OnPropertyChanged(nameof(CurrentRuleSelection));
+                }
+            }
         }
 
         #endregion
 
         #region Others
 
+        private List<RuleGroup> LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, Guid acClassWFID, Guid partslistID)
+        {
+            List<ACClassWF> dischargingItems = GetAllDischargingItems(database, databaseApp, acClassWFID, partslistID);
+            List<RuleGroup> grouped = GroupDischargingItems(database, databaseApp, configStores, dischargingItems);
+            return grouped;
+        }
         public List<ACClassWF> GetAllDischargingItems(Database database, dbMes.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID)
         {
             Type typeReceiveMat = typeof(IPWNodeReceiveMaterialRouteable);
@@ -125,7 +176,14 @@ namespace gip.bso.masterdata
             {
                 RuleGroup ruleGroup = GetRuleGroup(database, ruleGroups, aCClassWF);
                 dbMes.ACClassWF mesWf = aCClassWF.FromAppContext<dbMes.ACClassWF>(databaseApp);
-                List<dbMes.MaterialWFConnection> connections = mesWf.MaterialWFConnection_ACClassWF.OrderBy(c => c.Material.MaterialNo).ToList();
+                List<dbMes.MaterialWFConnection> connections =
+                    mesWf
+                    .MaterialWFConnection_ACClassWF
+                    .GroupBy(c => c.Material.MaterialNo)
+                    .Select(c => c.FirstOrDefault())
+                    .OrderBy(c => c.Material.MaterialNo).ToList();
+
+                List<ACClass> modules = RulesCommand.GetProcessModules(aCClassWF, database).ToList();
 
                 foreach (dbMes.MaterialWFConnection connection in connections)
                 {
@@ -136,32 +194,106 @@ namespace gip.bso.masterdata
                     };
                     ruleSelection.WF.MatWFConn = connection;
 
-                    ruleSelection.AvailableValues = RulesCommand.GetProcessModules(aCClassWF, database).ToList();
-
-                    ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
-                    RuleValueList ruleValueList = serviceInstance.GetRuleValueList(configStores, "", aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString());
-                    if(ruleValueList != null)
+                    try
                     {
-                        ruleSelection.SelectedValues = ruleValueList.GetSelectedClasses(ACClassWFRuleTypes.Allowed_instances, database).ToList();
-                        //ruleSelection.ProcessModules = GetProcessModules(database, aCClassWF);
-                        PreselectModules(database, ruleSelection);
+                        string[] materialNos = new string[] { };
+                        dbMes.Partslist partslist = configStores.FirstOrDefault() as dbMes.Partslist;
+                        if (partslist != null)
+                        {
+                            materialNos =
+                                partslist
+                                .PartslistPos_Partslist.Where(c => c.MaterialID == connection.Material.MaterialID)
+                                .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
+                                .Select(c => c.SourcePartslistPos.Material)
+                                .GroupBy(c => c.MaterialNo)
+                                .Select(c => c.Key)
+                                .ToArray();
+                        }
+                        if (materialNos.Any())
+                        {
+                            ruleSelection.AvailableValues = FilterModulesByMaterial(databaseApp, modules, materialNos);
+                            ruleSelection.SelectedValues = GetSelectedValues(database, configStores, aCClassWF);
+                        }
                     }
+                    catch (Exception ex)
+                    {
 
+                    }
                     ruleGroup.RuleSelections.Add(ruleSelection);
                 }
 
+                // add for all material
+                RuleSelection allMaterialsSelection = new RuleSelection();
+                allMaterialsSelection.WF = new mes.facility.MapPosToWFConn()
+                {
+                    PWNode = aCClassWF,
+                    MatWFConn = new dbMes.MaterialWFConnection()
+                    {
+                        Material = new dbMes.Material()
+                        {
+                            MaterialNo = "-",
+                            MaterialName1 = "-"
+                        }
+                    }
+                };
+                allMaterialsSelection.AvailableValues = modules;
+                allMaterialsSelection.SelectedValues = GetSelectedValues(database, configStores, aCClassWF);
+                ruleGroup.RuleSelections.Add(allMaterialsSelection);
             }
             return ruleGroups;
         }
 
-        private void PreselectModules(Database database, RuleSelection ruleSelection)
+        private List<ACClass> FilterModulesByMaterial(dbMes.DatabaseApp databaseApp, List<ACClass> modules, string[] materialNos)
         {
+            Guid[] facilityAssociatedWithMaterial =
+                databaseApp
+                .Facility
+                .Where(c =>
+                                c.Material != null
+                                && materialNos.Contains(c.Material.MaterialNo)
+                                && c.VBiFacilityACClassID != null
+                     )
+                .Select(c => c.VBiFacilityACClassID ?? Guid.Empty)
+                .ToArray();
 
+            dbMes.Facility[] faciltiyWithMaterial =
+                databaseApp
+                .Material
+                .Where(c => materialNos.Contains(c.MaterialNo))
+                .SelectMany(c => c.FacilityCharge_Material)
+                .Where(c => !c.NotAvailable && c.FacilityID != null)
+                .Select(c => c.Facility)
+                .GroupBy(c => c.FacilityNo)
+                .Select(c => c.FirstOrDefault())
+                .ToArray();
+
+            Guid[] facilityHaveMaterialCharge =
+                faciltiyWithMaterial
+                .Where(c =>
+                               c.VBiFacilityACClassID != null
+                     )
+                .Select(c => c.VBiFacilityACClassID ?? Guid.Empty)
+                .ToArray();
+
+            List<ACClass> filtered =
+                modules
+                .Where(c =>
+                    facilityAssociatedWithMaterial.Contains(c.ACClassID)
+                    || facilityHaveMaterialCharge.Contains(c.ACClassID))
+            .ToList();
+            return filtered;
         }
 
-        private List<ACClass> GetProcessModules(Database database, ACClassWF aCClassWF)
+        private List<ACClass> GetSelectedValues(Database database, List<IACConfigStore> configStores, ACClassWF aCClassWF)
         {
-            return new List<ACClass>();
+            List<ACClass> result = new List<ACClass>();
+            ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
+            RuleValueList ruleValueList = serviceInstance.GetRuleValueList(configStores, "", aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString());
+            if (ruleValueList != null)
+            {
+                result = ruleValueList.GetSelectedClasses(ACClassWFRuleTypes.Allowed_instances, database).ToList();
+            }
+            return result ?? new List<ACClass>();
         }
 
         private RuleGroup GetRuleGroup(Database database, List<RuleGroup> ruleGroups, ACClassWF aCClassWF)
