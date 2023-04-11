@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'RuleGroup'}de{'RuleGroup'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'RuleGroup'}de{'RuleGroup'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]
     public class RuleGroup : INotifyPropertyChanged
     {
 
@@ -29,13 +29,11 @@ namespace gip.bso.masterdata
             {
                 if (_CurrentRuleSelection != value)
                 {
-
                     _CurrentRuleSelection = value;
                     OnPropertyChanged(nameof(CurrentRuleSelection));
-                    if(_CurrentRuleSelection != null)
+                    if (_CurrentRuleSelection != null)
                     {
-                        _CurrentRuleSelection.OnPropertyChanged(nameof(RuleSelection.AvailableValues));
-                        _CurrentRuleSelection.OnPropertyChanged(nameof(RuleSelection.SelectedValues));
+                        _CurrentRuleSelection.OnPropertyChanged(nameof(RuleSelection.Items));
                     }
                 }
             }
@@ -50,6 +48,29 @@ namespace gip.bso.masterdata
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        /// <summary>
+        /// is same module is selected on other view - sync booth values
+        /// </summary>
+        /// <param name="ruleSelection"></param>
+        /// <param name="aCClass"></param>
+        /// <param name="isSelected"></param>
+        public void PropagateSelection(RuleSelection ruleSelection, ACClass aCClass, bool isSelected)
+        {
+            foreach (RuleSelection currRuleSelection in RuleSelections)
+            {
+                if (currRuleSelection.RuleSelectionID != ruleSelection.RuleSelectionID)
+                {
+                    foreach (RuleItem ruleItem in currRuleSelection.Items)
+                    {
+                        if (ruleItem.Machine.ACClassID == aCClass.ACClassID)
+                        {
+                            ruleItem.IsSelected = isSelected;
+                        }
+                    }
+                }
             }
         }
 

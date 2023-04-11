@@ -2,47 +2,57 @@
 using System.Collections.Generic;
 using gip.mes.facility;
 using System.ComponentModel;
+using System;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'RuleSelection'}de{'RuleSelection'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]
+
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'RuleSelection'}de{'RuleSelection'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]
     public class RuleSelection : INotifyPropertyChanged
     {
+
+        #region DI
+
+        public RuleGroup RuleGroup { get; private set; }
+
+        public bool PropagateRuleSelection { get; set; }
+
+        #endregion
+
+        #region ctor's
+        public RuleSelection(RuleGroup ruleGroup)
+        {
+            RuleGroup = ruleGroup;
+            RuleSelectionID = Guid.NewGuid();
+        }
+        #endregion
+
+        #region Properies
+
+        public Guid RuleSelectionID;
+
+        public string PreConfigACUrl { get; set; }
 
         [ACPropertyInfo(100, "", Const.Workflow)]
         public MapPosToWFConn WF { get; set; }
 
-        private List<ACClass> _AvailableValues;
+        private List<RuleItem> _Items;
         [ACPropertyInfo(101, "", Const.ProcessModule)]
-        public List<ACClass> AvailableValues
+        public List<RuleItem> Items
         {
             get
             {
-                return _AvailableValues;
+                return _Items;
             }
 
             set
             {
-                _AvailableValues = value;
-                OnPropertyChanged(nameof(AvailableValues));
+                _Items = value;
+                OnPropertyChanged(nameof(Items));
             }
         }
 
-        private List<ACClass> _SelectedValues;
-        [ACPropertyInfo(102, "", Const.ProcessModule)]
-        public List<ACClass> SelectedValues
-        {
-            get
-            {
-                return _SelectedValues;
-            }
-
-            set
-            {
-                _SelectedValues = value;
-                OnPropertyChanged(nameof(SelectedValues));
-            }
-        }
+        #endregion
 
 
         #region INotifyPropertyChanged
@@ -58,5 +68,6 @@ namespace gip.bso.masterdata
         }
 
         #endregion
+
     }
 }

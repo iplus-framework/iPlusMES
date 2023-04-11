@@ -130,6 +130,7 @@
     <Compile Include="Partslist\BSOPartslistExplorer.cs" />
     <Compile Include="Partslist\BSOSourceSelectionRules.cs" />
     <Compile Include="Partslist\RuleGroup.cs" />
+    <Compile Include="Partslist\RuleItem.cs" />
     <Compile Include="Partslist\RuleSelection.cs" />
     <Compile Include="Production\MDBSOProdOrderPartslistPosState.cs" />
     <Compile Include="Sales\MDBSOInvoiceState.cs" />
@@ -424,6 +425,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2023-03-23 09-25_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-11 14-46_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
