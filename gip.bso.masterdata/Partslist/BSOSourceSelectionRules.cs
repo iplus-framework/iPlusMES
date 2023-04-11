@@ -67,8 +67,6 @@ namespace gip.bso.masterdata
             this.CloseTopDialog();
         }
 
-
-
         public bool IsEnabledDlgSelectSourcesOk()
         {
             return true;
@@ -114,7 +112,6 @@ namespace gip.bso.masterdata
                 return _RuleGroupList;
             }
         }
-
 
         private RuleSelection _CurrentRuleSelection;
 
@@ -235,7 +232,7 @@ namespace gip.bso.masterdata
                     }
                     catch (Exception ex)
                     {
-
+                        Messages.LogException(GetACUrl(), nameof(GroupDischargingItems), ex);
                     }
                     ruleGroup.RuleSelections.Add(ruleSelection);
                 }
@@ -354,6 +351,8 @@ namespace gip.bso.masterdata
         {
             if (ruleGroupList != null)
             {
+                bool change = false;
+
                 foreach (RuleGroup ruleGroup in ruleGroupList)
                 {
                     foreach (RuleSelection ruleSelection in ruleGroup.RuleSelections)
@@ -367,9 +366,10 @@ namespace gip.bso.masterdata
 
                             if (!ruleSelection.Items.Any(c => !c.IsSelected))
                             {
-                                if(currentStoreConfigItem != null)
+                                if (currentStoreConfigItem != null)
                                 {
                                     partslist.CurrentConfigStore.RemoveACConfig(currentStoreConfigItem);
+                                    change = true;
                                 }
                             }
                             else
@@ -383,8 +383,19 @@ namespace gip.bso.masterdata
                                 List<object> excludedModules = ruleSelection.Items.Where(c => !c.IsSelected).Select(c => c.Machine as object).ToList();
                                 RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
                                 RulesCommand.WriteIACConfig(Database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
+                                change = true;
                             }
                         }
+                    }
+                }
+
+                if (change)
+                {
+                    MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+                    if (msgWithDetails != null && !msgWithDetails.IsSucceded())
+                    {
+                        Messages.Msg(msgWithDetails);
+                        DatabaseApp.ACUndoChanges();
                     }
                 }
             }

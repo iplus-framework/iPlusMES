@@ -8,16 +8,18 @@ namespace gip.bso.masterdata
     public class RuleGroup : INotifyPropertyChanged
     {
 
-        [ACPropertyInfo(100, "", Const.ACGroup)]
+        #region Properties
+
+        [ACPropertyInfo(100, "", "en{'Application Class'}de{'Anwendungsklasse'}")]
         public ACClass RefPAACClass { get; set; }
 
 
-        [ACPropertyInfo(101, "", Const.ACGroup)]
+        [ACPropertyInfo(101, "", "en{'RuleSelections'}de{'RuleSelections'}")]
         public List<RuleSelection> RuleSelections { get; set; } = new List<RuleSelection>();
 
         private RuleSelection _CurrentRuleSelection;
 
-        [ACPropertyInfo(102, "", Const.ACGroup)]
+        [ACPropertyInfo(102, "", "en{'CurrentRuleSelection'}de{'CurrentRuleSelection'}")]
         public RuleSelection CurrentRuleSelection
 
         {
@@ -39,6 +41,8 @@ namespace gip.bso.masterdata
             }
         }
 
+        #endregion
+
         #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -50,6 +54,10 @@ namespace gip.bso.masterdata
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// is same module is selected on other view - sync booth values
@@ -72,6 +80,11 @@ namespace gip.bso.masterdata
                     }
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return RefPAACClass?.ACCaption;
         }
 
         #endregion

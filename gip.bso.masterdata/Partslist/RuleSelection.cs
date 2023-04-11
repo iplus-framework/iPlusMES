@@ -33,11 +33,19 @@ namespace gip.bso.masterdata
 
         public string PreConfigACUrl { get; set; }
 
+        public string ConfigACUrl_Excluded_process_modules
+        {
+            get
+            {
+                return WF?.PWNode?.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Excluded_process_modules.ToString();
+            }
+        }
+
         [ACPropertyInfo(100, "", Const.Workflow)]
         public MapPosToWFConn WF { get; set; }
 
         private List<RuleItem> _Items;
-        [ACPropertyInfo(101, "", Const.ProcessModule)]
+        [ACPropertyInfo(101, "", "en{'Items'}de{'Items'}")]
         public List<RuleItem> Items
         {
             get
@@ -54,7 +62,6 @@ namespace gip.bso.masterdata
 
         #endregion
 
-
         #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -65,6 +72,17 @@ namespace gip.bso.masterdata
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public override string ToString()
+        {
+            if (WF == null)
+                return base.ToString();
+            return $"{WF.PWNode?.ACCaption} - [{WF.MatWFConn?.Material?.MaterialNo}]";
         }
 
         #endregion
