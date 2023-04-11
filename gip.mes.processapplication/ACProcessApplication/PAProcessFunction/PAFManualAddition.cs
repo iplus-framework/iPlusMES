@@ -97,6 +97,21 @@ namespace gip.mes.processapplication
             ManuallyAddedQuantity.ValueT = newQuantity;
         }
 
+        public void AcknowledgeComponent()
+        {
+            if (CurrentACMethod != null)
+            {
+                var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
+                double targetQuantity = 0;
+                if (targetQ != null)
+                    targetQuantity = targetQ.ParamAsDouble;
+
+                ManuallyAddedQuantity.ValueT = targetQuantity;
+                SetPAFResult(targetQuantity);
+                CompleteWeighing(targetQuantity);
+            }
+        }
+
         #endregion
     }
 }

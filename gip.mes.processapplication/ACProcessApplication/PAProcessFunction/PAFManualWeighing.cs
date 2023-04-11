@@ -296,7 +296,7 @@ namespace gip.mes.processapplication
                         .ToArray());
         }
 
-        internal void CompleteWeighing(double actualQuantity, bool isForBinChange = false)
+        public void CompleteWeighing(double actualQuantity, bool isForBinChange = false)
         {
             using (ACMonitor.Lock(_65000_IsManCompLock))
             {
