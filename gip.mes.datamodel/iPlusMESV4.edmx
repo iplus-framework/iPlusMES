@@ -3164,6 +3164,10 @@
           <Property Name="MDSchedulingGroupWFID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MDSchedulingGroupID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="VBiACClassWFID" Type="uniqueidentifier" Nullable="false" />
+		  <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+		  <Property Name="InsertDate" Type="datetime" Nullable="false" />
+		  <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+		  <Property Name="UpdateDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="MDTermOfPayment">
           <Key>
@@ -24193,7 +24197,11 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="MDSchedulingGroupWFID" Type="Guid" Nullable="false" />
           <Property Name="MDSchedulingGroupID" Type="Guid" Nullable="false" />
           <Property Name="VBiACClassWFID" Type="Guid" Nullable="false" />
-          <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_MDSchedulingGroupWF_VBiACClassWF" FromRole="MDSchedulingGroupWF" ToRole="ACClassWF" />
+			<Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+			<Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+			<Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+			<Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+			<NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_MDSchedulingGroupWF_VBiACClassWF" FromRole="MDSchedulingGroupWF" ToRole="ACClassWF" />
           <NavigationProperty Name="MDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_MDSchedulingGroupWF_MDSchedulingGroup" FromRole="MDSchedulingGroupWF" ToRole="MDSchedulingGroup" />
         </EntityType>
         <EntityType Name="MDTermOfPayment">
@@ -38742,6 +38750,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="VBiACClassWFID" ColumnName="VBiACClassWFID" />
                 <ScalarProperty Name="MDSchedulingGroupID" ColumnName="MDSchedulingGroupID" />
                 <ScalarProperty Name="MDSchedulingGroupWFID" ColumnName="MDSchedulingGroupWFID" />
+				<ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+				<ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+				<ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+				<ScalarProperty Name="InsertName" ColumnName="InsertName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
