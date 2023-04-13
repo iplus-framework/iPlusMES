@@ -539,5 +539,12 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        #region other methods
+        public void CalcPositionUsedCount()
+        {
+            PositionUsedCount = PartslistPosRelation_SourcePartslistPos.Count();
+        }
+        #endregion
+
     }
 }
