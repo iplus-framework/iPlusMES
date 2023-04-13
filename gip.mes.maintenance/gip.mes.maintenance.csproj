@@ -1,106 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4E67A54F-A057-4FE7-9E5D-C40A5C465AEA}</ProjectGuid>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>gip.mes.maintenance</RootNamespace>
-    <AssemblyName>gip.mes.maintenance</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj" />
+    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Wrappers\ACClassWrapper.cs" />
-    <Compile Include="ACMaintService.cs" />
-    <Compile Include="BSOMaintOrder.cs" />
-    <Compile Include="Configuration\BSOMaintConfig.cs" />
-    <Compile Include="Configuration\MDBSOMaintMode.cs" />
-    <Compile Include="ACDlgManagerMaint.cs" />
-    <Compile Include="MDBSOMaintOrderPropertyState.cs" />
-    <Compile Include="MDBSOMaintOrderState.cs" />
-    <Compile Include="MDBSOMaintTaskState.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ACMaintWarning.cs" />
-    <Compile Include="Wrappers\MaintACClassPropertyWrapper.cs" />
-    <Compile Include="Wrappers\VBGroupWrapper.cs" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
-      <Project>{763ea3dc-3fb4-4d74-a252-a6a8811f0461}</Project>
-      <Name>gip.bso.iplus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
-      <Project>{893d3b1b-dc55-4684-8b5d-941f1049151b}</Project>
-      <Name>gip.core.autocomponent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
-      <Project>{16fb4111-5110-46e5-851d-38a4d7522f85}</Project>
-      <Name>gip.core.datamodel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
-      <Project>{3A9383D8-5C6D-429C-89D3-57C1D2565AD1}</Project>
-      <Name>gip.core.manager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
-      <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
-      <Name>gip.core.processapplication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
-      <Project>{a1b3c017-ad96-4ae2-b6ff-9c8948393a39}</Project>
-      <Name>gip.mes.autocomponent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
-      <Project>{5a0c15dd-ad10-43e7-9113-c4fb1b92d3b9}</Project>
-      <Name>gip.mes.datamodel</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="VBControlScripts\2022-09-18 21-03_ihrastinski.zip">
+    <None Update="VBControlScripts\2022-09-18 21-03_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2023-02-23 12-27_ihrastinski.zip">
+    <None Update="VBControlScripts\2023-02-23 12-27_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

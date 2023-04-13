@@ -8,7 +8,6 @@ using gip.mes.datamodel;
 using gip.core.processapplication;
 using System.Xml;
 using System.Collections.Specialized;
-using System.Web;
 using gip.mes.facility;
 using System.Globalization;
 
