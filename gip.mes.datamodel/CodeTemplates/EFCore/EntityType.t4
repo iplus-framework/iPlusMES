@@ -1,0 +1,303 @@
+<#@ template debug="true" hostSpecific="true" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
+<#@ assembly name="Microsoft.Extensions.DependencyInjection.Abstractions" #>
+<#@ parameter name="EntityType" type="Microsoft.EntityFrameworkCore.Metadata.IEntityType" #>
+<#@ parameter name="Options" type="Microsoft.EntityFrameworkCore.Scaffolding.ModelCodeGenerationOptions" #>
+<#@ parameter name="NamespaceHint" type="System.String" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.ComponentModel.DataAnnotations" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
+<#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
+<#
+    Debugger.Launch();
+    if (EntityType.IsSimpleManyToManyJoinEntityType())
+    {
+        // Don't scaffold these
+        return "";
+    }
+    if ((EntityType.Name).Contains("udw"))
+    {
+        // Don't scaffold these
+        return "";
+    }
+
+    var services = (IServiceProvider)Host;
+    var annotationCodeGenerator = services.GetRequiredService<IAnnotationCodeGenerator>();
+    var code = services.GetRequiredService<ICSharpHelper>();
+
+    var usings = new List<string>
+    {
+        "System",
+        "System.Collections.Generic",
+        "gip.core.datamodel",
+        "Microsoft.EntityFrameworkCore.ChangeTracking",
+        "Microsoft.EntityFrameworkCore.Infrastructure"
+    };
+
+    if (Options.UseDataAnnotations)
+    {
+        usings.Add("System.ComponentModel.DataAnnotations");
+        usings.Add("System.ComponentModel.DataAnnotations.Schema");
+        usings.Add("Microsoft.EntityFrameworkCore");
+    }
+
+    if (!string.IsNullOrEmpty(NamespaceHint))
+    {
+#>
+namespace <#= "gip.mes.datamodel" #>;
+
+<#
+    }
+
+    if (!string.IsNullOrEmpty(EntityType.GetComment()))
+    {
+#>
+/// <summary>
+/// <#= code.XmlComment(EntityType.GetComment()) #>
+/// </summary>
+<#
+    }
+
+    if (Options.UseDataAnnotations)
+    {
+        foreach (var dataAnnotation in EntityType.GetDataAnnotations(annotationCodeGenerator))
+        {
+#>
+<#= code.Fragment(dataAnnotation) #>
+<#
+        }
+    }
+    bool setInsertUpdateInterface = false;
+    List<String> propertyNames = new List<String>();
+    foreach (var property in EntityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
+    {
+        propertyNames.Add(property.Name);
+    }
+    if (propertyNames.Contains("UpdateName") && propertyNames.Contains("UpdateDate") && propertyNames.Contains("InsertName") && propertyNames.Contains("InsertDate"))
+    {
+        setInsertUpdateInterface = true;
+    }
+
+    string entityTypeNewName = "";
+    if ((EntityType.Name).Substring(0, 1) == "@")
+    {
+        entityTypeNewName = EntityType.Name.Remove(0,1);
+    }
+    else
+    {
+        entityTypeNewName = EntityType.Name;
+    }
+#>
+public partial class <#= entityTypeNewName #> : VBEntityObject <#= setInsertUpdateInterface ? ", IInsertInfo, IUpdateInfo" : "" #>
+{
+
+    public <#= entityTypeNewName #>()
+    {
+    }
+
+    private <#= entityTypeNewName #>(ILazyLoader lazyLoader)
+    {
+        LazyLoader = lazyLoader;
+    }
+
+    private ILazyLoader LazyLoader { get; set; }
+<#
+    var firstProperty = true;
+    foreach (var property in EntityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
+    {
+        if (!firstProperty)
+        {
+            WriteLine("");
+        }
+
+        if (!string.IsNullOrEmpty(property.GetComment()))
+        {
+#>
+    /// <summary>
+    /// <#= code.XmlComment(property.GetComment(), indent: 1) #>
+    /// </summary>
+<#
+        }
+
+        if (Options.UseDataAnnotations)
+        {
+            var dataAnnotations = property.GetDataAnnotations(annotationCodeGenerator)
+                .Where(a => !(a.Type == typeof(RequiredAttribute) && Options.UseNullableReferenceTypes && !property.ClrType.IsValueType));
+            foreach (var dataAnnotation in dataAnnotations)
+            {
+#>
+    <#= code.Fragment(dataAnnotation) #>
+<#
+            }
+        }
+
+        usings.AddRange(code.GetRequiredUsings(property.ClrType));
+
+        var needsNullable = Options.UseNullableReferenceTypes && property.IsNullable && !property.ClrType.IsValueType;
+        var needsInitializer = Options.UseNullableReferenceTypes && !property.IsNullable && !property.ClrType.IsValueType;
+        var needsOverride = property.Name == ("ACIdentifier") || property.Name == ("XMLConfig");
+#>
+    <#=code.Reference(property.ClrType)#><#= needsNullable ? "?" : "" #> _<#= property.Name #>;
+    public <#= needsOverride ? "override " : "" #><#= code.Reference(property.ClrType) #><#= needsNullable ? "?" : "" #> <#= property.Name #> 
+    {
+        get { return _<#= property.Name#>; }
+        set { SetProperty<<#=code.Reference(property.ClrType)#><#= needsNullable ? "?" : "" #>>(ref _<#= property.Name#>, value); }
+    }<#= needsInitializer ? " = null!;" : "" #>
+<#
+        firstProperty = false;
+    }
+
+    foreach (var navigation in EntityType.GetNavigations())
+    {
+        WriteLine("");
+
+        if (Options.UseDataAnnotations)
+        {
+            foreach (var dataAnnotation in navigation.GetDataAnnotations(annotationCodeGenerator))
+            {
+#>
+    <#= code.Fragment(dataAnnotation) #>
+<#
+            }
+        }
+
+        var targetType = navigation.TargetEntityType.Name;
+        if (targetType.Contains("@"))
+            targetType = targetType.Remove(0,1);
+        string navName = navigation.Name;
+        string relName = "";
+        if (navigation.IsCollection)
+        {
+            if(navName.Contains("Inverse"))
+            {
+                string navNameRef = navName.Remove(0,7);
+                relName = targetType+"_"+navNameRef;
+            }
+            else
+            {
+                string pkName = navigation.ForeignKey.PrincipalToDependent.ToString();
+                string pkIdName = pkName.Split("Inverse: ").Last();
+                relName = targetType+"_"+pkIdName;
+            }
+            if (relName.Contains("@"))
+            {
+                relName = relName.Remove(0,1);
+            }
+#>
+    private ICollection<<#= targetType #>> _<#= relName #>;
+    public virtual ICollection<<#= targetType #>> <#= relName #>
+    {
+        get => LazyLoader.Load(this, ref _<#= relName #>);
+        set => _<#= relName #> = value;
+    }
+
+    public bool <#= relName #>_IsLoaded
+    {
+        get
+        {
+            return <#= relName #> != null;
+        }
+    }
+
+    public virtual CollectionEntry <#= relName + "Reference"#>
+    {
+        get { return Context.Entry(this).Collection(c => c.<#= relName #>); }
+    }
+<#
+        }
+        else
+        {
+            var needsNullable = Options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
+            var needsInitializer = Options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;
+            string navPIdname = "";
+            if (navigation.Name == "BasedOnOutOffer" || navigation.Name == "BasedOnInRequest")
+            {
+                navPIdname = navigation.Name;
+            }
+            else if (navigation.Name.Contains("OrderLog"))
+            {
+                navPIdname = "OrderLog_VBiACProgramLog";
+            }
+            else if (!(navigation.ForeignKey.IsRequired && navigation.IsOnDependent) && targetType == EntityType.Name || navigation.Name == "BasedOn"+targetType)
+            {
+                navPIdname = targetType+"1_"+navName;
+            }
+            else
+            {
+                navPIdname = navigation.Name;
+            }
+        #>
+    private <#= targetType #><#= needsNullable ? "?" : "" #> _<#= navPIdname #>;
+    public virtual <#= targetType #><#= needsNullable ? "?" : "" #> <#= navPIdname #>
+    { 
+        get => LazyLoader.Load(this, ref _<#= navPIdname #>);
+        set => _<#= navPIdname #> = value;
+    }<#= needsInitializer ? " = null!;" : "" #>
+
+    public bool <#= navPIdname #>_IsLoaded
+    {
+        get
+        {
+            return <#= navPIdname #> != null;
+        }
+    }
+
+    public virtual ReferenceEntry<#= needsNullable ? "?" : "" #> <#= navPIdname+"Reference" #> 
+    {
+        get { return Context.Entry(this).Reference("<#=navPIdname#>"); }
+    }<#= needsInitializer ? " = null!;" : "" #>
+    <#
+        }
+    }
+
+    foreach (var skipNavigation in EntityType.GetSkipNavigations())
+    {
+        WriteLine("");
+
+        if (Options.UseDataAnnotations)
+        {
+            foreach (var dataAnnotation in skipNavigation.GetDataAnnotations(annotationCodeGenerator))
+            {
+#>
+    <#= code.Fragment(dataAnnotation) #>
+<#
+            }
+        }
+#>
+    private ICollection<<#= skipNavigation.TargetEntityType.Name #>> _<#= skipNavigation.Name #>;
+    public virtual ICollection<<#= skipNavigation.TargetEntityType.Name #>> <#= skipNavigation.Name #>
+    {
+        get => LazyLoader.Load(this, ref _<#= skipNavigation.Name #>);
+        set => _<#= skipNavigation.Name #> = value;
+    }
+
+    public virtual CollectionEntry <#= skipNavigation.Name + "Reference"#>
+    {
+        get { return Context.Entry(this).Collections(c => c.<#= skipNavigation.Name #>); }
+    }
+<#
+    }
+#>
+}
+<#
+    var previousOutput = GenerationEnvironment;
+    GenerationEnvironment = new StringBuilder();
+
+    foreach (var ns in usings.Distinct().OrderBy(x => x, new NamespaceComparer()))
+    {
+#>
+using <#= ns #>;
+<#
+    }
+
+    WriteLine("");
+
+    GenerationEnvironment.Append(previousOutput);
+#>

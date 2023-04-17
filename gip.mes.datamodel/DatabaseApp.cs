@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
 using System.Configuration;
-using System.Data.EntityClient;
-using System.Data.Objects;
-using System.Data.Objects.DataClasses;
 using System.Data;
 using System.ComponentModel;
 using System.Threading;
@@ -34,7 +31,7 @@ namespace gip.mes.datamodel
     }
 
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Database application'}de{'Datenbank Anwendung'}", Global.ACKinds.TACDBAManager, Global.ACStorableTypes.NotStorable, false, false)]
-    public partial class DatabaseApp : iPlusMESV4_Entities, IACEntityObjectContext, INotifyPropertyChanged
+    public partial class DatabaseApp : iPlusMESV5Context, IACEntityObjectContext, INotifyPropertyChanged
     {
         #region c'tors
         public DatabaseApp()

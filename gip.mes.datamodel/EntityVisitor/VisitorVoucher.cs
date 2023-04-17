@@ -1,5 +1,6 @@
 using System;
 using gip.core.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -141,7 +142,7 @@ namespace gip.mes.datamodel
         partial void OnXMLConfigChanging(global::System.String value)
         {
             bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
+            if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
                 bRefreshConfig = true;
         }
 

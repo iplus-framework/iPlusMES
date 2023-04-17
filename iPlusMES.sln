@@ -45,27 +45,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.tool.entitywizzard", ".
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Businesslayer", "2. Businesslayer", "{213CEB9A-795B-48BE-8FB5-86CD2D1AD63F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.facility", "gip.bso.facility\gip.bso.facility.csproj", "{9D0A5A8E-7C05-4F37-8E98-848C8E9DB4E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.facility", "gip.bso.facility\gip.bso.facility.csproj", "{9D0A5A8E-7C05-4F37-8E98-848C8E9DB4E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.logistics", "gip.bso.logistics\gip.bso.logistics.csproj", "{D82E92F5-AEB2-4826-812B-2AA51B7BC069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.logistics", "gip.bso.logistics\gip.bso.logistics.csproj", "{D82E92F5-AEB2-4826-812B-2AA51B7BC069}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.manufacturing", "gip.bso.manufacturing\gip.bso.manufacturing.csproj", "{33D19B80-129B-44FD-9662-282772BCD4DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.manufacturing", "gip.bso.manufacturing\gip.bso.manufacturing.csproj", "{33D19B80-129B-44FD-9662-282772BCD4DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.purchasing", "gip.bso.purchasing\gip.bso.purchasing.csproj", "{EC203D60-594B-47E0-BCB5-80643D25DAFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.purchasing", "gip.bso.purchasing\gip.bso.purchasing.csproj", "{EC203D60-594B-47E0-BCB5-80643D25DAFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.sales", "gip.bso.sales\gip.bso.sales.csproj", "{8E8C3A4B-86DF-42B4-AA59-A4F4B4E3882A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.sales", "gip.bso.sales\gip.bso.sales.csproj", "{8E8C3A4B-86DF-42B4-AA59-A4F4B4E3882A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.test", "gip.bso.test\gip.bso.test.csproj", "{D471399C-8F50-422F-8965-13FFC4D24FB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.test", "gip.bso.test\gip.bso.test.csproj", "{D471399C-8F50-422F-8965-13FFC4D24FB6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Datalayer", "3. Datalayer", "{F4A3E5B7-F8EA-41BB-A00A-C75D60754CAE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{3C7E5EA9-3F24-4077-BD6D-28C8B8B805E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip2006.variobatch.processapplication", "gip2006.variobatch.processapplication\gip2006.variobatch.processapplication.csproj", "{BC0B3EC7-E348-4E7D-96A9-FBBE68BD1AB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip2006.variobatch.processapplication", "gip2006.variobatch.processapplication\gip2006.variobatch.processapplication.csproj", "{BC0B3EC7-E348-4E7D-96A9-FBBE68BD1AB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.datamodel", "gip.mes.datamodel\gip.mes.datamodel.csproj", "{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.datamodel", "gip.mes.datamodel\gip.mes.datamodel.csproj", "{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.client", "gip.mes.client\gip.mes.client.csproj", "{193FBAF8-9269-4131-AA66-55DDBEFA8B01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.client", "gip.mes.client\gip.mes.client.csproj", "{193FBAF8-9269-4131-AA66-55DDBEFA8B01}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Clientlayer", "1. Clientlayer", "{C6192895-C25E-4A60-8606-7925C4D9374A}"
 EndProject
@@ -85,15 +85,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.ext.widgets", "..\iPlus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.ext.xamldom", "..\iPlus\gip.ext.xamldom\project\gip.ext.xamldom.csproj", "{88DA149F-21B2-48AB-82C4-28FB6BDFD783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.autocomponent", "gip.mes.autocomponent\gip.mes.autocomponent.csproj", "{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.autocomponent", "gip.mes.autocomponent\gip.mes.autocomponent.csproj", "{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.manager", "gip.mes.manager\gip.mes.manager.csproj", "{89D489D6-8881-4E43-A760-48051FAC6C41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.manager", "gip.mes.manager\gip.mes.manager.csproj", "{89D489D6-8881-4E43-A760-48051FAC6C41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.processapplication", "gip.mes.processapplication\gip.mes.processapplication.csproj", "{D1320FB8-333D-4072-880D-BD5137933D2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.processapplication", "gip.mes.processapplication\gip.mes.processapplication.csproj", "{D1320FB8-333D-4072-880D-BD5137933D2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.masterdata", "gip.bso.masterdata\gip.bso.masterdata.csproj", "{64342646-DAD9-441C-A270-2A7DD2228A42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.masterdata", "gip.bso.masterdata\gip.bso.masterdata.csproj", "{64342646-DAD9-441C-A270-2A7DD2228A42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.facility", "gip.mes.facility\gip.mes.facility.csproj", "{52DC947D-677D-42CA-BCA6-153A4E027272}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.facility", "gip.mes.facility\gip.mes.facility.csproj", "{52DC947D-677D-42CA-BCA6-153A4E027272}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.ext.fluent", "..\iPlus\gip.ext.fluent\gip.ext.fluent.csproj", "{4C92FCF4-3561-499F-BC5B-F2F089863047}"
 EndProject
@@ -111,11 +111,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.tcShared", "..\iPl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.tcClient", "..\iPlus\gip.core.tcClient\gip.core.tcClient.csproj", "{BBE18389-883E-4E82-BED7-D8FCC77CD846}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcat.mes.processapplication", "tcat.mes.processapplication\tcat.mes.processapplication.csproj", "{0884A79F-4204-4497-A4C8-7AE5A608E050}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tcat.mes.processapplication", "tcat.mes.processapplication\tcat.mes.processapplication.csproj", "{0884A79F-4204-4497-A4C8-7AE5A608E050}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.maintenance", "gip.mes.maintenance\gip.mes.maintenance.csproj", "{4E67A54F-A057-4FE7-9E5D-C40A5C465AEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.maintenance", "gip.mes.maintenance\gip.mes.maintenance.csproj", "{4E67A54F-A057-4FE7-9E5D-C40A5C465AEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.archiver", "gip.mes.archiver\gip.mes.archiver.csproj", "{7923BC55-C796-4711-87A7-EABE1981C3FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.archiver", "gip.mes.archiver\gip.mes.archiver.csproj", "{7923BC55-C796-4711-87A7-EABE1981C3FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.archiver", "..\iPlus\gip.core.archiver\gip.core.archiver.csproj", "{7D912622-055C-4B2C-8EE4-52D8F1C25F73}"
 EndProject
@@ -127,7 +127,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.tool.devLicense", "..\i
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBSyncerUpdate.unit.test", "..\iPlus\DBSyncerUpdate.unit.test\DBSyncerUpdate.unit.test.csproj", "{FCC827AC-CC93-49C5-B577-103CF86BA4ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.webservices", "gip.mes.webservices\gip.mes.webservices.csproj", "{099CAF77-67A9-4ED5-B5D9-8709796F3628}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.webservices", "gip.mes.webservices\gip.mes.webservices.csproj", "{099CAF77-67A9-4ED5-B5D9-8709796F3628}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "gip.mes.webservices.shared", "gip.mes.webservices.shared\gip.mes.webservices.shared.shproj", "{1131F03B-F0F7-4AB7-AD22-8207D49C2E24}"
 EndProject
@@ -143,7 +143,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "gip.core.autocomponent.shar
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "gip.mes.datamodel.shared", "gip.mes.datamodel.shared\gip.mes.datamodel.shared.shproj", "{AE832FBC-6E4E-4AD5-A2D6-04B45C1B1B5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.cmdlet", "gip.mes.cmdlet\gip.mes.cmdlet.csproj", "{71C000C3-7BEF-410E-9922-7282476FCEAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.cmdlet", "gip.mes.cmdlet\gip.mes.cmdlet.csproj", "{71C000C3-7BEF-410E-9922-7282476FCEAD}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.core.sql", "..\iPlus\gip.core.sql\gip.core.sql.sqlproj", "{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}"
 EndProject
@@ -454,12 +454,30 @@ Global
 		{099CAF77-67A9-4ED5-B5D9-8709796F3628}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
 		{099CAF77-67A9-4ED5-B5D9-8709796F3628}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{099CAF77-67A9-4ED5-B5D9-8709796F3628}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1131F03B-F0F7-4AB7-AD22-8207D49C2E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1131F03B-F0F7-4AB7-AD22-8207D49C2E24}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{1131F03B-F0F7-4AB7-AD22-8207D49C2E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C232936-48B8-4CCD-951E-8AD3D439D264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C232936-48B8-4CCD-951E-8AD3D439D264}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C232936-48B8-4CCD-951E-8AD3D439D264}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7931F65B-3C2A-4DB9-A5A6-4BC5B4D12C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7931F65B-3C2A-4DB9-A5A6-4BC5B4D12C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7931F65B-3C2A-4DB9-A5A6-4BC5B4D12C00}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
 		{7931F65B-3C2A-4DB9-A5A6-4BC5B4D12C00}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
 		{7931F65B-3C2A-4DB9-A5A6-4BC5B4D12C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7931F65B-3C2A-4DB9-A5A6-4BC5B4D12C00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47F013C1-E869-419E-8B17-C56313ACC34B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47F013C1-E869-419E-8B17-C56313ACC34B}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{47F013C1-E869-419E-8B17-C56313ACC34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE279FBA-181F-4D15-BBE8-8820CAF186B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE279FBA-181F-4D15-BBE8-8820CAF186B2}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE279FBA-181F-4D15-BBE8-8820CAF186B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D353DD2-970B-45BB-9AB6-D23A28E0233F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D353DD2-970B-45BB-9AB6-D23A28E0233F}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D353DD2-970B-45BB-9AB6-D23A28E0233F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE832FBC-6E4E-4AD5-A2D6-04B45C1B1B5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE832FBC-6E4E-4AD5-A2D6-04B45C1B1B5E}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE832FBC-6E4E-4AD5-A2D6-04B45C1B1B5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71C000C3-7BEF-410E-9922-7282476FCEAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{71C000C3-7BEF-410E-9922-7282476FCEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71C000C3-7BEF-410E-9922-7282476FCEAD}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
