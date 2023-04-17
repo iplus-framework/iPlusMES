@@ -109,24 +109,24 @@ public partial class FacilityInventory : VBEntityObject , IInsertInfo, IUpdateIn
         get { return Context.Entry(this).Reference("Facility"); }
     }
     
-    private ICollection<FacilityInventoryPos> _FacilityInventoryPo_FacilityInventory;
-    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPo_FacilityInventory
+    private ICollection<FacilityInventoryPos> _FacilityInventoryPos_FacilityInventory;
+    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityInventory
     {
-        get => LazyLoader.Load(this, ref _FacilityInventoryPo_FacilityInventory);
-        set => _FacilityInventoryPo_FacilityInventory = value;
+        get => LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityInventory);
+        set => _FacilityInventoryPos_FacilityInventory = value;
     }
 
-    public bool FacilityInventoryPo_FacilityInventory_IsLoaded
+    public bool FacilityInventoryPos_FacilityInventory_IsLoaded
     {
         get
         {
-            return FacilityInventoryPo_FacilityInventory != null;
+            return FacilityInventoryPos_FacilityInventory != null;
         }
     }
 
-    public virtual CollectionEntry FacilityInventoryPo_FacilityInventoryReference
+    public virtual CollectionEntry FacilityInventoryPos_FacilityInventoryReference
     {
-        get { return Context.Entry(this).Collection(c => c.FacilityInventoryPo_FacilityInventory); }
+        get { return Context.Entry(this).Collection(c => c.FacilityInventoryPos_FacilityInventory); }
     }
 
     private MDFacilityInventoryState _MDFacilityInventoryState;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -35,12 +35,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDTourplanState>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDTourplanState>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDTourplanState>>(
             (database) => from c in database.MDTourplanState where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDTourplanState>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDTourplanState>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDTourplanState>>(
             (database, index) => from c in database.MDTourplanState where c.MDTourplanStateIndex == index select c
         );
 

@@ -224,24 +224,24 @@ public partial class ACClassTask : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassTask1_ParentACClassTask"); }
     }
     
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPo_ACClassTask;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPo_ACClassTask
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ACClassTask;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ACClassTask
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPo_ACClassTask);
-        set => _ProdOrderPartslistPo_ACClassTask = value;
+        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_ACClassTask);
+        set => _ProdOrderPartslistPos_ACClassTask = value;
     }
 
-    public bool ProdOrderPartslistPo_ACClassTask_IsLoaded
+    public bool ProdOrderPartslistPos_ACClassTask_IsLoaded
     {
         get
         {
-            return ProdOrderPartslistPo_ACClassTask != null;
+            return ProdOrderPartslistPos_ACClassTask != null;
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPo_ACClassTaskReference
+    public virtual CollectionEntry ProdOrderPartslistPos_ACClassTaskReference
     {
-        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPo_ACClassTask); }
+        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_ACClassTask); }
     }
 
     private ACClass _TaskTypeACClass;

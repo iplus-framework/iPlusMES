@@ -261,24 +261,24 @@ public partial class Invoice : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryCompanyAddress"); }
     }
     
-    private ICollection<InvoicePos> _InvoicePo_Invoice;
-    public virtual ICollection<InvoicePos> InvoicePo_Invoice
+    private ICollection<InvoicePos> _InvoicePos_Invoice;
+    public virtual ICollection<InvoicePos> InvoicePos_Invoice
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_Invoice);
-        set => _InvoicePo_Invoice = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_Invoice);
+        set => _InvoicePos_Invoice = value;
     }
 
-    public bool InvoicePo_Invoice_IsLoaded
+    public bool InvoicePos_Invoice_IsLoaded
     {
         get
         {
-            return InvoicePo_Invoice != null;
+            return InvoicePos_Invoice != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_InvoiceReference
+    public virtual CollectionEntry InvoicePos_InvoiceReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_Invoice); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_Invoice); }
     }
 
     private CompanyAddress _IssuerCompanyAddress;

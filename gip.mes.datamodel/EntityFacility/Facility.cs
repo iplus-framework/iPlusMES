@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -319,7 +319,7 @@ namespace gip.mes.datamodel
             }
             this.VisitorVoucher_VehicleFacility.Clear();
 
-            database.DeleteObject(this);
+            database.Remove(this);
 
             return null;
         }
@@ -831,7 +831,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.FacilityCharge_Facility.CreateSourceQuery().Where(c => c.NotAvailable == false
+                return Context.Entry(this).Collection(c => c.FacilityCharge_Facility).Query().Where(c => c.NotAvailable == false
                                                                 && (c.MDReleaseStateID.HasValue && c.MDReleaseState.MDReleaseStateIndex >= (short)MDReleaseState.ReleaseStates.Locked)
                                                                     || (c.FacilityLotID.HasValue && c.FacilityLot.MDReleaseStateID.HasValue && c.FacilityLot.MDReleaseState.MDReleaseStateIndex >= (short)MDReleaseState.ReleaseStates.Locked));
             }
@@ -841,7 +841,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.FacilityCharge_Facility.CreateSourceQuery()
+                return Context.Entry(this).Collection(c => c.FacilityCharge_Facility).Query()
                                                     .Where(c => c.NotAvailable == false
                                                             && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
                                                             && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree));
@@ -984,7 +984,7 @@ namespace gip.mes.datamodel
         }
 
         //public static readonly Func<DatabaseApp, Facility, Guid, bool> s_cQry_IsLocatedIn =
-        //    CompiledQuery.Compile<DatabaseApp, Facility, Guid, bool>((ctx, facility, parentFacilityID) => 
+        //    EF.CompileQuery<DatabaseApp, Facility, Guid, bool>((ctx, facility, parentFacilityID) => 
         //                  facility.FacilityID == parentFacilityID
         //              || (facility.ParentFacilityID.HasValue && facility.ParentFacilityID == parentFacilityID) //1. Level
         //              || (   facility.Facility1_ParentFacility != null                                         //2. Level

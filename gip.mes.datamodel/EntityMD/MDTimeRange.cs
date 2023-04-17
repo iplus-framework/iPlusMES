@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -50,7 +50,7 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDTimeRange>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDTimeRange>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDTimeRange>>(
             (database) => from c in database.MDTimeRange where c.IsDefault select c
         );
 

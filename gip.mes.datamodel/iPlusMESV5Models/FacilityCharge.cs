@@ -439,24 +439,24 @@ public partial class FacilityCharge : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacilityCharge); }
     }
 
-    private ICollection<FacilityInventoryPos> _FacilityInventoryPo_FacilityCharge;
-    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPo_FacilityCharge
+    private ICollection<FacilityInventoryPos> _FacilityInventoryPos_FacilityCharge;
+    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityInventoryPo_FacilityCharge);
-        set => _FacilityInventoryPo_FacilityCharge = value;
+        get => LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityCharge);
+        set => _FacilityInventoryPos_FacilityCharge = value;
     }
 
-    public bool FacilityInventoryPo_FacilityCharge_IsLoaded
+    public bool FacilityInventoryPos_FacilityCharge_IsLoaded
     {
         get
         {
-            return FacilityInventoryPo_FacilityCharge != null;
+            return FacilityInventoryPos_FacilityCharge != null;
         }
     }
 
-    public virtual CollectionEntry FacilityInventoryPo_FacilityChargeReference
+    public virtual CollectionEntry FacilityInventoryPos_FacilityChargeReference
     {
-        get { return Context.Entry(this).Collection(c => c.FacilityInventoryPo_FacilityCharge); }
+        get { return Context.Entry(this).Collection(c => c.FacilityInventoryPos_FacilityCharge); }
     }
 
     private FacilityLot _FacilityLot;

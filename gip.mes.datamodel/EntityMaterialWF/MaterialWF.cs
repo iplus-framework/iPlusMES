@@ -1,7 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;

@@ -83,9 +83,9 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             Picking picking = Picking;
-            if (picking != null && picking.PickingPos_Picking.IsLoaded)
+            if (picking != null && picking.PickingPos_Picking_IsLoaded)
                 picking.PickingPos_Picking.Remove(this);
-            database.DeleteObject(this);
+            database.Remove(this);
             if (picking != null)
             {
                 PickingPos.RenumberSequence(picking, sequence);
@@ -563,11 +563,11 @@ namespace gip.mes.datamodel
 
             DatabaseApp dbApp = null;
             double sumActualQuantityUOM = 0;
-            var sumsPerUnitID = this.FacilityBookingCharge_PickingPos
-                                            .CreateSourceQuery()
-                                            .GroupBy(c => c.MDUnitID)
-                                            .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
-                                            .ToArray();
+            var sumsPerUnitID = Context.Entry(this).Collection(c => c.FacilityBookingCharge_PickingPos)
+                                                   .Query()
+                                                   .GroupBy(c => c.MDUnitID)
+                                                   .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
+                                                   .ToArray();
             MDUnit thisMDUnit = this.MDUnit;
             foreach (var sumPerUnit in sumsPerUnitID)
             {

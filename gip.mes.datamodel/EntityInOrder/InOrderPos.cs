@@ -1,7 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -75,9 +75,9 @@ namespace gip.mes.datamodel
                 entity.TargetDeliveryDate = inOrder.TargetDeliveryDate;
                 entity.TargetDeliveryMaxDate = inOrder.TargetDeliveryMaxDate;
 
-                if (!inOrder.InOrderPos_InOrder.IsLoaded
-                    && (inOrder.EntityState == System.Data.EntityState.Modified || inOrder.EntityState == System.Data.EntityState.Unchanged))
-                    entity.Sequence = inOrder.InOrderPos_InOrder.CreateSourceQuery().Max(c => c.Sequence) + 1;
+                if (!inOrder.InOrderPos_InOrder_IsLoaded
+                    && (inOrder.EntityState == EntityState.Modified || inOrder.EntityState == EntityState.Unchanged))
+                    entity.Sequence = inOrder.Context.Entry(inOrder).Collection(c => c.InOrderPos_InOrder).Query().Max(c => c.Sequence) + 1;
                 else if (inOrder.InOrderPos_InOrder.Any())
                 {
                     IEnumerable<int> querySequence = inOrder.InOrderPos_InOrder.Select(c => c.Sequence);
@@ -88,7 +88,7 @@ namespace gip.mes.datamodel
 
                 entity.InOrder = inOrder;
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.InwardRoot;
-                if (parentInOrderPos == null || inOrder.InOrderPos_InOrder.IsLoaded)
+                if (parentInOrderPos == null || inOrder.InOrderPos_InOrder_IsLoaded)
                     inOrder.InOrderPos_InOrder.Add(entity);
                 else
                     dbApp.InOrderPos.AddObject(entity);
@@ -131,9 +131,9 @@ namespace gip.mes.datamodel
 
             InOrder inOrder = InOrder;
             if (inOrder != null)
-                if (inOrder.InOrderPos_InOrder.IsLoaded)
+                if (inOrder.InOrderPos_InOrder_IsLoaded)
                     inOrder.InOrderPos_InOrder.Remove(this);
-            database.DeleteObject(this);
+            database.Remove(this);
             if (inOrder != null)
                 InOrderPos.RenumberSequence(inOrder, sequence);
             return null;
@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
                 || !inOrder.InOrderPos_InOrder.Any())
                 return;
 
-            var elements = inOrder.InOrderPos_InOrder.Where(c => c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted).OrderBy(c => c.Sequence);
+            var elements = inOrder.InOrderPos_InOrder.Where(c => c.Sequence > sequence && c.EntityState != EntityState.Deleted).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {
@@ -548,7 +548,7 @@ namespace gip.mes.datamodel
 
         public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null)
         {
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != EntityState.Added)
             {
                 if (mergeOption.HasValue)
                     this.InOrderPos_ParentInOrderPos.Load(mergeOption.Value);
@@ -582,8 +582,8 @@ namespace gip.mes.datamodel
             }
 
             DatabaseApp dbApp = null;
-            var sumsPerUnitID = this.FacilityBookingCharge_InOrderPos
-                                .CreateSourceQuery()
+            var sumsPerUnitID = Context.Entry(this).Collection(c => c.FacilityBookingCharge_InOrderPos)
+                                .Query()
                                 .GroupBy(c => c.MDUnitID)
                                 .Select(t => new { MDUnitID = t.Key, inwardQUOM = t.Sum(u => u.InwardQuantityUOM), inwardQ = t.Sum(u => u.InwardQuantity) })
                                 .ToArray();
@@ -634,7 +634,7 @@ namespace gip.mes.datamodel
 
         public void RecalcDeliveryStates(Nullable<MergeOption> mergeOption = null)
         {
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != EntityState.Added)
             {
                 if (mergeOption.HasValue)
                     this.InOrderPos_ParentInOrderPos.Load(mergeOption.Value);
@@ -675,7 +675,7 @@ namespace gip.mes.datamodel
 
         public double PreBookingInwardQuantityUOM(Nullable<MergeOption> mergeOption = null)
         {
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != EntityState.Added)
             {
                 if (mergeOption.HasValue)
                     this.InOrderPos_ParentInOrderPos.Load(mergeOption.Value);
@@ -689,7 +689,7 @@ namespace gip.mes.datamodel
                 sumUOM += childPos.PreBookingInwardQuantityUOM(mergeOption);
             }
 
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != EntityState.Added)
             {
                 if (mergeOption.HasValue)
                     this.FacilityPreBooking_InOrderPos.Load(mergeOption.Value);

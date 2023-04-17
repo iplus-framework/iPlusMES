@@ -231,64 +231,64 @@ public partial class MDUnit : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_MDUnit); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDUnit;
-    public virtual ICollection<InOrderPos> InOrderPo_MDUnit
+    private ICollection<InOrderPos> _InOrderPos_MDUnit;
+    public virtual ICollection<InOrderPos> InOrderPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDUnit);
-        set => _InOrderPo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDUnit);
+        set => _InOrderPos_MDUnit = value;
     }
 
-    public bool InOrderPo_MDUnit_IsLoaded
+    public bool InOrderPos_MDUnit_IsLoaded
     {
         get
         {
-            return InOrderPo_MDUnit != null;
+            return InOrderPos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDUnitReference
+    public virtual CollectionEntry InOrderPos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDUnit); }
     }
 
-    private ICollection<InRequestPos> _InRequestPo_MDUnit;
-    public virtual ICollection<InRequestPos> InRequestPo_MDUnit
+    private ICollection<InRequestPos> _InRequestPos_MDUnit;
+    public virtual ICollection<InRequestPos> InRequestPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _InRequestPo_MDUnit);
-        set => _InRequestPo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _InRequestPos_MDUnit);
+        set => _InRequestPos_MDUnit = value;
     }
 
-    public bool InRequestPo_MDUnit_IsLoaded
+    public bool InRequestPos_MDUnit_IsLoaded
     {
         get
         {
-            return InRequestPo_MDUnit != null;
+            return InRequestPos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry InRequestPo_MDUnitReference
+    public virtual CollectionEntry InRequestPos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.InRequestPo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.InRequestPos_MDUnit); }
     }
 
-    private ICollection<InvoicePos> _InvoicePo_MDUnit;
-    public virtual ICollection<InvoicePos> InvoicePo_MDUnit
+    private ICollection<InvoicePos> _InvoicePos_MDUnit;
+    public virtual ICollection<InvoicePos> InvoicePos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_MDUnit);
-        set => _InvoicePo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_MDUnit);
+        set => _InvoicePos_MDUnit = value;
     }
 
-    public bool InvoicePo_MDUnit_IsLoaded
+    public bool InvoicePos_MDUnit_IsLoaded
     {
         get
         {
-            return InvoicePo_MDUnit != null;
+            return InvoicePos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_MDUnitReference
+    public virtual CollectionEntry InvoicePos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_MDUnit); }
     }
 
     private ICollection<MDGMPAdditive> _MDGMPAdditive_MDQuantityUnit;
@@ -391,64 +391,64 @@ public partial class MDUnit : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Material_BaseMDUnit); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPo_MDUnit;
-    public virtual ICollection<OutOfferPos> OutOfferPo_MDUnit
+    private ICollection<OutOfferPos> _OutOfferPos_MDUnit;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_MDUnit);
-        set => _OutOfferPo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_MDUnit);
+        set => _OutOfferPos_MDUnit = value;
     }
 
-    public bool OutOfferPo_MDUnit_IsLoaded
+    public bool OutOfferPos_MDUnit_IsLoaded
     {
         get
         {
-            return OutOfferPo_MDUnit != null;
+            return OutOfferPos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_MDUnitReference
+    public virtual CollectionEntry OutOfferPos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDUnit); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDUnit;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDUnit
+    private ICollection<OutOrderPos> _OutOrderPos_MDUnit;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDUnit);
-        set => _OutOrderPo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDUnit);
+        set => _OutOrderPos_MDUnit = value;
     }
 
-    public bool OutOrderPo_MDUnit_IsLoaded
+    public bool OutOrderPos_MDUnit_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDUnit != null;
+            return OutOrderPos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDUnitReference
+    public virtual CollectionEntry OutOrderPos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDUnit); }
     }
 
-    private ICollection<PartslistPos> _PartslistPo_MDUnit;
-    public virtual ICollection<PartslistPos> PartslistPo_MDUnit
+    private ICollection<PartslistPos> _PartslistPos_MDUnit;
+    public virtual ICollection<PartslistPos> PartslistPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _PartslistPo_MDUnit);
-        set => _PartslistPo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _PartslistPos_MDUnit);
+        set => _PartslistPos_MDUnit = value;
     }
 
-    public bool PartslistPo_MDUnit_IsLoaded
+    public bool PartslistPos_MDUnit_IsLoaded
     {
         get
         {
-            return PartslistPo_MDUnit != null;
+            return PartslistPos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry PartslistPo_MDUnitReference
+    public virtual CollectionEntry PartslistPos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.PartslistPo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.PartslistPos_MDUnit); }
     }
 
     private ICollection<Partslist> _Partslist_MDUnit;
@@ -471,23 +471,23 @@ public partial class MDUnit : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Partslist_MDUnit); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPo_MDUnit;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPo_MDUnit
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDUnit;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPo_MDUnit);
-        set => _ProdOrderPartslistPo_MDUnit = value;
+        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDUnit);
+        set => _ProdOrderPartslistPos_MDUnit = value;
     }
 
-    public bool ProdOrderPartslistPo_MDUnit_IsLoaded
+    public bool ProdOrderPartslistPos_MDUnit_IsLoaded
     {
         get
         {
-            return ProdOrderPartslistPo_MDUnit != null;
+            return ProdOrderPartslistPos_MDUnit != null;
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPo_MDUnitReference
+    public virtual CollectionEntry ProdOrderPartslistPos_MDUnitReference
     {
-        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPo_MDUnit); }
+        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDUnit); }
     }
 }

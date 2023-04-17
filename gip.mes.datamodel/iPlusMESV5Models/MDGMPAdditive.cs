@@ -117,24 +117,24 @@ public partial class MDGMPAdditive : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPo_MDGMPAdditive;
-    public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPo_MDGMPAdditive
+    private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPos_MDGMPAdditive;
+    public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPAdditive
     {
-        get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPo_MDGMPAdditive);
-        set => _MDGMPMaterialGroupPo_MDGMPAdditive = value;
+        get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPAdditive);
+        set => _MDGMPMaterialGroupPos_MDGMPAdditive = value;
     }
 
-    public bool MDGMPMaterialGroupPo_MDGMPAdditive_IsLoaded
+    public bool MDGMPMaterialGroupPos_MDGMPAdditive_IsLoaded
     {
         get
         {
-            return MDGMPMaterialGroupPo_MDGMPAdditive != null;
+            return MDGMPMaterialGroupPos_MDGMPAdditive != null;
         }
     }
 
-    public virtual CollectionEntry MDGMPMaterialGroupPo_MDGMPAdditiveReference
+    public virtual CollectionEntry MDGMPMaterialGroupPos_MDGMPAdditiveReference
     {
-        get { return Context.Entry(this).Collection(c => c.MDGMPMaterialGroupPo_MDGMPAdditive); }
+        get { return Context.Entry(this).Collection(c => c.MDGMPMaterialGroupPos_MDGMPAdditive); }
     }
 
     private MDProcessErrorAction _MDProcessErrorAction;

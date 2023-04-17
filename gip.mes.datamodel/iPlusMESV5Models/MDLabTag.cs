@@ -96,23 +96,23 @@ public partial class MDLabTag : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<LabOrderPos> _LabOrderPo_MDLabTag;
-    public virtual ICollection<LabOrderPos> LabOrderPo_MDLabTag
+    private ICollection<LabOrderPos> _LabOrderPos_MDLabTag;
+    public virtual ICollection<LabOrderPos> LabOrderPos_MDLabTag
     {
-        get => LazyLoader.Load(this, ref _LabOrderPo_MDLabTag);
-        set => _LabOrderPo_MDLabTag = value;
+        get => LazyLoader.Load(this, ref _LabOrderPos_MDLabTag);
+        set => _LabOrderPos_MDLabTag = value;
     }
 
-    public bool LabOrderPo_MDLabTag_IsLoaded
+    public bool LabOrderPos_MDLabTag_IsLoaded
     {
         get
         {
-            return LabOrderPo_MDLabTag != null;
+            return LabOrderPos_MDLabTag != null;
         }
     }
 
-    public virtual CollectionEntry LabOrderPo_MDLabTagReference
+    public virtual CollectionEntry LabOrderPos_MDLabTagReference
     {
-        get { return Context.Entry(this).Collection(c => c.LabOrderPo_MDLabTag); }
+        get { return Context.Entry(this).Collection(c => c.LabOrderPos_MDLabTag); }
     }
 }

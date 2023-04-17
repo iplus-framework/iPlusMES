@@ -129,24 +129,24 @@ public partial class ACClassTaskValue : VBEntityObject , IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Reference("ACClassTask"); }
     }
     
-    private ICollection<ACClassTaskValuePos> _ACClassTaskValuePo_ACClassTaskValue;
-    public virtual ICollection<ACClassTaskValuePos> ACClassTaskValuePo_ACClassTaskValue
+    private ICollection<ACClassTaskValuePos> _ACClassTaskValuePos_ACClassTaskValue;
+    public virtual ICollection<ACClassTaskValuePos> ACClassTaskValuePos_ACClassTaskValue
     {
-        get => LazyLoader.Load(this, ref _ACClassTaskValuePo_ACClassTaskValue);
-        set => _ACClassTaskValuePo_ACClassTaskValue = value;
+        get => LazyLoader.Load(this, ref _ACClassTaskValuePos_ACClassTaskValue);
+        set => _ACClassTaskValuePos_ACClassTaskValue = value;
     }
 
-    public bool ACClassTaskValuePo_ACClassTaskValue_IsLoaded
+    public bool ACClassTaskValuePos_ACClassTaskValue_IsLoaded
     {
         get
         {
-            return ACClassTaskValuePo_ACClassTaskValue != null;
+            return ACClassTaskValuePos_ACClassTaskValue != null;
         }
     }
 
-    public virtual CollectionEntry ACClassTaskValuePo_ACClassTaskValueReference
+    public virtual CollectionEntry ACClassTaskValuePos_ACClassTaskValueReference
     {
-        get { return Context.Entry(this).Collection(c => c.ACClassTaskValuePo_ACClassTaskValue); }
+        get { return Context.Entry(this).Collection(c => c.ACClassTaskValuePos_ACClassTaskValue); }
     }
 
     private VBUser _VBUser;

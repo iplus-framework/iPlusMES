@@ -110,64 +110,64 @@ public partial class MDCountrySalesTax : VBEntityObject , IInsertInfo, IUpdateIn
         set { SetProperty<DateTime?>(ref _DateTo, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDCountrySalesTax;
-    public virtual ICollection<InOrderPos> InOrderPo_MDCountrySalesTax
+    private ICollection<InOrderPos> _InOrderPos_MDCountrySalesTax;
+    public virtual ICollection<InOrderPos> InOrderPos_MDCountrySalesTax
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDCountrySalesTax);
-        set => _InOrderPo_MDCountrySalesTax = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDCountrySalesTax);
+        set => _InOrderPos_MDCountrySalesTax = value;
     }
 
-    public bool InOrderPo_MDCountrySalesTax_IsLoaded
+    public bool InOrderPos_MDCountrySalesTax_IsLoaded
     {
         get
         {
-            return InOrderPo_MDCountrySalesTax != null;
+            return InOrderPos_MDCountrySalesTax != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDCountrySalesTaxReference
+    public virtual CollectionEntry InOrderPos_MDCountrySalesTaxReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDCountrySalesTax); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDCountrySalesTax); }
     }
 
-    private ICollection<InRequestPos> _InRequestPo_MDCountrySalesTax;
-    public virtual ICollection<InRequestPos> InRequestPo_MDCountrySalesTax
+    private ICollection<InRequestPos> _InRequestPos_MDCountrySalesTax;
+    public virtual ICollection<InRequestPos> InRequestPos_MDCountrySalesTax
     {
-        get => LazyLoader.Load(this, ref _InRequestPo_MDCountrySalesTax);
-        set => _InRequestPo_MDCountrySalesTax = value;
+        get => LazyLoader.Load(this, ref _InRequestPos_MDCountrySalesTax);
+        set => _InRequestPos_MDCountrySalesTax = value;
     }
 
-    public bool InRequestPo_MDCountrySalesTax_IsLoaded
+    public bool InRequestPos_MDCountrySalesTax_IsLoaded
     {
         get
         {
-            return InRequestPo_MDCountrySalesTax != null;
+            return InRequestPos_MDCountrySalesTax != null;
         }
     }
 
-    public virtual CollectionEntry InRequestPo_MDCountrySalesTaxReference
+    public virtual CollectionEntry InRequestPos_MDCountrySalesTaxReference
     {
-        get { return Context.Entry(this).Collection(c => c.InRequestPo_MDCountrySalesTax); }
+        get { return Context.Entry(this).Collection(c => c.InRequestPos_MDCountrySalesTax); }
     }
 
-    private ICollection<InvoicePos> _InvoicePo_MDCountrySalesTax;
-    public virtual ICollection<InvoicePos> InvoicePo_MDCountrySalesTax
+    private ICollection<InvoicePos> _InvoicePos_MDCountrySalesTax;
+    public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTax
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_MDCountrySalesTax);
-        set => _InvoicePo_MDCountrySalesTax = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTax);
+        set => _InvoicePos_MDCountrySalesTax = value;
     }
 
-    public bool InvoicePo_MDCountrySalesTax_IsLoaded
+    public bool InvoicePos_MDCountrySalesTax_IsLoaded
     {
         get
         {
-            return InvoicePo_MDCountrySalesTax != null;
+            return InvoicePos_MDCountrySalesTax != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_MDCountrySalesTaxReference
+    public virtual CollectionEntry InvoicePos_MDCountrySalesTaxReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_MDCountrySalesTax); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_MDCountrySalesTax); }
     }
 
     private MDCountry _MDCountry;
@@ -230,43 +230,43 @@ public partial class MDCountrySalesTax : VBEntityObject , IInsertInfo, IUpdateIn
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMaterial_MDCountrySalesTax); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPo_MDCountrySalesTax;
-    public virtual ICollection<OutOfferPos> OutOfferPo_MDCountrySalesTax
+    private ICollection<OutOfferPos> _OutOfferPos_MDCountrySalesTax;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTax
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_MDCountrySalesTax);
-        set => _OutOfferPo_MDCountrySalesTax = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTax);
+        set => _OutOfferPos_MDCountrySalesTax = value;
     }
 
-    public bool OutOfferPo_MDCountrySalesTax_IsLoaded
+    public bool OutOfferPos_MDCountrySalesTax_IsLoaded
     {
         get
         {
-            return OutOfferPo_MDCountrySalesTax != null;
+            return OutOfferPos_MDCountrySalesTax != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_MDCountrySalesTaxReference
+    public virtual CollectionEntry OutOfferPos_MDCountrySalesTaxReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_MDCountrySalesTax); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTax); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDCountrySalesTax;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDCountrySalesTax
+    private ICollection<OutOrderPos> _OutOrderPos_MDCountrySalesTax;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTax
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDCountrySalesTax);
-        set => _OutOrderPo_MDCountrySalesTax = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTax);
+        set => _OutOrderPos_MDCountrySalesTax = value;
     }
 
-    public bool OutOrderPo_MDCountrySalesTax_IsLoaded
+    public bool OutOrderPos_MDCountrySalesTax_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDCountrySalesTax != null;
+            return OutOrderPos_MDCountrySalesTax != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDCountrySalesTaxReference
+    public virtual CollectionEntry OutOrderPos_MDCountrySalesTaxReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDCountrySalesTax); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDCountrySalesTax); }
     }
 }

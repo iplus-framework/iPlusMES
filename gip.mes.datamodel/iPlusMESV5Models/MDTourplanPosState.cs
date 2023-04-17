@@ -96,43 +96,43 @@ public partial class MDTourplanPosState : VBEntityObject , IInsertInfo, IUpdateI
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDTourplanPosState;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDTourplanPosState
+    private ICollection<OutOrderPos> _OutOrderPos_MDTourplanPosState;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDTourplanPosState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDTourplanPosState);
-        set => _OutOrderPo_MDTourplanPosState = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDTourplanPosState);
+        set => _OutOrderPos_MDTourplanPosState = value;
     }
 
-    public bool OutOrderPo_MDTourplanPosState_IsLoaded
+    public bool OutOrderPos_MDTourplanPosState_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDTourplanPosState != null;
+            return OutOrderPos_MDTourplanPosState != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDTourplanPosStateReference
+    public virtual CollectionEntry OutOrderPos_MDTourplanPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDTourplanPosState); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTourplanPosState); }
     }
 
-    private ICollection<TourplanPos> _TourplanPo_MDTourplanPosState;
-    public virtual ICollection<TourplanPos> TourplanPo_MDTourplanPosState
+    private ICollection<TourplanPos> _TourplanPos_MDTourplanPosState;
+    public virtual ICollection<TourplanPos> TourplanPos_MDTourplanPosState
     {
-        get => LazyLoader.Load(this, ref _TourplanPo_MDTourplanPosState);
-        set => _TourplanPo_MDTourplanPosState = value;
+        get => LazyLoader.Load(this, ref _TourplanPos_MDTourplanPosState);
+        set => _TourplanPos_MDTourplanPosState = value;
     }
 
-    public bool TourplanPo_MDTourplanPosState_IsLoaded
+    public bool TourplanPos_MDTourplanPosState_IsLoaded
     {
         get
         {
-            return TourplanPo_MDTourplanPosState != null;
+            return TourplanPos_MDTourplanPosState != null;
         }
     }
 
-    public virtual CollectionEntry TourplanPo_MDTourplanPosStateReference
+    public virtual CollectionEntry TourplanPos_MDTourplanPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.TourplanPo_MDTourplanPosState); }
+        get { return Context.Entry(this).Collection(c => c.TourplanPos_MDTourplanPosState); }
     }
 }

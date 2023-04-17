@@ -6,14 +6,14 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class DemandOrderPo : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class DemandOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
 {
 
-    public DemandOrderPo()
+    public DemandOrderPos()
     {
     }
 
-    private DemandOrderPo(ILazyLoader lazyLoader)
+    private DemandOrderPos(ILazyLoader lazyLoader)
     {
         LazyLoader = lazyLoader;
     }

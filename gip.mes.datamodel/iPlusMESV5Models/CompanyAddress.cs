@@ -682,24 +682,24 @@ public partial class CompanyAddress : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Picking_DeliveryCompanyAddress); }
     }
 
-    private ICollection<TourplanPos> _TourplanPo_CompanyAddress;
-    public virtual ICollection<TourplanPos> TourplanPo_CompanyAddress
+    private ICollection<TourplanPos> _TourplanPos_CompanyAddress;
+    public virtual ICollection<TourplanPos> TourplanPos_CompanyAddress
     {
-        get => LazyLoader.Load(this, ref _TourplanPo_CompanyAddress);
-        set => _TourplanPo_CompanyAddress = value;
+        get => LazyLoader.Load(this, ref _TourplanPos_CompanyAddress);
+        set => _TourplanPos_CompanyAddress = value;
     }
 
-    public bool TourplanPo_CompanyAddress_IsLoaded
+    public bool TourplanPos_CompanyAddress_IsLoaded
     {
         get
         {
-            return TourplanPo_CompanyAddress != null;
+            return TourplanPos_CompanyAddress != null;
         }
     }
 
-    public virtual CollectionEntry TourplanPo_CompanyAddressReference
+    public virtual CollectionEntry TourplanPos_CompanyAddressReference
     {
-        get { return Context.Entry(this).Collection(c => c.TourplanPo_CompanyAddress); }
+        get { return Context.Entry(this).Collection(c => c.TourplanPos_CompanyAddress); }
     }
 
     private ICollection<UserSettings> _UserSetting_InvoiceCompanyAddress;

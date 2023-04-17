@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
 
 namespace gip.mes.datamodel
 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -79,7 +79,7 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDCountryLand>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDCountryLand>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDCountryLand>>(
             (database) => from c in database.MDCountryLand where c.IsDefault select c
         );
 

@@ -8,6 +8,7 @@ using System.Data;
 using System.ComponentModel;
 using System.Threading;
 using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -412,7 +413,7 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public IList<T> GetAddedEntities<T>(Func<T, bool> selector = null) where T : class
         {
-            return _ObjectContextHelper.GetChangedEntities<T>(System.Data.EntityState.Added, selector);
+            return _ObjectContextHelper.GetChangedEntities<T>(EntityState.Added, selector);
         }
 
         /// <summary>
@@ -422,7 +423,7 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public IList<T> GetModifiedEntities<T>(Func<T, bool> selector = null) where T : class
         {
-            return _ObjectContextHelper.GetChangedEntities<T>(System.Data.EntityState.Modified, selector);
+            return _ObjectContextHelper.GetChangedEntities<T>(EntityState.Modified, selector);
         }
 
         /// <summary>
@@ -432,7 +433,7 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public IList<T> GetDeletedEntities<T>(Func<T, bool> selector = null) where T : class
         {
-            return _ObjectContextHelper.GetChangedEntities<T>(System.Data.EntityState.Deleted, selector);
+            return _ObjectContextHelper.GetChangedEntities<T>(EntityState.Deleted, selector);
         }
 
         /// <summary>
@@ -442,7 +443,7 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public IList<T> GetDetachedEntities<T>(Func<T, bool> selector = null) where T : class
         {
-            return _ObjectContextHelper.GetChangedEntities<T>(System.Data.EntityState.Detached, selector);
+            return _ObjectContextHelper.GetChangedEntities<T>(EntityState.Detached, selector);
         }
 
         /// <summary>
@@ -452,7 +453,7 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public IList<T> GetUnchangedEntities<T>(Func<T, bool> selector = null) where T : class
         {
-            return _ObjectContextHelper.GetChangedEntities<T>(System.Data.EntityState.Unchanged, selector);
+            return _ObjectContextHelper.GetChangedEntities<T>(EntityState.Unchanged, selector);
         }
 
         /// <summary>
@@ -1247,42 +1248,42 @@ namespace gip.mes.datamodel
 
         #region precompiled Queries
         public static readonly Func<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>> s_cQry_GetMDProdOrderPosState =
-        CompiledQuery.Compile<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>>(
+        EF.CompileQuery<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>>(
             (ctx, state) => ctx.MDProdOrderPartslistPosState.Where(c => c.MDProdOrderPartslistPosStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>> s_cQry_GetMDDelivPosState =
-        CompiledQuery.Compile<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>>(
             (ctx, state) => ctx.MDDelivPosState.Where(c => c.MDDelivPosStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, string, IQueryable<MDPickingType>> s_cQry_GetMDPickingType =
-        CompiledQuery.Compile<DatabaseApp, string, IQueryable<MDPickingType>>(
+        EF.CompileQuery<DatabaseApp, string, IQueryable<MDPickingType>>(
             (ctx, key) => ctx.MDPickingType.Where(c => c.MDKey == key)
         );
 
         public static readonly Func<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>> s_cQry_GetMDDelivPosLoadState =
-        CompiledQuery.Compile<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>>(
+        EF.CompileQuery<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>>(
             (ctx, state) => ctx.MDDelivPosLoadState.Where(c => c.MDDelivPosLoadStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>> s_cQry_GetMDProdOrderState =
-        CompiledQuery.Compile<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>>(
+        EF.CompileQuery<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>>(
             (ctx, state) => ctx.MDProdOrderState.Where(c => c.MDProdOrderStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>> s_cQry_GetMDDelivNoteState =
-        CompiledQuery.Compile<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>>(
+        EF.CompileQuery<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>>(
             (ctx, state) => ctx.MDDelivNoteState.Where(c => c.MDDelivNoteStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>> s_cQry_GetMDBookingNotAvailableMode =
-        CompiledQuery.Compile<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>>(
+        EF.CompileQuery<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>>(
             (ctx, mode) => ctx.MDBookingNotAvailableMode.Where(c => c.MDBookingNotAvailableModeIndex == (short)mode)
         );
 
         public static readonly Func<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>> s_cQry_GetMDBalancingMode =
-        CompiledQuery.Compile<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>>(
+        EF.CompileQuery<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>>(
             (ctx, mode) => ctx.MDBalancingMode.Where(c => c.MDBalancingModeIndex == (short)mode)
         );
 
@@ -1299,6 +1300,5 @@ namespace gip.mes.datamodel
             if (dispose)
                 Dispose(true);
         }
-
     }
 }

@@ -96,63 +96,63 @@ public partial class MDDelivPosLoadState : VBEntityObject , IInsertInfo, IUpdate
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDDelivPosLoadState;
-    public virtual ICollection<InOrderPos> InOrderPo_MDDelivPosLoadState
+    private ICollection<InOrderPos> _InOrderPos_MDDelivPosLoadState;
+    public virtual ICollection<InOrderPos> InOrderPos_MDDelivPosLoadState
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDDelivPosLoadState);
-        set => _InOrderPo_MDDelivPosLoadState = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDDelivPosLoadState);
+        set => _InOrderPos_MDDelivPosLoadState = value;
     }
 
-    public bool InOrderPo_MDDelivPosLoadState_IsLoaded
+    public bool InOrderPos_MDDelivPosLoadState_IsLoaded
     {
         get
         {
-            return InOrderPo_MDDelivPosLoadState != null;
+            return InOrderPos_MDDelivPosLoadState != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDDelivPosLoadStateReference
+    public virtual CollectionEntry InOrderPos_MDDelivPosLoadStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDDelivPosLoadState); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDDelivPosLoadState); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDDelivPosLoadState;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDDelivPosLoadState
+    private ICollection<OutOrderPos> _OutOrderPos_MDDelivPosLoadState;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDDelivPosLoadState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDDelivPosLoadState);
-        set => _OutOrderPo_MDDelivPosLoadState = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDDelivPosLoadState);
+        set => _OutOrderPos_MDDelivPosLoadState = value;
     }
 
-    public bool OutOrderPo_MDDelivPosLoadState_IsLoaded
+    public bool OutOrderPos_MDDelivPosLoadState_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDDelivPosLoadState != null;
+            return OutOrderPos_MDDelivPosLoadState != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDDelivPosLoadStateReference
+    public virtual CollectionEntry OutOrderPos_MDDelivPosLoadStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDDelivPosLoadState); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDDelivPosLoadState); }
     }
 
-    private ICollection<PickingPos> _PickingPo_MDDelivPosLoadState;
-    public virtual ICollection<PickingPos> PickingPo_MDDelivPosLoadState
+    private ICollection<PickingPos> _PickingPos_MDDelivPosLoadState;
+    public virtual ICollection<PickingPos> PickingPos_MDDelivPosLoadState
     {
-        get => LazyLoader.Load(this, ref _PickingPo_MDDelivPosLoadState);
-        set => _PickingPo_MDDelivPosLoadState = value;
+        get => LazyLoader.Load(this, ref _PickingPos_MDDelivPosLoadState);
+        set => _PickingPos_MDDelivPosLoadState = value;
     }
 
-    public bool PickingPo_MDDelivPosLoadState_IsLoaded
+    public bool PickingPos_MDDelivPosLoadState_IsLoaded
     {
         get
         {
-            return PickingPo_MDDelivPosLoadState != null;
+            return PickingPos_MDDelivPosLoadState != null;
         }
     }
 
-    public virtual CollectionEntry PickingPo_MDDelivPosLoadStateReference
+    public virtual CollectionEntry PickingPos_MDDelivPosLoadStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.PickingPo_MDDelivPosLoadState); }
+        get { return Context.Entry(this).Collection(c => c.PickingPos_MDDelivPosLoadState); }
     }
 }

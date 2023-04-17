@@ -284,24 +284,24 @@ public partial class InOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_InOrderPos); }
     }
 
-    private ICollection<DeliveryNotePos> _DeliveryNotePo_InOrderPos;
-    public virtual ICollection<DeliveryNotePos> DeliveryNotePo_InOrderPos
+    private ICollection<DeliveryNotePos> _DeliveryNotePos_InOrderPos;
+    public virtual ICollection<DeliveryNotePos> DeliveryNotePos_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _DeliveryNotePo_InOrderPos);
-        set => _DeliveryNotePo_InOrderPos = value;
+        get => LazyLoader.Load(this, ref _DeliveryNotePos_InOrderPos);
+        set => _DeliveryNotePos_InOrderPos = value;
     }
 
-    public bool DeliveryNotePo_InOrderPos_IsLoaded
+    public bool DeliveryNotePos_InOrderPos_IsLoaded
     {
         get
         {
-            return DeliveryNotePo_InOrderPos != null;
+            return DeliveryNotePos_InOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry DeliveryNotePo_InOrderPosReference
+    public virtual CollectionEntry DeliveryNotePos_InOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.DeliveryNotePo_InOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_InOrderPos); }
     }
 
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InOrderPos;
@@ -424,24 +424,24 @@ public partial class InOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderPosSplit_InOrderPos); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_ParentInOrderPos;
-    public virtual ICollection<InOrderPos> InOrderPo_ParentInOrderPos
+    private ICollection<InOrderPos> _InOrderPos_ParentInOrderPos;
+    public virtual ICollection<InOrderPos> InOrderPos_ParentInOrderPos
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_ParentInOrderPos);
-        set => _InOrderPo_ParentInOrderPos = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_ParentInOrderPos);
+        set => _InOrderPos_ParentInOrderPos = value;
     }
 
-    public bool InOrderPo_ParentInOrderPos_IsLoaded
+    public bool InOrderPos_ParentInOrderPos_IsLoaded
     {
         get
         {
-            return InOrderPo_ParentInOrderPos != null;
+            return InOrderPos_ParentInOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_ParentInOrderPosReference
+    public virtual CollectionEntry InOrderPos_ParentInOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_ParentInOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_ParentInOrderPos); }
     }
 
     private ICollection<LabOrder> _LabOrder_InOrderPos;
@@ -624,44 +624,44 @@ public partial class InOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private InOrderPos _InOrderPo1_ParentInOrderPos;
-    public virtual InOrderPos InOrderPo1_ParentInOrderPos
+    private InOrderPos _InOrderPos1_ParentInOrderPos;
+    public virtual InOrderPos InOrderPos1_ParentInOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPo1_ParentInOrderPos);
-        set => _InOrderPo1_ParentInOrderPos = value;
+        get => LazyLoader.Load(this, ref _InOrderPos1_ParentInOrderPos);
+        set => _InOrderPos1_ParentInOrderPos = value;
     }
 
-    public bool InOrderPo1_ParentInOrderPos_IsLoaded
+    public bool InOrderPos1_ParentInOrderPos_IsLoaded
     {
         get
         {
-            return InOrderPo1_ParentInOrderPos != null;
+            return InOrderPos1_ParentInOrderPos != null;
         }
     }
 
-    public virtual ReferenceEntry InOrderPo1_ParentInOrderPosReference 
+    public virtual ReferenceEntry InOrderPos1_ParentInOrderPosReference 
     {
-        get { return Context.Entry(this).Reference("InOrderPo1_ParentInOrderPos"); }
+        get { return Context.Entry(this).Reference("InOrderPos1_ParentInOrderPos"); }
     }
     
-    private ICollection<PickingPos> _PickingPo_InOrderPos;
-    public virtual ICollection<PickingPos> PickingPo_InOrderPos
+    private ICollection<PickingPos> _PickingPos_InOrderPos;
+    public virtual ICollection<PickingPos> PickingPos_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _PickingPo_InOrderPos);
-        set => _PickingPo_InOrderPos = value;
+        get => LazyLoader.Load(this, ref _PickingPos_InOrderPos);
+        set => _PickingPos_InOrderPos = value;
     }
 
-    public bool PickingPo_InOrderPos_IsLoaded
+    public bool PickingPos_InOrderPos_IsLoaded
     {
         get
         {
-            return PickingPo_InOrderPos != null;
+            return PickingPos_InOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry PickingPo_InOrderPosReference
+    public virtual CollectionEntry PickingPos_InOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.PickingPo_InOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.PickingPos_InOrderPos); }
     }
 
     private CompanyMaterial _PickupCompanyMaterial;
@@ -704,24 +704,24 @@ public partial class InOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_InOrderPos); }
     }
 
-    private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPo_InOrderPos;
-    public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPo_InOrderPos
+    private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPos_InOrderPos;
+    public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointInOrderPo_InOrderPos);
-        set => _TandTv3MixPointInOrderPo_InOrderPos = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointInOrderPos_InOrderPos);
+        set => _TandTv3MixPointInOrderPos_InOrderPos = value;
     }
 
-    public bool TandTv3MixPointInOrderPo_InOrderPos_IsLoaded
+    public bool TandTv3MixPointInOrderPos_InOrderPos_IsLoaded
     {
         get
         {
-            return TandTv3MixPointInOrderPo_InOrderPos != null;
+            return TandTv3MixPointInOrderPos_InOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointInOrderPo_InOrderPosReference
+    public virtual CollectionEntry TandTv3MixPointInOrderPos_InOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointInOrderPo_InOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointInOrderPos_InOrderPos); }
     }
 
     private ICollection<Weighing> _Weighing_InOrderPos;

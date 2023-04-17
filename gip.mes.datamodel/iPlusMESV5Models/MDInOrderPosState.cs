@@ -96,23 +96,23 @@ public partial class MDInOrderPosState : VBEntityObject , IInsertInfo, IUpdateIn
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDInOrderPosState;
-    public virtual ICollection<InOrderPos> InOrderPo_MDInOrderPosState
+    private ICollection<InOrderPos> _InOrderPos_MDInOrderPosState;
+    public virtual ICollection<InOrderPos> InOrderPos_MDInOrderPosState
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDInOrderPosState);
-        set => _InOrderPo_MDInOrderPosState = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDInOrderPosState);
+        set => _InOrderPos_MDInOrderPosState = value;
     }
 
-    public bool InOrderPo_MDInOrderPosState_IsLoaded
+    public bool InOrderPos_MDInOrderPosState_IsLoaded
     {
         get
         {
-            return InOrderPo_MDInOrderPosState != null;
+            return InOrderPos_MDInOrderPosState != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDInOrderPosStateReference
+    public virtual CollectionEntry InOrderPos_MDInOrderPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDInOrderPosState); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDInOrderPosState); }
     }
 }

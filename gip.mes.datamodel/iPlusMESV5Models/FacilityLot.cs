@@ -345,24 +345,24 @@ public partial class FacilityLot : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPo_FacilityLot;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPo_FacilityLot
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_FacilityLot;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPo_FacilityLot);
-        set => _ProdOrderPartslistPo_FacilityLot = value;
+        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_FacilityLot);
+        set => _ProdOrderPartslistPos_FacilityLot = value;
     }
 
-    public bool ProdOrderPartslistPo_FacilityLot_IsLoaded
+    public bool ProdOrderPartslistPos_FacilityLot_IsLoaded
     {
         get
         {
-            return ProdOrderPartslistPo_FacilityLot != null;
+            return ProdOrderPartslistPos_FacilityLot != null;
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPo_FacilityLotReference
+    public virtual CollectionEntry ProdOrderPartslistPos_FacilityLotReference
     {
-        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPo_FacilityLot); }
+        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_FacilityLot); }
     }
 
     private ICollection<ProdOrderPartslistPosFacilityLot> _ProdOrderPartslistPosFacilityLot_FacilityLot;

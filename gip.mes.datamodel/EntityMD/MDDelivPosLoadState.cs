@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -36,12 +36,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosLoadState>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosLoadState>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosLoadState>>(
             (database) => from c in database.MDDelivPosLoadState where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDDelivPosLoadState>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDDelivPosLoadState>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDDelivPosLoadState>>(
             (database, index) => from c in database.MDDelivPosLoadState where c.MDDelivPosLoadStateIndex == index select c
         );
 

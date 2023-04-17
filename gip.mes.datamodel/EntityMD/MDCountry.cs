@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -42,12 +42,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDCountry>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDCountry>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDCountry>>(
             (database) => from c in database.MDCountry where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, string, IQueryable<MDCountry>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, string, IQueryable<MDCountry>>(
+            EF.CompileQuery<DatabaseApp, string, IQueryable<MDCountry>>(
             (database, index) => from c in database.MDCountry where c.CountryCode == index select c
         );
 

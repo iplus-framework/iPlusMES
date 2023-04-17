@@ -45,10 +45,10 @@ namespace gip.mes.datamodel
 
                 try
                 {
-                    if (companyVisitor.EntityState != System.Data.EntityState.Added)
+                    if (companyVisitor.EntityState != EntityState.Added)
                     {
-                        if (!companyVisitor.VisitorVoucher_Visitor.IsLoaded)
-                            companyVisitor.VisitorVoucher_Visitor.Load();
+                        if (!companyVisitor.VisitorVoucher_Visitor_IsLoaded)
+                            companyVisitor.VisitorVoucher_Visitor.AutoLoad(companyVisitor.VisitorVoucher_VisitorReference, companyVisitor);
                     }
                 }
                 catch (Exception ec)
@@ -83,7 +83,7 @@ namespace gip.mes.datamodel
                     return msg;
             }
             Visitor companyPerson = Visitor;
-            database.DeleteObject(this);
+            database.Remove(this);
             return null;
         }
 

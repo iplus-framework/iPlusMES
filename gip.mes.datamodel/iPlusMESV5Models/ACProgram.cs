@@ -170,24 +170,24 @@ public partial class ACProgram : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACProgramLog_ACProgram); }
     }
 
-    private ICollection<DemandOrderPo> _DemandOrderPo_ACProgram;
-    public virtual ICollection<DemandOrderPo> DemandOrderPo_ACProgram
+    private ICollection<DemandOrderPos> _DemandOrderPos_ACProgram;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_ACProgram
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPo_ACProgram);
-        set => _DemandOrderPo_ACProgram = value;
+        get => LazyLoader.Load(this, ref _DemandOrderPos_ACProgram);
+        set => _DemandOrderPos_ACProgram = value;
     }
 
-    public bool DemandOrderPo_ACProgram_IsLoaded
+    public bool DemandOrderPos_ACProgram_IsLoaded
     {
         get
         {
-            return DemandOrderPo_ACProgram != null;
+            return DemandOrderPos_ACProgram != null;
         }
     }
 
-    public virtual CollectionEntry DemandOrderPo_ACProgramReference
+    public virtual CollectionEntry DemandOrderPos_ACProgramReference
     {
-        get { return Context.Entry(this).Collection(c => c.DemandOrderPo_ACProgram); }
+        get { return Context.Entry(this).Collection(c => c.DemandOrderPos_ACProgram); }
     }
 
     private ICollection<ProdOrderPartslist> _ProdOrderPartslist_VBiACProgram;

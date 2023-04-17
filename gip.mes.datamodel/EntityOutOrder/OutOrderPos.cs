@@ -2,7 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace gip.mes.datamodel
@@ -77,17 +77,17 @@ namespace gip.mes.datamodel
 
             if (outOrder != null)
             {
-                if (!outOrder.OutOrderPos_OutOrder.IsLoaded 
-                    && (outOrder.EntityState == System.Data.EntityState.Modified || outOrder.EntityState == System.Data.EntityState.Unchanged))
+                if (!outOrder.OutOrderPos_OutOrder_IsLoaded 
+                    && (outOrder.EntityState == Microsoft.EntityFrameworkCore.EntityState.Modified || outOrder.EntityState == Microsoft.EntityFrameworkCore.EntityState.Unchanged))
                 {
                     if (parentGroupPos == null)
-                        entity.Sequence = outOrder.OutOrderPos_OutOrder
-                                                .CreateSourceQuery()
+                        entity.Sequence = outOrder.Context.Entry(outOrder).Collection(c => c.OutOrderPos_OutOrder)
+                                                .Query()
                                                 .Where(c => !c.GroupOutOrderPosID.HasValue)
                                                 .Max(c => c.Sequence) + 1;
                     else
-                        entity.Sequence = outOrder.OutOrderPos_OutOrder
-                                                .CreateSourceQuery()
+                        entity.Sequence = outOrder.Context.Entry(outOrder).Collection(c => c.OutOrderPos_OutOrder)
+                                                .Query()
                                                 .Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID)
                                                 .Max(c => c.Sequence) + 1;
 
@@ -114,7 +114,7 @@ namespace gip.mes.datamodel
 
                 entity.OutOrder = outOrder;
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardRoot;
-                if (parentOutOrderPos == null || outOrder.OutOrderPos_OutOrder.IsLoaded)
+                if (parentOutOrderPos == null || outOrder.OutOrderPos_OutOrder_IsLoaded)
                     outOrder.OutOrderPos_OutOrder.Add(entity);
                 else
                     dbApp.OutOrderPos.AddObject(entity);
@@ -156,9 +156,9 @@ namespace gip.mes.datamodel
             int sequence = Sequence;
             OutOrder outOrder = OutOrder;
             if (outOrder != null)
-                if (outOrder.OutOrderPos_OutOrder.IsLoaded)
+                if (outOrder.OutOrderPos_OutOrder_IsLoaded)
                     outOrder.OutOrderPos_OutOrder.Remove(this);
-            database.DeleteObject(this);
+            database.Remove(this);
             if (outOrder != null)
                 OutOrderPos.RenumberSequence(outOrder, sequence);
             return null;
@@ -173,7 +173,7 @@ namespace gip.mes.datamodel
                 || !outOrder.OutOrderPos_OutOrder.Any())
                 return;
 
-            var elements = outOrder.OutOrderPos_OutOrder.Where(c => c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted).OrderBy(c => c.Sequence);
+            var elements = outOrder.OutOrderPos_OutOrder.Where(c => c.Sequence > sequence && c.EntityState != Microsoft.EntityFrameworkCore.EntityState.Deleted).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {
@@ -724,7 +724,7 @@ namespace gip.mes.datamodel
 
         public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null)
         {
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != Microsoft.EntityFrameworkCore.EntityState.Added)
             {
                 if (mergeOption.HasValue)
                     this.OutOrderPos_ParentOutOrderPos.Load(mergeOption.Value);
@@ -759,8 +759,8 @@ namespace gip.mes.datamodel
 
 
             DatabaseApp dbApp = null;
-            var sumsPerUnitID = this.FacilityBookingCharge_OutOrderPos
-                                .CreateSourceQuery()
+            var sumsPerUnitID = Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutOrderPos)
+                                .Query()
                                 .GroupBy(c => c.MDUnitID)
                                 .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), outwardQ = t.Sum(u => u.OutwardQuantity) })
                                 .ToArray();

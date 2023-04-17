@@ -388,24 +388,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_Material); }
     }
 
-    private ICollection<DemandOrderPo> _DemandOrderPo_Material;
-    public virtual ICollection<DemandOrderPo> DemandOrderPo_Material
+    private ICollection<DemandOrderPos> _DemandOrderPos_Material;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPo_Material);
-        set => _DemandOrderPo_Material = value;
+        get => LazyLoader.Load(this, ref _DemandOrderPos_Material);
+        set => _DemandOrderPos_Material = value;
     }
 
-    public bool DemandOrderPo_Material_IsLoaded
+    public bool DemandOrderPos_Material_IsLoaded
     {
         get
         {
-            return DemandOrderPo_Material != null;
+            return DemandOrderPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry DemandOrderPo_MaterialReference
+    public virtual CollectionEntry DemandOrderPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.DemandOrderPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.DemandOrderPos_Material); }
     }
 
     private ICollection<DemandPrimary> _DemandPrimary_Material;
@@ -648,24 +648,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_Material); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_Material;
-    public virtual ICollection<InOrderPos> InOrderPo_Material
+    private ICollection<InOrderPos> _InOrderPos_Material;
+    public virtual ICollection<InOrderPos> InOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_Material);
-        set => _InOrderPo_Material = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_Material);
+        set => _InOrderPos_Material = value;
     }
 
-    public bool InOrderPo_Material_IsLoaded
+    public bool InOrderPos_Material_IsLoaded
     {
         get
         {
-            return InOrderPo_Material != null;
+            return InOrderPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MaterialReference
+    public virtual CollectionEntry InOrderPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_Material); }
     }
 
     private ICollection<InRequestConfig> _InRequestConfig_Material;
@@ -688,24 +688,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_Material); }
     }
 
-    private ICollection<InRequestPos> _InRequestPo_Material;
-    public virtual ICollection<InRequestPos> InRequestPo_Material
+    private ICollection<InRequestPos> _InRequestPos_Material;
+    public virtual ICollection<InRequestPos> InRequestPos_Material
     {
-        get => LazyLoader.Load(this, ref _InRequestPo_Material);
-        set => _InRequestPo_Material = value;
+        get => LazyLoader.Load(this, ref _InRequestPos_Material);
+        set => _InRequestPos_Material = value;
     }
 
-    public bool InRequestPo_Material_IsLoaded
+    public bool InRequestPos_Material_IsLoaded
     {
         get
         {
-            return InRequestPo_Material != null;
+            return InRequestPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry InRequestPo_MaterialReference
+    public virtual CollectionEntry InRequestPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.InRequestPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.InRequestPos_Material); }
     }
 
     private ICollection<Material> _Material_ProductionMaterial;
@@ -728,24 +728,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Material_ProductionMaterial); }
     }
 
-    private ICollection<InvoicePos> _InvoicePo_Material;
-    public virtual ICollection<InvoicePos> InvoicePo_Material
+    private ICollection<InvoicePos> _InvoicePos_Material;
+    public virtual ICollection<InvoicePos> InvoicePos_Material
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_Material);
-        set => _InvoicePo_Material = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_Material);
+        set => _InvoicePos_Material = value;
     }
 
-    public bool InvoicePo_Material_IsLoaded
+    public bool InvoicePos_Material_IsLoaded
     {
         get
         {
-            return InvoicePo_Material != null;
+            return InvoicePos_Material != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_MaterialReference
+    public virtual CollectionEntry InvoicePos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_Material); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_Material); }
     }
 
     private ICollection<LabOrder> _LabOrder_Material;
@@ -1128,24 +1128,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_Material); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPo_Material;
-    public virtual ICollection<OutOfferPos> OutOfferPo_Material
+    private ICollection<OutOfferPos> _OutOfferPos_Material;
+    public virtual ICollection<OutOfferPos> OutOfferPos_Material
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_Material);
-        set => _OutOfferPo_Material = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_Material);
+        set => _OutOfferPos_Material = value;
     }
 
-    public bool OutOfferPo_Material_IsLoaded
+    public bool OutOfferPos_Material_IsLoaded
     {
         get
         {
-            return OutOfferPo_Material != null;
+            return OutOfferPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_MaterialReference
+    public virtual CollectionEntry OutOfferPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_Material); }
     }
 
     private ICollection<OutOrderConfig> _OutOrderConfig_Material;
@@ -1168,24 +1168,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_Material); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_Material;
-    public virtual ICollection<OutOrderPos> OutOrderPo_Material
+    private ICollection<OutOrderPos> _OutOrderPos_Material;
+    public virtual ICollection<OutOrderPos> OutOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_Material);
-        set => _OutOrderPo_Material = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_Material);
+        set => _OutOrderPos_Material = value;
     }
 
-    public bool OutOrderPo_Material_IsLoaded
+    public bool OutOrderPos_Material_IsLoaded
     {
         get
         {
-            return OutOrderPo_Material != null;
+            return OutOrderPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MaterialReference
+    public virtual CollectionEntry OutOrderPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_Material); }
     }
 
     private ICollection<OutOrderPosUtilization> _OutOrderPosUtilization_Material;
@@ -1228,24 +1228,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_Material); }
     }
 
-    private ICollection<PartslistPos> _PartslistPo_Material;
-    public virtual ICollection<PartslistPos> PartslistPo_Material
+    private ICollection<PartslistPos> _PartslistPos_Material;
+    public virtual ICollection<PartslistPos> PartslistPos_Material
     {
-        get => LazyLoader.Load(this, ref _PartslistPo_Material);
-        set => _PartslistPo_Material = value;
+        get => LazyLoader.Load(this, ref _PartslistPos_Material);
+        set => _PartslistPos_Material = value;
     }
 
-    public bool PartslistPo_Material_IsLoaded
+    public bool PartslistPos_Material_IsLoaded
     {
         get
         {
-            return PartslistPo_Material != null;
+            return PartslistPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry PartslistPo_MaterialReference
+    public virtual CollectionEntry PartslistPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.PartslistPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.PartslistPos_Material); }
     }
 
     private ICollection<Partslist> _Partslist_Material;
@@ -1288,24 +1288,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingConfig_Material); }
     }
 
-    private ICollection<PickingPos> _PickingPo_PickingMaterial;
-    public virtual ICollection<PickingPos> PickingPo_PickingMaterial
+    private ICollection<PickingPos> _PickingPos_PickingMaterial;
+    public virtual ICollection<PickingPos> PickingPos_PickingMaterial
     {
-        get => LazyLoader.Load(this, ref _PickingPo_PickingMaterial);
-        set => _PickingPo_PickingMaterial = value;
+        get => LazyLoader.Load(this, ref _PickingPos_PickingMaterial);
+        set => _PickingPos_PickingMaterial = value;
     }
 
-    public bool PickingPo_PickingMaterial_IsLoaded
+    public bool PickingPos_PickingMaterial_IsLoaded
     {
         get
         {
-            return PickingPo_PickingMaterial != null;
+            return PickingPos_PickingMaterial != null;
         }
     }
 
-    public virtual CollectionEntry PickingPo_PickingMaterialReference
+    public virtual CollectionEntry PickingPos_PickingMaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.PickingPo_PickingMaterial); }
+        get { return Context.Entry(this).Collection(c => c.PickingPos_PickingMaterial); }
     }
 
     private ICollection<PriceListMaterial> _PriceListMaterial_Material;
@@ -1348,24 +1348,24 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_Material); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPo_Material;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPo_Material
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_Material;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_Material
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPo_Material);
-        set => _ProdOrderPartslistPo_Material = value;
+        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_Material);
+        set => _ProdOrderPartslistPos_Material = value;
     }
 
-    public bool ProdOrderPartslistPo_Material_IsLoaded
+    public bool ProdOrderPartslistPos_Material_IsLoaded
     {
         get
         {
-            return ProdOrderPartslistPo_Material != null;
+            return ProdOrderPartslistPos_Material != null;
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPo_MaterialReference
+    public virtual CollectionEntry ProdOrderPartslistPos_MaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPo_Material); }
+        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_Material); }
     }
 
     private Material _Material1_ProductionMaterial;

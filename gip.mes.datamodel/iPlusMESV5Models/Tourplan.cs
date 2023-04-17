@@ -329,24 +329,24 @@ public partial class Tourplan : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TourplanConfig_Tourplan); }
     }
 
-    private ICollection<TourplanPos> _TourplanPo_Tourplan;
-    public virtual ICollection<TourplanPos> TourplanPo_Tourplan
+    private ICollection<TourplanPos> _TourplanPos_Tourplan;
+    public virtual ICollection<TourplanPos> TourplanPos_Tourplan
     {
-        get => LazyLoader.Load(this, ref _TourplanPo_Tourplan);
-        set => _TourplanPo_Tourplan = value;
+        get => LazyLoader.Load(this, ref _TourplanPos_Tourplan);
+        set => _TourplanPos_Tourplan = value;
     }
 
-    public bool TourplanPo_Tourplan_IsLoaded
+    public bool TourplanPos_Tourplan_IsLoaded
     {
         get
         {
-            return TourplanPo_Tourplan != null;
+            return TourplanPos_Tourplan != null;
         }
     }
 
-    public virtual CollectionEntry TourplanPo_TourplanReference
+    public virtual CollectionEntry TourplanPos_TourplanReference
     {
-        get { return Context.Entry(this).Collection(c => c.TourplanPo_Tourplan); }
+        get { return Context.Entry(this).Collection(c => c.TourplanPos_Tourplan); }
     }
 
     private Facility _TrailerFacility;

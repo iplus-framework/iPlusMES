@@ -96,44 +96,44 @@ public partial class MDToleranceState : VBEntityObject , IInsertInfo, IUpdateInf
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDToleranceState;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDToleranceState
+    private ICollection<OutOrderPos> _OutOrderPos_MDToleranceState;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDToleranceState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDToleranceState);
-        set => _OutOrderPo_MDToleranceState = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDToleranceState);
+        set => _OutOrderPos_MDToleranceState = value;
     }
 
-    public bool OutOrderPo_MDToleranceState_IsLoaded
+    public bool OutOrderPos_MDToleranceState_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDToleranceState != null;
+            return OutOrderPos_MDToleranceState != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDToleranceStateReference
+    public virtual CollectionEntry OutOrderPos_MDToleranceStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDToleranceState); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDToleranceState); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPo_MDToleranceState;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPo_MDToleranceState
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDToleranceState;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDToleranceState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPo_MDToleranceState);
-        set => _ProdOrderPartslistPo_MDToleranceState = value;
+        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDToleranceState);
+        set => _ProdOrderPartslistPos_MDToleranceState = value;
     }
 
-    public bool ProdOrderPartslistPo_MDToleranceState_IsLoaded
+    public bool ProdOrderPartslistPos_MDToleranceState_IsLoaded
     {
         get
         {
-            return ProdOrderPartslistPo_MDToleranceState != null;
+            return ProdOrderPartslistPos_MDToleranceState != null;
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPo_MDToleranceStateReference
+    public virtual CollectionEntry ProdOrderPartslistPos_MDToleranceStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPo_MDToleranceState); }
+        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDToleranceState); }
     }
 
     private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDToleranceState;

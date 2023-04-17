@@ -203,23 +203,23 @@ public partial class DeliveryNotePos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_DeliveryNotePos); }
     }
 
-    private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePo_DeliveryNotePos;
-    public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePo_DeliveryNotePos
+    private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_DeliveryNotePos;
+    public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePo_DeliveryNotePos);
-        set => _TandTv3MixPointDeliveryNotePo_DeliveryNotePos = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePos_DeliveryNotePos);
+        set => _TandTv3MixPointDeliveryNotePos_DeliveryNotePos = value;
     }
 
-    public bool TandTv3MixPointDeliveryNotePo_DeliveryNotePos_IsLoaded
+    public bool TandTv3MixPointDeliveryNotePos_DeliveryNotePos_IsLoaded
     {
         get
         {
-            return TandTv3MixPointDeliveryNotePo_DeliveryNotePos != null;
+            return TandTv3MixPointDeliveryNotePos_DeliveryNotePos != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointDeliveryNotePo_DeliveryNotePosReference
+    public virtual CollectionEntry TandTv3MixPointDeliveryNotePos_DeliveryNotePosReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointDeliveryNotePo_DeliveryNotePos); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointDeliveryNotePos_DeliveryNotePos); }
     }
 }

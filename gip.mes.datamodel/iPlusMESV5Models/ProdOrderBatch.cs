@@ -156,24 +156,24 @@ public partial class ProdOrderBatch : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ProdOrderPartslist"); }
     }
     
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPo_ProdOrderBatch;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPo_ProdOrderBatch
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ProdOrderBatch;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ProdOrderBatch
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPo_ProdOrderBatch);
-        set => _ProdOrderPartslistPo_ProdOrderBatch = value;
+        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_ProdOrderBatch);
+        set => _ProdOrderPartslistPos_ProdOrderBatch = value;
     }
 
-    public bool ProdOrderPartslistPo_ProdOrderBatch_IsLoaded
+    public bool ProdOrderPartslistPos_ProdOrderBatch_IsLoaded
     {
         get
         {
-            return ProdOrderPartslistPo_ProdOrderBatch != null;
+            return ProdOrderPartslistPos_ProdOrderBatch != null;
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPo_ProdOrderBatchReference
+    public virtual CollectionEntry ProdOrderPartslistPos_ProdOrderBatchReference
     {
-        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPo_ProdOrderBatch); }
+        get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_ProdOrderBatch); }
     }
 
     private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_ProdOrderBatch;

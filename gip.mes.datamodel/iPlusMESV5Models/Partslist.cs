@@ -243,24 +243,24 @@ public partial class Partslist : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _KeyOfExtSys, value); }
     }
 
-    private ICollection<DemandOrderPo> _DemandOrderPo_Partslist;
-    public virtual ICollection<DemandOrderPo> DemandOrderPo_Partslist
+    private ICollection<DemandOrderPos> _DemandOrderPos_Partslist;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_Partslist
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPo_Partslist);
-        set => _DemandOrderPo_Partslist = value;
+        get => LazyLoader.Load(this, ref _DemandOrderPos_Partslist);
+        set => _DemandOrderPos_Partslist = value;
     }
 
-    public bool DemandOrderPo_Partslist_IsLoaded
+    public bool DemandOrderPos_Partslist_IsLoaded
     {
         get
         {
-            return DemandOrderPo_Partslist != null;
+            return DemandOrderPos_Partslist != null;
         }
     }
 
-    public virtual CollectionEntry DemandOrderPo_PartslistReference
+    public virtual CollectionEntry DemandOrderPos_PartslistReference
     {
-        get { return Context.Entry(this).Collection(c => c.DemandOrderPo_Partslist); }
+        get { return Context.Entry(this).Collection(c => c.DemandOrderPos_Partslist); }
     }
 
     private ICollection<Facility> _Facility_Partslist;
@@ -503,44 +503,44 @@ public partial class Partslist : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_Partslist); }
     }
 
-    private ICollection<PartslistPos> _PartslistPo_ParentPartslist;
-    public virtual ICollection<PartslistPos> PartslistPo_ParentPartslist
+    private ICollection<PartslistPos> _PartslistPos_ParentPartslist;
+    public virtual ICollection<PartslistPos> PartslistPos_ParentPartslist
     {
-        get => LazyLoader.Load(this, ref _PartslistPo_ParentPartslist);
-        set => _PartslistPo_ParentPartslist = value;
+        get => LazyLoader.Load(this, ref _PartslistPos_ParentPartslist);
+        set => _PartslistPos_ParentPartslist = value;
     }
 
-    public bool PartslistPo_ParentPartslist_IsLoaded
+    public bool PartslistPos_ParentPartslist_IsLoaded
     {
         get
         {
-            return PartslistPo_ParentPartslist != null;
+            return PartslistPos_ParentPartslist != null;
         }
     }
 
-    public virtual CollectionEntry PartslistPo_ParentPartslistReference
+    public virtual CollectionEntry PartslistPos_ParentPartslistReference
     {
-        get { return Context.Entry(this).Collection(c => c.PartslistPo_ParentPartslist); }
+        get { return Context.Entry(this).Collection(c => c.PartslistPos_ParentPartslist); }
     }
 
-    private ICollection<PartslistPos> _PartslistPo_Partslist;
-    public virtual ICollection<PartslistPos> PartslistPo_Partslist
+    private ICollection<PartslistPos> _PartslistPos_Partslist;
+    public virtual ICollection<PartslistPos> PartslistPos_Partslist
     {
-        get => LazyLoader.Load(this, ref _PartslistPo_Partslist);
-        set => _PartslistPo_Partslist = value;
+        get => LazyLoader.Load(this, ref _PartslistPos_Partslist);
+        set => _PartslistPos_Partslist = value;
     }
 
-    public bool PartslistPo_Partslist_IsLoaded
+    public bool PartslistPos_Partslist_IsLoaded
     {
         get
         {
-            return PartslistPo_Partslist != null;
+            return PartslistPos_Partslist != null;
         }
     }
 
-    public virtual CollectionEntry PartslistPo_PartslistReference
+    public virtual CollectionEntry PartslistPos_PartslistReference
     {
-        get { return Context.Entry(this).Collection(c => c.PartslistPo_Partslist); }
+        get { return Context.Entry(this).Collection(c => c.PartslistPos_Partslist); }
     }
 
     private ICollection<PartslistStock> _PartslistStock_Partslist;

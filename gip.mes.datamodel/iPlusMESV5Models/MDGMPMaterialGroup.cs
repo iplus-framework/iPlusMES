@@ -96,24 +96,24 @@ public partial class MDGMPMaterialGroup : VBEntityObject , IInsertInfo, IUpdateI
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPo_MDGMPMaterialGroup;
-    public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPo_MDGMPMaterialGroup
+    private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPos_MDGMPMaterialGroup;
+    public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPo_MDGMPMaterialGroup);
-        set => _MDGMPMaterialGroupPo_MDGMPMaterialGroup = value;
+        get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPMaterialGroup);
+        set => _MDGMPMaterialGroupPos_MDGMPMaterialGroup = value;
     }
 
-    public bool MDGMPMaterialGroupPo_MDGMPMaterialGroup_IsLoaded
+    public bool MDGMPMaterialGroupPos_MDGMPMaterialGroup_IsLoaded
     {
         get
         {
-            return MDGMPMaterialGroupPo_MDGMPMaterialGroup != null;
+            return MDGMPMaterialGroupPos_MDGMPMaterialGroup != null;
         }
     }
 
-    public virtual CollectionEntry MDGMPMaterialGroupPo_MDGMPMaterialGroupReference
+    public virtual CollectionEntry MDGMPMaterialGroupPos_MDGMPMaterialGroupReference
     {
-        get { return Context.Entry(this).Collection(c => c.MDGMPMaterialGroupPo_MDGMPMaterialGroup); }
+        get { return Context.Entry(this).Collection(c => c.MDGMPMaterialGroupPos_MDGMPMaterialGroup); }
     }
 
     private ICollection<Material> _Material_MDGMPMaterialGroup;

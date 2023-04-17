@@ -388,24 +388,24 @@ public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_OutOrderPos); }
     }
 
-    private ICollection<DeliveryNotePos> _DeliveryNotePo_OutOrderPos;
-    public virtual ICollection<DeliveryNotePos> DeliveryNotePo_OutOrderPos
+    private ICollection<DeliveryNotePos> _DeliveryNotePos_OutOrderPos;
+    public virtual ICollection<DeliveryNotePos> DeliveryNotePos_OutOrderPos
     {
-        get => LazyLoader.Load(this, ref _DeliveryNotePo_OutOrderPos);
-        set => _DeliveryNotePo_OutOrderPos = value;
+        get => LazyLoader.Load(this, ref _DeliveryNotePos_OutOrderPos);
+        set => _DeliveryNotePos_OutOrderPos = value;
     }
 
-    public bool DeliveryNotePo_OutOrderPos_IsLoaded
+    public bool DeliveryNotePos_OutOrderPos_IsLoaded
     {
         get
         {
-            return DeliveryNotePo_OutOrderPos != null;
+            return DeliveryNotePos_OutOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry DeliveryNotePo_OutOrderPosReference
+    public virtual CollectionEntry DeliveryNotePos_OutOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.DeliveryNotePo_OutOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_OutOrderPos); }
     }
 
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutOrderPos;
@@ -488,84 +488,84 @@ public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_OutOrderPos); }
     }
 
-    private OutOrderPos _OutOrderPo1_GroupOutOrderPos;
-    public virtual OutOrderPos OutOrderPo1_GroupOutOrderPos
+    private OutOrderPos _OutOrderPos1_GroupOutOrderPos;
+    public virtual OutOrderPos OutOrderPos1_GroupOutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPo1_GroupOutOrderPos);
-        set => _OutOrderPo1_GroupOutOrderPos = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos1_GroupOutOrderPos);
+        set => _OutOrderPos1_GroupOutOrderPos = value;
     }
 
-    public bool OutOrderPo1_GroupOutOrderPos_IsLoaded
+    public bool OutOrderPos1_GroupOutOrderPos_IsLoaded
     {
         get
         {
-            return OutOrderPo1_GroupOutOrderPos != null;
+            return OutOrderPos1_GroupOutOrderPos != null;
         }
     }
 
-    public virtual ReferenceEntry OutOrderPo1_GroupOutOrderPosReference 
+    public virtual ReferenceEntry OutOrderPos1_GroupOutOrderPosReference 
     {
-        get { return Context.Entry(this).Reference("OutOrderPo1_GroupOutOrderPos"); }
+        get { return Context.Entry(this).Reference("OutOrderPos1_GroupOutOrderPos"); }
     }
     
-    private ICollection<OutOrderPos> _OutOrderPo_GroupOutOrderPos;
-    public virtual ICollection<OutOrderPos> OutOrderPo_GroupOutOrderPos
+    private ICollection<OutOrderPos> _OutOrderPos_GroupOutOrderPos;
+    public virtual ICollection<OutOrderPos> OutOrderPos_GroupOutOrderPos
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_GroupOutOrderPos);
-        set => _OutOrderPo_GroupOutOrderPos = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_GroupOutOrderPos);
+        set => _OutOrderPos_GroupOutOrderPos = value;
     }
 
-    public bool OutOrderPo_GroupOutOrderPos_IsLoaded
+    public bool OutOrderPos_GroupOutOrderPos_IsLoaded
     {
         get
         {
-            return OutOrderPo_GroupOutOrderPos != null;
+            return OutOrderPos_GroupOutOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_GroupOutOrderPosReference
+    public virtual CollectionEntry OutOrderPos_GroupOutOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_GroupOutOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_GroupOutOrderPos); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_ParentOutOrderPos;
-    public virtual ICollection<OutOrderPos> OutOrderPo_ParentOutOrderPos
+    private ICollection<OutOrderPos> _OutOrderPos_ParentOutOrderPos;
+    public virtual ICollection<OutOrderPos> OutOrderPos_ParentOutOrderPos
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_ParentOutOrderPos);
-        set => _OutOrderPo_ParentOutOrderPos = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_ParentOutOrderPos);
+        set => _OutOrderPos_ParentOutOrderPos = value;
     }
 
-    public bool OutOrderPo_ParentOutOrderPos_IsLoaded
+    public bool OutOrderPos_ParentOutOrderPos_IsLoaded
     {
         get
         {
-            return OutOrderPo_ParentOutOrderPos != null;
+            return OutOrderPos_ParentOutOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_ParentOutOrderPosReference
+    public virtual CollectionEntry OutOrderPos_ParentOutOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_ParentOutOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_ParentOutOrderPos); }
     }
 
-    private ICollection<InvoicePos> _InvoicePo_OutOrderPos;
-    public virtual ICollection<InvoicePos> InvoicePo_OutOrderPos
+    private ICollection<InvoicePos> _InvoicePos_OutOrderPos;
+    public virtual ICollection<InvoicePos> InvoicePos_OutOrderPos
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_OutOrderPos);
-        set => _InvoicePo_OutOrderPos = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_OutOrderPos);
+        set => _InvoicePos_OutOrderPos = value;
     }
 
-    public bool InvoicePo_OutOrderPos_IsLoaded
+    public bool InvoicePos_OutOrderPos_IsLoaded
     {
         get
         {
-            return InvoicePo_OutOrderPos != null;
+            return InvoicePos_OutOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_OutOrderPosReference
+    public virtual CollectionEntry InvoicePos_OutOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_OutOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_OutOrderPos); }
     }
 
     private ICollection<LabOrder> _LabOrder_OutOrderPos;
@@ -908,44 +908,44 @@ public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderPosUtilization_OutOrderPos); }
     }
 
-    private OutOrderPos _OutOrderPo1_ParentOutOrderPos;
-    public virtual OutOrderPos OutOrderPo1_ParentOutOrderPos
+    private OutOrderPos _OutOrderPos1_ParentOutOrderPos;
+    public virtual OutOrderPos OutOrderPos1_ParentOutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPo1_ParentOutOrderPos);
-        set => _OutOrderPo1_ParentOutOrderPos = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos1_ParentOutOrderPos);
+        set => _OutOrderPos1_ParentOutOrderPos = value;
     }
 
-    public bool OutOrderPo1_ParentOutOrderPos_IsLoaded
+    public bool OutOrderPos1_ParentOutOrderPos_IsLoaded
     {
         get
         {
-            return OutOrderPo1_ParentOutOrderPos != null;
+            return OutOrderPos1_ParentOutOrderPos != null;
         }
     }
 
-    public virtual ReferenceEntry OutOrderPo1_ParentOutOrderPosReference 
+    public virtual ReferenceEntry OutOrderPos1_ParentOutOrderPosReference 
     {
-        get { return Context.Entry(this).Reference("OutOrderPo1_ParentOutOrderPos"); }
+        get { return Context.Entry(this).Reference("OutOrderPos1_ParentOutOrderPos"); }
     }
     
-    private ICollection<PickingPos> _PickingPo_OutOrderPos;
-    public virtual ICollection<PickingPos> PickingPo_OutOrderPos
+    private ICollection<PickingPos> _PickingPos_OutOrderPos;
+    public virtual ICollection<PickingPos> PickingPos_OutOrderPos
     {
-        get => LazyLoader.Load(this, ref _PickingPo_OutOrderPos);
-        set => _PickingPo_OutOrderPos = value;
+        get => LazyLoader.Load(this, ref _PickingPos_OutOrderPos);
+        set => _PickingPos_OutOrderPos = value;
     }
 
-    public bool PickingPo_OutOrderPos_IsLoaded
+    public bool PickingPos_OutOrderPos_IsLoaded
     {
         get
         {
-            return PickingPo_OutOrderPos != null;
+            return PickingPos_OutOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry PickingPo_OutOrderPosReference
+    public virtual CollectionEntry PickingPos_OutOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.PickingPo_OutOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.PickingPos_OutOrderPos); }
     }
 
     private CompanyMaterial _PickupCompanyMaterial;
@@ -988,24 +988,24 @@ public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_OutOrderPos); }
     }
 
-    private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPo_OutOrderPos;
-    public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPo_OutOrderPos
+    private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
+    public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointOutOrderPo_OutOrderPos);
-        set => _TandTv3MixPointOutOrderPo_OutOrderPos = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointOutOrderPos_OutOrderPos);
+        set => _TandTv3MixPointOutOrderPos_OutOrderPos = value;
     }
 
-    public bool TandTv3MixPointOutOrderPo_OutOrderPos_IsLoaded
+    public bool TandTv3MixPointOutOrderPos_OutOrderPos_IsLoaded
     {
         get
         {
-            return TandTv3MixPointOutOrderPo_OutOrderPos != null;
+            return TandTv3MixPointOutOrderPos_OutOrderPos != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointOutOrderPo_OutOrderPosReference
+    public virtual CollectionEntry TandTv3MixPointOutOrderPos_OutOrderPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPo_OutOrderPos); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPos_OutOrderPos); }
     }
 
     private ICollection<Weighing> _Weighing_OutOrderPos;

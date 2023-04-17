@@ -262,24 +262,24 @@ public partial class DeliveryNote : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryCompanyAddress"); }
     }
     
-    private ICollection<DeliveryNotePos> _DeliveryNotePo_DeliveryNote;
-    public virtual ICollection<DeliveryNotePos> DeliveryNotePo_DeliveryNote
+    private ICollection<DeliveryNotePos> _DeliveryNotePos_DeliveryNote;
+    public virtual ICollection<DeliveryNotePos> DeliveryNotePos_DeliveryNote
     {
-        get => LazyLoader.Load(this, ref _DeliveryNotePo_DeliveryNote);
-        set => _DeliveryNotePo_DeliveryNote = value;
+        get => LazyLoader.Load(this, ref _DeliveryNotePos_DeliveryNote);
+        set => _DeliveryNotePos_DeliveryNote = value;
     }
 
-    public bool DeliveryNotePo_DeliveryNote_IsLoaded
+    public bool DeliveryNotePos_DeliveryNote_IsLoaded
     {
         get
         {
-            return DeliveryNotePo_DeliveryNote != null;
+            return DeliveryNotePos_DeliveryNote != null;
         }
     }
 
-    public virtual CollectionEntry DeliveryNotePo_DeliveryNoteReference
+    public virtual CollectionEntry DeliveryNotePos_DeliveryNoteReference
     {
-        get { return Context.Entry(this).Collection(c => c.DeliveryNotePo_DeliveryNote); }
+        get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_DeliveryNote); }
     }
 
     private MDDelivNoteState _MDDelivNoteState;

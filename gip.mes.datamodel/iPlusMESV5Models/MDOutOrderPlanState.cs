@@ -96,23 +96,23 @@ public partial class MDOutOrderPlanState : VBEntityObject , IInsertInfo, IUpdate
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDOutOrderPlanState;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDOutOrderPlanState
+    private ICollection<OutOrderPos> _OutOrderPos_MDOutOrderPlanState;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDOutOrderPlanState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDOutOrderPlanState);
-        set => _OutOrderPo_MDOutOrderPlanState = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDOutOrderPlanState);
+        set => _OutOrderPos_MDOutOrderPlanState = value;
     }
 
-    public bool OutOrderPo_MDOutOrderPlanState_IsLoaded
+    public bool OutOrderPos_MDOutOrderPlanState_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDOutOrderPlanState != null;
+            return OutOrderPos_MDOutOrderPlanState != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDOutOrderPlanStateReference
+    public virtual CollectionEntry OutOrderPos_MDOutOrderPlanStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDOutOrderPlanState); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDOutOrderPlanState); }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -106,7 +107,7 @@ namespace gip.mes.datamodel
             partsListNewVersion.IsDefault = false;
             previusPartList.IsDefault = true;
 
-            dbApp.Partslist.AddObject(partsListNewVersion);
+            dbApp.Partslist.Add(partsListNewVersion);
 
             List<PartslistPos> previusPartPosList = dbApp.PartslistPos.Where(x => x.PartslistID == previusPartList.PartslistID).ToList();
             List<Guid> previusPartPosIDList = previusPartPosList.Select(x => x.PartslistPosID).ToList();
@@ -321,7 +322,7 @@ namespace gip.mes.datamodel
             if (ACConfigListCache.Contains(acConfig))
                 ACConfigListCache.Remove(acConfig);
             PartslistConfig_Partslist.Remove(acConfig);
-            if (acConfig.EntityState != System.Data.EntityState.Detached)
+            if (acConfig.EntityState != EntityState.Detached)
                 acConfig.DeleteACObject(this.GetObjectContext<DatabaseApp>(), false);
         }
 
@@ -365,7 +366,7 @@ namespace gip.mes.datamodel
                         return _ACConfigListCache;
                 }
                 SafeList<IACConfig> newSafeList = new SafeList<IACConfig>();
-                if (PartslistConfig_Partslist.IsLoaded)
+                if (PartslistConfig_Partslist_IsLoaded)
                 {
                     PartslistConfig_Partslist.AutoRefresh();
                     PartslistConfig_Partslist.AutoLoad();

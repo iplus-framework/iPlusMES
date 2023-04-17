@@ -47,24 +47,24 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
         set { SetProperty<decimal>(ref _SalesTax, value); }
     }
 
-    private ICollection<InvoicePos> _InvoicePo_MDCountrySalesTaxMDMaterialGroup;
-    public virtual ICollection<InvoicePos> InvoicePo_MDCountrySalesTaxMDMaterialGroup
+    private ICollection<InvoicePos> _InvoicePos_MDCountrySalesTaxMDMaterialGroup;
+    public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTaxMDMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_MDCountrySalesTaxMDMaterialGroup);
-        set => _InvoicePo_MDCountrySalesTaxMDMaterialGroup = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTaxMDMaterialGroup);
+        set => _InvoicePos_MDCountrySalesTaxMDMaterialGroup = value;
     }
 
-    public bool InvoicePo_MDCountrySalesTaxMDMaterialGroup_IsLoaded
+    public bool InvoicePos_MDCountrySalesTaxMDMaterialGroup_IsLoaded
     {
         get
         {
-            return InvoicePo_MDCountrySalesTaxMDMaterialGroup != null;
+            return InvoicePos_MDCountrySalesTaxMDMaterialGroup != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_MDCountrySalesTaxMDMaterialGroupReference
+    public virtual CollectionEntry InvoicePos_MDCountrySalesTaxMDMaterialGroupReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_MDCountrySalesTaxMDMaterialGroup); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_MDCountrySalesTaxMDMaterialGroup); }
     }
 
     private MDCountrySalesTax _MDCountrySalesTax;
@@ -107,43 +107,43 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
         get { return Context.Entry(this).Reference("MDMaterialGroup"); }
     }
     
-    private ICollection<OutOfferPos> _OutOfferPo_MDCountrySalesTaxMDMaterialGroup;
-    public virtual ICollection<OutOfferPos> OutOfferPo_MDCountrySalesTaxMDMaterialGroup
+    private ICollection<OutOfferPos> _OutOfferPos_MDCountrySalesTaxMDMaterialGroup;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTaxMDMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_MDCountrySalesTaxMDMaterialGroup);
-        set => _OutOfferPo_MDCountrySalesTaxMDMaterialGroup = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTaxMDMaterialGroup);
+        set => _OutOfferPos_MDCountrySalesTaxMDMaterialGroup = value;
     }
 
-    public bool OutOfferPo_MDCountrySalesTaxMDMaterialGroup_IsLoaded
+    public bool OutOfferPos_MDCountrySalesTaxMDMaterialGroup_IsLoaded
     {
         get
         {
-            return OutOfferPo_MDCountrySalesTaxMDMaterialGroup != null;
+            return OutOfferPos_MDCountrySalesTaxMDMaterialGroup != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_MDCountrySalesTaxMDMaterialGroupReference
+    public virtual CollectionEntry OutOfferPos_MDCountrySalesTaxMDMaterialGroupReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_MDCountrySalesTaxMDMaterialGroup); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTaxMDMaterialGroup); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDCountrySalesTaxMDMaterialGroup;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDCountrySalesTaxMDMaterialGroup
+    private ICollection<OutOrderPos> _OutOrderPos_MDCountrySalesTaxMDMaterialGroup;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTaxMDMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDCountrySalesTaxMDMaterialGroup);
-        set => _OutOrderPo_MDCountrySalesTaxMDMaterialGroup = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTaxMDMaterialGroup);
+        set => _OutOrderPos_MDCountrySalesTaxMDMaterialGroup = value;
     }
 
-    public bool OutOrderPo_MDCountrySalesTaxMDMaterialGroup_IsLoaded
+    public bool OutOrderPos_MDCountrySalesTaxMDMaterialGroup_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDCountrySalesTaxMDMaterialGroup != null;
+            return OutOrderPos_MDCountrySalesTaxMDMaterialGroup != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDCountrySalesTaxMDMaterialGroupReference
+    public virtual CollectionEntry OutOrderPos_MDCountrySalesTaxMDMaterialGroupReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDCountrySalesTaxMDMaterialGroup); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDCountrySalesTaxMDMaterialGroup); }
     }
 }

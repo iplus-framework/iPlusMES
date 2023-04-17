@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -47,7 +47,7 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDTour>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDTour>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDTour>>(
             (database) => from c in database.MDTour where c.IsDefault select c
         );
 

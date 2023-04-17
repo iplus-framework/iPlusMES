@@ -47,24 +47,24 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         set { SetProperty<decimal>(ref _SalesTax, value); }
     }
 
-    private ICollection<InvoicePos> _InvoicePo_MDCountrySalesTaxMaterial;
-    public virtual ICollection<InvoicePos> InvoicePo_MDCountrySalesTaxMaterial
+    private ICollection<InvoicePos> _InvoicePos_MDCountrySalesTaxMaterial;
+    public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTaxMaterial
     {
-        get => LazyLoader.Load(this, ref _InvoicePo_MDCountrySalesTaxMaterial);
-        set => _InvoicePo_MDCountrySalesTaxMaterial = value;
+        get => LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTaxMaterial);
+        set => _InvoicePos_MDCountrySalesTaxMaterial = value;
     }
 
-    public bool InvoicePo_MDCountrySalesTaxMaterial_IsLoaded
+    public bool InvoicePos_MDCountrySalesTaxMaterial_IsLoaded
     {
         get
         {
-            return InvoicePo_MDCountrySalesTaxMaterial != null;
+            return InvoicePos_MDCountrySalesTaxMaterial != null;
         }
     }
 
-    public virtual CollectionEntry InvoicePo_MDCountrySalesTaxMaterialReference
+    public virtual CollectionEntry InvoicePos_MDCountrySalesTaxMaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.InvoicePo_MDCountrySalesTaxMaterial); }
+        get { return Context.Entry(this).Collection(c => c.InvoicePos_MDCountrySalesTaxMaterial); }
     }
 
     private MDCountrySalesTax _MDCountrySalesTax;
@@ -107,43 +107,43 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ICollection<OutOfferPos> _OutOfferPo_MDCountrySalesTaxMaterial;
-    public virtual ICollection<OutOfferPos> OutOfferPo_MDCountrySalesTaxMaterial
+    private ICollection<OutOfferPos> _OutOfferPos_MDCountrySalesTaxMaterial;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTaxMaterial
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_MDCountrySalesTaxMaterial);
-        set => _OutOfferPo_MDCountrySalesTaxMaterial = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTaxMaterial);
+        set => _OutOfferPos_MDCountrySalesTaxMaterial = value;
     }
 
-    public bool OutOfferPo_MDCountrySalesTaxMaterial_IsLoaded
+    public bool OutOfferPos_MDCountrySalesTaxMaterial_IsLoaded
     {
         get
         {
-            return OutOfferPo_MDCountrySalesTaxMaterial != null;
+            return OutOfferPos_MDCountrySalesTaxMaterial != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_MDCountrySalesTaxMaterialReference
+    public virtual CollectionEntry OutOfferPos_MDCountrySalesTaxMaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_MDCountrySalesTaxMaterial); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTaxMaterial); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDCountrySalesTaxMaterial;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDCountrySalesTaxMaterial
+    private ICollection<OutOrderPos> _OutOrderPos_MDCountrySalesTaxMaterial;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTaxMaterial
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDCountrySalesTaxMaterial);
-        set => _OutOrderPo_MDCountrySalesTaxMaterial = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTaxMaterial);
+        set => _OutOrderPos_MDCountrySalesTaxMaterial = value;
     }
 
-    public bool OutOrderPo_MDCountrySalesTaxMaterial_IsLoaded
+    public bool OutOrderPos_MDCountrySalesTaxMaterial_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDCountrySalesTaxMaterial != null;
+            return OutOrderPos_MDCountrySalesTaxMaterial != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDCountrySalesTaxMaterialReference
+    public virtual CollectionEntry OutOrderPos_MDCountrySalesTaxMaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDCountrySalesTaxMaterial); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDCountrySalesTaxMaterial); }
     }
 }

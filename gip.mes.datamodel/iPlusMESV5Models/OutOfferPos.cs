@@ -229,64 +229,64 @@ public partial class OutOfferPos : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private OutOfferPos _OutOfferPo1_GroupOutOfferPos;
-    public virtual OutOfferPos OutOfferPo1_GroupOutOfferPos
+    private OutOfferPos _OutOfferPos1_GroupOutOfferPos;
+    public virtual OutOfferPos OutOfferPos1_GroupOutOfferPos
     { 
-        get => LazyLoader.Load(this, ref _OutOfferPo1_GroupOutOfferPos);
-        set => _OutOfferPo1_GroupOutOfferPos = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos1_GroupOutOfferPos);
+        set => _OutOfferPos1_GroupOutOfferPos = value;
     }
 
-    public bool OutOfferPo1_GroupOutOfferPos_IsLoaded
+    public bool OutOfferPos1_GroupOutOfferPos_IsLoaded
     {
         get
         {
-            return OutOfferPo1_GroupOutOfferPos != null;
+            return OutOfferPos1_GroupOutOfferPos != null;
         }
     }
 
-    public virtual ReferenceEntry OutOfferPo1_GroupOutOfferPosReference 
+    public virtual ReferenceEntry OutOfferPos1_GroupOutOfferPosReference 
     {
-        get { return Context.Entry(this).Reference("OutOfferPo1_GroupOutOfferPos"); }
+        get { return Context.Entry(this).Reference("OutOfferPos1_GroupOutOfferPos"); }
     }
     
-    private ICollection<OutOfferPos> _OutOfferPo_GroupOutOfferPos;
-    public virtual ICollection<OutOfferPos> OutOfferPo_GroupOutOfferPos
+    private ICollection<OutOfferPos> _OutOfferPos_GroupOutOfferPos;
+    public virtual ICollection<OutOfferPos> OutOfferPos_GroupOutOfferPos
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_GroupOutOfferPos);
-        set => _OutOfferPo_GroupOutOfferPos = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_GroupOutOfferPos);
+        set => _OutOfferPos_GroupOutOfferPos = value;
     }
 
-    public bool OutOfferPo_GroupOutOfferPos_IsLoaded
+    public bool OutOfferPos_GroupOutOfferPos_IsLoaded
     {
         get
         {
-            return OutOfferPo_GroupOutOfferPos != null;
+            return OutOfferPos_GroupOutOfferPos != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_GroupOutOfferPosReference
+    public virtual CollectionEntry OutOfferPos_GroupOutOfferPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_GroupOutOfferPos); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_GroupOutOfferPos); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPo_ParentOutOfferPos;
-    public virtual ICollection<OutOfferPos> OutOfferPo_ParentOutOfferPos
+    private ICollection<OutOfferPos> _OutOfferPos_ParentOutOfferPos;
+    public virtual ICollection<OutOfferPos> OutOfferPos_ParentOutOfferPos
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_ParentOutOfferPos);
-        set => _OutOfferPo_ParentOutOfferPos = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_ParentOutOfferPos);
+        set => _OutOfferPos_ParentOutOfferPos = value;
     }
 
-    public bool OutOfferPo_ParentOutOfferPos_IsLoaded
+    public bool OutOfferPos_ParentOutOfferPos_IsLoaded
     {
         get
         {
-            return OutOfferPo_ParentOutOfferPos != null;
+            return OutOfferPos_ParentOutOfferPos != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_ParentOutOfferPosReference
+    public virtual CollectionEntry OutOfferPos_ParentOutOfferPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_ParentOutOfferPos); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_ParentOutOfferPos); }
     }
 
     private MDCountrySalesTax _MDCountrySalesTax;
@@ -429,23 +429,23 @@ public partial class OutOfferPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("OutOffer"); }
     }
     
-    private OutOfferPos _OutOfferPo1_ParentOutOfferPos;
-    public virtual OutOfferPos OutOfferPo1_ParentOutOfferPos
+    private OutOfferPos _OutOfferPos1_ParentOutOfferPos;
+    public virtual OutOfferPos OutOfferPos1_ParentOutOfferPos
     { 
-        get => LazyLoader.Load(this, ref _OutOfferPo1_ParentOutOfferPos);
-        set => _OutOfferPo1_ParentOutOfferPos = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos1_ParentOutOfferPos);
+        set => _OutOfferPos1_ParentOutOfferPos = value;
     }
 
-    public bool OutOfferPo1_ParentOutOfferPos_IsLoaded
+    public bool OutOfferPos1_ParentOutOfferPos_IsLoaded
     {
         get
         {
-            return OutOfferPo1_ParentOutOfferPos != null;
+            return OutOfferPos1_ParentOutOfferPos != null;
         }
     }
 
-    public virtual ReferenceEntry OutOfferPo1_ParentOutOfferPosReference 
+    public virtual ReferenceEntry OutOfferPos1_ParentOutOfferPosReference 
     {
-        get { return Context.Entry(this).Reference("OutOfferPo1_ParentOutOfferPos"); }
+        get { return Context.Entry(this).Reference("OutOfferPos1_ParentOutOfferPos"); }
     }
     }

@@ -1,7 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,12 +39,12 @@ namespace gip.mes.datamodel
         #endregion
 
         public static readonly Func<DatabaseApp, IQueryable<MDPickingType>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDPickingType>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDPickingType>>(
             (database) => from c in database.MDPickingType where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDPickingType>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDPickingType>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDPickingType>>(
             (database, index) => from c in database.MDPickingType where c.MDPickingTypeIndex == index select c
         );
 

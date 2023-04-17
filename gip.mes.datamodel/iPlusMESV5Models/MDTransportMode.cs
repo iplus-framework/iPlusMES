@@ -96,43 +96,43 @@ public partial class MDTransportMode : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDTransportMode;
-    public virtual ICollection<InOrderPos> InOrderPo_MDTransportMode
+    private ICollection<InOrderPos> _InOrderPos_MDTransportMode;
+    public virtual ICollection<InOrderPos> InOrderPos_MDTransportMode
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDTransportMode);
-        set => _InOrderPo_MDTransportMode = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDTransportMode);
+        set => _InOrderPos_MDTransportMode = value;
     }
 
-    public bool InOrderPo_MDTransportMode_IsLoaded
+    public bool InOrderPos_MDTransportMode_IsLoaded
     {
         get
         {
-            return InOrderPo_MDTransportMode != null;
+            return InOrderPos_MDTransportMode != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDTransportModeReference
+    public virtual CollectionEntry InOrderPos_MDTransportModeReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDTransportMode); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDTransportMode); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDTransportMode;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDTransportMode
+    private ICollection<OutOrderPos> _OutOrderPos_MDTransportMode;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDTransportMode
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDTransportMode);
-        set => _OutOrderPo_MDTransportMode = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDTransportMode);
+        set => _OutOrderPos_MDTransportMode = value;
     }
 
-    public bool OutOrderPo_MDTransportMode_IsLoaded
+    public bool OutOrderPos_MDTransportMode_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDTransportMode != null;
+            return OutOrderPos_MDTransportMode != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDTransportModeReference
+    public virtual CollectionEntry OutOrderPos_MDTransportModeReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDTransportMode); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTransportMode); }
     }
 }

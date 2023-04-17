@@ -109,43 +109,43 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject , IInsertInfo
         get { return Context.Entry(this).Reference("CompanyAddress"); }
     }
     
-    private ICollection<OutOrderPos> _OutOrderPo_CompanyAddressUnloadingpoint;
-    public virtual ICollection<OutOrderPos> OutOrderPo_CompanyAddressUnloadingpoint
+    private ICollection<OutOrderPos> _OutOrderPos_CompanyAddressUnloadingpoint;
+    public virtual ICollection<OutOrderPos> OutOrderPos_CompanyAddressUnloadingpoint
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_CompanyAddressUnloadingpoint);
-        set => _OutOrderPo_CompanyAddressUnloadingpoint = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_CompanyAddressUnloadingpoint);
+        set => _OutOrderPos_CompanyAddressUnloadingpoint = value;
     }
 
-    public bool OutOrderPo_CompanyAddressUnloadingpoint_IsLoaded
+    public bool OutOrderPos_CompanyAddressUnloadingpoint_IsLoaded
     {
         get
         {
-            return OutOrderPo_CompanyAddressUnloadingpoint != null;
+            return OutOrderPos_CompanyAddressUnloadingpoint != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_CompanyAddressUnloadingpointReference
+    public virtual CollectionEntry OutOrderPos_CompanyAddressUnloadingpointReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_CompanyAddressUnloadingpoint); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_CompanyAddressUnloadingpoint); }
     }
 
-    private ICollection<TourplanPos> _TourplanPo_CompanyAddressUnloadingpoint;
-    public virtual ICollection<TourplanPos> TourplanPo_CompanyAddressUnloadingpoint
+    private ICollection<TourplanPos> _TourplanPos_CompanyAddressUnloadingpoint;
+    public virtual ICollection<TourplanPos> TourplanPos_CompanyAddressUnloadingpoint
     {
-        get => LazyLoader.Load(this, ref _TourplanPo_CompanyAddressUnloadingpoint);
-        set => _TourplanPo_CompanyAddressUnloadingpoint = value;
+        get => LazyLoader.Load(this, ref _TourplanPos_CompanyAddressUnloadingpoint);
+        set => _TourplanPos_CompanyAddressUnloadingpoint = value;
     }
 
-    public bool TourplanPo_CompanyAddressUnloadingpoint_IsLoaded
+    public bool TourplanPos_CompanyAddressUnloadingpoint_IsLoaded
     {
         get
         {
-            return TourplanPo_CompanyAddressUnloadingpoint != null;
+            return TourplanPos_CompanyAddressUnloadingpoint != null;
         }
     }
 
-    public virtual CollectionEntry TourplanPo_CompanyAddressUnloadingpointReference
+    public virtual CollectionEntry TourplanPos_CompanyAddressUnloadingpointReference
     {
-        get { return Context.Entry(this).Collection(c => c.TourplanPo_CompanyAddressUnloadingpoint); }
+        get { return Context.Entry(this).Collection(c => c.TourplanPos_CompanyAddressUnloadingpoint); }
     }
 }

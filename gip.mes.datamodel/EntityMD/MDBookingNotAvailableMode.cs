@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -36,12 +36,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDBookingNotAvailableMode>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDBookingNotAvailableMode>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDBookingNotAvailableMode>>(
             (database) => from c in database.MDBookingNotAvailableMode where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDBookingNotAvailableMode>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDBookingNotAvailableMode>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDBookingNotAvailableMode>>(
             (database, index) => from c in database.MDBookingNotAvailableMode where c.MDBookingNotAvailableModeIndex == index select c
         );
 

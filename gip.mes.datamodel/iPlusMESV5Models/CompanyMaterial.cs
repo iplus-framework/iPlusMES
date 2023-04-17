@@ -392,24 +392,24 @@ public partial class CompanyMaterial : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_CompanyMaterial); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_PickupCompanyMaterial;
-    public virtual ICollection<InOrderPos> InOrderPo_PickupCompanyMaterial
+    private ICollection<InOrderPos> _InOrderPos_PickupCompanyMaterial;
+    public virtual ICollection<InOrderPos> InOrderPos_PickupCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_PickupCompanyMaterial);
-        set => _InOrderPo_PickupCompanyMaterial = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_PickupCompanyMaterial);
+        set => _InOrderPos_PickupCompanyMaterial = value;
     }
 
-    public bool InOrderPo_PickupCompanyMaterial_IsLoaded
+    public bool InOrderPos_PickupCompanyMaterial_IsLoaded
     {
         get
         {
-            return InOrderPo_PickupCompanyMaterial != null;
+            return InOrderPos_PickupCompanyMaterial != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_PickupCompanyMaterialReference
+    public virtual CollectionEntry InOrderPos_PickupCompanyMaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_PickupCompanyMaterial); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_PickupCompanyMaterial); }
     }
 
     private MDUnit _MDUnit;
@@ -452,23 +452,23 @@ public partial class CompanyMaterial : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ICollection<OutOrderPos> _OutOrderPo_PickupCompanyMaterial;
-    public virtual ICollection<OutOrderPos> OutOrderPo_PickupCompanyMaterial
+    private ICollection<OutOrderPos> _OutOrderPos_PickupCompanyMaterial;
+    public virtual ICollection<OutOrderPos> OutOrderPos_PickupCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_PickupCompanyMaterial);
-        set => _OutOrderPo_PickupCompanyMaterial = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_PickupCompanyMaterial);
+        set => _OutOrderPos_PickupCompanyMaterial = value;
     }
 
-    public bool OutOrderPo_PickupCompanyMaterial_IsLoaded
+    public bool OutOrderPos_PickupCompanyMaterial_IsLoaded
     {
         get
         {
-            return OutOrderPo_PickupCompanyMaterial != null;
+            return OutOrderPos_PickupCompanyMaterial != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_PickupCompanyMaterialReference
+    public virtual CollectionEntry OutOrderPos_PickupCompanyMaterialReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_PickupCompanyMaterial); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_PickupCompanyMaterial); }
     }
 }

@@ -988,44 +988,44 @@ public partial class Facility : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Partslist"); }
     }
     
-    private ICollection<PickingPos> _PickingPo_FromFacility;
-    public virtual ICollection<PickingPos> PickingPo_FromFacility
+    private ICollection<PickingPos> _PickingPos_FromFacility;
+    public virtual ICollection<PickingPos> PickingPos_FromFacility
     {
-        get => LazyLoader.Load(this, ref _PickingPo_FromFacility);
-        set => _PickingPo_FromFacility = value;
+        get => LazyLoader.Load(this, ref _PickingPos_FromFacility);
+        set => _PickingPos_FromFacility = value;
     }
 
-    public bool PickingPo_FromFacility_IsLoaded
+    public bool PickingPos_FromFacility_IsLoaded
     {
         get
         {
-            return PickingPo_FromFacility != null;
+            return PickingPos_FromFacility != null;
         }
     }
 
-    public virtual CollectionEntry PickingPo_FromFacilityReference
+    public virtual CollectionEntry PickingPos_FromFacilityReference
     {
-        get { return Context.Entry(this).Collection(c => c.PickingPo_FromFacility); }
+        get { return Context.Entry(this).Collection(c => c.PickingPos_FromFacility); }
     }
 
-    private ICollection<PickingPos> _PickingPo_ToFacility;
-    public virtual ICollection<PickingPos> PickingPo_ToFacility
+    private ICollection<PickingPos> _PickingPos_ToFacility;
+    public virtual ICollection<PickingPos> PickingPos_ToFacility
     {
-        get => LazyLoader.Load(this, ref _PickingPo_ToFacility);
-        set => _PickingPo_ToFacility = value;
+        get => LazyLoader.Load(this, ref _PickingPos_ToFacility);
+        set => _PickingPos_ToFacility = value;
     }
 
-    public bool PickingPo_ToFacility_IsLoaded
+    public bool PickingPos_ToFacility_IsLoaded
     {
         get
         {
-            return PickingPo_ToFacility != null;
+            return PickingPos_ToFacility != null;
         }
     }
 
-    public virtual CollectionEntry PickingPo_ToFacilityReference
+    public virtual CollectionEntry PickingPos_ToFacilityReference
     {
-        get { return Context.Entry(this).Collection(c => c.PickingPo_ToFacility); }
+        get { return Context.Entry(this).Collection(c => c.PickingPos_ToFacility); }
     }
 
     private ICollection<TandTv2StepItem> _TandTv2StepItem_Facility;

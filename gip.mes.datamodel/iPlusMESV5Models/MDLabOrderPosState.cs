@@ -96,23 +96,23 @@ public partial class MDLabOrderPosState : VBEntityObject , IInsertInfo, IUpdateI
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<LabOrderPos> _LabOrderPo_MDLabOrderPosState;
-    public virtual ICollection<LabOrderPos> LabOrderPo_MDLabOrderPosState
+    private ICollection<LabOrderPos> _LabOrderPos_MDLabOrderPosState;
+    public virtual ICollection<LabOrderPos> LabOrderPos_MDLabOrderPosState
     {
-        get => LazyLoader.Load(this, ref _LabOrderPo_MDLabOrderPosState);
-        set => _LabOrderPo_MDLabOrderPosState = value;
+        get => LazyLoader.Load(this, ref _LabOrderPos_MDLabOrderPosState);
+        set => _LabOrderPos_MDLabOrderPosState = value;
     }
 
-    public bool LabOrderPo_MDLabOrderPosState_IsLoaded
+    public bool LabOrderPos_MDLabOrderPosState_IsLoaded
     {
         get
         {
-            return LabOrderPo_MDLabOrderPosState != null;
+            return LabOrderPos_MDLabOrderPosState != null;
         }
     }
 
-    public virtual CollectionEntry LabOrderPo_MDLabOrderPosStateReference
+    public virtual CollectionEntry LabOrderPos_MDLabOrderPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.LabOrderPo_MDLabOrderPosState); }
+        get { return Context.Entry(this).Collection(c => c.LabOrderPos_MDLabOrderPosState); }
     }
 }

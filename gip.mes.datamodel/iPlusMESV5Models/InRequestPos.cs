@@ -214,24 +214,24 @@ public partial class InRequestPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("InRequest"); }
     }
     
-    private ICollection<InRequestPos> _InRequestPo_ParentInRequestPos;
-    public virtual ICollection<InRequestPos> InRequestPo_ParentInRequestPos
+    private ICollection<InRequestPos> _InRequestPos_ParentInRequestPos;
+    public virtual ICollection<InRequestPos> InRequestPos_ParentInRequestPos
     {
-        get => LazyLoader.Load(this, ref _InRequestPo_ParentInRequestPos);
-        set => _InRequestPo_ParentInRequestPos = value;
+        get => LazyLoader.Load(this, ref _InRequestPos_ParentInRequestPos);
+        set => _InRequestPos_ParentInRequestPos = value;
     }
 
-    public bool InRequestPo_ParentInRequestPos_IsLoaded
+    public bool InRequestPos_ParentInRequestPos_IsLoaded
     {
         get
         {
-            return InRequestPo_ParentInRequestPos != null;
+            return InRequestPos_ParentInRequestPos != null;
         }
     }
 
-    public virtual CollectionEntry InRequestPo_ParentInRequestPosReference
+    public virtual CollectionEntry InRequestPos_ParentInRequestPosReference
     {
-        get { return Context.Entry(this).Collection(c => c.InRequestPo_ParentInRequestPos); }
+        get { return Context.Entry(this).Collection(c => c.InRequestPos_ParentInRequestPos); }
     }
 
     private MDCountrySalesTax _MDCountrySalesTax;
@@ -314,23 +314,23 @@ public partial class InRequestPos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private InRequestPos _InRequestPo1_ParentInRequestPos;
-    public virtual InRequestPos InRequestPo1_ParentInRequestPos
+    private InRequestPos _InRequestPos1_ParentInRequestPos;
+    public virtual InRequestPos InRequestPos1_ParentInRequestPos
     { 
-        get => LazyLoader.Load(this, ref _InRequestPo1_ParentInRequestPos);
-        set => _InRequestPo1_ParentInRequestPos = value;
+        get => LazyLoader.Load(this, ref _InRequestPos1_ParentInRequestPos);
+        set => _InRequestPos1_ParentInRequestPos = value;
     }
 
-    public bool InRequestPo1_ParentInRequestPos_IsLoaded
+    public bool InRequestPos1_ParentInRequestPos_IsLoaded
     {
         get
         {
-            return InRequestPo1_ParentInRequestPos != null;
+            return InRequestPos1_ParentInRequestPos != null;
         }
     }
 
-    public virtual ReferenceEntry InRequestPo1_ParentInRequestPosReference 
+    public virtual ReferenceEntry InRequestPos1_ParentInRequestPosReference 
     {
-        get { return Context.Entry(this).Reference("InRequestPo1_ParentInRequestPos"); }
+        get { return Context.Entry(this).Reference("InRequestPos1_ParentInRequestPos"); }
     }
     }

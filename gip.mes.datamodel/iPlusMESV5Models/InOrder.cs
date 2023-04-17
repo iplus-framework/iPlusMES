@@ -328,24 +328,24 @@ public partial class InOrder : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_InOrder); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_InOrder;
-    public virtual ICollection<InOrderPos> InOrderPo_InOrder
+    private ICollection<InOrderPos> _InOrderPos_InOrder;
+    public virtual ICollection<InOrderPos> InOrderPos_InOrder
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_InOrder);
-        set => _InOrderPo_InOrder = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_InOrder);
+        set => _InOrderPos_InOrder = value;
     }
 
-    public bool InOrderPo_InOrder_IsLoaded
+    public bool InOrderPos_InOrder_IsLoaded
     {
         get
         {
-            return InOrderPo_InOrder != null;
+            return InOrderPos_InOrder != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_InOrderReference
+    public virtual CollectionEntry InOrderPos_InOrderReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_InOrder); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_InOrder); }
     }
 
     private CompanyPerson _IssuerCompanyPerson;

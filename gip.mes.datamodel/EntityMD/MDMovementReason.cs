@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -35,12 +35,12 @@ namespace gip.mes.datamodel
         }
 
         static readonly Func<DatabaseApp, IQueryable<MDMovementReason>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDMovementReason>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDMovementReason>>(
             (database) => from c in database.MDMovementReason where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDMovementReason>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDMovementReason>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDMovementReason>>(
             (database, index) => from c in database.MDMovementReason where c.MDMovementReasonIndex == index select c
         );
 

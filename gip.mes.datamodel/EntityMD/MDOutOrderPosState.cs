@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -36,12 +36,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
             (database) => from c in database.MDOutOrderPosState where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDOutOrderPosState>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDOutOrderPosState>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDOutOrderPosState>>(
             (database, index) => from c in database.MDOutOrderPosState where c.MDOutOrderPosStateIndex == index select c
         );
 

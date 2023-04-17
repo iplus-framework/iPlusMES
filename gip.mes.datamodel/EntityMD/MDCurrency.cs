@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -33,12 +33,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDCurrency>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDCurrency>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDCurrency>>(
             (database) => from c in database.MDCurrency where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, string, IQueryable<MDCurrency>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, string, IQueryable<MDCurrency>>(
+            EF.CompileQuery<DatabaseApp, string, IQueryable<MDCurrency>>(
             (database, index) => from c in database.MDCurrency where c.MDCurrencyShortname == index select c
         );
 

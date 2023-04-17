@@ -96,23 +96,23 @@ public partial class MDFacilityInventoryPosState : VBEntityObject , IInsertInfo,
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<FacilityInventoryPos> _FacilityInventoryPo_MDFacilityInventoryPosState;
-    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPo_MDFacilityInventoryPosState
+    private ICollection<FacilityInventoryPos> _FacilityInventoryPos_MDFacilityInventoryPosState;
+    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_MDFacilityInventoryPosState
     {
-        get => LazyLoader.Load(this, ref _FacilityInventoryPo_MDFacilityInventoryPosState);
-        set => _FacilityInventoryPo_MDFacilityInventoryPosState = value;
+        get => LazyLoader.Load(this, ref _FacilityInventoryPos_MDFacilityInventoryPosState);
+        set => _FacilityInventoryPos_MDFacilityInventoryPosState = value;
     }
 
-    public bool FacilityInventoryPo_MDFacilityInventoryPosState_IsLoaded
+    public bool FacilityInventoryPos_MDFacilityInventoryPosState_IsLoaded
     {
         get
         {
-            return FacilityInventoryPo_MDFacilityInventoryPosState != null;
+            return FacilityInventoryPos_MDFacilityInventoryPosState != null;
         }
     }
 
-    public virtual CollectionEntry FacilityInventoryPo_MDFacilityInventoryPosStateReference
+    public virtual CollectionEntry FacilityInventoryPos_MDFacilityInventoryPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.FacilityInventoryPo_MDFacilityInventoryPosState); }
+        get { return Context.Entry(this).Collection(c => c.FacilityInventoryPos_MDFacilityInventoryPosState); }
     }
 }

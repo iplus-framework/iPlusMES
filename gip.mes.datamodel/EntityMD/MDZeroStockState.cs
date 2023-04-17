@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -36,18 +36,18 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDZeroStockState>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDZeroStockState>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDZeroStockState>>(
             (database) => from c in database.MDZeroStockState where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDZeroStockState>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDZeroStockState>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDZeroStockState>>(
             (database, index) => from c in database.MDZeroStockState where c.MDZeroStockStateIndex == index select c
         );
 
 
         static readonly Func<DatabaseApp, short, IQueryable<MDZeroStockState>> s_cQry_IndexDefault =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDZeroStockState>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDZeroStockState>>(
             (database, index) => from c in database.MDZeroStockState where c.IsDefault && c.MDZeroStockStateIndex == index select c
         );
 

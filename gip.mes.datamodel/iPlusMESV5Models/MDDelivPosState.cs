@@ -96,43 +96,43 @@ public partial class MDDelivPosState : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDDelivPosState;
-    public virtual ICollection<InOrderPos> InOrderPo_MDDelivPosState
+    private ICollection<InOrderPos> _InOrderPos_MDDelivPosState;
+    public virtual ICollection<InOrderPos> InOrderPos_MDDelivPosState
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDDelivPosState);
-        set => _InOrderPo_MDDelivPosState = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDDelivPosState);
+        set => _InOrderPos_MDDelivPosState = value;
     }
 
-    public bool InOrderPo_MDDelivPosState_IsLoaded
+    public bool InOrderPos_MDDelivPosState_IsLoaded
     {
         get
         {
-            return InOrderPo_MDDelivPosState != null;
+            return InOrderPos_MDDelivPosState != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDDelivPosStateReference
+    public virtual CollectionEntry InOrderPos_MDDelivPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDDelivPosState); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDDelivPosState); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDDelivPosState;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDDelivPosState
+    private ICollection<OutOrderPos> _OutOrderPos_MDDelivPosState;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDDelivPosState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDDelivPosState);
-        set => _OutOrderPo_MDDelivPosState = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDDelivPosState);
+        set => _OutOrderPos_MDDelivPosState = value;
     }
 
-    public bool OutOrderPo_MDDelivPosState_IsLoaded
+    public bool OutOrderPos_MDDelivPosState_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDDelivPosState != null;
+            return OutOrderPos_MDDelivPosState != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDDelivPosStateReference
+    public virtual CollectionEntry OutOrderPos_MDDelivPosStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDDelivPosState); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDDelivPosState); }
     }
 }

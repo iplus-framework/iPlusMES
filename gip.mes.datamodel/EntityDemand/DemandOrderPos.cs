@@ -2,7 +2,6 @@ using gip.core.datamodel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Objects.DataClasses;
 using System.Linq;
 using System.Reflection;
 using System.Text;

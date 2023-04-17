@@ -157,24 +157,24 @@ public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_MDTimeRange); }
     }
 
-    private ICollection<InOrderPos> _InOrderPo_MDTimeRange;
-    public virtual ICollection<InOrderPos> InOrderPo_MDTimeRange
+    private ICollection<InOrderPos> _InOrderPos_MDTimeRange;
+    public virtual ICollection<InOrderPos> InOrderPos_MDTimeRange
     {
-        get => LazyLoader.Load(this, ref _InOrderPo_MDTimeRange);
-        set => _InOrderPo_MDTimeRange = value;
+        get => LazyLoader.Load(this, ref _InOrderPos_MDTimeRange);
+        set => _InOrderPos_MDTimeRange = value;
     }
 
-    public bool InOrderPo_MDTimeRange_IsLoaded
+    public bool InOrderPos_MDTimeRange_IsLoaded
     {
         get
         {
-            return InOrderPo_MDTimeRange != null;
+            return InOrderPos_MDTimeRange != null;
         }
     }
 
-    public virtual CollectionEntry InOrderPo_MDTimeRangeReference
+    public virtual CollectionEntry InOrderPos_MDTimeRangeReference
     {
-        get { return Context.Entry(this).Collection(c => c.InOrderPo_MDTimeRange); }
+        get { return Context.Entry(this).Collection(c => c.InOrderPos_MDTimeRange); }
     }
 
     private ICollection<InOrder> _InOrder_MDTimeRange;
@@ -197,24 +197,24 @@ public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrder_MDTimeRange); }
     }
 
-    private ICollection<InRequestPos> _InRequestPo_MDTimeRange;
-    public virtual ICollection<InRequestPos> InRequestPo_MDTimeRange
+    private ICollection<InRequestPos> _InRequestPos_MDTimeRange;
+    public virtual ICollection<InRequestPos> InRequestPos_MDTimeRange
     {
-        get => LazyLoader.Load(this, ref _InRequestPo_MDTimeRange);
-        set => _InRequestPo_MDTimeRange = value;
+        get => LazyLoader.Load(this, ref _InRequestPos_MDTimeRange);
+        set => _InRequestPos_MDTimeRange = value;
     }
 
-    public bool InRequestPo_MDTimeRange_IsLoaded
+    public bool InRequestPos_MDTimeRange_IsLoaded
     {
         get
         {
-            return InRequestPo_MDTimeRange != null;
+            return InRequestPos_MDTimeRange != null;
         }
     }
 
-    public virtual CollectionEntry InRequestPo_MDTimeRangeReference
+    public virtual CollectionEntry InRequestPos_MDTimeRangeReference
     {
-        get { return Context.Entry(this).Collection(c => c.InRequestPo_MDTimeRange); }
+        get { return Context.Entry(this).Collection(c => c.InRequestPos_MDTimeRange); }
     }
 
     private ICollection<InRequest> _InRequest_MDTimeRange;
@@ -257,24 +257,24 @@ public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MDTimeRange_ParentMDTimeRange); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPo_MDTimeRange;
-    public virtual ICollection<OutOfferPos> OutOfferPo_MDTimeRange
+    private ICollection<OutOfferPos> _OutOfferPos_MDTimeRange;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDTimeRange
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_MDTimeRange);
-        set => _OutOfferPo_MDTimeRange = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_MDTimeRange);
+        set => _OutOfferPos_MDTimeRange = value;
     }
 
-    public bool OutOfferPo_MDTimeRange_IsLoaded
+    public bool OutOfferPos_MDTimeRange_IsLoaded
     {
         get
         {
-            return OutOfferPo_MDTimeRange != null;
+            return OutOfferPos_MDTimeRange != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_MDTimeRangeReference
+    public virtual CollectionEntry OutOfferPos_MDTimeRangeReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_MDTimeRange); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDTimeRange); }
     }
 
     private ICollection<OutOffer> _OutOffer_MDTimeRange;
@@ -297,24 +297,24 @@ public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDTimeRange); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_MDTimeRange;
-    public virtual ICollection<OutOrderPos> OutOrderPo_MDTimeRange
+    private ICollection<OutOrderPos> _OutOrderPos_MDTimeRange;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDTimeRange
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_MDTimeRange);
-        set => _OutOrderPo_MDTimeRange = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_MDTimeRange);
+        set => _OutOrderPos_MDTimeRange = value;
     }
 
-    public bool OutOrderPo_MDTimeRange_IsLoaded
+    public bool OutOrderPos_MDTimeRange_IsLoaded
     {
         get
         {
-            return OutOrderPo_MDTimeRange != null;
+            return OutOrderPos_MDTimeRange != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_MDTimeRangeReference
+    public virtual CollectionEntry OutOrderPos_MDTimeRangeReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_MDTimeRange); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTimeRange); }
     }
 
     private ICollection<OutOrder> _OutOrder_MDTimeRange;
@@ -357,23 +357,23 @@ public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDTimeRange1_ParentMDTimeRange"); }
     }
     
-    private ICollection<TourplanPos> _TourplanPo_MDTimeRange;
-    public virtual ICollection<TourplanPos> TourplanPo_MDTimeRange
+    private ICollection<TourplanPos> _TourplanPos_MDTimeRange;
+    public virtual ICollection<TourplanPos> TourplanPos_MDTimeRange
     {
-        get => LazyLoader.Load(this, ref _TourplanPo_MDTimeRange);
-        set => _TourplanPo_MDTimeRange = value;
+        get => LazyLoader.Load(this, ref _TourplanPos_MDTimeRange);
+        set => _TourplanPos_MDTimeRange = value;
     }
 
-    public bool TourplanPo_MDTimeRange_IsLoaded
+    public bool TourplanPos_MDTimeRange_IsLoaded
     {
         get
         {
-            return TourplanPo_MDTimeRange != null;
+            return TourplanPos_MDTimeRange != null;
         }
     }
 
-    public virtual CollectionEntry TourplanPo_MDTimeRangeReference
+    public virtual CollectionEntry TourplanPos_MDTimeRangeReference
     {
-        get { return Context.Entry(this).Collection(c => c.TourplanPo_MDTimeRange); }
+        get { return Context.Entry(this).Collection(c => c.TourplanPos_MDTimeRange); }
     }
 }

@@ -1,7 +1,6 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 
 namespace gip.mes.datamodel
@@ -92,7 +91,7 @@ namespace gip.mes.datamodel
                     return msg;
             }
             int sequence = Sequence;
-            database.DeleteObject(this);
+            database.Remove(this);
             return null;
         }
 
@@ -838,8 +837,8 @@ namespace gip.mes.datamodel
             }
 
             DatabaseApp dbApp = null;
-            var sumsPerUnitID = this.FacilityBookingCharge_ProdOrderPartslistPos
-                                        .CreateSourceQuery()
+            var sumsPerUnitID = Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPos)
+                                        .Query()
                                         .GroupBy(c => c.MDUnitID)
                                         .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
                                         .ToArray();

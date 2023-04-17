@@ -536,24 +536,24 @@ public partial class OutOrder : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_OutOrder); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPo_OutOrder;
-    public virtual ICollection<OutOrderPos> OutOrderPo_OutOrder
+    private ICollection<OutOrderPos> _OutOrderPos_OutOrder;
+    public virtual ICollection<OutOrderPos> OutOrderPos_OutOrder
     {
-        get => LazyLoader.Load(this, ref _OutOrderPo_OutOrder);
-        set => _OutOrderPo_OutOrder = value;
+        get => LazyLoader.Load(this, ref _OutOrderPos_OutOrder);
+        set => _OutOrderPos_OutOrder = value;
     }
 
-    public bool OutOrderPo_OutOrder_IsLoaded
+    public bool OutOrderPos_OutOrder_IsLoaded
     {
         get
         {
-            return OutOrderPo_OutOrder != null;
+            return OutOrderPos_OutOrder != null;
         }
     }
 
-    public virtual CollectionEntry OutOrderPo_OutOrderReference
+    public virtual CollectionEntry OutOrderPos_OutOrderReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOrderPo_OutOrder); }
+        get { return Context.Entry(this).Collection(c => c.OutOrderPos_OutOrder); }
     }
 
     private ICollection<TandTv2StepItem> _TandTv2StepItem_OutOrder;

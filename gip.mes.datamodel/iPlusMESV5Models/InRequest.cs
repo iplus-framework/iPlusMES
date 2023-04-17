@@ -280,24 +280,24 @@ public partial class InRequest : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_InRequest); }
     }
 
-    private ICollection<InRequestPos> _InRequestPo_InRequest;
-    public virtual ICollection<InRequestPos> InRequestPo_InRequest
+    private ICollection<InRequestPos> _InRequestPos_InRequest;
+    public virtual ICollection<InRequestPos> InRequestPos_InRequest
     {
-        get => LazyLoader.Load(this, ref _InRequestPo_InRequest);
-        set => _InRequestPo_InRequest = value;
+        get => LazyLoader.Load(this, ref _InRequestPos_InRequest);
+        set => _InRequestPos_InRequest = value;
     }
 
-    public bool InRequestPo_InRequest_IsLoaded
+    public bool InRequestPos_InRequest_IsLoaded
     {
         get
         {
-            return InRequestPo_InRequest != null;
+            return InRequestPos_InRequest != null;
         }
     }
 
-    public virtual CollectionEntry InRequestPo_InRequestReference
+    public virtual CollectionEntry InRequestPos_InRequestReference
     {
-        get { return Context.Entry(this).Collection(c => c.InRequestPo_InRequest); }
+        get { return Context.Entry(this).Collection(c => c.InRequestPos_InRequest); }
     }
 
     private MDDelivType _MDDelivType;

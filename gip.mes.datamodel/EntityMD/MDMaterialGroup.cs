@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -37,12 +37,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDMaterialGroup>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDMaterialGroup>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDMaterialGroup>>(
             (database) => from c in database.MDMaterialGroup where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDMaterialGroup>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDMaterialGroup>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDMaterialGroup>>(
             (database, index) => from c in database.MDMaterialGroup where c.MDMaterialGroupIndex == index select c
         );
 

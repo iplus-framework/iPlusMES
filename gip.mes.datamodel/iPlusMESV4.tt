@@ -65,7 +65,7 @@ propertiesForOverriden.Add("ACIdentifier");
 using System;
 using System.ComponentModel;
 using System.Data.EntityClient;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 using System.Data.Objects.DataClasses;
 using System.Linq;
 using System.Runtime.Serialization;

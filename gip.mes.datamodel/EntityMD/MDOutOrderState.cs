@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using gip.core.datamodel;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -35,12 +35,12 @@ namespace gip.mes.datamodel
 
 
         static readonly Func<DatabaseApp, IQueryable<MDOutOrderState>> s_cQry_Default =
-            CompiledQuery.Compile<DatabaseApp, IQueryable<MDOutOrderState>>(
+            EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderState>>(
             (database) => from c in database.MDOutOrderState where c.IsDefault select c
         );
 
         static readonly Func<DatabaseApp, short, IQueryable<MDOutOrderState>> s_cQry_Index =
-            CompiledQuery.Compile<DatabaseApp, short, IQueryable<MDOutOrderState>>(
+            EF.CompileQuery<DatabaseApp, short, IQueryable<MDOutOrderState>>(
             (database, index) => from c in database.MDOutOrderState where c.MDOutOrderStateIndex == index select c
         );
 

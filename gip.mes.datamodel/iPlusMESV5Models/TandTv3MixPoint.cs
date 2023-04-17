@@ -101,24 +101,24 @@ public partial class TandTv3MixPoint : VBEntityObject
         get { return Context.Entry(this).Reference("InwardMaterial"); }
     }
     
-    private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePo_TandTv3MixPoint;
-    public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePo_TandTv3MixPoint
+    private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_TandTv3MixPoint;
+    public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_TandTv3MixPoint
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePo_TandTv3MixPoint);
-        set => _TandTv3MixPointDeliveryNotePo_TandTv3MixPoint = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePos_TandTv3MixPoint);
+        set => _TandTv3MixPointDeliveryNotePos_TandTv3MixPoint = value;
     }
 
-    public bool TandTv3MixPointDeliveryNotePo_TandTv3MixPoint_IsLoaded
+    public bool TandTv3MixPointDeliveryNotePos_TandTv3MixPoint_IsLoaded
     {
         get
         {
-            return TandTv3MixPointDeliveryNotePo_TandTv3MixPoint != null;
+            return TandTv3MixPointDeliveryNotePos_TandTv3MixPoint != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointDeliveryNotePo_TandTv3MixPointReference
+    public virtual CollectionEntry TandTv3MixPointDeliveryNotePos_TandTv3MixPointReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointDeliveryNotePo_TandTv3MixPoint); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint); }
     }
 
     private ICollection<TandTv3MixPointFacility> _TandTv3MixPointFacility_TandTv3MixPoint;
@@ -201,84 +201,84 @@ public partial class TandTv3MixPoint : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityPreBooking_TandTv3MixPoint); }
     }
 
-    private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPo_TandTv3MixPoint;
-    public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPo_TandTv3MixPoint
+    private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPos_TandTv3MixPoint;
+    public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_TandTv3MixPoint
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointInOrderPo_TandTv3MixPoint);
-        set => _TandTv3MixPointInOrderPo_TandTv3MixPoint = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointInOrderPos_TandTv3MixPoint);
+        set => _TandTv3MixPointInOrderPos_TandTv3MixPoint = value;
     }
 
-    public bool TandTv3MixPointInOrderPo_TandTv3MixPoint_IsLoaded
+    public bool TandTv3MixPointInOrderPos_TandTv3MixPoint_IsLoaded
     {
         get
         {
-            return TandTv3MixPointInOrderPo_TandTv3MixPoint != null;
+            return TandTv3MixPointInOrderPos_TandTv3MixPoint != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointInOrderPo_TandTv3MixPointReference
+    public virtual CollectionEntry TandTv3MixPointInOrderPos_TandTv3MixPointReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointInOrderPo_TandTv3MixPoint); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointInOrderPos_TandTv3MixPoint); }
     }
 
-    private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPo_TandTv3MixPoint;
-    public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPo_TandTv3MixPoint
+    private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_TandTv3MixPoint;
+    public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_TandTv3MixPoint
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointOutOrderPo_TandTv3MixPoint);
-        set => _TandTv3MixPointOutOrderPo_TandTv3MixPoint = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointOutOrderPos_TandTv3MixPoint);
+        set => _TandTv3MixPointOutOrderPos_TandTv3MixPoint = value;
     }
 
-    public bool TandTv3MixPointOutOrderPo_TandTv3MixPoint_IsLoaded
+    public bool TandTv3MixPointOutOrderPos_TandTv3MixPoint_IsLoaded
     {
         get
         {
-            return TandTv3MixPointOutOrderPo_TandTv3MixPoint != null;
+            return TandTv3MixPointOutOrderPos_TandTv3MixPoint != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointOutOrderPo_TandTv3MixPointReference
+    public virtual CollectionEntry TandTv3MixPointOutOrderPos_TandTv3MixPointReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPo_TandTv3MixPoint); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPos_TandTv3MixPoint); }
     }
 
-    private ICollection<TandTv3MixPointPickingPos> _TandTv3MixPointPickingPo_TandTv3MixPoint;
-    public virtual ICollection<TandTv3MixPointPickingPos> TandTv3MixPointPickingPo_TandTv3MixPoint
+    private ICollection<TandTv3MixPointPickingPos> _TandTv3MixPointPickingPos_TandTv3MixPoint;
+    public virtual ICollection<TandTv3MixPointPickingPos> TandTv3MixPointPickingPos_TandTv3MixPoint
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointPickingPo_TandTv3MixPoint);
-        set => _TandTv3MixPointPickingPo_TandTv3MixPoint = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointPickingPos_TandTv3MixPoint);
+        set => _TandTv3MixPointPickingPos_TandTv3MixPoint = value;
     }
 
-    public bool TandTv3MixPointPickingPo_TandTv3MixPoint_IsLoaded
+    public bool TandTv3MixPointPickingPos_TandTv3MixPoint_IsLoaded
     {
         get
         {
-            return TandTv3MixPointPickingPo_TandTv3MixPoint != null;
+            return TandTv3MixPointPickingPos_TandTv3MixPoint != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointPickingPo_TandTv3MixPointReference
+    public virtual CollectionEntry TandTv3MixPointPickingPos_TandTv3MixPointReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointPickingPo_TandTv3MixPoint); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointPickingPos_TandTv3MixPoint); }
     }
 
-    private ICollection<TandTv3MixPointProdOrderPartslistPos> _TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint;
-    public virtual ICollection<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint
+    private ICollection<TandTv3MixPointProdOrderPartslistPos> _TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint;
+    public virtual ICollection<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint);
-        set => _TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint);
+        set => _TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint = value;
     }
 
-    public bool TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint_IsLoaded
+    public bool TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint_IsLoaded
     {
         get
         {
-            return TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint != null;
+            return TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint != null;
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointProdOrderPartslistPo_TandTv3MixPointReference
+    public virtual CollectionEntry TandTv3MixPointProdOrderPartslistPos_TandTv3MixPointReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointProdOrderPartslistPo_TandTv3MixPoint); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint); }
     }
 
     private ICollection<TandTv3MixPointProdOrderPartslistPosRelation> _TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint;

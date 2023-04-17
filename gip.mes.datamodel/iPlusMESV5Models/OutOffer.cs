@@ -462,24 +462,24 @@ public partial class OutOffer : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_OutOffer); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPo_OutOffer;
-    public virtual ICollection<OutOfferPos> OutOfferPo_OutOffer
+    private ICollection<OutOfferPos> _OutOfferPos_OutOffer;
+    public virtual ICollection<OutOfferPos> OutOfferPos_OutOffer
     {
-        get => LazyLoader.Load(this, ref _OutOfferPo_OutOffer);
-        set => _OutOfferPo_OutOffer = value;
+        get => LazyLoader.Load(this, ref _OutOfferPos_OutOffer);
+        set => _OutOfferPos_OutOffer = value;
     }
 
-    public bool OutOfferPo_OutOffer_IsLoaded
+    public bool OutOfferPos_OutOffer_IsLoaded
     {
         get
         {
-            return OutOfferPo_OutOffer != null;
+            return OutOfferPos_OutOffer != null;
         }
     }
 
-    public virtual CollectionEntry OutOfferPo_OutOfferReference
+    public virtual CollectionEntry OutOfferPos_OutOfferReference
     {
-        get { return Context.Entry(this).Collection(c => c.OutOfferPo_OutOffer); }
+        get { return Context.Entry(this).Collection(c => c.OutOfferPos_OutOffer); }
     }
 
     private ICollection<OutOrder> _OutOrder_BasedOnOutOffer;

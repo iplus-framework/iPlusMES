@@ -89,24 +89,24 @@ public partial class DemandOrder : VBEntityObject , IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<DemandOrderPo> _DemandOrderPo_DemandOrder;
-    public virtual ICollection<DemandOrderPo> DemandOrderPo_DemandOrder
+    private ICollection<DemandOrderPos> _DemandOrderPos_DemandOrder;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_DemandOrder
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPo_DemandOrder);
-        set => _DemandOrderPo_DemandOrder = value;
+        get => LazyLoader.Load(this, ref _DemandOrderPos_DemandOrder);
+        set => _DemandOrderPos_DemandOrder = value;
     }
 
-    public bool DemandOrderPo_DemandOrder_IsLoaded
+    public bool DemandOrderPos_DemandOrder_IsLoaded
     {
         get
         {
-            return DemandOrderPo_DemandOrder != null;
+            return DemandOrderPos_DemandOrder != null;
         }
     }
 
-    public virtual CollectionEntry DemandOrderPo_DemandOrderReference
+    public virtual CollectionEntry DemandOrderPos_DemandOrderReference
     {
-        get { return Context.Entry(this).Collection(c => c.DemandOrderPo_DemandOrder); }
+        get { return Context.Entry(this).Collection(c => c.DemandOrderPos_DemandOrder); }
     }
 
     private ICollection<DemandProdOrder> _DemandProdOrder_DemandOrder;

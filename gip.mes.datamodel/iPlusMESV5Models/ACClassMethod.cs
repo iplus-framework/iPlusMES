@@ -465,24 +465,24 @@ public partial class ACClassMethod : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("AttachedFromACClass"); }
     }
     
-    private ICollection<DemandOrderPo> _DemandOrderPo_VBiProgramACClassMethod;
-    public virtual ICollection<DemandOrderPo> DemandOrderPo_VBiProgramACClassMethod
+    private ICollection<DemandOrderPos> _DemandOrderPos_VBiProgramACClassMethod;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_VBiProgramACClassMethod
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPo_VBiProgramACClassMethod);
-        set => _DemandOrderPo_VBiProgramACClassMethod = value;
+        get => LazyLoader.Load(this, ref _DemandOrderPos_VBiProgramACClassMethod);
+        set => _DemandOrderPos_VBiProgramACClassMethod = value;
     }
 
-    public bool DemandOrderPo_VBiProgramACClassMethod_IsLoaded
+    public bool DemandOrderPos_VBiProgramACClassMethod_IsLoaded
     {
         get
         {
-            return DemandOrderPo_VBiProgramACClassMethod != null;
+            return DemandOrderPos_VBiProgramACClassMethod != null;
         }
     }
 
-    public virtual CollectionEntry DemandOrderPo_VBiProgramACClassMethodReference
+    public virtual CollectionEntry DemandOrderPos_VBiProgramACClassMethodReference
     {
-        get { return Context.Entry(this).Collection(c => c.DemandOrderPo_VBiProgramACClassMethod); }
+        get { return Context.Entry(this).Collection(c => c.DemandOrderPos_VBiProgramACClassMethod); }
     }
 
     private ICollection<ACClassMethod> _ACClassMethod_ParentACClassMethod;

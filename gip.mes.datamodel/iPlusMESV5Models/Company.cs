@@ -602,24 +602,24 @@ public partial class Company : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ShippingMDTermOfPayment"); }
     }
     
-    private ICollection<TourplanPos> _TourplanPo_Company;
-    public virtual ICollection<TourplanPos> TourplanPo_Company
+    private ICollection<TourplanPos> _TourplanPos_Company;
+    public virtual ICollection<TourplanPos> TourplanPos_Company
     {
-        get => LazyLoader.Load(this, ref _TourplanPo_Company);
-        set => _TourplanPo_Company = value;
+        get => LazyLoader.Load(this, ref _TourplanPos_Company);
+        set => _TourplanPos_Company = value;
     }
 
-    public bool TourplanPo_Company_IsLoaded
+    public bool TourplanPos_Company_IsLoaded
     {
         get
         {
-            return TourplanPo_Company != null;
+            return TourplanPos_Company != null;
         }
     }
 
-    public virtual CollectionEntry TourplanPo_CompanyReference
+    public virtual CollectionEntry TourplanPos_CompanyReference
     {
-        get { return Context.Entry(this).Collection(c => c.TourplanPo_Company); }
+        get { return Context.Entry(this).Collection(c => c.TourplanPos_Company); }
     }
 
     private ICollection<Tourplan> _Tourplan_Company;

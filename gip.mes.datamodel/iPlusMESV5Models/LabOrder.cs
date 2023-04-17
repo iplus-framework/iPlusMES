@@ -225,24 +225,24 @@ public partial class LabOrder : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.LabOrder_BasedOnTemplate); }
     }
 
-    private ICollection<LabOrderPos> _LabOrderPo_LabOrder;
-    public virtual ICollection<LabOrderPos> LabOrderPo_LabOrder
+    private ICollection<LabOrderPos> _LabOrderPos_LabOrder;
+    public virtual ICollection<LabOrderPos> LabOrderPos_LabOrder
     {
-        get => LazyLoader.Load(this, ref _LabOrderPo_LabOrder);
-        set => _LabOrderPo_LabOrder = value;
+        get => LazyLoader.Load(this, ref _LabOrderPos_LabOrder);
+        set => _LabOrderPos_LabOrder = value;
     }
 
-    public bool LabOrderPo_LabOrder_IsLoaded
+    public bool LabOrderPos_LabOrder_IsLoaded
     {
         get
         {
-            return LabOrderPo_LabOrder != null;
+            return LabOrderPos_LabOrder != null;
         }
     }
 
-    public virtual CollectionEntry LabOrderPo_LabOrderReference
+    public virtual CollectionEntry LabOrderPos_LabOrderReference
     {
-        get { return Context.Entry(this).Collection(c => c.LabOrderPo_LabOrder); }
+        get { return Context.Entry(this).Collection(c => c.LabOrderPos_LabOrder); }
     }
 
     private MDLabOrderState _MDLabOrderState;
