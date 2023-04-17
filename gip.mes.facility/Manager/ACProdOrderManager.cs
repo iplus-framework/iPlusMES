@@ -11,6 +11,7 @@ using System.Data.Objects;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
+using gip.core.processapplication;
 
 namespace gip.mes.facility
 {
@@ -25,6 +26,7 @@ namespace gip.mes.facility
         {
             _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, "TolRemainingCallQ", 20);
             _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, "IsActiveMatReqCheck", false);
+            _CalculateOEEs = new ACPropertyConfigValue<bool>(this, "CalculateOEEs", false);
         }
 
         public const string ClassName = "ACProdOrderManager";
@@ -159,6 +161,20 @@ namespace gip.mes.facility
             set
             {
                 _IsActiveMatReqCheck.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _CalculateOEEs;
+        [ACPropertyConfig("en{'OEE-Calculation active'}de{'OEE-Berechnung aktiv'}")]
+        public bool CalculateOEEs
+        {
+            get
+            {
+                return _CalculateOEEs.ValueT;
+            }
+            set
+            {
+                _CalculateOEEs.ValueT = value;
             }
         }
 
@@ -3382,6 +3398,11 @@ namespace gip.mes.facility
 
             CalculateStatisticProdPlPerAvg(prodOrderPartslist, components);
 
+            if (CalculateOEEs)
+            {
+                CalculateOEE(databaseApp, prodOrderPartslist, components, lastIntermediatePos, finalPartslist, lastIntermediatePosOfFinalPL);
+            }
+
             if (msg == null)
                 return null;
             if (msg.MsgDetailsCount <= 0)
@@ -3444,6 +3465,128 @@ namespace gip.mes.facility
 
 
             return msg;
+        }
+
+        public void CalculateOEE(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, IEnumerable<ProdOrderPartslistPos> component, ProdOrderPartslistPos lastIntermediatePos, ProdOrderPartslist finalPartslist, ProdOrderPartslistPos lastIntermediatePosOfFinalPL)
+        {
+            using (Database database = new core.datamodel.Database())
+            {
+                Guid[] programIDs = databaseApp.OrderLog
+                                            .Where(c => ((c.ProdOrderPartslistPos != null
+                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
+                                                            || (c.ProdOrderPartslistPosRelation != null
+                                                                && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
+                                                          )
+                                                        && c.VBiACProgramLog.ACProgramLog1_ParentACProgramLog == null)
+                                           .Select(x => x.VBiACProgramLog.ACProgramID)
+                                           .Distinct()
+                                           .ToArray();
+                if (programIDs == null || !programIDs.Any())
+                    return;
+                List<ACPropertyLogSumOfProgram> machineDurations = new List<ACPropertyLogSumOfProgram>();
+                foreach (Guid programID in programIDs)
+                {
+                    IEnumerable<ACPropertyLogSumOfProgram> sumOfProgram = gip.core.datamodel.ACPropertyLog.GetSummarizedDurationsOfProgram(database, programID, new string[] { GlobalProcApp.AvailabilityStatePropName });
+                    if (sumOfProgram != null && sumOfProgram.Any())
+                    {
+                        machineDurations.AddRange(sumOfProgram);
+                    }
+                }
+
+                foreach (var machine in machineDurations.GroupBy(c => c.ACClass))
+                {
+                    Guid machineACClassID = machine.Key.ACClassID;
+                    Facility facility = databaseApp.Facility.Where(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == machineACClassID).FirstOrDefault();
+                    if (facility == null)
+                        continue;
+
+                    FacilityMaterial facilityMaterial = databaseApp.FacilityMaterial.Where(c => c.FacilityID == facility.FacilityID && c.MaterialID == prodOrderPartslist.Partslist.MaterialID).FirstOrDefault();
+                    if (facilityMaterial == null)
+                    {
+                        facilityMaterial = FacilityMaterial.NewACObject(databaseApp, facility);
+                        // TODO Material could theoretically also be a component instead
+                        facilityMaterial.Material = prodOrderPartslist.Partslist.Material;
+                        facilityMaterial.Throughput = 0;
+                        facilityMaterial.ThroughputAuto = 1;
+                        databaseApp.FacilityMaterial.AddObject(facilityMaterial);
+                    }
+
+                    var propLogSumsByProgramLog = machine.SelectMany(c => c.Sum)
+                                            .Where(c => c.ProgramLog != null)
+                                            .GroupBy(c => c.ProgramLog);
+                    foreach (var propLogSumByProgramLog in propLogSumsByProgramLog)
+                    {
+                        FacilityMaterialOEE oeeEntry = null;
+                        if (facilityMaterial.EntityState != EntityState.Added)
+                            oeeEntry = databaseApp.FacilityMaterialOEE.Where(c => c.ACProgramLogID == propLogSumByProgramLog.Key.ACProgramLogID && c.FacilityMaterial.Facility.VBiFacilityACClassID == facility.FacilityID).FirstOrDefault();
+                        if (oeeEntry == null)
+                        {
+                            oeeEntry = FacilityMaterialOEE.NewACObject(databaseApp, facilityMaterial);
+                            oeeEntry.ACProgramLogID = propLogSumByProgramLog.Key.ACProgramLogID;
+                            databaseApp.FacilityMaterialOEE.AddObject(oeeEntry);
+                        }
+
+                        DateTime minStartDate = DateTime.MaxValue;
+                        DateTime maxEndDate = DateTime.MinValue;
+                        TimeSpan idleTime = TimeSpan.Zero;
+                        TimeSpan maintenanceTime = TimeSpan.Zero;
+                        TimeSpan retoolingTime = TimeSpan.Zero;
+                        TimeSpan scheduledBreakTime = TimeSpan.Zero;
+                        TimeSpan unscheduledBreakTime = TimeSpan.Zero;
+                        TimeSpan standByTime = TimeSpan.Zero;
+                        TimeSpan operationTime = TimeSpan.Zero;
+                        foreach (var propLogSum in propLogSumByProgramLog)
+                        {
+                            if (propLogSum.StartDate.HasValue && propLogSum.StartDate.Value < minStartDate)
+                                minStartDate = propLogSum.StartDate.Value;
+                            if (propLogSum.EndDate.HasValue && propLogSum.EndDate.Value > maxEndDate)
+                                maxEndDate = propLogSum.EndDate.Value;
+                            GlobalProcApp.AvailabilityState availabilityState = (GlobalProcApp.AvailabilityState)propLogSum.PropertyValue;
+                            if (availabilityState == GlobalProcApp.AvailabilityState.Idle)
+                                idleTime += propLogSum.Duration;
+                            else if (availabilityState == GlobalProcApp.AvailabilityState.Standby)
+                                standByTime += propLogSum.Duration;
+                            else if (availabilityState == GlobalProcApp.AvailabilityState.InOperation)
+                                operationTime += propLogSum.Duration;
+                            else if (availabilityState == GlobalProcApp.AvailabilityState.ScheduledBreak)
+                                scheduledBreakTime += propLogSum.Duration;
+                            else if (availabilityState == GlobalProcApp.AvailabilityState.UnscheduledBreak)
+                                unscheduledBreakTime += propLogSum.Duration;
+                            else if (availabilityState == GlobalProcApp.AvailabilityState.Retooling)
+                                retoolingTime += propLogSum.Duration;
+                            else if (availabilityState == GlobalProcApp.AvailabilityState.Maintenance)
+                                maintenanceTime += propLogSum.Duration;
+                        }
+
+                        oeeEntry.StartDate = minStartDate;
+                        oeeEntry.StartDate = maxEndDate;
+                        oeeEntry.IdleTime = idleTime;
+                        oeeEntry.StandByTime = standByTime;
+                        oeeEntry.OperationTime = operationTime;
+                        oeeEntry.ScheduledBreakTime = scheduledBreakTime;
+                        oeeEntry.UnscheduledBreakTime = unscheduledBreakTime;
+                        oeeEntry.RetoolingTime = retoolingTime;
+                        oeeEntry.MaintenanceTime = maintenanceTime;
+
+                        // TODO: Calc Quantities and Scrap
+                        oeeEntry.CalcOEE();
+                    }
+
+                    //double operationTimeSec = propLogSums.Where(x => x.PropertyValue != null && (GlobalProcApp.AvailabilityState)x.PropertyValue == GlobalProcApp.AvailabilityState.InOperation)
+                    //                                    .Sum(c => c.Duration.TotalSeconds);
+                    //if (operationTimeSec > 0.00001)
+                    //{
+                    //    double[] splittedResult = SplitResult(operationTimeSec);
+                    //    foreach (double result in splittedResult)
+                    //    {
+                    //        PAOperation operation = operations.Where(c => c.Maschine == maschine).FirstOrDefault();
+                    //        PAZugang pAZugang = GetPAZugang(mandant, prodOrderPartslist, operation != null ? operation.Nr : defaultOperationNr, maschine, result);
+                    //        pAZugangs.Add(pAZugang);
+                    //    }
+                    //}
+                }
+
+            }
         }
 
         #endregion
