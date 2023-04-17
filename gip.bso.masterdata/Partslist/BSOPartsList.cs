@@ -2553,8 +2553,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledShowDialogSelectSources())
                 return;
 
-            gip.core.datamodel.ACClassWF wf = ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF;
-            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID, CurrentPartslist.PartslistID);
+            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID, CurrentPartslist.PartslistID, null);
         }
 
         public bool IsEnabledShowDialogSelectSources()

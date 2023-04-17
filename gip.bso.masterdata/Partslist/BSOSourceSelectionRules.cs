@@ -30,12 +30,23 @@ namespace gip.bso.masterdata
         #region Method
 
         [ACMethodInfo("Dialog", "en{'Select Sources'}de{'Quellen auswählen'}", (short)MISort.QueryPreviewDlg)]
-        public void ShowDialogSelectSources(Guid acClassWFID, Guid partslistID)
+        public void ShowDialogSelectSources(Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
             Console.WriteLine(acClassWFID.ToString());
-            BSOPartslist partslist = ParentACComponent as BSOPartslist;
-            List<IACConfigStore> configStores = partslist.MandatoryConfigStores;
-            _RuleGroupList = LoadRuleGroupList(DatabaseApp.ContextIPlus, DatabaseApp, configStores, acClassWFID, partslistID);
+
+            List<IACConfigStore> configStores = new List<IACConfigStore>();
+            dbMes.Partslist partslist = DatabaseApp.Partslist.FirstOrDefault(c => c.PartslistID == partslistID);
+            if (prodOrderPartslistID != null)
+            {
+                dbMes.ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistID == prodOrderPartslistID);
+                configStores.Add(prodOrderPartslist);
+            }
+            else
+            {
+                configStores.Add(partslist);
+            }
+
+            _RuleGroupList = LoadRuleGroupList(DatabaseApp.ContextIPlus, DatabaseApp, configStores, acClassWFID, partslist);
             foreach (RuleGroup ruleGroup in _RuleGroupList)
             {
                 ruleGroup.PropertyChanged += RuleGroup_PropertyChanged;
@@ -142,13 +153,13 @@ namespace gip.bso.masterdata
 
         #region Others
 
-        private List<RuleGroup> LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, Guid acClassWFID, Guid partslistID)
+        private List<RuleGroup> LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, Guid acClassWFID, dbMes.Partslist partslist)
         {
-            Tuple<ACClassWF, List<ACClassWF>> dischargingResult = GetAllDischargingItems(database, databaseApp, acClassWFID, partslistID);
-            List<RuleGroup> grouped = GroupDischargingItems(database, databaseApp, configStores, dischargingResult.Item1, dischargingResult.Item2);
+            Tuple<ACClassWF, List<ACClassWF>> dischargingResult = GetAllDischargingItems(database, databaseApp, acClassWFID, partslist);
+            List<RuleGroup> grouped = GroupDischargingItems(database, databaseApp, configStores, dischargingResult.Item1, dischargingResult.Item2, partslist);
             return grouped;
         }
-        public Tuple<ACClassWF, List<ACClassWF>> GetAllDischargingItems(Database database, dbMes.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID)
+        public Tuple<ACClassWF, List<ACClassWF>> GetAllDischargingItems(Database database, dbMes.DatabaseApp databaseApp, Guid acClassWFID, dbMes.Partslist partslist)
         {
             Type typeReceiveMat = typeof(IPWNodeReceiveMaterialRouteable);
             ACClassWF wf = database.ACClassWF.Where(c => c.ACClassWFID == acClassWFID).FirstOrDefault();
@@ -161,9 +172,8 @@ namespace gip.bso.masterdata
                 .Where(c => typeReceiveMat.IsAssignableFrom(c.PWACClass.ObjectType))
                 .ToList();
 
-            dbMes.Partslist pll = databaseApp.Partslist.FirstOrDefault(c => c.PartslistID == partslistID);
             Guid[] connectedACClassWFIDs =
-                pll
+                partslist
                 .MaterialWF
                 .MaterialWFACClassMethod_MaterialWF
                 .SelectMany(c => c.MaterialWFConnection_MaterialWFACClassMethod)
@@ -177,7 +187,7 @@ namespace gip.bso.masterdata
         }
 
         public List<RuleGroup> GroupDischargingItems(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores,
-            ACClassWF rootWF, List<ACClassWF> dischargingItems)
+            ACClassWF rootWF, List<ACClassWF> dischargingItems, dbMes.Partslist partslist)
         {
             List<RuleGroup> ruleGroups = new List<RuleGroup>();
             foreach (ACClassWF aCClassWF in dischargingItems)
@@ -212,7 +222,6 @@ namespace gip.bso.masterdata
                     try
                     {
                         string[] materialNos = new string[] { };
-                        dbMes.Partslist partslist = configStores.FirstOrDefault() as dbMes.Partslist;
                         if (partslist != null)
                         {
                             materialNos =

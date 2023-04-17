@@ -137,6 +137,24 @@ namespace gip.bso.test
                 && SelectedRemoteFacilityManagerInfo != null;
         }
 
+        /// <summary>
+        /// Source Property: ReciveRemotePicking
+        /// </summary>
+        [ACMethodInfo("ReciveRemotePickingLocal", "en{'Recive remote Picking local'}de{'Recive remote Picking local'}", 999)]
+        public void ReciveRemotePickingLocal()
+        {
+            if (!IsEnabledReciveRemotePickingLocal())
+                return;
+            RemoteFMHelper fm = new RemoteFMHelper();
+            RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
+            fm.SynchronizeFacility(this, Messages, PickingManager, SelectedRemoteFacilityManagerInfo.RemoteConnString, remoteStorePostingData);
+        }
+
+        public bool IsEnabledReciveRemotePickingLocal()
+        {
+            return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
+        }
+
         private List<RemoteFacilityModel> LoadRemoteFacilityManagerInfoList()
         {
             List<RemoteFacilityModel> rmList = new List<RemoteFacilityModel>();

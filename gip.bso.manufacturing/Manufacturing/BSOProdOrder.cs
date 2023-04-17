@@ -5111,6 +5111,32 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region ShowDialogSelectSources
+
+        [ACMethodInfo("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655)]
+        public void ShowDialogSelectSources()
+        {
+            if (!IsEnabledShowDialogSelectSources())
+                return;
+
+            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID, SelectedProdOrderPartslist.Partslist.PartslistID, SelectedProdOrderPartslist.ProdOrderPartslistID);
+        }
+
+        public bool IsEnabledShowDialogSelectSources()
+        {
+            return
+                SelectedProdOrderPartslist != null
+                && CurrentProcessWorkflow != null
+                && BSOSourceSelectionRules_Child != null
+                && BSOSourceSelectionRules_Child.Value != null
+                && ProcessWorkflowPresenter != null
+                && ProcessWorkflowPresenter.SelectedWFNode != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
+            //&& ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.IsWFProdNode("PWNodeProcessWorkflowVB");
+        }
+
+        #endregion
+
         #region BackgroundWorker
 
         /// <summary>
