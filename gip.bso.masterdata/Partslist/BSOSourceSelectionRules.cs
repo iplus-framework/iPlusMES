@@ -45,7 +45,7 @@ namespace gip.bso.masterdata
             {
                 configStores.Add(partslist);
             }
-
+            CurrentRuleSelection = null;
             _RuleGroupList = LoadRuleGroupList(DatabaseApp.ContextIPlus, DatabaseApp, configStores, acClassWFID, partslist);
             foreach (RuleGroup ruleGroup in _RuleGroupList)
             {
@@ -144,7 +144,10 @@ namespace gip.bso.masterdata
                 {
                     _CurrentRuleSelection = value;
                     OnPropertyChanged(nameof(CurrentRuleSelection));
-                    _CurrentRuleSelection.PropagateRuleSelection = true;
+                    if (_CurrentRuleSelection != null)
+                    {
+                        _CurrentRuleSelection.PropagateRuleSelection = true;
+                    }
                 }
             }
         }
