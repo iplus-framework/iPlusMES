@@ -1,4 +1,9 @@
-﻿CREATE VIEW [dbo].[MachineMaterialView]
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'MachineMaterialView')
+	BEGIN
+		DROP  view  dbo.[MachineMaterialView]
+	END
+GO
+CREATE VIEW [dbo].[MachineMaterialView]
 	AS 
 select
 		ROW_NUMBER() over (order by t.ProgramNo, t.PartslistSequence, t.MachineName) as Nr,

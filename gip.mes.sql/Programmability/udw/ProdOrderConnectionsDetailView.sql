@@ -3,7 +3,6 @@
 		DROP  View dbo.[ProdOrderConnectionsDetailView]
 	END
 GO
-
 CREATE VIEW [dbo].[ProdOrderConnectionsDetailView]
 	AS 
 select

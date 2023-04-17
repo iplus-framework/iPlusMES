@@ -1,4 +1,9 @@
-﻿CREATE VIEW [dbo].[ACProgramLogView]
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'ACProgramLogView')
+	BEGIN
+		DROP  view  dbo.[ACProgramLogView]
+	END
+GO
+CREATE VIEW [dbo].[ACProgramLogView]
 	AS 
 select
 	prLog.ACProgramLogID,

@@ -1,4 +1,9 @@
-﻿CREATE VIEW [dbo].[OrderLogRelView]
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'OrderLogRelView')
+	BEGIN
+		DROP  view  dbo.[OrderLogRelView]
+	END
+GO
+CREATE VIEW [dbo].[OrderLogRelView]
 	AS 
 select
 	-- order log part
