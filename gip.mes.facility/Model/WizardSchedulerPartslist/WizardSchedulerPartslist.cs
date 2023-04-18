@@ -840,8 +840,12 @@ namespace gip.mes.facility
         {
             BatchPlanSuggestion = new BatchPlanSuggestion(this);
             double targetQuantity = GetTargetQuantityUOM();
-            TargetQuantityUOM = targetQuantity;
-            ProdOrderPartslistPos.TargetQuantityUOM = targetQuantity;
+            // Fix TargetQuantityUOM <> TargetQuantity in case when changed from other context
+            if (TargetQuantityUOM != targetQuantity)
+            {
+                TargetQuantityUOM = targetQuantity;
+                ProdOrderPartslistPos.TargetQuantityUOM = targetQuantity;
+            }
             BatchPlanSuggestion.RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
