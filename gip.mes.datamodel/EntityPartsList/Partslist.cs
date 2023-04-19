@@ -127,7 +127,7 @@ namespace gip.mes.datamodel
                 newPartlistPos.AlternativePartslistPosID = item.AlternativePartslistPosID;
                 newPartlistPos.LineNumber = item.LineNumber;
                 item.NewVersion = newPartlistPos;
-                dbApp.PartslistPos.AddObject(newPartlistPos);
+                dbApp.PartslistPos.Add(newPartlistPos);
             }
 
             foreach (var item in previousPartsPosRelationsList)
@@ -145,7 +145,7 @@ namespace gip.mes.datamodel
                 newRelationItem.SourcePartslistPos = source.NewVersion;
                 newRelationItem.TargetPartslistPos = target.NewVersion;
 
-                dbApp.PartslistPosRelation.AddObject(newRelationItem);
+                dbApp.PartslistPosRelation.Add(newRelationItem);
             }
 
             return partsListNewVersion;
@@ -248,17 +248,24 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
-        partial void OnXMLConfigChanging(global::System.String value)
+        protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
-            bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-                bRefreshConfig = true;
-        }
-
-        partial void OnXMLConfigChanged()
-        {
-            if (bRefreshConfig)
-                ACProperties.Refresh();
+            if (propertyName == nameof(XMLConfig))
+            {
+                string xmlConfig = newValue as string;
+                if (afterChange)
+                {
+                    if (bRefreshConfig)
+                        ACProperties.Refresh();
+                }
+                else
+                {
+                    bRefreshConfig = false;
+                    if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
+                        bRefreshConfig = true;
+                }
+            }
+            base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
         #endregion
@@ -368,8 +375,7 @@ namespace gip.mes.datamodel
                 SafeList<IACConfig> newSafeList = new SafeList<IACConfig>();
                 if (PartslistConfig_Partslist_IsLoaded)
                 {
-                    PartslistConfig_Partslist.AutoRefresh();
-                    PartslistConfig_Partslist.AutoLoad();
+                    PartslistConfig_Partslist.AutoLoad(PartslistConfig_PartslistReference, this);
                 }
                 newSafeList = new SafeList<IACConfig>(PartslistConfig_Partslist.ToList().Select(x => (IACConfig)x));
                 using (ACMonitor.Lock(_11020_LockValue))

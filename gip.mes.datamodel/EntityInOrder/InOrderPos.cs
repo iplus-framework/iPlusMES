@@ -91,7 +91,7 @@ namespace gip.mes.datamodel
                 if (parentInOrderPos == null || inOrder.InOrderPos_InOrder_IsLoaded)
                     inOrder.InOrderPos_InOrder.Add(entity);
                 else
-                    dbApp.InOrderPos.AddObject(entity);
+                    dbApp.InOrderPos.Add(entity);
             }
             entity.TargetQuantityUOM = 1;
             entity.MDInOrderPosState = MDInOrderPosState.DefaultMDInOrderPosState(dbApp);
@@ -224,17 +224,24 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
-        partial void OnXMLConfigChanging(global::System.String value)
+        protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
-            bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-                bRefreshConfig = true;
-        }
-
-        partial void OnXMLConfigChanged()
-        {
-            if (bRefreshConfig)
-                ACProperties.Refresh();
+            if (propertyName == nameof(XMLConfig))
+            {
+                string xmlConfig = newValue as string;
+                if (afterChange)
+                {
+                    if (bRefreshConfig)
+                        ACProperties.Refresh();
+                }
+                else
+                {
+                    bRefreshConfig = false;
+                    if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
+                        bRefreshConfig = true;
+                }
+            }
+            base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
         #endregion
@@ -282,7 +289,7 @@ namespace gip.mes.datamodel
         bool _OnCalledUpQuantityChanging = false;
         partial void OnCalledUpQuantityChanged()
         {
-            if (!_OnCalledUpQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnCalledUpQuantityUOMChanging && EntityState != EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnCalledUpQuantityChanging = true;
                 try
@@ -309,7 +316,7 @@ namespace gip.mes.datamodel
         bool _OnCalledUpQuantityUOMChanging = false;
         partial void OnCalledUpQuantityUOMChanged()
         {
-            if (!_OnCalledUpQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnCalledUpQuantityChanging && EntityState != EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnCalledUpQuantityUOMChanging = true;
                 try
@@ -335,7 +342,7 @@ namespace gip.mes.datamodel
 
         partial void OnTargetQuantityChanged()
         {
-            if (EntityState != System.Data.EntityState.Detached 
+            if (EntityState != EntityState.Detached 
                 && Material != null 
                 && MDUnit != null
                 && string.IsNullOrEmpty(PropertyChangedName))
@@ -364,7 +371,7 @@ namespace gip.mes.datamodel
 
         partial void OnTargetQuantityUOMChanged()
         {
-            if (EntityState != System.Data.EntityState.Detached 
+            if (EntityState != EntityState.Detached 
                 && Material != null 
                 && MDUnit != null)
             {
@@ -392,7 +399,7 @@ namespace gip.mes.datamodel
 
         partial void OnMDUnitIDChanged()
         {
-            if (EntityState != System.Data.EntityState.Detached
+            if (EntityState != EntityState.Detached
                 && Material != null
                 && MDUnit != null)
             {
@@ -427,7 +434,7 @@ namespace gip.mes.datamodel
         bool _OnActualQuantityChanging = false;
         partial void OnActualQuantityChanged()
         {
-            if (!_OnActualQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnActualQuantityUOMChanging && EntityState != EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnActualQuantityChanging = true;
                 try
@@ -452,7 +459,7 @@ namespace gip.mes.datamodel
         bool _OnActualQuantityUOMChanging = false;
         partial void OnActualQuantityUOMChanged()
         {
-            if (!_OnActualQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnActualQuantityChanging && EntityState != EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnActualQuantityUOMChanging = true;
                 try

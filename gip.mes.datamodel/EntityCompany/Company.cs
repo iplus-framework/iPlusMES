@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -185,7 +186,7 @@ namespace gip.mes.datamodel
             }
             this.VisitorVoucher_VisitorCompany.Clear();
 
-            database.DeleteObject(this);
+            database.Remove(this);
             return null;
         }
 
@@ -259,7 +260,7 @@ namespace gip.mes.datamodel
                 CompanyAddress address = this.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).FirstOrDefault();
                 if (address != null)
                     return address;
-                return CompanyAddress_Company.Where(c => c.EntityState == System.Data.EntityState.Added && c.IsHouseCompanyAddress == true).FirstOrDefault();
+                return CompanyAddress_Company.Where(c => c.EntityState == EntityState.Added && c.IsHouseCompanyAddress == true).FirstOrDefault();
             }
         }
 
@@ -271,7 +272,7 @@ namespace gip.mes.datamodel
                 CompanyAddress address = this.CompanyAddress_Company.Where(c => c.IsBillingCompanyAddress).FirstOrDefault();
                 if (address != null)
                     return address;
-                return CompanyAddress_Company.Where(c => c.EntityState == System.Data.EntityState.Added && c.IsBillingCompanyAddress == true).FirstOrDefault();
+                return CompanyAddress_Company.Where(c => c.EntityState == EntityState.Added && c.IsBillingCompanyAddress == true).FirstOrDefault();
             }
         }
 
@@ -283,7 +284,7 @@ namespace gip.mes.datamodel
                 CompanyAddress address = this.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).FirstOrDefault();
                 if (address != null)
                     return address;
-                return CompanyAddress_Company.Where(c => c.EntityState == System.Data.EntityState.Added && c.IsDeliveryCompanyAddress == true).FirstOrDefault();
+                return CompanyAddress_Company.Where(c => c.EntityState == EntityState.Added && c.IsDeliveryCompanyAddress == true).FirstOrDefault();
             }
         }
         #endregion
@@ -339,17 +340,24 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
-        partial void OnXMLConfigChanging(global::System.String value)
+        protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
-            bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-                bRefreshConfig = true;
-        }
-
-        partial void OnXMLConfigChanged()
-        {
-            if (bRefreshConfig)
-                ACProperties.Refresh();
+            if (propertyName == nameof(XMLConfig))
+            {
+                string xmlConfig = newValue as string;
+                if (afterChange)
+                {
+                    if (bRefreshConfig)
+                        ACProperties.Refresh();
+                }
+                else
+                {
+                    bRefreshConfig = false;
+                    if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
+                        bRefreshConfig = true;
+                }
+            }
+            base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
         #endregion

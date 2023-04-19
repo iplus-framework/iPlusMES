@@ -47,7 +47,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<ACClassTaskValue> ACClassTaskValue { get; set; }
 
-    public virtual DbSet<ACClassTaskValuePos> ACClassTaskValuePo { get; set; }
+    public virtual DbSet<ACClassTaskValuePos> ACClassTaskValuePos { get; set; }
 
     public virtual DbSet<ACClassText> ACClassText { get; set; }
 
@@ -103,11 +103,11 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<DeliveryNote> DeliveryNote { get; set; }
 
-    public virtual DbSet<DeliveryNotePos> DeliveryNotePo { get; set; }
+    public virtual DbSet<DeliveryNotePos> DeliveryNotePos { get; set; }
 
     public virtual DbSet<DemandOrder> DemandOrder { get; set; }
 
-    public virtual DbSet<DemandOrderPos> DemandOrderPo { get; set; }
+    public virtual DbSet<DemandOrderPos> DemandOrderPos { get; set; }
 
     public virtual DbSet<DemandPrimary> DemandPrimary { get; set; }
 
@@ -125,7 +125,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<FacilityInventory> FacilityInventory { get; set; }
 
-    public virtual DbSet<FacilityInventoryPos> FacilityInventoryPo { get; set; }
+    public virtual DbSet<FacilityInventoryPos> FacilityInventoryPos { get; set; }
 
     public virtual DbSet<FacilityLot> FacilityLot { get; set; }
 
@@ -149,7 +149,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<InOrderConfig> InOrderConfig { get; set; }
 
-    public virtual DbSet<InOrderPos> InOrderPo { get; set; }
+    public virtual DbSet<InOrderPos> InOrderPos { get; set; }
 
     public virtual DbSet<InOrderPosSplit> InOrderPosSplit { get; set; }
 
@@ -157,17 +157,17 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<InRequestConfig> InRequestConfig { get; set; }
 
-    public virtual DbSet<InRequestPos> InRequestPo { get; set; }
+    public virtual DbSet<InRequestPos> InRequestPos { get; set; }
 
     public virtual DbSet<Invoice> Invoice { get; set; }
 
-    public virtual DbSet<InvoicePos> InvoicePo { get; set; }
+    public virtual DbSet<InvoicePos> InvoicePos { get; set; }
 
     public virtual DbSet<JobTableRecalcActualQuantity> JobTableRecalcActualQuantity { get; set; }
 
     public virtual DbSet<LabOrder> LabOrder { get; set; }
 
-    public virtual DbSet<LabOrderPos> LabOrderPo { get; set; }
+    public virtual DbSet<LabOrderPos> LabOrderPos { get; set; }
 
     public virtual DbSet<Label> Label { get; set; }
 
@@ -219,7 +219,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<MDGMPMaterialGroup> MDGMPMaterialGroup { get; set; }
 
-    public virtual DbSet<MDGMPMaterialGroupPos> MDGMPMaterialGroupPo { get; set; }
+    public virtual DbSet<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos { get; set; }
 
     public virtual DbSet<MDInOrderPosState> MDInOrderPosState { get; set; }
 
@@ -355,7 +355,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<OrderLog> OrderLog { get; set; }
 
-    public virtual DbSet<OrderLogPosMachine> OrderLogPosMachine { get; set; }
+    public virtual DbSet<OrderLogPosMachines> OrderLogPosMachines { get; set; }
 
     public virtual DbSet<OrderLogPosView> OrderLogPosView { get; set; }
 
@@ -365,13 +365,13 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<OutOfferConfig> OutOfferConfig { get; set; }
 
-    public virtual DbSet<OutOfferPos> OutOfferPo { get; set; }
+    public virtual DbSet<OutOfferPos> OutOfferPos { get; set; }
 
     public virtual DbSet<OutOrder> OutOrder { get; set; }
 
     public virtual DbSet<OutOrderConfig> OutOrderConfig { get; set; }
 
-    public virtual DbSet<OutOrderPos> OutOrderPo { get; set; }
+    public virtual DbSet<OutOrderPos> OutOrderPos{ get; set; }
 
     public virtual DbSet<OutOrderPosSplit> OutOrderPosSplit { get; set; }
 
@@ -383,7 +383,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<PartslistConfig> PartslistConfig { get; set; }
 
-    public virtual DbSet<PartslistPos> PartslistPo { get; set; }
+    public virtual DbSet<PartslistPos> PartslistPos { get; set; }
 
     public virtual DbSet<PartslistPosRelation> PartslistPosRelation { get; set; }
 
@@ -395,9 +395,9 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<PickingConfig> PickingConfig { get; set; }
 
-    public virtual DbSet<PickingPos> PickingPo { get; set; }
+    public virtual DbSet<PickingPos> PickingPos { get; set; }
 
-    public virtual DbSet<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPo { get; set; }
+    public virtual DbSet<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos { get; set; }
 
     public virtual DbSet<PlanningMR> PlanningMR { get; set; }
 
@@ -425,7 +425,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<ProdOrderPartslistConfig> ProdOrderPartslistConfig { get; set; }
 
-    public virtual DbSet<ProdOrderPartslistPos> ProdOrderPartslistPo { get; set; }
+    public virtual DbSet<ProdOrderPartslistPos> ProdOrderPartslistPos{ get; set; }
 
     public virtual DbSet<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot { get; set; }
 
@@ -457,7 +457,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<TandTv2StepLot> TandTv2StepLot { get; set; }
 
-    public virtual DbSet<TandTv2TempPos> TandTv2TempPo { get; set; }
+    public virtual DbSet<TandTv2TempPos> TandTv2TempPos{ get; set; }
 
     public virtual DbSet<TandTv2TrackingStyle> TandTv2TrackingStyle { get; set; }
 
@@ -473,7 +473,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<TandTv3MixPoint> TandTv3MixPoint { get; set; }
 
-    public virtual DbSet<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePo { get; set; }
+    public virtual DbSet<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos{ get; set; }
 
     public virtual DbSet<TandTv3MixPointFacility> TandTv3MixPointFacility { get; set; }
 
@@ -483,13 +483,13 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking { get; set; }
 
-    public virtual DbSet<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPo { get; set; }
+    public virtual DbSet<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos { get; set; }
 
-    public virtual DbSet<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPo { get; set; }
+    public virtual DbSet<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos { get; set; }
 
-    public virtual DbSet<TandTv3MixPointPickingPos> TandTv3MixPointPickingPo { get; set; }
+    public virtual DbSet<TandTv3MixPointPickingPos> TandTv3MixPointPickingPos { get; set; }
 
-    public virtual DbSet<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPo { get; set; }
+    public virtual DbSet<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPos { get; set; }
 
     public virtual DbSet<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation { get; set; }
 
@@ -501,7 +501,7 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<TourplanConfig> TourplanConfig { get; set; }
 
-    public virtual DbSet<TourplanPos> TourplanPo { get; set; }
+    public virtual DbSet<TourplanPos> TourplanPos { get; set; }
 
     public virtual DbSet<UserSettings> UserSetting { get; set; }
 
@@ -7345,7 +7345,7 @@ public partial class iPlusMESV5Context : DbContext
                 .HasConstraintName("FK_OrderLog_ACProgramLogID");
         });
 
-        modelBuilder.Entity<OrderLogPosMachine>(entity =>
+        modelBuilder.Entity<OrderLogPosMachines>(entity =>
         {
             entity
                 .HasNoKey()

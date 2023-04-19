@@ -9,19 +9,26 @@ using System.ComponentModel;
 using System.Threading;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Data.SqlClient;
 
 namespace gip.mes.datamodel
 {
     public static class EntityObjectExtensionApp
     {
-        public static TEntityApp FromAppContext<TEntityApp>(this EntityObject entityIPlus, DatabaseApp dbApp) where TEntityApp : EntityObject
+        public static TEntityApp FromAppContext<TEntityApp>(this VBEntityObject entityIPlus, DatabaseApp dbApp) where TEntityApp : VBEntityObject
         {
             if (entityIPlus == null || entityIPlus.EntityKey == null || dbApp == null)
                 return default(TEntityApp);
-            EntityKey key = new EntityKey(dbApp.DefaultContainerName + "." + entityIPlus.EntityKey.EntitySetName, entityIPlus.EntityKey.EntityKeyValues);
-            //key.EntityContainerName = entityApp.DefaultContainerName;
-            object obj = null;
+            Type typeOfTargetContext = dbApp.GetType();
+            string fullName = typeOfTargetContext.Namespace + "." + entityIPlus.EntityKey.EntitySetName;
+            Type typeOfTargetEntity = typeOfTargetContext.Assembly.GetType(fullName);
+            if (typeOfTargetEntity == null)
+                throw new ArgumentException(String.Format("Type {0} not found in assembly {1}", fullName, typeOfTargetContext.Assembly.ToString()));
 
+            EntityKey key = new EntityKey(fullName, entityIPlus.EntityKey.EntityKeyValues);
+
+            object obj = null;
             using (ACMonitor.Lock(dbApp.QueryLock_1X000))
             {
                 if (!dbApp.TryGetObjectByKey(key, out obj))
@@ -36,50 +43,50 @@ namespace gip.mes.datamodel
     {
         #region c'tors
         public DatabaseApp()
-            : base(ConnectionString)
+            : base(EntityObjectExtension.DbContextOptions<iPlusMESV5Context>(ConnectionString))
         {
             _ObjectContextHelper = new ACObjectContextHelper(this);
         }
 
         public DatabaseApp(string connectionString)
-            : base(connectionString)
+            : base(EntityObjectExtension.DbContextOptions<iPlusMESV5Context>(connectionString))
         {
             _ObjectContextHelper = new ACObjectContextHelper(this);
         }
 
         public DatabaseApp(Database contextIPlus)
-            : base(ConnectionString)
+            : base(EntityObjectExtension.DbContextOptions<iPlusMESV5Context>(ConnectionString))
         {
             _ObjectContextHelper = new ACObjectContextHelper(this);
             _ContextIPlus = contextIPlus;
         }
 
         public DatabaseApp(string connectionString, Database contextIPlus)
-            : base(connectionString)
+            : base(EntityObjectExtension.DbContextOptions<iPlusMESV5Context>(connectionString))
         {
             _ObjectContextHelper = new ACObjectContextHelper(this);
             _ContextIPlus = contextIPlus;
         }
 
         public DatabaseApp(bool createSeparateConnection)
-            : this(new EntityConnection(ConnectionString))
+            : this(new SqlConnection(ConnectionString))
         {
         }
 
         public DatabaseApp(bool createSeparateConnection, Database contextIPlus)
-            : this(new EntityConnection(ConnectionString))
+            : this(new SqlConnection(ConnectionString))
         {
         }
 
-        public DatabaseApp(EntityConnection connection)
-            : base(connection)
+        public DatabaseApp(DbConnection connection)
+            : base(EntityObjectExtension.DbContextOptions<iPlusMESV5Context>(connection))
         {
             _SeparateConnection = connection;
             _ObjectContextHelper = new ACObjectContextHelper(this);
         }
 
-        public DatabaseApp(EntityConnection connection, Database contextIPlus)
-            : base(connection)
+        public DatabaseApp(DbConnection connection, Database contextIPlus)
+            : base(EntityObjectExtension.DbContextOptions<iPlusMESV5Context>(connection))
         {
             _SeparateConnection = connection;
             _ObjectContextHelper = new ACObjectContextHelper(this);
@@ -92,13 +99,13 @@ namespace gip.mes.datamodel
             //    Global.ContextMenuCategoryList.Add(new ACValueItem("en{'Production, Plannung & Logistics'}de{'Production, Plannung & Logistics'}", (short)Global.ContextMenuCategory.ProdPlanLog, null, null, 250));
         }
 
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
             if (_ObjectContextHelper != null)
                 _ObjectContextHelper.Dispose();
             _ObjectContextHelper = null;
             _ContextIPlus = null;
-            base.Dispose(disposing);
+            base.Dispose();
             if (SeparateConnection != null)
                 SeparateConnection.Dispose();
             _SeparateConnection = null;
@@ -153,11 +160,11 @@ namespace gip.mes.datamodel
                         if (ec.InnerException != null && ec.InnerException.Message != null)
                             msg += " Inner:" + ec.InnerException.Message;
 
-                        if (Database.Root != null && Database.Root.Messages != null && Database.Root.InitState == ACInitState.Initialized)
-                            Database.Root.Messages.LogException("DatabaseApp", "ConnectionString", msg);
+                        if (gip.core.datamodel.Database.Root != null && gip.core.datamodel.Database.Root.Messages != null && gip.core.datamodel.Database.Root.InitState == ACInitState.Initialized)
+                            gip.core.datamodel.Database.Root.Messages.LogException("DatabaseApp", "ConnectionString", msg);
                     }
                 }
-                return "name=iPlusMESV4_Entities";
+                return ConfigurationManager.ConnectionStrings["iPlusMESV4_Entities"].ConnectionString;
             }
         }
 
@@ -179,7 +186,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return _ContextIPlus == null ? Database.GlobalDatabase : _ContextIPlus;
+                return _ContextIPlus == null ? gip.core.datamodel.Database.GlobalDatabase : _ContextIPlus;
             }
         }
 
@@ -189,14 +196,22 @@ namespace gip.mes.datamodel
             {
                 if (_ContextIPlus == null)
                     return false;
-                else if (_ContextIPlus == Database.GlobalDatabase)
+                else if (_ContextIPlus == gip.core.datamodel.Database.GlobalDatabase)
                     return false;
                 return true;
             }
         }
 
-        EntityConnection _SeparateConnection;
-        public EntityConnection SeparateConnection
+        public DbConnection Connection
+        {
+            get
+            {
+                return ContextIPlus.Connection;
+            }
+        }
+
+        DbConnection _SeparateConnection;
+        public DbConnection SeparateConnection
         {
             get
             {
@@ -212,11 +227,11 @@ namespace gip.mes.datamodel
                 if (!String.IsNullOrEmpty(_UserName))
                     return _UserName;
                 if (Database.Root == null
-                    || !Database.Root.Initialized
-                    || Database.Root.Environment == null
-                    || Database.Root.Environment.User == null)
+                    || !gip.core.datamodel.Database.Root.Initialized
+                    || gip.core.datamodel.Database.Root.Environment == null
+                    || gip.core.datamodel.Database.Root.Environment.User == null)
                     return "Init";
-                _UserName = Database.Root.Environment.User.Initials;
+                _UserName = gip.core.datamodel.Database.Root.Environment.User.Initials;
                 return _UserName;
             }
             set
@@ -327,9 +342,9 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <returns></returns>
         [ACMethodInfo("", "", 9999)]
-        public MsgWithDetails ACSaveChanges(bool autoSaveContextIPlus = true, SaveOptions saveOptions = SaveOptions.AcceptAllChangesAfterSave, bool validationOff = false, bool writeUpdateInfo = true)
+        public MsgWithDetails ACSaveChanges(bool autoSaveContextIPlus = true, bool acceptAllChangesOnSuccess = true, bool validationOff = false, bool writeUpdateInfo = true)
         {
-            MsgWithDetails result = _ObjectContextHelper.ACSaveChanges(autoSaveContextIPlus, saveOptions, validationOff, writeUpdateInfo);
+            MsgWithDetails result = _ObjectContextHelper.ACSaveChanges(autoSaveContextIPlus, acceptAllChangesOnSuccess, validationOff, writeUpdateInfo);
             if (result == null)
             {
                 if (ACChangesExecuted != null)
@@ -348,9 +363,9 @@ namespace gip.mes.datamodel
         /// If parameter retries ist not set, then ACObjectContextHelper.C_NumberOfRetriesOnTransError is used to limit the Retry-Loop.
         /// </summary>
         [ACMethodInfo("", "", 9999)]
-        public MsgWithDetails ACSaveChangesWithRetry(ushort? retries = null, bool autoSaveContextIPlus = true, SaveOptions saveOptions = SaveOptions.AcceptAllChangesAfterSave, bool validationOff = false, bool writeUpdateInfo = true)
+        public MsgWithDetails ACSaveChangesWithRetry(ushort? retries = null, bool autoSaveContextIPlus = true, bool acceptAllChangesOnSuccess = true, bool validationOff = false, bool writeUpdateInfo = true)
         {
-            MsgWithDetails result = _ObjectContextHelper.ACSaveChangesWithRetry(retries, autoSaveContextIPlus, saveOptions, validationOff, writeUpdateInfo);
+            MsgWithDetails result = _ObjectContextHelper.ACSaveChangesWithRetry(retries, autoSaveContextIPlus, acceptAllChangesOnSuccess, validationOff, writeUpdateInfo);
             if (result == null)
             {
                 if (ACChangesExecuted != null)
@@ -476,19 +491,10 @@ namespace gip.mes.datamodel
         }
 
         /// <summary>
-        /// UNSAFE. Use QueryLock_1X000 outside
-        /// </summary>
-        /// <returns></returns>
-        public DbDataRecord GetOriginalValues(EntityKey entityKey)
-        {
-            return _ObjectContextHelper.GetOriginalValues(entityKey);
-        }
-
-        /// <summary>
         /// Refreshes the EntityObject if not in modified state. Else it leaves it untouched.
         /// </summary>
         /// <param name="entityObject"></param>
-        public void AutoRefresh(EntityObject entityObject)
+        public void AutoRefresh(VBEntityObject entityObject)
         {
             _ObjectContextHelper.AutoRefresh(entityObject);
         }
@@ -500,9 +506,9 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entityCollection"></param>
-        public void AutoRefresh<T>(EntityCollection<T> entityCollection) where T : class
+        public void AutoRefresh<T>(ICollection<T> entityCollection, CollectionEntry entry) where T : class
         {
-            _ObjectContextHelper.AutoRefresh<T>(entityCollection);
+            _ObjectContextHelper.AutoRefresh<T>(entityCollection, entry);
         }
 
         /// <summary>
@@ -511,9 +517,9 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entityCollection"></param>
-        public void AutoLoad<T>(EntityCollection<T> entityCollection) where T : class
+        public void AutoLoad<T>(ICollection<T> entityCollection, CollectionEntry entry) where T : class
         {
-            _ObjectContextHelper.AutoLoad<T>(entityCollection);
+            _ObjectContextHelper.AutoLoad<T>(entityCollection, entry);
         }
 
         public void ParseException(MsgWithDetails msg, Exception e)
@@ -585,7 +591,7 @@ namespace gip.mes.datamodel
             return ACIdentifier;
         }
 
-        public void FullDetach(EntityObject obj)
+        public void FullDetach(VBEntityObject obj)
         {
             Detach(obj);
             // General Problem of ObjectContext-MAnager
@@ -739,7 +745,7 @@ namespace gip.mes.datamodel
 
                 if (_MovementReasonsList == null)
                 {
-                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(MDMovementReason));
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(MDMovementReason));
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _MovementReasonsList = enumClass.ACValueListForEnum;
                     else
@@ -776,7 +782,7 @@ namespace gip.mes.datamodel
             {
                 if (_FacilityTypesEnumList == null)
                 {
-                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(FacilityTypesEnum));
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(FacilityTypesEnum));
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _FacilityTypesEnumList = enumClass.ACValueListForEnum;
                     else
@@ -1064,7 +1070,7 @@ namespace gip.mes.datamodel
             {
                 if (_PickingStateList == null)
                 {
-                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PickingStateEnum));
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PickingStateEnum));
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _PickingStateList = enumClass.ACValueListForEnum;
                     else
@@ -1091,7 +1097,7 @@ namespace gip.mes.datamodel
             {
                 if (_PostingBehaviourEnumList == null)
                 {
-                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PostingBehaviourEnum));
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PostingBehaviourEnum));
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _PostingBehaviourEnumList = enumClass.ACValueListForEnum;
                     else
@@ -1298,7 +1304,37 @@ namespace gip.mes.datamodel
             if (_ObjectContextHelper != null && detach)
                 _ObjectContextHelper.DetachAllEntities();
             if (dispose)
-                Dispose(true);
+                Dispose();
+        }
+
+        public void Detach(object entity)
+        {
+            _ObjectContextHelper.Detach(entity);
+        }
+
+        public void AcceptAllChanges()
+        {
+            ((IACEntityObjectContext)ContextIPlus).ChangeTracker.AcceptAllChanges();
+        }
+
+        public DbSet<TEntity> CreateObjectSet<TEntity>() where TEntity : class
+        {
+            return ((IACEntityObjectContext)ContextIPlus).CreateObjectSet<TEntity>();
+        }
+
+        public DbSet<TEntity> CreateObjectSet<TEntity>(string entitySetName) where TEntity : class
+        {
+            return ((IACEntityObjectContext)ContextIPlus).CreateObjectSet<TEntity>(entitySetName);
+        }
+
+        public object GetObjectByKey(EntityKey key)
+        {
+            return _ObjectContextHelper.GetObjectByKey(key);
+        }
+
+        public bool TryGetObjectByKey(EntityKey key, out object entity)
+        {
+            return _ObjectContextHelper.TryGetObjectByKey(key, out entity);
         }
     }
 }

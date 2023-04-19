@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Transactions;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -216,17 +217,24 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
-        partial void OnXMLConfigChanging(global::System.String value)
+        protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
-            bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-                bRefreshConfig = true;
-        }
-
-        partial void OnXMLConfigChanged()
-        {
-            if (bRefreshConfig)
-                ACProperties.Refresh();
+            if (propertyName == nameof(XMLConfig))
+            {
+                string xmlConfig = newValue as string;
+                if (afterChange)
+                {
+                    if (bRefreshConfig)
+                        ACProperties.Refresh();
+                }
+                else
+                {
+                    bRefreshConfig = false;
+                    if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
+                        bRefreshConfig = true;
+                }
+            }
+            base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
         /// <summary>
@@ -865,7 +873,7 @@ namespace gip.mes.datamodel
             if (ACConfigListCache.Contains(acConfig))
                 ACConfigListCache.Remove(acConfig);
             MaterialConfig_Material.Remove(acConfig);
-            if (acConfig.EntityState != System.Data.EntityState.Detached)
+            if (acConfig.EntityState != EntityState.Detached)
                 acConfig.DeleteACObject(this.GetObjectContext<DatabaseApp>(), false);
         }
 
@@ -909,10 +917,9 @@ namespace gip.mes.datamodel
                         return _ACConfigListCache;
                 }
                 SafeList<IACConfig> newSafeList = new SafeList<IACConfig>();
-                if (MaterialConfig_Material.IsLoaded)
+                if (MaterialConfig_Material_IsLoaded)
                 {
-                    MaterialConfig_Material.AutoRefresh();
-                    MaterialConfig_Material.AutoLoad();
+                    MaterialConfig_Material.AutoLoad(MaterialConfig_MaterialReference, this);
                 }
                 newSafeList = new SafeList<IACConfig>(MaterialConfig_Material.ToList().Select(x => (IACConfig)x));
                 using (ACMonitor.Lock(_11020_LockValue))

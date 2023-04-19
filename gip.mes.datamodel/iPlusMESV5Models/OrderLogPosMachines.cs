@@ -6,14 +6,14 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OrderLogPosMachine : VBEntityObject 
+public partial class OrderLogPosMachines : VBEntityObject 
 {
 
-    public OrderLogPosMachine()
+    public OrderLogPosMachines()
     {
     }
 
-    private OrderLogPosMachine(ILazyLoader lazyLoader)
+    private OrderLogPosMachines(ILazyLoader lazyLoader)
     {
         LazyLoader = lazyLoader;
     }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Transactions;
+using Microsoft.EntityFrameworkCore;
+
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.DeliveryNotePos, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
@@ -31,12 +33,12 @@ namespace gip.mes.datamodel
             if (parentACObject is DeliveryNote)
             {
                 DeliveryNote deliveryNote = parentACObject as DeliveryNote;
-                if (deliveryNote.EntityState != System.Data.EntityState.Added)
+                if (deliveryNote.EntityState != EntityState.Added)
                 {
                     try
                     {
-                        if (!deliveryNote.DeliveryNotePos_DeliveryNote.IsLoaded)
-                            deliveryNote.DeliveryNotePos_DeliveryNote.Load();
+                        if (!deliveryNote.DeliveryNotePos_DeliveryNote_IsLoaded)
+                            deliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(deliveryNote.DeliveryNotePos_DeliveryNoteReference, deliveryNote);
                     }
                     catch (Exception ec)
                     {
@@ -78,10 +80,10 @@ namespace gip.mes.datamodel
             DeliveryNote inDeliveryNote = DeliveryNote;
             if (inDeliveryNote != null)
             {
-                if (inDeliveryNote.DeliveryNotePos_DeliveryNote.IsLoaded)
+                if (inDeliveryNote.DeliveryNotePos_DeliveryNote_IsLoaded)
                     inDeliveryNote.DeliveryNotePos_DeliveryNote.Remove(this);
             }
-            database.DeleteObject(this);
+            database.Remove(this);
             if (inDeliveryNote != null)
                 DeliveryNotePos.RenumberSequence(inDeliveryNote, sequence);
             return null;
@@ -158,17 +160,24 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
-        partial void OnXMLConfigChanging(global::System.String value)
+        protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
-            bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-                bRefreshConfig = true;
-        }
-
-        partial void OnXMLConfigChanged()
-        {
-            if (bRefreshConfig)
-                ACProperties.Refresh();
+            if (propertyName == nameof(XMLConfig))
+            {
+                string xmlConfig = newValue as string;
+                if (afterChange)
+                {
+                    if (bRefreshConfig)
+                        ACProperties.Refresh();
+                }
+                else
+                {
+                    bRefreshConfig = false;
+                    if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
+                        bRefreshConfig = true;
+                }
+            }
+            base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
         #endregion

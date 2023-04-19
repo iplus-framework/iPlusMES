@@ -110,7 +110,7 @@ namespace gip.mes.datamodel
             if (ACConfigListCache.Contains(acConfig))
                 ACConfigListCache.Remove(acConfig);
             MaterialWFACClassMethodConfig_MaterialWFACClassMethod.Remove(acConfig);
-            if (acConfig.EntityState != System.Data.EntityState.Detached)
+            if (acConfig.EntityState != EntityState.Detached)
                 acConfig.DeleteACObject(this.GetObjectContext<DatabaseApp>(), false);
         }
 
@@ -154,10 +154,9 @@ namespace gip.mes.datamodel
                         return _ACConfigListCache;
                 }
                 SafeList<IACConfig> newSafeList = new SafeList<IACConfig>();
-                if (MaterialWFACClassMethodConfig_MaterialWFACClassMethod.IsLoaded)
+                if (MaterialWFACClassMethodConfig_MaterialWFACClassMethod_IsLoaded)
                 {
-                    MaterialWFACClassMethodConfig_MaterialWFACClassMethod.AutoRefresh();
-                    MaterialWFACClassMethodConfig_MaterialWFACClassMethod.AutoLoad();
+                    MaterialWFACClassMethodConfig_MaterialWFACClassMethod.AutoLoad(MaterialWFACClassMethodConfig_MaterialWFACClassMethodReference, this);
                 }
                 newSafeList = new SafeList<IACConfig>(MaterialWFACClassMethodConfig_MaterialWFACClassMethod.ToList().Select(x => (IACConfig)x));
                 using (ACMonitor.Lock(_11020_LockValue))

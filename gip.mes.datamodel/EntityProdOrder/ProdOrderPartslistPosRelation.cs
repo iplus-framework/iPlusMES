@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -113,7 +114,7 @@ namespace gip.mes.datamodel
         bool _OnTargetQuantityChanging = false;
         partial void OnTargetQuantityChanged()
         {
-            if (!_OnTargetQuantityUOMChanging && SourceProdOrderPartslistPos != null && EntityState != System.Data.EntityState.Detached && SourceProdOrderPartslistPos.Material != null)
+            if (!_OnTargetQuantityUOMChanging && SourceProdOrderPartslistPos != null && EntityState != EntityState.Detached && SourceProdOrderPartslistPos.Material != null)
             {
                 _OnTargetQuantityChanging = true;
                 try
@@ -146,7 +147,7 @@ namespace gip.mes.datamodel
         bool _OnTargetQuantityUOMChanging = false;
         partial void OnTargetQuantityUOMChanged()
         {
-            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && SourceProdOrderPartslistPos != null && SourceProdOrderPartslistPos.Material != null)
+            if (!_OnTargetQuantityChanging && EntityState != EntityState.Detached && SourceProdOrderPartslistPos != null && SourceProdOrderPartslistPos.Material != null)
             {
                 _OnTargetQuantityUOMChanging = true;
                 try
@@ -179,7 +180,7 @@ namespace gip.mes.datamodel
         bool _OnActualQuantityChanging = false;
         partial void OnActualQuantityChanged()
         {
-            if (!_OnActualQuantityUOMChanging && this.SourceProdOrderPartslistPos != null && EntityState != System.Data.EntityState.Detached
+            if (!_OnActualQuantityUOMChanging && this.SourceProdOrderPartslistPos != null && EntityState != EntityState.Detached
                 && this.SourceProdOrderPartslistPos.Material != null && this.SourceProdOrderPartslistPos.MDUnit != null)
             {
                 _OnActualQuantityChanging = true;
@@ -206,7 +207,7 @@ namespace gip.mes.datamodel
         bool _OnActualQuantityUOMChanging = false;
         partial void OnActualQuantityUOMChanged()
         {
-            if (!_OnActualQuantityChanging && this.SourceProdOrderPartslistPos != null && EntityState != System.Data.EntityState.Detached
+            if (!_OnActualQuantityChanging && this.SourceProdOrderPartslistPos != null && EntityState != EntityState.Detached
                 && this.SourceProdOrderPartslistPos.Material != null && this.SourceProdOrderPartslistPos.MDUnit != null)
             {
                 _OnActualQuantityUOMChanging = true;

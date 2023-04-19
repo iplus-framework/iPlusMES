@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Transactions;
+using Microsoft.EntityFrameworkCore;
+
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Demandorderposistion'}de{'Anforderungsauftragsposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
@@ -50,8 +52,8 @@ namespace gip.mes.datamodel
                 {
                     try
                     {
-                        if (!demandOrder.DemandOrderPos_DemandOrder.IsLoaded)
-                            demandOrder.DemandOrderPos_DemandOrder.Load();
+                        if (!demandOrder.DemandOrderPos_DemandOrder_IsLoaded)
+                            demandOrder.DemandOrderPos_DemandOrder.AutoLoad(demandOrder.DemandOrderPos_DemandOrderReference, demandOrder);
                     }
                     catch (Exception ec)
                     {
@@ -91,7 +93,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             DemandOrder demandOrder = DemandOrder;
-            database.DeleteObject(this);
+            database.Remove(this);
             DemandOrderPos.RenumberSequence(demandOrder, sequence);
             return null;
         }
@@ -191,17 +193,24 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
-        partial void OnXMLConfigChanging(global::System.String value)
+        protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
-            bRefreshConfig = false;
-            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-                bRefreshConfig = true;
-        }
-
-        partial void OnXMLConfigChanged()
-        {
-            if (bRefreshConfig)
-                ACProperties.Refresh();
+            if (propertyName == nameof(XMLConfig))
+            {
+                string xmlConfig = newValue as string;
+                if (afterChange)
+                {
+                    if (bRefreshConfig)
+                        ACProperties.Refresh();
+                }
+                else
+                {
+                    bRefreshConfig = false;
+                    if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
+                        bRefreshConfig = true;
+                }
+            }
+            base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
         #endregion
