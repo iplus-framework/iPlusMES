@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class DemandOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class DemandOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public DemandOrderPos()

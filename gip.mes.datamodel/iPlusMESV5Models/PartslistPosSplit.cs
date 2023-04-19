@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PartslistPosSplit : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class PartslistPosSplit : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public PartslistPosSplit()

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDCountrySalesTax : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDCountrySalesTax : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDCountrySalesTax()

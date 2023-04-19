@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaterialWFRelation : VBEntityObject 
+public partial class MaterialWFRelation : VBEntityObject, ISequence
 {
 
     public MaterialWFRelation()

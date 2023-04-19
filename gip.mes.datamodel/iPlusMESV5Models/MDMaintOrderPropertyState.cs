@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDMaintOrderPropertyState : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDMaintOrderPropertyState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDMaintOrderPropertyState()

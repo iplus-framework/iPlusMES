@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDTourplanState : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDTourplanState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDTourplanState()

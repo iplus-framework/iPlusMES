@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PartslistPosRelation : VBEntityObject 
+public partial class PartslistPosRelation : VBEntityObject , ISequence, ITargetQuantity
 {
 
     public PartslistPosRelation()

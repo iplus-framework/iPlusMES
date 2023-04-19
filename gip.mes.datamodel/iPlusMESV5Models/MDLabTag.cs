@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDLabTag : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDLabTag : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDLabTag()

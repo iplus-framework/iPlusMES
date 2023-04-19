@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDCountrySalesTaxMaterial : VBEntityObject 
+public partial class MDCountrySalesTaxMaterial : VBEntityObject
 {
 
     public MDCountrySalesTaxMaterial()

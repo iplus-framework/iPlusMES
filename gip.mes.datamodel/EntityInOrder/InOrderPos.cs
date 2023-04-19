@@ -553,21 +553,18 @@ namespace gip.mes.datamodel
         }
 
 
-        public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null)
+        public void RecalcActualQuantity()
         {
             if (this.EntityState != EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.InOrderPos_ParentInOrderPos.Load(mergeOption.Value);
-                else
-                    this.InOrderPos_ParentInOrderPos.AutoLoad();
+                this.InOrderPos_ParentInOrderPos.AutoLoad(this.InOrderPos_ParentInOrderPosReference, this);
             }
 
             double sumActualQuantity = 0;
             double sumActualQuantityUOM = 0;
             foreach (InOrderPos childPos in this.InOrderPos_ParentInOrderPos)
             {
-                childPos.RecalcActualQuantity(mergeOption);
+                childPos.RecalcActualQuantity();
                 sumActualQuantityUOM += childPos.ActualQuantityUOM;
                 if (childPos.MDUnit == this.MDUnit)
                     sumActualQuantity += childPos.ActualQuantity;
@@ -639,20 +636,17 @@ namespace gip.mes.datamodel
             this.ActualQuantityUOM = sumActualQuantityUOM;
         }
 
-        public void RecalcDeliveryStates(Nullable<MergeOption> mergeOption = null)
+        public void RecalcDeliveryStates()
         {
             if (this.EntityState != EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.InOrderPos_ParentInOrderPos.Load(mergeOption.Value);
-                else
-                    this.InOrderPos_ParentInOrderPos.AutoLoad();
+                this.InOrderPos_ParentInOrderPos.AutoLoad(this.InOrderPos_ParentInOrderPosReference, this);
             }
 
             bool childsDelivererd = true;
             foreach (InOrderPos childPos in this.InOrderPos_ParentInOrderPos)
             {
-                childPos.RecalcDeliveryStates(mergeOption);
+                childPos.RecalcDeliveryStates();
                 if (childPos.MDDelivPosState.DelivPosState != datamodel.MDDelivPosState.DelivPosStates.Delivered)
                 {
                     childsDelivererd = false;
@@ -680,28 +674,22 @@ namespace gip.mes.datamodel
         //    get;
         //}
 
-        public double PreBookingInwardQuantityUOM(Nullable<MergeOption> mergeOption = null)
+        public double PreBookingInwardQuantityUOM()
         {
             if (this.EntityState != EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.InOrderPos_ParentInOrderPos.Load(mergeOption.Value);
-                else
-                    this.InOrderPos_ParentInOrderPos.AutoLoad();
+                this.InOrderPos_ParentInOrderPos.AutoLoad(this.InOrderPos_ParentInOrderPosReference, this);
             }
 
             double sumUOM = 0;
             foreach (InOrderPos childPos in this.InOrderPos_ParentInOrderPos)
             {
-                sumUOM += childPos.PreBookingInwardQuantityUOM(mergeOption);
+                sumUOM += childPos.PreBookingInwardQuantityUOM();
             }
 
             if (this.EntityState != EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.FacilityPreBooking_InOrderPos.Load(mergeOption.Value);
-                else
-                    this.FacilityPreBooking_InOrderPos.AutoLoad();
+                this.FacilityPreBooking_InOrderPos.AutoLoad(this.FacilityPreBooking_InOrderPosReference, this);
             }
             foreach (FacilityPreBooking fb in FacilityPreBooking_InOrderPos)
             {

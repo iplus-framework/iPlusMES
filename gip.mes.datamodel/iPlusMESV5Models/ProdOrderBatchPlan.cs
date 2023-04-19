@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrderBatchPlan : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ProdOrderBatchPlan : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, IScheduledOrder
 {
 
     public ProdOrderBatchPlan()

@@ -387,18 +387,15 @@ namespace gip.mes.datamodel
         }
 
 
-        public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null)
+        public void RecalcActualQuantity()
         {
-            if (mergeOption.HasValue)
-                this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation.Load(mergeOption.Value);
-            else
-                this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation.AutoLoad();
+            this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation.AutoLoad(this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelationReference, this);
 
             double sumActualQuantity = 0;
             double sumActualQuantityUOM = 0;
             foreach (ProdOrderPartslistPosRelation childPos in this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation)
             {
-                childPos.RecalcActualQuantity(mergeOption);
+                childPos.RecalcActualQuantity();
                 sumActualQuantity += childPos.ActualQuantity;
                 sumActualQuantityUOM += childPos.ActualQuantityUOM;
             }
@@ -518,22 +515,15 @@ namespace gip.mes.datamodel
             }
         }
 
-        public double PreBookingOutwardQuantityUOM(Nullable<MergeOption> mergeOption = null)
+        public double PreBookingOutwardQuantityUOM()
         {
-            if (mergeOption.HasValue)
-                this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation.Load(mergeOption.Value);
-            else
-                this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation.AutoLoad();
+            this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation.AutoLoad(this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelationReference, this);
             double sumUOM = 0;
             foreach (ProdOrderPartslistPosRelation childPos in this.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation)
             {
-                sumUOM += childPos.PreBookingOutwardQuantityUOM(mergeOption);
+                sumUOM += childPos.PreBookingOutwardQuantityUOM();
             }
-
-            if (mergeOption.HasValue)
-                this.FacilityPreBooking_ProdOrderPartslistPosRelation.Load(mergeOption.Value);
-            else
-                this.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad();
+            this.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(this.FacilityPreBooking_ProdOrderPartslistPosRelationReference, this);
             foreach (FacilityPreBooking fb in FacilityPreBooking_ProdOrderPartslistPosRelation)
             {
                 if (fb.OutwardQuantity.HasValue)

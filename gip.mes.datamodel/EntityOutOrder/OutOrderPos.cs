@@ -729,21 +729,18 @@ namespace gip.mes.datamodel
         }
 
 
-        public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null)
+        public void RecalcActualQuantity()
         {
             if (this.EntityState != Microsoft.EntityFrameworkCore.EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.OutOrderPos_ParentOutOrderPos.Load(mergeOption.Value);
-                else
-                    this.OutOrderPos_ParentOutOrderPos.AutoLoad();
+                this.OutOrderPos_ParentOutOrderPos.AutoLoad(this.OutOrderPos_ParentOutOrderPosReference, this);
             }
 
             double sumActualQuantity = 0;
             double sumActualQuantityUOM = 0;
             foreach (OutOrderPos childPos in this.OutOrderPos_ParentOutOrderPos)
             {
-                childPos.RecalcActualQuantity(mergeOption);
+                childPos.RecalcActualQuantity();
                 sumActualQuantityUOM += childPos.ActualQuantityUOM;
                 if (childPos.MDUnit == this.MDUnit)
                     sumActualQuantity += childPos.ActualQuantity;
@@ -827,27 +824,21 @@ namespace gip.mes.datamodel
         //    get;
         //}
 
-        public double PreBookingOutwardQuantityUOM(Nullable<MergeOption> mergeOption = null)
+        public double PreBookingOutwardQuantityUOM()
         {
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != Microsoft.EntityFrameworkCore.EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.OutOrderPos_ParentOutOrderPos.Load(mergeOption.Value);
-                else
-                    this.OutOrderPos_ParentOutOrderPos.AutoLoad();
+                this.OutOrderPos_ParentOutOrderPos.AutoLoad(this.OutOrderPos_ParentOutOrderPosReference, this);
             }
             double sumUOM = 0;
             foreach (OutOrderPos childPos in this.OutOrderPos_ParentOutOrderPos)
             {
-                sumUOM += childPos.PreBookingOutwardQuantityUOM(mergeOption);
+                sumUOM += childPos.PreBookingOutwardQuantityUOM();
             }
 
-            if (this.EntityState != System.Data.EntityState.Added)
+            if (this.EntityState != Microsoft.EntityFrameworkCore.EntityState.Added)
             {
-                if (mergeOption.HasValue)
-                    this.FacilityPreBooking_OutOrderPos.Load(mergeOption.Value);
-                else
-                    this.FacilityPreBooking_OutOrderPos.AutoLoad();
+                this.FacilityPreBooking_OutOrderPos.AutoLoad(this.FacilityPreBooking_OutOrderPosReference, this);
             }
             foreach (FacilityPreBooking fb in FacilityPreBooking_OutOrderPos)
             {

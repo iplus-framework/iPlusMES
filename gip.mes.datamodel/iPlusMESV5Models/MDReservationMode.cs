@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDReservationMode : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDReservationMode : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDReservationMode()

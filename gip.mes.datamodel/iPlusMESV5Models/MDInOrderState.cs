@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDInOrderState : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDInOrderState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDInOrderState()

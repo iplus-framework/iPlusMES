@@ -75,6 +75,10 @@ namespace <#= "gip.mes.datamodel" #>;
         }
     }
     bool setInsertUpdateInterface = false;
+    bool setISequenceInterface = false;
+    bool setTargetQuantityInterface = false;
+    bool setScheduledOrderInterface = false;
+    bool setDeleteInfoInterface = false;
     List<String> propertyNames = new List<String>();
     foreach (var property in EntityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
     {
@@ -83,6 +87,28 @@ namespace <#= "gip.mes.datamodel" #>;
     if (propertyNames.Contains("UpdateName") && propertyNames.Contains("UpdateDate") && propertyNames.Contains("InsertName") && propertyNames.Contains("InsertDate"))
     {
         setInsertUpdateInterface = true;
+    }
+    if (propertyNames.Contains("Sequence"))
+    {
+        setISequenceInterface = true;
+    }
+    if (propertyNames.Contains("TargetQuantity"))
+    {
+        setTargetQuantityInterface = true;
+    }
+    if (propertyNames.Contains("ScheduledOrder"))
+    {
+        setScheduledOrderInterface = true;
+    }
+    if (propertyNames.Contains("DeleteDate"))
+    {
+        setDeleteInfoInterface = true;
+    }
+
+    bool setMDTransInterface = false;
+    if (propertyNames.Contains("MDNameTrans") && propertyNames.Contains("MDKey"))
+    {
+        setMDTransInterface = true;
     }
 
     string entityTypeNewName = "";
@@ -95,7 +121,7 @@ namespace <#= "gip.mes.datamodel" #>;
         entityTypeNewName = EntityType.Name;
     }
 #>
-public partial class <#= entityTypeNewName #> : VBEntityObject <#= setInsertUpdateInterface ? ", IInsertInfo, IUpdateInfo" : "" #>
+public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdateInterface ? ", IInsertInfo, IUpdateInfo" : "" #><#= setDeleteInfoInterface ? ", IDeleteInfo" : "" #><#= setMDTransInterface ? ", IMDTrans" : "" #><#= setISequenceInterface ? ", ISequence" : "" #><#= setTargetQuantityInterface ? ", ITargetQuantity" : "" #><#= setScheduledOrderInterface ? ", IScheduledOrder" : "" #>
 {
 
     public <#= entityTypeNewName #>()

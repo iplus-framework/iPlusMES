@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OutOrderPosSplit : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class OutOrderPosSplit : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public OutOrderPosSplit()

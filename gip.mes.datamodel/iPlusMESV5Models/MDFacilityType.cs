@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDFacilityType : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDFacilityType : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDFacilityType()

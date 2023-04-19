@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyAddressUnloadingpoint : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class CompanyAddressUnloadingpoint : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence
 {
 
     public CompanyAddressUnloadingpoint()

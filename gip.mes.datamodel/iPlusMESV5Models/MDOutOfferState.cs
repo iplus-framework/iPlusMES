@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDOutOfferState : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDOutOfferState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDOutOfferState()

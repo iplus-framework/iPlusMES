@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 
@@ -269,14 +270,14 @@ namespace gip.mes.datamodel
         /// <param name="dbApp"></param>
         public void RecalcActualQuantitySP(DatabaseApp dbApp, bool callRefresh = true)
         {
-            dbApp.udpRecalcActualQuantity(ProgramNo, null);
+            dbApp.Database.ExecuteSql(FormattableStringFactory.Create("udpRecalcActualQuantity @p0, @p1" ,ProgramNo, null));
             if (callRefresh)
                 RefreshAfterRecalcActualQuantity(dbApp);
         }
 
         public void RefreshAfterRecalcActualQuantity(DatabaseApp dbApp)
         {
-            this.Refresh(RefreshMode.StoreWins, dbApp);
+            this.Refresh(dbApp);
             foreach (var pl in ProdOrderPartslist_ProdOrder)
             {
                 pl.RefreshAfterRecalcActualQuantity(dbApp);

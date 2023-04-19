@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrderPartslistPos : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ProdOrderPartslistPos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public ProdOrderPartslistPos()

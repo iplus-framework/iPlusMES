@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OutOfferPos : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class OutOfferPos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public OutOfferPos()

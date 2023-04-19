@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDGMPMaterialGroupPos : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MDGMPMaterialGroupPos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence
 {
 
     public MDGMPMaterialGroupPos()

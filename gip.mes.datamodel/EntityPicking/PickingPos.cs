@@ -556,16 +556,16 @@ namespace gip.mes.datamodel
             }
         }
 
-        public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null)
+        public void RecalcActualQuantity()
         {
             if (this.InOrderPos != null)
             {
-                this.InOrderPos.RecalcActualQuantity(mergeOption);
+                this.InOrderPos.RecalcActualQuantity();
                 return;
             }
             else if (this.OutOrderPos != null)
             {
-                this.OutOrderPos.RecalcActualQuantity(mergeOption);
+                this.OutOrderPos.RecalcActualQuantity();
                 return;
             }
 
