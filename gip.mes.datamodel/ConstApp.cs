@@ -107,6 +107,7 @@
         public const string TargetQuantityUOM = "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}";
         public const string ActualQuantity = "en{'Actual Quantity'}de{'Istmenge'}";
         public const string ActualQuantityUOM = "en{'Actual Quantity (UOM)'}de{'Istmenge (BME)'}";
+        public const string RejectQuantityUOM = "en{'Reject Quantity (UOM)'}de{'Menge ablehnen (BME)'}";
         public const string StockQuantity = "en{'Stock Quantity'}de{'Lagermenge'}";
         public const string StockQuantityAmb = "en{'Stock Quantity Ambient'}de{'Lagermenge ambient'}";
         public const string StockWeight = "en{'Stock Weight'}de{'Lagergewicht'}";
