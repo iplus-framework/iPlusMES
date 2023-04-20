@@ -146,12 +146,6 @@ namespace gip.bso.manufacturing
 
         public const string FunctionMonitorTabVBContent = "FuncMonitor";
 
-
-        private void _timer_Tick(object sender, EventArgs e)
-        {
-            CurrentTime = DateTime.Now;
-        }
-
         #endregion
 
         #region Properties
@@ -1218,11 +1212,22 @@ namespace gip.bso.manufacturing
                 if (processModule == null || !processModuleType.IsAssignableFrom(processModule.ObjectType) || processModule.ACStartTypeIndex != (short)Global.ACStartTypes.Automatic)
                     continue;
 
-                var basePAF = paf.ClassHierarchy.FirstOrDefault(c => c.ACClass1_ParentACClass == null && c.ConfigurationEntries.Any(x => x.KeyACUrl == Const.KeyACUrl_BusinessobjectList));
-                if (basePAF == null)
-                    continue;
+                core.datamodel.ACClass configPAF = null;
 
-                var BSOs = basePAF.ConfigurationEntries.Where(c => c.KeyACUrl == Const.KeyACUrl_BusinessobjectList).Select(x => x.Value as ACComposition).ToArray();
+                if (paf.ConfigurationEntries.Any(x => x.LocalConfigACUrl == Const.LocalConfigACUrl_BusinessobjectList))
+                {
+                    configPAF = paf;
+                }
+                else
+                {
+                    var basePAF = paf.ClassHierarchy.FirstOrDefault(c => c.ACClass1_ParentACClass == null && c.ConfigurationEntries.Any(x => x.LocalConfigACUrl == Const.LocalConfigACUrl_BusinessobjectList));
+                    if (basePAF == null)
+                        continue;
+
+                    configPAF = basePAF;
+                }
+
+                var BSOs = configPAF.ConfigurationEntries.Where(c => c.LocalConfigACUrl == Const.LocalConfigACUrl_BusinessobjectList).Select(x => x.Value as ACComposition).ToArray();
                 if (!BSOs.Any())
                     continue;
 
@@ -1794,6 +1799,11 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        private void _timer_Tick(object sender, EventArgs e)
+        {
+            CurrentTime = DateTime.Now;
+        }
 
         #endregion
 

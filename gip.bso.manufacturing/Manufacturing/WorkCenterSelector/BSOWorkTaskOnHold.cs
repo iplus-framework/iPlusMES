@@ -5,6 +5,7 @@ using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +19,16 @@ namespace gip.bso.manufacturing
         public BSOWorkTaskOnHold(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
+        }
+
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            return base.ACInit(startChildMode);
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            return base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -118,7 +129,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Start work task'}de{'Arbeitsaufgabe starten'}", 710, true)]
         public void StartWorkTask()
         {
-            if (_PAFWorkTaskScan == null)
+            if (_PAFWorkTaskScan == null || SelectedWorkTaskOnHold == null)
                 return;
 
             IACComponent paf = _PAFWorkTaskScan.ValueT;
@@ -195,7 +206,7 @@ namespace gip.bso.manufacturing
                                       PartslistName = x.Item1.ProdOrderPartslist.Partslist.PartslistName,
                                       IntermediateMaterial = x.Item1.MaterialName,
                                       WFACUrl = x.Item2.ACUrlWF,
-                                      ForRelease = x.Item2.ForRelease                                 
+                                      ForRelease = x.Item2.ForRelease
                                   })
                                   .ToList();
                 }
@@ -209,7 +220,6 @@ namespace gip.bso.manufacturing
             {
                 SortWorkTasks();
             }
-            
         }
 
         private void SortWorkTasks()

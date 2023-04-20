@@ -113,6 +113,7 @@
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosingSkip.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Picking.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeLoop.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWPickingByMaterial.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskOnHold.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\ScaleBoundaries.cs" />
