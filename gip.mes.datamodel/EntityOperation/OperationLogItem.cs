@@ -25,6 +25,8 @@ namespace gip.mes.datamodel
 - RestTime (TimeSpan)= FinishTime - Now
          */
 
+        public Guid ACProgramLogID;
+
         #region DataMembers
         [DataMember]
         [ACPropertyInfo(1, "Sn", "en{'Sn'}de{'Sn'}")]

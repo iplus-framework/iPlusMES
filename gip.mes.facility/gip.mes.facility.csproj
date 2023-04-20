@@ -176,6 +176,7 @@
     <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommandModeEnum.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\KeepEqualBatchSizes.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\PartslistConfigExtract.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\WizardSchedulerPartslist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stackbooking\ACStackCalculatorBase.cs" />
