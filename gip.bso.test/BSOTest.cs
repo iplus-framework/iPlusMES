@@ -242,12 +242,12 @@ namespace gip.bso.test
             return true;
         }
 
-        [ACMethodInfo("TestMethod1", "en{'TestMethod1'}de{'TestMethod1'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("TestMethod1", "en{'ShuffleMaterial'}de{'ShuffleMaterial'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void TestMethod1()
         {
             if (!IsEnabledTestMethod1())
                 return;
-
+            ShuffleMaterial(false);
         }
 
         public bool IsEnabledTestMethod1()
@@ -255,12 +255,12 @@ namespace gip.bso.test
             return true;
         }
 
-        [ACMethodInfo("TestMethod2", "en{'TestMethod2'}de{'TestMethod2'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("TestMethod2", "en{'UndoShuffleMaterial'}de{'UndoShuffleMaterial'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void TestMethod2()
         {
             if (!IsEnabledTestMethod2())
                 return;
-
+            ShuffleMaterial(true);
         }
 
         public bool IsEnabledTestMethod2()
