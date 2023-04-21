@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -276,11 +277,16 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnVBiProgramACClassMethodIDChanged()
-        {
-            OnPropertyChanged("ProgramACClassMethod");
-        }
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(VBiProgramACClassMethodID))
+            {
+                base.OnPropertyChanged("ProgramACClassMethod");
+            }
+            base.OnPropertyChanged(propertyName);
+        }
 
     }
 }

@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -99,6 +100,26 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(TargetQuantity):
+                    OnTargetQuantityChanged();
+                    break;
+                case nameof(TargetQuantityUOM):
+                    OnTargetQuantityUOMChanged();
+                    break;
+                case nameof(ActualQuantity):
+                    OnActualQuantityChanged();
+                    break;
+                case nameof(ActualQuantityUOM):
+                    OnActualQuantityUOMChanged();
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region Partial methods
 
         public ProdOrderPartslistPosRelation TopParentPartslistPosRelation
@@ -112,7 +133,7 @@ namespace gip.mes.datamodel
         }
 
         bool _OnTargetQuantityChanging = false;
-        partial void OnTargetQuantityChanged()
+        protected void OnTargetQuantityChanged()
         {
             if (!_OnTargetQuantityUOMChanging && SourceProdOrderPartslistPos != null && EntityState != EntityState.Detached && SourceProdOrderPartslistPos.Material != null)
             {
@@ -141,11 +162,11 @@ namespace gip.mes.datamodel
                     _OnTargetQuantityChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantity");
+            base.OnPropertyChanged("DifferenceQuantity");
         }
 
         bool _OnTargetQuantityUOMChanging = false;
-        partial void OnTargetQuantityUOMChanged()
+        protected void OnTargetQuantityUOMChanged()
         {
             if (!_OnTargetQuantityChanging && EntityState != EntityState.Detached && SourceProdOrderPartslistPos != null && SourceProdOrderPartslistPos.Material != null)
             {
@@ -174,11 +195,11 @@ namespace gip.mes.datamodel
                     _OnTargetQuantityUOMChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantityUOM");
+            base.OnPropertyChanged("DifferenceQuantityUOM");
         }
 
         bool _OnActualQuantityChanging = false;
-        partial void OnActualQuantityChanged()
+        protected void OnActualQuantityChanged()
         {
             if (!_OnActualQuantityUOMChanging && this.SourceProdOrderPartslistPos != null && EntityState != EntityState.Detached
                 && this.SourceProdOrderPartslistPos.Material != null && this.SourceProdOrderPartslistPos.MDUnit != null)
@@ -201,11 +222,11 @@ namespace gip.mes.datamodel
                     _OnActualQuantityChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantity");
+            base.OnPropertyChanged("DifferenceQuantity");
         }
 
         bool _OnActualQuantityUOMChanging = false;
-        partial void OnActualQuantityUOMChanged()
+        protected void OnActualQuantityUOMChanged()
         {
             if (!_OnActualQuantityChanging && this.SourceProdOrderPartslistPos != null && EntityState != EntityState.Detached
                 && this.SourceProdOrderPartslistPos.Material != null && this.SourceProdOrderPartslistPos.MDUnit != null)
@@ -228,7 +249,7 @@ namespace gip.mes.datamodel
                     _OnActualQuantityUOMChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantityUOM");
+            base.OnPropertyChanged("DifferenceQuantityUOM");
         }
 
         [ACPropertyInfo(24, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]

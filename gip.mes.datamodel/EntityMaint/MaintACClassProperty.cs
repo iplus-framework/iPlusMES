@@ -99,6 +99,10 @@ namespace gip.mes.datamodel
                 if (WarningValueDiff != warningValue)
                     WarningValueDiff = warningValue;
             }
+            else if (propertyName == nameof(VBiACClassPropertyID))
+            {
+                OnPropertyChanged("ACClassProperty");
+            }
         }
 
         private gip.core.datamodel.ACClassProperty _ACClassProperty;
@@ -150,11 +154,6 @@ namespace gip.mes.datamodel
                     this.VBiACClassProperty = value2;
                 }
             }
-        }
-
-        partial void OnVBiACClassPropertyIDChanged()
-        {
-            OnPropertyChanged("ACClassProperty");
         }
 
     }

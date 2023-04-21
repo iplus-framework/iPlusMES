@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Transactions;
 using gip.core.datamodel;
@@ -159,62 +160,67 @@ namespace gip.mes.datamodel
         #endregion
 
         #region VBIplus-Context
-                private gip.core.datamodel.ACClass _RoleACClass;
-                [ACPropertyInfo(9999, "", "en{'Role'}de{'Rolle'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
-                public gip.core.datamodel.ACClass RoleACClass
+        private gip.core.datamodel.ACClass _RoleACClass;
+        [ACPropertyInfo(9999, "", "en{'Role'}de{'Rolle'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        public gip.core.datamodel.ACClass RoleACClass
+        {
+            get
+            {
+                if (this.VBiRoleACClassID == null || this.VBiRoleACClassID == Guid.Empty)
+                    return null;
+                if (_RoleACClass != null)
+                    return _RoleACClass;
+                if (this.VBiRoleACClass == null)
                 {
-                    get
-                    {
-                        if (this.VBiRoleACClassID == null || this.VBiRoleACClassID == Guid.Empty)
-                            return null;
-                        if (_RoleACClass != null)
-                            return _RoleACClass;
-                        if (this.VBiRoleACClass == null)
-                        {
-                            DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
-                            _RoleACClass = dbApp.ContextIPlus.ACClass.Where(c => c.ACClassID == this.VBiRoleACClassID).FirstOrDefault();
-                            return _RoleACClass;
-                        }
-                        else
-                        {
-                            _RoleACClass = this.VBiRoleACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
-                            return _RoleACClass;
-                        }
-                    }
-                    set
-                    {
-                        if (value == null)
-                        {
-                            if (this.VBiRoleACClass == null)
-                                return;
-                            _RoleACClass = null;
-                            this.VBiRoleACClass = null;
-                        }
-                        else
-                        {
-                            if (_RoleACClass != null && value == _RoleACClass)
-                                return;
-                            gip.mes.datamodel.ACClass value2 = value.FromAppContext<gip.mes.datamodel.ACClass>(this.GetObjectContext<DatabaseApp>());
-                            // Neu angelegtes Objekt, das im AppContext noch nicht existiert
-                            if (value2 == null)
-                            {
-                                this.VBiRoleACClassID = value.ACClassID;
-                                throw new NullReferenceException("Value doesn't exist in Application-Context. Please save new value in iPlusContext before setting this property!");
-                                //return;
-                            }
-                            _RoleACClass = value;
-                            if (value2 == this.VBiRoleACClass)
-                                return;
-                            this.VBiRoleACClass = value2;
-                        }
-                    }
+                    DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                    _RoleACClass = dbApp.ContextIPlus.ACClass.Where(c => c.ACClassID == this.VBiRoleACClassID).FirstOrDefault();
+                    return _RoleACClass;
                 }
+                else
+                {
+                    _RoleACClass = this.VBiRoleACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                    return _RoleACClass;
+                }
+            }
+            set
+            {
+                if (value == null)
+                {
+                    if (this.VBiRoleACClass == null)
+                        return;
+                    _RoleACClass = null;
+                    this.VBiRoleACClass = null;
+                }
+                else
+                {
+                    if (_RoleACClass != null && value == _RoleACClass)
+                        return;
+                    gip.mes.datamodel.ACClass value2 = value.FromAppContext<gip.mes.datamodel.ACClass>(this.GetObjectContext<DatabaseApp>());
+                    // Neu angelegtes Objekt, das im AppContext noch nicht existiert
+                    if (value2 == null)
+                    {
+                        this.VBiRoleACClassID = value.ACClassID;
+                        throw new NullReferenceException("Value doesn't exist in Application-Context. Please save new value in iPlusContext before setting this property!");
+                        //return;
+                    }
+                    _RoleACClass = value;
+                    if (value2 == this.VBiRoleACClass)
+                        return;
+                    this.VBiRoleACClass = value2;
+                }
+            }
+        }
 
-                partial void OnVBiRoleACClassIDChanged()
-                {
-                    OnPropertyChanged("RoleACClass");
-                }
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(VBiRoleACClassID))
+            {
+                base.OnPropertyChanged("RoleACClass");
+            }
+            base.OnPropertyChanged(propertyName);
+        }
 
     }
 }

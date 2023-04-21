@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -329,10 +330,10 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnSequenceChanged()
-        {
-            OnPropertyChanged("Position");
-        }
+        //partial void OnSequenceChanged()
+        //{
+        //    OnPropertyChanged("Position");
+        //}
 
         [ACPropertyInfo(31)]
         public List<OutOrderPos> Items
@@ -476,11 +477,46 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(Sequence):
+                    base.OnEntityPropertyChanged("Position");
+                    break;
+                case nameof(CalledUpQuantity):
+                    OnCalledUpQuantityChanged();
+                    break;
+                case nameof(CalledUpQuantityUOM):
+                    OnCalledUpQuantityUOMChanged();
+                    break;
+                case nameof(TargetQuantity):
+                    OnTargetQuantityChanged();
+                    break;
+                case nameof(TargetQuantityUOM):
+                    OnTargetQuantityUOMChanged();
+                    break;
+                case nameof(ActualQuantity):
+                    OnActualQuantityChanged();
+                    break;
+                case nameof(ActualQuantityUOM):
+                    OnActualQuantityUOMChanged();
+                    break;
+                case nameof(ExternQuantity):
+                    OnExternQuantityChanged();
+                    break;
+                case nameof(ExternQuantityUOM):
+                    OnExternQuantityUOMChanged();
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region partial methods
         bool _OnCalledUpQuantityChanging = false;
-        partial void OnCalledUpQuantityChanged()
+        protected void OnCalledUpQuantityChanged()
         {
-            if (!_OnCalledUpQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnCalledUpQuantityUOMChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnCalledUpQuantityChanging = true;
                 try
@@ -500,13 +536,13 @@ namespace gip.mes.datamodel
                     _OnCalledUpQuantityChanging = false;
                 }
             }
-            OnPropertyChanged("RemainingCallQuantity");
+            base.OnPropertyChanged("RemainingCallQuantity");
         }
 
         bool _OnCalledUpQuantityUOMChanging = false;
-        partial void OnCalledUpQuantityUOMChanged()
+        protected void OnCalledUpQuantityUOMChanged()
         {
-            if (!_OnCalledUpQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnCalledUpQuantityChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnCalledUpQuantityUOMChanging = true;
                 try
@@ -526,13 +562,13 @@ namespace gip.mes.datamodel
                     _OnCalledUpQuantityUOMChanging = false;
                 }
             }
-            OnPropertyChanged("RemainingCallQuantityUOM");
+            base.OnPropertyChanged("RemainingCallQuantityUOM");
         }
 
         bool _OnTargetQuantityChanging = false;
-        partial void OnTargetQuantityChanged()
+        protected void OnTargetQuantityChanged()
         {
-            if (!_OnTargetQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnTargetQuantityUOMChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnTargetQuantityChanging = true;
                 try
@@ -552,13 +588,13 @@ namespace gip.mes.datamodel
                     _OnTargetQuantityChanging = false;
                 }
             }
-            OnPropertyChanged("RemainingCallQuantity");
+            base.OnPropertyChanged("RemainingCallQuantity");
         }
 
         bool _OnTargetQuantityUOMChanging = false;
-        partial void OnTargetQuantityUOMChanged()
+        protected void OnTargetQuantityUOMChanged()
         {
-            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnTargetQuantityChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnTargetQuantityUOMChanging = true;
                 try
@@ -578,13 +614,13 @@ namespace gip.mes.datamodel
                     _OnTargetQuantityUOMChanging = false;
                 }
             }
-            OnPropertyChanged("RemainingCallQuantityUOM");
+            base.OnPropertyChanged("RemainingCallQuantityUOM");
         }
 
         bool _OnActualQuantityChanging = false;
-        partial void OnActualQuantityChanged()
+        protected void OnActualQuantityChanged()
         {
-            if (!_OnActualQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnActualQuantityUOMChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnActualQuantityChanging = true;
                 try
@@ -607,9 +643,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnActualQuantityUOMChanging = false;
-        partial void OnActualQuantityUOMChanged()
+        protected void OnActualQuantityUOMChanged()
         {
-            if (!_OnActualQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnActualQuantityChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnActualQuantityUOMChanging = true;
                 try
@@ -632,9 +668,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnExternQuantityChanging = false;
-        partial void OnExternQuantityChanged()
+        protected void OnExternQuantityChanged()
         {
-            if (!_OnExternQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnExternQuantityUOMChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnExternQuantityChanging = true;
                 try
@@ -657,9 +693,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnExternQuantityUOMChanging = false;
-        partial void OnExternQuantityUOMChanged()
+        protected void OnExternQuantityUOMChanged()
         {
-            if (!_OnExternQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnExternQuantityChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnExternQuantityUOMChanging = true;
                 try

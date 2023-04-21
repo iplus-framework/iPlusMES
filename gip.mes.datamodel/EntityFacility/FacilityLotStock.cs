@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -190,9 +191,13 @@ namespace gip.mes.datamodel
             base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
-        partial void OnStockQuantityChanged()
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            RefreshMinOptFields();
+            if (propertyName == nameof(StockQuantity))
+            {
+                RefreshMinOptFields();
+            }
+            base.OnPropertyChanged(propertyName);
         }
 
         public void RefreshMinOptFields()

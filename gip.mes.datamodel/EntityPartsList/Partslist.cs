@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 
@@ -504,9 +505,22 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(TargetQuantity))
+            {
+                OnTargetQuantityChanged();
+            }
+            else if (propertyName == nameof(TargetQuantityUOM))
+            {
+                OnTargetQuantityUOMChanged();
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region partial methods
         bool _OnTargetQuantityChanging = false;
-        partial void OnTargetQuantityChanged()
+        protected void OnTargetQuantityChanged()
         {
             if (!_OnTargetQuantityUOMChanging && Material != null && MDUnit != null)
             {
@@ -531,7 +545,7 @@ namespace gip.mes.datamodel
         }
 
         bool _OnTargetQuantityUOMChanging = false;
-        partial void OnTargetQuantityUOMChanged()
+        protected void OnTargetQuantityUOMChanged()
         {
             if (!_OnTargetQuantityChanging && Material != null && MDUnit != null)
             {

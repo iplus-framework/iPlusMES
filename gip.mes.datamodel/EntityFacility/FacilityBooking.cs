@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -551,9 +552,13 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnVBiStackCalculatorACClassIDChanged()
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            OnPropertyChanged("StackCalculatorACClass");
+            if (propertyName == nameof(VBiStackCalculatorACClassID))
+            {
+                base.OnPropertyChanged("StackCalculatorACClass");
+            }
+            base.OnPropertyChanged(propertyName);
         }
 
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -169,18 +170,22 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(TargetQuantity):
+                    base.OnPropertyChanged("DifferenceQuantity");
+                    base.OnPropertyChanged("TargetQuantityLossFactor");
+                    break;
+                case nameof(ActualQuantity):
+                    base.OnEntityPropertyChanged("DifferenceQuantity");
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region AdditionalProperties
-
-        partial void OnTargetQuantityChanged()
-        {
-            OnPropertyChanged("DifferenceQuantity");
-            OnPropertyChanged("TargetQuantityLossFactor");
-        }
-
-        partial void OnActualQuantityChanged()
-        {
-            OnPropertyChanged("DifferenceQuantity");
-        }
 
         [ACPropertyInfo(24, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
         public double DifferenceQuantity
@@ -252,13 +257,9 @@ namespace gip.mes.datamodel
 
         #region Methods
 
-        public void RecalcActualQuantity(Nullable<MergeOption> mergeOption = null, bool recalcChilds = false)
+        public void RecalcActualQuantity(bool recalcChilds = false)
         {
-
-            if (mergeOption.HasValue)
-                this.ProdOrderPartslistPos_ProdOrderPartslist.Load(mergeOption.Value);
-            else
-                this.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad();
+            this.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(this.ProdOrderPartslistPos_ProdOrderPartslistReference, this);
 
             List<ProdOrderPartslistPos> intermediates = ProdOrderPartslistPos_ProdOrderPartslist
                 .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
@@ -272,11 +273,11 @@ namespace gip.mes.datamodel
             {
                 foreach (ProdOrderPartslistPos inwardPos in intermediates)
                 {
-                    inwardPos.RecalcActualQuantity(mergeOption);
+                    inwardPos.RecalcActualQuantity();
                 }
                 foreach (ProdOrderPartslistPos outwardPos in outwards)
                 {
-                    outwardPos.RecalcActualQuantity(mergeOption);
+                    outwardPos.RecalcActualQuantity();
                 }
             }
 
@@ -294,20 +295,20 @@ namespace gip.mes.datamodel
         /// <param name="dbApp"></param>
         public void RecalcActualQuantitySP(DatabaseApp dbApp, bool callRefresh = true)
         {
-            dbApp.udpRecalcActualQuantity(ProdOrder.ProgramNo, ProdOrderPartslistID);
+            dbApp.Database.ExecuteSql(FormattableStringFactory.Create("udpRecalcActualQuantity @p0, @p1", ProdOrder.ProgramNo, ProdOrderPartslistID));
             if (callRefresh)
                 RefreshAfterRecalcActualQuantity(dbApp);
         }
 
         public void RefreshAfterRecalcActualQuantity(DatabaseApp dbApp)
         {
-            this.Refresh(RefreshMode.StoreWins, dbApp);
+            this.Refresh(dbApp);
             foreach (var pos in ProdOrderPartslistPos_ProdOrderPartslist)
             {
-                pos.Refresh(RefreshMode.StoreWins, dbApp);
+                pos.Refresh(dbApp);
                 foreach (var rel in pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                 {
-                    rel.Refresh(RefreshMode.StoreWins, dbApp);
+                    rel.Refresh(dbApp);
                 }
             }
         }
@@ -372,7 +373,7 @@ namespace gip.mes.datamodel
             if (ACConfigListCache.Contains(acConfig))
                 ACConfigListCache.Remove(acConfig);
             ProdOrderPartslistConfig_ProdOrderPartslist.Remove(acConfig);
-            if (acConfig.EntityState != System.Data.EntityState.Detached)
+            if (acConfig.EntityState != EntityState.Detached)
                 acConfig.DeleteACObject(this.GetObjectContext<DatabaseApp>(), false);
         }
 
@@ -417,10 +418,9 @@ namespace gip.mes.datamodel
                         return _ACConfigListCache;
                 }
                 SafeList<IACConfig> newSafeList = new SafeList<IACConfig>();
-                if (ProdOrderPartslistConfig_ProdOrderPartslist.IsLoaded)
+                if (ProdOrderPartslistConfig_ProdOrderPartslist_IsLoaded)
                 {
-                    ProdOrderPartslistConfig_ProdOrderPartslist.AutoRefresh();
-                    ProdOrderPartslistConfig_ProdOrderPartslist.AutoLoad();
+                    ProdOrderPartslistConfig_ProdOrderPartslist.AutoLoad(ProdOrderPartslistConfig_ProdOrderPartslistReference, this);
                 }
                 newSafeList = new SafeList<IACConfig>(ProdOrderPartslistConfig_ProdOrderPartslist.ToList().Select(x => (IACConfig)x));
                 using (ACMonitor.Lock(_11020_LockValue))

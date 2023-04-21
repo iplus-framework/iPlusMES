@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Collections;
 using System.Transactions; using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -156,62 +157,67 @@ namespace gip.mes.datamodel
         #endregion
 
         #region VBIplus-Context
-                private gip.core.datamodel.ACProject _ACProject;
-                [ACPropertyInfo(9999, "", "en{'Project'}de{'Projekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACProject.ClassName)]
-                public gip.core.datamodel.ACProject ACProject
+        private gip.core.datamodel.ACProject _ACProject;
+        [ACPropertyInfo(9999, "", "en{'Project'}de{'Projekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACProject.ClassName)]
+        public gip.core.datamodel.ACProject ACProject
+        {
+            get
+            {
+                if (this.VBiACProjectID == null || this.VBiACProjectID == Guid.Empty)
+                    return null;
+                if (_ACProject != null)
+                    return _ACProject;
+                if (this.VBiACProject == null)
                 {
-                    get
-                    {
-                        if (this.VBiACProjectID == null || this.VBiACProjectID == Guid.Empty)
-                            return null;
-                        if (_ACProject != null)
-                            return _ACProject;
-                        if (this.VBiACProject == null)
-                        {
-                            DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
-                            _ACProject = dbApp.ContextIPlus.ACProject.Where(c => c.ACProjectID == this.VBiACProjectID).FirstOrDefault();
-                            return _ACProject;
-                        }
-                        else
-                        {
-                            _ACProject = this.VBiACProject.FromIPlusContext<gip.core.datamodel.ACProject>();
-                            return _ACProject;
-                        }
-                    }
-                    set
-                    {
-                        if (value == null)
-                        {
-                            if (this.VBiACProject == null)
-                                return;
-                            _ACProject = null;
-                            this.VBiACProject = null;
-                        }
-                        else
-                        {
-                            if (_ACProject != null && value == _ACProject)
-                                return;
-                            gip.mes.datamodel.ACProject value2 = value.FromAppContext<gip.mes.datamodel.ACProject>(this.GetObjectContext<DatabaseApp>());
-                            // Neu angelegtes Objekt, das im AppContext noch nicht existiert
-                            if (value2 == null)
-                            {
-                                this.VBiACProjectID = value.ACProjectID;
-                                throw new NullReferenceException("Value doesn't exist in Application-Context. Please save new value in iPlusContext before setting this property!");
-                                //return;
-                            }
-                            _ACProject = value;
-                            if (value2 == this.VBiACProject)
-                                return;
-                            this.VBiACProject = value2;
-                        }
-                    }
+                    DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                    _ACProject = dbApp.ContextIPlus.ACProject.Where(c => c.ACProjectID == this.VBiACProjectID).FirstOrDefault();
+                    return _ACProject;
                 }
+                else
+                {
+                    _ACProject = this.VBiACProject.FromIPlusContext<gip.core.datamodel.ACProject>();
+                    return _ACProject;
+                }
+            }
+            set
+            {
+                if (value == null)
+                {
+                    if (this.VBiACProject == null)
+                        return;
+                    _ACProject = null;
+                    this.VBiACProject = null;
+                }
+                else
+                {
+                    if (_ACProject != null && value == _ACProject)
+                        return;
+                    gip.mes.datamodel.ACProject value2 = value.FromAppContext<gip.mes.datamodel.ACProject>(this.GetObjectContext<DatabaseApp>());
+                    // Neu angelegtes Objekt, das im AppContext noch nicht existiert
+                    if (value2 == null)
+                    {
+                        this.VBiACProjectID = value.ACProjectID;
+                        throw new NullReferenceException("Value doesn't exist in Application-Context. Please save new value in iPlusContext before setting this property!");
+                        //return;
+                    }
+                    _ACProject = value;
+                    if (value2 == this.VBiACProject)
+                        return;
+                    this.VBiACProject = value2;
+                }
+            }
+        }
 
-                partial void OnVBiACProjectIDChanged()
-                {
-                    OnPropertyChanged("ACProject");
-                }
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(VBiACProjectID))
+            {
+                base.OnPropertyChanged("ACProject");
+            }
+            base.OnPropertyChanged(propertyName);
+        }
 
     }
 }

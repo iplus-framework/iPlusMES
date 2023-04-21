@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -577,6 +578,20 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(VBiFacilityACClassID):
+                    base.OnPropertyChanged("FacilityACClass");
+                    break;
+                case nameof(VBiStackCalculatorACClassID):
+                    base.OnPropertyChanged("StackCalculatorACClass");
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region VBIplus-Context
         private gip.core.datamodel.ACClass _FacilityACClass;
         [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
@@ -631,11 +646,6 @@ namespace gip.mes.datamodel
                     this.VBiFacilityACClass = value2;
                 }
             }
-        }
-
-        partial void OnVBiFacilityACClassIDChanged()
-        {
-            OnPropertyChanged("FacilityACClass");
         }
 
         public gip.core.datamodel.ACClass GetFacilityACClass(Database db)
@@ -715,11 +725,6 @@ namespace gip.mes.datamodel
                     this.VBiStackCalculatorACClass = value2;
                 }
             }
-        }
-
-        partial void OnVBiStackCalculatorACClassIDChanged()
-        {
-            OnPropertyChanged("StackCalculatorACClass");
         }
 
         public FacilityFillValidation FillValidationMode()

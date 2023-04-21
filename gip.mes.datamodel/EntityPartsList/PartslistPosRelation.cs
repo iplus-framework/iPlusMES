@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -52,7 +53,7 @@ namespace gip.mes.datamodel
                     return msg;
             }
             int sequence = Sequence;
-            database.DeleteObject(this);
+            database.Remove(this);
             return null;
         }
         #endregion
@@ -82,12 +83,25 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(TargetQuantity))
+            {
+                OnTargetQuantityChanged();
+            }
+            else if (propertyName == nameof(TargetQuantityUOM))
+            {
+                OnTargetQuantityUOMChanged();
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region Partial Methods
 
         bool _OnTargetQuantityChanging = false;
-        partial void OnTargetQuantityChanged()
+        protected void OnTargetQuantityChanged()
         {
-            if (!_OnTargetQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && SourcePartslistPos != null && SourcePartslistPos.Material != null && SourcePartslistPos.MDUnit != null)
+            if (!_OnTargetQuantityUOMChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && SourcePartslistPos != null && SourcePartslistPos.Material != null && SourcePartslistPos.MDUnit != null)
             {
                 _OnTargetQuantityChanging = true;
                 try
@@ -110,9 +124,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnTargetQuantityUOMChanging = false;
-        partial void OnTargetQuantityUOMChanged()
+        protected void OnTargetQuantityUOMChanged()
         {
-            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && SourcePartslistPos != null && SourcePartslistPos.Material != null && SourcePartslistPos.MDUnit != null)
+            if (!_OnTargetQuantityChanging && EntityState != Microsoft.EntityFrameworkCore.EntityState.Detached && SourcePartslistPos != null && SourcePartslistPos.Material != null && SourcePartslistPos.MDUnit != null)
             {
                 _OnTargetQuantityUOMChanging = true;
                 try

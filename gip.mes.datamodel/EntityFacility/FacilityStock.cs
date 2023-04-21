@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -279,9 +280,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnDayInwardDiffChanging(value);
-                this.ReportPropertyChanging("DayInwardDiff");
-                this._DayInwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("DayInwardDiff");
+                this.OnPropertyChanging(value, "DayInwardDiff", false);
+                this._DayInwardDiff = (float)value;
+                this.OnPropertyChanged("DayInwardDiff");
                 this.OnDayInwardDiffChanged();
             }
         }
@@ -304,9 +305,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnDayInwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("DayInwardDiffPercent");
-                this._DayInwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("DayInwardDiffPercent");
+                this.OnPropertyChanging(value, "DayInwardDiffPercent", false);
+                this._DayInwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("DayInwardDiffPercent");
                 this.OnDayInwardDiffPercentChanged();
             }
         }
@@ -329,9 +330,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnDayOutwardDiffChanging(value);
-                this.ReportPropertyChanging("DayOutwardDiff");
-                this._DayOutwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("DayOutwardDiff");
+                this.OnPropertyChanging(value, "DayOutwardDiff", false);
+                this._DayOutwardDiff = (float?)value;
+                this.OnPropertyChanged("DayOutwardDiff");
                 this.OnDayOutwardDiffChanged();
             }
         }
@@ -354,9 +355,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnDayOutwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("DayOutwardDiffPercent");
-                this._DayOutwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("DayOutwardDiffPercent");
+                this.OnPropertyChanging(value, "DayOutwardDiffPercent", false);
+                this._DayOutwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("DayOutwardDiffPercent");
                 this.OnDayOutwardDiffPercentChanged();
             }
         }
@@ -379,9 +380,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnWeekInwardDiffChanging(value);
-                this.ReportPropertyChanging("WeekInwardDiff");
-                this._WeekInwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("WeekInwardDiff");
+                this.OnPropertyChanging(value, "WeekInwardDiff", false);
+                this._WeekInwardDiff = (float?)value;
+                this.OnPropertyChanged("WeekInwardDiff");
                 this.OnWeekInwardDiffChanged();
             }
         }
@@ -404,9 +405,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnWeekInwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("WeekInwardDiffPercent");
-                this._WeekInwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("WeekInwardDiffPercent");
+                this.OnPropertyChanging(value, "WeekInwardDiffPercent", false);
+                this._WeekInwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("WeekInwardDiffPercent");
                 this.OnWeekInwardDiffPercentChanged();
             }
         }
@@ -430,9 +431,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnWeekOutwardDiffChanging(value);
-                this.ReportPropertyChanging("WeekOutwardDiff");
-                this._WeekOutwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("WeekOutwardDiff");
+                this.OnPropertyChanging(value, "WeekOutwardDiff", false);
+                this._WeekOutwardDiff = (float?)value;
+                this.OnPropertyChanged("WeekOutwardDiff");
                 this.OnWeekOutwardDiffChanged();
             }
         }
@@ -455,9 +456,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnWeekOutwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("WeekOutwardDiffPercent");
-                this._WeekOutwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("WeekOutwardDiffPercent");
+                this.OnPropertyChanging(value, "WeekOutwardDiffPercent", false);
+                this._WeekOutwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("WeekOutwardDiffPercent");
                 this.OnWeekOutwardDiffPercentChanged();
             }
         }
@@ -480,9 +481,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnMonthInwardDiffChanging(value);
-                this.ReportPropertyChanging("MonthInwardDiff");
-                this._MonthInwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("MonthInwardDiff");
+                this.OnPropertyChanging(value, "MonthInwardDiff", false);
+                this._MonthInwardDiff = (float?)value;
+                this.OnPropertyChanged("MonthInwardDiff");
                 this.OnMonthInwardDiffChanged();
             }
         }
@@ -505,9 +506,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnMonthInwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("MonthInwardDiffPercent");
-                this._MonthInwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("MonthInwardDiffPercent");
+                this.OnPropertyChanging(value, "MonthInwardDiffPercent", false);
+                this._MonthInwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("MonthInwardDiffPercent");
                 this.OnMonthInwardDiffPercentChanged();
             }
         }
@@ -531,9 +532,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnMonthOutwardDiffChanging(value);
-                this.ReportPropertyChanging("MonthOutwardDiff");
-                this._MonthOutwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("MonthOutwardDiff");
+                this.OnPropertyChanging(value, "MonthOutwardDiff", false);
+                this._MonthOutwardDiff = (float?)value;
+                this.OnPropertyChanged("MonthOutwardDiff");
                 this.OnMonthOutwardDiffChanged();
             }
         }
@@ -556,9 +557,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnMonthOutwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("MonthOutwardDiffPercent");
-                this._MonthOutwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("MonthOutwardDiffPercent");
+                this.OnPropertyChanging(value, "MonthOutwardDiffPercent", false);
+                this._MonthOutwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("MonthOutwardDiffPercent");
                 this.OnMonthOutwardDiffPercentChanged();
             }
         }
@@ -581,9 +582,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnYearInwardDiffChanging(value);
-                this.ReportPropertyChanging("YearInwardDiff");
-                this._YearInwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("YearInwardDiff");
+                this.OnPropertyChanging(value, "YearInwardDiff", false);
+                this._YearInwardDiff = (float?)value;
+                this.OnPropertyChanged("YearInwardDiff");
                 this.OnYearInwardDiffChanged();
             }
         }
@@ -606,9 +607,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnYearInwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("YearInwardDiffPercent");
-                this._YearInwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("YearInwardDiffPercent");
+                this.OnPropertyChanging(value, "YearInwardDiffPercent", false);
+                this._YearInwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("YearInwardDiffPercent");
                 this.OnYearInwardDiffPercentChanged();
             }
         }
@@ -631,9 +632,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnYearOutwardDiffChanging(value);
-                this.ReportPropertyChanging("YearOutwardDiff");
-                this._YearOutwardDiff = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("YearOutwardDiff");
+                this.OnPropertyChanging(value, "YearOutwardDiff", false);
+                this._YearOutwardDiff = (float?)value;
+                this.OnPropertyChanged("YearOutwardDiff");
                 this.OnYearOutwardDiffChanged();
             }
         }
@@ -656,9 +657,9 @@ namespace gip.mes.datamodel
             set
             {
                 this.OnYearOutwardDiffPercentChanging(value);
-                this.ReportPropertyChanging("YearOutwardDiffPercent");
-                this._YearOutwardDiffPercent = global::System.Data.Objects.DataClasses.StructuralObject.SetValidValue(value);
-                this.ReportPropertyChanged("YearOutwardDiffPercent");
+                this.OnPropertyChanging(value, "YearOutwardDiffPercent", false);
+                this._YearOutwardDiffPercent = (float?)value;
+                this.OnPropertyChanged("YearOutwardDiffPercent");
                 this.OnYearOutwardDiffPercentChanged();
             }
         }
@@ -789,29 +790,14 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnReservedOutwardQuantityChanged()
-        {
-            RefreshMinOptFields();
-        }
-
-        partial void OnReservedInwardQuantityChanged()
-        {
-            RefreshMinOptFields();
-        }
-
-        partial void OnStockQuantityChanged()
-        {
-            RefreshMinOptFields();
-        }
-
         public void RefreshMinOptFields()
         {
-            OnPropertyChanged("AvailableQuantity");
-            OnPropertyChanged("ReservedQuantity");
-            OnPropertyChanged("MinStockQuantityDiff");
-            OnPropertyChanged("MinStockQuantityExceeded");
-            OnPropertyChanged("OptStockQuantityDiff");
-            OnPropertyChanged("OptStockQuantityExceeded");
+            base.OnPropertyChanged("AvailableQuantity");
+            base.OnPropertyChanged("ReservedQuantity");
+            base.OnPropertyChanged("MinStockQuantityDiff");
+            base.OnPropertyChanged("MinStockQuantityExceeded");
+            base.OnPropertyChanged("OptStockQuantityDiff");
+            base.OnPropertyChanged("OptStockQuantityExceeded");
             if (this.Facility != null)
                 this.Facility.OnEntityPropertyChanged(null);
         }
@@ -865,6 +851,23 @@ namespace gip.mes.datamodel
         }
 
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(ReservedOutwardQuantity):
+                    RefreshMinOptFields();
+                    break;
+                case nameof(ReservedInwardQuantity):
+                    RefreshMinOptFields();
+                    break;
+                case nameof(StockQuantity):
+                    RefreshMinOptFields();
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
 
     }
 }

@@ -260,7 +260,7 @@ namespace gip.mes.datamodel
         {
             foreach (ProdOrderPartslist pOPl in this.ProdOrderPartslist_ProdOrder)
             {
-                pOPl.RecalcActualQuantity(mergeOption, true);
+                pOPl.RecalcActualQuantity(true);
             }
         }
 

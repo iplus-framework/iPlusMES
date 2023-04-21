@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace gip.mes.datamodel
 {
@@ -255,9 +258,13 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnSequenceChanged()
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            OnPropertyChanged("Position");
+            if (propertyName == nameof(Sequence))
+            {
+                base.OnPropertyChanged("Position");
+            }
+            base.OnPropertyChanged(propertyName);
         }
 
 

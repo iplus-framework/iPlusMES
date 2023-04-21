@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -967,6 +968,20 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(VBiProgramACClassMethodID):
+                    base.OnPropertyChanged("ProgramACClassMethod");
+                    break;
+                case nameof(VBiStackCalculatorACClassID):
+                    base.OnPropertyChanged("StackCalculatorACClass");
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region VBIplus-Context
         private gip.core.datamodel.ACClassMethod _ProgramACClassMethod;
         [ACPropertyInfo(9999, "", "en{'Program Method'}de{'Programmmethode'}", Const.ContextDatabaseIPlus + "\\ACClassMethod")]
@@ -1019,11 +1034,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnVBiProgramACClassMethodIDChanged()
-        {
-            OnPropertyChanged("ProgramACClassMethod");
-        }
-
         private gip.core.datamodel.ACClass _StackCalculatorACClass;
         [ACPropertyInfo(9999, "", "en{'Stack Posting Type'}de{'Stapelbuchungsart'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
         public gip.core.datamodel.ACClass StackCalculatorACClass
@@ -1073,11 +1083,6 @@ namespace gip.mes.datamodel
                     this.VBiStackCalculatorACClass = value2;
                 }
             }
-        }
-
-        partial void OnVBiStackCalculatorACClassIDChanged()
-        {
-            OnPropertyChanged("StackCalculatorACClass");
         }
 
         #endregion

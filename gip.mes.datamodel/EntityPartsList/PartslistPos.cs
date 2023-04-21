@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -378,12 +379,25 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(TargetQuantity))
+            {
+                OnTargetQuantityChanged();
+            }
+            else if (propertyName == nameof(TargetQuantityUOM))
+            {
+                OnTargetQuantityUOMChanged();
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region Partial Methods
 
         bool _OnTargetQuantityChanging = false;
-        partial void OnTargetQuantityChanged()
+        protected void OnTargetQuantityChanged()
         {
-            if (!_OnTargetQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnTargetQuantityUOMChanging && EntityState != EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnTargetQuantityChanging = true;
                 try
@@ -406,9 +420,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnTargetQuantityUOMChanging = false;
-        partial void OnTargetQuantityUOMChanged()
+        protected void OnTargetQuantityUOMChanged()
         {
-            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (!_OnTargetQuantityChanging && EntityState != EntityState.Detached && Material != null && MDUnit != null)
             {
                 _OnTargetQuantityUOMChanging = true;
                 try

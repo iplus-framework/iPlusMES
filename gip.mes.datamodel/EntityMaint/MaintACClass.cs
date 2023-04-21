@@ -26,7 +26,7 @@ namespace gip.mes.datamodel
             var entity = new MaintACClass();
             entity.MaintACClassID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            dbApp.MaintACClass.AddObject(entity);
+            dbApp.MaintACClass.Add(entity);
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
@@ -41,6 +41,10 @@ namespace gip.mes.datamodel
                 //else
                 //    NextMaintTerm = null;
                 OnPropertyChanged("NextMaintTerm");
+            }
+            else if (property == nameof(VBiACClassID))
+            {
+                OnPropertyChanged("FacilityACClass");
             }
             //else if (property == "MDMaintModeID")
             //{
@@ -193,11 +197,6 @@ namespace gip.mes.datamodel
                     this.VBiACClass = value2;
                 }
             }
-        }
-
-        partial void OnVBiACClassIDChanged()
-        {
-            OnPropertyChanged("FacilityACClass");
         }
 
         public gip.core.datamodel.ACClass GetACClass(Database db)

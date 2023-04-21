@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -171,6 +172,29 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(ValueMax):
+                    base.OnPropertyChanged("ExceedState");
+                    break;
+                case nameof(ValueMaxMax):
+                    base.OnPropertyChanged("ExceedState");
+                    break;
+                case nameof(ValueMin):
+                    base.OnPropertyChanged("ExceedState");
+                    break;
+                case nameof(ValueMinMin):
+                    base.OnPropertyChanged("ExceedState");
+                    break;
+                case nameof(ActualValue):
+                    base.OnPropertyChanged("ExceedState");
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region Exceed
         public enum ExceedStates : short
         {
@@ -179,32 +203,6 @@ namespace gip.mes.datamodel
             WarningMax = 2,
             ErrorMin = 3,
             ErrorMax = 4
-        }
-
-
-        partial void OnValueMaxChanged()
-        {
-            OnPropertyChanged("ExceedState");
-        }
-
-        partial void OnValueMaxMaxChanged()
-        {
-            OnPropertyChanged("ExceedState");
-        }
-
-        partial void OnValueMinChanged()
-        {
-            OnPropertyChanged("ExceedState");
-        }
-
-        partial void OnValueMinMinChanged()
-        {
-            OnPropertyChanged("ExceedState");
-        }
-
-        partial void OnActualValueChanged()
-        {
-            OnPropertyChanged("ExceedState");
         }
 
         [ACPropertyInfo(1000, "", "en{'Exceedstate'}de{'Überschreitungsstatus'}")]

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Transactions;
 using gip.core.datamodel;
@@ -213,10 +214,15 @@ namespace gip.mes.datamodel
                 return this.VBiACClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
         }
 
-        partial void OnVBiACClassIDChanged()
-        {
-            OnPropertyChanged("FacilityACClass");
-        }
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(VBiACClassID))
+            {
+                OnPropertyChanged("FacilityACClass");
+            }
+            base.OnPropertyChanged(propertyName);
+        }
     }
 }

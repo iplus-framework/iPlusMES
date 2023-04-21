@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Mvc;
 
 namespace gip.mes.datamodel
 {
@@ -267,20 +269,23 @@ namespace gip.mes.datamodel
             }
         }
 
-
         public void OnPricePropertyChanged()
         {
-            OnPropertyChanged("PosPriceNetTotal");
-            OnPropertyChanged("PosPriceNetDiscount");
-            OnPropertyChanged("PosPriceNetSum");
-            OnPropertyChanged("ForeginPosPriceNetTotal");
-            OnPropertyChanged("ForeginPosPriceNetDiscount");
-            OnPropertyChanged("ForeginPosPriceNetSum");
+            base.OnPropertyChanged("PosPriceNetTotal");
+            base.OnPropertyChanged("PosPriceNetDiscount");
+            base.OnPropertyChanged("PosPriceNetSum");
+            base.OnPropertyChanged("ForeginPosPriceNetTotal");
+            base.OnPropertyChanged("ForeginPosPriceNetDiscount");
+            base.OnPropertyChanged("ForeginPosPriceNetSum");
         }
 
-        partial void OnPriceGrossChanged()
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            OnPropertyChanged("ForeignPriceGross");
+            if (propertyName == nameof(PriceGross))
+            {
+                OnPropertyChanged("ForeignPriceGross");
+            }
+            base.OnPropertyChanged(propertyName);
         }
 
         [ACPropertyInfo(38, "", "en{'Due date'}de{'Fälligkeitsdatum'}")]

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -634,10 +635,14 @@ namespace gip.mes.datamodel
             OnPropertyChanged(nameof(CompleteFactor));
         }
 
-        partial void OnPickingMaterialIDChanged()
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            OnPropertyChanged(nameof(Material));
-            OnPropertyChanged(nameof(MDUnit));
+            if (propertyName == nameof(PickingMaterialID))
+            {
+                base.OnPropertyChanged(nameof(Material));
+                base.OnPropertyChanged(nameof(MDUnit));
+            }
+            base.OnPropertyChanged(propertyName);
         }
 
         #endregion

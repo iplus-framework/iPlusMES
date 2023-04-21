@@ -6,6 +6,7 @@ using System.Reflection;
 using gip.core.datamodel;
 using gipCoreData = gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -193,11 +194,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnVBiACClassIDChanged()
-        {
-            OnPropertyChanged(gip.core.datamodel.ACClass.ClassName);
-        }
-
         private gip.core.datamodel.ACClass _ValueTypeACClass;
         /// <summary>
         /// Metadata (iPlus-Type) of the Value-Property. ATTENTION: ACClass is a EF-Object. Therefore the access to Navigation-Properties must be secured using the QueryLock_1X000 of the Global Database-Context!
@@ -244,11 +240,6 @@ namespace gip.mes.datamodel
                     this.VBiValueTypeACClass = value2;
                 }
             }
-        }
-
-        partial void OnVBiValueTypeACClassIDChanged()
-        {
-            OnPropertyChanged("ValueTypeACClass");
         }
 
         private gip.core.datamodel.ACClassPropertyRelation _ACClassPropertyRelation;
@@ -306,10 +297,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnVBiACClassPropertyRelationIDChanged()
-        {
-            OnPropertyChanged("ACClassPropertyRelation");
-        }
         #endregion
 
         #region IACConfig
@@ -435,5 +422,22 @@ namespace gip.mes.datamodel
         }
 
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(VBiACClassID):
+                    base.OnPropertyChanged(gip.core.datamodel.ACClass.ClassName);
+                    break;
+                case nameof(VBiValueTypeACClassID):
+                    base.OnPropertyChanged("ValueTypeACClass");
+                    break;
+                case nameof(VBiACClassPropertyRelationID):
+                    base.OnPropertyChanged("ACClassPropertyRelation");
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
     }
 }

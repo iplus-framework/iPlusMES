@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -525,30 +526,31 @@ namespace gip.mes.datamodel
             }
         }
 
-
-        partial void OnReservedOutwardQuantityChanged()
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            RefreshMinOptFields();
-        }
-
-        partial void OnReservedInwardQuantityChanged()
-        {
-            RefreshMinOptFields();
-        }
-
-        partial void OnStockQuantityChanged()
-        {
-            RefreshMinOptFields();
+            switch (propertyName)
+            {
+                case nameof(ReservedOutwardQuantity):
+                    RefreshMinOptFields();
+                    break;
+                case nameof(ReservedInwardQuantity):
+                    RefreshMinOptFields();
+                    break;
+                case nameof(StockQuantity):
+                    RefreshMinOptFields();
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
         }
 
         public void RefreshMinOptFields()
         {
-            OnPropertyChanged("AvailableQuantity");
-            OnPropertyChanged("ReservedQuantity");
-            OnPropertyChanged("MinStockQuantityDiff");
-            OnPropertyChanged("MinStockQuantityExceeded");
-            OnPropertyChanged("OptStockQuantityDiff");
-            OnPropertyChanged("OptStockQuantityExceeded");
+            base.OnPropertyChanged("AvailableQuantity");
+            base.OnPropertyChanged("ReservedQuantity");
+            base.OnPropertyChanged("MinStockQuantityDiff");
+            base.OnPropertyChanged("MinStockQuantityExceeded");
+            base.OnPropertyChanged("OptStockQuantityDiff");
+            base.OnPropertyChanged("OptStockQuantityExceeded");
             if (this.Material != null)
                 this.Material.OnEntityPropertyChanged(null);
         }

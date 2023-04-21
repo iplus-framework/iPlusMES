@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -306,17 +307,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnPriceGrossChanged()
-        {
-            OnPropertyChanged("ForeignPriceGross");
-        }
-
-        partial void OnPriceNetChanged()
-        {
-            OnPropertyChanged("ForeignPriceNet");
-        }
-
-
         private string _MaterialNo;
         [ACPropertyInfo(41)]
         public string MaterialNo
@@ -422,6 +412,20 @@ namespace gip.mes.datamodel
         }
 
         #endregion
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(PriceGross):
+                    base.OnPropertyChanged("ForeignPriceGross");
+                    break;
+                case nameof(PriceNet):
+                    base.OnPropertyChanged("ForeignPriceNet");
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
 
     }
 }

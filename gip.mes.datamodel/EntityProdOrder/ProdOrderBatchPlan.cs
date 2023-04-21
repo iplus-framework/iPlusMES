@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 
@@ -164,6 +165,7 @@ namespace gip.mes.datamodel
         #region IEntityProperty Members
 
         bool bRefreshConfig = false;
+        BatchPlanMode _PreviousMode = BatchPlanMode.UseBatchCount;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
             if (propertyName == nameof(XMLConfig))
@@ -180,6 +182,12 @@ namespace gip.mes.datamodel
                     if (this.EntityState != EntityState.Detached && (!(String.IsNullOrEmpty(xmlConfig) && String.IsNullOrEmpty(XMLConfig)) && xmlConfig != XMLConfig))
                         bRefreshConfig = true;
                 }
+            }
+            else if (propertyName == nameof(PlanModeIndex))
+            {
+                if (EntityState == EntityState.Detached)
+                    return;
+                _PreviousMode = this.PlanMode;
             }
             base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
@@ -381,12 +389,41 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(BatchNoFrom):
+                    OnBatchNoFromChanged();
+                    break;
+                case nameof(BatchNoTo):
+                    OnBatchNoToChanged();
+                    break;
+                case nameof(BatchTargetCount):
+                    OnBatchTargetCountChanged();
+                    break;
+                case nameof(BatchSize):
+                    OnBatchSizeChanged();
+                    break;
+                case nameof(TotalSize):
+                    OnTotalSizeChanged();
+                    break;
+                case nameof(PlanModeIndex):
+                    OnPlanModeIndexChanged();
+                    break;
+                case nameof(PlanStateIndex):
+                    OnPlanStateIndexChanged();
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
         #region Partial methods
 
         bool _OnBatchBatchNoFromChanging = false;
-        partial void OnBatchNoFromChanged()
+        protected void OnBatchNoFromChanged()
         {
-            if (EntityState == System.Data.EntityState.Detached)
+            if (EntityState == EntityState.Detached)
                 return;
             if (this.PlanMode != BatchPlanMode.UseFromTo)
                 return;
@@ -403,8 +440,8 @@ namespace gip.mes.datamodel
                 {
                     this.TotalSize = 0;
                 }
-                OnPropertyChanged("TotalSizeAltUOM");
-                OnPropertyChanged("BatchSizeAltUOM");
+                base.OnPropertyChanged("TotalSizeAltUOM");
+                base.OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -421,9 +458,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnBatchBatchNoToChanging = false;
-        partial void OnBatchNoToChanged()
+        protected void OnBatchNoToChanged()
         {
-            if (EntityState == System.Data.EntityState.Detached)
+            if (EntityState == EntityState.Detached)
                 return;
             if (this.PlanMode != BatchPlanMode.UseFromTo)
                 return;
@@ -440,8 +477,8 @@ namespace gip.mes.datamodel
                 {
                     this.TotalSize = 0;
                 }
-                OnPropertyChanged("TotalSizeAltUOM");
-                OnPropertyChanged("BatchSizeAltUOM");
+                base.OnPropertyChanged("TotalSizeAltUOM");
+                base.OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -458,9 +495,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnBatchTargetCountChanging = false;
-        partial void OnBatchTargetCountChanged()
+        protected void OnBatchTargetCountChanged()
         {
-            if (EntityState == System.Data.EntityState.Detached)
+            if (EntityState == EntityState.Detached)
                 return;
             if (this.PlanMode != BatchPlanMode.UseBatchCount)
                 return;
@@ -470,8 +507,8 @@ namespace gip.mes.datamodel
             try
             {
                 this.TotalSize = this.BatchTargetCount * this.BatchSize;
-                OnPropertyChanged("TotalSizeAltUOM");
-                OnPropertyChanged("BatchSizeAltUOM");
+                base.OnPropertyChanged("TotalSizeAltUOM");
+                base.OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -488,9 +525,9 @@ namespace gip.mes.datamodel
         }
 
         bool _OnBatchSizeChanging = false;
-        partial void OnBatchSizeChanged()
+        protected void OnBatchSizeChanged()
         {
-            if (EntityState == System.Data.EntityState.Detached)
+            if (EntityState == EntityState.Detached)
                 return;
             if (this.PlanMode == BatchPlanMode.UseTotalSize)
                 return;
@@ -515,8 +552,8 @@ namespace gip.mes.datamodel
                         this.TotalSize = 0;
                     }
                 }
-                OnPropertyChanged("TotalSizeAltUOM");
-                OnPropertyChanged("BatchSizeAltUOM");
+                base.OnPropertyChanged("TotalSizeAltUOM");
+                base.OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -533,14 +570,14 @@ namespace gip.mes.datamodel
         }
 
         bool _OnTotalSizeChanging = false;
-        partial void OnTotalSizeChanged()
+        protected void OnTotalSizeChanged()
         {
-            if (EntityState == System.Data.EntityState.Detached)
+            if (EntityState == EntityState.Detached)
                 return;
-            OnPropertyChanged("RemainingQuantity");
-            OnPropertyChanged("DifferenceQuantity");
-            OnPropertyChanged("YieldBatchSize");
-            OnPropertyChanged("YieldTotalSize");
+            base.OnPropertyChanged("RemainingQuantity");
+            base.OnPropertyChanged("DifferenceQuantity");
+            base.OnPropertyChanged("YieldBatchSize");
+            base.OnPropertyChanged("YieldTotalSize");
             if (this.PlanMode != BatchPlanMode.UseTotalSize)
                 return;
             if (_OnBatchSizeChanging || _OnBatchTargetCountChanging || _OnBatchBatchNoToChanging || _OnBatchBatchNoFromChanging || _OnPlanModeIndexChanging)
@@ -556,17 +593,16 @@ namespace gip.mes.datamodel
 
 
         bool _OnPlanModeIndexChanging = false;
-        BatchPlanMode _PreviousMode = BatchPlanMode.UseBatchCount;
-        partial void OnPlanModeIndexChanging(global::System.Int16 value)
-        {
-            if (EntityState == System.Data.EntityState.Detached)
-                return;
-            _PreviousMode = this.PlanMode;
-        }
+        //partial void OnPlanModeIndexChanging(global::System.Int16 value)
+        //{
+        //    if (EntityState == System.Data.EntityState.Detached)
+        //        return;
+        //    _PreviousMode = this.PlanMode;
+        //}
 
-        partial void OnPlanModeIndexChanged()
+        protected void OnPlanModeIndexChanged()
         {
-            if (EntityState == System.Data.EntityState.Detached)
+            if (EntityState == EntityState.Detached)
                 return;
             _OnPlanModeIndexChanging = true;
             try
@@ -620,10 +656,10 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnPlanStateIndexChanged()
+        protected void OnPlanStateIndexChanged()
         {
-            OnPropertyChanged("PlanState");
-            OnPropertyChanged("PlanStateIndexName");
+            base.OnPropertyChanged("PlanState");
+            base.OnPropertyChanged("PlanStateIndexName");
         }
 
         [ACPropertyInfo(15, "", "en{'Called-up Quantity'}de{'Abgerufene Menge'}")]
