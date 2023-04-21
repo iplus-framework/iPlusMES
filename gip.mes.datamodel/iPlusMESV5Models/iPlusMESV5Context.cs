@@ -353,6 +353,8 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<MsgAlarmLog> MsgAlarmLog { get; set; }
 
+    public virtual DbSet<OperationLog> OperationLog { get; set; }
+
     public virtual DbSet<OrderLog> OrderLog { get; set; }
 
     public virtual DbSet<OrderLogPosMachines> OrderLogPosMachines { get; set; }
@@ -540,8 +542,9 @@ public partial class iPlusMESV5Context : DbContext
     public virtual DbSet<Weighing> Weighing { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=.\\;Database=iPlusMESV5;Trusted_Connection=True;Encrypt=False");
+    {
+
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -7299,6 +7302,32 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACProgramLog).WithMany(p => p.MsgAlarmLog_ACProgramLog)
                 .HasForeignKey(d => d.ACProgramLogID)
                 .HasConstraintName("FK_MsgAlarmLog_ACProgramLogID");
+        });
+
+        modelBuilder.Entity<OperationLog>(entity =>
+        {
+            entity.ToTable("OperationLog");
+
+            entity.Property(e => e.OperationLogID).ValueGeneratedNever();
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.OperationTime).HasColumnType("datetime");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.ACProgramLog).WithMany(p => p.OperationLog_ACProgramLog)
+                 .HasForeignKey(d => d.ACProgramLogID)
+                 .HasConstraintName("FK_OperationLog_ACProgramLog");
+
+            entity.HasOne(d => d.FacilityCharge).WithMany(p => p.OperationLog_FacilityCharge)
+                 .HasForeignKey(d => d.FacilityChargeID)
+                 .HasConstraintName("FK_OperationLog_FacilityCharge");
         });
 
         modelBuilder.Entity<OrderLog>(entity =>

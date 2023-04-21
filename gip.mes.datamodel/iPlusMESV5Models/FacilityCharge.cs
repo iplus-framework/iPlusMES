@@ -558,7 +558,27 @@ public partial class FacilityCharge : VBEntityObject , IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Reference("Material"); }
     }
-    
+
+    private ICollection<OperationLog> _OperationLog_FacilityCharge;
+    public virtual ICollection<OperationLog> OperationLog_FacilityCharge
+    {
+        get => LazyLoader.Load(this, ref _OperationLog_FacilityCharge);
+        set => _OperationLog_FacilityCharge = value;
+    }
+
+    public bool OperationLog_FacilityCharge_IsLoaded
+    {
+        get
+        {
+            return OperationLog_FacilityCharge != null;
+        }
+    }
+
+    public virtual CollectionEntry OperationLog_FacilityChargeReference
+    {
+        get { return Context.Entry(this).Collection(c => c.OperationLog_FacilityCharge); }
+    }
+
     private Partslist _Partslist;
     public virtual Partslist Partslist
     { 

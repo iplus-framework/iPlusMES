@@ -71,7 +71,7 @@ namespace gip.mes.datamodel
             outOperationLog.OperationTime = DateTime.Now;
             outOperationLog.ACProgramLogID = inOperationLog.ACProgramLogID;
 
-            dbApp.OperationLog.AddObject(outOperationLog);
+            dbApp.OperationLog.Add(outOperationLog);
 
             return dbApp.ACSaveChanges();
         }

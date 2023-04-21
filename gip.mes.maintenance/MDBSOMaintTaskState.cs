@@ -197,7 +197,7 @@ namespace gip.mes.maintenance
         {
             if (!PreExecute("New")) return;
             CurrentMaintTaskState = MDMaintTaskState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDMaintTaskState.AddObject(CurrentMaintTaskState);
+            DatabaseApp.MDMaintTaskState.Add(CurrentMaintTaskState);
             ACState = Const.SMNew;
             PostExecute("New");
 

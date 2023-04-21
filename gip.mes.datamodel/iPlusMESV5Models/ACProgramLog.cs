@@ -225,6 +225,26 @@ public partial class ACProgramLog : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MsgAlarmLog_ACProgramLog); }
     }
 
+    private ICollection<OperationLog> _OperationLog_ACProgramLog;
+    public virtual ICollection<OperationLog> OperationLog_ACProgramLog
+    {
+        get => LazyLoader.Load(this, ref _OperationLog_ACProgramLog);
+        set => _OperationLog_ACProgramLog = value;
+    }
+
+    public bool OperationLog_ACProgramLog_IsLoaded
+    {
+        get
+        {
+            return OperationLog_ACProgramLog != null;
+        }
+    }
+
+    public virtual CollectionEntry OperationLog_ACProgramLogReference
+    {
+        get { return Context.Entry(this).Collection(c => c.OperationLog_ACProgramLog); }
+    }
+
     private OrderLog _OrderLog_VBiACProgramLog;
     public virtual OrderLog OrderLog_VBiACProgramLog
     { 

@@ -83,7 +83,7 @@ namespace gip.mes.datamodel
             using (StringReader ms = new StringReader(handlingUnitXML))
             using (XmlTextReader xmlReader = new XmlTextReader(ms))
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(HandlingUnit), ACKnownTypes.GetKnownType(), 99999999, true, true, null, ACConvert.MyDataContractResolver);
+                DataContractSerializer serializer = new DataContractSerializer(typeof(HandlingUnit), new DataContractSerializerSettings() { KnownTypes = ACKnownTypes.GetKnownType(), MaxItemsInObjectGraph = 99999999, IgnoreExtensionDataObject = true, PreserveObjectReferences = true, DataContractResolver = ACConvert.MyDataContractResolver });
                 HandlingUnit handlingUnit = (HandlingUnit)serializer.ReadObject(xmlReader);
                 return handlingUnit;
             }
@@ -99,7 +99,7 @@ namespace gip.mes.datamodel
             using (StringWriter sw = new StringWriter(sb))
             using (XmlTextWriter xmlWriter = new XmlTextWriter(sw))
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(HandlingUnit), ACKnownTypes.GetKnownType(), 99999999, true, true, null, ACConvert.MyDataContractResolver);
+                DataContractSerializer serializer = new DataContractSerializer(typeof(HandlingUnit), new DataContractSerializerSettings() { KnownTypes = ACKnownTypes.GetKnownType(), MaxItemsInObjectGraph = 99999999, IgnoreExtensionDataObject = true, PreserveObjectReferences = true, DataContractResolver = ACConvert.MyDataContractResolver });
                 serializer.WriteObject(xmlWriter, this);
 
                 string handlingUnitXML = sw.ToString();

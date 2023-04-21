@@ -31,8 +31,8 @@ namespace gip.mes.datamodel
                 Material material = parentACObject as Material;
                 try
                 {
-                    if (!material.MaterialGMPAdditive_Material.IsLoaded)
-                        material.MaterialGMPAdditive_Material.Load();
+                    if (!material.MaterialGMPAdditive_Material_IsLoaded)
+                        material.MaterialGMPAdditive_Material.AutoLoad(material.MaterialGMPAdditive_MaterialReference, material);
                 }
                 catch (Exception ec)
                 {
@@ -72,7 +72,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             Material material = Material;
-            database.DeleteObject(this);
+            database.Remove(this);
             MaterialGMPAdditive.RenumberSequence(material, sequence);
             return null;
         }

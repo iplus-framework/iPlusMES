@@ -199,7 +199,7 @@ namespace gip.mes.maintenance
         {
             if (!PreExecute("New")) return;
             CurrentMaintOrderPropertyState = MDMaintOrderPropertyState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDMaintOrderPropertyState.AddObject(CurrentMaintOrderPropertyState);
+            DatabaseApp.MDMaintOrderPropertyState.Add(CurrentMaintOrderPropertyState);
             ACState = Const.SMNew;
             PostExecute("New");
 

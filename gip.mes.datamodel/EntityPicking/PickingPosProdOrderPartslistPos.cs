@@ -37,7 +37,7 @@ namespace gip.mes.datamodel
                 if (msg != null)
                     return msg;
             }
-            database.DeleteObject(this);
+            database.Remove(this);
             return null;
         }
 

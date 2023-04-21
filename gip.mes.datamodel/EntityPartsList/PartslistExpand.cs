@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
@@ -18,12 +19,11 @@ namespace gip.mes.datamodel
             : base(partsList, index, treeQuantityRatio, parent)
         {
             if (Partslist != null
-                && Partslist.EntityState == System.Data.EntityState.Unchanged
+                && Partslist.EntityState == EntityState.Unchanged
                 && Partslist.PartslistPos_Partslist != null
-                && Partslist.PartslistPos_Partslist.IsLoaded)
+                && Partslist.PartslistPos_Partslist_IsLoaded)
             {
-                Partslist.PartslistPos_Partslist.AutoLoad();
-                Partslist.PartslistPos_Partslist.AutoRefresh();
+                Partslist.PartslistPos_Partslist.AutoLoad(Partslist.PartslistPos_PartslistReference, Partslist);
             }
             LoadDisplayProperties(partsList, TreeQuantityRatio);
         }
@@ -118,9 +118,9 @@ namespace gip.mes.datamodel
         {
             bool isPartslistPresent = false;
             int i = 1;
-            if (   Partslist.EntityState == System.Data.EntityState.Added
-                || Partslist.EntityState == System.Data.EntityState.Detached
-                || Partslist.EntityState == System.Data.EntityState.Deleted
+            if (   Partslist.EntityState == EntityState.Added
+                || Partslist.EntityState == EntityState.Detached
+                || Partslist.EntityState == EntityState.Deleted
                 || Partslist.PartslistPos_Partslist == null)
             {
                 return;
@@ -160,10 +160,9 @@ namespace gip.mes.datamodel
                     if (   position.Material != null
                         && position.Material.Partslist_Material != null)
                     {
-                        if (position.Material.Partslist_Material.IsLoaded)
+                        if (position.Material.Partslist_Material_IsLoaded)
                         {
-                            position.Material.Partslist_Material.AutoLoad();
-                            position.Material.Partslist_Material.AutoRefresh();
+                            position.Material.Partslist_Material.AutoLoad(position.Material.Partslist_MaterialReference, position);
                         }
                         List<Partslist> positionPartslist =
                             position

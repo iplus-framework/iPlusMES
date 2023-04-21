@@ -223,7 +223,7 @@ namespace gip.mes.maintenance
         {
             if (!PreExecute("New")) return;
             CurrentMaintMode = MDMaintMode.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDMaintMode.AddObject(CurrentMaintMode);
+            DatabaseApp.MDMaintMode.Add(CurrentMaintMode);
             ACState = Const.SMNew;
             PostExecute("New");
 
