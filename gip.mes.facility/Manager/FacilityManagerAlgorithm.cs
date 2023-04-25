@@ -1410,12 +1410,22 @@ namespace gip.mes.facility
                     else if (BP.ParamsAdjusted.InwardMaterial != null)
                     {
                         Guid? guidNull = null;
-                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
-                                                                                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
-                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false), BP);
+
+                        if (BP.MDZeroStockState != null && (BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility 
+                                                         || BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable))
+                        {
+                            facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_LastAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.InwardFacility.FacilityID), BP);
+                        }
+                        else
+                        {
+                            facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                                                                                                    BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                                                                                    BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                    false), BP);
+                        }
                     }
                     // Keine Materialnummer vorgegeben
                     else

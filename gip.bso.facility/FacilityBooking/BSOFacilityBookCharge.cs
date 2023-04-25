@@ -1647,7 +1647,16 @@ namespace gip.bso.facility
 
         public bool BookAvailableFacilityCharge(bool withRefresh)
         {
-            CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailable);
+            //Question50097: Do you want to restore a last stock?
+            if (Messages.Question(this, "Question50098") == Global.MsgResult.Yes)
+            {
+                CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable);
+            }
+            else
+            {
+                CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailable);
+            }
+            
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);

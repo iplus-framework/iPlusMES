@@ -2515,6 +2515,14 @@ namespace gip.mes.facility
                     else if ((InwardFacilityCharge != null) && (OutwardFacilityCharge != null))
                         AddBookingMessage(eResultCodes.RequiredParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00023"));
                 }
+                else if (MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility)
+                {
+                    if ((InwardMaterial != null) || (InwardFacilityCharge != null) || (InwardFacilityLot != null) || (InwardFacilityLocation != null)
+                        || (OutwardMaterial != null) || (OutwardFacilityCharge != null) || (OutwardFacilityLot != null) || (OutwardFacilityLocation != null))
+                        AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00022"));
+                    else if ((InwardFacility != null) && (OutwardFacility != null))
+                        AddBookingMessage(eResultCodes.RequiredParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00023"));
+                }
                 else // if (ZeroStock <= Global.ZeroStockState.SetNotAvailable)
                 {
                 }
@@ -3046,6 +3054,18 @@ namespace gip.mes.facility
 
             if (!AreFacilityEntitiesNeeded || !IsCallForBooking)
                 return true;
+
+            if (ParamsAdjusted.MDZeroStockState != null && ParamsAdjusted.InwardFacility != null
+                                                        && (ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility 
+                                                         || ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable))
+            {
+                FacilityCharge lastQuant = FacilityManager.s_cQry_FCList_Fac_LastAvailable(ParamsAdjusted.DatabaseApp, ParamsAdjusted.InwardFacility.FacilityID)?.FirstOrDefault();
+                if (lastQuant != null)
+                {
+                    ParamsAdjusted.InwardMaterial = lastQuant.Material;
+                    return true;
+                }
+            }
 
             AddBookingMessage(eResultCodes.EmptyParameterCouldNotBeDerived, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00049"));
             return false;

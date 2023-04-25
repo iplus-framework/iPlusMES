@@ -95,6 +95,15 @@ namespace gip.mes.facility
             {
                 return SetZeroStock(isInwardBooking, shiftBookingReverse, negativeStockAllowed, quantityUOM, mdUnitUOM, facilityCharges, BP, stackItemListInOut, msgBookingResult);
             }
+
+            if ((BP.ParamsAdjusted.MDZeroStockState != null)
+                && ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility)
+                    || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable)))
+            {
+                bool restoreLastQuantity = BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable;
+                return ResetZeroStock(isInwardBooking, shiftBookingReverse, negativeStockAllowed, restoreLastQuantity, quantityUOM, mdUnitUOM, facilityCharges, BP, stackItemListInOut, msgBookingResult);
+            }
+
             // Falls Sperrung/Freigabe
             else if (BP.ParamsAdjusted.MDReleaseState != null)
             {
@@ -105,8 +114,6 @@ namespace gip.mes.facility
             {
                 return InternCalculateInOut(isInwardBooking, shiftBookingReverse, negativeStockAllowed, quantityUOM, mdUnitUOM, facilityCharges, BP, stackItemListInOut, msgBookingResult, isRetrogradePosting);
             }
-
-
         }
 
         private Global.ACMethodResultState SetZeroStock(bool isInwardBooking, // false: Outward, true: Inward
@@ -131,6 +138,48 @@ namespace gip.mes.facility
             foreach (var facilityCharge in facilityCharges)
             {
                 bookingResult = AddQuantityToStackItemList(ItemListId.InOut, facilityCharge, facilityCharge.StockQuantity == 0 ? 0 : facilityCharge.StockQuantity * (-1), false, isInwardBooking, stackItemListInOut, localStackItemListRelocation, localStackItemListReOrganize, msgBookingResult);
+                if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                    return bookingResult;
+            }
+            return bookingResult;
+
+        }
+
+
+        private Global.ACMethodResultState ResetZeroStock(bool isInwardBooking, // false: Outward, true: Inward
+                        bool shiftBookingReverse, // false: normal, true: reverse booking
+                        bool negativeStockAllowed,
+                        bool restoreLastQuantity,
+                        Double quantityUOM, MDUnit mdUnitUOM,
+                        IEnumerable<FacilityCharge> facilityCharges,
+                        ACMethodBooking BP,
+                        StackItemList stackItemListInOut,
+                        MsgBooking msgBookingResult)
+        {
+            Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
+            StackItemList localStackItemListRelocation = new StackItemList();
+            StackItemList localStackItemListReOrganize = new StackItemList();
+
+            int nCountElements = facilityCharges.Count();
+            if (nCountElements <= 0)
+            {
+                return bookingResult;
+            }
+
+            foreach (var facilityCharge in facilityCharges)
+            {
+                double quantity = 0;
+                if (restoreLastQuantity && facilityCharge.NotAvailable)
+                {
+                    FacilityBookingCharge fbc = facilityCharge.FacilityBookingCharge_InwardFacilityCharge
+                                                              .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                              .OrderByDescending(c => c.InsertDate)
+                                                              .FirstOrDefault();
+
+                    quantity = fbc.InwardQuantity * (-1);
+                }
+
+                bookingResult = AddQuantityToStackItemList(ItemListId.InOut, facilityCharge, quantity, false, isInwardBooking, stackItemListInOut, localStackItemListRelocation, localStackItemListReOrganize, msgBookingResult);
                 if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                     return bookingResult;
             }
