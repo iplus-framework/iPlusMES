@@ -27,9 +27,16 @@ namespace gip.mes.datamodel
         StorageBinContainer = 1110,
 
         /// <summary>
-        /// Bin for prepration of imermediate material
+        /// Bin for prepration of intermediate material
         /// </summary>
         PreparationBin = 1120,
+
+
+        /// <summary>
+        /// Virtual Inventory place where Inventory is stored as FacilityCharge
+        /// Or Machines that are related to ACClass for OEE-Calculation
+        /// </summary>
+        MachineOrInventory = 1200,
 
         /// <summary>
         /// Vehilce

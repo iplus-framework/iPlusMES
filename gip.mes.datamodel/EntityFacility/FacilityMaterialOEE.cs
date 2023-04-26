@@ -278,14 +278,14 @@ namespace gip.mes.datamodel
         {
             // TODO:
             Random random = new Random();
-            PerformanceOEE = random.Next(1, 100) / 100;
+            PerformanceOEE = ((double) random.Next(1, 100)) / 100.0;
         }
 
         public void CalcQualityOEE()
         {
             // TODO:
             Random random = new Random();
-            QualityOEE = random.Next(1, 100) / 100;
+            QualityOEE = ((double)random.Next(1, 100)) / 100.0;
         }
 
         public void CalcOEE()
@@ -293,7 +293,7 @@ namespace gip.mes.datamodel
             CalcAvailabilityOEE();
             CalcPerformanceOEE();
             CalcQualityOEE();
-            this.TotalOEE = AvailabilityOEE > double.Epsilon ? AvailabilityOEE : 1 * PerformanceOEE > double.Epsilon ? PerformanceOEE : 1 * QualityOEE > double.Epsilon ? QualityOEE : 1;
+            this.TotalOEE = (AvailabilityOEE > double.Epsilon ? AvailabilityOEE : 1) * (PerformanceOEE > double.Epsilon ? PerformanceOEE : 1) * (QualityOEE > double.Epsilon ? QualityOEE : 1);
         }
 
         #endregion

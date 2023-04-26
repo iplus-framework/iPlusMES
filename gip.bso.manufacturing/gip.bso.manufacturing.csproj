@@ -119,6 +119,9 @@
     <Compile Include="Model\WorkCenter\WorkCenterItemFunction.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterRule.cs" />
     <Compile Include="Model\WorkCenter\WorkTaskOnHoldItem.cs" />
+    <Compile Include="OEE\BSOFacilityOEEView.cs" />
+    <Compile Include="OEE\FacilityOEEGraphItem.cs" />
+    <Compile Include="OEE\FacilityOEEAvg.cs" />
     <Compile Include="Planning\BSODemandOrder.cs" />
     <Compile Include="Planning\BSOProdMatRequirement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -151,6 +154,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
       <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
       <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.bso.facility\gip.bso.facility.csproj">
+      <Project>{9d0a5a8e-7c05-4f37-8e98-848c8e9db4e4}</Project>
+      <Name>gip.bso.facility</Name>
     </ProjectReference>
     <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj">
       <Project>{64342646-dad9-441c-a270-2a7dd2228a42}</Project>
@@ -570,6 +577,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2023-04-05 17-21_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-24 17-00_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-26 14-36_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -26,7 +26,7 @@ namespace gip.bso.manufacturing
     /// <summary>
     /// Class BSOPropertyLogPresenterVB
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Equipment Analysis MES (OEE)'}de{'Geräteanalyse MES (OEE)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Analysis of plant logs'}de{'Auswertung der Anlagenprotokolle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOPropertyLogPresenterVB : VBBSOPropertyLogPresenter
     {
         #region c´tors
