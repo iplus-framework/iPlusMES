@@ -127,6 +127,7 @@
     <Compile Include="Model\ActualSalesTax.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
+    <Compile Include="Model\PartslistValidationInfo.cs" />
     <Compile Include="Model\OEE\FacilityOEEAvg.cs" />
     <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
     <Compile Include="Model\PlanningTargetStockPreview.cs" />

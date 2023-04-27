@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using gip.mes.facility;
 using System.ComponentModel;
 using System;
+using dbMes = gip.mes.datamodel;
+using System.ComponentModel.Design;
 
 namespace gip.bso.masterdata
 {
@@ -13,18 +15,21 @@ namespace gip.bso.masterdata
 
         #region DI
 
-        public RuleGroup RuleGroup { get; private set; }
+        public RuleGroup RuleGroup { get; set; }
 
         public bool PropagateRuleSelection { get; set; }
 
         #endregion
 
         #region ctor's
-        public RuleSelection(RuleGroup ruleGroup)
-        {
-            RuleGroup = ruleGroup;
-            RuleSelectionID = Guid.NewGuid();
-        }
+        //public RuleSelection(RuleGroup ruleGroup, dbMes.Material material, RouteItem routeItem, string preConfigACUrl)
+        //{
+        //    RuleSelectionID = Guid.NewGuid();
+        //    RuleGroup = ruleGroup;
+        //    Material = material;
+        //    RouteItem = routeItem;
+        //    PreConfigACUrl = preConfigACUrl;
+        //}
         #endregion
 
         #region Properies
@@ -33,30 +38,35 @@ namespace gip.bso.masterdata
 
         public string PreConfigACUrl { get; set; }
 
-        public string ConfigACUrl_Excluded_process_modules
+        public string GetConfigACUrl(ACClassWF aCClassWF)
         {
-            get
-            {
-                return WF?.PWNode?.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Excluded_process_modules.ToString();
-            }
+            return aCClassWF?.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Excluded_process_modules.ToString();
         }
 
         [ACPropertyInfo(100, "", Const.Workflow)]
-        public MapPosToWFConn WF { get; set; }
+        public List<ACClassWF> PWNodes { get; private set; } = new List<ACClassWF>();
 
-        private List<RuleItem> _Items;
-        [ACPropertyInfo(101, "", "en{'Items'}de{'Items'}")]
-        public List<RuleItem> Items
+        [ACPropertyInfo(101, "", dbMes.ConstApp.Material)]
+        public dbMes.Material Material { get; set; }
+
+        [ACPropertyInfo(102, "", Const.Workflow)]
+        public ACClass Source { get; set; }
+
+        [ACPropertyInfo(103, "", Const.Workflow)]
+        public ACClass Target { get; set; }
+
+        private bool _IsSelected;
+        [ACPropertyInfo(104, "", gip.mes.datamodel.ConstApp.Select)]
+        public bool IsSelected
         {
             get
             {
-                return _Items;
+                return _IsSelected;
             }
-
             set
             {
-                _Items = value;
-                OnPropertyChanged(nameof(Items));
+                _IsSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
             }
         }
 
@@ -80,9 +90,8 @@ namespace gip.bso.masterdata
 
         public override string ToString()
         {
-            if (WF == null)
-                return base.ToString();
-            return $"{WF.PWNode?.ACCaption} - [{WF.MatWFConn?.Material?.MaterialNo}]";
+            string material = Material != null ? Material.ToString() : "-";
+            return $"[{(IsSelected ? "x" : "")}] {material} | {Source} -> {Target}";
         }
 
         #endregion
