@@ -50,6 +50,11 @@ namespace gip.mes.facility.TandTv3
 
         public override List<IACObjectEntity> GetNextStepItems()
         {
+
+            if (Item?.OutwardFacilityCharge?.FacilityLot?.LotNo == "ZGFL10123338")
+            {
+                //System.Diagnostics.Debugger.Break();
+            }
             List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
 
             bool isFilteredMaterialForInwardSearch = false;
@@ -58,7 +63,7 @@ namespace gip.mes.facility.TandTv3
                 isFilteredMaterialForInwardSearch = Result.Filter.MaterialNOsForStopTracking.Contains(Item.OutwardMaterial.MaterialNo);
             }
 
-            if(isFilteredMaterialForInwardSearch)
+            if (isFilteredMaterialForInwardSearch)
                 return nextStepItems;
 
             FacilityCharge fc = null;
@@ -73,7 +78,7 @@ namespace gip.mes.facility.TandTv3
                 bool isOrderTrackingActive = Result.IsOrderTrackingActive();
 
                 Guid? outwardFacilityID = Item.OutwardFacilityID;
-                if(Result.TandTv3Command != null && !Result.TandTv3Command.FilterFaciltiyAtSearchInwardCharges)
+                if (Result.TandTv3Command != null && !Result.TandTv3Command.FilterFaciltiyAtSearchInwardCharges)
                 {
                     outwardFacilityID = null;
                 }
@@ -82,9 +87,17 @@ namespace gip.mes.facility.TandTv3
                     fc
                     .FacilityLot
                     .FacilityBookingCharge_InwardFacilityLot
-                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, outwardFacilityID, isOrderTrackingActive, Result.Filter.FilteredBookingTypes))
+                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, outwardFacilityID, isOrderTrackingActive))
                     .OrderBy(c => c.FacilityBookingChargeNo)
                     .ToList();
+
+                var bookingTypes = fc
+                    .FacilityLot
+                    .FacilityBookingCharge_InwardFacilityLot
+                    .GroupBy(c => c.FacilityBookingTypeIndex)
+                    .Select(c=> new {c.Key, FCS = c.Select(x=> new {x.InwardFacility?.FacilityNo, x.InwardFacility.FacilityID })})
+                    .ToArray();
+
 
                 if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
                 {

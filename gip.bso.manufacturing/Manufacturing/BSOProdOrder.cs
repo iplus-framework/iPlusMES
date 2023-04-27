@@ -5119,7 +5119,11 @@ namespace gip.bso.manufacturing
             if (!IsEnabledShowDialogSelectSources())
                 return;
 
-            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID, SelectedProdOrderPartslist.Partslist.PartslistID, SelectedProdOrderPartslist.ProdOrderPartslistID);
+            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(
+                ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
+                CurrentProcessWorkflow.ACClassMethodID,
+                SelectedProdOrderPartslist.Partslist.PartslistID,
+                SelectedProdOrderPartslist.ProdOrderPartslistID);
         }
 
         public bool IsEnabledShowDialogSelectSources()

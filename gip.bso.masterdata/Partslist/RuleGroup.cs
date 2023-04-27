@@ -1,6 +1,9 @@
 ﻿using gip.core.datamodel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using dbMes = gip.mes.datamodel;
 
 namespace gip.bso.masterdata
 {
@@ -14,32 +17,55 @@ namespace gip.bso.masterdata
         public ACClass RefPAACClass { get; set; }
 
 
-        [ACPropertyInfo(101, "", "en{'RuleSelections'}de{'RuleSelections'}")]
-        public List<RuleSelection> RuleSelections { get; set; } = new List<RuleSelection>();
-
-        private RuleSelection _CurrentRuleSelection;
-
-        [ACPropertyInfo(102, "", "en{'CurrentRuleSelection'}de{'CurrentRuleSelection'}")]
-        public RuleSelection CurrentRuleSelection
-
+        #region RuleSelection
+        private RuleSelection _SelectedRuleSelection;
+        /// <summary>
+        /// Selected property for RuleSelection
+        /// </summary>
+        /// <value>The selected RuleSelection</value>
+        [ACPropertySelected(9999, "RuleSelection", "en{'TODO: RuleSelection'}de{'TODO: RuleSelection'}")]
+        public RuleSelection SelectedRuleSelection
         {
             get
             {
-                return _CurrentRuleSelection;
+                return _SelectedRuleSelection;
             }
             set
             {
-                if (_CurrentRuleSelection != value)
+                if (_SelectedRuleSelection != value)
                 {
-                    _CurrentRuleSelection = value;
-                    OnPropertyChanged(nameof(CurrentRuleSelection));
-                    if (_CurrentRuleSelection != null)
-                    {
-                        _CurrentRuleSelection.OnPropertyChanged(nameof(RuleSelection.Items));
-                    }
+                    _SelectedRuleSelection = value;
+                    OnPropertyChanged(nameof(SelectedRuleSelection));
                 }
             }
         }
+
+
+        private List<RuleSelection> _RuleSelectionList;
+        /// <summary>
+        /// List property for RuleSelection
+        /// </summary>
+        /// <value>The RuleSelection list</value>
+        [ACPropertyList(9999, "RuleSelection")]
+        public List<RuleSelection> RuleSelectionList
+        {
+            get
+            {
+                if (_RuleSelectionList == null)
+                {
+                    _RuleSelectionList = new List<RuleSelection>();
+                }
+                return _RuleSelectionList;
+            }
+            set
+            {
+                _RuleSelectionList = value;
+                OnPropertyChanged(nameof(RuleSelectionList));
+            }
+        }
+
+        #endregion
+
 
         #endregion
 
@@ -59,6 +85,36 @@ namespace gip.bso.masterdata
 
         #region Methods
 
+        public RuleSelection AddRuleSelection(ACClassWF pwNode, dbMes.Material material, ACClass source, ACClass target, string preConfigACUrl)
+        {
+            RuleSelection ruleSelection =
+                RuleSelectionList
+                .Where(c => 
+                            c.Source == source
+                            && c.Target == target
+                            && (material == null || (c.Material !=null && c.Material.MaterialNo == material.MaterialNo))
+                ).FirstOrDefault();
+
+            if (ruleSelection == null)
+            {
+                ruleSelection = new RuleSelection();
+                ruleSelection.RuleSelectionID = Guid.NewGuid();
+                ruleSelection.RuleGroup = this;
+                ruleSelection.Material = material;
+                ruleSelection.Source = source;
+                ruleSelection.Target = target;
+                ruleSelection.PreConfigACUrl = preConfigACUrl;
+                RuleSelectionList.Add(ruleSelection);
+            }
+
+            if (!ruleSelection.PWNodes.Select(c => c.ACClassWFID).Contains(pwNode.ACClassWFID))
+            {
+                ruleSelection.PWNodes.Add(pwNode);
+            }
+
+            return ruleSelection;
+        }
+
         /// <summary>
         /// is same module is selected on other view - sync booth values
         /// </summary>
@@ -67,19 +123,22 @@ namespace gip.bso.masterdata
         /// <param name="isSelected"></param>
         public void PropagateSelection(RuleSelection ruleSelection, ACClass aCClass, bool isSelected)
         {
-            foreach (RuleSelection currRuleSelection in RuleSelections)
-            {
-                if (currRuleSelection.RuleSelectionID != ruleSelection.RuleSelectionID)
-                {
-                    foreach (RuleItem ruleItem in currRuleSelection.Items)
-                    {
-                        if (ruleItem.Machine.ACClassID == aCClass.ACClassID)
-                        {
-                            ruleItem.IsSelected = isSelected;
-                        }
-                    }
-                }
-            }
+            //foreach (RuleSelection currRuleSelection in RuleSelections)
+            //{
+            //    if (currRuleSelection.RuleSelectionID != ruleSelection.RuleSelectionID)
+            //    {
+            //        if(currRuleSelection.Items != null)
+            //        {
+            //            foreach (RuleItem ruleItem in currRuleSelection.Items)
+            //            {
+            //                if (ruleItem.Machine.ACClassID == aCClass.ACClassID)
+            //                {
+            //                    ruleItem.IsSelected = isSelected;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         public override string ToString()

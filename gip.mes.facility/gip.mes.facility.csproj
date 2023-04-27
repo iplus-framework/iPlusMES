@@ -126,6 +126,7 @@
     <Compile Include="Model\ActualSalesTax.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
+    <Compile Include="Model\PartslistValidationInfo.cs" />
     <Compile Include="Model\PlanningTargetStockPreview.cs" />
     <Compile Include="Model\ProdOrderPartslistOverview.cs" />
     <Compile Include="Model\RemoteStoreConfig.cs" />
