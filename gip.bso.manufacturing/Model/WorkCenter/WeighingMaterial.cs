@@ -255,6 +255,12 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public Guid? QuantInWeighing
+        {
+            get;
+            set;
+        }
+
         public BSOManualWeighing ParentBSO
         {
             get => ParentACObject as BSOManualWeighing;
@@ -512,7 +518,11 @@ namespace gip.bso.manufacturing
                 {
                     PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad();
                     PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoRefresh();
-                    DiffWeighOnEnd = PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.Any();
+
+                    var prebooking = PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.FirstOrDefault();
+                    DiffWeighOnEnd = prebooking != null;
+                    if (DiffWeighOnEnd)
+                        QuantInWeighing = prebooking?.OutwardFacilityCharge?.FacilityChargeID;
 
                     PosRelation.AutoRefresh();
                     ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;

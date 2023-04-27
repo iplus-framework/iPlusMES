@@ -1,0 +1,1 @@
+INSERT INTO [dbo].[MDFacilityType]([MDFacilityTypeID],[MDFacilityTypeIndex],[MDNameTrans],[SortIndex],[XMLConfig],[InsertName],[InsertDate],[UpdateName],[UpdateDate],[MDKey],[IsDefault]) VALUES (NEWID(), 1200, 'en{''Machine or Inventory''}de{''Maschine oder Inventar''}', 7, NULL, '00', GETDATE(), '00', GETDATE(), 'Machine', 0);

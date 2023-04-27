@@ -3518,7 +3518,7 @@ namespace gip.mes.facility
                     {
                         FacilityMaterialOEE oeeEntry = null;
                         if (facilityMaterial.EntityState != EntityState.Added)
-                            oeeEntry = databaseApp.FacilityMaterialOEE.Where(c => c.ACProgramLogID == propLogSumByProgramLog.Key.ACProgramLogID && c.FacilityMaterial.Facility.VBiFacilityACClassID == facility.FacilityID).FirstOrDefault();
+                            oeeEntry = databaseApp.FacilityMaterialOEE.Where(c => c.ACProgramLogID == propLogSumByProgramLog.Key.ACProgramLogID && c.FacilityMaterialID == facilityMaterial.FacilityMaterialID).FirstOrDefault();
                         if (oeeEntry == null)
                         {
                             oeeEntry = FacilityMaterialOEE.NewACObject(databaseApp, facilityMaterial);
