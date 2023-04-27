@@ -58,6 +58,7 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _FacilityOEEManager = ACFacilityOEEManager.ACRefToServiceInstance(this);
             Search();
             return true;
         }
@@ -66,6 +67,9 @@ namespace gip.bso.manufacturing
         {
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
+
+            if (_FacilityOEEManager != null)
+                ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
 
             var b = base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
@@ -79,6 +83,22 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region BSO->ACProperty
+
+
+        #region Managers
+
+        protected ACRef<ACFacilityOEEManager> _FacilityOEEManager = null;
+        public ACFacilityOEEManager FacilityOEEManager
+        {
+            get
+            {
+                if (_FacilityOEEManager == null)
+                    return null;
+                return _FacilityOEEManager.ValueT;
+            }
+        }
+
+        #endregion
 
         #region Access-Primary
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -515,8 +535,10 @@ namespace gip.bso.manufacturing
                 || (Period3To.HasValue && Period3To.Value < totalRangeTo.Value))
                 totalRangeTo = Period3To;
 
-            if (CurrentFacility == null 
-                || (!totalRangeFrom.HasValue && !totalRangeTo.HasValue))
+            if (   CurrentFacility == null 
+                || !totalRangeFrom.HasValue 
+                || !totalRangeTo.HasValue
+                || FacilityOEEManager == null)
             {
                 OEEAvgPeriod1 = _NullOEEAvg;
                 OEEAvgPeriod2 = _NullOEEAvg;
@@ -524,20 +546,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            FacilityOEEAvg[] resultsInTotalRange =
-            dbApp.FacilityMaterialOEE.Where(c => c.FacilityMaterial.FacilityID == CurrentFacility.FacilityID)
-                .OrderBy(c => c.EndDate)
-                .Select(c => new FacilityOEEAvg()
-                {
-                    AvailabilityOEE = c.AvailabilityOEE,
-                    PerformanceOEE = c.PerformanceOEE,
-                    QualityOEE = c.QualityOEE,
-                    TotalOEE = c.TotalOEE,
-                    EndDate = c.EndDate,
-                    StartDate = c.StartDate
-                })
-                .ToArray();
-
+            FacilityOEEAvg[] resultsInTotalRange = FacilityOEEManager.GetOEEEntries(dbApp, CurrentFacility, totalRangeFrom.Value, totalRangeTo.Value);
             List<FacilityOEEAvg> resultsInPeriod1 = new List<FacilityOEEAvg>();
             List<FacilityOEEAvg> resultsInPeriod2 = new List<FacilityOEEAvg>();
             List<FacilityOEEAvg> resultsInPeriod3 = new List<FacilityOEEAvg>();

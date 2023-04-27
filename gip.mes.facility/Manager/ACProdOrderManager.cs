@@ -3559,7 +3559,7 @@ namespace gip.mes.facility
                         }
 
                         oeeEntry.StartDate = minStartDate;
-                        oeeEntry.StartDate = maxEndDate;
+                        oeeEntry.EndDate = maxEndDate;
                         oeeEntry.IdleTime = idleTime;
                         oeeEntry.StandByTime = standByTime;
                         oeeEntry.OperationTime = operationTime;
@@ -3567,6 +3567,13 @@ namespace gip.mes.facility
                         oeeEntry.UnscheduledBreakTime = unscheduledBreakTime;
                         oeeEntry.RetoolingTime = retoolingTime;
                         oeeEntry.MaintenanceTime = maintenanceTime;
+
+                        //#region DEBUG
+                        //{
+                        //    Random random = new Random();
+                        //    PerformanceOEE = ((double)random.Next(1, 100)) / 100.0;
+                        //}
+                        //#endregion
 
                         // TODO: Calc Quantities and Scrap
                         oeeEntry.CalcOEE();

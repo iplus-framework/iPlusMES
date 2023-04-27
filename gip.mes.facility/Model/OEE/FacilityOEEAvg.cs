@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'POFacilityOEEModel'}de{'POFacilityOEEModel'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable)]
     public class FacilityOEEAvg : EntityBase, IACObject

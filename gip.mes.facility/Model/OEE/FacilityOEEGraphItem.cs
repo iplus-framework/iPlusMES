@@ -3,7 +3,7 @@ using gip.mes.datamodel;
 using System;
 using System.Linq;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'FacilityOEEGraphItem'}de{'FacilityOEEGraphItem'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable)]
     public class FacilityOEEGraphItem : IVBChartTupleT<DateTime, double>

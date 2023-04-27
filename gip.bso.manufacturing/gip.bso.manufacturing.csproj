@@ -120,8 +120,6 @@
     <Compile Include="Model\WorkCenter\WorkCenterRule.cs" />
     <Compile Include="Model\WorkCenter\WorkTaskOnHoldItem.cs" />
     <Compile Include="OEE\BSOFacilityOEEView.cs" />
-    <Compile Include="OEE\FacilityOEEGraphItem.cs" />
-    <Compile Include="OEE\FacilityOEEAvg.cs" />
     <Compile Include="Planning\BSODemandOrder.cs" />
     <Compile Include="Planning\BSOProdMatRequirement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

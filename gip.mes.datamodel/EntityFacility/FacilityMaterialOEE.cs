@@ -20,7 +20,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(10, "RetoolingTimeSec", "en{'Retooling [sec]'}de{'Rüstzeit [sec]'}", "", "", true)]
     [ACPropertyEntity(11, "MaintenanceTimeSec", "en{'Maintenance [sec]'}de{'Wartung [sec]'}", "", "", true)]
     [ACPropertyEntity(12, "AvailabilityOEE", "en{'Availability'}de{'Verfügbarkeit'}", "", "", true)]
-    [ACPropertyEntity(13, "Quantity", "en{'Total quantity [UOM]'}de{'Gesamtmenge [BME/h]'}", "", "", true)]
+    [ACPropertyEntity(13, "Quantity", "en{'Total quantity [UOM]'}de{'Gesamtmenge [BME]'}", "", "", true)]
     [ACPropertyEntity(14, "Throughput", "en{'Throughput [UOM/h]'}de{'Durchsatz [BME/h]'}", "", "", true)]
     [ACPropertyEntity(15, "PerformanceOEE", "en{'Performance'}de{'Leistung'}", "", "", true)]
     [ACPropertyEntity(16, "QuantityScrap", "en{'Scrap quantity [UOM]'}de{'Ausschuss [UOM]'}", "", "", true)]
@@ -190,6 +190,12 @@ namespace gip.mes.datamodel
             }
         }
 
+        partial void OnOperationTimeSecChanged()
+        {
+            _OperationTime = null;
+            OnPropertyChanged(nameof(OperationTime));
+        }
+
         private TimeSpan? _StandByTime;
         [ACPropertyInfo(105, "", "en{'Stand by'}de{'Still stehend'}")]
         public TimeSpan StandByTime
@@ -205,6 +211,13 @@ namespace gip.mes.datamodel
                 StandByTimeSec = (int)value.TotalSeconds;
                 OnPropertyChanged(nameof(StandByTime));
             }
+        }
+
+
+        partial void OnStandByTimeSecChanged()
+        {
+            _StandByTime = null;
+            OnPropertyChanged(nameof(StandByTime));
         }
 
         [ACPropertyInfo(110, "", "en{'Availability [%]'}de{'Verfügbarkeit [%]'}")]
@@ -268,24 +281,39 @@ namespace gip.mes.datamodel
             if (OperationTimeSec > 0)
             {
                 int plannedTimeSec = OperationTimeSec + UnscheduledBreakTimeSec;
-                AvailabilityOEE = (OperationTimeSec / plannedTimeSec);
+                AvailabilityOEE = (double)OperationTimeSec / (double)plannedTimeSec;
             }
             else
                 AvailabilityOEE = 1;
         }
 
+
         public void CalcPerformanceOEE()
         {
-            // TODO:
-            Random random = new Random();
-            PerformanceOEE = ((double) random.Next(1, 100)) / 100.0;
+            PerformanceOEE = 1;
+            if (Quantity > double.Epsilon && OperationTimeSec > 0)
+            {
+                Throughput = Quantity * 3600.0 / (double)OperationTimeSec;
+                if (   this.FacilityMaterial.Throughput.HasValue
+                    && this.FacilityMaterial.Throughput.Value > double.Epsilon)
+                {
+                    PerformanceOEE = Throughput / this.FacilityMaterial.Throughput.Value;
+                    if (PerformanceOEE > 1)
+                        PerformanceOEE = 1;
+                }
+            }
         }
 
         public void CalcQualityOEE()
         {
-            // TODO:
-            Random random = new Random();
-            QualityOEE = ((double)random.Next(1, 100)) / 100.0;
+            QualityOEE = 1;
+            if (Quantity > double.Epsilon)
+            {
+                if (QuantityScrap > double.Epsilon)
+                    QualityOEE = (Quantity - QuantityScrap) / Quantity;
+                if (QualityOEE > 1)
+                    QualityOEE = 1;
+            }
         }
 
         public void CalcOEE()

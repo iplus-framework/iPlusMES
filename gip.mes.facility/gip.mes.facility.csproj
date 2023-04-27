@@ -56,6 +56,7 @@
     <Compile Include="Helperclasses\FacilityReservationData.cs" />
     <Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
     <Compile Include="Helperclasses\MsgBooking.cs" />
+    <Compile Include="Manager\ACFacilityOEEManager.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
     <Compile Include="Manager\RemoteMaterialForwarder.cs" />
     <Compile Include="Manager\RemoteFacilityManager.cs" />
@@ -126,6 +127,8 @@
     <Compile Include="Model\ActualSalesTax.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
+    <Compile Include="Model\OEE\FacilityOEEAvg.cs" />
+    <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
     <Compile Include="Model\PlanningTargetStockPreview.cs" />
     <Compile Include="Model\ProdOrderPartslistOverview.cs" />
     <Compile Include="Model\RemoteStoreConfig.cs" />

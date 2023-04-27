@@ -21,6 +21,7 @@ using System.Data.Objects;
 using gip.mes.autocomponent;
 using System.Windows.Input;
 using static gip.core.datamodel.Global;
+using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
@@ -65,6 +66,7 @@ namespace gip.bso.masterdata
             AccessReplacementMaterial.NavSearch();
 
             _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
+            _FacilityOEEManager = ACFacilityOEEManager.ACRefToServiceInstance(this);
             Search();
 
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
@@ -107,6 +109,8 @@ namespace gip.bso.masterdata
             this._SelectedUnitConvertTest = null;
             if (_VarioConfigManager != null)
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
+            if (_FacilityOEEManager != null)
+                ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
             _VarioConfigManager = null;
             var b = base.ACDeInit(deleteACClassTask);
             if (_AccessMaterialUnit != null)
@@ -141,6 +145,17 @@ namespace gip.bso.masterdata
                 if (_VarioConfigManager == null)
                     return null;
                 return _VarioConfigManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACFacilityOEEManager> _FacilityOEEManager = null;
+        public ACFacilityOEEManager FacilityOEEManager
+        {
+            get
+            {
+                if (_FacilityOEEManager == null)
+                    return null;
+                return _FacilityOEEManager.ValueT;
             }
         }
 
@@ -1453,7 +1468,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: AddFacility
         /// </summary>
-        [ACMethodInfo("AddFacility", "en{'Add'}de{'Neu'}", 999)]
+        [ACMethodInfo("", "en{'Add'}de{'Neu'}", 700)]
         public void AddFacility()
         {
             if (!IsEnabledAddFacility())
@@ -1477,7 +1492,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: DeleteFacility
         /// </summary>
-        [ACMethodInfo("DeleteFacility", "en{'Delete'}de{'Löschen'}", 999)]
+        [ACMethodInfo("", "en{'Delete'}de{'Löschen'}", 701)]
         public void DeleteFacility()
         {
             if (!IsEnabledDeleteFacility())
@@ -1499,7 +1514,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: ShowDlgInwardFacility
         /// </summary>
-        [ACMethodInfo("ShowFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        [ACMethodInfo("", "en{'Choose facility'}de{'Lager auswählen'}", 702)]
         public void ShowFacility()
         {
             if (!IsEnabledShowFacility())
@@ -1519,6 +1534,72 @@ namespace gip.bso.masterdata
             return SelectedFacilityMaterial != null;
         }
 
+        [ACMethodInfo("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703)]
+        public void GenerateTestOEEData()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+            using (DatabaseApp dbApp = new DatabaseApp()) 
+            {
+                FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
+                FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
+            }
+        }
+
+        public bool IsEnabledGenerateTestOEEData()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
+
+        [ACMethodInfo("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704)]
+        public void DeleteTestOEEData()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
+                FacilityOEEManager.DeleteTestOEEData(dbApp, facilityMaterial);
+            }
+        }
+
+        public bool IsEnabledDeleteTestOEEData()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
+
+
+        [ACMethodInfo("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705)]
+        public void RecalcThroughputAverage()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+
+            FacilityOEEManager.RecalcThroughputAverage(this.DatabaseApp, SelectedFacilityMaterial, false);
+        }
+
+        public bool IsEnabledRecalcThroughputAverage()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
+
+        [ACMethodInfo("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706)]
+        public void RecalcThroughputAndOEE()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
+                FacilityOEEManager.RecalcThroughputAndOEE(dbApp, facilityMaterial, null, null);
+            }
+        }
+
+        public bool IsEnabledRecalcThroughputAndOEE()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
         #endregion
 
         #endregion
@@ -2137,178 +2218,219 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case "IsEnabledConvertTestToBase":
+                case nameof(IsEnabledConvertTestToBase):
                     result = IsEnabledConvertTestToBase();
                     return true;
-                case "ConvertTestFromBase":
+                case nameof(ConvertTestFromBase):
                     ConvertTestFromBase();
                     return true;
-                case "IsEnabledConvertTestFromBase":
+                case nameof(IsEnabledConvertTestFromBase):
                     result = IsEnabledConvertTestFromBase();
                     return true;
-                case "ConvertTest":
+                case nameof(ConvertTest):
                     ConvertTest();
                     return true;
-                case "IsEnabledConvertTest":
+                case nameof(IsEnabledConvertTest):
                     result = IsEnabledConvertTest();
                     return true;
-                case "TranslationNew":
+                case nameof(TranslationNew):
                     TranslationNew();
                     return true;
-                case "TranslationDelete":
+                case nameof(TranslationDelete):
                     TranslationDelete();
                     return true;
-                case "IsEnabledTranslationNew":
+                case nameof(IsEnabledTranslationNew):
                     result = IsEnabledTranslationNew();
                     return true;
-                case "IsEnabledTranslationDelete":
+                case nameof(IsEnabledTranslationDelete):
                     result = IsEnabledTranslationDelete();
                     return true;
-                case "ValidateInput":
+                case nameof(ValidateInput):
                     result = ValidateInput((String)acParameter[0], (Object)acParameter[1], (System.Globalization.CultureInfo)acParameter[2]);
                     return true;
-                case "ConvertAmbientVolToRefVol15":
+                case nameof(ConvertAmbientVolToRefVol15):
                     ConvertAmbientVolToRefVol15();
                     return true;
-                case "IsEnabledConvertAmbientVolToRefVol15":
+                case nameof(IsEnabledConvertAmbientVolToRefVol15):
                     result = IsEnabledConvertAmbientVolToRefVol15();
                     return true;
-                case "ConvertRefVol15ToAmbientVol":
+                case nameof(ConvertRefVol15ToAmbientVol):
                     ConvertRefVol15ToAmbientVol();
                     return true;
-                case "IsEnabledConvertRefVol15ToAmbientVol":
+                case nameof(IsEnabledConvertRefVol15ToAmbientVol):
                     result = IsEnabledConvertRefVol15ToAmbientVol();
                     return true;
-                case "ConvertAmbVolToMass":
+                case nameof(ConvertAmbVolToMass):
                     ConvertAmbVolToMass();
                     return true;
-                case "IsEnabledConvertAmbVolToMass":
+                case nameof(IsEnabledConvertAmbVolToMass):
                     result = IsEnabledConvertAmbVolToMass();
                     return true;
-                case "ConvertMassToAmbVol":
+                case nameof(ConvertMassToAmbVol):
                     ConvertMassToAmbVol();
                     return true;
-                case "IsEnabledConvertMassToAmbVol":
+                case nameof(IsEnabledConvertMassToAmbVol):
                     result = IsEnabledConvertMassToAmbVol();
                     return true;
-                case "CalcDensityAndTemp":
+                case nameof(CalcDensityAndTemp):
                     CalcDensityAndTemp();
                     return true;
-                case "IsEnabledCalcDensityAndTemp":
+                case nameof(IsEnabledCalcDensityAndTemp):
                     result = IsEnabledCalcDensityAndTemp();
                     return true;
-                case "CalcDensityAndVol":
+                case nameof(CalcDensityAndVol):
                     CalcDensityAndVol();
                     return true;
-                case "IsEnabledCalcDensityAndVol":
+                case nameof(IsEnabledCalcDensityAndVol):
                     result = IsEnabledCalcDensityAndVol();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "NewMaterialUnit":
+                case nameof(NewMaterialUnit):
                     NewMaterialUnit();
                     return true;
-                case "IsEnabledNewMaterialUnit":
+                case nameof(IsEnabledNewMaterialUnit):
                     result = IsEnabledNewMaterialUnit();
                     return true;
-                case "DeleteMaterialUnit":
+                case nameof(DeleteMaterialUnit):
                     DeleteMaterialUnit();
                     return true;
-                case "IsEnabledDeleteMaterialUnit":
+                case nameof(IsEnabledDeleteMaterialUnit):
                     result = IsEnabledDeleteMaterialUnit();
                     return true;
-                case "NewMaterialUnitOK":
+                case nameof(NewMaterialUnitOK):
                     NewMaterialUnitOK();
                     return true;
-                case "IsEnabledNewMaterialUnitOK":
+                case nameof(IsEnabledNewMaterialUnitOK):
                     result = IsEnabledNewMaterialUnitOK();
                     return true;
-                case "NewMaterialUnitCancel":
+                case nameof(NewMaterialUnitCancel):
                     NewMaterialUnitCancel();
                     return true;
-                case "LoadMaterialCalculation":
+                case nameof(LoadMaterialCalculation):
                     LoadMaterialCalculation();
                     return true;
-                case "IsEnabledLoadMaterialCalculation":
+                case nameof(IsEnabledLoadMaterialCalculation):
                     result = IsEnabledLoadMaterialCalculation();
                     return true;
-                case "NewMaterialCalculation":
+                case nameof(NewMaterialCalculation):
                     NewMaterialCalculation();
                     return true;
-                case "IsEnabledNewMaterialCalculation":
+                case nameof(IsEnabledNewMaterialCalculation):
                     result = IsEnabledNewMaterialCalculation();
                     return true;
-                case "DeleteMaterialCalculation":
+                case nameof(DeleteMaterialCalculation):
                     DeleteMaterialCalculation();
                     return true;
-                case "IsEnabledDeleteMaterialCalculation":
+                case nameof(IsEnabledDeleteMaterialCalculation):
                     result = IsEnabledDeleteMaterialCalculation();
                     return true;
-                case "LoadACConfig":
+                case nameof(LoadACConfig):
                     LoadACConfig();
                     return true;
-                case "IsEnabledLoadACConfig":
+                case nameof(IsEnabledLoadACConfig):
                     result = IsEnabledLoadACConfig();
                     return true;
-                case "NewACConfig":
+                case nameof(NewACConfig):
                     NewACConfig();
                     return true;
-                case "IsEnabledNewACConfig":
+                case nameof(IsEnabledNewACConfig):
                     result = IsEnabledNewACConfig();
                     return true;
-                case "DeleteACConfig":
+                case nameof(DeleteACConfig):
                     DeleteACConfig();
                     return true;
-                case "IsEnabledDeleteACConfig":
+                case nameof(IsEnabledDeleteACConfig):
                     result = IsEnabledDeleteACConfig();
                     return true;
-                case "ConvertTestToBase":
+                case nameof(ConvertTestToBase):
                     ConvertTestToBase();
                     return true;
-                case "AddPWMethodNodeConfig":
+                case nameof(AddPWMethodNodeConfig):
                     AddPWMethodNodeConfig();
                     return true;
-                case "IsEnabledAddPWMethodNodeConfig":
+                case nameof(IsEnabledAddPWMethodNodeConfig):
                     result = IsEnabledAddPWMethodNodeConfig();
                     return true;
-                case "DeletePWMethodNodeConfig":
+                case nameof(DeletePWMethodNodeConfig):
                     DeletePWMethodNodeConfig();
                     return true;
-                case "IsEnabledDeletePWMethodNodeConfig":
+                case nameof(IsEnabledDeletePWMethodNodeConfig):
                     result = IsEnabledDeletePWMethodNodeConfig();
                     return true;
-
+                case nameof(AddFacility):
+                    AddFacility();
+                    return true;
+                case nameof(IsEnabledAddFacility):
+                    result = IsEnabledAddFacility();
+                    return true;
+                case nameof(DeleteFacility):
+                    DeleteFacility();
+                    return true;
+                case nameof(IsEnabledDeleteFacility):
+                    result = IsEnabledDeleteFacility();
+                    return true;
+                case nameof(ShowFacility):
+                    ShowFacility();
+                    return true;
+                case nameof(IsEnabledShowFacility):
+                    result = IsEnabledShowFacility();
+                    return true;
+                case nameof(GenerateTestOEEData):
+                    GenerateTestOEEData();
+                    return true;
+                case nameof(IsEnabledGenerateTestOEEData):
+                    result = IsEnabledGenerateTestOEEData();
+                    return true;
+                case nameof(DeleteTestOEEData):
+                    DeleteTestOEEData();
+                    return true;
+                case nameof(IsEnabledDeleteTestOEEData):
+                    result = IsEnabledDeleteTestOEEData();
+                    return true;
+                case nameof(RecalcThroughputAverage):
+                    RecalcThroughputAverage();
+                    return true;
+                case nameof(IsEnabledRecalcThroughputAverage):
+                    result = IsEnabledRecalcThroughputAverage();
+                    return true;
+                case nameof(RecalcThroughputAndOEE):
+                    RecalcThroughputAndOEE();
+                    return true;
+                case nameof(IsEnabledRecalcThroughputAndOEE):
+                    result = IsEnabledRecalcThroughputAndOEE();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
