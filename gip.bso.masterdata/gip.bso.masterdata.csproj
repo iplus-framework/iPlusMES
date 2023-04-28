@@ -128,10 +128,6 @@
     <Compile Include="Partslist\BOMModel.cs" />
     <Compile Include="Partslist\BSOPartsList.cs" />
     <Compile Include="Partslist\BSOPartslistExplorer.cs" />
-    <Compile Include="Partslist\BSOSourceSelectionRules.cs" />
-    <Compile Include="Partslist\RuleGroup.cs" />
-    <Compile Include="Partslist\RuleItem.cs" />
-    <Compile Include="Partslist\RuleSelection.cs" />
     <Compile Include="Production\MDBSOProdOrderPartslistPosState.cs" />
     <Compile Include="Sales\MDBSOInvoiceState.cs" />
     <Compile Include="Sales\MDBSOInvoiceType.cs" />
@@ -154,6 +150,11 @@
     <Compile Include="Production\MDBSODemandOrderState.cs" />
     <Compile Include="Purchase\MDBSOInRequestState.cs" />
     <Compile Include="Sales\MDBSOOutOfferState.cs" />
+    <Compile Include="SourceSelectionRules\BSOSourceSelectionRules.cs" />
+    <Compile Include="SourceSelectionRules\MachineItem.cs" />
+    <Compile Include="SourceSelectionRules\RuleGroup.cs" />
+    <Compile Include="SourceSelectionRules\RuleSelection.cs" />
+    <Compile Include="SourceSelectionRules\SourceSelectionRulesResult.cs" />
     <Compile Include="System\BSOCompany.cs" />
     <Compile Include="System\BSOCtrlUpdateMessageInfo.cs" />
     <Compile Include="System\BSOMedia.cs" />
@@ -437,6 +438,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2023-04-27 19-06_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-28 16-10_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
