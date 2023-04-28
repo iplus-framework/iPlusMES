@@ -212,19 +212,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
-        [ACPropertyInfo(600)]
-        [ACChildInfo("BSOSourceSelectionRules_Child", typeof(BSOSourceSelectionRules))]
-        public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
-        {
-            get
-            {
-                if (_BSOSourceSelectionRules_Child == null)
-                    _BSOSourceSelectionRules_Child = new ACChildItem<BSOSourceSelectionRules>(this, "BSOSourceSelectionRules_Child");
-                return _BSOSourceSelectionRules_Child;
-            }
-        }
-
         #endregion
 
         #region Properties
@@ -5119,7 +5106,11 @@ namespace gip.bso.manufacturing
             if (!IsEnabledShowDialogSelectSources())
                 return;
 
-            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(
+            ACComponent bso = this.Root.Businessobjects.ACUrlCommand("?" + nameof(BSOSourceSelectionRules)) as ACComponent;
+            if (bso == null)
+                bso = this.Root.Businessobjects.StartComponent(nameof(BSOSourceSelectionRules), null, new object[] { }) as ACComponent;
+
+            (bso as BSOSourceSelectionRules).ShowDialogSelectSources(
                 ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
                 CurrentProcessWorkflow.ACClassMethodID,
                 SelectedProdOrderPartslist.Partslist.PartslistID,
@@ -5131,8 +5122,6 @@ namespace gip.bso.manufacturing
             return
                 SelectedProdOrderPartslist != null
                 && CurrentProcessWorkflow != null
-                && BSOSourceSelectionRules_Child != null
-                && BSOSourceSelectionRules_Child.Value != null
                 && ProcessWorkflowPresenter != null
                 && ProcessWorkflowPresenter.SelectedWFNode != null
                 && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
