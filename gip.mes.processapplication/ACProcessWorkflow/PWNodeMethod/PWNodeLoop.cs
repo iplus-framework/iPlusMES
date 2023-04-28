@@ -11,6 +11,8 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow loop'}de{'Workflow Schleife'}", Global.ACKinds.TPWNodeStatic, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWNodeLoop : PWNodeDecisionFunc
     {
+        #region c'tors
+
         static PWNodeLoop()
         {
             ACMethod method;
@@ -19,6 +21,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("OnLoopACIdentifier", typeof(string), "", Global.ParamOption.Required));
             paramTranslation.Add("OnLoopACIdentifier", "en{'On loop inpoint ACIdentifier'}de{'On loop inpoint ACIdentifier'}");
+
+            method.ParameterValueList.Add(new ACValue("CompletePWGroupsOnInpointLoop", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("CompletePWGroupsOnInpointLoop", "en{'Complete PWGroups(SMStarting) on inpoint loop'}de{'Complete PWGroups(SMStarting) on inpoint loop'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeLoop), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeLoop), ACStateConst.SMStarting, wrapper);
@@ -34,7 +39,6 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _IsInCompleteState = false;
@@ -46,6 +50,8 @@ namespace gip.mes.processapplication
             _IsInCompleteState = false;
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
+
+        #endregion
 
         #region Properties
 
@@ -68,7 +74,26 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected bool CompletePWGroupsOnInpointLoop
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("CompletePWGroupsOnInpointLoop");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
         #endregion
+
+        #region Methods
 
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
         public override void SMStarting()
@@ -99,18 +124,23 @@ namespace gip.mes.processapplication
             else
             {
                 _IsInCompleteState = true;
-            }
-        }
 
-        public virtual void OnLoopComplete()
-        {
-            _IsInCompleteState = true;
-            RaiseOutEventAndComplete();
+                if (CompletePWGroupsOnInpointLoop)
+                {
+                    PWGroup pwGroup = FindPredecessors<PWGroup>(true, c => c is PWGroup && c.ACIdentifier == OnLoopACIdentifier).FirstOrDefault();
+                    if (pwGroup != null && pwGroup.CurrentACState == ACStateEnum.SMStarting)
+                    {
+                        pwGroup.ResetAndComplete();
+                    }
+                }
+            }
         }
 
         public static bool HandleExecuteACMethod_PWNodeLoop(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PWNodeDecisionFunc(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
+
+        #endregion
     }
 }
