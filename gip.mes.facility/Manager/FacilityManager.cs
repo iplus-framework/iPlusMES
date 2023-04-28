@@ -1103,16 +1103,6 @@ namespace gip.mes.facility
 
         #endregion
 
-        #region Temp added - should be arranged into file on appropriate place
-
-        public const string MN_ProdOrderPosInward = GlobalApp.FBT_ProdOrderPosInward;
-        public const string MN_ProdOrderPosInwardCancel = GlobalApp.FBT_ProdOrderPosInwardCancel;
-        public const string MN_ProdOrderPosOutward = GlobalApp.FBT_ProdOrderPosOutward;
-        public const string MN_ProdOrderPosOutwardCancel = GlobalApp.FBT_ProdOrderPosOutwardCancel;
-        public const string MN_ProdOrderPosOutwardOnEmptyingFacility = GlobalApp.FBT_ProdOrderPosOutwardOnEmptyingFacility;
-
-        #endregion
-
         #region Execute-Helper-Handlers
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

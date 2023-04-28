@@ -2398,7 +2398,7 @@ namespace gip.mes.facility
                 if (_BookParamOutwardMovementClone != null)
                     return _BookParamOutwardMovementClone.Clone() as ACMethodBooking;
             }
-            var clone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            var clone = ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             using (ACMonitor.Lock(_40010_ValueLock))
             {
                 _BookParamOutwardMovementClone = clone;
@@ -2620,7 +2620,7 @@ namespace gip.mes.facility
                 if (_BookParamInwardMovementClone != null)
                     return _BookParamInwardMovementClone.Clone() as ACMethodBooking;
             }
-            var clone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            var clone = ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             using (ACMonitor.Lock(_40010_ValueLock))
             {
                 _BookParamInwardMovementClone = clone;

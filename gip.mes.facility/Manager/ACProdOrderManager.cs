@@ -88,7 +88,7 @@ namespace gip.mes.facility
                 return _BookParamInwardMovementClone;
             if (facilityManager == null)
                 return null;
-            _BookParamInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamInwardMovementClone;
         }
 
@@ -99,7 +99,7 @@ namespace gip.mes.facility
                 return _BookParamInCancelClone;
             if (facilityManager == null)
                 return null;
-            _BookParamInCancelClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInCancelClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosInwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamInCancelClone;
         }
 
@@ -110,7 +110,7 @@ namespace gip.mes.facility
                 return _BookParamOutwardMovementClone;
             if (facilityManager == null)
                 return null;
-            _BookParamOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamOutwardMovementClone;
         }
 
@@ -121,7 +121,7 @@ namespace gip.mes.facility
                 return _BookParamOutCancelClone;
             if (facilityManager == null)
                 return null;
-            _BookParamOutCancelClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutCancelClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamOutCancelClone;
         }
 
@@ -132,7 +132,7 @@ namespace gip.mes.facility
                 return _BookParamOutwardMovementOnEmptyingFacilityClone;
             if (facilityManager == null)
                 return null;
-            _BookParamOutwardMovementOnEmptyingFacilityClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutwardOnEmptyingFacility.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutwardMovementOnEmptyingFacilityClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutwardOnEmptyingFacility.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamOutwardMovementOnEmptyingFacilityClone;
         }
 
@@ -3577,7 +3577,45 @@ namespace gip.mes.facility
 
                         // TODO: Calc Quantities and Scrap
                         oeeEntry.CalcOEE();
+
+
+                        //GlobalApp.FacilityBookingType.ProdOrderPosInward
+
+
+                        bool quantityFound = false;
+                        /// 1. Prüfe ob es in der Gruppe eine Zugangsbuchung (Beziehung zu ProdORderPartslistPos in Booking) gibt -> Nehme diese Mengen zur Ermittlung
+                        ///     Achtung wenn Zwischenprodukt mit Partslist-Buchung, dann nehme das richtige Endprodukt material
+                        FacilityBooking[] postingsOnThisMachine =
+                        databaseApp.FacilityBooking.Include(c => c.MDMovementReason)
+                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue
+                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
+                                                                && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ProdOrderPosInward
+                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead!
+                                                                && c.PropertyACUrl == machine.Key.ACURLComponentCached)
+                                                    .ToArray();
+                        if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
+                        {
+                            quantityFound = true;
+                            oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.InwardQuantity)
+                                                                    .DefaultIfEmpty()
+                                                                    .Sum();
+                            oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
+                                                 .Select(c => c.InwardQuantity)
+                                                 .DefaultIfEmpty()
+                                                 .Sum();
+                        }
+
+                        /// 2. Prüfe ob es OperationsLogs gibt. Wenn ja, dann nehme diese Quantmengen solange es nicht 0-Mengen-Buchungen sind (z.B. Stikkenwägen mit 1 Stück weil man die MEnge nicht kennt)
+                        if (!quantityFound)
+                        {
+                            //databaseApp.OperationLog.Include(c => c.ACClass.ACClass1_ParentACClass)
+                        }
+                        /// 3. Prüfe ob es Verbrauchsbuchungen gibt und finde die Hauptkomponente heraus (Halbfabrikat aus Vorstufe) und ermittle darüber
+                        /// 4. Ermittle Menge anhand des Endproduktes und errechne den theoretischen Durchsatz anhand des Mittelwertes
+                        /// 5. Trage OEE ein.
+                        /// 5. Falls Verfügbakeit = 100 und AutoKorrektur gesetzt, berechne neuen Mittelwert.
                     }
+
 
                     //double operationTimeSec = propLogSums.Where(x => x.PropertyValue != null && (GlobalProcApp.AvailabilityState)x.PropertyValue == GlobalProcApp.AvailabilityState.InOperation)
                     //                                    .Sum(c => c.Duration.TotalSeconds);
