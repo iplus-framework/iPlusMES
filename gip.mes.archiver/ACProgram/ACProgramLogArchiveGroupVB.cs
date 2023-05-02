@@ -67,6 +67,9 @@ namespace gip.mes.archiver
             using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
             {
                 vd.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
+
+                DeleteOperationLog(dbApp, acProgram);
+
                 orderLogList = dbApp.OrderLog.Where(c => c.VBiACProgramLog.ACProgramID == acProgram.ACProgramID).ToArray();
 
                 if (orderLogList.Any())
@@ -215,6 +218,34 @@ namespace gip.mes.archiver
                     msgEc += " Inner:" + ec.InnerException.Message;
 
                 Messages.LogException(ClassName, "ArchiveOrderLog(20)", msgEc);
+
+                return;
+            }
+        }
+
+        private void DeleteOperationLog(vd.DatabaseApp dbApp, ACProgram acProgram)
+        {
+            if (acProgram == null)
+                return;
+
+            try
+            {
+                dbApp.ExecuteStoreCommand("delete OperationLog from OperationLog ol inner join ACProgramLog pl on ol.ACProgramLogID = pl.ACProgramLogID where pl.ACProgramID = {0}", acProgram.ACProgramID);
+
+                DateTime dateTime = DateTime.Now.AddDays(-ArchiveAfterDays);
+                dbApp.ExecuteStoreCommand("delete OperationLog where OperationTime < {0}", dateTime);
+            }
+            catch (Exception ec)
+            {
+                //Error50217: Order log archive is fail! Error message: {0}
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DeleteOperationLog), 241, "Error50217", ec.Message);
+                AddAlarm(PropNameExportAlarm, msg);
+
+                string msgEc = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msgEc += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException(ClassName, nameof(DeleteOperationLog)+"(10)", msgEc);
 
                 return;
             }

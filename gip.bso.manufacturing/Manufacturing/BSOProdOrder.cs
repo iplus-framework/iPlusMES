@@ -64,10 +64,15 @@ namespace gip.bso.manufacturing
             if (_MatReqManager == null)
                 throw new Exception("MatReqManager not configured");
 
-            AccessFilterPlanningMR.NavSearch();
-            SelectedFilterPlanningMR = null;
-            SelectedPOPosTimeFilterMode = POPosTimeFilterModeList?.FirstOrDefault();
-            Search();
+            bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
+            if (!skipSearchOnStart)
+            {
+                AccessFilterPlanningMR.NavSearch();
+                SelectedFilterPlanningMR = null;
+                SelectedPOPosTimeFilterMode = POPosTimeFilterModeList?.FirstOrDefault();
+                Search();
+            }
+
             return true;
         }
 
