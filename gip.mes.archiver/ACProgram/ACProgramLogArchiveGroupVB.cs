@@ -45,10 +45,10 @@ namespace gip.mes.archiver
             result = null;
             switch (acMethodName)
             {
-                case "RestoreArchivedProgramLogVB":
+                case nameof(RestoreArchivedProgramLogVB):
                     result = RestoreArchivedProgramLogVB(acParameter[0] as String, (DateTime) acParameter[1]);
                     return true;
-                case "ArchiveProgramLogVBManual":
+                case nameof(ArchiveProgramLogVBManual):
                     result = ArchiveProgramLogVBManual(acParameter[0] as String, (DateTime)acParameter[1], acParameter[2] as String);
                     return true;
             }
@@ -80,8 +80,8 @@ namespace gip.mes.archiver
                     if (msg != null)
                     {
                         AddAlarm(PropNameExportAlarm, msg);
-                        Messages.LogError(GetACUrl(), "OnProgramLogArchive(10)", msg.Message);
-                        Messages.LogError(GetACUrl(), "OnProgramLogArchive(11)", msg.InnerMessage);
+                        Messages.LogError(GetACUrl(), nameof(OnProgramLogArchive) + "(10)", msg.Message);
+                        Messages.LogError(GetACUrl(), nameof(OnProgramLogArchive) + "(11)", msg.InnerMessage);
                     }
 
                     return acProgramFolderName;
@@ -168,14 +168,14 @@ namespace gip.mes.archiver
             catch(Exception ec)
             {
                 //Error50219: Detaching OrderLog from database context is fail!!! Error message: {0}
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ArchiveOrderLog", 164, "Error50219", ec.Message);
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOrderLog), 164, "Error50219", ec.Message);
                 AddAlarm(PropNameExportAlarm, msg);
 
                 string msgEc = ec.Message;
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msgEc += " Inner:" + ec.InnerException.Message;
 
-                Messages.LogException(ClassName, "ArchiveOrderLog(0)", msgEc);
+                Messages.LogException(ClassName, nameof(ArchiveOrderLog) + "(0)", msgEc);
 
                 return;
             }
@@ -191,14 +191,14 @@ namespace gip.mes.archiver
             catch (Exception ec)
             {
                 //Error50218: Order log serialization is fail! Error message: {0}
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ArchiveOrderLog", 187, "Error50218", ec.Message);
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOrderLog), 187, "Error50218", ec.Message);
                 AddAlarm(PropNameExportAlarm, msg);
 
                 string msgEc = ec.Message;
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msgEc += " Inner:" + ec.InnerException.Message;
 
-                Messages.LogException(ClassName, "ArchiveOrderLog(10)", msgEc);
+                Messages.LogException(ClassName, nameof(ArchiveOrderLog) + "(10)", msgEc);
 
                 return;
             }
@@ -210,14 +210,14 @@ namespace gip.mes.archiver
             catch (Exception ec)
             {
                 //Error50217: Order log archive is fail! Error message: {0}
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ArchiveOrderLog", 206, "Error50217", ec.Message);
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOrderLog), 213, "Error50217", ec.Message);
                 AddAlarm(PropNameExportAlarm, msg);
 
                 string msgEc = ec.Message;
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msgEc += " Inner:" + ec.InnerException.Message;
 
-                Messages.LogException(ClassName, "ArchiveOrderLog(20)", msgEc);
+                Messages.LogException(ClassName, nameof(ArchiveOrderLog) + "(20)", msgEc);
 
                 return;
             }
@@ -282,7 +282,7 @@ namespace gip.mes.archiver
             if (!Directory.Exists(pathWithDate))
             {
                 //Error50213: Restore ACProgram: Can't find the directory with path: {0}
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "FindProgramLogInArchive", 253, "Error50213", pathWithDate);
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(FindProgramLogInArchive), 253, "Error50213", pathWithDate);
                 AddAlarm(PropNameExportAlarm, msg);
                 return;
             }
@@ -310,7 +310,7 @@ namespace gip.mes.archiver
             if (string.IsNullOrEmpty(orderLogPath))
             {
                 //Error50216:Restore ACProgram: Can't find the OrderLog file path!
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "FindProgramLogInArchive", 281, "Error50216");
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ProcessArchiveFile), 313, "Error50216");
                 AddAlarm(PropNameExportAlarm, msg);
                 return;
             }
@@ -338,8 +338,8 @@ namespace gip.mes.archiver
                         if (msg != null)
                         {
                             AddAlarm(PropNameExportAlarm, msg);
-                            Messages.LogError(GetACUrl(), "FindProgramLogInArchive(9)", msg.Message);
-                            Messages.LogError(GetACUrl(), "FindProgramLogInArchive(9)", msg.InnerMessage);
+                            Messages.LogError(GetACUrl(), nameof(ProcessArchiveFile) + "(9)", msg.Message);
+                            Messages.LogError(GetACUrl(), nameof(ProcessArchiveFile) + "(9)", msg.InnerMessage);
                             return;
                         }
                     }
@@ -356,7 +356,7 @@ namespace gip.mes.archiver
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msgEc += " Inner:" + ec.InnerException.Message;
 
-                Messages.LogException(ClassName, "FindProgramLogInArchive(10)", msgEc);
+                Messages.LogException(ClassName, nameof(ProcessArchiveFile) + "(10)", msgEc);
 
                 return;
             }
@@ -412,7 +412,7 @@ namespace gip.mes.archiver
                     if (acProgram == null)
                     {
                         //Error50214: Archive ProgramLog: Can't find a ACProgram!
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "AcrhiveProgramLogVB", 379, "Error50214");
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveProgramLogVB), 379, "Error50214");
                         AddAlarm(PropNameExportAlarm, msg);
                         return;
                     }
@@ -424,8 +424,8 @@ namespace gip.mes.archiver
                         if (msg1 != null)
                         {
                             AddAlarm(PropNameExportAlarm, msg1);
-                            Messages.LogError(GetACUrl(), "ArchiveProgramLogVB(9)", msg1.Message);
-                            Messages.LogError(GetACUrl(), "ArchiveProgramLogVB(10)", msg1.InnerMessage);
+                            Messages.LogError(GetACUrl(), nameof(ArchiveProgramLogVB) + "(9)", msg1.Message);
+                            Messages.LogError(GetACUrl(), nameof(ArchiveProgramLogVB) + "(10)", msg1.InnerMessage);
                         }
                     }
                     catch (Exception e)
@@ -437,7 +437,7 @@ namespace gip.mes.archiver
                         if (e.InnerException != null && e.InnerException.Message != null)
                             msgEc += " Inner:" + e.InnerException.Message;
 
-                        Messages.LogException(ClassName, "ArchiveProgramLogVB(10)", msgEc);
+                        Messages.LogException(ClassName, nameof(ArchiveProgramLogVB) + "(11)", msgEc);
                     }
                 }
             }
