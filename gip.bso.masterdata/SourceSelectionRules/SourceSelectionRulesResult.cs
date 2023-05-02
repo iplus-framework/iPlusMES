@@ -12,11 +12,21 @@ namespace gip.bso.masterdata
 
         public List<RuleGroup> RuleGroups { get; set; } = new List<RuleGroup>();
         public List<MachineItem> MachineItems { get; set; } = new List<MachineItem>();
+        public List<dbMes.Material> DosableMaterials { get; set; } = new List<dbMes.Material>();
         public List<dbMes.Material> NotDosableMaterials { get; set; } = new List<dbMes.Material>();
 
         #endregion
 
         #region Methods
+
+        public void AddDosableMaterial(dbMes.Material material)
+        {
+            if (!DosableMaterials.Select(c => c.MaterialNo).Contains(material.MaterialNo))
+            {
+                DosableMaterials.Add(material);
+            }
+        }
+
 
         public void AddNotDosableMaterial(dbMes.Material material)
         {

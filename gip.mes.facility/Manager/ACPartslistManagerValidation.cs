@@ -367,7 +367,8 @@ namespace gip.mes.facility
             List<IACConfigStore> configStores,
             PARole.ValidationBehaviour validationBehaviour,
             MsgWithDetails detailMessages,
-            core.datamodel.ACClassWF inovokeNode = null)
+            core.datamodel.ACClassWF invokerPWNode = null,
+            bool collectingData = false)
         {
             PartslistValidationInfo validationInfo = new PartslistValidationInfo();
             List<MapPosToWFConn> matWFConnections = new List<MapPosToWFConn>();
@@ -433,7 +434,7 @@ namespace gip.mes.facility
 
             if (detailMessages.IsSucceded())
             {
-                validationInfo = CheckResourcesAndRouting(dbApp, dbiPlus, iPartslist, configStores, matWFConnections, validationBehaviour, detailMessages, inovokeNode);
+                validationInfo = CheckResourcesAndRouting(dbApp, dbiPlus, iPartslist, configStores, matWFConnections, validationBehaviour, detailMessages, invokerPWNode, collectingData);
             }
             return validationInfo;
         }
@@ -443,7 +444,8 @@ namespace gip.mes.facility
                                                     List<IACConfigStore> configStores, List<MapPosToWFConn> mapPosToWFConn,
                                                     PARole.ValidationBehaviour validationBehaviour,
                                                     MsgWithDetails detailMessages,
-                                                    core.datamodel.ACClassWF inovokeNode = null)
+                                                    core.datamodel.ACClassWF invokerPWNode = null,
+                                                    bool collectingData = false)
         {
             PartslistValidationInfo validationInfo = new PartslistValidationInfo();
             if (!mapPosToWFConn.Any() || configStores == null)
@@ -473,7 +475,7 @@ namespace gip.mes.facility
                 .Where(c =>
                             c.MatWFConn.ACClassWF.RefPAACClassMethod != null
                             && c.MatWFConn.ACClassWF.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                            && (inovokeNode == null || c.MatWFConn.ACClassWF.ACClassWFID == inovokeNode.ACClassWFID)
+                            && (invokerPWNode == null || c.MatWFConn.ACClassWF.ACClassWFID == invokerPWNode.ACClassWFID)
                       );
             validationInfo.MapPosToWFConnections = connToBatchInvocNodes.ToList();
             // Loop through Batch-Nodes
@@ -499,7 +501,7 @@ namespace gip.mes.facility
                     {
                         Guid[] possibleProjectIDs = possibleClassProjects.Select(c => c.ACProjectID).ToArray();
                         // Determine all PWGroups of the subworkflow and determine which ProcessModules could be mapped
-                        var mapPWGroup2Modules = dbIPlus.ACClassWF
+                        MapPWGroup2Modules[] mapPWGroup2Modules = dbIPlus.ACClassWF
                                                             .Include(c => c.RefPAACClass.ACClass_BasedOnACClass)
                                                             .Where(c => c.ACClassMethodID == mapPosWF.MatWFConn.ACClassWF.RefPAACClassMethodID
                                                                 && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWGroup
@@ -614,13 +616,13 @@ namespace gip.mes.facility
                                     IPartslistPosRelation[] materialsToCheck = node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.ToArray();
                                     foreach (IPartslistPosRelation mat4Dosing in materialsToCheck)
                                     {
-                                        if (dosableRelations.Contains(mat4Dosing))
+                                        if (!collectingData && dosableRelations.Contains(mat4Dosing))
                                             continue;
                                         if (!IsRouteValidationNeededForPos(mat4Dosing, dbApp, dbIPlus, pList, configStores, mapPosToWFConn, validationBehaviour, detailMessages))
                                             continue;
 
                                         MapPosToWFConnSubItem subItem = mapPosWF.MapPosToWFConnSubItems.Where(c => c.PWNode.ACClassWFID == node2Check.PWNode.ACClassWFID).FirstOrDefault();
-                                        if(subItem == null)
+                                        if (subItem == null)
                                         {
                                             subItem = new MapPosToWFConnSubItem() { PWNode = node2Check.PWNode };
                                             mapPosWF.MapPosToWFConnSubItems.Add(subItem);
@@ -632,7 +634,8 @@ namespace gip.mes.facility
                                         }
                                         IEnumerable<Route> routes = null;
                                         // Find mappingInfo for PWGroup (which ProcessModules could be used)
-                                        foreach (var pwGroup2Check in mapPWGroup2Modules.Where(c => c.PWGroup == node2Check.PWNode.ACClassWF1_ParentACClassWF))
+                                        MapPWGroup2Modules[] submapPWGroup2Modules = mapPWGroup2Modules.Where(c => c.PWGroup == node2Check.PWNode.ACClassWF1_ParentACClassWF).ToArray();
+                                        foreach (var pwGroup2Check in submapPWGroup2Modules)
                                         {
                                             foreach (var acClassPM in pwGroup2Check.ProcessModuleList)
                                             {

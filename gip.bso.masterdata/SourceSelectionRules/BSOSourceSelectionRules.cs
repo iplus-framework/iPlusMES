@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using dbMes = gip.mes.datamodel;
 using static gip.mes.datamodel.EntityObjectExtensionApp;
+using System.Windows.Media.Media3D;
+using System.ComponentModel.Design.Serialization;
 
 namespace gip.bso.masterdata
 {
@@ -280,19 +282,19 @@ namespace gip.bso.masterdata
             ACClassMethod method = databaseApp.ContextIPlus.ACClassMethod.FirstOrDefault(c => c.ACClassMethodID == acClassMethodID);
             dbMes.Partslist partslist = databaseApp.Partslist.FirstOrDefault(c => c.PartslistID == partslistID);
             dbMes.ProdOrderPartslist prodOrderPartslist = null;
-            ACClassWF inwokeWF = databaseApp.ContextIPlus.ACClassWF.Where(c => c.ACClassWFID == acClassWFID).FirstOrDefault();
+            ACClassWF invokerPWNode = databaseApp.ContextIPlus.ACClassWF.Where(c => c.ACClassWFID == acClassWFID).FirstOrDefault();
             if (prodOrderPartslistID != null)
             {
                 prodOrderPartslist = databaseApp.ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistID == prodOrderPartslistID);
             }
 
-            (IACConfigStore currentConfigStore, List<IACConfigStore> configStores) = GetConfigStores(method, partslist, prodOrderPartslist);
+            (IACConfigStore currentConfigStore, List<IACConfigStore> configStores) = GetConfigStores(new ACClassMethod[] { method, invokerPWNode.RefPAACClassMethod }, partslist, prodOrderPartslist);
 
-            SourceSelectionRulesResult sourceSelectionRulesResult = LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, configStores, inwokeWF, partslist);
+            SourceSelectionRulesResult sourceSelectionRulesResult = LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, configStores, invokerPWNode, partslist);
             return new Tuple<IACConfigStore, SourceSelectionRulesResult>(currentConfigStore, sourceSelectionRulesResult);
         }
 
-        private Tuple<IACConfigStore, List<IACConfigStore>> GetConfigStores(ACClassMethod method, dbMes.Partslist partslist, dbMes.ProdOrderPartslist prodOrderPartslist)
+        private Tuple<IACConfigStore, List<IACConfigStore>> GetConfigStores(ACClassMethod[] aCClassMethods, dbMes.Partslist partslist, dbMes.ProdOrderPartslist prodOrderPartslist)
         {
             List<IACConfigStore> configStores = new List<IACConfigStore>();
             IACConfigStore currentConfigStore = partslist;
@@ -307,19 +309,19 @@ namespace gip.bso.masterdata
                 configStores.Add(partslist);
             }
 
-            configStores.Add(method);
+            configStores.AddRange(aCClassMethods);
 
             configStores = iPlusMESConfigManager.GetACConfigStores(configStores);
 
             return new Tuple<IACConfigStore, List<IACConfigStore>>(currentConfigStore, configStores);
         }
 
-        private SourceSelectionRulesResult LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, ACClassWF inwokeWF, dbMes.Partslist partslist)
+        private SourceSelectionRulesResult LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, ACClassWF invokerPWNode, dbMes.Partslist partslist)
         {
             SourceSelectionRulesResult result = new SourceSelectionRulesResult();
 
             MsgWithDetails validationMessage = new MsgWithDetails();
-            PartslistValidationInfo partslistValidationInfo = PartslistManager.CheckResourcesAndRouting(databaseApp, Database.ContextIPlus, partslist, configStores, PARole.ValidationBehaviour.Laxly, validationMessage, inwokeWF);
+            PartslistValidationInfo partslistValidationInfo = PartslistManager.CheckResourcesAndRouting(databaseApp, Database.ContextIPlus, partslist, configStores, PARole.ValidationBehaviour.Laxly, validationMessage, invokerPWNode, true);
 
             MapPosToWFConn mapPosToWFConn = partslistValidationInfo.MapPosToWFConnections.FirstOrDefault();
             if (mapPosToWFConn != null)
@@ -334,7 +336,7 @@ namespace gip.bso.masterdata
 
                     foreach (MapPosToWFConnSubItem mapPosToWFConnSub in mapPosToWFConnSubs)
                     {
-                        string preConfigACUrl = inwokeWF.ConfigACUrl;
+                        string preConfigACUrl = invokerPWNode.ConfigACUrl;
                         if (!preConfigACUrl.EndsWith("\\"))
                         {
                             preConfigACUrl = preConfigACUrl + "\\";
@@ -347,6 +349,7 @@ namespace gip.bso.masterdata
                         {
                             if (mat4DosingAndRoutes.Value.Any())
                             {
+                                result.AddDosableMaterial(mat4DosingAndRoutes.Key);
                                 foreach (Route route in mat4DosingAndRoutes.Value)
                                 {
                                     if (route != null)
@@ -386,6 +389,8 @@ namespace gip.bso.masterdata
                     machineItem.Material = facility.Material;
                 }
             }
+
+            result.NotDosableMaterials = result.NotDosableMaterials.Where(c => !result.DosableMaterials.Select(x => x.MaterialNo).Contains(c.MaterialNo)).ToList();
 
             return result;
         }
