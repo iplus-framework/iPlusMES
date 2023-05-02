@@ -19,6 +19,7 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDCountrySalesTaxMDMaterialGroupID;
     public Guid MDCountrySalesTaxMDMaterialGroupID 
     {

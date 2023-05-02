@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class InvoicePos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
+public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public InvoicePos()
@@ -19,6 +19,7 @@ public partial class InvoicePos : VBEntityObject , IInsertInfo, IUpdateInfo, ISe
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _InvoicePosID;
     public Guid InvoicePosID 
     {

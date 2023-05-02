@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityMaterial : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public FacilityMaterial()
@@ -19,6 +19,7 @@ public partial class FacilityMaterial : VBEntityObject , IInsertInfo, IUpdateInf
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityMaterialID;
     public Guid FacilityMaterialID 
     {

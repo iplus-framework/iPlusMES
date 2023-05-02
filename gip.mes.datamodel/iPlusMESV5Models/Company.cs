@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Company : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public Company()
@@ -19,6 +19,7 @@ public partial class Company : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyID;
     public Guid CompanyID 
     {
@@ -642,24 +643,24 @@ public partial class Company : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Tourplan_Company); }
     }
 
-    private ICollection<UserSettings> _UserSetting_TenantCompany;
-    public virtual ICollection<UserSettings> UserSetting_TenantCompany
+    private ICollection<UserSettings> _UserSettings_TenantCompany;
+    public virtual ICollection<UserSettings> UserSettings_TenantCompany
     {
-        get => LazyLoader.Load(this, ref _UserSetting_TenantCompany);
-        set => _UserSetting_TenantCompany = value;
+        get => LazyLoader.Load(this, ref _UserSettings_TenantCompany);
+        set => _UserSettings_TenantCompany = value;
     }
 
-    public bool UserSetting_TenantCompany_IsLoaded
+    public bool UserSettings_TenantCompany_IsLoaded
     {
         get
         {
-            return UserSetting_TenantCompany != null;
+            return UserSettings_TenantCompany != null;
         }
     }
 
-    public virtual CollectionEntry UserSetting_TenantCompanyReference
+    public virtual CollectionEntry UserSettings_TenantCompanyReference
     {
-        get { return Context.Entry(this).Collection(c => c.UserSetting_TenantCompany); }
+        get { return Context.Entry(this).Collection(c => c.UserSettings_TenantCompany); }
     }
 
     private VBUser _VBUser;

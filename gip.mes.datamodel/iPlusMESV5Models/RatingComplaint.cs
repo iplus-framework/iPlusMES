@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class RatingComplaint : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class RatingComplaint : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public RatingComplaint()
@@ -19,6 +19,7 @@ public partial class RatingComplaint : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _RatingComplaintID;
     public Guid RatingComplaintID 
     {

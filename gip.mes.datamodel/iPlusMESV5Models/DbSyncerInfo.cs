@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class DbSyncerInfo : VBEntityObject 
+public partial class DbSyncerInfo : VBEntityObject
 {
 
     public DbSyncerInfo()
@@ -19,6 +19,7 @@ public partial class DbSyncerInfo : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     int _DbSyncerInfoID;
     public int DbSyncerInfoID 
     {

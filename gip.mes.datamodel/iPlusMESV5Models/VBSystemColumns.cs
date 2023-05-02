@@ -6,19 +6,20 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBSystemColumn : VBEntityObject 
+public partial class VBSystemColumns : VBEntityObject
 {
 
-    public VBSystemColumn()
+    public VBSystemColumns()
     {
     }
 
-    private VBSystemColumn(ILazyLoader lazyLoader)
+    private VBSystemColumns(ILazyLoader lazyLoader)
     {
         LazyLoader = lazyLoader;
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     string _tablename;
     public string tablename 
     {

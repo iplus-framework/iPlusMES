@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDBookingNotAvailableMode : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDBookingNotAvailableMode()
@@ -19,6 +19,7 @@ public partial class MDBookingNotAvailableMode : VBEntityObject , IInsertInfo, I
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDBookingNotAvailableModeID;
     public Guid MDBookingNotAvailableModeID 
     {

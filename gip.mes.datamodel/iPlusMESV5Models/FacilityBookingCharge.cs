@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityBookingCharge : VBEntityObject 
+public partial class FacilityBookingCharge : VBEntityObject
 {
 
     public FacilityBookingCharge()
@@ -19,6 +19,7 @@ public partial class FacilityBookingCharge : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityBookingChargeID;
     public Guid FacilityBookingChargeID 
     {
@@ -1094,25 +1095,6 @@ public partial class FacilityBookingCharge : VBEntityObject
         get { return Context.Entry(this).Reference("ProdOrderPartslistPosRelation"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_FacilityBookingCharge;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_FacilityBookingCharge
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_FacilityBookingCharge);
-        set => _TandTv2StepItem_FacilityBookingCharge = value;
-    }
-
-    public bool TandTv2StepItem_FacilityBookingCharge_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_FacilityBookingCharge != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_FacilityBookingChargeReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_FacilityBookingCharge); }
-    }
 
     private ICollection<TandTv3MixPointFacilityBookingCharge> _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge;
     public virtual ICollection<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge

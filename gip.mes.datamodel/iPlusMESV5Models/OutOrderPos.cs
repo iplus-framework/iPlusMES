@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
+public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public OutOrderPos()
@@ -19,6 +19,7 @@ public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo, IS
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _OutOrderPosID;
     public Guid OutOrderPosID 
     {
@@ -968,25 +969,6 @@ public partial class OutOrderPos : VBEntityObject , IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Reference("PickupCompanyMaterial"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_OutOrderPos;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_OutOrderPos
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_OutOrderPos);
-        set => _TandTv2StepItem_OutOrderPos = value;
-    }
-
-    public bool TandTv2StepItem_OutOrderPos_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_OutOrderPos != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_OutOrderPosReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_OutOrderPos); }
-    }
 
     private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
     public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBGroupRight : VBEntityObject 
+public partial class VBGroupRight : VBEntityObject
 {
 
     public VBGroupRight()
@@ -19,6 +19,7 @@ public partial class VBGroupRight : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VBGroupRightID;
     public Guid VBGroupRightID 
     {

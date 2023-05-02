@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ACClass : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public ACClass()
@@ -19,6 +19,7 @@ public partial class ACClass : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ACClassID;
     public Guid ACClassID 
     {
@@ -1597,25 +1598,6 @@ public partial class ACClass : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_VBiValueTypeACClass); }
     }
 
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_ACClass;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_ACClass
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_ACClass);
-        set => _TandTv2StepItem_ACClass = value;
-    }
-
-    public bool TandTv2StepItem_ACClass_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_ACClass != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_ACClassReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_ACClass); }
-    }
 
     private ICollection<TourplanConfig> _TourplanConfig_VBiACClass;
     public virtual ICollection<TourplanConfig> TourplanConfig_VBiACClass

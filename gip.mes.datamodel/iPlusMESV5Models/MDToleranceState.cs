@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDToleranceState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDToleranceState()
@@ -19,6 +19,7 @@ public partial class MDToleranceState : VBEntityObject , IInsertInfo, IUpdateInf
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDToleranceStateID;
     public Guid MDToleranceStateID 
     {

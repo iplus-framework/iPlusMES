@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public Material()
@@ -19,6 +19,7 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MaterialID;
     public Guid MaterialID 
     {
@@ -1388,25 +1389,6 @@ public partial class Material : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material1_ProductionMaterial"); }
     }
     
-    private ICollection<TandTv2JobMaterial> _TandTv2JobMaterial_Material;
-    public virtual ICollection<TandTv2JobMaterial> TandTv2JobMaterial_Material
-    {
-        get => LazyLoader.Load(this, ref _TandTv2JobMaterial_Material);
-        set => _TandTv2JobMaterial_Material = value;
-    }
-
-    public bool TandTv2JobMaterial_Material_IsLoaded
-    {
-        get
-        {
-            return TandTv2JobMaterial_Material != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2JobMaterial_MaterialReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2JobMaterial_Material); }
-    }
 
     private ICollection<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_Material;
     public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_Material

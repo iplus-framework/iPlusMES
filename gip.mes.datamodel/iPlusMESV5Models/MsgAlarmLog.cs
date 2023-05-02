@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MsgAlarmLog : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MsgAlarmLog : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public MsgAlarmLog()
@@ -19,6 +19,7 @@ public partial class MsgAlarmLog : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MsgAlarmLogID;
     public Guid MsgAlarmLogID 
     {

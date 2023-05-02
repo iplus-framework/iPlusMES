@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PriceListMaterial : VBEntityObject 
+public partial class PriceListMaterial : VBEntityObject
 {
 
     public PriceListMaterial()
@@ -19,6 +19,7 @@ public partial class PriceListMaterial : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _PriceListMaterialID;
     public Guid PriceListMaterialID 
     {

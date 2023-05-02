@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityBooking : VBEntityObject 
+public partial class FacilityBooking : VBEntityObject
 {
 
     public FacilityBooking()
@@ -19,6 +19,7 @@ public partial class FacilityBooking : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityBookingID;
     public Guid FacilityBookingID 
     {
@@ -1121,25 +1122,6 @@ public partial class FacilityBooking : VBEntityObject
         get { return Context.Entry(this).Reference("ProdOrderPartslistPosRelation"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_FacilityBooking;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_FacilityBooking
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_FacilityBooking);
-        set => _TandTv2StepItem_FacilityBooking = value;
-    }
-
-    public bool TandTv2StepItem_FacilityBooking_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_FacilityBooking != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_FacilityBookingReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_FacilityBooking); }
-    }
 
     private ACClass _VBiStackCalculatorACClass;
     public virtual ACClass VBiStackCalculatorACClass

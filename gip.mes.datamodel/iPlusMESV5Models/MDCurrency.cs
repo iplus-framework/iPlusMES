@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDCurrency : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDCurrency()
@@ -19,6 +19,7 @@ public partial class MDCurrency : VBEntityObject , IInsertInfo, IUpdateInfo, IMD
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDCurrencyID;
     public Guid MDCurrencyID 
     {

@@ -16,13 +16,18 @@
 <#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
 <#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
 <#
-    Debugger.Launch();
+    // Template version: 703 - please do NOT remove this line
     if (EntityType.IsSimpleManyToManyJoinEntityType())
     {
         // Don't scaffold these
         return "";
     }
     if ((EntityType.Name).Contains("udw"))
+    {
+        // Don't scaffold these
+        return "";
+    }
+    if ((EntityType.Name).Contains("TandTv2"))
     {
         // Don't scaffold these
         return "";
@@ -36,8 +41,8 @@
     {
         "System",
         "System.Collections.Generic",
-        "gip.core.datamodel",
         "Microsoft.EntityFrameworkCore.ChangeTracking",
+        "gip.core.datamodel",
         "Microsoft.EntityFrameworkCore.Infrastructure"
     };
 
@@ -134,6 +139,7 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
 <#
     var firstProperty = true;
     foreach (var property in EntityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
@@ -199,7 +205,7 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
             targetType = targetType.Remove(0,1);
         string navName = navigation.Name;
         string relName = "";
-        if (navigation.IsCollection)
+        if (navigation.IsCollection && !(navName.Contains("TandTv2")))
         {
             if(navName.Contains("Inverse"))
             {
@@ -238,7 +244,7 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
     }
 <#
         }
-        else
+        else if(!(navigation.Name.Contains("TandTv2")))
         {
             var needsNullable = Options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
             var needsInitializer = Options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;
@@ -251,7 +257,7 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
             {
                 navPIdname = "OrderLog_VBiACProgramLog";
             }
-            else if (!(navigation.ForeignKey.IsRequired && navigation.IsOnDependent) && targetType == EntityType.Name || navigation.Name == "BasedOn"+targetType)
+            else if (!(navigation.ForeignKey.IsRequired && navigation.IsOnDependent) && targetType == EntityType.Name || navigation.Name == "BasedOn"+targetType && navigation.Name != "BasedOnPartslistPos")
             {
                 navPIdname = targetType+"1_"+navName;
             }

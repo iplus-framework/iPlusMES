@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaintTask : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MaintTask : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public MaintTask()
@@ -19,6 +19,7 @@ public partial class MaintTask : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MaintTaskID;
     public Guid MaintTaskID 
     {

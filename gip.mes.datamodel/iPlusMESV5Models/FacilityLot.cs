@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityLot : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public FacilityLot()
@@ -19,6 +19,7 @@ public partial class FacilityLot : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityLotID;
     public Guid FacilityLotID 
     {
@@ -385,24 +386,25 @@ public partial class FacilityLot : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosFacilityLot_FacilityLot); }
     }
 
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_FacilityLot;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_FacilityLot
+
+    private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardLot;
+    public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardLot
     {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_FacilityLot);
-        set => _TandTv2StepItem_FacilityLot = value;
+        get => LazyLoader.Load(this, ref _TandTv3MixPoint_InwardLot);
+        set => _TandTv3MixPoint_InwardLot = value;
     }
 
-    public bool TandTv2StepItem_FacilityLot_IsLoaded
+    public bool TandTv3MixPoint_InwardLot_IsLoaded
     {
         get
         {
-            return TandTv2StepItem_FacilityLot != null;
+            return TandTv3MixPoint_InwardLot != null;
         }
     }
 
-    public virtual CollectionEntry TandTv2StepItem_FacilityLotReference
+    public virtual CollectionEntry TandTv3MixPoint_InwardLotReference
     {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_FacilityLot); }
+        get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_InwardLot); }
     }
 
     private ICollection<TandTv3MixPointFacilityLot> _TandTv3MixPointFacilityLot_FacilityLot;
@@ -423,25 +425,5 @@ public partial class FacilityLot : VBEntityObject , IInsertInfo, IUpdateInfo
     public virtual CollectionEntry TandTv3MixPointFacilityLot_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityLot_FacilityLot); }
-    }
-
-    private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardLot;
-    public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardLot
-    {
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint_InwardLot);
-        set => _TandTv3MixPoint_InwardLot = value;
-    }
-
-    public bool TandTv3MixPoint_InwardLot_IsLoaded
-    {
-        get
-        {
-            return TandTv3MixPoint_InwardLot != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv3MixPoint_InwardLotReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_InwardLot); }
     }
 }

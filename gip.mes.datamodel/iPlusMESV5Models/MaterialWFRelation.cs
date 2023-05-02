@@ -19,6 +19,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MaterialWFRelationID;
     public Guid MaterialWFRelationID 
     {

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDLabTag : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDLabTag : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDLabTag()
@@ -19,6 +19,7 @@ public partial class MDLabTag : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTr
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDLabTagID;
     public Guid MDLabTagID 
     {

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBUserACProject : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class VBUserACProject : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public VBUserACProject()
@@ -19,6 +19,7 @@ public partial class VBUserACProject : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VBUserACProjectID;
     public Guid VBUserACProjectID 
     {

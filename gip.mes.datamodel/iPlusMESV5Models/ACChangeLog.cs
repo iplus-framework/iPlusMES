@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ACChangeLog : VBEntityObject 
+public partial class ACChangeLog : VBEntityObject
 {
 
     public ACChangeLog()
@@ -19,6 +19,7 @@ public partial class ACChangeLog : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ACChangeLogID;
     public Guid ACChangeLogID 
     {
@@ -41,7 +42,7 @@ public partial class ACChangeLog : VBEntityObject
     }
 
     Guid _EntityKey;
-    new public Guid EntityKey 
+    public Guid EntityKey 
     {
         get { return _EntityKey; }
         set { SetProperty<Guid>(ref _EntityKey, value); }

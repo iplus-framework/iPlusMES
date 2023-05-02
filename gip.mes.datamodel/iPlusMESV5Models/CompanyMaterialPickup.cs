@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyMaterialPickup : VBEntityObject 
+public partial class CompanyMaterialPickup : VBEntityObject
 {
 
     public CompanyMaterialPickup()
@@ -19,6 +19,7 @@ public partial class CompanyMaterialPickup : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyMaterialPickupID;
     public Guid CompanyMaterialPickupID 
     {

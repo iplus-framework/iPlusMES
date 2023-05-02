@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDBalancingMode : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDBalancingMode()
@@ -19,6 +19,7 @@ public partial class MDBalancingMode : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDBalancingModeID;
     public Guid MDBalancingModeID 
     {

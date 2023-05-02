@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrderPartslistPosSplit : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
+public partial class ProdOrderPartslistPosSplit : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public ProdOrderPartslistPosSplit()
@@ -19,6 +19,7 @@ public partial class ProdOrderPartslistPosSplit : VBEntityObject , IInsertInfo, 
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ProdOrderPartslistPosSplitID;
     public Guid ProdOrderPartslistPosSplitID 
     {

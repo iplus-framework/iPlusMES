@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class InOrder : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public InOrder()
@@ -19,6 +19,7 @@ public partial class InOrder : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _InOrderID;
     public Guid InOrderID 
     {
@@ -508,23 +509,4 @@ public partial class InOrder : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PlanningMRProposal_InOrder); }
     }
 
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_InOrder;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_InOrder
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_InOrder);
-        set => _TandTv2StepItem_InOrder = value;
-    }
-
-    public bool TandTv2StepItem_InOrder_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_InOrder != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_InOrderReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_InOrder); }
-    }
 }

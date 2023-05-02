@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ControlScriptSyncInfo : VBEntityObject 
+public partial class ControlScriptSyncInfo : VBEntityObject
 {
 
     public ControlScriptSyncInfo()
@@ -19,6 +19,7 @@ public partial class ControlScriptSyncInfo : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     int _ControlScriptSyncInfoID;
     public int ControlScriptSyncInfoID 
     {

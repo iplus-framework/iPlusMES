@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PickingPosProdOrderPartslistPos : VBEntityObject 
+public partial class PickingPosProdOrderPartslistPos : VBEntityObject
 {
 
     public PickingPosProdOrderPartslistPos()
@@ -19,6 +19,7 @@ public partial class PickingPosProdOrderPartslistPos : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _PickingPosProdOrderPartslistPosID;
     public Guid PickingPosProdOrderPartslistPosID 
     {

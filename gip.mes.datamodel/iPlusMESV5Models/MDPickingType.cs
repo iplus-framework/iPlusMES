@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDPickingType : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDPickingType()
@@ -19,6 +19,7 @@ public partial class MDPickingType : VBEntityObject , IInsertInfo, IUpdateInfo, 
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDPickingTypeID;
     public Guid MDPickingTypeID 
     {

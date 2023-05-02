@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDFacilityInventoryState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDFacilityInventoryState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDFacilityInventoryState()
@@ -19,6 +19,7 @@ public partial class MDFacilityInventoryState : VBEntityObject , IInsertInfo, IU
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDFacilityInventoryStateID;
     public Guid MDFacilityInventoryStateID 
     {

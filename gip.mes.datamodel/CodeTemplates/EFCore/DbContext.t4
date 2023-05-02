@@ -16,7 +16,7 @@
 <#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
 <#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
 <#
-    Debugger.Launch();
+    // Template version: 703 - please do NOT remove this line
     if (!ProductInfo.GetVersion().StartsWith("7.0"))
     {
         Warning("Your templates were created using an older version of Entity Framework. Additional features and bug fixes may be available. See https://aka.ms/efcore-docs-updating-templates for more information.");
@@ -31,7 +31,9 @@
     {
         "System",
         "System.Collections.Generic",
-        "Microsoft.EntityFrameworkCore"
+        "Microsoft.EntityFrameworkCore",
+        "gip.core.datamodel",
+        "Microsoft.EntityFrameworkCore.Diagnostics"
     };
 
     if (NamespaceHint != Options.ModelNamespace
@@ -78,7 +80,7 @@ public partial class <#= Options.ContextName #> : DbContext
 <#
     } 
     
-    else if (!(entityType.Name.Contains("udw")))
+    else if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")))
     {
 #>
     public virtual DbSet<<#= entityType.Name #>> <#= entityType.Name #> { get; set; }
@@ -91,20 +93,20 @@ public partial class <#= Options.ContextName #> : DbContext
     {
 #>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
 <#
     if (!Options.SuppressConnectionStringWarning)
     {
 #>
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
 <#
     }
 #>
-        => optionsBuilder<#= code.Fragment(providerCode.GenerateUseProvider(Options.ConnectionString), indent: 3) #>;
-
+    }
 <#
     }
 
 #>
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 <#
@@ -142,7 +144,7 @@ public partial class <#= Options.ContextName #> : DbContext
         }
 
         var anyEntityTypeConfiguration = false;
-        if (!(entityType.Name.Contains("udw")))
+        if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")))
         {
 #>
         modelBuilder.Entity<<#= entityTypeNewName #>>(entity =>

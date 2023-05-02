@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBTranslationView : VBEntityObject 
+public partial class VBTranslationView : VBEntityObject
 {
 
     public VBTranslationView()
@@ -19,6 +19,7 @@ public partial class VBTranslationView : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     string _ACProjectName;
     public string ACProjectName 
     {

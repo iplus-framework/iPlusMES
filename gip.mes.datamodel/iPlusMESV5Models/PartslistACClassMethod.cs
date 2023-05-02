@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PartslistACClassMethod : VBEntityObject 
+public partial class PartslistACClassMethod : VBEntityObject
 {
 
     public PartslistACClassMethod()
@@ -19,6 +19,7 @@ public partial class PartslistACClassMethod : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _PartslistACClassMethodID;
     public Guid PartslistACClassMethodID 
     {

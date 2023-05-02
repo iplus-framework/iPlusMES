@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrderConnectionsDetailView : VBEntityObject 
+public partial class ProdOrderConnectionsDetailView : VBEntityObject
 {
 
     public ProdOrderConnectionsDetailView()
@@ -19,6 +19,7 @@ public partial class ProdOrderConnectionsDetailView : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     string _InwardProgramNo;
     public string InwardProgramNo 
     {

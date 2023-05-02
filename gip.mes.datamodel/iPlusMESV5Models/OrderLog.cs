@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OrderLog : VBEntityObject 
+public partial class OrderLog : VBEntityObject
 {
 
     public OrderLog()
@@ -19,6 +19,7 @@ public partial class OrderLog : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VBiACProgramLogID;
     public Guid VBiACProgramLogID 
     {

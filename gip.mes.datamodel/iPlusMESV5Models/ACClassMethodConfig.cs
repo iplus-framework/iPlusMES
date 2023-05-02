@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ACClassMethodConfig : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ACClassMethodConfig : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public ACClassMethodConfig()
@@ -19,6 +19,7 @@ public partial class ACClassMethodConfig : VBEntityObject , IInsertInfo, IUpdate
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ACClassMethodConfigID;
     public Guid ACClassMethodConfigID 
     {

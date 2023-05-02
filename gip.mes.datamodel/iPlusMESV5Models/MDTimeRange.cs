@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDTimeRange()
@@ -19,6 +19,7 @@ public partial class MDTimeRange : VBEntityObject , IInsertInfo, IUpdateInfo, IM
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDTimeRangeID;
     public Guid MDTimeRangeID 
     {

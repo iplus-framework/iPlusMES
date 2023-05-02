@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MachineMaterialPosView : VBEntityObject 
+public partial class MachineMaterialPosView : VBEntityObject, ISequence
 {
 
     public MachineMaterialPosView()
@@ -19,6 +19,7 @@ public partial class MachineMaterialPosView : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     string _ProgramNo;
     public string ProgramNo 
     {

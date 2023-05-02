@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OutOfferConfig : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public OutOfferConfig()
@@ -19,6 +19,7 @@ public partial class OutOfferConfig : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _OutOfferConfigID;
     public Guid OutOfferConfigID 
     {

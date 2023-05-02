@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class TourplanConfig : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public TourplanConfig()
@@ -19,6 +19,7 @@ public partial class TourplanConfig : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _TourplanConfigID;
     public Guid TourplanConfigID 
     {

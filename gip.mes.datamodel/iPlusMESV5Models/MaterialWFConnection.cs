@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaterialWFConnection : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public MaterialWFConnection()
@@ -19,6 +19,7 @@ public partial class MaterialWFConnection : VBEntityObject , IInsertInfo, IUpdat
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MaterialWFConnectionID;
     public Guid MaterialWFConnectionID 
     {

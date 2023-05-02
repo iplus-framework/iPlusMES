@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class TandTv3MixPointProdOrderPartslistPosRelation : VBEntityObject 
+public partial class TandTv3MixPointProdOrderPartslistPosRelation : VBEntityObject
 {
 
     public TandTv3MixPointProdOrderPartslistPosRelation()
@@ -19,6 +19,7 @@ public partial class TandTv3MixPointProdOrderPartslistPosRelation : VBEntityObje
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _TandTv3MixPointProdOrderPartslistPosRelationID;
     public Guid TandTv3MixPointProdOrderPartslistPosRelationID 
     {

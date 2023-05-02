@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyAddressUnloadingpoint : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence
+public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence
 {
 
     public CompanyAddressUnloadingpoint()
@@ -19,6 +19,7 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject , IInsertInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyAddressUnloadingpointID;
     public Guid CompanyAddressUnloadingpointID 
     {

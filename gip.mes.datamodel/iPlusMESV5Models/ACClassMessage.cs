@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ACClassMessage : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ACClassMessage : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public ACClassMessage()
@@ -19,6 +19,7 @@ public partial class ACClassMessage : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ACClassMessageID;
     public Guid ACClassMessageID 
     {

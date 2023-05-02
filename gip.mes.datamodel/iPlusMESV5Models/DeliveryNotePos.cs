@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class DeliveryNotePos : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence
+public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence
 {
 
     public DeliveryNotePos()
@@ -19,6 +19,7 @@ public partial class DeliveryNotePos : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _DeliveryNotePosID;
     public Guid DeliveryNotePosID 
     {
@@ -183,25 +184,6 @@ public partial class DeliveryNotePos : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("OutOrderPos"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_DeliveryNotePos;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_DeliveryNotePos
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_DeliveryNotePos);
-        set => _TandTv2StepItem_DeliveryNotePos = value;
-    }
-
-    public bool TandTv2StepItem_DeliveryNotePos_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_DeliveryNotePos != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_DeliveryNotePosReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_DeliveryNotePos); }
-    }
 
     private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_DeliveryNotePos;
     public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos

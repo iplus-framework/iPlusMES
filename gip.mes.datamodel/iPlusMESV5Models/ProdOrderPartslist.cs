@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrderPartslist : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
+public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public ProdOrderPartslist()
@@ -19,6 +19,7 @@ public partial class ProdOrderPartslist : VBEntityObject , IInsertInfo, IUpdateI
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ProdOrderPartslistID;
     public Guid ProdOrderPartslistID 
     {
@@ -409,25 +410,6 @@ public partial class ProdOrderPartslist : VBEntityObject , IInsertInfo, IUpdateI
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_SourceProdOrderPartslist); }
     }
 
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_ProdOrderPartslist;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_ProdOrderPartslist
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_ProdOrderPartslist);
-        set => _TandTv2StepItem_ProdOrderPartslist = value;
-    }
-
-    public bool TandTv2StepItem_ProdOrderPartslist_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_ProdOrderPartslist != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_ProdOrderPartslistReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_ProdOrderPartslist); }
-    }
 
     private ACProgram _VBiACProgram;
     public virtual ACProgram VBiACProgram

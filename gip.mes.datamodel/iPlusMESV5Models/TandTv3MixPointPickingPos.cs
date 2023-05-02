@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class TandTv3MixPointPickingPos : VBEntityObject 
+public partial class TandTv3MixPointPickingPos : VBEntityObject
 {
 
     public TandTv3MixPointPickingPos()
@@ -19,6 +19,7 @@ public partial class TandTv3MixPointPickingPos : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _TandTv3MixPointPickingPosID;
     public Guid TandTv3MixPointPickingPosID 
     {

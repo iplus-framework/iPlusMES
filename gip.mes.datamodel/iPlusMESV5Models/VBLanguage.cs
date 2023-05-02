@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBLanguage : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public VBLanguage()
@@ -19,6 +19,7 @@ public partial class VBLanguage : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VBLanguageID;
     public Guid VBLanguageID 
     {

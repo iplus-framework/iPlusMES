@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyAddressDepartment : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public CompanyAddressDepartment()
@@ -19,6 +19,7 @@ public partial class CompanyAddressDepartment : VBEntityObject , IInsertInfo, IU
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyAddressDepartmentID;
     public Guid CompanyAddressDepartmentID 
     {

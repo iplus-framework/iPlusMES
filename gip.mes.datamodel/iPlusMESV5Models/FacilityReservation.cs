@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityReservation : VBEntityObject , IInsertInfo, IUpdateInfo, ISequence
+public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence
 {
 
     public FacilityReservation()
@@ -19,6 +19,7 @@ public partial class FacilityReservation : VBEntityObject , IInsertInfo, IUpdate
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityReservationID;
     public Guid FacilityReservationID 
     {

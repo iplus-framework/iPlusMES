@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyPerson : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public CompanyPerson()
@@ -19,6 +19,7 @@ public partial class CompanyPerson : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyPersonID;
     public Guid CompanyPersonID 
     {
@@ -379,24 +380,24 @@ public partial class CompanyPerson : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Rating_CompanyPerson); }
     }
 
-    private ICollection<UserSettings> _UserSetting_InvoiceCompanyPerson;
-    public virtual ICollection<UserSettings> UserSetting_InvoiceCompanyPerson
+    private ICollection<UserSettings> _UserSettings_InvoiceCompanyPerson;
+    public virtual ICollection<UserSettings> UserSettings_InvoiceCompanyPerson
     {
-        get => LazyLoader.Load(this, ref _UserSetting_InvoiceCompanyPerson);
-        set => _UserSetting_InvoiceCompanyPerson = value;
+        get => LazyLoader.Load(this, ref _UserSettings_InvoiceCompanyPerson);
+        set => _UserSettings_InvoiceCompanyPerson = value;
     }
 
-    public bool UserSetting_InvoiceCompanyPerson_IsLoaded
+    public bool UserSettings_InvoiceCompanyPerson_IsLoaded
     {
         get
         {
-            return UserSetting_InvoiceCompanyPerson != null;
+            return UserSettings_InvoiceCompanyPerson != null;
         }
     }
 
-    public virtual CollectionEntry UserSetting_InvoiceCompanyPersonReference
+    public virtual CollectionEntry UserSettings_InvoiceCompanyPersonReference
     {
-        get { return Context.Entry(this).Collection(c => c.UserSetting_InvoiceCompanyPerson); }
+        get { return Context.Entry(this).Collection(c => c.UserSettings_InvoiceCompanyPerson); }
     }
 
     private ICollection<VisitorVoucher> _VisitorVoucher_VisitorCompanyPerson;

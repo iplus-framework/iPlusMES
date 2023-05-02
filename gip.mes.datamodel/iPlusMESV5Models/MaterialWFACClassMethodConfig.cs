@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaterialWFACClassMethodConfig : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public MaterialWFACClassMethodConfig()
@@ -19,6 +19,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject , IInsertInf
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MaterialWFACClassMethodConfigID;
     public Guid MaterialWFACClassMethodConfigID 
     {

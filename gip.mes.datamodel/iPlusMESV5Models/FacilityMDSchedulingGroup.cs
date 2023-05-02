@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityMDSchedulingGroup : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public FacilityMDSchedulingGroup()
@@ -19,6 +19,7 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject , IInsertInfo, I
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityMDSchedulingGroupID;
     public Guid FacilityMDSchedulingGroupID 
     {

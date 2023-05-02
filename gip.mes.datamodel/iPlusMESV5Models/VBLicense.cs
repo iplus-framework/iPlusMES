@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBLicense : VBEntityObject 
+public partial class VBLicense : VBEntityObject
 {
 
     public VBLicense()
@@ -19,6 +19,7 @@ public partial class VBLicense : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VBLicenseID;
     public Guid VBLicenseID 
     {

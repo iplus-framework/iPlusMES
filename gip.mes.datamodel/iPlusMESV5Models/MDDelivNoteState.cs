@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDDelivNoteState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDDelivNoteState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDDelivNoteState()
@@ -19,6 +19,7 @@ public partial class MDDelivNoteState : VBEntityObject , IInsertInfo, IUpdateInf
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDDelivNoteStateID;
     public Guid MDDelivNoteStateID 
     {

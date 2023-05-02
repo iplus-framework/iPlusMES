@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDFacilityVehicleType : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDFacilityVehicleType : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDFacilityVehicleType()
@@ -19,6 +19,7 @@ public partial class MDFacilityVehicleType : VBEntityObject , IInsertInfo, IUpda
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDFacilityVehicleTypeID;
     public Guid MDFacilityVehicleTypeID 
     {

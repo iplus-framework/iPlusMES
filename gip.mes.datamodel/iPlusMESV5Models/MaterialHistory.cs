@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaterialHistory : VBEntityObject 
+public partial class MaterialHistory : VBEntityObject
 {
 
     public MaterialHistory()
@@ -19,6 +19,7 @@ public partial class MaterialHistory : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MaterialHistoryID;
     public Guid MaterialHistoryID 
     {

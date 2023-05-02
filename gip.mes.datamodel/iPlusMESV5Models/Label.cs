@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Label : VBEntityObject 
+public partial class Label : VBEntityObject
 {
 
     public Label()
@@ -19,6 +19,7 @@ public partial class Label : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _LabelID;
     public Guid LabelID 
     {

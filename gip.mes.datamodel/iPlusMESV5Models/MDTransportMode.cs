@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDTransportMode : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDTransportMode()
@@ -19,6 +19,7 @@ public partial class MDTransportMode : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDTransportModeID;
     public Guid MDTransportModeID 
     {

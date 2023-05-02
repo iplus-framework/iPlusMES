@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class TandTv3MDTrackingStartItemType : VBEntityObject 
+public partial class TandTv3MDTrackingStartItemType : VBEntityObject
 {
 
     public TandTv3MDTrackingStartItemType()
@@ -19,6 +19,7 @@ public partial class TandTv3MDTrackingStartItemType : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     string _TandTv3MDTrackingStartItemTypeID;
     public string TandTv3MDTrackingStartItemTypeID 
     {

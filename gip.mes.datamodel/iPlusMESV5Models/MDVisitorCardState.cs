@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDVisitorCardState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDVisitorCardState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDVisitorCardState()
@@ -19,6 +19,7 @@ public partial class MDVisitorCardState : VBEntityObject , IInsertInfo, IUpdateI
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDVisitorCardStateID;
     public Guid MDVisitorCardStateID 
     {

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyPersonRole : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public CompanyPersonRole()
@@ -19,6 +19,7 @@ public partial class CompanyPersonRole : VBEntityObject , IInsertInfo, IUpdateIn
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyPersonRoleID;
     public Guid CompanyPersonRoleID 
     {

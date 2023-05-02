@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDTourplanPosState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDTourplanPosState()
@@ -19,6 +19,7 @@ public partial class MDTourplanPosState : VBEntityObject , IInsertInfo, IUpdateI
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDTourplanPosStateID;
     public Guid MDTourplanPosStateID 
     {

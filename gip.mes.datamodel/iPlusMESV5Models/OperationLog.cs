@@ -19,6 +19,7 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _OperationLogID;
     public Guid OperationLogID 
     {

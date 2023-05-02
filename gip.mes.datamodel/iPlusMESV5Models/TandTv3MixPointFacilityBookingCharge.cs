@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class TandTv3MixPointFacilityBookingCharge : VBEntityObject 
+public partial class TandTv3MixPointFacilityBookingCharge : VBEntityObject
 {
 
     public TandTv3MixPointFacilityBookingCharge()
@@ -19,6 +19,7 @@ public partial class TandTv3MixPointFacilityBookingCharge : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _TandTv3MixPointFacilityBookingChargeID;
     public Guid TandTv3MixPointFacilityBookingChargeID 
     {

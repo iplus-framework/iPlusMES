@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDTermOfPayment : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDTermOfPayment()
@@ -19,6 +19,7 @@ public partial class MDTermOfPayment : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDTermOfPaymentID;
     public Guid MDTermOfPaymentID 
     {

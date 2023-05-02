@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PlanningMRProposal : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public PlanningMRProposal()
@@ -19,6 +19,7 @@ public partial class PlanningMRProposal : VBEntityObject , IInsertInfo, IUpdateI
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _PlanningMRProposalID;
     public Guid PlanningMRProposalID 
     {

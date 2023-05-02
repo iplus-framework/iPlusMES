@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDCountryLand : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDCountryLand()
@@ -19,6 +19,7 @@ public partial class MDCountryLand : VBEntityObject , IInsertInfo, IUpdateInfo, 
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDCountryLandID;
     public Guid MDCountryLandID 
     {

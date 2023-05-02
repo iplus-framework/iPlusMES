@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PickingConfig : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public PickingConfig()
@@ -19,6 +19,7 @@ public partial class PickingConfig : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _PickingConfigID;
     public Guid PickingConfigID 
     {

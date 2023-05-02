@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDMaintOrderState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDMaintOrderState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDMaintOrderState()
@@ -19,6 +19,7 @@ public partial class MDMaintOrderState : VBEntityObject , IInsertInfo, IUpdateIn
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDMaintOrderStateID;
     public Guid MDMaintOrderStateID 
     {

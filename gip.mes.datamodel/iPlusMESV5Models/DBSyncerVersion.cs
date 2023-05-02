@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class DBSyncerVersion : VBEntityObject 
+public partial class DBSyncerVersion : VBEntityObject
 {
 
     public DBSyncerVersion()
@@ -19,6 +19,7 @@ public partial class DBSyncerVersion : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     string _Version;
     public string Version 
     {

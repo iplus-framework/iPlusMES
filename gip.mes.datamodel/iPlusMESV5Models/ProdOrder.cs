@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrder : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public ProdOrder()
@@ -19,6 +19,7 @@ public partial class ProdOrder : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ProdOrderID;
     public Guid ProdOrderID 
     {
@@ -169,23 +170,4 @@ public partial class ProdOrder : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslist_ProdOrder); }
     }
 
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_ProdOrder;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_ProdOrder
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_ProdOrder);
-        set => _TandTv2StepItem_ProdOrder = value;
-    }
-
-    public bool TandTv2StepItem_ProdOrder_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_ProdOrder != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_ProdOrderReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_ProdOrder); }
-    }
 }

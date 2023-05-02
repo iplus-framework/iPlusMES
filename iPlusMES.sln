@@ -149,6 +149,10 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.core.sql", "..\iPlus\gi
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.mes.sql", "gip.mes.sql\gip.mes.sql.sqlproj", "{D2F4E983-CF1F-4689-BF8D-4D56A6615491}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.reporthandlerwpf", "..\iPlus\gip.core.reporthandlerwpf\gip.core.reporthandlerwpf.csproj", "{7FE01550-DA55-421C-8B1E-7760E70B71B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.wpfservices", "..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj", "{61584164-8F67-4175-B42F-E9142C835F6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -480,6 +484,18 @@ Global
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61584164-8F67-4175-B42F-E9142C835F6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61584164-8F67-4175-B42F-E9142C835F6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61584164-8F67-4175-B42F-E9142C835F6E}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{61584164-8F67-4175-B42F-E9142C835F6E}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
+		{61584164-8F67-4175-B42F-E9142C835F6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61584164-8F67-4175-B42F-E9142C835F6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -553,6 +569,8 @@ Global
 		{71C000C3-7BEF-410E-9922-7282476FCEAD} = {3C7E5EA9-3F24-4077-BD6D-28C8B8B805E3}
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12} = {B5C7FEEF-A87E-4FDE-8092-3A03B1E092A9}
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491} = {F4A3E5B7-F8EA-41BB-A00A-C75D60754CAE}
+		{7FE01550-DA55-421C-8B1E-7760E70B71B5} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
+		{61584164-8F67-4175-B42F-E9142C835F6E} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3D892D3-D698-40B1-927D-CB943150F1E1}

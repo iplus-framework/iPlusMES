@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class OrderLogRelView : VBEntityObject 
+public partial class OrderLogRelView : VBEntityObject
 {
 
     public OrderLogRelView()
@@ -19,6 +19,7 @@ public partial class OrderLogRelView : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ACProgramLogID;
     public Guid ACProgramLogID 
     {

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class CompanyAddress : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public CompanyAddress()
@@ -19,6 +19,7 @@ public partial class CompanyAddress : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CompanyAddressID;
     public Guid CompanyAddressID 
     {
@@ -702,23 +703,23 @@ public partial class CompanyAddress : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TourplanPos_CompanyAddress); }
     }
 
-    private ICollection<UserSettings> _UserSetting_InvoiceCompanyAddress;
-    public virtual ICollection<UserSettings> UserSetting_InvoiceCompanyAddress
+    private ICollection<UserSettings> _UserSettings_InvoiceCompanyAddress;
+    public virtual ICollection<UserSettings> UserSettings_InvoiceCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _UserSetting_InvoiceCompanyAddress);
-        set => _UserSetting_InvoiceCompanyAddress = value;
+        get => LazyLoader.Load(this, ref _UserSettings_InvoiceCompanyAddress);
+        set => _UserSettings_InvoiceCompanyAddress = value;
     }
 
-    public bool UserSetting_InvoiceCompanyAddress_IsLoaded
+    public bool UserSettings_InvoiceCompanyAddress_IsLoaded
     {
         get
         {
-            return UserSetting_InvoiceCompanyAddress != null;
+            return UserSettings_InvoiceCompanyAddress != null;
         }
     }
 
-    public virtual CollectionEntry UserSetting_InvoiceCompanyAddressReference
+    public virtual CollectionEntry UserSettings_InvoiceCompanyAddressReference
     {
-        get { return Context.Entry(this).Collection(c => c.UserSetting_InvoiceCompanyAddress); }
+        get { return Context.Entry(this).Collection(c => c.UserSettings_InvoiceCompanyAddress); }
     }
 }

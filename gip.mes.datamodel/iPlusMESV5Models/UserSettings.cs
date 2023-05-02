@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class UserSettings : VBEntityObject 
+public partial class UserSettings : VBEntityObject
 {
 
     public UserSettings()
@@ -19,6 +19,7 @@ public partial class UserSettings : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _UserSettingsID;
     public Guid UserSettingsID 
     {

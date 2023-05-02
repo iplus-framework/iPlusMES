@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VisitorVoucher : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public VisitorVoucher()
@@ -19,6 +19,7 @@ public partial class VisitorVoucher : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VisitorVoucherID;
     public Guid VisitorVoucherID 
     {

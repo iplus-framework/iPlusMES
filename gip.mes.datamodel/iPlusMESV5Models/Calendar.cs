@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Calendar : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public Calendar()
@@ -19,6 +19,7 @@ public partial class Calendar : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _CalendarID;
     public Guid CalendarID 
     {

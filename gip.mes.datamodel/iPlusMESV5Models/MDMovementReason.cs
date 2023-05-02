@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDMovementReason : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDMovementReason()
@@ -19,6 +19,7 @@ public partial class MDMovementReason : VBEntityObject , IInsertInfo, IUpdateInf
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDMovementReasonID;
     public Guid MDMovementReasonID 
     {

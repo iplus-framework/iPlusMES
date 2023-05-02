@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class FacilityCharge : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public FacilityCharge()
@@ -19,6 +19,7 @@ public partial class FacilityCharge : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityChargeID;
     public Guid FacilityChargeID 
     {
@@ -558,7 +559,7 @@ public partial class FacilityCharge : VBEntityObject , IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Reference("Material"); }
     }
-
+    
     private ICollection<OperationLog> _OperationLog_FacilityCharge;
     public virtual ICollection<OperationLog> OperationLog_FacilityCharge
     {
@@ -599,23 +600,4 @@ public partial class FacilityCharge : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Partslist"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_FacilityCharge;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_FacilityCharge
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_FacilityCharge);
-        set => _TandTv2StepItem_FacilityCharge = value;
-    }
-
-    public bool TandTv2StepItem_FacilityCharge_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_FacilityCharge != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_FacilityChargeReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_FacilityCharge); }
-    }
 }

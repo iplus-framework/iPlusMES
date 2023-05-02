@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ProdOrderPartslistPosRelation : VBEntityObject , ISequence, ITargetQuantity
+public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, ITargetQuantity
 {
 
     public ProdOrderPartslistPosRelation()
@@ -19,6 +19,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject , ISequence,
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ProdOrderPartslistPosRelationID;
     public Guid ProdOrderPartslistPosRelationID 
     {
@@ -344,25 +345,6 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject , ISequence,
         get { return Context.Entry(this).Reference("SourceProdOrderPartslistPos"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_ProdOrderPartslistPosRelation;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_ProdOrderPartslistPosRelation
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_ProdOrderPartslistPosRelation);
-        set => _TandTv2StepItem_ProdOrderPartslistPosRelation = value;
-    }
-
-    public bool TandTv2StepItem_ProdOrderPartslistPosRelation_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_ProdOrderPartslistPosRelation != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_ProdOrderPartslistPosRelationReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_ProdOrderPartslistPosRelation); }
-    }
 
     private ICollection<TandTv3MixPointProdOrderPartslistPosRelation> _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation;
     public virtual ICollection<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation

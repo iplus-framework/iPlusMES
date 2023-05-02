@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDReservationMode : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDReservationMode()
@@ -19,6 +19,7 @@ public partial class MDReservationMode : VBEntityObject , IInsertInfo, IUpdateIn
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDReservationModeID;
     public Guid MDReservationModeID 
     {

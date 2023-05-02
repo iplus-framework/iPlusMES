@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDMaterialGroup : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDMaterialGroup()
@@ -19,6 +19,7 @@ public partial class MDMaterialGroup : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDMaterialGroupID;
     public Guid MDMaterialGroupID 
     {

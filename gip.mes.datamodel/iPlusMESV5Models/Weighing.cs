@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Weighing : VBEntityObject 
+public partial class Weighing : VBEntityObject
 {
 
     public Weighing()
@@ -19,6 +19,7 @@ public partial class Weighing : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _WeighingID;
     public Guid WeighingID 
     {

@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class VBUser : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public VBUser()
@@ -19,6 +19,7 @@ public partial class VBUser : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _VBUserID;
     public Guid VBUserID 
     {
@@ -197,24 +198,24 @@ public partial class VBUser : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MenuACClassDesign"); }
     }
     
-    private ICollection<UserSettings> _UserSetting_VBUser;
-    public virtual ICollection<UserSettings> UserSetting_VBUser
+    private ICollection<UserSettings> _UserSettings_VBUser;
+    public virtual ICollection<UserSettings> UserSettings_VBUser
     {
-        get => LazyLoader.Load(this, ref _UserSetting_VBUser);
-        set => _UserSetting_VBUser = value;
+        get => LazyLoader.Load(this, ref _UserSettings_VBUser);
+        set => _UserSettings_VBUser = value;
     }
 
-    public bool UserSetting_VBUser_IsLoaded
+    public bool UserSettings_VBUser_IsLoaded
     {
         get
         {
-            return UserSetting_VBUser != null;
+            return UserSettings_VBUser != null;
         }
     }
 
-    public virtual CollectionEntry UserSetting_VBUserReference
+    public virtual CollectionEntry UserSettings_VBUserReference
     {
-        get { return Context.Entry(this).Collection(c => c.UserSetting_VBUser); }
+        get { return Context.Entry(this).Collection(c => c.UserSettings_VBUser); }
     }
 
     private VBLanguage _VBLanguage;

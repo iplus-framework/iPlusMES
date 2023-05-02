@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDRatingComplaintType : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDRatingComplaintType : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDRatingComplaintType()
@@ -19,6 +19,7 @@ public partial class MDRatingComplaintType : VBEntityObject , IInsertInfo, IUpda
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDRatingComplaintTypeID;
     public Guid MDRatingComplaintTypeID 
     {

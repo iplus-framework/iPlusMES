@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class ACPropertyLogRule : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class ACPropertyLogRule : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public ACPropertyLogRule()
@@ -19,6 +19,7 @@ public partial class ACPropertyLogRule : VBEntityObject , IInsertInfo, IUpdateIn
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _ACPropertyLogRuleID;
     public Guid ACPropertyLogRuleID 
     {

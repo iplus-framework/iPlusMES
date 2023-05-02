@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDGMPAdditive : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDGMPAdditive()
@@ -19,6 +19,7 @@ public partial class MDGMPAdditive : VBEntityObject , IInsertInfo, IUpdateInfo, 
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDGMPAdditiveID;
     public Guid MDGMPAdditiveID 
     {

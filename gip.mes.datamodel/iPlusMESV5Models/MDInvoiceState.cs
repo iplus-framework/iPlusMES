@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDInvoiceState : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDInvoiceState : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDInvoiceState()
@@ -19,6 +19,7 @@ public partial class MDInvoiceState : VBEntityObject , IInsertInfo, IUpdateInfo,
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDInvoiceStateID;
     public Guid MDInvoiceStateID 
     {

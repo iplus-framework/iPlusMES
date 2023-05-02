@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDProcessErrorAction : VBEntityObject , IInsertInfo, IUpdateInfo, IMDTrans
+public partial class MDProcessErrorAction : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
 {
 
     public MDProcessErrorAction()
@@ -19,6 +19,7 @@ public partial class MDProcessErrorAction : VBEntityObject , IInsertInfo, IUpdat
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _MDProcessErrorActionID;
     public Guid MDProcessErrorActionID 
     {

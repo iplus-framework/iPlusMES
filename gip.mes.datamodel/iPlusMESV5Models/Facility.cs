@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Facility : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public Facility()
@@ -19,6 +19,7 @@ public partial class Facility : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _FacilityID;
     public Guid FacilityID 
     {
@@ -1028,25 +1029,6 @@ public partial class Facility : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingPos_ToFacility); }
     }
 
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_Facility;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_Facility
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_Facility);
-        set => _TandTv2StepItem_Facility = value;
-    }
-
-    public bool TandTv2StepItem_Facility_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_Facility != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_FacilityReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_Facility); }
-    }
 
     private ICollection<TandTv3MixPointFacility> _TandTv3MixPointFacility_Facility;
     public virtual ICollection<TandTv3MixPointFacility> TandTv3MixPointFacility_Facility

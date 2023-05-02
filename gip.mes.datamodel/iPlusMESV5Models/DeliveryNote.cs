@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class DeliveryNote : VBEntityObject , IInsertInfo, IUpdateInfo
+public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public DeliveryNote()
@@ -19,6 +19,7 @@ public partial class DeliveryNote : VBEntityObject , IInsertInfo, IUpdateInfo
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _DeliveryNoteID;
     public Guid DeliveryNoteID 
     {
@@ -342,25 +343,6 @@ public partial class DeliveryNote : VBEntityObject , IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ShipperCompanyAddress"); }
     }
     
-    private ICollection<TandTv2StepItem> _TandTv2StepItem_DeliveryNote;
-    public virtual ICollection<TandTv2StepItem> TandTv2StepItem_DeliveryNote
-    {
-        get => LazyLoader.Load(this, ref _TandTv2StepItem_DeliveryNote);
-        set => _TandTv2StepItem_DeliveryNote = value;
-    }
-
-    public bool TandTv2StepItem_DeliveryNote_IsLoaded
-    {
-        get
-        {
-            return TandTv2StepItem_DeliveryNote != null;
-        }
-    }
-
-    public virtual CollectionEntry TandTv2StepItem_DeliveryNoteReference
-    {
-        get { return Context.Entry(this).Collection(c => c.TandTv2StepItem_DeliveryNote); }
-    }
 
     private TourplanPos _TourplanPos;
     public virtual TourplanPos TourplanPos

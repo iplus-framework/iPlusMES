@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class JobTableRecalcActualQuantity : VBEntityObject 
+public partial class JobTableRecalcActualQuantity : VBEntityObject
 {
 
     public JobTableRecalcActualQuantity()
@@ -19,6 +19,7 @@ public partial class JobTableRecalcActualQuantity : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     long _ID;
     public long ID 
     {

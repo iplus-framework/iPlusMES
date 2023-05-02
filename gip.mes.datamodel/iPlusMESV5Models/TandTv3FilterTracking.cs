@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class TandTv3FilterTracking : VBEntityObject 
+public partial class TandTv3FilterTracking : VBEntityObject
 {
 
     public TandTv3FilterTracking()
@@ -19,6 +19,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     }
 
     private ILazyLoader LazyLoader { get; set; }
+    
     Guid _TandTv3FilterTrackingID;
     public Guid TandTv3FilterTrackingID 
     {
