@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Security.Cryptography;
 using dbMes = gip.mes.datamodel;
 
@@ -61,11 +62,31 @@ namespace gip.bso.masterdata
                     OnPropertyChanged(nameof(IsSelected));
                     if (RuleGroup != null)
                     {
-                        RuleGroup.MachineItemSelectionChanged(this);
+                        SourceSelectionRulesResult.UpdateMachineItems(value, this);
                     }
-                    else
+                }
+            }
+        }
+
+        public bool AllSelectionStarted { get; set; } = false;
+        public bool? _IsSelectedAll;
+
+        [ACPropertyInfo(103, "", gip.mes.datamodel.ConstApp.Select)]
+        public bool? IsSelectedAll
+        {
+            get
+            {
+                return _IsSelectedAll;
+            }
+            set
+            {
+                if (_IsSelectedAll != value)
+                {
+                    _IsSelectedAll = value;
+                    OnPropertyChanged(nameof(IsSelectedAll));
+                    if (RuleGroup == null)
                     {
-                        SourceSelectionRulesResult.MachineItemSelectionChanged(this);
+                        SourceSelectionRulesResult.UpdateRuleGroupMachine(Machine.ACClassID, value);
                     }
                 }
             }

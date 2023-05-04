@@ -51,7 +51,7 @@ namespace gip.bso.masterdata
                 material = MachineItem.Material.ToString();
             }
             string isSelected = "";
-            if (MachineItem == null && MachineItem.IsSelected)
+            if (MachineItem != null && MachineItem.IsSelected)
             {
                 isSelected = "x";
             }

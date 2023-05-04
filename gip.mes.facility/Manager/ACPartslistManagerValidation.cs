@@ -647,8 +647,10 @@ namespace gip.mes.facility
 
                                                     KeyValuePair<Material, List<Route>> mat4DosingRoute = subItem.Mat4DosingAndRoutes.FirstOrDefault(c => c.Key.MaterialNo == mat4Dosing.I_SourcePartslistPos.MaterialNo);
                                                     mat4DosingRoute.Value.AddRange(routes);
-
-                                                    break;
+                                                    if(!collectingData)
+                                                    {
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
