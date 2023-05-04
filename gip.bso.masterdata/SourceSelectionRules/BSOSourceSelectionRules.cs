@@ -347,7 +347,6 @@ namespace gip.bso.masterdata
                             preConfigACUrl = preConfigACUrl + "\\";
                         }
 
-
                         List<ACClass> excludedProcessModules = GetExcludedProcessModules(database, configStores, preConfigACUrl, mapPosToWFConnSub.PWNode);
 
                         foreach (KeyValuePair<dbMes.Material, List<Route>> mat4DosingAndRoutes in mapPosToWFConnSub.Mat4DosingAndRoutes)
@@ -445,10 +444,26 @@ namespace gip.bso.masterdata
             bool change = false;
             foreach (ACClassWF aCClassWF in machineItem.PWNodes)
             {
-                IACConfig currentStoreConfigItem = ACConfigHelper.GetStoreConfiguration(CurrentConfigStore.ConfigurationEntries, machineItem.PreConfigACUrl, machineItem.GetConfigACUrl(aCClassWF), false, null);
+                string localConfigACUrl = machineItem.GetConfigACUrl(aCClassWF);
+
+                IACConfig currentStoreConfigItem = ACConfigHelper.GetStoreConfiguration(CurrentConfigStore.ConfigurationEntries, machineItem.PreConfigACUrl, localConfigACUrl, false, null);
                 List<ACClass> excludedModules = GetExcludedProcessModules(database, new List<IACConfigStore>() { CurrentConfigStore }, machineItem.PreConfigACUrl, aCClassWF);
 
-                if (machineItem.IsSelected)
+                bool? isSelected = null;
+                if(machineItem.RuleGroup == null)
+                {
+                    isSelected = machineItem.IsSelectedAll;
+                }
+                else
+                {
+                    isSelected = machineItem.IsSelected;
+                }
+
+                if(isSelected == null)
+                {
+                    // do nothing
+                }
+                else if (isSelected ?? false)
                 {
 
                     if (excludedModules.Select(c => c.ACClassID).Contains(machineItem.Machine.ACClassID))
@@ -475,7 +490,7 @@ namespace gip.bso.masterdata
                     {
                         currentStoreConfigItem = CurrentConfigStore.NewACConfig(aCClassWF);
                         currentStoreConfigItem.PreConfigACUrl = machineItem.PreConfigACUrl;
-                        currentStoreConfigItem.LocalConfigACUrl = machineItem.GetConfigACUrl(aCClassWF);
+                        currentStoreConfigItem.LocalConfigACUrl = localConfigACUrl;
                         change = true;
                     }
 
@@ -513,7 +528,6 @@ namespace gip.bso.masterdata
             }
             return result ?? new List<ACClass>();
         }
-
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {

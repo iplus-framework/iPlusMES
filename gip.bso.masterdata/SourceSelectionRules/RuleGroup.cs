@@ -111,7 +111,7 @@ namespace gip.bso.masterdata
 
                 ruleSelection.MachineItem = new MachineItem(SourceSelectionRulesResult, this, source, material, preConfigACUrl);
                 SourceSelectionRulesResult.MachineItems.Add(ruleSelection.MachineItem);
-                ruleSelection.MachineItem.IsSelected = true;
+                ruleSelection.MachineItem._IsSelected = true;
 
                 ruleSelection.Target = target;
                 
@@ -123,41 +123,11 @@ namespace gip.bso.masterdata
             return ruleSelection;
         }
 
-        /// <summary>
-        /// is same module is selected on other view - sync booth values
-        /// </summary>
-        /// <param name="ruleSelection"></param>
-        /// <param name="aCClass"></param>
-        /// <param name="isSelected"></param>
-        public void PropagateSelection(RuleSelection ruleSelection, ACClass aCClass, bool isSelected)
-        {
-            //foreach (RuleSelection currRuleSelection in RuleSelections)
-            //{
-            //    if (currRuleSelection.RuleSelectionID != ruleSelection.RuleSelectionID)
-            //    {
-            //        if(currRuleSelection.Items != null)
-            //        {
-            //            foreach (RuleItem ruleItem in currRuleSelection.Items)
-            //            {
-            //                if (ruleItem.Machine.ACClassID == aCClass.ACClassID)
-            //                {
-            //                    ruleItem.IsSelected = isSelected;
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
         public override string ToString()
         {
             return RefPAACClass?.ACCaption;
         }
 
-        public void MachineItemSelectionChanged(MachineItem machineItem)
-        {
-            
-        }
 
         #endregion
     }
