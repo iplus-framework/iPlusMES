@@ -3493,6 +3493,9 @@ namespace gip.mes.facility
                     }
                 }
 
+                // TODO: Merke ob Menge bereits berechnet. Sonst Verteilung über Gesamtmenge.
+                // 
+                List<FacilityMaterialOEE> oeeEntriesOfCompleteOrder = new List<FacilityMaterialOEE>();
                 foreach (var machine in machineDurations.GroupBy(c => c.ACClass))
                 {
                     Guid machineACClassID = machine.Key.ACClassID;
@@ -3500,7 +3503,10 @@ namespace gip.mes.facility
                     if (facility == null)
                         continue;
 
-                    FacilityMaterial facilityMaterial = databaseApp.FacilityMaterial.Where(c => c.FacilityID == facility.FacilityID && c.MaterialID == prodOrderPartslist.Partslist.MaterialID).FirstOrDefault();
+                    FacilityMaterial facilityMaterial = databaseApp.FacilityMaterial
+                                                                    .Include(c => c.Facility.VBiFacilityACClass)
+                                                                    .Where(c => c.FacilityID == facility.FacilityID && c.MaterialID == prodOrderPartslist.Partslist.MaterialID)
+                                                                    .FirstOrDefault();
                     if (facilityMaterial == null)
                     {
                         facilityMaterial = FacilityMaterial.NewACObject(databaseApp, facility);
@@ -3525,6 +3531,7 @@ namespace gip.mes.facility
                             oeeEntry.ACProgramLogID = propLogSumByProgramLog.Key.ACProgramLogID;
                             databaseApp.FacilityMaterialOEE.AddObject(oeeEntry);
                         }
+                        oeeEntriesOfCompleteOrder.Add(oeeEntry);
 
                         DateTime minStartDate = DateTime.MaxValue;
                         DateTime maxEndDate = DateTime.MinValue;
@@ -3576,22 +3583,17 @@ namespace gip.mes.facility
                         //#endregion
 
                         // TODO: Calc Quantities and Scrap
-                        oeeEntry.CalcOEE();
-
-
-                        //GlobalApp.FacilityBookingType.ProdOrderPosInward
-
 
                         bool quantityFound = false;
                         /// 1. Prüfe ob es in der Gruppe eine Zugangsbuchung (Beziehung zu ProdORderPartslistPos in Booking) gibt -> Nehme diese Mengen zur Ermittlung
                         ///     Achtung wenn Zwischenprodukt mit Partslist-Buchung, dann nehme das richtige Endprodukt material
-                        FacilityBooking[] postingsOnThisMachine =
-                        databaseApp.FacilityBooking.Include(c => c.MDMovementReason)
+                        FacilityBookingCharge[] postingsOnThisMachine =
+                        databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue
                                                                 && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
                                                                 && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ProdOrderPosInward
                                                                 && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead!
-                                                                && c.PropertyACUrl == machine.Key.ACURLComponentCached)
+                                                                && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
                                                     .ToArray();
                         if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
                         {
@@ -3608,29 +3610,58 @@ namespace gip.mes.facility
                         /// 2. Prüfe ob es OperationsLogs gibt. Wenn ja, dann nehme diese Quantmengen solange es nicht 0-Mengen-Buchungen sind (z.B. Stikkenwägen mit 1 Stück weil man die MEnge nicht kennt)
                         if (!quantityFound)
                         {
-                            //databaseApp.OperationLog.Include(c => c.ACClass.ACClass1_ParentACClass)
+                            postingsOnThisMachine = databaseApp.FacilityBookingCharge
+                                                    .Include(c => c.MDMovementReason)
+                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue
+                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
+                                                                && c.InwardFacilityCharge != null 
+                                                                && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID 
+                                                                                                                            && d.ACProgramLogID.HasValue 
+                                                                                                                            && d.ACProgramLogID == oeeEntry.ACProgramLogID))
+                                                    .ToArray();
+
+                            if (postingsOnThisMachine == null || !postingsOnThisMachine.Any())
+                            {
+                                postingsOnThisMachine = databaseApp.FacilityBookingCharge
+                                                        .Include(c => c.MDMovementReason)
+                                                        .Where(c => c.ProdOrderPartslistPosID.HasValue
+                                                                    && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
+                                                                    && c.InwardFacilityCharge != null
+                                                                    && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID
+                                                                                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate))
+                                                        .ToArray();
+
+                            }
+                            if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
+                            {
+                                quantityFound = true;
+                                oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.InwardQuantity)
+                                                                        .DefaultIfEmpty()
+                                                                        .Sum();
+                                oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
+                                                     .Select(c => c.InwardQuantity)
+                                                     .DefaultIfEmpty()
+                                                     .Sum();
+                            }
                         }
+
                         /// 3. Prüfe ob es Verbrauchsbuchungen gibt und finde die Hauptkomponente heraus (Halbfabrikat aus Vorstufe) und ermittle darüber
-                        /// 4. Ermittle Menge anhand des Endproduktes und errechne den theoretischen Durchsatz anhand des Mittelwertes
-                        /// 5. Trage OEE ein.
-                        /// 5. Falls Verfügbakeit = 100 und AutoKorrektur gesetzt, berechne neuen Mittelwert.
+                        /// TODO: Problem ist hier, dass man keine Informationen über den Ausschuss hat
+                        //if (!quantityFound)
+                        //{
+                        //}
+                        oeeEntry.CalcOEE();
                     }
 
+                    var oeeGroupedEntriesWithoutQ = oeeEntriesOfCompleteOrder.Where(c => c.Quantity <= 0.00001 && c.FacilityMaterial.Facility.VBiFacilityACClass.BasedOnACClassID.HasValue)
+                                                                      .GroupBy(c => c.FacilityMaterial.Facility.VBiFacilityACClass.BasedOnACClassID.Value);
+                    foreach (var key in oeeGroupedEntriesWithoutQ)
+                    {
+                    }
+                    /// 4. Ermittle Menge anhand des Endproduktes und errechne den theoretischen Durchsatz anhand des Mittelwertes
+                    /// 5. Falls Verfügbakeit = 100 und AutoKorrektur gesetzt, berechne neuen Mittelwert.
 
-                    //double operationTimeSec = propLogSums.Where(x => x.PropertyValue != null && (GlobalProcApp.AvailabilityState)x.PropertyValue == GlobalProcApp.AvailabilityState.InOperation)
-                    //                                    .Sum(c => c.Duration.TotalSeconds);
-                    //if (operationTimeSec > 0.00001)
-                    //{
-                    //    double[] splittedResult = SplitResult(operationTimeSec);
-                    //    foreach (double result in splittedResult)
-                    //    {
-                    //        PAOperation operation = operations.Where(c => c.Maschine == maschine).FirstOrDefault();
-                    //        PAZugang pAZugang = GetPAZugang(mandant, prodOrderPartslist, operation != null ? operation.Nr : defaultOperationNr, maschine, result);
-                    //        pAZugangs.Add(pAZugang);
-                    //    }
-                    //}
                 }
-
             }
         }
 
