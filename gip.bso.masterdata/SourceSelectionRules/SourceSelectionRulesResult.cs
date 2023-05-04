@@ -41,13 +41,23 @@ namespace gip.bso.masterdata
             foreach (ACClass machine in allProcessModules)
             {
                 MachineItem machineItem = MachineItems.Where(c => c.RuleGroup == null && c.Machine.ACClassID == machine.ACClassID).FirstOrDefault();
+
                 if (machineItem == null)
                 {
                     machineItem = new MachineItem(this, null, machine, null, preConfigACUrl);
                     MachineItems.Add(machineItem);
                 }
-                machineItem.AddPWNode(pwNode);
-                machineItem.IsSelected = machineItem.IsSelected || !excludedProcessModules.Contains(machine);
+           
+                if(machineItem.RuleGroup == null)
+                {
+                    machineItem.AddPWNode(pwNode);
+                    if (machineItem.RuleGroup != null)
+                    {
+                        System.Diagnostics.Debugger.Break();
+                    }
+                    // IsSelected == true - if 
+                    machineItem._IsSelected = !excludedProcessModules.Select(c => c.ACClassID).Contains(machine.ACClassID) || machineItem.IsSelected;
+                }
             }
         }
 

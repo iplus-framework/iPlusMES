@@ -313,6 +313,11 @@ namespace gip.bso.masterdata
 
             configStores = iPlusMESConfigManager.GetACConfigStores(configStores);
 
+            foreach(IACConfigStore configStore in configStores)
+            {
+                configStore.ClearCacheOfConfigurationEntries();
+            }
+
             return new Tuple<IACConfigStore, List<IACConfigStore>>(currentConfigStore, configStores);
         }
 
@@ -358,7 +363,8 @@ namespace gip.bso.masterdata
                                         RouteItem target = route.GetRouteTarget();
 
                                         RuleSelection ruleSelection = ruleGroup.AddRuleSelection(mapPosToWFConnSub.PWNode, mat4DosingAndRoutes.Key, source.Source, target.Target, preConfigACUrl);
-                                        ruleSelection.MachineItem.IsSelected = ruleSelection.MachineItem.IsSelected || !excludedProcessModules.Contains(source.Source);
+                                        // IsSelected == true - if auf any PWNode is not in excludedProcessModules
+                                        ruleSelection.MachineItem._IsSelected = !excludedProcessModules.Select(c=>c.ACClassID).Contains(source.Source.ACClassID) && ruleSelection.MachineItem.IsSelected;
                                     }
                                 }
                             }
@@ -405,7 +411,8 @@ namespace gip.bso.masterdata
                 {
                     foreach (MachineItem machineItem in allMachineItems)
                     {
-                        change = change || WriteConfigToPWMNode(database, machineItem);
+                        bool tmpChange = WriteConfigToPWMNode(database, machineItem);
+                        change = change || tmpChange;
                     }
                 }
 
@@ -415,7 +422,8 @@ namespace gip.bso.masterdata
                     {
                         foreach (RuleSelection ruleSelection in ruleGroup.RuleSelectionList)
                         {
-                            change = change || WriteConfigToPWMNode(database, ruleSelection.MachineItem);
+                            bool tmpChange = WriteConfigToPWMNode(database, ruleSelection.MachineItem);
+                            change = change || tmpChange;
                         }
                     }
                 }
@@ -443,9 +451,9 @@ namespace gip.bso.masterdata
                 if (machineItem.IsSelected)
                 {
 
-                    if (excludedModules.Contains(machineItem.Machine))
+                    if (excludedModules.Select(c => c.ACClassID).Contains(machineItem.Machine.ACClassID))
                     {
-                        excludedModules.Remove(machineItem.Machine);
+                        excludedModules.RemoveAll(c=>c.ACClassID == machineItem.Machine.ACClassID);
                         if (excludedModules.Any())
                         {
                             RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
@@ -471,7 +479,7 @@ namespace gip.bso.masterdata
                         change = true;
                     }
 
-                    if (!excludedModules.Contains(machineItem.Machine))
+                    if (!excludedModules.Select(c => c.ACClassID).Contains(machineItem.Machine.ACClassID))
                     {
                         excludedModules.Add(machineItem.Machine);
                         change = true;

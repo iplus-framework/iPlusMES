@@ -111,8 +111,10 @@ namespace gip.bso.masterdata
 
                 ruleSelection.MachineItem = new MachineItem(SourceSelectionRulesResult, this, source, material, preConfigACUrl);
                 SourceSelectionRulesResult.MachineItems.Add(ruleSelection.MachineItem);
+                ruleSelection.MachineItem.IsSelected = true;
 
                 ruleSelection.Target = target;
+                
                 RuleSelectionList.Add(ruleSelection);
             }
 
