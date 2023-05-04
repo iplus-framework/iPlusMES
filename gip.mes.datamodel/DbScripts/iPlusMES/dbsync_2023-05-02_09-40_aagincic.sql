@@ -1,6 +1,7 @@
 -- droping TandTv2 resources
 /****** Object:  StoredProcedure [dbo].[udpTandTv2JobDelete]    Script Date: 2.5.2023. 9:39:24 ******/
-DROP PROCEDURE IF EXISTS [dbo].[udpTandTv2JobDelete]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[udpTandTv2JobDelete]') AND type in (N'P'))
+DROP PROCEDURE [dbo].[udpTandTv2JobDelete]
 GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TandTv2TempPos]') AND type in (N'U'))
 ALTER TABLE [dbo].[TandTv2TempPos] DROP CONSTRAINT IF EXISTS [FK_TandTv2TempPos_TandTv2StepID]
