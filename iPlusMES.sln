@@ -153,6 +153,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.reporthandlerwpf",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.wpfservices", "..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj", "{61584164-8F67-4175-B42F-E9142C835F6E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.wpfservices", "gip.mes.wpfservices\gip.mes.wpfservices.csproj", "{3DA23C05-F95E-403C-8585-304B182BF005}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -496,6 +498,12 @@ Global
 		{61584164-8F67-4175-B42F-E9142C835F6E}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
 		{61584164-8F67-4175-B42F-E9142C835F6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61584164-8F67-4175-B42F-E9142C835F6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DA23C05-F95E-403C-8585-304B182BF005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DA23C05-F95E-403C-8585-304B182BF005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DA23C05-F95E-403C-8585-304B182BF005}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DA23C05-F95E-403C-8585-304B182BF005}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
+		{3DA23C05-F95E-403C-8585-304B182BF005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DA23C05-F95E-403C-8585-304B182BF005}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -571,6 +579,7 @@ Global
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491} = {F4A3E5B7-F8EA-41BB-A00A-C75D60754CAE}
 		{7FE01550-DA55-421C-8B1E-7760E70B71B5} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
 		{61584164-8F67-4175-B42F-E9142C835F6E} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
+		{3DA23C05-F95E-403C-8585-304B182BF005} = {3C7E5EA9-3F24-4077-BD6D-28C8B8B805E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3D892D3-D698-40B1-927D-CB943150F1E1}

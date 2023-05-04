@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>disable</Nullable>
+	  <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
+    <ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj" />
+  </ItemGroup>
+
+</Project>

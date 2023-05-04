@@ -7,7 +7,6 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -19,11 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.core.layoutengine\gip.core.layoutengine.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.ext.designer\project\gip.ext.designer.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.ext.design\project\gip.ext.design.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.ext.graphics\gip.ext.graphics.csproj" />
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
   </ItemGroup>
