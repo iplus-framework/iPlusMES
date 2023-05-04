@@ -3,8 +3,8 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -56,37 +56,37 @@ namespace gip.mes.facility
 
         #region PrecompiledQueries
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDInOrderPosState>> s_cQry_InOrderInProcess =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDInOrderPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDInOrderPosState>>(
             (ctx) => from c in ctx.MDInOrderPosState where c.MDInOrderPosStateIndex == (Int16)MDInOrderPosState.InOrderPosStates.InProcess select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDInOrderPosState>> s_cQry_InOrderCompleted =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDInOrderPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDInOrderPosState>>(
             (ctx) => from c in ctx.MDInOrderPosState where c.MDInOrderPosStateIndex == (Int16)MDInOrderPosState.InOrderPosStates.Completed select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_OutOrderInProcess =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.InProcess select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_OutOrderCompleted =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.Completed select c
         );
         #endregion
@@ -210,8 +210,8 @@ namespace gip.mes.facility
 
             // 1. Zweite Ebene einfügen (für Lieferscheinzuordnung vorbereiten)
             // Suche zuerst ob es bereits eine zweite Ebene für diese Auftragsposition im Kommissionierauftrag gibt
-            if (currentPicking.EntityState != System.Data.EntityState.Added)
-                currentPicking.PickingPos_Picking.AutoLoad(dbApp);
+            if (currentPicking.EntityState != EntityState.Added)
+                currentPicking.PickingPos_Picking.AutoLoad(currentPicking.PickingPos_PickingReference, currentPicking);
 
             currentInOrderPos1Level.AutoRefresh(dbApp);
 
@@ -460,8 +460,8 @@ namespace gip.mes.facility
 
             // 1. Zweite Ebene einfügen (für Lieferscheinzuordnung vorbereiten)
             // Suche zuerst ob es bereits eine zweite Ebene für diese Auftragsposition im Kommissionierauftrag gibt
-            if (currentPicking.EntityState != System.Data.EntityState.Added)
-                currentPicking.PickingPos_Picking.AutoLoad(dbApp);
+            if (currentPicking.EntityState != EntityState.Added)
+                currentPicking.PickingPos_Picking.AutoLoad(currentPicking.PickingPos_PickingReference, currentPicking);
 
             currentOutOrderPos1Level.AutoRefresh(dbApp);
 
@@ -722,7 +722,7 @@ namespace gip.mes.facility
         {
             if (currentPicking == null)
                 return null;
-            currentPicking.PickingPos_Picking.AutoRefresh(dbApp);
+            currentPicking.PickingPos_Picking.AutoRefresh(currentPicking.PickingPos_PickingReference, currentPicking);
             foreach (PickingPos pickingPos in currentPicking.PickingPos_Picking.ToArray())
             {
                 Msg result = UnassignPickingPos(pickingPos, dbApp, deletePickingPos);
@@ -802,7 +802,7 @@ namespace gip.mes.facility
                 currentPickingPos.InOrderPos.AutoRefresh(dbApp);
                 InOrderPos parentInOrderPos = currentPickingPos.InOrderPos.InOrderPos1_ParentInOrderPos;
                 parentInOrderPos.AutoRefresh(dbApp);
-                parentInOrderPos.InOrderPos_ParentInOrderPos.AutoRefresh(dbApp);
+                parentInOrderPos.InOrderPos_ParentInOrderPos.AutoRefresh(parentInOrderPos.InOrderPos_ParentInOrderPosReference, parentInOrderPos);
                 int childs = parentInOrderPos.InOrderPos_ParentInOrderPos.Count;
 
                 // Addiere Abrufmenge auf Elternpositionen hinzu
@@ -822,7 +822,7 @@ namespace gip.mes.facility
                 childs--;
 
                 // 3. Lösche zweite Ebene, wenn nicht einem Lieferschein zugeordnet
-                parentInOrderPos.DeliveryNotePos_InOrderPos.AutoRefresh(dbApp);
+                parentInOrderPos.DeliveryNotePos_InOrderPos.AutoRefresh(parentInOrderPos.DeliveryNotePos_InOrderPosReference, parentInOrderPos);
                 if (!parentInOrderPos.DeliveryNotePos_InOrderPos.Any() && childs == 0)
                 {
                     if (parentInOrderPos.InOrderPos1_ParentInOrderPos != null)
@@ -854,7 +854,7 @@ namespace gip.mes.facility
                 currentPickingPos.OutOrderPos.AutoRefresh(dbApp);
                 OutOrderPos parentOutOrderPos = currentPickingPos.OutOrderPos.OutOrderPos1_ParentOutOrderPos;
                 parentOutOrderPos.AutoRefresh(dbApp);
-                parentOutOrderPos.OutOrderPos_ParentOutOrderPos.AutoRefresh(dbApp);
+                parentOutOrderPos.OutOrderPos_ParentOutOrderPos.AutoRefresh(parentOutOrderPos.OutOrderPos_ParentOutOrderPosReference, parentOutOrderPos);
                 int childs = parentOutOrderPos.OutOrderPos_ParentOutOrderPos.Count;
 
                 // Addiere Abrufmenge auf Elternpositionen hinzu
@@ -875,7 +875,7 @@ namespace gip.mes.facility
                 childs--;
 
                 // 3. Lösche zweite Ebene, wenn nicht einem Lieferschein zugeordnet
-                parentOutOrderPos.DeliveryNotePos_OutOrderPos.AutoRefresh(dbApp);
+                parentOutOrderPos.DeliveryNotePos_OutOrderPos.AutoRefresh(parentOutOrderPos.DeliveryNotePos_OutOrderPosReference, parentOutOrderPos);
                 if (!parentOutOrderPos.DeliveryNotePos_OutOrderPos.Any() && childs == 0)
                 {
                     if (parentOutOrderPos.OutOrderPos1_ParentOutOrderPos != null)
@@ -904,7 +904,7 @@ namespace gip.mes.facility
                 }
 
                 // 1. Hole Parent-Bestellposition aus Bestellung und korrigiere Abgerufene teilmenge
-                currentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.AutoRefresh(dbApp);
+                currentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.AutoRefresh(currentPickingPos.PickingPosProdOrderPartslistPos_PickingPosReference, currentPickingPos);
                 //List<ProdOrderPartslistPos> parentProdOrderPartslistPositions = currentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos).ToList();
                 //foreach (var parentProdOrderPartslistPos in parentProdOrderPartslistPositions)
                 //    parentProdOrderPartslistPos.AutoRefresh(dbApp);
@@ -968,7 +968,7 @@ namespace gip.mes.facility
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
             picking = Picking.NewACObject(dbApp, null, secondaryKey);
             picking.ACClassMethodID = aCClassMethod.ACClassMethodID;
-            dbApp.Picking.AddObject(picking);
+            dbApp.Picking.Add(picking);
             PickingPos pickingPos = PickingPos.NewACObject(dbApp, picking);
             picking.PickingPos_Picking.Add(pickingPos);
             if (relocationBooking.OutwardFacilityCharge != null)
@@ -1836,7 +1836,7 @@ namespace gip.mes.facility
         /// which contains this material 
         /// </summary>
         protected static readonly Func<DatabaseApp, Material, bool, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterial =
-        CompiledQuery.Compile<DatabaseApp, Material, bool, bool, IQueryable<Facility>>(
+        EF.CompileQuery<DatabaseApp, Material, bool, bool, IQueryable<Facility>>(
             (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -1861,7 +1861,7 @@ namespace gip.mes.facility
         /// which contains this material 
         /// </summary>
         protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>>(
+        EF.CompileQuery<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>>(
             (ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false

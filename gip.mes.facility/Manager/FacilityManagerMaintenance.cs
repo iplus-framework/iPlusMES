@@ -4,6 +4,8 @@ using System.Linq;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.facility
 {
@@ -782,7 +784,7 @@ namespace gip.mes.facility
                 companyMaterialHistory.TargetInward = companyMaterialStock.DayTargetInward;
                 if (companyMaterialHistory.LentQuantity > 0)
                 {
-                    MaterialHistory materialHistory = history.MaterialHistory_History.Where(c => c.EntityState == System.Data.EntityState.Added && c.MaterialID == companyMaterialHistory.CompanyMaterial.MaterialID).FirstOrDefault();
+                    MaterialHistory materialHistory = history.MaterialHistory_History.Where(c => c.EntityState == EntityState.Added && c.MaterialID == companyMaterialHistory.CompanyMaterial.MaterialID).FirstOrDefault();
                     if (materialHistory != null)
                         materialHistory.LentQuantity += companyMaterialHistory.LentQuantity;
                 }
@@ -1305,8 +1307,7 @@ namespace gip.mes.facility
                 //        ok = false;
                 //}
 
-                SqlParameter balanceDateParam = new SqlParameter("balanceDate", history.BalanceDate);
-                BP.DatabaseApp.ExecuteStoreCommand(
+                BP.DatabaseApp.Database.ExecuteSql( FormattableStringFactory.Create(
                     @"update facilityLotStock set
 			            facilityLotStock.MonthActStock = 0,
                         facilityLotStock.MonthLastOutward = facilityLotStock.MonthOutward,
@@ -1325,8 +1326,8 @@ namespace gip.mes.facility
                         facilityLotStock.MonthTargetOutwardAmb = 0,
                         facilityLotStock.MonthTargetInwardAmb = 0,
                         facilityLotStock.MonthAdjustmentAmb = 0,
-                        facilityLotStock.MonthBalanceDate = @balanceDate
-                    from FacilityLotStock facilityLotStock", balanceDateParam);
+                        facilityLotStock.MonthBalanceDate = @p0
+                    from FacilityLotStock facilityLotStock", history.BalanceDate));
 
                 ReportProgressTotal(BP);
 
@@ -1925,7 +1926,7 @@ namespace gip.mes.facility
             _CurrentHistory.BalanceDate = DateTime.Now;
             _CurrentHistory.TimePeriod = timePeriod;
             _CurrentHistory.PeriodNo = periode;
-            BP.DatabaseApp.History.AddObject(_CurrentHistory);
+            BP.DatabaseApp.History.Add(_CurrentHistory);
 
             return _CurrentHistory;
         }

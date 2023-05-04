@@ -5,6 +5,7 @@ using System.Text;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -126,7 +127,7 @@ namespace gip.mes.facility
             FB.RecipeOrFactoryInfo = BP.RecipeOrFactoryInfo;
             FB.PropertyACUrl = BP.PropertyACUrl;
 
-            BP.DatabaseApp.FacilityBooking.AddObject(FB);
+            BP.DatabaseApp.FacilityBooking.Add(FB);
 
             BP.FacilityBooking = FB;
             BP.EmptyCellsWithLotManagedBookings();

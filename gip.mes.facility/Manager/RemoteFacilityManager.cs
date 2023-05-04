@@ -4,6 +4,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -448,7 +449,7 @@ namespace gip.mes.facility
                     localFacility.VBiFacilityACClassID = aCClass.ACClassID;
                     using (ACMonitor.Lock(dbIplus.QueryLock_1X000))
                     {
-                        dbIplus.ACClass.AddObject(aCClass);
+                        dbIplus.ACClass.Add(aCClass);
                         msgWithDetails = dbIplus.ACSaveChanges();
                         if (msgWithDetails != null)
                             dbIplus.ACUndoChanges();
@@ -465,7 +466,7 @@ namespace gip.mes.facility
                 }
                 return false;
             }
-            else if (addOrUpdateFacilityMD != null && localFacility.EntityState == System.Data.EntityState.Added)
+            else if (addOrUpdateFacilityMD != null && localFacility.EntityState == EntityState.Added)
             {
                 localFacility.VBiFacilityACClassID = aCClass.ACClassID;
                 msgWithDetails = dbLocal.ACSaveChanges();
@@ -523,7 +524,7 @@ namespace gip.mes.facility
                 localFC = FacilityCharge.NewACObject(dbLocal, localLot);
                 localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
                 localFC.CopyFrom(changedRemoteFC, true, false);
-                dbLocal.FacilityCharge.AddObject(localFC);
+                dbLocal.FacilityCharge.Add(localFC);
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
                 {
@@ -604,7 +605,7 @@ namespace gip.mes.facility
                 localFacility.FacilityID = addOrUpdateFacilityMD.KeyId;
                 localFacility.MDFacilityTypeID = remoteFacility.MDFacilityTypeID;
                 localFacility.VBiStackCalculatorACClassID = remoteFacility.VBiStackCalculatorACClassID;
-                dbLocal.Facility.AddObject(localFacility);
+                dbLocal.Facility.Add(localFacility);
             }
             else
             {
@@ -620,7 +621,7 @@ namespace gip.mes.facility
             if (localPicking == null)
             {
                 localPicking = remotePicking.Clone(true) as Picking;
-                dbLocal.Picking.AddObject(localPicking);
+                dbLocal.Picking.Add(localPicking);
             }
             else
             {
@@ -711,7 +712,7 @@ namespace gip.mes.facility
                             if (localMaterial == null)
                             {
                                 localMaterial = Material.NewACObject(dbLocal, null);
-                                dbLocal.Material.AddObject(localMaterial);
+                                dbLocal.Material.Add(localMaterial);
                                 localMaterial.MaterialID = remoteMaterial.MaterialID;
                             }
 

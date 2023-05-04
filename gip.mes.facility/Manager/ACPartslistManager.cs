@@ -5,9 +5,9 @@ using gip.mes.datamodel.EntityMaterial;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Objects;
-using System.Data.Objects.DataClasses;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace gip.mes.facility
 {
@@ -67,7 +67,7 @@ namespace gip.mes.facility
 
 
         static readonly Func<DatabaseApp, Guid, IEnumerable<PartslistPos>> s_cQry_AllPositions =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
+            EF.CompileQuery<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
                 (db, partslistID) =>
                     db.PartslistPos.Where(x => x.PartslistID == partslistID).OrderBy(x => x.Sequence)
 
@@ -77,7 +77,7 @@ namespace gip.mes.facility
         /// Outward root position - Components
         /// </summary>
         static readonly Func<DatabaseApp, Guid, IEnumerable<PartslistPos>> s_cQry_PosComponents =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
+            EF.CompileQuery<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
                 (db, partslistID) => db.PartslistPos.Where(x =>
                             x.PartslistID == partslistID &&
                             x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot &&
@@ -90,7 +90,7 @@ namespace gip.mes.facility
         /// Outward root positions - Alternative for Component positions
         /// </summary>
         static readonly Func<DatabaseApp, Guid, IEnumerable<PartslistPos>> s_cQry_PosAlternative =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
+            EF.CompileQuery<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
                 (db, partslistPosID) => db.PartslistPos.Where(x => x.AlternativePartslistPosID == partslistPosID)
                     .OrderBy(x => x.Sequence)
 
@@ -101,7 +101,7 @@ namespace gip.mes.facility
         /// Inward elements - Intermediate components
         /// </summary>
         public static readonly Func<DatabaseApp, Guid, IEnumerable<PartslistPos>> s_cQry_PosIntermediate =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
+            EF.CompileQuery<DatabaseApp, Guid, IEnumerable<PartslistPos>>(
                 (db, partslistID) => db.PartslistPos.Where(x =>
                             x.PartslistID == partslistID &&
                             x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern)
@@ -112,7 +112,7 @@ namespace gip.mes.facility
         /// Outward root position - Components
         /// </summary>
         static readonly Func<DatabaseApp, Guid, IEnumerable<PartslistPosRelation>> s_cQry_PosIntermediateComponents =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<PartslistPosRelation>>(
+            EF.CompileQuery<DatabaseApp, Guid, IEnumerable<PartslistPosRelation>>(
                 (db, partslistPosID) => db.PartslistPosRelation.Where(x => x.TargetPartslistPosID == partslistPosID).OrderBy(x => x.Sequence)
             );
 
@@ -723,7 +723,7 @@ namespace gip.mes.facility
         {
             bool isChangedPartslist = partslist.EntityState == EntityState.Modified;
             if (isChangedPartslist)
-                isChangedPartslist = AreEntityPropertiesChanged(databaseApp, new List<EntityObject>() { partslist }, S_Partslist_Change_Fields);
+                isChangedPartslist = AreEntityPropertiesChanged(databaseApp, new List<VBEntityObject>() { partslist }, S_Partslist_Change_Fields);
             bool isChangedQuantities = false;
             bool isAddedElements = false;
             bool isDeletedElements = false;
@@ -736,22 +736,22 @@ namespace gip.mes.facility
 
                 if (!isAddedElements)
                 {
-                    List<EntityObject> changedPositions =
+                    List<VBEntityObject> changedPositions =
                          partslist
                          .PartslistPos_Partslist
                          .Where(c => c.EntityState == EntityState.Modified)
-                         .Select(c => c as EntityObject)
+                         .Select(c => c as VBEntityObject)
                          .ToList();
 
-                    List<EntityObject> changedRelations =
+                    List<VBEntityObject> changedRelations =
                         partslist
                         .PartslistPos_Partslist
                         .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
                         .Where(c => c.EntityState == EntityState.Modified)
-                        .Select(c => c as EntityObject)
+                        .Select(c => c as VBEntityObject)
                         .ToList();
 
-                    List<EntityObject> changedObjects = changedPositions.Union(changedRelations).ToList();
+                    List<VBEntityObject> changedObjects = changedPositions.Union(changedRelations).ToList();
 
                     isChangedQuantities = AreEntityPropertiesChanged(databaseApp, changedObjects, S_PartslistPosRelation_Change_Fields);
                 }
@@ -759,11 +759,11 @@ namespace gip.mes.facility
 
             if (!isChangedPartslist)
             {
-                IEnumerable<ObjectStateEntry> deletedItems = partslist.GetObjectContext().ObjectStateManager.GetObjectStateEntries(EntityState.Deleted);
+                IEnumerable<EntityEntry> deletedItems = partslist.GetObjectContext().ChangeTracker.Entries().Where(c => c.State == EntityState.Deleted);
                 if (deletedItems.Any())
                 {
-                    IEnumerable<ObjectStateEntry> deletedPositions = deletedItems.Where(c => c.EntityKey.EntitySetName == nameof(PartslistPos));
-                    foreach (ObjectStateEntry deletedPos in deletedPositions)
+                    IEnumerable<EntityEntry> deletedPositions = deletedItems.Where(c => c.Metadata.Name == nameof(PartslistPos));
+                    foreach (EntityEntry deletedPos in deletedPositions)
                     {
                         if (deletedPos.Entity is PartslistPos)
                         {
@@ -775,8 +775,8 @@ namespace gip.mes.facility
 
                     if (!isChangedPartslist)
                     {
-                        IEnumerable<ObjectStateEntry> deletedRelations = deletedItems.Where(c => c.EntityKey.EntitySetName == nameof(PartslistPosRelation));
-                        foreach (ObjectStateEntry deletedRel in deletedRelations)
+                        IEnumerable<EntityEntry> deletedRelations = deletedItems.Where(c => c.Metadata.Name == nameof(PartslistPosRelation));
+                        foreach (EntityEntry deletedRel in deletedRelations)
                         {
                             if (deletedRel.Entity is PartslistPosRelation)
                             {
@@ -796,14 +796,14 @@ namespace gip.mes.facility
             return isChangedPartslist || isAddedElements || isChangedQuantities || isDeletedElements;
         }
 
-        private bool AreEntityPropertiesChanged(DatabaseApp databaseApp, List<EntityObject> changedObjects, string[] fieldsForValidation)
+        private bool AreEntityPropertiesChanged(DatabaseApp databaseApp, List<VBEntityObject> changedObjects, string[] fieldsForValidation)
         {
 
             bool isChangedProperty = false;
-            foreach (EntityObject changedObject in changedObjects)
+            foreach (VBEntityObject changedObject in changedObjects)
             {
-                ObjectStateEntry myObjectState = databaseApp.ObjectStateManager.GetObjectStateEntry(changedObject.EntityKey);
-                IEnumerable<string> modifiedProperties = myObjectState.GetModifiedProperties();
+                EntityEntry myObjectState = databaseApp.Entry(changedObject);
+                IEnumerable<string> modifiedProperties = myObjectState.Properties.Where(c => c.IsModified).Select(c => c.Metadata.Name);
                 foreach (string modifiedProperty in modifiedProperties)
                 {
                     if (fieldsForValidation.Contains(modifiedProperty))

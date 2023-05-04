@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Objects;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -48,7 +48,7 @@ namespace gip.mes.facility
         //);
 
         public static Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>> s_cQry_ProdOrderAlternativePositions =
-            CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>>(
+            EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>>(
             (db, selectedProdOrderPartslistID, selectedProdOrderPartslistPosID) =>
                     db.ProdOrderPartslistPos.Where(c =>
                     c.ProdOrderPartslistID == selectedProdOrderPartslistID &&
@@ -307,7 +307,7 @@ namespace gip.mes.facility
             BatchLinearResize(prodOrderPartsListPosItems, quantityFactor);
             BatchLinearResize(prodOrderPartsListPosRelationItems, quantityFactor);
 
-            dbApp.ProdOrderPartslist.AddObject(prodOrderPartsList);
+            dbApp.ProdOrderPartslist.Add(prodOrderPartsList);
 
             PostExecute("PartslistAdd");
             return msg;
@@ -737,9 +737,9 @@ namespace gip.mes.facility
                     }
                 }
 
-                model.Batches.ForEach(x => dbApp.ProdOrderBatch.AddObject(x));
-                model.BatchPositions.ForEach(x => dbApp.ProdOrderPartslistPos.AddObject(x));
-                model.BatchRelations.ForEach(x => dbApp.ProdOrderPartslistPosRelation.AddObject(x));
+                model.Batches.ForEach(x => dbApp.ProdOrderBatch.Add(x));
+                model.BatchPositions.ForEach(x => dbApp.ProdOrderPartslistPos.Add(x));
+                model.BatchRelations.ForEach(x => dbApp.ProdOrderPartslistPosRelation.Add(x));
                 //model.BatchDefinition = batches;
             }
 
@@ -814,8 +814,8 @@ namespace gip.mes.facility
                     resultNewEntities.Add(childRelation);
                 }
 
-                dbApp.ProdOrderPartslistPos.AddObject(childPosition);
-                batchRelations.ForEach(x => dbApp.ProdOrderPartslistPosRelation.AddObject(x));
+                dbApp.ProdOrderPartslistPos.Add(childPosition);
+                batchRelations.ForEach(x => dbApp.ProdOrderPartslistPosRelation.Add(x));
             }
 
             //PostExecute("BatchCreate");
@@ -1350,14 +1350,14 @@ namespace gip.mes.facility
                 {
                     FacilityReservation[] selectedModules = new FacilityReservation[] { };
                     if (
-                            batchPlan.EntityState != System.Data.EntityState.Added
-                            && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged)
+                            batchPlan.EntityState != EntityState.Added
+                            && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != EntityState.Unchanged)
                         )
                     {
-                        batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
-                        selectedModules = batchPlan
-                            .FacilityReservation_ProdOrderBatchPlan
-                            .CreateSourceQuery()
+                        batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh(batchPlan.FacilityReservation_ProdOrderBatchPlanReference, batchPlan);
+                        selectedModules = batchPlan.Context.Entry(batchPlan)
+                            .Collection(c => c.FacilityReservation_ProdOrderBatchPlan)
+                            .Query()
                             .Include(c => c.Facility)
                             .Include(c => c.Facility.Material)
                             .AutoMergeOption()
@@ -1415,8 +1415,8 @@ namespace gip.mes.facility
 
                     // select first if only one is present
                     if (preselectFirstReservation
-                        && ((batchPlan.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
-                            || ((batchPlan.EntityState == System.Data.EntityState.Unchanged || batchPlan.EntityState == System.Data.EntityState.Modified)
+                        && ((batchPlan.EntityState == EntityState.Added && reservationCollection.Count() == 1)
+                            || ((batchPlan.EntityState == EntityState.Unchanged || batchPlan.EntityState == EntityState.Modified)
                                     && reservationCollection.Count() == 1
                                     && !reservationCollection.Any(c => c.IsChecked))))
                         reservationCollection[0].IsChecked = true;
@@ -1665,7 +1665,7 @@ namespace gip.mes.facility
             gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(databaseApp.ContextIPlus, null, secondaryKey);
             program.ProgramACClassMethod = acClassMethod;
             program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-            databaseApp.ContextIPlus.ACProgram.AddObject(program);
+            databaseApp.ContextIPlus.ACProgram.Add(program);
             //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
             MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
             if (saveMsg == null)
@@ -1724,7 +1724,7 @@ namespace gip.mes.facility
 
         #region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
@@ -1783,10 +1783,10 @@ namespace gip.mes.facility
             string programNo,
             string materialNo)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState,
+            IQueryable<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState,
                 (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
-                planningMRID, mdBatchPlanGroup, programNo, materialNo) as ObjectQuery<ProdOrderBatchPlan>;
-            batchQuery.MergeOption = MergeOption.OverwriteChanges;
+                planningMRID, mdBatchPlanGroup, programNo, materialNo) as IQueryable<ProdOrderBatchPlan>;
+            //batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
 
@@ -1911,10 +1911,10 @@ namespace gip.mes.facility
             FacilityPreBooking facilityPreBooking = null;
             if (partsListPosRelation == null || partsListPosRelation.MDProdOrderPartslistPosState == null || partsListPosRelation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
                 return null;
-            if (partsListPosRelation.EntityState != System.Data.EntityState.Added)
+            if (partsListPosRelation.EntityState != EntityState.Added)
             {
-                partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad(dbApp);
-                partsListPosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(dbApp);
+                partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad(partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelationReference, partsListPosRelation);
+                partsListPosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(partsListPosRelation.FacilityPreBooking_ProdOrderPartslistPosRelationReference, partsListPosRelation);
             }
             else
                 return null;
@@ -1963,8 +1963,8 @@ namespace gip.mes.facility
         {
             if (partsList == null)
                 return null;
-            if (partsList.EntityState != System.Data.EntityState.Added)
-                partsList.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(dbApp);
+            if (partsList.EntityState != EntityState.Added)
+                partsList.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(partsList.ProdOrderPartslistPos_ProdOrderPartslistReference, partsList);
             List<FacilityPreBooking> result = null;
             foreach (ProdOrderPartslistPos partsListPos in partsList.ProdOrderPartslistPos_ProdOrderPartslist)
             {
@@ -2023,10 +2023,10 @@ namespace gip.mes.facility
             FacilityPreBooking facilityPreBooking = null;
             if (partsListPos == null || partsListPos.MDProdOrderPartslistPosState == null || partsListPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
                 return null;
-            if (partsListPos.EntityState != System.Data.EntityState.Added)
+            if (partsListPos.EntityState != EntityState.Added)
             {
-                partsListPos.FacilityBooking_ProdOrderPartslistPos.AutoLoad(dbApp);
-                partsListPos.FacilityPreBooking_ProdOrderPartslistPos.AutoLoad(dbApp);
+                partsListPos.FacilityBooking_ProdOrderPartslistPos.AutoLoad(partsListPos.FacilityBooking_ProdOrderPartslistPosReference, partsListPos);
+                partsListPos.FacilityPreBooking_ProdOrderPartslistPos.AutoLoad(partsListPos.FacilityPreBooking_ProdOrderPartslistPosReference, partsListPos);
             }
             else
                 return null;
@@ -2075,8 +2075,8 @@ namespace gip.mes.facility
         {
             if (partsList == null)
                 return null;
-            if (partsList.EntityState != System.Data.EntityState.Added)
-                partsList.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(dbApp);
+            if (partsList.EntityState != EntityState.Added)
+                partsList.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(partsList.ProdOrderPartslistPos_ProdOrderPartslistReference, partsList);
             List<FacilityPreBooking> result = null;
             foreach (ProdOrderPartslistPos partsListPos in partsList.ProdOrderPartslistPos_ProdOrderPartslist)
             {

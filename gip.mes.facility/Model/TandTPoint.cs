@@ -2,7 +2,6 @@
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects.DataClasses;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ namespace gip.mes.facility
         public TandTPoint(DatabaseApp dbApp, IACObjectEntity item, TandTFilter filter)
         {
             Item = item;
-            ID = (Guid)((EntityObject)item).EntityKey.EntityKeyValues[0].Value;
+            ID = (Guid)((VBEntityObject)item).EntityKey.EntityKeyValues[0].Value;
             Filter = filter;
         }
 

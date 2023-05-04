@@ -5,6 +5,7 @@ using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -1062,7 +1063,7 @@ namespace gip.mes.facility
                 FBC.InwardFacilityCharge.AutoRefresh();
 
             // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
-            if (   (   FBC.InwardFacilityCharge.EntityState == System.Data.EntityState.Added
+            if (   (   FBC.InwardFacilityCharge.EntityState == EntityState.Added
                     || Math.Abs(FBC.InwardFacilityCharge.StockQuantityUOM - 0) < Double.Epsilon)
                 && BP.ParamsAdjusted.MDReleaseState == null
                 && BP.ParamsAdjusted.PostingBehaviour == PostingBehaviourEnum.BlockOnRelocation)
@@ -1369,10 +1370,10 @@ namespace gip.mes.facility
             {
                 if (pickingPos.InOrderPos.MDInOrderPosState.InOrderPosState == MDInOrderPosState.InOrderPosStates.Cancelled)
                     return null;
-                if (pickingPos.InOrderPos.EntityState != System.Data.EntityState.Added)
+                if (pickingPos.InOrderPos.EntityState != EntityState.Added)
                 {
-                    pickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad(dbApp);
-                    pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad(dbApp);
+                    pickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad(pickingPos.InOrderPos.FacilityBooking_InOrderPosReference, pickingPos);
+                    pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad(pickingPos.InOrderPos.FacilityPreBooking_InOrderPosReference, pickingPos);
                 }
                 else
                     return null;
@@ -1434,10 +1435,10 @@ namespace gip.mes.facility
             {
                 if (pickingPos.OutOrderPos.MDOutOrderPosState.OutOrderPosState == MDOutOrderPosState.OutOrderPosStates.Cancelled)
                     return null;
-                if (pickingPos.OutOrderPos.EntityState != System.Data.EntityState.Added)
+                if (pickingPos.OutOrderPos.EntityState != EntityState.Added)
                 {
-                    pickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoLoad(dbApp);
-                    pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad(dbApp);
+                    pickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoLoad(pickingPos.OutOrderPos.FacilityBooking_OutOrderPosReference, pickingPos);
+                    pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad(pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPosReference, pickingPos);
                 }
                 else
                     return null;
@@ -1501,10 +1502,10 @@ namespace gip.mes.facility
             {
                 if (pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.NewCreated)
                     return null;
-                if (pickingPos.EntityState != System.Data.EntityState.Added)
+                if (pickingPos.EntityState != EntityState.Added)
                 {
-                    pickingPos.FacilityBooking_PickingPos.AutoLoad(dbApp);
-                    pickingPos.FacilityPreBooking_PickingPos.AutoLoad(dbApp);
+                    pickingPos.FacilityBooking_PickingPos.AutoLoad(pickingPos.FacilityBooking_PickingPosReference, pickingPos);
+                    pickingPos.FacilityPreBooking_PickingPos.AutoLoad(pickingPos.FacilityPreBooking_PickingPosReference, pickingPos);
                 }
                 else
                     return null;
@@ -1574,8 +1575,8 @@ namespace gip.mes.facility
         {
             if (picking == null)
                 return null;
-            if (picking.EntityState != System.Data.EntityState.Added)
-                picking.PickingPos_Picking.AutoLoad(dbApp);
+            if (picking.EntityState != EntityState.Added)
+                picking.PickingPos_Picking.AutoLoad(picking.PickingPos_PickingReference, picking);
             List<FacilityPreBooking> result = null;
             foreach (PickingPos pickingPos in picking.PickingPos_Picking)
             {

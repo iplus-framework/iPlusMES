@@ -4,7 +4,7 @@ using System.Linq;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -21,27 +21,27 @@ namespace gip.mes.facility
 
         #region PrecompiledQueries
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDInOrderPosState>> s_cQry_InOrderInProcess =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDInOrderPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDInOrderPosState>>(
             (ctx) => from c in ctx.MDInOrderPosState where c.MDInOrderPosStateIndex == (Int16)MDInOrderPosState.InOrderPosStates.InProcess select c
         );
 
         static readonly Func<DatabaseApp, IQueryable<MDInOrderPosState>> s_cQry_InOrderCompleted =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<MDInOrderPosState>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<MDInOrderPosState>>(
             (ctx) => from c in ctx.MDInOrderPosState where c.MDInOrderPosStateIndex == (Int16)MDInOrderPosState.InOrderPosStates.Completed select c
         );
         #endregion
@@ -239,11 +239,11 @@ namespace gip.mes.facility
 
             // 2. Lösche Unter-Bestellposition
             // aagincic note: Autoload of parentInOrder pos was changed state of InOrderPos from Deleted to Unmodified
-            parentInOrderPos.InOrderPos_ParentInOrderPos.AutoLoad(dbApp);
+            parentInOrderPos.InOrderPos_ParentInOrderPos.AutoLoad(parentInOrderPos.InOrderPos_ParentInOrderPosReference, parentInOrderPos);
             currentReleasePos.DeleteACObject(dbApp, false);
 
             // 3. Korrigiere Status der Parent-Bestellposition
-            var queryChildsSubPos = parentInOrderPos.InOrderPos_ParentInOrderPos.Where(c => c.EntityState != System.Data.EntityState.Deleted);
+            var queryChildsSubPos = parentInOrderPos.InOrderPos_ParentInOrderPos.Where(c => c.EntityState != EntityState.Deleted);
             if (!queryChildsSubPos.Any())
             {
                 parentInOrderPos.MDDelivPosState = queryDelivStateNotPlanned.First();
@@ -462,11 +462,11 @@ namespace gip.mes.facility
 
             // 2. Lösche Unter-Bestellposition
             // aagincic note: Autoload of parentInOrder pos was changed state of InOrderPos from Deleted to Unmodified
-            parentInOrderPos.InOrderPos_ParentInOrderPos.AutoLoad(dbApp);
+            parentInOrderPos.InOrderPos_ParentInOrderPos.AutoLoad(parentInOrderPos.InOrderPos_ParentInOrderPosReference, parentInOrderPos);
             currentDeliveryNotePos.InOrderPos.DeleteACObject(dbApp, false);
 
             // 3. Korrigiere Status der Parent-Bestellposition
-            var queryChildsSubPos = parentInOrderPos.InOrderPos_ParentInOrderPos.Where(c => c.EntityState != System.Data.EntityState.Deleted);
+            var queryChildsSubPos = parentInOrderPos.InOrderPos_ParentInOrderPos.Where(c => c.EntityState != EntityState.Deleted);
             if (!queryChildsSubPos.Any())
             {
                 parentInOrderPos.MDDelivPosState = queryDelivStateNotPlanned.First();
@@ -521,10 +521,10 @@ namespace gip.mes.facility
             FacilityPreBooking facilityPreBooking = null;
             if (deliveryNotePos.InOrderPos == null || deliveryNotePos.InOrderPos.MDInOrderPosState.InOrderPosState == MDInOrderPosState.InOrderPosStates.Cancelled)
                 return null;
-            if (deliveryNotePos.InOrderPos.EntityState != System.Data.EntityState.Added)
+            if (deliveryNotePos.InOrderPos.EntityState != EntityState.Added)
             {
-                deliveryNotePos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad(dbApp);
-                deliveryNotePos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad(dbApp);
+                deliveryNotePos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad(deliveryNotePos.InOrderPos.FacilityBooking_InOrderPosReference, deliveryNotePos);
+                deliveryNotePos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad(deliveryNotePos.InOrderPos.FacilityPreBooking_InOrderPosReference, deliveryNotePos);
             }
             else
                 return null;
@@ -573,8 +573,8 @@ namespace gip.mes.facility
         {
             if (deliveryNote == null)
                 return null;
-            if (deliveryNote.EntityState != System.Data.EntityState.Added)
-                deliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(dbApp);
+            if (deliveryNote.EntityState != EntityState.Added)
+                deliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(deliveryNote.DeliveryNotePos_DeliveryNoteReference, deliveryNote);
             List<FacilityPreBooking> result = null;
             foreach (DeliveryNotePos deliveryNotePos in deliveryNote.DeliveryNotePos_DeliveryNote)
             {

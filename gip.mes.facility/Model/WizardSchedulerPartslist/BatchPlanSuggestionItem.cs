@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -292,7 +293,7 @@ namespace gip.mes.facility
                 if (_ProdOrderBatchPlan != value)
                 {
                     _ProdOrderBatchPlan = value;
-                    if (_ProdOrderBatchPlan != null && _ProdOrderBatchPlan.EntityState != System.Data.EntityState.Added)
+                    if (_ProdOrderBatchPlan != null && _ProdOrderBatchPlan.EntityState != EntityState.Added)
                     {
                         _PrevChanged = Field.BatchSizeUOM;
                         _LastChanged = Field.BatchTargetCountUOM;

@@ -4,9 +4,9 @@ using gip.mes.datamodel;
 using gip.mes.manager;
 using System;
 using System.Data;
-using System.Data.Objects;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -381,7 +381,7 @@ namespace gip.mes.facility
 
         #region Precompiled Query
         public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderBatch>> s_cQry_BatchInfo =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<ProdOrderBatch>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<ProdOrderBatch>>(
             (ctx, id) => ctx.ProdOrderBatch.Include("ProdOrderPartslist")
                                  .Include("ProdOrderPartslist.ProdOrder")
                                  .Include("ProdOrderPartslist.Partslist")
@@ -393,7 +393,7 @@ namespace gip.mes.facility
         );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPos>> s_cQry_POPosInfo =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPos>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPos>>(
             (ctx, id) => ctx.ProdOrderPartslistPos.Include("ProdOrderPartslist")
                                  .Include("ProdOrderPartslist.ProdOrder")
                                  .Include("ProdOrderPartslist.Partslist")
@@ -406,14 +406,14 @@ namespace gip.mes.facility
         );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<Picking>> s_cQry_PickingInfo =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<Picking>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<Picking>>(
             (ctx, id) => ctx.Picking.Include("PickingPos_Picking")
                                  .Include("PickingPos_Picking.ToFacility")
                                  .Where(c => c.PickingID == id)
         );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<DeliveryNotePos>> s_cQry_DeliveryNotePosInfo =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<DeliveryNotePos>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<DeliveryNotePos>>(
             (ctx, id) => ctx.DeliveryNotePos.Include("DeliveryNote")
                                     .Include("InOrderPos")
                                     .Include("InOrderPos.Material")
@@ -423,7 +423,7 @@ namespace gip.mes.facility
         );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityBooking>> s_cQry_FacilityBookingInfo =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityBooking>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityBooking>>(
             (ctx, id) => ctx.FacilityBooking.Include("OutwardMaterial")
                                             .Include("InwardMaterial")
                                     .Include("OutwardFacility")

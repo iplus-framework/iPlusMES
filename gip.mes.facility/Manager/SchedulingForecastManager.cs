@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -449,7 +450,7 @@ namespace gip.mes.facility
                     usernameParam.Value = username;
 
                     string updateBatchPlanDurationSQL = GetUpdateDurationSQL();
-                    int cnt = databaseApp.ExecuteStoreCommand(updateBatchPlanDurationSQL, linieParam, partslistNoParam, prodOrderPartslistIDParam, prodOrderBatchPlanIDParam, usernameParam);
+                    int cnt = databaseApp.Database.ExecuteSqlRaw(updateBatchPlanDurationSQL, linieParam, partslistNoParam, prodOrderPartslistIDParam, prodOrderBatchPlanIDParam, usernameParam);
                 }
             }
             catch (Exception ec)

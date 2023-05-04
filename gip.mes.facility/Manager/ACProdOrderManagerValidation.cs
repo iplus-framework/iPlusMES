@@ -20,8 +20,8 @@ namespace gip.mes.facility
             MsgWithDetails detailMessages = new MsgWithDetails();
             foreach (ProdOrderPartslistPos pos in poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
             {
-                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(dbApp);
-                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(dbApp);
+                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference, pos);
+                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference, pos);
                 if (!pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.
@@ -115,8 +115,8 @@ namespace gip.mes.facility
 
             foreach (ProdOrderPartslistPos pos in poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
             {
-                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(dbApp);
-                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(dbApp);
+                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference, pos);
+                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference, pos);
                 if (!pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.

@@ -1,8 +1,8 @@
 ﻿using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility.TandTv3
 {
@@ -12,7 +12,7 @@ namespace gip.mes.facility.TandTv3
         #region Production Queries
 
         public static Func<DatabaseApp, Guid, ProdOrderPartslistPos> s_cQry_GetFinalMixure =
-           CompiledQuery.Compile<DatabaseApp, Guid, ProdOrderPartslistPos>(
+           EF.CompileQuery<DatabaseApp, Guid, ProdOrderPartslistPos>(
            (db, sourceProdOrderPartslistID) =>
                    db.ProdOrderPartslistPos.Where(p =>
                     p.ProdOrderPartslistID == sourceProdOrderPartslistID &&
@@ -28,7 +28,7 @@ namespace gip.mes.facility.TandTv3
 
 
         public static Func<DatabaseApp, Guid, bool, List<Guid>, List<string>, IEnumerable<FacilityBookingCharge>> s_cQry_GetPosCharge =
-           CompiledQuery.Compile<DatabaseApp, Guid, bool, List<Guid>, List<string>, IEnumerable<FacilityBookingCharge>>(
+           EF.CompileQuery<DatabaseApp, Guid, bool, List<Guid>, List<string>, IEnumerable<FacilityBookingCharge>>(
            (db, posID, useLotCheck, IDs, lotNos) =>
                    db.FacilityBookingCharge.Where(c =>
                         c.ProdOrderPartslistPosID == posID 

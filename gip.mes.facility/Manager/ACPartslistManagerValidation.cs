@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -319,8 +320,8 @@ namespace gip.mes.facility
 
             foreach (PartslistPos pos in partslist.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
             {
-                pos.PartslistPosRelation_SourcePartslistPos.AutoRefresh(dbApp);
-                pos.PartslistPosRelation_TargetPartslistPos.AutoRefresh(dbApp);
+                pos.PartslistPosRelation_SourcePartslistPos.AutoRefresh(pos.PartslistPosRelation_SourcePartslistPosReference, pos);
+                pos.PartslistPosRelation_TargetPartslistPos.AutoRefresh(pos.PartslistPosRelation_TargetPartslistPosReference, pos);
                 if (!pos.PartslistPosRelation_SourcePartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.
@@ -352,7 +353,7 @@ namespace gip.mes.facility
                 && partslist.MaterialWF.MaterialWFACClassMethod_MaterialWF.Any()
                 )
             {
-                partslist.PartslistACClassMethod_Partslist.AutoRefresh(dbApp);
+                partslist.PartslistACClassMethod_Partslist.AutoRefresh(partslist.PartslistACClassMethod_PartslistReference, partslist);
                 if (!partslist.PartslistACClassMethod_Partslist.Any())
                 {
                     // Der Stückliste wurde kein Steuerrezept zugeordnet obwohl im Materialflussplan mindestens ein Steuerrezept zugeordnet worden ist.

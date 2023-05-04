@@ -2,10 +2,12 @@
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility.TandTv3;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.facility
 {
@@ -159,7 +161,7 @@ namespace gip.mes.facility
             MsgWithDetails msg = new MsgWithDetails();
             try
             {
-                databaseApp.udpTandTv3FilterTrackingDelete(filter.TandTv3FilterTrackingID);
+                databaseApp.Database.ExecuteSql(FormattableStringFactory.Create("udpTandTv3FilterTrackingDelete @p0", filter.TandTv3FilterTrackingID));
                 msg.MessageLevel = eMsgLevel.Info;
                 msg.Message = "Successfully deleted T&T item!";
             }

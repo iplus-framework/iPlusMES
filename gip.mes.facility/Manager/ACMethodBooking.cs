@@ -4,9 +4,9 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -2197,7 +2197,7 @@ namespace gip.mes.facility
         }
 
         public static readonly Func<Database, IQueryable<gip.core.datamodel.ACClass>> s_cQry_StackCalculator =
-            CompiledQuery.Compile<Database, IQueryable<gip.core.datamodel.ACClass>>(
+            EF.CompileQuery<Database, IQueryable<gip.core.datamodel.ACClass>>(
                 (db) =>
                     db.ACClass
                     .Where(c => (c.BasedOnACClassID.HasValue

@@ -4,6 +4,7 @@ using System.Linq;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {

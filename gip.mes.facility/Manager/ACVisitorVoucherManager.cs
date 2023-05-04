@@ -4,6 +4,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -82,15 +83,15 @@ namespace gip.mes.facility
 
             // Durchsuche InOrder-Positionen nach Unterpositionen, die einer Kommissionierliste zugeordnet sind
             // Falls Kommissionierliste ein LKW-Entladungsplan ist, dann weise Komissionierliste der Hofliste zu
-            currentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(dbApp);
+            currentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(currentDeliveryNote.DeliveryNotePos_DeliveryNoteReference, currentDeliveryNote);
             var queryInOrderPos2Level = currentDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.InOrderPos != null && c.InOrderPos.InOrderPos_ParentInOrderPos.Any()).Select(c => c.InOrderPos);
             foreach (InOrderPos inOrderPos2Level in queryInOrderPos2Level)
             {
                 // Schaue in dritter Ebene nach
-                inOrderPos2Level.InOrderPos_ParentInOrderPos.AutoLoad(dbApp);
+                inOrderPos2Level.InOrderPos_ParentInOrderPos.AutoLoad(inOrderPos2Level.InOrderPos_ParentInOrderPosReference, inOrderPos2Level);
                 foreach (InOrderPos inOrderPos3Level in inOrderPos2Level.InOrderPos_ParentInOrderPos)
                 {
-                    inOrderPos3Level.PickingPos_InOrderPos.AutoLoad(dbApp);
+                    inOrderPos3Level.PickingPos_InOrderPos.AutoLoad(inOrderPos3Level.PickingPos_InOrderPosReference, inOrderPos3Level);
                     IEnumerable<Picking> pickingList = inOrderPos3Level.PickingPos_InOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle
                                                                                                       && (c.Picking.VisitorVoucher == null || c.Picking.VisitorVoucher != currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
@@ -107,10 +108,10 @@ namespace gip.mes.facility
             foreach (OutOrderPos outOrderPos2Level in queryOutOrderPos2Level)
             {
                 // Schaue in dritter Ebene nach
-                outOrderPos2Level.OutOrderPos_ParentOutOrderPos.AutoLoad(dbApp);
+                outOrderPos2Level.OutOrderPos_ParentOutOrderPos.AutoLoad(outOrderPos2Level.OutOrderPos_ParentOutOrderPosReference, outOrderPos2Level);
                 foreach (OutOrderPos outOrderPos3Level in outOrderPos2Level.OutOrderPos_ParentOutOrderPos)
                 {
-                    outOrderPos3Level.PickingPos_OutOrderPos.AutoLoad(dbApp);
+                    outOrderPos3Level.PickingPos_OutOrderPos.AutoLoad(outOrderPos3Level.PickingPos_OutOrderPosReference, outOrderPos3Level);
                     IEnumerable<Picking> pickingList = outOrderPos3Level.PickingPos_OutOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle
                                                                                                       && (c.Picking.VisitorVoucher == null || c.Picking.VisitorVoucher != currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
@@ -148,15 +149,15 @@ namespace gip.mes.facility
 
             // Durchsuche InOrder-Positionen nach Unterpositionen, die einer Kommissionierliste zugeordnet sind
             // Falls Kommissionierliste ein LKW-Entladungsplan ist, dann weise Komissionierliste der Hofliste zu
-            currentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(dbApp);
+            currentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(currentDeliveryNote.DeliveryNotePos_DeliveryNoteReference, currentDeliveryNote);
             var queryInOrderPos2Level = currentDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.InOrderPos != null && c.InOrderPos.InOrderPos_ParentInOrderPos.Any()).Select(c => c.InOrderPos);
             foreach (InOrderPos inOrderPos2Level in queryInOrderPos2Level)
             {
                 // Schaue in dritter Ebene nach
-                inOrderPos2Level.InOrderPos_ParentInOrderPos.AutoLoad(dbApp);
+                inOrderPos2Level.InOrderPos_ParentInOrderPos.AutoLoad(inOrderPos2Level.InOrderPos_ParentInOrderPosReference, inOrderPos2Level);
                 foreach (InOrderPos inOrderPos3Level in inOrderPos2Level.InOrderPos_ParentInOrderPos)
                 {
-                    inOrderPos3Level.PickingPos_InOrderPos.AutoLoad(dbApp);
+                    inOrderPos3Level.PickingPos_InOrderPos.AutoLoad(inOrderPos3Level.PickingPos_InOrderPosReference, inOrderPos3Level);
                     IEnumerable<Picking> pickingList = inOrderPos3Level.PickingPos_InOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle
                                                                                                       && (c.Picking.VisitorVoucher != null && c.Picking.VisitorVoucher == currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
@@ -173,10 +174,10 @@ namespace gip.mes.facility
             foreach (OutOrderPos outOrderPos2Level in queryOutOrderPos2Level)
             {
                 // Schaue in dritter Ebene nach
-                outOrderPos2Level.OutOrderPos_ParentOutOrderPos.AutoLoad(dbApp);
+                outOrderPos2Level.OutOrderPos_ParentOutOrderPos.AutoLoad(outOrderPos2Level.OutOrderPos_ParentOutOrderPosReference, outOrderPos2Level);
                 foreach (OutOrderPos outOrderPos3Level in outOrderPos2Level.OutOrderPos_ParentOutOrderPos)
                 {
-                    outOrderPos3Level.PickingPos_OutOrderPos.AutoLoad(dbApp);
+                    outOrderPos3Level.PickingPos_OutOrderPos.AutoLoad(outOrderPos3Level.PickingPos_OutOrderPosReference, outOrderPos3Level);
                     IEnumerable<Picking> pickingList = outOrderPos3Level.PickingPos_OutOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle
                                                                                                       && (c.Picking.VisitorVoucher != null && c.Picking.VisitorVoucher == currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
@@ -220,10 +221,10 @@ namespace gip.mes.facility
                 picking.VisitorVoucher = currentVisitorVoucher;
             }
 
-            currentTourplan.TourplanPos_Tourplan.AutoLoad(dbApp);
+            currentTourplan.TourplanPos_Tourplan.AutoLoad(currentTourplan.TourplanPos_TourplanReference, currentTourplan);
             foreach (TourplanPos tourPos in currentTourplan.TourplanPos_Tourplan)
             {
-                tourPos.DeliveryNote_TourplanPos.AutoLoad(dbApp);
+                tourPos.DeliveryNote_TourplanPos.AutoLoad(tourPos.DeliveryNote_TourplanPosReference, tourPos);
                 foreach (DeliveryNote note in tourPos.DeliveryNote_TourplanPos)
                 {
                     if (note.VisitorVoucherID == null)
@@ -257,16 +258,16 @@ namespace gip.mes.facility
             }
 
             currentTourplan.VisitorVoucher = null;
-            currentTourplan.Picking_Tourplan.AutoLoad(dbApp);
+            currentTourplan.Picking_Tourplan.AutoLoad(currentTourplan.Picking_TourplanReference, currentTourplan);
             foreach (Picking picking in currentTourplan.Picking_Tourplan)
             {
                 picking.VisitorVoucher = null;
             }
 
-            currentTourplan.TourplanPos_Tourplan.AutoLoad(dbApp);
+            currentTourplan.TourplanPos_Tourplan.AutoLoad(currentTourplan.TourplanPos_TourplanReference, currentTourplan);
             foreach (TourplanPos tourPos in currentTourplan.TourplanPos_Tourplan)
             {
-                tourPos.DeliveryNote_TourplanPos.AutoLoad(dbApp);
+                tourPos.DeliveryNote_TourplanPos.AutoLoad(tourPos.DeliveryNote_TourplanPosReference, tourPos);
                 foreach (DeliveryNote note in tourPos.DeliveryNote_TourplanPos)
                 {
                     if (note.VisitorVoucher != null)
@@ -315,7 +316,7 @@ namespace gip.mes.facility
             // Wareneingang
             else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
             {
-                currentPicking.PickingPos_Picking.AutoLoad(dbApp);
+                currentPicking.PickingPos_Picking.AutoLoad(currentPicking.PickingPos_PickingReference, currentPicking);
                 if (currentPicking.PickingPos_Picking.Any())
                 {
                     // Weise bereits angelegte Lieferscheine dem Besuch zu
@@ -398,8 +399,8 @@ namespace gip.mes.facility
             // Warenausgang
             else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
             {
-                if (currentPicking.EntityState != System.Data.EntityState.Added)
-                    currentPicking.PickingPos_Picking.AutoLoad(dbApp);
+                if (currentPicking.EntityState != EntityState.Added)
+                    currentPicking.PickingPos_Picking.AutoLoad(currentPicking.PickingPos_PickingReference, currentPicking);
                 if (currentPicking.PickingPos_Picking.Any())
                 {
                     // Weise bereits angelegte Lieferscheine dem Besuch zu
@@ -518,7 +519,7 @@ namespace gip.mes.facility
             // Wareneingang
             else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
             {
-                currentPicking.PickingPos_Picking.AutoLoad(dbApp);
+                currentPicking.PickingPos_Picking.AutoLoad(currentPicking.PickingPos_PickingReference, currentPicking);
                 if (currentPicking.PickingPos_Picking.Any())
                 {
                     IEnumerable<DeliveryNote> inDeliveryNoteList = currentPicking.PickingPos_Picking
@@ -544,7 +545,7 @@ namespace gip.mes.facility
             }
             else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
             {
-                currentPicking.PickingPos_Picking.AutoLoad(dbApp);
+                currentPicking.PickingPos_Picking.AutoLoad(currentPicking.PickingPos_PickingReference, currentPicking);
                 if (currentPicking.PickingPos_Picking.Any())
                 {
                     IEnumerable<DeliveryNote> outDeliveryNoteList = currentPicking.PickingPos_Picking

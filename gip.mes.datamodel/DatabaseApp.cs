@@ -265,6 +265,14 @@ namespace gip.mes.datamodel
             }
         }
 
+        public string DefaultContainerName
+        {
+            get
+            {
+                return this.GetType().Namespace;
+            }
+        }
+
         public event ACChangesEventHandler ACChangesExecuted;
 
         #endregion

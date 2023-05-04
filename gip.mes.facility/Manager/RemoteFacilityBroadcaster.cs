@@ -7,7 +7,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using System.Globalization;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -73,7 +73,7 @@ namespace gip.mes.facility
             {
                 try
                 {
-                    (_ParentComponent as ACComponent).ACTypeFromLiveContext.ACClassConfig_ACClass.Load(MergeOption.OverwriteChanges);
+                    (_ParentComponent as ACComponent).ACTypeFromLiveContext.ACClassConfig_ACClass.AutoLoad((_ParentComponent as ACComponent).ACTypeFromLiveContext.ACClassConfig_ACClassReference, (_ParentComponent as ACComponent).ACTypeFromLiveContext);
                     var query = (_ParentComponent as ACComponent).ACTypeFromLiveContext.ACClassConfig_ACClass.Where(c => c.KeyACUrl == keyACUrl);
                     if (query.Any())
                         result = query.ToList();

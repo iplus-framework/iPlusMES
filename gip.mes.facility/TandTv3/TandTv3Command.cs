@@ -1,11 +1,13 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility.TandTv3.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.facility.TandTv3
 {
@@ -91,7 +93,7 @@ namespace gip.mes.facility.TandTv3
             {
                 dbFilter = databaseApp.TandTv3FilterTracking.FirstOrDefault(c => c.ItemSystemNo == filter.ItemSystemNo);
                 if (dbFilter != null)
-                    databaseApp.udpTandTv3FilterTrackingDelete(dbFilter.TandTv3FilterTrackingID);
+                    databaseApp.Database.ExecuteSql(FormattableStringFactory.Create("udpTandTv3FilterTrackingDelete @p0", dbFilter.TandTv3FilterTrackingID));
             }
             dbFilter = GetFilter(databaseApp, filter, vBUserNo);
             return dbFilter;
@@ -835,7 +837,7 @@ namespace gip.mes.facility.TandTv3
             TandTv3MDBookingDirection inwardDirection = databaseApp.TandTv3MDBookingDirection.ToList().FirstOrDefault(c => c.TandTv3MDBookingDirectionID == MDBookingDirectionEnum.Inward.ToString());
             TandTv3MDBookingDirection outwardDirection = databaseApp.TandTv3MDBookingDirection.ToList().FirstOrDefault(c => c.TandTv3MDBookingDirectionID == MDBookingDirectionEnum.Outward.ToString());
 
-            databaseApp.TandTv3FilterTracking.AddObject(result.Filter);
+            databaseApp.TandTv3FilterTracking.Add(result.Filter);
 
             Dictionary<int, TandTv3Step> stepMapping = new Dictionary<int, TandTv3Step>();
             foreach (var step in result.Steps)
@@ -1010,7 +1012,7 @@ namespace gip.mes.facility.TandTv3
                             SourceTandTv3MixPoint = dbSourceMixPoint,
                             TargetTandTv3MixPoint = dbTargetMixPoint
                         };
-                        databaseApp.TandTv3MixPointRelation.AddObject(dbMixPointRelation);
+                        databaseApp.TandTv3MixPointRelation.Add(dbMixPointRelation);
                     }
                 }
             }

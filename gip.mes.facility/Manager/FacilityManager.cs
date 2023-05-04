@@ -9,6 +9,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.reporthandler;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
