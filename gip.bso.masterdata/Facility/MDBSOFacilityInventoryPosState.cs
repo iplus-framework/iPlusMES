@@ -223,7 +223,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentFacilityInventoryPosState = MDFacilityInventoryPosState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDFacilityInventoryPosState.AddObject(CurrentFacilityInventoryPosState);
+            DatabaseApp.MDFacilityInventoryPosState.Add(CurrentFacilityInventoryPosState);
             ACState = Const.SMNew;
             PostExecute("New");
 

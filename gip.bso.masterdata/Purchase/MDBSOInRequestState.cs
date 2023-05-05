@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentInRequestState = MDInRequestState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDInRequestState.AddObject(CurrentInRequestState);
+            DatabaseApp.MDInRequestState.Add(CurrentInRequestState);
             ACState = Const.SMNew;
             PostExecute("New");
 

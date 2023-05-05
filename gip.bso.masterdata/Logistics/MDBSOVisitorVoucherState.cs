@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentVisitorVoucherState = MDVisitorVoucherState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDVisitorVoucherState.AddObject(CurrentVisitorVoucherState);
+            DatabaseApp.MDVisitorVoucherState.Add(CurrentVisitorVoucherState);
             ACState = Const.SMNew;
             PostExecute("New");
 

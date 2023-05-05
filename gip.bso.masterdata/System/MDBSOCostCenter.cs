@@ -215,7 +215,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentCostCenter = MDCostCenter.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDCostCenter.AddObject(CurrentCostCenter);
+            DatabaseApp.MDCostCenter.Add(CurrentCostCenter);
             ACState = Const.SMNew;
             PostExecute("New");
 

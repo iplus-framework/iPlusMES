@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentOutOrderState = MDOutOrderState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDOutOrderState.AddObject(CurrentOutOrderState);
+            DatabaseApp.MDOutOrderState.Add(CurrentOutOrderState);
             ACState = Const.SMNew;
             PostExecute("New");
 

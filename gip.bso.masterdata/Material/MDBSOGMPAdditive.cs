@@ -216,7 +216,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentGMPAdditive = MDGMPAdditive.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDGMPAdditive.AddObject(CurrentGMPAdditive);
+            DatabaseApp.MDGMPAdditive.Add(CurrentGMPAdditive);
             ACState = Const.SMNew;
             PostExecute("New");
 

@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentDemandOrderState = MDDemandOrderState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDDemandOrderState.AddObject(CurrentDemandOrderState);
+            DatabaseApp.MDDemandOrderState.Add(CurrentDemandOrderState);
             ACState = Const.SMNew;
             PostExecute("New");
 

@@ -222,7 +222,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentMovementReason = MDMovementReason.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDMovementReason.AddObject(CurrentMovementReason);
+            DatabaseApp.MDMovementReason.Add(CurrentMovementReason);
             ACState = Const.SMNew;
             PostExecute("New");
 

@@ -201,7 +201,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentPickingType = MDPickingType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDPickingType.AddObject(CurrentPickingType);
+            DatabaseApp.MDPickingType.Add(CurrentPickingType);
             ACState = Const.SMNew;
             PostExecute("New");
 

@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentTransportMode = MDTransportMode.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDTransportMode.AddObject(CurrentTransportMode);
+            DatabaseApp.MDTransportMode.Add(CurrentTransportMode);
             ACState = Const.SMNew;
             PostExecute("New");
 

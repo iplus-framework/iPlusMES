@@ -222,7 +222,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentZeroStockState = MDZeroStockState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDZeroStockState.AddObject(CurrentZeroStockState);
+            DatabaseApp.MDZeroStockState.Add(CurrentZeroStockState);
             ACState = Const.SMNew;
             PostExecute("New");
 

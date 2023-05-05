@@ -289,7 +289,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             SelectedMaterialGroup = MDMaterialGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDMaterialGroup.AddObject(SelectedMaterialGroup);
+            DatabaseApp.MDMaterialGroup.Add(SelectedMaterialGroup);
             AccessPrimary.NavList.Add(SelectedMaterialGroup);
             ACState = Const.SMNew;
             OnPropertyChanged("MaterialGroupList");

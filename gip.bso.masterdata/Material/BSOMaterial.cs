@@ -17,10 +17,10 @@ using System.Linq;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
-using System.Data.Objects;
 using gip.mes.autocomponent;
 using System.Windows.Input;
 using static gip.core.datamodel.Global;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.masterdata
 {
@@ -391,8 +391,9 @@ namespace gip.bso.masterdata
                 List<MDUnit> convertableUnits = new List<MDUnit>();
                 // Erstelle Liste mit allen Dimensionslosen Einheiten, die nicht bereits als Alternativ-Einheit angelegt worden sind
                 var query = DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentMaterial.BaseMDUnit.MDUnitID);
-                if (!DatabaseApp.IsChanged)
-                    (query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
+                //No Replacement for MergeOption and ObjectQuery
+                //if (!DatabaseApp.IsChanged)
+                //    (query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
                 if (query.Any())
                 {
                     foreach (MDUnit unit in query)
@@ -911,7 +912,7 @@ namespace gip.bso.masterdata
                 return;
             LoadEntity<Material>(requery, () => SelectedMaterial, () => CurrentMaterial, c => CurrentMaterial = c,
                         DatabaseApp.Material
-                         .Include(c => c.BaseMDUnit)
+                        .Include(c => c.BaseMDUnit)
                         .Include(c => c.MDMaterialGroup)
                         .Include(c => c.MDMaterialType)
                         .Include(c => c.MDGMPMaterialGroup)
@@ -926,7 +927,7 @@ namespace gip.bso.masterdata
             PostExecute("Load");
             if (requery)
             {
-                CurrentMaterial.MaterialUnit_Material.AutoRefresh();
+                CurrentMaterial.MaterialUnit_Material.AutoRefresh(CurrentMaterial.MaterialUnit_MaterialReference, CurrentMaterial);
                 //CurrentMaterial.MaterialUnit_Material.AutoLoad();
                 OnPropertyChanged("MaterialUnitList");
             }
@@ -952,7 +953,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentMaterial = Material.NewACObject(DatabaseApp, null);
-            DatabaseApp.Material.AddObject(CurrentMaterial);
+            DatabaseApp.Material.Add(CurrentMaterial);
             AccessPrimary.NavList.Add(CurrentMaterial);
             AccessPrimary.Selected = CurrentMaterial;
             OnPropertyChanged("SelectedMaterial");
@@ -1013,7 +1014,7 @@ namespace gip.bso.masterdata
         {
             if (_VisitedMaterials != null && _VisitedMaterials.Any())
             {
-                _VisitedMaterials.RemoveAll(c => c.EntityState == System.Data.EntityState.Unchanged);
+                _VisitedMaterials.RemoveAll(c => c.EntityState == EntityState.Unchanged);
             }
             return base.OnPreSave();
         }
@@ -1583,10 +1584,10 @@ namespace gip.bso.masterdata
             if (CurrentMaterial.Label == null)
             {
                 CurrentMaterial.Label = Label.NewACObject(DatabaseApp, CurrentMaterial);
-                DatabaseApp.Label.AddObject(CurrentMaterial.Label);
+                DatabaseApp.Label.Add(CurrentMaterial.Label);
             }
             LabelTranslation translation = LabelTranslation.NewACObject(DatabaseApp, CurrentMaterial.Label);
-            DatabaseApp.LabelTranslation.AddObject(translation);
+            DatabaseApp.LabelTranslation.Add(translation);
             CurrentMaterial.Label.LabelTranslation_Label.Add(translation);
             SelectedTranslation = translation;
             OnPropertyChanged("TranslationList");
@@ -2116,7 +2117,7 @@ namespace gip.bso.masterdata
         public void DeletePWMethodNodeConfig()
         {
             SelectedMaterial.MaterialConfig_Material.Remove(SelectedAssignedPWMethodNode);
-            DatabaseApp.DeleteObject(SelectedAssignedPWMethodNode);
+            DatabaseApp.Remove(SelectedAssignedPWMethodNode);
             OnPropertyChanged("AssignedPWMethodNodes");
             OnPropertyChanged("AvailablePWMethodNodes");
         }

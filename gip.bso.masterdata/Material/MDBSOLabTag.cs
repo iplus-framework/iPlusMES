@@ -210,7 +210,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentLabTag = MDLabTag.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDLabTag.AddObject(CurrentLabTag);
+            DatabaseApp.MDLabTag.Add(CurrentLabTag);
             ACState = Const.SMNew;
             PostExecute("New");
 

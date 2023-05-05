@@ -1,11 +1,11 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Objects;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -342,7 +342,7 @@ namespace gip.bso.masterdata
 
         public virtual IQueryable<Partslist> AccessPrimaryNavSearchExecuting(IQueryable<Partslist> result)
         {
-            ObjectQuery<Partslist> query = result as ObjectQuery<Partslist>;
+            IQueryable<Partslist> query = result as IQueryable<Partslist>;
             if (query != null)
             {
                 query.Include(c => c.Material)

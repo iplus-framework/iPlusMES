@@ -407,7 +407,7 @@ namespace gip.bso.masterdata
             _IsSavedAfterAddedNewMaterialWF = false;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaterialWF), MaterialWF.NoColumnName, MaterialWF.FormatNewNo, this);
             MaterialWF newMaterialWF = MaterialWF.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.MaterialWF.AddObject(newMaterialWF);
+            DatabaseApp.MaterialWF.Add(newMaterialWF);
             AccessPrimary.NavList.Add(newMaterialWF);
             VBDesignerMaterialWF.DoInsertRoot(newMaterialWF, null);
             SelectedMaterialWF = newMaterialWF;
@@ -1030,7 +1030,7 @@ namespace gip.bso.masterdata
             item.ACClassMethodID = this.NewProcessWorkflow.ACClassMethodID;
             //item = MaterialWFACClassMethod.CreateMaterialWFACClassMethod(Guid.NewGuid(), this.CurrentMaterialWF.MaterialWFID, this.NewProcessWorkflow.ACClassMethodID);
 
-            ((gip.mes.datamodel.DatabaseApp)this.DatabaseApp).MaterialWFACClassMethod.AddObject(item);
+            ((gip.mes.datamodel.DatabaseApp)this.DatabaseApp).MaterialWFACClassMethod.Add(item);
 
             OnPropertyChanged("ProcessWorkflowList");
             this.CurrentProcessWorkflow = item;
@@ -1093,7 +1093,7 @@ namespace gip.bso.masterdata
                     //                                                                             Root.Environment.User.Initials, DateTime.Now,
                     //                                                                             Root.Environment.User.Initials, DateTime.Now);
 
-                    DatabaseApp.MaterialWFConnection.AddObject(entry);
+                    DatabaseApp.MaterialWFConnection.Add(entry);
                 }
             }
             OnPropertyChanged("MaterialPWNodeConnectionList");

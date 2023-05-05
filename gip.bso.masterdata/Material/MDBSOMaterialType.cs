@@ -228,7 +228,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             SelectedMaterialType = MDMaterialType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDMaterialType.AddObject(SelectedMaterialType);
+            DatabaseApp.MDMaterialType.Add(SelectedMaterialType);
             AccessPrimary.NavList.Add(SelectedMaterialType);
             ACState = Const.SMNew;
             OnPropertyChanged("MaterialTypeList");

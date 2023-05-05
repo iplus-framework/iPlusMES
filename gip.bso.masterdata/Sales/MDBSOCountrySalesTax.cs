@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -667,7 +668,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             SelectedMDCountrySalesTax = MDCountrySalesTax.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDCountrySalesTax.AddObject(SelectedMDCountrySalesTax);
+            DatabaseApp.MDCountrySalesTax.Add(SelectedMDCountrySalesTax);
             AccessPrimary.NavList.Add(SelectedMDCountrySalesTax);
             OnPropertyChanged("MDCountrySalesTaxList");
             ACState = Const.SMNew;

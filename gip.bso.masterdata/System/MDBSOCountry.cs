@@ -309,7 +309,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentCountry = MDCountry.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDCountry.AddObject(CurrentCountry);
+            DatabaseApp.MDCountry.Add(CurrentCountry);
             ACState = Const.SMNew;
             PostExecute("New");
 

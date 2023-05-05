@@ -214,7 +214,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentDelivType = MDDelivType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDDelivType.AddObject(CurrentDelivType);
+            DatabaseApp.MDDelivType.Add(CurrentDelivType);
             ACState = Const.SMNew;
             PostExecute("New");
 

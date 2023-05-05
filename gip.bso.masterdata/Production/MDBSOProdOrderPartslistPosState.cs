@@ -213,7 +213,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentProdOrderPartslistPosState = MDProdOrderPartslistPosState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDProdOrderPartslistPosState.AddObject(CurrentProdOrderPartslistPosState);
+            DatabaseApp.MDProdOrderPartslistPosState.Add(CurrentProdOrderPartslistPosState);
             ACState = Const.SMNew;
             PostExecute("New");
 

@@ -211,7 +211,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentVisitorCardState = MDVisitorCardState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDVisitorCardState.AddObject(CurrentVisitorCardState);
+            DatabaseApp.MDVisitorCardState.Add(CurrentVisitorCardState);
             ACState = Const.SMNew;
             PostExecute("New");
 

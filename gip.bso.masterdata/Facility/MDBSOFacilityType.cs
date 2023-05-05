@@ -223,7 +223,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentFacilityType = MDFacilityType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDFacilityType.AddObject(CurrentFacilityType);
+            DatabaseApp.MDFacilityType.Add(CurrentFacilityType);
             ACState = Const.SMNew;
             PostExecute("New");
 

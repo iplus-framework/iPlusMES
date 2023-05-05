@@ -213,7 +213,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentTour = MDTour.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDTour.AddObject(CurrentTour);
+            DatabaseApp.MDTour.Add(CurrentTour);
             ACState = Const.SMNew;
             PostExecute("New");
 

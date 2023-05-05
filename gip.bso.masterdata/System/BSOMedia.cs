@@ -791,8 +791,9 @@ namespace gip.bso.masterdata
 
             if (!string.IsNullOrEmpty(item.FilePath))
             {
-                item.Image = null;
-                item.ImageThumb = null;
+                // TODO: Migrate Media-classes to another assembly
+                //item.Image = null;
+                //item.ImageThumb = null;
                 DeleteFilesNames.Add(item.FilePath);
                 if (item.ThumbExistAndIsNotGeneric())
                     DeleteFilesNames.Add(item.ThumbPath);

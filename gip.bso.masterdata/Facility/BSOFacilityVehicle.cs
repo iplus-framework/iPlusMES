@@ -19,7 +19,7 @@ using System.ComponentModel;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.masterdata
 {
@@ -392,7 +392,7 @@ namespace gip.bso.masterdata
             vehicle.MDFacilityType = facilityType;
             vehicle.InwardEnabled = true;
             vehicle.OutwardEnabled = true;
-            DatabaseApp.Facility.AddObject(vehicle);
+            DatabaseApp.Facility.Add(vehicle);
             _AccessPrimary.NavList.Add(vehicle);
             OnPropertyChanged("VehicleList");
             CurrentVehicle = vehicle;
@@ -455,7 +455,7 @@ namespace gip.bso.masterdata
 
         private IQueryable<Facility> _AccessPrimary_NavSearchExecuting(IQueryable<Facility> result)
         {
-            ObjectQuery<Facility> query = result as ObjectQuery<Facility>;
+            IQueryable<Facility> query = result as IQueryable<Facility>;
             if (query != null)
             {
                 query.Include(c => c.Company);

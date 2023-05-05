@@ -222,7 +222,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentReleaseState = MDReleaseState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDReleaseState.AddObject(CurrentReleaseState);
+            DatabaseApp.MDReleaseState.Add(CurrentReleaseState);
             ACState = Const.SMNew;
             PostExecute("New");
         }

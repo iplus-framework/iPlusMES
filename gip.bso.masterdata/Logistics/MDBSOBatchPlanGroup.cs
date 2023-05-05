@@ -199,7 +199,7 @@ namespace gip.bso.masterdata
         public void New()
         {
             MDBatchPlanGroup newGroup = MDBatchPlanGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDBatchPlanGroup.AddObject(newGroup);
+            DatabaseApp.MDBatchPlanGroup.Add(newGroup);
             AccessPrimary.NavList.Add(newGroup);
             OnPropertyChanged(nameof(MDBatchPlanGroupList));
             CurrentMDBatchPlanGroup = newGroup;

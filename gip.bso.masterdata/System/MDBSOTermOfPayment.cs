@@ -217,7 +217,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentTermOfPayment = MDTermOfPayment.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDTermOfPayment.AddObject(CurrentTermOfPayment);
+            DatabaseApp.MDTermOfPayment.Add(CurrentTermOfPayment);
             ACState = Const.SMNew;
             PostExecute("New");
 

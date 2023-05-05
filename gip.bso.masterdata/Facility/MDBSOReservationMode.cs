@@ -222,7 +222,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentReservationMode = MDReservationMode.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDReservationMode.AddObject(CurrentReservationMode);
+            DatabaseApp.MDReservationMode.Add(CurrentReservationMode);
             ACState = Const.SMNew;
             PostExecute("New");
 

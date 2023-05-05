@@ -222,7 +222,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentFacilityVehicleType = MDFacilityVehicleType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDFacilityVehicleType.AddObject(CurrentFacilityVehicleType);
+            DatabaseApp.MDFacilityVehicleType.Add(CurrentFacilityVehicleType);
             ACState = Const.SMNew;
             PostExecute("New");
 

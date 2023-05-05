@@ -290,7 +290,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentTimeRangeModel = MDTimeRange.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDTimeRange.AddObject(CurrentTimeRangeModel);
+            DatabaseApp.MDTimeRange.Add(CurrentTimeRangeModel);
             ACState = Const.SMNew;
             PostExecute("Neu");
 

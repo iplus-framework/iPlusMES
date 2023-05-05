@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Reflection;
 using static gip.core.datamodel.Global;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.masterdata
 {
@@ -848,15 +849,15 @@ namespace gip.bso.masterdata
             if (!IsLabOrderParent)
             {
                 if (CurrentLabOrder.InOrderPos != null)
-                    ShowLabOrderViewDialog(CurrentLabOrder.InOrderPos, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(CurrentLabOrder.InOrderPos, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.OutOrderPos != null)
-                    ShowLabOrderViewDialog(null, CurrentLabOrder.OutOrderPos, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, CurrentLabOrder.OutOrderPos, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.ProdOrderPartslistPos != null)
-                    ShowLabOrderViewDialog(null, null, CurrentLabOrder.ProdOrderPartslistPos, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, null, CurrentLabOrder.ProdOrderPartslistPos, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.FacilityLot != null)
-                    ShowLabOrderViewDialog(null, null, null, CurrentLabOrder.FacilityLot, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, null, null, CurrentLabOrder.FacilityLot, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else
-                    ShowLabOrderViewDialog(null, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
             }
             else
             {

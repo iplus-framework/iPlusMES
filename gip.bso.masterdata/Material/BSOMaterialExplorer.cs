@@ -5,10 +5,10 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using static gip.core.datamodel.Global;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Windows.Input;
 using System;
 using gip.core.autocomponent;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.masterdata
 {
@@ -130,7 +130,7 @@ namespace gip.bso.masterdata
 
         protected virtual IQueryable<Material> _AccessPrimary_NavSearchExecuting(IQueryable<Material> result)
         {
-            ObjectQuery<Material> query = result as ObjectQuery<Material>;
+            IQueryable<Material> query = result as IQueryable<Material>;
             if (query != null)
             {
                 query
@@ -166,7 +166,7 @@ namespace gip.bso.masterdata
                                .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
                                .Any(x => x.MDSchedulingGroupID == FilterMDSchedulingGroupID)
                     )
-                    as ObjectQuery<Material>;
+                    as IQueryable<Material>;
 
             }
 
@@ -176,12 +176,12 @@ namespace gip.bso.masterdata
                     .Where(c =>
                                 c.Partslist_Material
                                 .Any(x => (x.DeleteDate == null) == (FilterIsNotDeleted ?? false))
-                           ) as ObjectQuery<Material>;
+                           ) as IQueryable<Material>;
             }
 
             if (FilterIsConnectedWithEnabledPartslist != null)
             {
-                query = query.Where(c => c.Partslist_Material.Any(x => x.DeleteDate == null && x.IsEnabled == (FilterIsConnectedWithEnabledPartslist ?? false))) as ObjectQuery<Material>;
+                query = query.Where(c => c.Partslist_Material.Any(x => x.DeleteDate == null && x.IsEnabled == (FilterIsConnectedWithEnabledPartslist ?? false))) as IQueryable<Material>;
             }
 
             return query;

@@ -17,8 +17,8 @@ using System.Linq;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.datamodel;
-using System.Data.Objects;
 using gip.mes.autocomponent;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.masterdata
 {
@@ -831,7 +831,7 @@ namespace gip.bso.masterdata
                 if (CurrentCompany == null)
                     return null;
                 var query = DatabaseApp.CompanyMaterialStock.Where(c => c.CompanyMaterial.CompanyID == CurrentCompany.CompanyID).OrderBy(c => c.CompanyMaterial.CompanyMaterialNo);
-                (query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
+                //(query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
                 return query;
             }
         }
@@ -955,8 +955,8 @@ namespace gip.bso.masterdata
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Company), Company.NoColumnName, Company.FormatNewNo, this);
             CurrentCompany = Company.NewACObject(DatabaseApp, null, secondaryKey);
 
-            DatabaseApp.Company.AddObject(CurrentCompany);
-            DatabaseApp.CompanyAddress.AddObject(CurrentCompany.HouseCompanyAddress);
+            DatabaseApp.Company.Add(CurrentCompany);
+            DatabaseApp.CompanyAddress.Add(CurrentCompany.HouseCompanyAddress);
             CurrentHouseAdress = CurrentCompany.HouseCompanyAddress;
 
             ACState = Const.SMNew;
@@ -1053,7 +1053,7 @@ namespace gip.bso.masterdata
             if (!PreExecute("NewCompanyAddress")) return;
             CurrentCompanyAddress = CompanyAddress.NewACObject(DatabaseApp, CurrentCompany);
             CurrentCompany.CompanyAddress_Company.Add(CurrentCompanyAddress);
-            DatabaseApp.CompanyAddress.AddObject(CurrentCompanyAddress);
+            DatabaseApp.CompanyAddress.Add(CurrentCompanyAddress);
             PostExecute("NewCompanyAddress");
             OnPropertyChanged("CompanyAddressList");
         }
@@ -1316,7 +1316,7 @@ namespace gip.bso.masterdata
             CurrentCompanyMaterial = CompanyMaterial.NewACObject(DatabaseApp, CurrentCompany);
             CurrentCompanyMaterial.CMMype = GlobalApp.CompanyMaterialTypes.MaterialMapping;
             CurrentCompany.CompanyMaterial_Company.Add(CurrentCompanyMaterial);
-            DatabaseApp.CompanyMaterial.AddObject(CurrentCompanyMaterial);
+            DatabaseApp.CompanyMaterial.Add(CurrentCompanyMaterial);
             PostExecute("NewCompanyMaterial");
             OnPropertyChanged("CompanyMaterialList");
         }
@@ -1409,7 +1409,7 @@ namespace gip.bso.masterdata
             CurrentCompanyMaterialPickup = CompanyMaterial.NewACObject(DatabaseApp, CurrentCompany);
             CurrentCompanyMaterialPickup.CMMype = GlobalApp.CompanyMaterialTypes.Pickup;
             CurrentCompany.CompanyMaterial_Company.Add(CurrentCompanyMaterialPickup);
-            DatabaseApp.CompanyMaterial.AddObject(CurrentCompanyMaterialPickup);
+            DatabaseApp.CompanyMaterial.Add(CurrentCompanyMaterialPickup);
             PostExecute("NewCompanyMaterialPickup");
             OnPropertyChanged("CompanyMaterialPickupList");
         }

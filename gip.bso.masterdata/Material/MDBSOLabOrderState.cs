@@ -213,7 +213,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentLabOrderState = MDLabOrderState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDLabOrderState.AddObject(CurrentLabOrderState);
+            DatabaseApp.MDLabOrderState.Add(CurrentLabOrderState);
             ACState = Const.SMNew;
             PostExecute("New");
 

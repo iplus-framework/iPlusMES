@@ -223,7 +223,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentBalancingMode = MDBalancingMode.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDBalancingMode.AddObject(CurrentBalancingMode);
+            DatabaseApp.MDBalancingMode.Add(CurrentBalancingMode);
             ACState = Const.SMNew;
             PostExecute("New");
 

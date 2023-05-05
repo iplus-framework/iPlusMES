@@ -2,9 +2,9 @@
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 
 
@@ -226,7 +226,9 @@ namespace gip.bso.masterdata.Scheduling
             }
             else
             {
-                _MDSchedulingGroupWFList = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.CreateSourceQuery()
+                _MDSchedulingGroupWFList = SelectedMDSchedulingGroup.Context.Entry(SelectedMDSchedulingGroup)
+                                                    .Collection(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
+                                                    .Query()
                                                     .Include(c => c.VBiACClassWF)
                                                     .Include(c => c.VBiACClassWF.ACClassMethod)
                                                     .AsEnumerable().OrderBy(c => c.ACClassWF.ACCaption).ToList();
@@ -265,7 +267,7 @@ namespace gip.bso.masterdata.Scheduling
                 List<Guid> assignedWorkflowNodeIds = new List<Guid>();
                 if (_MDSchedulingGroupWFList != null)
                     assignedWorkflowNodeIds = _MDSchedulingGroupWFList.Select(c => c.VBiACClassWFID).ToList();
-                ObjectQuery<core.datamodel.ACClassWF> query = result as ObjectQuery<core.datamodel.ACClassWF>;
+                IQueryable<core.datamodel.ACClassWF> query = result as IQueryable<core.datamodel.ACClassWF>;
                 if (query != null)
                 {
                     result = query.Include(c => c.ACClassMethod)
@@ -463,7 +465,7 @@ namespace gip.bso.masterdata.Scheduling
         {
             if (!PreExecute("New")) return;
             MDSchedulingGroup mDSchedulingGroup = MDSchedulingGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDSchedulingGroup.AddObject(mDSchedulingGroup);
+            DatabaseApp.MDSchedulingGroup.Add(mDSchedulingGroup);
             AccessPrimary.NavList.Add(mDSchedulingGroup);
             CurrentMDSchedulingGroup = mDSchedulingGroup;
             OnPropertyChanged("MDSchedulingGroupList");

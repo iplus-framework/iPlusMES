@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentCalendar = Calendar.NewACObject(DatabaseApp, null);
-            DatabaseApp.Calendar.AddObject(CurrentCalendar);
+            DatabaseApp.Calendar.Add(CurrentCalendar);
             ACState = Const.SMNew;
             PostExecute("Neu");
            

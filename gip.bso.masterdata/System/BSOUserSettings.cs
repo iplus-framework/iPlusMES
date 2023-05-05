@@ -275,7 +275,7 @@ namespace gip.bso.masterdata
             if (CurrentUserSettings == null)
             {
                 CurrentUserSettings = UserSettings.NewACObject(DatabaseApp, Root.Environment.User);
-                DatabaseApp.UserSettings.AddObject(CurrentUserSettings);
+                DatabaseApp.UserSettings.Add(CurrentUserSettings);
             }
             CurrentUserSettings.TenantCompany = SelectedCompany;
             CurrentUserSettings.InvoiceCompanyAddress = SelectedCompanyAddress;

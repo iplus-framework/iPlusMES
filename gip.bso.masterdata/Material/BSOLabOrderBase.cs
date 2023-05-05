@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.mes.facility;
 using static gip.core.datamodel.Global;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.masterdata
 {
@@ -358,7 +359,7 @@ namespace gip.bso.masterdata
             _LabOrderPosList = null;
             if (labOrder != null)
             {
-                labOrder.LabOrderPos_LabOrder.AutoRefresh(this.DatabaseApp);
+                labOrder.LabOrderPos_LabOrder.AutoRefresh(labOrder.LabOrderPos_LabOrderReference, labOrder);
                 _LabOrderPosList = labOrder.LabOrderPos_LabOrder.OrderBy(c => c.Sequence).ToList();
             }
             if(_LabOrderPosList == null)
@@ -597,7 +598,7 @@ namespace gip.bso.masterdata
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(LabOrder), LabOrder.NoColumnName, LabOrder.FormatNewNo, this);
             var newLabOrder = LabOrder.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.LabOrder.AddObject(newLabOrder);
+            DatabaseApp.LabOrder.Add(newLabOrder);
             ACState = Const.SMNew;
             AccessPrimary.NavList.Add(newLabOrder);
             CurrentLabOrder = newLabOrder;

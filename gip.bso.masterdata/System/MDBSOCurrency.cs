@@ -342,7 +342,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentCurrency = MDCurrency.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDCurrency.AddObject(CurrentCurrency);
+            DatabaseApp.MDCurrency.Add(CurrentCurrency);
             ACState = Const.SMNew;
             PostExecute("New");
 
@@ -453,7 +453,7 @@ namespace gip.bso.masterdata
         {
             CloseTopDialog();
             CurrentCurrencyExchange = CurrentNewCurrencyExchange;
-            DatabaseApp.MDCurrencyExchange.AddObject(CurrentCurrencyExchange);
+            DatabaseApp.MDCurrencyExchange.Add(CurrentCurrencyExchange);
             CurrentCurrencyExchange = CurrentNewCurrencyExchange;
             OnPropertyChanged("CurrencyExchangeList");
         }

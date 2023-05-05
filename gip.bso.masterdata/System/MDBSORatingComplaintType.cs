@@ -191,7 +191,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentMDRatingComplaintType = MDRatingComplaintType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDRatingComplaintType.AddObject(CurrentMDRatingComplaintType);
+            DatabaseApp.MDRatingComplaintType.Add(CurrentMDRatingComplaintType);
             AccessPrimary.NavList.Add(CurrentMDRatingComplaintType);
             ACState = Const.SMNew;
             PostExecute("New");

@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -160,7 +161,7 @@ namespace gip.bso.masterdata
             facility.FacilityName = "-";
             facility.MDFacilityType = mDFacilityType;
             facility.MDFacilityTypeID = mDFacilityType.MDFacilityTypeID;
-            DatabaseApp.Facility.AddObject(facility);
+            DatabaseApp.Facility.Add(facility);
             if (parentFacility != null)
                 parentFacility.Facility_ParentFacility.Add(facility);
 

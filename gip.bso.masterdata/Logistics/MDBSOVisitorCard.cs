@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentVisitorCard = MDVisitorCard.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDVisitorCard.AddObject(CurrentVisitorCard);
+            DatabaseApp.MDVisitorCard.Add(CurrentVisitorCard);
             ACState = Const.SMNew;
             PostExecute("New");
 

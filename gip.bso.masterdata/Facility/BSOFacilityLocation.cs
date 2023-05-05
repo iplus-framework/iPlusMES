@@ -380,7 +380,7 @@ namespace gip.bso.masterdata
             CurrentStorageLocation = Facility.NewACObject(DatabaseApp, null);
             CurrentStorageLocation.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageLocation).FirstOrDefault();
             if (CurrentStorageLocation.MDFacilityType != null)
-                DatabaseApp.Facility.AddObject(CurrentStorageLocation);
+                DatabaseApp.Facility.Add(CurrentStorageLocation);
             _AccessPrimary.NavList.Add(CurrentStorageLocation);
             OnPropertyChanged("StorageLocationList");
             ACState = Const.SMNew;

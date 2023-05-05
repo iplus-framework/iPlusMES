@@ -213,7 +213,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentInOrderPosState = MDInOrderPosState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDInOrderPosState.AddObject(CurrentInOrderPosState);
+            DatabaseApp.MDInOrderPosState.Add(CurrentInOrderPosState);
             ACState = Const.SMNew;
             PostExecute("New");
 

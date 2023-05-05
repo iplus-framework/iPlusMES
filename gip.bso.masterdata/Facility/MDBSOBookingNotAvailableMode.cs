@@ -223,7 +223,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentBookingNotAvailableMode = MDBookingNotAvailableMode.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDBookingNotAvailableMode.AddObject(CurrentBookingNotAvailableMode);
+            DatabaseApp.MDBookingNotAvailableMode.Add(CurrentBookingNotAvailableMode);
             ACState = Const.SMNew;
             PostExecute("New");
 

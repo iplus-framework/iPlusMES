@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentToleranceState = MDToleranceState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDToleranceState.AddObject(CurrentToleranceState);
+            DatabaseApp.MDToleranceState.Add(CurrentToleranceState);
             ACState = Const.SMNew;
             PostExecute("New");
 

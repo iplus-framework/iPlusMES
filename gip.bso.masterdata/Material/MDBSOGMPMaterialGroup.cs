@@ -308,7 +308,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentGMPMaterialGroup = MDGMPMaterialGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDGMPMaterialGroup.AddObject(CurrentGMPMaterialGroup);
+            DatabaseApp.MDGMPMaterialGroup.Add(CurrentGMPMaterialGroup);
             ACState = Const.SMNew;
             PostExecute("New");
         }

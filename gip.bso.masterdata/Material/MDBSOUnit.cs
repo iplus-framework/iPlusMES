@@ -439,7 +439,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentUnit = MDUnit.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDUnit.AddObject(CurrentUnit);
+            DatabaseApp.MDUnit.Add(CurrentUnit);
             ACState = Const.SMNew;
             PostExecute("New");
 

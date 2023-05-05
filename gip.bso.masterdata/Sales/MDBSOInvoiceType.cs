@@ -198,7 +198,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentMDInvoiceType = MDInvoiceType.NewACObject(DatabaseApp);
-            DatabaseApp.MDInvoiceType.AddObject(CurrentMDInvoiceType);
+            DatabaseApp.MDInvoiceType.Add(CurrentMDInvoiceType);
             ACState = Const.SMNew;
             PostExecute("New");
 

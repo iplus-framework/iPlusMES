@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentProcessErrorAction = MDProcessErrorAction.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDProcessErrorAction.AddObject(CurrentProcessErrorAction);
+            DatabaseApp.MDProcessErrorAction.Add(CurrentProcessErrorAction);
             ACState = Const.SMNew;
             PostExecute("New");
 

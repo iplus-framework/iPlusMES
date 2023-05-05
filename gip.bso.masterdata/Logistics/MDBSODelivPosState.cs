@@ -212,7 +212,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentDelivPosState = MDDelivPosState.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDDelivPosState.AddObject(CurrentDelivPosState);
+            DatabaseApp.MDDelivPosState.Add(CurrentDelivPosState);
             ACState = Const.SMNew;
             PostExecute("New");
 

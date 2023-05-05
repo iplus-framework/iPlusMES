@@ -18,6 +18,7 @@ using gip.core.reporthandler.Configuration;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.manager;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -311,7 +312,7 @@ namespace gip.bso.masterdata
             IsLoadDisabled = true;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Partslist), Partslist.NoColumnName, Partslist.FormatNewNo, this);
             Partslist partsList = Partslist.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.Partslist.AddObject(partsList);
+            DatabaseApp.Partslist.Add(partsList);
             AccessPrimary.NavList.Insert(0, partsList);
             SelectedPartslist = partsList;
             CurrentPartslist = partsList;
@@ -582,10 +583,9 @@ namespace gip.bso.masterdata
                         .Where(c => c.PartslistID == SelectedPartslist.PartslistID));
             if (requery && CurrentPartslist != null)
             {
-                CurrentPartslist.PartslistPos_Partslist.AutoLoad();
-                CurrentPartslist.PartslistPos_Partslist.AutoRefresh();
+                CurrentPartslist.PartslistPos_Partslist.AutoLoad(CurrentPartslist.PartslistPos_PartslistReference, CurrentPartslist);
                 foreach (var item in CurrentPartslist.PartslistPos_Partslist)
-                    item.PartslistPosRelation_TargetPartslistPos.AutoLoad(this.DatabaseApp);
+                    item.PartslistPosRelation_TargetPartslistPos.AutoLoad(item.PartslistPosRelation_TargetPartslistPosReference, item);
             }
 
             PostExecute();

@@ -113,7 +113,7 @@ namespace gip.bso.masterdata
             var newLabOrder = LabOrder.NewACObject(DatabaseApp, null, secondaryKey);
             newLabOrder.LabOrderTypeIndex = (short)GlobalApp.LabOrderType.Template;
             newLabOrder.MDLabOrderState = DatabaseApp.MDLabOrderState.FirstOrDefault(c => c.IsDefault);
-            DatabaseApp.LabOrder.AddObject(newLabOrder);
+            DatabaseApp.LabOrder.Add(newLabOrder);
             ACState = Const.SMNew;
             AccessPrimary.NavList.Add(newLabOrder);
             CurrentLabOrder = newLabOrder;

@@ -222,7 +222,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentInventoryManagementType = MDInventoryManagementType.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDInventoryManagementType.AddObject(CurrentInventoryManagementType);
+            DatabaseApp.MDInventoryManagementType.Add(CurrentInventoryManagementType);
             ACState = Const.SMNew;
             PostExecute("New");
 
