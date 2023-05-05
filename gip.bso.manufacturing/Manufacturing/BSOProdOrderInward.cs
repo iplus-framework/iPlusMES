@@ -2,6 +2,7 @@
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -686,7 +687,7 @@ namespace gip.bso.manufacturing
                     if (_SelectedProdOrderIntermediateBatch != null
                          && _SelectedProdOrderIntermediateBatch.EntityState != EntityState.Added
                          && _SelectedProdOrderIntermediateBatch.EntityState != EntityState.Detached)
-                        SelectedProdOrderIntermediateBatch.FacilityBooking_ProdOrderPartslistPos.AutoLoad(this.DatabaseApp);
+                        SelectedProdOrderIntermediateBatch.FacilityBooking_ProdOrderPartslistPos.AutoLoad(SelectedProdOrderIntermediateBatch.FacilityBooking_ProdOrderPartslistPosReference, SelectedProdOrderIntermediateBatch);
                     return SelectedProdOrderIntermediateBatch.FacilityBooking_ProdOrderPartslistPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
                 else
@@ -694,7 +695,7 @@ namespace gip.bso.manufacturing
                     if (_SelectedIntermediate != null
                          && _SelectedIntermediate.EntityState != EntityState.Added
                          && _SelectedIntermediate.EntityState != EntityState.Detached)
-                        SelectedIntermediate.FacilityBooking_ProdOrderPartslistPos.AutoLoad(this.DatabaseApp);
+                        SelectedIntermediate.FacilityBooking_ProdOrderPartslistPos.AutoLoad(SelectedIntermediate.FacilityBooking_ProdOrderPartslistPosReference, SelectedIntermediate);
                     return SelectedIntermediate.FacilityBooking_ProdOrderPartslistPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
             }
@@ -751,7 +752,7 @@ namespace gip.bso.manufacturing
             {
                 if (SelectedInwardFacilityBooking == null)
                     return null;
-                SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
+                SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBookingReference, SelectedInwardFacilityBooking);
                 return SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo);
             }
         }

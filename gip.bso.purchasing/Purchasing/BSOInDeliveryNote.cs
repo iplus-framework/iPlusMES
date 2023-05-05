@@ -17,10 +17,9 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
-using System.Data.Objects.DataClasses;
 using System.Linq;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.MDDelivNoteState;
@@ -231,7 +230,7 @@ namespace gip.bso.purchasing
 
         protected IQueryable<DeliveryNote> _AccessPrimary_NavSearchExecuting(IQueryable<DeliveryNote> result)
         {
-            ObjectQuery<DeliveryNote> query = result as ObjectQuery<DeliveryNote>;
+            IQueryable<DeliveryNote> query = result as IQueryable<DeliveryNote>;
             if (query != null)
             {
                 query.Include(c => c.MDDelivNoteState)
@@ -384,12 +383,12 @@ namespace gip.bso.purchasing
                         item = Rating.NewACObject(DatabaseApp, null);
                         item.CompanyID = CurrentDeliveryNote.DeliveryCompanyAddress.Company.CompanyID;
                         item.DeliveryNoteID = CurrentDeliveryNote.DeliveryNoteID;
-                        DatabaseApp.Rating.AddObject(item);
+                        DatabaseApp.Rating.Add(item);
                         CurrentDeliveryNote.Rating_DeliveryNote.Add(item);
                     }
                     else if (value == 0)
                     {
-                        DatabaseApp.Rating.DeleteObject(item);
+                        DatabaseApp.Rating.Remove(item);
                         CurrentDeliveryNote.Rating_DeliveryNote.Remove(item);
                     }
                     item.Score = value;
@@ -432,12 +431,12 @@ namespace gip.bso.purchasing
                         item = Rating.NewACObject(DatabaseApp, null);
                         item.CompanyID = CurrentDeliveryNote.ShipperCompanyAddress.Company.CompanyID;
                         item.DeliveryNoteID = CurrentDeliveryNote.DeliveryNoteID;
-                        DatabaseApp.Rating.AddObject(item);
+                        DatabaseApp.Rating.Add(item);
                         CurrentDeliveryNote.Rating_DeliveryNote.Add(item);
                     }
                     else if (value == 0)
                     {
-                        DatabaseApp.Rating.DeleteObject(item);
+                        DatabaseApp.Rating.Remove(item);
                         CurrentDeliveryNote.Rating_DeliveryNote.Remove(item);
                     }
                     item.Score = value;
@@ -480,12 +479,12 @@ namespace gip.bso.purchasing
                         item = Rating.NewACObject(DatabaseApp, null);
                         item.CompanyID = CurrentDeliveryNote.Delivery2CompanyAddress.Company.CompanyID;
                         item.DeliveryNoteID = CurrentDeliveryNote.DeliveryNoteID;
-                        DatabaseApp.Rating.AddObject(item);
+                        DatabaseApp.Rating.Add(item);
                         CurrentDeliveryNote.Rating_DeliveryNote.Add(item);
                     }
                     else if (value == 0)
                     {
-                        DatabaseApp.Rating.DeleteObject(item);
+                        DatabaseApp.Rating.Remove(item);
                         CurrentDeliveryNote.Rating_DeliveryNote.Remove(item);
                     }
                     item.Score = value;
@@ -732,8 +731,8 @@ namespace gip.bso.purchasing
                     if (
                         _SelectedDeliveryNotePos != null &&
                         _SelectedDeliveryNotePos.InOrderPos != null
-                        && (_SelectedDeliveryNotePos as EntityObject).EntityState == System.Data.EntityState.Unchanged)
-                        _SelectedDeliveryNotePos.InOrderPos.LabOrder_InOrderPos.AutoLoad(this.DatabaseApp);
+                        && (_SelectedDeliveryNotePos as VBEntityObject).EntityState == EntityState.Unchanged)
+                        _SelectedDeliveryNotePos.InOrderPos.LabOrder_InOrderPos.AutoLoad(_SelectedDeliveryNotePos.InOrderPos.LabOrder_InOrderPosReference, _SelectedDeliveryNotePos);
                     OnPropertyChanged("SelectedDeliveryNotePos");
                 }
                 CurrentDeliveryNotePos = value;
@@ -861,7 +860,7 @@ namespace gip.bso.purchasing
                     return null;
                 if (CurrentDeliveryNote != null)
                 {
-                    IEnumerable<InOrderPos> addedPositions = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == System.Data.EntityState.Added
+                    IEnumerable<InOrderPos> addedPositions = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == EntityState.Added
                         && c.InOrderPos != null
                         && c.InOrderPos.InOrderPos1_ParentInOrderPos != null
                         && c.InOrderPos.InOrderPos1_ParentInOrderPos.MDDelivPosState == StateCompletelyAssigned
@@ -1611,7 +1610,7 @@ namespace gip.bso.purchasing
             {
                 if (CurrentFacilityBooking != null)
                 {
-                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
+                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(CurrentFacilityBooking.FacilityBookingCharge_FacilityBookingReference, CurrentFacilityBooking);
                     return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo).ToList();
                 }
                 return null;
@@ -1777,7 +1776,7 @@ namespace gip.bso.purchasing
             if (!PreExecute("Load"))
                 return;
             if (SelectedDeliveryNote != null && requery)
-                SelectedDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(this.DatabaseApp);
+                SelectedDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(SelectedDeliveryNote.DeliveryNotePos_DeliveryNoteReference, SelectedDeliveryNote);
             LoadEntity<DeliveryNote>(requery, () => SelectedDeliveryNote, () => CurrentDeliveryNote, c => CurrentDeliveryNote = c,
                         DatabaseApp.DeliveryNote
                         .Include(c => c.DeliveryNotePos_DeliveryNote)
@@ -1904,8 +1903,8 @@ namespace gip.bso.purchasing
             _UnSavedUnAssignedInOrderPos = new List<InOrderPos>();
             _UnSavedAssignedPickingInOrderPos = new List<InOrderPos>();
             RefreshInOrderPosList();
-            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState != System.Data.EntityState.Added)
-                CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Load();
+            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState != EntityState.Added)
+                CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(CurrentDeliveryNote.DeliveryNotePos_DeliveryNoteReference, CurrentDeliveryNote);
             OnPropertyChanged("DeliveryNotePosList");
             base.OnPostUndoSave();
         }
@@ -1921,7 +1920,7 @@ namespace gip.bso.purchasing
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(DeliveryNote), DeliveryNote.NoColumnName, DeliveryNote.FormatNewNo, this);
             CurrentDeliveryNote = DeliveryNote.NewACObject(DatabaseApp, null, secondaryKey);
             CurrentDeliveryNote.DeliveryNoteType = GlobalApp.DeliveryNoteType.Receipt;
-            DatabaseApp.DeliveryNote.AddObject(CurrentDeliveryNote);
+            DatabaseApp.DeliveryNote.Add(CurrentDeliveryNote);
             SelectedDeliveryNote = CurrentDeliveryNote;
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(CurrentDeliveryNote);
@@ -2686,7 +2685,7 @@ namespace gip.bso.purchasing
         [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
         public void DialogCancel()
         {
-            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState == System.Data.EntityState.Added)
+            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState == EntityState.Added)
                 Delete();
             DialogResult = new VBDialogResult();
             DialogResult.SelectedCommand = eMsgButton.Cancel;

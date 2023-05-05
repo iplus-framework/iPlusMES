@@ -12,8 +12,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Objects;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using static gip.mes.datamodel.GlobalApp;
 
 namespace gip.bso.manufacturing
@@ -820,7 +820,7 @@ namespace gip.bso.manufacturing
 
         protected IQueryable<ProdOrder> _AccessPrimary_NavSearchExecuting(IQueryable<ProdOrder> result)
         {
-            ObjectQuery<ProdOrder> query = result as ObjectQuery<ProdOrder>;
+            IQueryable<ProdOrder> query = result as IQueryable<ProdOrder>;
             if (query != null)
             {
                 query.Include(c => c.CPartnerCompany);
@@ -1034,7 +1034,7 @@ namespace gip.bso.manufacturing
             if (AccessPrimary == null) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
             ProdOrder prodOrder = ProdOrder.NewACObject(base.DatabaseApp, null, secondaryKey);
-            DatabaseApp.ProdOrder.AddObject(prodOrder);
+            DatabaseApp.ProdOrder.Add(prodOrder);
             AccessPrimary.NavList.Insert(0, prodOrder);
             SelectedProdOrder = prodOrder;
             OnPropertyChanged("ProdOrderList");
@@ -2187,7 +2187,7 @@ namespace gip.bso.manufacturing
             {
                 newComponent.Sequence = ProdOrderPartslistPosList.Max(x => x.Sequence) + 1;
             }
-            DatabaseApp.ProdOrderPartslistPos.AddObject(newComponent);
+            DatabaseApp.ProdOrderPartslistPos.Add(newComponent);
             PreselectedProdorderPartslistID = newComponent.ProdOrderPartslistPosID;
             SearchProdOrderPartslistPos();
             PostExecute("NewProdOrderPartslistPos");
@@ -2495,7 +2495,7 @@ namespace gip.bso.manufacturing
 
         private IQueryable<Material> _AccessInputMaterial_NavSearchExecuting(IQueryable<Material> result)
         {
-            ObjectQuery<Material> query = result as ObjectQuery<Material>;
+            IQueryable<Material> query = result as IQueryable<Material>;
             if (query != null)
                 query.Include(c => c.BaseMDUnit);
             return result.Where(x => !(x.MaterialWFRelation_TargetMaterial.Any() || x.MaterialWFRelation_SourceMaterial.Any()));
@@ -2600,7 +2600,7 @@ namespace gip.bso.manufacturing
             if (!PreExecute("AlternativeNewProdOrderPartslistpos")) return;
             ProdOrderPartslistPos alternativePartslistpos = ProdOrderPartslistPos.NewAlternativeProdOrderPartslistPos(DatabaseApp, SelectedProdOrderPartslist, SelectedProdOrderPartslistPos);
             alternativePartslistpos.Sequence = AlternativeProdOrderPartslistPosList.Count() + 1;
-            DatabaseApp.ProdOrderPartslistPos.AddObject(alternativePartslistpos);
+            DatabaseApp.ProdOrderPartslistPos.Add(alternativePartslistpos);
             PreselectedAlternativeSelectedProdOrderPartslistPosID = alternativePartslistpos.ProdOrderPartslistPosID;
             SearchAlternative();
             ACState = Const.SMNew;
@@ -2869,7 +2869,7 @@ namespace gip.bso.manufacturing
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrderBatch), ProdOrderBatch.NoColumnName, ProdOrderBatch.FormatNewNo, this);
             ProdOrderBatch newProdOrderBatch = ProdOrderBatch.NewACObject(DatabaseApp, null, secondaryKey);
             newProdOrderBatch.ProdOrderPartslist = SelectedProdOrderPartslist;
-            DatabaseApp.ProdOrderBatch.AddObject(newProdOrderBatch);
+            DatabaseApp.ProdOrderBatch.Add(newProdOrderBatch);
             PreselectedBatchID = newProdOrderBatch.ProdOrderBatchID;
             SearchBatch();
             PostExecute("BatchAddDialog");
@@ -3008,8 +3008,8 @@ namespace gip.bso.manufacturing
                         && _SelectedProdOrderIntermediateBatch.EntityState != EntityState.Added
                         && _SelectedProdOrderIntermediateBatch.EntityState != EntityState.Detached)
                     {
-                        _SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.AutoLoad(this.DatabaseApp);
-                        _SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.AutoLoad(this.DatabaseApp);
+                        _SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.AutoLoad(_SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPosReference, _SelectedProdOrderIntermediateBatch);
+                        _SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.AutoLoad(_SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPosReference, _SelectedProdOrderIntermediateBatch);
                     }
                     SearchOutwardPartslistPos();
                     OnPropertyChanged("SelectedProdOrderIntermediateBatch");
@@ -3083,8 +3083,8 @@ namespace gip.bso.manufacturing
                 batchRelation.ProdOrderBatch = SelectedBatch;
                 batchRelations.Add(batchRelation);
             }
-            DatabaseApp.ProdOrderPartslistPos.AddObject(batchItem);
-            batchRelations.ForEach(x => DatabaseApp.ProdOrderPartslistPosRelation.AddObject(x));
+            DatabaseApp.ProdOrderPartslistPos.Add(batchItem);
+            batchRelations.ForEach(x => DatabaseApp.ProdOrderPartslistPosRelation.Add(x));
             PreselectedInwardBatchPosID = batchItem?.ProdOrderPartslistPosID;
             SearchProdOrderIntermediateBatch();
             PostExecute("ProdOrderIntermediateBatchAssign");

@@ -19,6 +19,7 @@ using System.Text;
 using gip.mes.datamodel; using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.purchasing
 {

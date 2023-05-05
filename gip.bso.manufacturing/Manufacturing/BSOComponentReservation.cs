@@ -4,8 +4,8 @@ using System.Linq;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.autocomponent;
-using System.Data.Objects;
 using gip.core.autocomponent;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -45,7 +45,7 @@ namespace gip.bso.manufacturing
 
         #region Queries
         public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityReservation>> s_cQry_OpenReservations =
-            CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityReservation>>(
+            EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityReservation>>(
                 (ctx, acClassID) => ctx.FacilityReservation
                             .Include(InOrderPos.ClassName)
                             .Include("InOrderPos.DeliveryNotePos_InOrderPos")

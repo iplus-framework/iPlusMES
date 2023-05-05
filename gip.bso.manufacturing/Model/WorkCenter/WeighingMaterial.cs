@@ -483,14 +483,14 @@ namespace gip.bso.manufacturing
                         if (PosRelation != null)
                         {
                             PosRelation.AutoRefresh();
-                            PosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
+                            PosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad(PosRelation.FacilityBooking_ProdOrderPartslistPosRelationReference, PosRelation);
                             remainingDosingWeight = PosRelation.RemainingDosingWeight;
                         }
                         else if (PickingPosition != null)
                         {
                             PickingPosition.AutoRefresh();
                             PickingPosition.OnLocalPropertyChanged(nameof(PickingPosition.ActualQuantityUOM));
-                            PickingPosition.FacilityBooking_PickingPos.AutoLoad();
+                            PickingPosition.FacilityBooking_PickingPos.AutoLoad(PickingPosition.FacilityBooking_PickingPosReference, PickingPosition);
                             remainingDosingWeight = PickingPosition.RemainingDosingWeight;
                         }
 
@@ -510,8 +510,7 @@ namespace gip.bso.manufacturing
             {
                 try
                 {
-                    PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad();
-                    PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoRefresh();
+                    PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelationReference, PosRelation);
                     DiffWeighOnEnd = PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.Any();
 
                     PosRelation.AutoRefresh();

@@ -283,7 +283,7 @@ namespace gip.bso.manufacturing
             PlanningMR planningMR = PlanningMR.NewACObject(DatabaseApp, null, secondaryKey);
             planningMR.Template = true;
             AccessPrimary.NavList.Add(planningMR);
-            DatabaseApp.PlanningMR.AddObject(planningMR);
+            DatabaseApp.PlanningMR.Add(planningMR);
             CurrentPlanningMR = planningMR;
             OnPropertyChanged("PlanningMRList");
         }
@@ -599,7 +599,7 @@ namespace gip.bso.manufacturing
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
                 PlanningMR planningMR = PlanningMR.NewACObject(DatabaseApp, null, secondaryKey);
                 planningMR.Template = true;
-                databaseApp.PlanningMR.AddObject(planningMR);
+                databaseApp.PlanningMR.Add(planningMR);
                 result = GenerateProdOrders(databaseApp, null, planningMR);
             }
             return result;

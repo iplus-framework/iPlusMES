@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,6 +16,8 @@ using System.Text;
 using vd = gip.mes.datamodel;
 using System.Xml;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace gip.bso.manufacturing
 {
@@ -1713,7 +1714,7 @@ namespace gip.bso.manufacturing
                     maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            ObjectQuery<ProdOrderPartslistPlanWrapper> batchQuery =
+            IQueryable<ProdOrderPartslistPlanWrapper> batchQuery =
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
@@ -1725,9 +1726,9 @@ namespace gip.bso.manufacturing
                     FilterOnlyOnThisLine,
                     FilterDepartmentUserName,
                     FilterOrderProgramNo,
-                    FilterOrderMaterialNo) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+                    FilterOrderMaterialNo) as IQueryable<ProdOrderPartslistPlanWrapper>;
 
-            batchQuery.MergeOption = MergeOption.OverwriteChanges;
+            //batchQuery.MergeOption = MergeOption.OverwriteChanges;
             IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = null;
             if (FilterProdPartslistOrder != null)
                 switch (FilterProdPartslistOrder)
@@ -1746,7 +1747,7 @@ namespace gip.bso.manufacturing
         }
 
         protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
+        EF.CompileQuery<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
             (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo, materialNo) =>
                 ctx
                 .ProdOrderPartslist
@@ -2704,8 +2705,8 @@ namespace gip.bso.manufacturing
         public Msg CheckForInappropriateComponentQuantityOccurrence()
         {
             Msg msg = null;
-            IEnumerable<ObjectStateEntry> modifiedEntities = DatabaseApp.ObjectStateManager.GetObjectStateEntries(EntityState.Modified);
-            IEnumerable<ObjectStateEntry> modifiedPosEntities = modifiedEntities.Where(c => c.EntitySet.Name == nameof(ProdOrderPartslistPos));
+            IEnumerable<EntityEntry> modifiedEntities = DatabaseApp.ChangeTracker.Entries().Where(c => c.State == EntityState.Modified);
+            IEnumerable<EntityEntry> modifiedPosEntities = modifiedEntities.Where(c => c.Metadata.Name == nameof(ProdOrderPartslistPos));
             if (modifiedPosEntities.Any())
             {
                 IEnumerable<ProdOrderPartslistPos> modifiedPositions = modifiedPosEntities.Select(c => c.Entity as ProdOrderPartslistPos).Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot);
@@ -2713,16 +2714,16 @@ namespace gip.bso.manufacturing
                 {
                     foreach (ProdOrderPartslistPos modifiedPos in modifiedPositions)
                     {
-                        ObjectStateEntry objectStateEntry = DatabaseApp.ObjectStateManager.GetObjectStateEntry(modifiedPos.EntityKey);
+                        EntityEntry objectStateEntry = DatabaseApp.Entry(modifiedPos.EntityKey);
                         if (
                                 objectStateEntry != null
 
                                 && objectStateEntry.OriginalValues != null
-                                && objectStateEntry.OriginalValues.FieldCount > 0
+                                && objectStateEntry.OriginalValues.Properties.Count() > 0
                                 && objectStateEntry.OriginalValues[nameof(ProdOrderPartslistPos.TargetQuantityUOM)] != null
 
                                 && objectStateEntry.CurrentValues != null
-                                && objectStateEntry.CurrentValues.FieldCount > 0
+                                && objectStateEntry.CurrentValues.Properties.Count() > 0
                                 && objectStateEntry.CurrentValues[nameof(ProdOrderPartslistPos.TargetQuantityUOM)] != null
                             )
                         {
@@ -3777,7 +3778,7 @@ namespace gip.bso.manufacturing
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
                 batchPlan.AutoRefresh();
-                batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
+                batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh(batchPlan.FacilityReservation_ProdOrderBatchPlanReference, batchPlan);
             }
 
             List<MaintainOrderInfo> maintainOrderInfos = new List<MaintainOrderInfo>();
@@ -5841,7 +5842,7 @@ namespace gip.bso.manufacturing
                         throw new Exception();
                     MDSchedulingGroupWF groupWf = MDSchedulingGroupWF.NewACObject(databaseApp, group);
                     groupWf.VBiACClassWF = item;
-                    databaseApp.MDSchedulingGroup.AddObject(group);
+                    databaseApp.MDSchedulingGroup.Add(group);
                 }
                 LocalSaveChanges();
                 OnPropertyChanged(nameof(ScheduleForPWNodeList));

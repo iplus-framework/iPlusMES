@@ -4,11 +4,11 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Linq;
 using static gip.core.datamodel.Global;
 
@@ -1743,7 +1743,7 @@ namespace gip.bso.manufacturing
         };
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>> s_cQry_ProdOrderPartslistOverview =
-        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>>(
+        EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>>(
             (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName) =>
                 ctx
                 .ProdOrderPartslist
@@ -1846,7 +1846,7 @@ namespace gip.bso.manufacturing
 
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>> s_cQry_Inputs =
-       CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>>(
+       EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo, calculateStatistics) =>
                ctx
                .ProdOrderPartslistPos
@@ -1942,7 +1942,7 @@ namespace gip.bso.manufacturing
        );
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>> s_cQry_FinalInput =
-       CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>>(
+       EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, calculateStatistics) =>
               ctx
               .ProdOrderPartslistPos
@@ -2033,7 +2033,7 @@ namespace gip.bso.manufacturing
 
             if (databaseApp != null)
             {
-                databaseApp.CommandTimeout = CommandTimeout * 60;
+                databaseApp.Database.SetCommandTimeout(CommandTimeout * 60);
             }
             return databaseApp;
         }

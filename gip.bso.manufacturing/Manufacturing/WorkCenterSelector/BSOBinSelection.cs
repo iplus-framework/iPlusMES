@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {

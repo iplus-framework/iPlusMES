@@ -16,9 +16,9 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 
 namespace gip.bso.purchasing
@@ -370,7 +370,7 @@ namespace gip.bso.purchasing
 
         private IQueryable<InOrder> _AccessPrimary_NavSearchExecuting(IQueryable<InOrder> result)
         {
-            ObjectQuery<InOrder> query = result as ObjectQuery<InOrder>;
+            IQueryable<InOrder> query = result as IQueryable<InOrder>;
             if (query != null)
             {
                 query.Include(c => c.MDInOrderType)
@@ -549,8 +549,8 @@ namespace gip.bso.purchasing
                 }
                 try
                 {
-                    if (!CurrentInOrder.DistributorCompany.CompanyAddress_Company.IsLoaded)
-                        CurrentInOrder.DistributorCompany.CompanyAddress_Company.Load();
+                    if (!CurrentInOrder.DistributorCompany.CompanyAddress_Company_IsLoaded)
+                        CurrentInOrder.DistributorCompany.CompanyAddress_Company.AutoLoad(CurrentInOrder.DistributorCompany.CompanyAddress_CompanyReference, CurrentInOrder);
                 }
                 catch (Exception e)
                 {
@@ -656,8 +656,8 @@ namespace gip.bso.purchasing
                 }
                 try
                 {
-                    if (!CurrentInOrder.DistributorCompany.CompanyAddress_Company.IsLoaded)
-                        CurrentInOrder.DistributorCompany.CompanyAddress_Company.Load();
+                    if (!CurrentInOrder.DistributorCompany.CompanyAddress_Company_IsLoaded)
+                        CurrentInOrder.DistributorCompany.CompanyAddress_Company.AutoLoad(CurrentInOrder.DistributorCompany.CompanyAddress_CompanyReference, CurrentInOrder);
                 }
                 catch (Exception e)
                 {
@@ -1135,7 +1135,7 @@ namespace gip.bso.purchasing
                     return null;
                 if (CurrentInOrderPos != null)
                 {
-                    IEnumerable<InOrderPos> addedPositions = CurrentInOrderPos.InOrderPos_ParentInOrderPos.Where(c => c.EntityState == System.Data.EntityState.Added
+                    IEnumerable<InOrderPos> addedPositions = CurrentInOrderPos.InOrderPos_ParentInOrderPos.Where(c => c.EntityState == EntityState.Added
                         && c != null
                         && c.InOrderPos1_ParentInOrderPos != null
                         && c.InOrderPos1_ParentInOrderPos.MDDelivPosState == StateCompletelyAssigned
@@ -1544,8 +1544,8 @@ namespace gip.bso.purchasing
         {
             _UnSavedUnAssignedContractPos = new List<InOrderPos>();
             RefreshOpenContractPosList();
-            if (CurrentInOrder != null && CurrentInOrder.EntityState != System.Data.EntityState.Added)
-                CurrentInOrder.InOrderPos_InOrder.Load();
+            if (CurrentInOrder != null && CurrentInOrder.EntityState != EntityState.Added)
+                CurrentInOrder.InOrderPos_InOrder.AutoLoad(CurrentInOrder.InOrderPos_InOrderReference, CurrentInOrder);
             OnPropertyChanged("InOrderPosList");
             base.OnPostUndoSave();
         }
@@ -1601,7 +1601,7 @@ namespace gip.bso.purchasing
                 Messages.LogException("BSOInOrder", "New", msg);
             }
 
-            DatabaseApp.InOrder.AddObject(CurrentInOrder);
+            DatabaseApp.InOrder.Add(CurrentInOrder);
             if (CurrentUserSettings != null)
             {
                 CurrentInOrder.BillingCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
@@ -1849,7 +1849,7 @@ namespace gip.bso.purchasing
         [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
         public void DialogCancel()
         {
-            if (CurrentInOrder != null && CurrentInOrder.EntityState == System.Data.EntityState.Added)
+            if (CurrentInOrder != null && CurrentInOrder.EntityState == EntityState.Added)
                 Delete();
             DialogResult = new VBDialogResult();
             DialogResult.SelectedCommand = eMsgButton.Cancel;

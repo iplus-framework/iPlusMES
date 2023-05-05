@@ -3,10 +3,10 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -131,8 +131,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         public static readonly Func<Database, string, IQueryable<gip.core.datamodel.ACClass>> s_cQry_GetRelevantPAProcessFunctions =
-CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
-    (ctx, pafACIdentifier) => ctx.ACClass.Where(c => (c.BasedOnACClassID.HasValue
+            EF.CompileQuery<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
+                                                (ctx, pafACIdentifier) => ctx.ACClass.Where(c => (c.BasedOnACClassID.HasValue
                                                     && (c.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 1. Ableitungsstufe
                                                         || (c.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
                                                                 && (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 2. Ableitungsstufe
@@ -149,8 +149,8 @@ CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
                                                                     )
                                                             )
                                                         )
-                                                    
- 
+
+
 
     ) && c.ACProject != null && c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application && c.ACStartTypeIndex == (short)Global.ACStartTypes.Automatic));
     }

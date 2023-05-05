@@ -2,6 +2,7 @@
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -111,7 +112,7 @@ namespace gip.bso.manufacturing
             SearchOutwardPartslistPos();
 
             ProdOrderPartslistPosRelation newRelation = ProdOrderPartslistPosRelation.NewACObject(DatabaseApp, null);
-            DatabaseApp.ProdOrderPartslistPosRelation.AddObject(newRelation);
+            DatabaseApp.ProdOrderPartslistPosRelation.Add(newRelation);
             if (SelectedProdOrderIntermediateBatch != null)
                 newRelation.TargetProdOrderPartslistPos = SelectedProdOrderIntermediateBatch;
             else
@@ -330,7 +331,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedOutwardPartslistPos != null
                          && _SelectedOutwardPartslistPos.EntityState != EntityState.Added
                          && _SelectedOutwardPartslistPos.EntityState != EntityState.Detached)
-                    SelectedOutwardPartslistPos.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(this.DatabaseApp);
+                    SelectedOutwardPartslistPos.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(SelectedOutwardPartslistPos.FacilityPreBooking_ProdOrderPartslistPosRelationReference, SelectedOutwardPartslistPos);
                 return SelectedOutwardPartslistPos.FacilityPreBooking_ProdOrderPartslistPosRelation.ToList();
             }
         }
@@ -900,7 +901,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedOutwardPartslistPos != null
                         && _SelectedOutwardPartslistPos.EntityState != EntityState.Added
                         && _SelectedOutwardPartslistPos.EntityState != EntityState.Detached)
-                    SelectedOutwardPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad(this.DatabaseApp);
+                    SelectedOutwardPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad(SelectedOutwardPartslistPos.FacilityBooking_ProdOrderPartslistPosRelationReference, SelectedOutwardPartslistPos);
                 return SelectedOutwardPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.OrderBy(c => c.FacilityBookingNo).ToList();
             }
         }
@@ -959,7 +960,7 @@ namespace gip.bso.manufacturing
             {
                 if (SelectedOutwardFacilityBooking == null)
                     return null;
-                SelectedOutwardFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
+                SelectedOutwardFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(SelectedOutwardFacilityBooking.FacilityBookingCharge_FacilityBookingReference, SelectedOutwardFacilityBooking);
                 return SelectedOutwardFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo);
             }
         }

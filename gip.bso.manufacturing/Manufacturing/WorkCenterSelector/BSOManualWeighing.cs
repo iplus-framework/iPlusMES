@@ -15,6 +15,7 @@ using System.Threading;
 using gip.mes.facility;
 using gip.core.layoutengine;
 using System.Collections.ObjectModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -2683,7 +2684,7 @@ namespace gip.bso.manufacturing
 
             vd.DatabaseApp dbApp = lastUsedLotConfig.GetObjectContext<vd.DatabaseApp>();
             if (dbApp != null)
-                dbApp.DeleteObject(lastUsedLotConfig);
+                dbApp.Remove(lastUsedLotConfig);
 
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)

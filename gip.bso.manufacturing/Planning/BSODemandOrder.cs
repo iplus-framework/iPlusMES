@@ -20,6 +20,7 @@ using gip.core.datamodel;
 //using gip.core.manager;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -443,7 +444,7 @@ namespace gip.bso.manufacturing
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(DemandOrder), DemandOrder.NoColumnName, DemandOrder.FormatNewNo, this);
             CurrentDemandOrder = DemandOrder.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.DemandOrder.AddObject(CurrentDemandOrder);
+            DatabaseApp.DemandOrder.Add(CurrentDemandOrder);
 
             CurrentDemandOrderPos = DemandOrderPos.NewACObject(DatabaseApp, CurrentDemandOrder);
             CurrentDemandOrderPos.DemandOrder = CurrentDemandOrder;

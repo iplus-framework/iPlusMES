@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.processapplication;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -756,7 +757,7 @@ namespace gip.bso.manufacturing
             List<ProductionOpenPosition> productionOpenPositions = new List<ProductionOpenPosition>();
             using (DatabaseApp databaseApp = new DatabaseApp())
             {
-                databaseApp.CommandTimeout = QueryTimeOutMinutes * 60;
+                databaseApp.Database.SetCommandTimeout(QueryTimeOutMinutes * 60);
                 productionOpenPositions = QueryPositionList(databaseApp, startTime, endTime, programNo).ToList();
                 int sn = 0;
                 foreach (ProductionOpenPosition position in productionOpenPositions)

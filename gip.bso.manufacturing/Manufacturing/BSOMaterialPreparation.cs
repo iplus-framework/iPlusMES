@@ -439,7 +439,7 @@ namespace gip.bso.manufacturing
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
             var picking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
             picking.MDPickingType = SelectedTargetStorageBin.MDPickingType;
-            DatabaseApp.Picking.AddObject(picking);
+            DatabaseApp.Picking.Add(picking);
             ACSaveChanges();
             PickingList.Add(picking);
             OnPropertyChanged(nameof(PickingList));

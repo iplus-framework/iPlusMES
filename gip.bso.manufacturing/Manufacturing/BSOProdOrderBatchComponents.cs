@@ -2,6 +2,7 @@
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -195,7 +196,7 @@ namespace gip.bso.manufacturing
             foreach (ProdOrderPartslistPos pos in components)
             {
                 pos.TargetQuantityUOM *= quantityIndex;
-                databaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
+                databaseApp.Entry(pos).State = EntityState.Unchanged;
             }
 
             return components;

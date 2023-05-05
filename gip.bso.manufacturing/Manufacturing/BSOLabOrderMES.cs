@@ -9,7 +9,6 @@ using gip.core.manager;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
-using System.Data.Objects;
 using gip.bso.masterdata;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.IO;

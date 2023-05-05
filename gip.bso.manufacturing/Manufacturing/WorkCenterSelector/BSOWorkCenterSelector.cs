@@ -6,7 +6,6 @@ using gip.mes.autocomponent;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,6 +16,7 @@ using gip.mes.datamodel;
 using System.Threading;
 using gip.mes.processapplication;
 using System.Windows.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -1867,7 +1867,7 @@ namespace gip.bso.manufacturing
         /// Get ACClass by based on base ACClass ACIdentifier. Max depth is 5 levels.
         /// </summary>
         public static readonly Func<Database, string, string, IQueryable<gip.core.datamodel.ACClass>> s_cQry_GetRelevantPAProcessFunctions =
-        CompiledQuery.Compile<Database, string, string, IQueryable<gip.core.datamodel.ACClass>>(
+        EF.CompileQuery<Database, string, string, IQueryable<gip.core.datamodel.ACClass>>(
             (ctx, pafACIdentifier, configKeyACUrl) => ctx.ACClass.Where(c => (c.BasedOnACClassID.HasValue
                                                             && (c.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 1. Ableitungsstufe
                                                                 || (c.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue

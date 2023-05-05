@@ -2,6 +2,7 @@
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -201,9 +202,9 @@ namespace gip.bso.purchasing
         {
             if (_CurrentDeliveryNotePos != null && _CurrentDeliveryNotePos.InOrderPos != null)
             {
-                if (    _CurrentDeliveryNotePos.InOrderPos.EntityState == System.Data.EntityState.Modified 
-                     || _CurrentDeliveryNotePos.InOrderPos.EntityState == System.Data.EntityState.Unchanged)
-                    _CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.AutoLoad(this.DatabaseApp);
+                if (    _CurrentDeliveryNotePos.InOrderPos.EntityState == EntityState.Modified 
+                     || _CurrentDeliveryNotePos.InOrderPos.EntityState == EntityState.Unchanged)
+                    _CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.AutoLoad(_CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPosReference, _CurrentDeliveryNotePos);
                 var selectedModules = _CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.ToArray();
                 var reservationCollection = new BindingList<POPartslistPosReservation>();
                 var availableModules = GetAvailableModulesAsACClass(_CurrentDeliveryNotePos, this.Database.ContextIPlus);
@@ -253,7 +254,7 @@ namespace gip.bso.purchasing
                         .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))
                         .ToList();
                     foreach (var facility in queryUnselFacilities)
-                        facility.FacilityStock_Facility.AutoLoad(this.DatabaseApp);
+                        facility.FacilityStock_Facility.AutoLoad(facility.FacilityStock_FacilityReference, facility);
                     foreach (var acClass in availableModules)
                     {
                         //if (ShowWCells && acClass.ACCaption.IndexOf("(W)") < 0)
@@ -418,7 +419,7 @@ namespace gip.bso.purchasing
                 gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(this.Database.ContextIPlus, null, secondaryKey);
                 program.ProgramACClassMethod = acClassMethod;
                 program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-                this.Database.ContextIPlus.ACProgram.AddObject(program);
+                this.Database.ContextIPlus.ACProgram.Add(program);
                 //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
                 if (ACSaveChanges())
                 {

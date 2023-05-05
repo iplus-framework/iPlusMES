@@ -17,9 +17,9 @@ using System.Linq;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
-using System.Data.Objects;
 using gip.bso.iplus;
 using gip.mes.processapplication;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -198,7 +198,7 @@ namespace gip.bso.manufacturing
 
         #region Refresh Tasklist
         static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByTaskID =
-            CompiledQuery.Compile<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>>(
+            EF.CompileQuery<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>>(
                 (db, rootACClassTaskID, orderNo, materialNo) =>
                     db.ACClassTask
                     .Include("TaskTypeACClass")
@@ -235,7 +235,7 @@ namespace gip.bso.manufacturing
             );
 
         static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByPWClassID =
-            CompiledQuery.Compile<DatabaseApp, Guid, string,string, IEnumerable<ACClassTaskWrapperVB>>(
+            EF.CompileQuery<DatabaseApp, Guid, string,string, IEnumerable<ACClassTaskWrapperVB>>(
                 (db, pwACClassID, orderNo, materialNo) =>
                     db.ACClassTask
                         .Include("TaskTypeACClass")
@@ -274,7 +274,7 @@ namespace gip.bso.manufacturing
             );
 
         static readonly Func<DatabaseApp, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistAll =
-            CompiledQuery.Compile<DatabaseApp, IEnumerable<ACClassTaskWrapperVB>>(
+            EF.CompileQuery<DatabaseApp, IEnumerable<ACClassTaskWrapperVB>>(
                 (db) =>
                     db.ACClassTask
                         .Include("TaskTypeACClass")

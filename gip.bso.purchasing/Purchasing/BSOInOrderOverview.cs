@@ -19,6 +19,7 @@ using System.Text;
 using gip.mes.datamodel; using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using System.Diagnostics;
 
 namespace gip.bso.purchasing
 {
@@ -228,8 +229,13 @@ namespace gip.bso.purchasing
                 ACSaveOrUndoChanges();
                 if (requery)
                 {
-                    if (DatabaseApp.RecommendedMergeOption == System.Data.Objects.MergeOption.OverwriteChanges)
-                        CurrentInOrder.InOrderPos_InOrder.Load(System.Data.Objects.MergeOption.OverwriteChanges);
+                    if (DatabaseApp.RecommendedMergeOption == MergeOption.OverwriteChanges)
+                    {
+                        Debugger.Break();
+                        throw new NotImplementedException();
+                        //Not implemented in entity framework core
+                        //CurrentInOrder.InOrderPos_InOrder.AutoLoad(System.Data.Objects.MergeOption.OverwriteChanges);
+                    }
                     CurrentInOrderPos = CurrentInOrder.InOrderPos_InOrder
                         .Where(c => c.InOrderPosID == SelectedInOrderPos.InOrderPosID).FirstOrDefault();
 

@@ -15,6 +15,7 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -415,8 +416,8 @@ namespace gip.bso.purchasing
                 }
                 try
                 {
-                    if (!CurrentInRequest.DistributorCompany.CompanyAddress_Company.IsLoaded)
-                        CurrentInRequest.DistributorCompany.CompanyAddress_Company.Load();
+                    if (!CurrentInRequest.DistributorCompany.CompanyAddress_Company_IsLoaded)
+                        CurrentInRequest.DistributorCompany.CompanyAddress_Company.AutoLoad(CurrentInRequest.DistributorCompany.CompanyAddress_CompanyReference, CurrentInRequest);
                 }
                 catch (Exception e)
                 {
@@ -532,7 +533,7 @@ namespace gip.bso.purchasing
                 Messages.LogException("BSOInRequest", "New", msg);
             }
 
-            DatabaseApp.InRequest.AddObject(CurrentInRequest);
+            DatabaseApp.InRequest.Add(CurrentInRequest);
             ACState = Const.SMNew;
             PostExecute("New");
 

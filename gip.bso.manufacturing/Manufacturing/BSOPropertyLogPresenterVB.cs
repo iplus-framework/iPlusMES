@@ -17,7 +17,6 @@ using System.Linq;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
-using System.Data.Objects;
 using gip.bso.iplus;
 using gip.mes.processapplication;
 

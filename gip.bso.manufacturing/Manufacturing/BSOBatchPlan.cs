@@ -9,7 +9,6 @@ using gip.core.manager;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
-using System.Data.Objects;
 
 namespace gip.bso.manufacturing
 {
@@ -235,7 +234,7 @@ namespace gip.bso.manufacturing
                 {
                     MDSchedulingGroupWF mDSchedulingGroupWF = MDSchedulingGroupWF.NewACObject(DatabaseApp, group);
                     mDSchedulingGroupWF.ACClassWF = aclassWF;
-                    DatabaseApp.MDSchedulingGroupWF.AddObject(mDSchedulingGroupWF);
+                    DatabaseApp.MDSchedulingGroupWF.Add(mDSchedulingGroupWF);
                 }
             }
         }
@@ -674,7 +673,7 @@ namespace gip.bso.manufacturing
         public void LoadBatchPlanForIntermediateList(bool autoLoad)
         {
             if (autoLoad)
-                SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.AutoLoad(DatabaseApp);
+                SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.AutoLoad(SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPosReference, SelectedIntermediate);
             BatchPlanForIntermediateList = new ObservableCollection<ProdOrderBatchPlan>(SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos
                 .Where(c => c.VBiACClassWFID.HasValue && c.VBiACClassWFID == VBCurrentACClassWF.ACClassWFID)
                 .OrderBy(c => c.Sequence)
