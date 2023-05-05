@@ -343,7 +343,6 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ShipperCompanyAddress"); }
     }
     
-
     private TourplanPos _TourplanPos;
     public virtual TourplanPos TourplanPos
     { 

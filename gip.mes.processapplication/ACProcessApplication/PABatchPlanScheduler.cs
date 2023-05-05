@@ -6,8 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
-using System.Data.Objects;
-using System.Data.Common.CommandTrees;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
@@ -152,7 +151,7 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
         protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>> s_cQry_ReadyBatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
                 (ctx, mdSchedulingGroupID, appDefManagerID) => ctx.ProdOrderBatchPlan
                                     .Where(c => c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.ProdFinished
                                                 && c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.ProdFinished

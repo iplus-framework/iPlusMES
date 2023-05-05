@@ -146,6 +146,13 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    Guid? _RefACClassID;
+    public Guid? RefACClassID 
+    {
+        get { return _RefACClassID; }
+        set { SetProperty<Guid?>(ref _RefACClassID, value); }
+    }
+
     private LabOrder _LabOrder1_BasedOnTemplate;
     public virtual LabOrder LabOrder1_BasedOnTemplate
     { 

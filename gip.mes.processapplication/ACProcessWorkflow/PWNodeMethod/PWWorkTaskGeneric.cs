@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using System.Xml;
 using gip.mes.facility;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {

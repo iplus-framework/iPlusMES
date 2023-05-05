@@ -111,7 +111,7 @@ namespace gip.mes.processapplication
                 vd.Weighing weighing = vd.Weighing.NewACObject(dbApp, parentPos, secondaryKey);
                 weighing.Weight = AlibiWeight.ValueT;
                 weighing.IdentNr = AlibiNo.ValueT;
-                dbApp.Weighing.AddObject(weighing);
+                dbApp.Weighing.Add(weighing);
 
                 msg = dbApp.ACSaveChanges();
                 if(msg != null)

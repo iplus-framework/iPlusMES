@@ -386,7 +386,6 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosFacilityLot_FacilityLot); }
     }
 
-
     private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardLot;
     public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardLot
     {

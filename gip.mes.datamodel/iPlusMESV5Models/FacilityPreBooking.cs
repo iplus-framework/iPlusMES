@@ -190,7 +190,6 @@ public partial class FacilityPreBooking : VBEntityObject
         get { return Context.Entry(this).Reference("ProdOrderPartslistPosRelation"); }
     }
     
-
     private ICollection<TandTv3MixPointFacilityPreBooking> _TandTv3MixPointFacilityPreBooking_FacilityPreBooking;
     public virtual ICollection<TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking_FacilityPreBooking
     {

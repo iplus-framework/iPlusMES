@@ -410,7 +410,6 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_SourceProdOrderPartslist); }
     }
 
-
     private ACProgram _VBiACProgram;
     public virtual ACProgram VBiACProgram
     { 

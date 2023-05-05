@@ -4,8 +4,8 @@ using System.Linq;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
-using System.Data.Objects;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
@@ -110,7 +110,7 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
         protected static readonly Func<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IQueryable<MaterialWFConnection>> s_cQry_IsSubBatchCreation =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IQueryable<MaterialWFConnection>>(
+        EF.CompileQuery<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IQueryable<MaterialWFConnection>>(
             (ctx, materialID, materialWFACClassMethodID, contentACClassWFVB) => ctx.MaterialWFConnection
                                                                     .Where(c => c.MaterialID == materialID
                                                                            && c.MaterialWFACClassMethodID == materialWFACClassMethodID

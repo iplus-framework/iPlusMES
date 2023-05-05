@@ -8,6 +8,7 @@ using gip.core.datamodel;
 using System.Threading;
 using System.Globalization;
 using vd = gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.maintenance
 {

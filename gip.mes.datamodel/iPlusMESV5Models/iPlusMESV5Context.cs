@@ -137,6 +137,8 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<FacilityMaterial> FacilityMaterial { get; set; }
 
+    public virtual DbSet<FacilityMaterialOEE> FacilityMaterialOEE { get; set; }
+
     public virtual DbSet<FacilityPreBooking> FacilityPreBooking { get; set; }
 
     public virtual DbSet<FacilityReservation> FacilityReservation { get; set; }
@@ -2941,6 +2943,8 @@ public partial class iPlusMESV5Context : DbContext
 
             entity.HasIndex(e => e.OutwardPartslistID, "NCI_FK_FacilityBookingCharge_OutwardPartslistID");
 
+            entity.HasIndex(e => e.PickingPosID, "NCI_FK_FacilityBookingCharge_PickingPosID");
+
             entity.HasIndex(e => e.ProdOrderPartslistPosID, "NCI_FK_FacilityBookingCharge_ProdOrderPartslistPosID");
 
             entity.HasIndex(e => e.ProdOrderPartslistPosRelationID, "NCI_FK_FacilityBookingCharge_ProdOrderPartslistPosRelationID");
@@ -3435,6 +3439,29 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FacilityMaterial_Material");
+        });
+
+        modelBuilder.Entity<FacilityMaterialOEE>(entity =>
+        {
+            entity.ToTable("FacilityMaterialOEE");
+
+            entity.Property(e => e.FacilityMaterialOEEID).ValueGeneratedNever();
+            entity.Property(e => e.EndDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+
+           entity.HasOne(d => d.FacilityMaterial).WithMany(p => p.FacilityMaterialOEE_FacilityMaterial)
+                .HasForeignKey(d => d.FacilityMaterialID)
+                .HasConstraintName("FK_FacilityMaterialOEE_FacilityMaterial");
         });
 
         modelBuilder.Entity<FacilityPreBooking>(entity =>
@@ -6003,6 +6030,16 @@ public partial class iPlusMESV5Context : DbContext
             entity.HasIndex(e => new { e.MDSchedulingGroupID, e.VBiACClassWFID }, "UX_SchedulingGroup_Wf").IsUnique();
 
             entity.Property(e => e.MDSchedulingGroupWFID).ValueGeneratedNever();
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
 
            entity.HasOne(d => d.MDSchedulingGroup).WithMany(p => p.MDSchedulingGroupWF_MDSchedulingGroup)
                 .HasForeignKey(d => d.MDSchedulingGroupID)
@@ -6416,7 +6453,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.MaterialName1)
                 .IsRequired()
-                .HasMaxLength(40)
+                .HasMaxLength(350)
                 .IsUnicode(false);
             entity.Property(e => e.MaterialNo)
                 .IsRequired()
@@ -6444,7 +6481,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.MaterialName1)
                 .IsRequired()
-                .HasMaxLength(40)
+                .HasMaxLength(350)
                 .IsUnicode(false);
             entity.Property(e => e.MaterialNo)
                 .IsRequired()
@@ -6472,7 +6509,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.MaterialName1)
                 .IsRequired()
-                .HasMaxLength(40)
+                .HasMaxLength(350)
                 .IsUnicode(false);
             entity.Property(e => e.MaterialNo)
                 .IsRequired()
@@ -7280,13 +7317,17 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
-            entity.HasOne(d => d.ACProgramLog).WithMany(p => p.OperationLog_ACProgramLog)
-                 .HasForeignKey(d => d.ACProgramLogID)
-                 .HasConstraintName("FK_OperationLog_ACProgramLog");
+           entity.HasOne(d => d.ACProgramLog).WithMany(p => p.OperationLog_ACProgramLog)
+                .HasForeignKey(d => d.ACProgramLogID)
+                .HasConstraintName("FK_OperationLog_ACProgramLog");
 
-            entity.HasOne(d => d.FacilityCharge).WithMany(p => p.OperationLog_FacilityCharge)
-                 .HasForeignKey(d => d.FacilityChargeID)
-                 .HasConstraintName("FK_OperationLog_FacilityCharge");
+           entity.HasOne(d => d.FacilityCharge).WithMany(p => p.OperationLog_FacilityCharge)
+                .HasForeignKey(d => d.FacilityChargeID)
+                .HasConstraintName("FK_OperationLog_FacilityCharge");
+
+           entity.HasOne(d => d.RefACClass).WithMany(p => p.OperationLog_RefACClass)
+                .HasForeignKey(d => d.RefACClassID)
+                .HasConstraintName("FK_OperationLog_OperationLogRefACClassID");
         });
 
         modelBuilder.Entity<OrderLog>(entity =>
@@ -7379,7 +7420,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.PosMaterialName)
                 .IsRequired()
-                .HasMaxLength(40)
+                .HasMaxLength(350)
                 .IsUnicode(false);
             entity.Property(e => e.PosMaterialNo)
                 .IsRequired()
@@ -7416,7 +7457,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.MaterialName1)
                 .IsRequired()
-                .HasMaxLength(40)
+                .HasMaxLength(350)
                 .IsUnicode(false);
             entity.Property(e => e.MaterialNo)
                 .IsRequired()
@@ -7427,7 +7468,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.PosMaterialName)
                 .IsRequired()
-                .HasMaxLength(40)
+                .HasMaxLength(350)
                 .IsUnicode(false);
             entity.Property(e => e.PosMaterialNo)
                 .IsRequired()
@@ -8990,6 +9031,8 @@ public partial class iPlusMESV5Context : DbContext
 
         modelBuilder.Entity<ProdOrderPartslistPos>(entity =>
         {
+            entity.HasIndex(e => e.ACClassTaskID, "NCI_FK_ProdOrderPartslistPos_ACClassTaskID");
+
             entity.HasIndex(e => e.AlternativeProdOrderPartslistPosID, "NCI_FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID");
 
             entity.HasIndex(e => e.BasedOnPartslistPosID, "NCI_FK_ProdOrderPartslistPos_BasedOnPartslistPosID");

@@ -556,5 +556,4 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_OutOrder); }
     }
-
 }

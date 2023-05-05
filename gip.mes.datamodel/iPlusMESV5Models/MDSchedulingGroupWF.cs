@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MDSchedulingGroupWF : VBEntityObject
+public partial class MDSchedulingGroupWF : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public MDSchedulingGroupWF()
@@ -39,6 +39,34 @@ public partial class MDSchedulingGroupWF : VBEntityObject
     {
         get { return _VBiACClassWFID; }
         set { SetProperty<Guid>(ref _VBiACClassWFID, value); }
+    }
+
+    string _InsertName;
+    public string InsertName 
+    {
+        get { return _InsertName; }
+        set { SetProperty<string>(ref _InsertName, value); }
+    }
+
+    DateTime _InsertDate;
+    public DateTime InsertDate 
+    {
+        get { return _InsertDate; }
+        set { SetProperty<DateTime>(ref _InsertDate, value); }
+    }
+
+    string _UpdateName;
+    public string UpdateName 
+    {
+        get { return _UpdateName; }
+        set { SetProperty<string>(ref _UpdateName, value); }
+    }
+
+    DateTime _UpdateDate;
+    public DateTime UpdateDate 
+    {
+        get { return _UpdateDate; }
+        set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
     private MDSchedulingGroup _MDSchedulingGroup;

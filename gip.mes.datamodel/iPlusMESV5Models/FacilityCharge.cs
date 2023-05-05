@@ -599,5 +599,4 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Reference("Partslist"); }
     }
-    
-}
+    }

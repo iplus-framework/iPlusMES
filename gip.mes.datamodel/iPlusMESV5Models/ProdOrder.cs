@@ -169,5 +169,4 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslist_ProdOrder); }
     }
-
 }

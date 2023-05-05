@@ -184,7 +184,6 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Reference("OutOrderPos"); }
     }
     
-
     private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_DeliveryNotePos;
     public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos
     {

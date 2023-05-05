@@ -6,8 +6,8 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using System.Xml;
-using System.Data.Objects;
 using gip.mes.facility;
+using System.Data.Entity;
 
 namespace gip.mes.processapplication
 {
@@ -762,8 +762,9 @@ namespace gip.mes.processapplication
                     using (ACMonitor.Lock(_20015_LockValue))
                     {
                         _MDSchedulingGroupLoaded = true;
-                        var queryMD = dbApp.MDSchedulingGroupWF.Where(c => c.VBiACClassWFID == ContentACClassWF.ACClassWFID).Select(c => c.MDSchedulingGroup);
-                        (queryMD as ObjectQuery).MergeOption = MergeOption.NoTracking;
+                        var queryMD = dbApp.MDSchedulingGroupWF.Where(c => c.VBiACClassWFID == ContentACClassWF.ACClassWFID).Select(c => c.MDSchedulingGroup).AsNoTracking();
+                        //Added AsNoTracking() to query
+                        //queryMD as ObjectQuery).MergeOption = MergeOption.NoTracking;
                         _MDSchedulingGroup = queryMD.FirstOrDefault();
                     }
                 }

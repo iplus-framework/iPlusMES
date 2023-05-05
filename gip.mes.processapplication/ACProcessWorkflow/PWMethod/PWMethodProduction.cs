@@ -558,7 +558,7 @@ namespace gip.mes.processapplication
             core.datamodel.ACClassTask contentTask = this.ContentTask;
             if (contentTask == null)
                 return;
-            if (contentTask.EntityState == System.Data.EntityState.Added || contentTask.EntityState == System.Data.EntityState.Detached)
+            if (contentTask.EntityState == Microsoft.EntityFrameworkCore.EntityState.Added || contentTask.EntityState == Microsoft.EntityFrameworkCore.EntityState.Detached)
             {
                 Messages.LogError(this.GetACUrl(), "LoadVBEntities(10)", "EntityState of ContentTask is Added and not saved to the database. The call of LoadVBEntities is too early!");
                 Messages.LogError(this.GetACUrl(), "LoadVBEntities(11)", System.Environment.StackTrace);
@@ -628,7 +628,7 @@ namespace gip.mes.processapplication
                         {
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             orderLog.ProdOrderPartslistPosID = currentProdOrderPartslistPos.ProdOrderPartslistPosID;
-                            dbApp.OrderLog.AddObject(orderLog);
+                            dbApp.OrderLog.Add(orderLog);
                             dbApp.ACSaveChanges();
                         }
                         _NewAddedProgramLog = null;

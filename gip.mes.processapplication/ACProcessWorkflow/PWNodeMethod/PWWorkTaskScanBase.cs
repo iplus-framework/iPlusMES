@@ -67,7 +67,7 @@ namespace gip.mes.processapplication
             if (refPAACClassMethod == null)
                 return false;
             if (refPAACClassMethod.AttachedFromACClassReference.IsLoaded)
-                pafClass = refPAACClassMethod.AttachedFromACClassReference.Value;
+                pafClass = refPAACClassMethod.AttachedFromACClass;
             if (pafClass == null)
             {
                 using (ACMonitor.Lock(this.ContextLockForACClassWF))
@@ -145,7 +145,7 @@ namespace gip.mes.processapplication
                 {
                     core.datamodel.ACProgram acProgram = null;
                     if (currentProgramLog.ACProgramReference.IsLoaded)
-                        acProgram = currentProgramLog.ACProgramReference.Value;
+                        acProgram = currentProgramLog.ACProgram;
                     if (acProgram == null)// && (currentProgramLog.EntityState == System.Data.EntityState.Added || currentProgramLog.EntityState == System.Data.EntityState.Detached))
                         acProgram = currentProgramLog.NewACProgramForQueue;
                     if (acProgram == null)

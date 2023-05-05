@@ -1072,7 +1072,7 @@ namespace gip.mes.processapplication
                                 orderLog.ProdOrderPartslistPosRelationID = dosingPosId;
                             if (IsTransport)
                                 orderLog.PickingPosID = dosingPosId;
-                            dbApp.OrderLog.AddObject(orderLog);
+                            dbApp.OrderLog.Add(orderLog);
                             dbApp.ACSaveChanges();
                         }
                         _NewAddedProgramLog = null;

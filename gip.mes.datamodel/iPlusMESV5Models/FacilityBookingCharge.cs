@@ -1095,7 +1095,6 @@ public partial class FacilityBookingCharge : VBEntityObject
         get { return Context.Entry(this).Reference("ProdOrderPartslistPosRelation"); }
     }
     
-
     private ICollection<TandTv3MixPointFacilityBookingCharge> _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge;
     public virtual ICollection<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge
     {

@@ -1389,7 +1389,6 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material1_ProductionMaterial"); }
     }
     
-
     private ICollection<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_Material;
     public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_Material
     {

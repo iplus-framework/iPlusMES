@@ -90,6 +90,34 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    double? _Throughput;
+    public double? Throughput 
+    {
+        get { return _Throughput; }
+        set { SetProperty<double?>(ref _Throughput, value); }
+    }
+
+    double? _ThroughputMax;
+    public double? ThroughputMax 
+    {
+        get { return _ThroughputMax; }
+        set { SetProperty<double?>(ref _ThroughputMax, value); }
+    }
+
+    double? _ThroughputMin;
+    public double? ThroughputMin 
+    {
+        get { return _ThroughputMin; }
+        set { SetProperty<double?>(ref _ThroughputMin, value); }
+    }
+
+    short _ThroughputAuto;
+    public short ThroughputAuto 
+    {
+        get { return _ThroughputAuto; }
+        set { SetProperty<short>(ref _ThroughputAuto, value); }
+    }
+
     private Facility _Facility;
     public virtual Facility Facility
     { 
@@ -110,6 +138,26 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Facility"); }
     }
     
+    private ICollection<FacilityMaterialOEE> _FacilityMaterialOEE_FacilityMaterial;
+    public virtual ICollection<FacilityMaterialOEE> FacilityMaterialOEE_FacilityMaterial
+    {
+        get => LazyLoader.Load(this, ref _FacilityMaterialOEE_FacilityMaterial);
+        set => _FacilityMaterialOEE_FacilityMaterial = value;
+    }
+
+    public bool FacilityMaterialOEE_FacilityMaterial_IsLoaded
+    {
+        get
+        {
+            return FacilityMaterialOEE_FacilityMaterial != null;
+        }
+    }
+
+    public virtual CollectionEntry FacilityMaterialOEE_FacilityMaterialReference
+    {
+        get { return Context.Entry(this).Collection(c => c.FacilityMaterialOEE_FacilityMaterial); }
+    }
+
     private Material _Material;
     public virtual Material Material
     { 

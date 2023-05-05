@@ -1122,7 +1122,6 @@ public partial class FacilityBooking : VBEntityObject
         get { return Context.Entry(this).Reference("ProdOrderPartslistPosRelation"); }
     }
     
-
     private ACClass _VBiStackCalculatorACClass;
     public virtual ACClass VBiStackCalculatorACClass
     { 

@@ -1312,7 +1312,7 @@ namespace gip.mes.processapplication
                                 orderLog.DeliveryNotePosID = currentDisEntityID;
                             else if (propertyToSet == 3)
                                 orderLog.FacilityBookingID = currentDisEntityID;
-                            dbApp.OrderLog.AddObject(orderLog);
+                            dbApp.OrderLog.Add(orderLog);
                             dbApp.ACSaveChanges();
                         }
                         _NewAddedProgramLog = null;

@@ -685,7 +685,6 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("PickupCompanyMaterial"); }
     }
     
-
     private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPos_InOrderPos;
     public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_InOrderPos
     {

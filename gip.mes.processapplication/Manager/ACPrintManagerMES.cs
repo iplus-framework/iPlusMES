@@ -5,7 +5,6 @@ using gip.mes.facility;
 using gip.mes.manager;
 using System;
 using System.Data;
-using System.Data.Objects;
 using System.Linq;
 using System.Text;
 using gip.core.reporthandler;

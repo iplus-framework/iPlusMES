@@ -12,6 +12,8 @@ using gip.core.autocomponent;
 using gip.core.archiver;
 using gip.core.communication;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.archiver
 {
@@ -202,7 +204,7 @@ namespace gip.mes.archiver
 
             try
             {
-                dbApp.ExecuteStoreCommand("delete OrderLog from OrderLog ol inner join ACProgramLog pl on pl.ACProgramLogID = ol.VBiACProgramLogID inner join ACProgram p on p.ACProgramID = pl.ACProgramID where pl.ACProgramID = {0}", acProgram.ACProgramID);
+                dbApp.Database.ExecuteSql(FormattableStringFactory.Create("delete OrderLog from OrderLog ol inner join ACProgramLog pl on pl.ACProgramLogID = ol.VBiACProgramLogID inner join ACProgram p on p.ACProgramID = pl.ACProgramID where pl.ACProgramID = @p0", acProgram.ACProgramID));
             }
             catch (Exception ec)
             {
@@ -300,7 +302,7 @@ namespace gip.mes.archiver
                             {
                                 if (String.IsNullOrEmpty(log.XMLConfig))
                                     log.ACProperties.Serialize();
-                                dbApp.AddToOrderLog(log);
+                                dbApp.Add(log);
                             }
                         }
                         MsgWithDetails msg = dbApp.ACSaveChanges();

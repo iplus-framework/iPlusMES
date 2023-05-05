@@ -1867,7 +1867,7 @@ namespace gip.mes.processapplication
                 newQuant.FacilityChargeSortNo = specialDest.GetNextFCSortNo(dbApp);
                 newQuant.NotAvailable = false;
                 newQuant.FillingDate = DateTime.Now;
-                dbApp.FacilityCharge.AddObject(newQuant);
+                dbApp.FacilityCharge.Add(newQuant);
 
                 // 1. Bereite Buchung vor
                 FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(this.ACFacilityManager, dbApp, dosingPosRelation);

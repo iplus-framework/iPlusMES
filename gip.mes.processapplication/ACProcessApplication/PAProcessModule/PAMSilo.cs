@@ -10,6 +10,7 @@ using System.Xml;
 using System.Collections.Specialized;
 using gip.mes.facility;
 using System.Globalization;
+using System.Web;
 
 namespace gip.mes.processapplication
 {
@@ -702,7 +703,7 @@ namespace gip.mes.processapplication
                     {
                         try
                         {
-                            if (facilitySilo.EntityState == System.Data.EntityState.Modified)
+                            if (facilitySilo.EntityState == Microsoft.EntityFrameworkCore.EntityState.Modified)
                                 RootDbOpQueue.AppContextQueue.Context.ACSaveChanges();
                             facilitySilo.AutoRefresh();
                         }
@@ -965,7 +966,7 @@ namespace gip.mes.processapplication
                 {
                     if (facilitySilo.CurrentFacilityStock == null)
                     {
-                        facilitySilo.FacilityStock_Facility.AutoLoad();
+                        facilitySilo.FacilityStock_Facility.AutoLoad(facilitySilo.FacilityStock_FacilityReference, facilitySilo);
                         if (facilitySilo.CurrentFacilityStock != null)
                         {
                             stockQ = facilitySilo.CurrentFacilityStock.StockQuantity;

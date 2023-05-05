@@ -3,9 +3,8 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
-using System.Data.Objects.DataClasses;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
@@ -250,14 +249,14 @@ namespace gip.mes.processapplication
 
         public override List<IACConfigStore> AttachConfigStoresToDatabase(IACEntityObjectContext db, List<ACConfigStoreInfo> rmiResult)
         {
-            ObjectContext obContext = db as ObjectContext;
+            DbContext obContext = db as DbContext;
             List<IACConfigStore> mandatoryConfigStore = base.AttachConfigStoresToDatabase(db, rmiResult);
-            List<ACConfigStoreInfo> subsetRMIresult = rmiResult.Where(x => !mandatoryConfigStore.Select(a => (a as EntityObject).EntityKey).Contains(x.ConfigStoreEntity)).ToList();
+            List<ACConfigStoreInfo> subsetRMIresult = rmiResult.Where(x => !mandatoryConfigStore.Select(a => (a as VBEntityObject).EntityKey).Contains(x.ConfigStoreEntity)).ToList();
             if (rmiResult != null)
             {
                 foreach (ACConfigStoreInfo configStoreInfo in subsetRMIresult)
                 {
-                    IACConfigStore dbConfigStoreItem = obContext.GetObjectByKey(configStoreInfo.ConfigStoreEntity) as IACConfigStore;
+                    IACConfigStore dbConfigStoreItem = obContext.Find<IACConfigStore>(configStoreInfo.ConfigStoreEntity);
                     if (dbConfigStoreItem != null)
                     {
                         dbConfigStoreItem.OverridingOrder = configStoreInfo.Priority;

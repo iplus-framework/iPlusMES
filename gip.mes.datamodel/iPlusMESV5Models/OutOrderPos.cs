@@ -969,7 +969,6 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("PickupCompanyMaterial"); }
     }
     
-
     private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
     public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
     {

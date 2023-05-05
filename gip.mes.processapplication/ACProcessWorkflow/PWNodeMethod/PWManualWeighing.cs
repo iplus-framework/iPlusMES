@@ -5,12 +5,12 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Objects;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Xml;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
@@ -2171,7 +2171,7 @@ namespace gip.mes.processapplication
         }
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>> s_cQry_WeighMaterials =
-                CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>>(
+                EF.CompileQuery<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>>(
                     (ctx, intermediateChildPOPLPosID) => ctx.ProdOrderPartslistPosRelation
                                                             .Include("SourceProdOrderPartslistPos")
                                                             .Include("SourceProdOrderPartslistPos.BasedOnPartslistPos")
@@ -2749,7 +2749,7 @@ namespace gip.mes.processapplication
                             lastUsedFC.MaterialID = matID;
                             lastUsedFC.VBiACClassID = moduleID;
                             lastUsedFC.KeyACUrl = MaterialConfigLastUsedLotKeyACUrl;
-                            dbApp.MaterialConfig.AddObject(lastUsedFC);
+                            dbApp.MaterialConfig.Add(lastUsedFC);
                             lastUsedFC.SetValueTypeACClass(db.GetACType(typeof(Guid)));
                         }
 

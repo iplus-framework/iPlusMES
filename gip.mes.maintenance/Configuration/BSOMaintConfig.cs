@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using vd = gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.maintenance
 {
@@ -327,7 +328,7 @@ namespace gip.mes.maintenance
             }
             set
             {
-                if (_CurrentMaintACClass != null && _CurrentMaintACClass.EntityState != System.Data.EntityState.Detached)
+                if (_CurrentMaintACClass != null && _CurrentMaintACClass.EntityState != EntityState.Detached)
                     DatabaseApp.Detach(_CurrentMaintACClass);
                 _CurrentMaintACClass = value;
                 //ClearPropertyNonSavedRoles();
@@ -841,7 +842,7 @@ namespace gip.mes.maintenance
                     else
                         DatabaseApp.ACUndoChanges();
                 }
-                if (CurrentMaintACClass != null && CurrentMaintACClass.EntityState == System.Data.EntityState.Detached)
+                if (CurrentMaintACClass != null && CurrentMaintACClass.EntityState == EntityState.Detached)
                     _SelectedACClassHierarchy.IsConfigured = null;
 
                 _SelectedACClassHierarchy = value;

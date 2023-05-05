@@ -369,7 +369,7 @@ namespace gip.mes.processapplication
                 gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(db, null, secondaryKey);
                 program.ProgramACClassMethod = acClassMethod;
                 program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-                db.ACProgram.AddObject(program);
+                db.ACProgram.Add(program);
                 if (db.ACSaveChanges() == null)
                 {
                     ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);

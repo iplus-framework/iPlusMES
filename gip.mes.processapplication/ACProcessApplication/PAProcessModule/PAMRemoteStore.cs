@@ -5,7 +5,6 @@ using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.core.processapplication;
-using System.Data.Objects;
 using gip.mes.datamodel;
 using gip.mes.facility;
 

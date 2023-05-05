@@ -1029,7 +1029,6 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingPos_ToFacility); }
     }
 
-
     private ICollection<TandTv3MixPointFacility> _TandTv3MixPointFacility_Facility;
     public virtual ICollection<TandTv3MixPointFacility> TandTv3MixPointFacility_Facility
     {

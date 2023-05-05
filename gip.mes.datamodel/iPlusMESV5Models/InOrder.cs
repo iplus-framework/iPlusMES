@@ -508,5 +508,4 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRProposal_InOrder); }
     }
-
 }

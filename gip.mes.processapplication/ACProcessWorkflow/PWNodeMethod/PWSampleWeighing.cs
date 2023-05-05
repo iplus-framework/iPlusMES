@@ -406,7 +406,7 @@ namespace gip.mes.processapplication
             Weighing weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
             weighing.Weight = actualWeight;
             weighing.IdentNr = alibiNo == null ? "" : alibiNo;
-            dbApp.Weighing.AddObject(weighing);
+            dbApp.Weighing.Add(weighing);
 
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)
@@ -451,7 +451,7 @@ namespace gip.mes.processapplication
             template.Material = material;
             template.SampleTakingDate = DateTime.Now;
             template.TemplateName = templateName;
-            dbApp.LabOrder.AddObject(template);
+            dbApp.LabOrder.Add(template);
 
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)
@@ -468,7 +468,7 @@ namespace gip.mes.processapplication
                 labTag.MDNameTrans = "en{'Sample weight'}de{'Stichproben gewicht'}";
                 labTag.SortIndex = 10000;
                 labTag.MDKey = C_LabOrderPosTagKey;
-                dbApp.MDLabTag.AddObject(labTag);
+                dbApp.MDLabTag.Add(labTag);
 
                 msg = dbApp.ACSaveChanges();
                 if (msg != null)
@@ -484,7 +484,7 @@ namespace gip.mes.processapplication
             templatePos.MDLabTag = labTag;
             templatePos.LineNumber = "1";
             templatePos.LabOrder = template;
-            dbApp.LabOrderPos.AddObject(templatePos);
+            dbApp.LabOrderPos.Add(templatePos);
 
             msg = dbApp.ACSaveChanges();
             if (msg != null)

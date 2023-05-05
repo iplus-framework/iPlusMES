@@ -7,7 +7,6 @@ using System.Timers;
 using System.Threading;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Data.Objects;
 using gip.mes.datamodel;
 using gip.core.autocomponent;
 using gip.mes.maintenance;

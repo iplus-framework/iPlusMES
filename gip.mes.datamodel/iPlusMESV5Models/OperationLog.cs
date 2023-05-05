@@ -136,4 +136,24 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Reference("FacilityCharge"); }
     }
+    
+    private ACClass _RefACClass;
+    public virtual ACClass RefACClass
+    { 
+        get => LazyLoader.Load(this, ref _RefACClass);
+        set => _RefACClass = value;
+    }
+
+    public bool RefACClass_IsLoaded
+    {
+        get
+        {
+            return RefACClass != null;
+        }
+    }
+
+    public virtual ReferenceEntry RefACClassReference 
+    {
+        get { return Context.Entry(this).Reference("RefACClass"); }
+    }
     }

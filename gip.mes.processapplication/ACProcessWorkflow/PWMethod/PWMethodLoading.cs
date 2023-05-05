@@ -138,7 +138,7 @@ namespace gip.mes.processapplication
             if (rootPW == null)
                 return;
 
-            if (this.ContentTask.EntityState == System.Data.EntityState.Added)
+            if (this.ContentTask.EntityState == Microsoft.EntityFrameworkCore.EntityState.Added)
             {
                 Messages.LogError(this.GetACUrl(), "LoadVBEntities(10)", "EntityState of ContentTask is Added and not saved to the database. The call of LoadVBEntities is too early!");
                 Messages.LogError(this.GetACUrl(), "LoadVBEntities(11)", System.Environment.StackTrace);
@@ -214,7 +214,7 @@ namespace gip.mes.processapplication
                         {
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             orderLog.DeliveryNotePosID = deliveryNotePosID;
-                            dbApp.OrderLog.AddObject(orderLog);
+                            dbApp.OrderLog.Add(orderLog);
                             dbApp.ACSaveChanges();
                         }
                         _NewAddedProgramLog = null;

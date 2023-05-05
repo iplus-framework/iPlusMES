@@ -1338,6 +1338,26 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MsgAlarmLog_ACClass); }
     }
 
+    private ICollection<OperationLog> _OperationLog_RefACClass;
+    public virtual ICollection<OperationLog> OperationLog_RefACClass
+    {
+        get => LazyLoader.Load(this, ref _OperationLog_RefACClass);
+        set => _OperationLog_RefACClass = value;
+    }
+
+    public bool OperationLog_RefACClass_IsLoaded
+    {
+        get
+        {
+            return OperationLog_RefACClass != null;
+        }
+    }
+
+    public virtual CollectionEntry OperationLog_RefACClassReference
+    {
+        get { return Context.Entry(this).Collection(c => c.OperationLog_RefACClass); }
+    }
+
     private ICollection<OutOfferConfig> _OutOfferConfig_VBiACClass;
     public virtual ICollection<OutOfferConfig> OutOfferConfig_VBiACClass
     {
@@ -1597,7 +1617,6 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_VBiValueTypeACClass); }
     }
-
 
     private ICollection<TourplanConfig> _TourplanConfig_VBiACClass;
     public virtual ICollection<TourplanConfig> TourplanConfig_VBiACClass

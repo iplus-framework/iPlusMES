@@ -163,7 +163,7 @@ namespace gip.mes.processapplication
             pos.TargetQuantityUOM = targetQuantity;
             pos.IsBaseQuantityExcluded = true;
 
-            dbApp.ProdOrderPartslistPos.AddObject(pos);
+            dbApp.ProdOrderPartslistPos.Add(pos);
 
             return pos;
         }
@@ -181,7 +181,7 @@ namespace gip.mes.processapplication
                 targetPos.Sequence = 1;
                 targetPos.MaterialID = intermediateMaterial.MaterialID;
                 targetPos.MaterialPosTypeIndex = (short)GlobalApp.MaterialPosTypes.InwardIntern;
-                dbApp.ProdOrderPartslistPos.AddObject(targetPos);
+                dbApp.ProdOrderPartslistPos.Add(targetPos);
             }
 
             ProdOrderPartslistPosRelation topRelation = sourcePos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
@@ -222,7 +222,7 @@ namespace gip.mes.processapplication
                 topRelation.Sequence = nextSeq;
                 topRelation.TargetQuantityUOM = totalQuantity;
 
-                dbApp.ProdOrderPartslistPosRelation.AddObject(topRelation);
+                dbApp.ProdOrderPartslistPosRelation.Add(topRelation);
             }
 
             if (topRelation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess)

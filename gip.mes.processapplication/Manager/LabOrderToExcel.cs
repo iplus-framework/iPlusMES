@@ -215,9 +215,6 @@ namespace gip.mes.processapplication
 
                 #endregion
             }
-
-
-
         }
 
         private static core.datamodel.ACClass GetLabOrderMachine(Database database, LabOrder labOrder)
