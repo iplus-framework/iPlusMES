@@ -1,4 +1,5 @@
 ﻿using gip.core.autocomponent;
+using gip.core.wpfservices;
 
 namespace gip.mes.cmdlet
 {
@@ -17,7 +18,8 @@ namespace gip.mes.cmdlet
             bool PropPersistenceOff = false;
             #endregion
 
-            ACStartUpRoot startupRoot = new ACStartUpRoot();
+            //TODO Linux implementation
+            ACStartUpRoot startupRoot = new ACStartUpRoot(new WPFServices());
             startupRoot.LoginUser(userName, password, registerACObjects, PropPersistenceOff, ref errorMsg);
             return errorMsg;
         }

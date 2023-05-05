@@ -93,7 +93,7 @@ namespace gip.mes.cmdlet.Translation
                         acClassText.InsertName = UpdateName;
                         acClassText.UpdateName = UpdateName;
 
-                        database.ACClassText.AddObject(acClassText);
+                        database.ACClassText.Add(acClassText);
                     }
                     else
                     {
@@ -108,7 +108,7 @@ namespace gip.mes.cmdlet.Translation
                         acClassMessage.InsertName = UpdateName;
                         acClassMessage.UpdateName = UpdateName;
 
-                        database.ACClassMessage.AddObject(acClassMessage);
+                        database.ACClassMessage.Add(acClassMessage);
                     }
                     MsgWithDetails saveMsg = database.ACSaveChanges();
                     if (saveMsg != null && !saveMsg.IsSucceded())

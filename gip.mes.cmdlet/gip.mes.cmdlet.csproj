@@ -11,16 +11,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Data.Services" />
-    <Reference Include="System.Data.Services.Client" />
-    <Reference Include="System.Transactions" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.ControlScriptSync\gip.core.ControlScriptSync.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.dbsyncer\gip.core.dbsyncer.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json" />
@@ -28,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.4" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />

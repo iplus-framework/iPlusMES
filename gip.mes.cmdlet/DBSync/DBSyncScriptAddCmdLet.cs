@@ -3,10 +3,11 @@ using gip.core.dbsyncer.Command;
 using gip.core.dbsyncer.helper;
 using gip.core.dbsyncer.model;
 using gip.mes.cmdlet.Settings;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.cmdlet.DBSync
 {
@@ -34,18 +35,18 @@ namespace gip.mes.cmdlet.DBSync
             string connectionString = DbSyncerSettings.GetDefaultConnectionString(CommandLineHelper.ConfigCurrentDir);
 
             string rootFolder = Path.Combine(iPlusCmdLetSettings.DLLBinFolder, "DbScripts", DbSyncerInfoContextID);
-            DbSyncerInfoContext dbSyncerInfoContext = new DbSyncerInfoContext() { DbSyncerInfoContextID = DbSyncerInfoContextID };
+            gip.core.datamodel.DbSyncerInfoContext dbSyncerInfoContext = new gip.core.datamodel.DbSyncerInfoContext() { DbSyncerInfoContextID = DbSyncerInfoContextID };
             FileInfo fi = new FileInfo(Path.Combine(rootFolder, FileName));
             ScriptFileInfo scriptFileInfo = new ScriptFileInfo(dbSyncerInfoContext, fi, rootFolder);
-            using (DbContext db = new DbContext(connectionString))
+            using (Database db = new Database(connectionString))
             {
                 DbSyncerInfoCommand.Update(db, scriptFileInfo);
                 WriteObject("Script added:");
                 WriteObject(string.Format("{0}\\{1}", DbSyncerInfoContextID, FileName));
                 WriteObject("Now last script:");
-                var result = db.Database.SqlQuery<DbSyncerInfo>("select top 1 * from [dbo].[@DbSyncerInfo] order by [ScriptDate] desc");
+                var result = db.Database.SqlQuery<DbSyncerInfo>(FormattableStringFactory.Create("select top 1 * from [dbo].[@DbSyncerInfo] order by [ScriptDate] desc"));
                 WriteObject(result.FirstOrDefault());
             }
-        }
+        } 
     }
 }

@@ -114,7 +114,7 @@ namespace gip.mes.cmdlet.DesignSync
 					design.BranchNo = 0;
 					design.InsertName = "SUP";
 					design.InsertDate = DateTime.Now;
-					db.ACClassDesign.AddObject(design);
+					db.ACClassDesign.Add(design);
 				}
 				design.XMLDesign = File.ReadAllText(designFileName, Encoding.UTF8);
 				design.UpdateDate = DateTime.Now;
