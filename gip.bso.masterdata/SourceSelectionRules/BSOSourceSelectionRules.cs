@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using dbMes = gip.mes.datamodel;
 using static gip.mes.datamodel.EntityObjectExtensionApp;
-using System.Windows.Media.Media3D;
-using System.ComponentModel.Design.Serialization;
 
 namespace gip.bso.masterdata
 {
@@ -84,7 +82,6 @@ namespace gip.bso.masterdata
         #region Property
 
         public bool AnyNotDosableMaterial { get; set; } = false;
-        public IACConfigStore CurrentConfigStore { get; set; }
 
         #region Property -> RuleGroup
 
@@ -236,25 +233,25 @@ namespace gip.bso.masterdata
         #region ACMethod
 
         [ACMethodInfo("Dialog", "en{'Select Sources'}de{'Quellen auswählen'}", (short)MISort.QueryPreviewDlg)]
-        public void ShowDialogSelectSources(Guid acClassWFID, Guid acClassMethodID, Guid partslistID, Guid? prodOrderPartslistID)
+        public void ShowDialogSelectSources(Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
             AnyNotDosableMaterial = false;
 
-            (IACConfigStore currentConfigStore, SourceSelectionRulesResult result) = DoShowDialogSelectSources(DatabaseApp, acClassWFID, acClassMethodID, partslistID, prodOrderPartslistID);
+            SourceSelectionRulesResult result = DoShowDialogSelectSources(DatabaseApp, acClassWFID, partslistID, prodOrderPartslistID);
 
             _RuleGroupList = result.RuleGroups.Where(c => c.RuleSelectionList.Any()).ToList();
-            OnPropertyChanged(nameof(RuleGroupList));
-
             _NotDosableMaterialsList = result.NotDosableMaterials;
-            OnPropertyChanged(nameof(NotDosableMaterialsList));
             AnyNotDosableMaterial = _NotDosableMaterialsList != null && _NotDosableMaterialsList.Any();
-
             _AllItemsList = result.MachineItems.Where(c => c.RuleGroup == null).OrderBy(c => c.Machine.ACIdentifier).ToList();
+
+            OnPropertyChanged(nameof(RuleGroupList));
+            OnPropertyChanged(nameof(NotDosableMaterialsList));
             OnPropertyChanged(nameof(AllItemsList));
 
-            CurrentConfigStore = currentConfigStore;
             ShowDialog(this, "DlgSelectSources");
         }
+
+
 
         /// <summary>
         /// Source Property: DlgSelectSourcesOk
@@ -277,32 +274,58 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        private Tuple<IACConfigStore, SourceSelectionRulesResult> DoShowDialogSelectSources(dbMes.DatabaseApp databaseApp, Guid acClassWFID, Guid acClassMethodID, Guid partslistID, Guid? prodOrderPartslistID)
+        private SourceSelectionRulesResult DoShowDialogSelectSources(dbMes.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
-            ACClassMethod method = databaseApp.ContextIPlus.ACClassMethod.FirstOrDefault(c => c.ACClassMethodID == acClassMethodID);
+            ACClassWF invokerPWNode = databaseApp.ContextIPlus.ACClassWF.Where(c => c.ACClassWFID == acClassWFID).FirstOrDefault();
+            ACClassMethod method = databaseApp.ContextIPlus.ACClassMethod.FirstOrDefault(c => c.ACClassMethodID == invokerPWNode.ACClassMethodID);
             dbMes.Partslist partslist = databaseApp.Partslist.FirstOrDefault(c => c.PartslistID == partslistID);
             dbMes.ProdOrderPartslist prodOrderPartslist = null;
-            ACClassWF invokerPWNode = databaseApp.ContextIPlus.ACClassWF.Where(c => c.ACClassWFID == acClassWFID).FirstOrDefault();
             if (prodOrderPartslistID != null)
             {
                 prodOrderPartslist = databaseApp.ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistID == prodOrderPartslistID);
             }
 
-            (IACConfigStore currentConfigStore, List<IACConfigStore> configStores) = GetConfigStores(new ACClassMethod[] { method, invokerPWNode.RefPAACClassMethod }, partslist, prodOrderPartslist);
+            // Load main WF
+            List<IACConfigStore> configStores = GetConfigStores(new ACClassMethod[] { method, invokerPWNode.RefPAACClassMethod }, partslist, prodOrderPartslist);
+            SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
+            LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, configStores, partslist, invokerPWNode);
+            sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(partslist, prodOrderPartslist);
+            
+            // Load Subs (level 1)
+            List<ACClassWF> allSubWf = invokerPWNode.RefPAACClassMethod.ACClassWF_ACClassMethod.ToList();
+            List<ACClassWF> filteredSubs = new List<ACClassWF>();
+            foreach(ACClassWF subWf in allSubWf)
+            {
+                if(subWf.IsWFProdNodeAll("PWNodeProcessWorkflowVB") || subWf.IsWFProdNodeAll("PWNodeProcessWorkflow"))
+                {
+                    filteredSubs.Add(subWf);
+                }
+            }
 
-            SourceSelectionRulesResult sourceSelectionRulesResult = LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, configStores, invokerPWNode, partslist);
-            return new Tuple<IACConfigStore, SourceSelectionRulesResult>(currentConfigStore, sourceSelectionRulesResult);
+            if(filteredSubs.Any())
+            {
+                string preConfigACUrl = invokerPWNode.ConfigACUrl;
+                if (!preConfigACUrl.EndsWith("\\"))
+                {
+                    preConfigACUrl = preConfigACUrl + "\\";
+                }
+                foreach(ACClassWF subWf in filteredSubs)
+                {
+                    List<IACConfigStore> subConfigStores = GetConfigStores(new ACClassMethod[] { method, subWf.RefPAACClassMethod }, partslist, prodOrderPartslist);
+                    LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, subConfigStores, partslist, subWf, preConfigACUrl);
+                }
+            }
+
+            return sourceSelectionRulesResult;
         }
 
-        private Tuple<IACConfigStore, List<IACConfigStore>> GetConfigStores(ACClassMethod[] aCClassMethods, dbMes.Partslist partslist, dbMes.ProdOrderPartslist prodOrderPartslist)
+        private List<IACConfigStore> GetConfigStores(ACClassMethod[] aCClassMethods, dbMes.Partslist partslist, dbMes.ProdOrderPartslist prodOrderPartslist)
         {
             List<IACConfigStore> configStores = new List<IACConfigStore>();
-            IACConfigStore currentConfigStore = partslist;
 
             if (prodOrderPartslist != null)
             {
                 configStores.Add(prodOrderPartslist);
-                currentConfigStore = prodOrderPartslist;
             }
             else
             {
@@ -313,17 +336,28 @@ namespace gip.bso.masterdata
 
             configStores = iPlusMESConfigManager.GetACConfigStores(configStores);
 
-            foreach(IACConfigStore configStore in configStores)
+            foreach (IACConfigStore configStore in configStores)
             {
                 configStore.ClearCacheOfConfigurationEntries();
             }
 
-            return new Tuple<IACConfigStore, List<IACConfigStore>>(currentConfigStore, configStores);
+            return configStores;
         }
 
-        private SourceSelectionRulesResult LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, List<IACConfigStore> configStores, ACClassWF invokerPWNode, dbMes.Partslist partslist)
+        private IACConfigStore GetCurrentConfigStore(dbMes.Partslist partslist, dbMes.ProdOrderPartslist prodOrderPartslist)
         {
-            SourceSelectionRulesResult result = new SourceSelectionRulesResult();
+            IACConfigStore currentConfigStore = partslist;
+
+            if (prodOrderPartslist != null)
+            {
+                currentConfigStore = prodOrderPartslist;
+            }
+
+            return currentConfigStore;
+        }
+
+        private void LoadRuleGroupList(Database database, dbMes.DatabaseApp databaseApp, SourceSelectionRulesResult result, List<IACConfigStore> configStores, dbMes.Partslist partslist, ACClassWF invokerPWNode, string outPreConfigACUrl = null)
+        {
 
             MsgWithDetails validationMessage = new MsgWithDetails();
             PartslistValidationInfo partslistValidationInfo = PartslistManager.CheckResourcesAndRouting(databaseApp, Database.ContextIPlus, partslist, configStores, PARole.ValidationBehaviour.Laxly, validationMessage, invokerPWNode, true);
@@ -336,8 +370,11 @@ namespace gip.bso.masterdata
                 foreach (var groupItem in groupDosingItems)
                 {
                     List<MapPosToWFConnSubItem> mapPosToWFConnSubs = groupItem.ToList();
-
-                    RuleGroup ruleGroup = new RuleGroup(result, groupItem.Key);
+                    RuleGroup ruleGroup = result.RuleGroups.FirstOrDefault(c => c.RefPAACClass.ACClassID == groupItem.Key.ACClassID);
+                    if (ruleGroup == null)
+                    {
+                        ruleGroup = new RuleGroup(result, groupItem.Key);
+                    }
 
                     foreach (MapPosToWFConnSubItem mapPosToWFConnSub in mapPosToWFConnSubs)
                     {
@@ -345,6 +382,10 @@ namespace gip.bso.masterdata
                         if (!preConfigACUrl.EndsWith("\\"))
                         {
                             preConfigACUrl = preConfigACUrl + "\\";
+                        }
+                        if (!string.IsNullOrEmpty(outPreConfigACUrl))
+                        {
+                            preConfigACUrl = outPreConfigACUrl + preConfigACUrl;
                         }
 
                         List<ACClass> excludedProcessModules = GetExcludedProcessModules(database, configStores, preConfigACUrl, mapPosToWFConnSub.PWNode);
@@ -363,7 +404,7 @@ namespace gip.bso.masterdata
 
                                         RuleSelection ruleSelection = ruleGroup.AddRuleSelection(mapPosToWFConnSub.PWNode, mat4DosingAndRoutes.Key, source.Source, target.Target, preConfigACUrl);
                                         // IsSelected == true - if auf any PWNode is not in excludedProcessModules
-                                        ruleSelection.MachineItem._IsSelected = !excludedProcessModules.Select(c=>c.ACClassID).Contains(source.Source.ACClassID) && ruleSelection.MachineItem.IsSelected;
+                                        ruleSelection.MachineItem._IsSelected = !excludedProcessModules.Select(c => c.ACClassID).Contains(source.Source.ACClassID) && ruleSelection.MachineItem.IsSelected;
                                     }
                                 }
                             }
@@ -397,7 +438,6 @@ namespace gip.bso.masterdata
 
             result.NotDosableMaterials = result.NotDosableMaterials.Where(c => !result.DosableMaterials.Select(x => x.MaterialNo).Contains(c.MaterialNo)).ToList();
 
-            return result;
         }
 
         private void SaveSourceSelectionRules(Database database, dbMes.DatabaseApp databaseApp, List<RuleGroup> ruleGroupList, List<MachineItem> allMachineItems)
@@ -446,11 +486,11 @@ namespace gip.bso.masterdata
             {
                 string localConfigACUrl = machineItem.GetConfigACUrl(aCClassWF);
 
-                IACConfig currentStoreConfigItem = ACConfigHelper.GetStoreConfiguration(CurrentConfigStore.ConfigurationEntries, machineItem.PreConfigACUrl, localConfigACUrl, false, null);
-                List<ACClass> excludedModules = GetExcludedProcessModules(database, new List<IACConfigStore>() { CurrentConfigStore }, machineItem.PreConfigACUrl, aCClassWF);
+                IACConfig currentStoreConfigItem = ACConfigHelper.GetStoreConfiguration(machineItem.SourceSelectionRulesResult.CurrentConfigStore.ConfigurationEntries, machineItem.PreConfigACUrl, localConfigACUrl, false, null);
+                List<ACClass> excludedModules = GetExcludedProcessModules(database, new List<IACConfigStore>() { machineItem.SourceSelectionRulesResult.CurrentConfigStore }, machineItem.PreConfigACUrl, aCClassWF);
 
                 bool? isSelected = null;
-                if(machineItem.RuleGroup == null)
+                if (machineItem.RuleGroup == null)
                 {
                     isSelected = machineItem.IsSelectedAll;
                 }
@@ -459,7 +499,7 @@ namespace gip.bso.masterdata
                     isSelected = machineItem.IsSelected;
                 }
 
-                if(isSelected == null)
+                if (isSelected == null)
                 {
                     // do nothing
                 }
@@ -468,7 +508,7 @@ namespace gip.bso.masterdata
 
                     if (excludedModules.Select(c => c.ACClassID).Contains(machineItem.Machine.ACClassID))
                     {
-                        excludedModules.RemoveAll(c=>c.ACClassID == machineItem.Machine.ACClassID);
+                        excludedModules.RemoveAll(c => c.ACClassID == machineItem.Machine.ACClassID);
                         if (excludedModules.Any())
                         {
                             RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
@@ -478,7 +518,7 @@ namespace gip.bso.masterdata
 
                     if (currentStoreConfigItem != null && !excludedModules.Any())
                     {
-                        CurrentConfigStore.RemoveACConfig(currentStoreConfigItem);
+                        machineItem.SourceSelectionRulesResult.CurrentConfigStore.RemoveACConfig(currentStoreConfigItem);
                         change = true;
                     }
 
@@ -488,7 +528,7 @@ namespace gip.bso.masterdata
 
                     if (currentStoreConfigItem == null)
                     {
-                        currentStoreConfigItem = CurrentConfigStore.NewACConfig(aCClassWF);
+                        currentStoreConfigItem = machineItem.SourceSelectionRulesResult.CurrentConfigStore.NewACConfig(aCClassWF);
                         currentStoreConfigItem.PreConfigACUrl = machineItem.PreConfigACUrl;
                         currentStoreConfigItem.LocalConfigACUrl = localConfigACUrl;
                         change = true;
@@ -535,7 +575,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(ShowDialogSelectSources):
-                    ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Nullable<System.Guid>)acParameter[3]);
+                    //ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Nullable<System.Guid>)acParameter[3]);
                     return true;
                 case nameof(DlgSelectSourcesOk):
                     DlgSelectSourcesOk();

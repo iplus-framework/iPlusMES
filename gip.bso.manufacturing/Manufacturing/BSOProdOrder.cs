@@ -5117,7 +5117,6 @@ namespace gip.bso.manufacturing
 
             (bso as BSOSourceSelectionRules).ShowDialogSelectSources(
                 ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
-                CurrentProcessWorkflow.ACClassMethodID,
                 SelectedProdOrderPartslist.Partslist.PartslistID,
                 SelectedProdOrderPartslist.ProdOrderPartslistID);
         }
@@ -5129,8 +5128,8 @@ namespace gip.bso.manufacturing
                 && CurrentProcessWorkflow != null
                 && ProcessWorkflowPresenter != null
                 && ProcessWorkflowPresenter.SelectedWFNode != null
-                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
-            //&& ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.IsWFProdNode("PWNodeProcessWorkflowVB");
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.IsWFProdNode("PWNodeProcessWorkflowVB");
         }
 
         #endregion

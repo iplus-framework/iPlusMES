@@ -3,7 +3,6 @@ using gip.core.datamodel;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Newtonsoft.Json.Linq;
 
 namespace gip.bso.masterdata
 {
@@ -15,6 +14,8 @@ namespace gip.bso.masterdata
         public List<MachineItem> MachineItems { get; set; } = new List<MachineItem>();
         public List<dbMes.Material> DosableMaterials { get; set; } = new List<dbMes.Material>();
         public List<dbMes.Material> NotDosableMaterials { get; set; } = new List<dbMes.Material>();
+
+        public IACConfigStore CurrentConfigStore { get; set; }
 
         #endregion
 
