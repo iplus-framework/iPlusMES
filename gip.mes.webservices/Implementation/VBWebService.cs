@@ -69,7 +69,8 @@ namespace gip.mes.webservices
                 //sequence.LastAddedSequence = nextEntity.Data;
                 //sequence.Sequence.Add(nextEntity.Data);
             }
-            else if (sequence.State == datamodel.BarcodeSequenceBase.ActionState.Selection)
+            else if (sequence.State == datamodel.BarcodeSequenceBase.ActionState.Selection
+                    || sequence.State == BarcodeSequenceBase.ActionState.FastSelection)
             {
                 BarcodeEntity lastEntity = sequence.Sequence.LastOrDefault();
                 if (lastEntity.SelectedOrderWF == null && lastEntity.WFMethod == null)

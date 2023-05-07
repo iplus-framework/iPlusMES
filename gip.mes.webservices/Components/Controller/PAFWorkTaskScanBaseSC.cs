@@ -54,7 +54,8 @@ namespace gip.mes.webservices
                 sequence.Sequence.LastOrDefault().WFMethod) as WorkTaskScanResult;
             if (result != null)
             {
-                if (result.Result.State == BarcodeSequenceBase.ActionState.Selection)
+                if (result.Result.State == BarcodeSequenceBase.ActionState.Selection
+                    || result.Result.State == BarcodeSequenceBase.ActionState.FastSelection)
                 {
                     BarcodeEntity barcodeEntity = new BarcodeEntity();
                     List<ProdOrderPartslistWFInfo> orderInfoList = new List<ProdOrderPartslistWFInfo>();
