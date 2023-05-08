@@ -3,13 +3,12 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 using gip.core.webservices;
+using CoreWCF;
+using CoreWCF.Description;
+using CoreWCF.Web;
 
 namespace gip.mes.webservices
 {
@@ -58,7 +57,7 @@ namespace gip.mes.webservices
                 {
                     opDescr.KnownTypes.Add(knownType);
                 }
-                foreach (IOperationBehavior behavior in opDescr.Behaviors)
+                foreach (IOperationBehavior behavior in opDescr.OperationBehaviors)
                 {
                     if (behavior is DataContractSerializerOperationBehavior)
                     {

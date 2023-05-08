@@ -5,11 +5,11 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.webservices
 {
@@ -18,7 +18,7 @@ namespace gip.mes.webservices
         #region FacilityCharge
 
         public static readonly Func<DatabaseApp, Guid?, IQueryable<FacilityCharge>> s_cQry_GetFacilityCharge =
-        CompiledQuery.Compile<DatabaseApp, Guid?, IQueryable<FacilityCharge>>(
+        EF.CompileQuery<DatabaseApp, Guid?, IQueryable<FacilityCharge>>(
             (dbApp, facilityChargeID) =>
                 dbApp.FacilityCharge
                 //.Include(gip.mes.datamodel.Material.ClassName)
@@ -79,7 +79,7 @@ namespace gip.mes.webservices
         );
 
         public static readonly Func<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
-                CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>>(
+                EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>>(
                     (dbApp, facilityID, materialID, facilityLotID, splitNo) =>
                         dbApp.FacilityCharge
                         .Include(gip.mes.datamodel.Material.ClassName)
@@ -536,7 +536,7 @@ namespace gip.mes.webservices
                             lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
                             lot.ExpirationDate = facilityCharge.FacilityLot.ExpirationDate;
                             lot.ExternLotNo = facilityCharge.FacilityLot.ExternLotNo;
-                            dbApp.FacilityLot.AddObject(lot);
+                            dbApp.FacilityLot.Add(lot);
 
                             msg = dbApp.ACSaveChangesWithRetry();
                             if (msg != null)
@@ -643,7 +643,7 @@ namespace gip.mes.webservices
                         mConfig.VBiACClassID = activationItem.ParamID;
                         mConfig.SetValueTypeACClass(dbApp.ContextIPlus.GetACType("Guid"));
 
-                        dbApp.MaterialConfig.AddObject(mConfig);
+                        dbApp.MaterialConfig.Add(mConfig);
                     }
 
                     mConfig.Value = activationItem.FacilityChargeID;
@@ -702,7 +702,7 @@ namespace gip.mes.webservices
                         return new WSResponse<bool>(true);
                     }
 
-                    dbApp.MaterialConfig.DeleteObject(mConfig);
+                    dbApp.MaterialConfig.Remove(mConfig);
 
                     Msg msg = dbApp.ACSaveChanges();
                     if (msg != null)
@@ -728,7 +728,7 @@ namespace gip.mes.webservices
         #region FacilityLot
 
         public static readonly Func<DatabaseApp, IQueryable<FacilityLot>> s_cQry_GetFacilityLots =
-        CompiledQuery.Compile<DatabaseApp, IQueryable<FacilityLot>>(
+        EF.CompileQuery<DatabaseApp, IQueryable<FacilityLot>>(
             (dbApp) =>
                 dbApp.FacilityCharge
                         .Where(c => !c.NotAvailable && c.FacilityLotID.HasValue)
@@ -746,7 +746,7 @@ namespace gip.mes.webservices
         );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityLotStock>> s_cQry_GetFacilityLotStock =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityLotStock>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityLotStock>>(
             (dbApp, facilityLotID) =>
                 dbApp.FacilityLotStock
                         .Where(c => c.FacilityLotID == facilityLotID)
@@ -793,7 +793,7 @@ namespace gip.mes.webservices
 
 
         public static readonly Func<DatabaseApp, Guid?, string, IQueryable<FacilityLot>> s_cQry_GetFacilityLot =
-        CompiledQuery.Compile<DatabaseApp, Guid?, string, IQueryable<FacilityLot>>(
+        EF.CompileQuery<DatabaseApp, Guid?, string, IQueryable<FacilityLot>>(
             (dbApp, facilityLotID, facilityLotNo) =>
                 dbApp.FacilityLot
                 .Where(c => (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
@@ -813,7 +813,7 @@ namespace gip.mes.webservices
         );
 
         public static readonly Func<DatabaseApp, string, IQueryable<FacilityLot>> s_cQry_GetFacilityLotByMaterial =
-        CompiledQuery.Compile<DatabaseApp, string, IQueryable<FacilityLot>>(
+        EF.CompileQuery<DatabaseApp, string, IQueryable<FacilityLot>>(
             (dbApp, materialNo) =>
                 dbApp.FacilityLot
                 .Include(nameof(Material))
@@ -1070,7 +1070,7 @@ namespace gip.mes.webservices
         #region Material
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<MaterialStock>> s_cQry_GetMaterialStock =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<MaterialStock>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<MaterialStock>>(
             (dbApp, MaterialID) =>
                 dbApp.MaterialStock
                         .Where(c => c.MaterialID == MaterialID)
@@ -1202,7 +1202,7 @@ namespace gip.mes.webservices
         #region Facility
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityStock>> s_cQry_GetFacilityStock =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityStock>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityStock>>(
             (dbApp, FacilityID) =>
                 dbApp.FacilityStock
                         .Where(c => c.FacilityID == FacilityID)
@@ -1897,7 +1897,7 @@ namespace gip.mes.webservices
         #region Inventory -> Get
 
         public static readonly Func<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>> s_cQry_GetFacilityInventories =
-        CompiledQuery.Compile<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>>(
+        EF.CompileQuery<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>>(
             (dbApp, inventoryState, dateFrom, dateTo) =>
                 dbApp.FacilityInventory
                         .Where(c => (inventoryState == null || c.MDFacilityInventoryState.MDFacilityInventoryStateIndex == inventoryState)
@@ -2131,7 +2131,7 @@ namespace gip.mes.webservices
         #region Inventory -> Pos - Get
 
         public static readonly Func<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
-        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
+        EF.CompileQuery<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
            (dbApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal) =>
                dbApp.FacilityInventoryPos
                        .Where(c =>
@@ -2371,7 +2371,7 @@ namespace gip.mes.webservices
                             if (facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
                                 dbFacilityInventoryPos.MDFacilityInventoryPosState = finishedState;
 
-                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges(true, SaveOptions.AcceptAllChangesAfterSave, false, false);
+                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges(true, false, false);
                             if (saveMsg == null || saveMsg.IsSucceded())
                                 response.Data = true;
                             else
@@ -2512,7 +2512,7 @@ namespace gip.mes.webservices
                             mesPos.FacilityCharge = facilityCharge;
                             mesPos.StockQuantity = facilityCharge.StockQuantityUOM;
                             mesPos.NotAvailable = facilityCharge.NotAvailable;
-                            databaseApp.FacilityInventoryPos.AddObject(mesPos);
+                            databaseApp.FacilityInventoryPos.Add(mesPos);
                             var rez = databaseApp.ACSaveChanges();
 
                             response.Data = GetFacilityInventoryPos(mesPos);
@@ -2569,7 +2569,7 @@ namespace gip.mes.webservices
         #region Movement reason
 
         public static readonly Func<DatabaseApp, IQueryable<MDMovementReason>> s_cQry_GetMovementReasons =
-                CompiledQuery.Compile<DatabaseApp, IQueryable<MDMovementReason>>(
+                EF.CompileQuery<DatabaseApp, IQueryable<MDMovementReason>>(
                     (dbApp) =>
                         dbApp.MDMovementReason
                              .OrderBy(x => x.SortIndex)

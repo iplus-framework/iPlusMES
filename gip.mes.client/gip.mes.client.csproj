@@ -37,8 +37,6 @@
     <ApplicationIcon>Images\iPlusIconDesktop.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="System.Runtime.Remoting" />
     <Reference Update="System.Runtime.Serialization">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -74,6 +72,7 @@
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.visualcontrols\gip.core.visualcontrols.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.ControlScriptSync\gip.core.ControlScriptSync.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
     <ProjectReference Include="..\gip.bso.facility\gip.bso.facility.csproj" />
     <ProjectReference Include="..\gip.bso.logistics\gip.bso.logistics.csproj" />
     <ProjectReference Include="..\gip.bso.manufacturing\gip.bso.manufacturing.csproj" />

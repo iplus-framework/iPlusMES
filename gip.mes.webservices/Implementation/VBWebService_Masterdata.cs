@@ -4,11 +4,11 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using gip.core.webservices;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.webservices
 {
@@ -17,7 +17,7 @@ namespace gip.mes.webservices
         #region Material
 
         public static readonly Func<DatabaseApp, Guid?, string, IQueryable<Material>> s_cQry_GetMaterial =
-        CompiledQuery.Compile<DatabaseApp, Guid?, string, IQueryable<Material>>(
+        EF.CompileQuery<DatabaseApp, Guid?, string, IQueryable<Material>>(
             (dbApp, materialID, term) =>
                 dbApp.Material
                 .Where(c => (!materialID.HasValue || c.MaterialID == materialID)
@@ -218,7 +218,7 @@ namespace gip.mes.webservices
         #region Facility
 
         public static readonly Func<DatabaseApp, Guid?, string, Guid?, short?, IQueryable<Facility>> s_cQry_GetFacility =
-        CompiledQuery.Compile<DatabaseApp, Guid?, string, Guid?, short?, IQueryable<Facility>>(
+        EF.CompileQuery<DatabaseApp, Guid?, string, Guid?, short?, IQueryable<Facility>>(
             (dbApp, facilityID, term, parentFacilityID, facilityTypeIndex) =>
                 dbApp.Facility
                 .Where(c => (!facilityID.HasValue || c.FacilityID == facilityID)

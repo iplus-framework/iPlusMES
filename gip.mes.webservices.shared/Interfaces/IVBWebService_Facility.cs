@@ -2,10 +2,10 @@
 using gip.core.datamodel;
 using gip.mes.facility;
 using System;
+using CoreWCF.Web;
 using System.Collections.Generic;
 #if NETFRAMEWORK
 using System.ServiceModel;
-using System.ServiceModel.Web;
 #elif NETSTANDARD
 using System.Threading.Tasks;
 #endif

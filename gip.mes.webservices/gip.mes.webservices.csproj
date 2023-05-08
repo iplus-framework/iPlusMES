@@ -13,9 +13,6 @@
     <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.ServiceModel.Web" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj" />
@@ -29,6 +26,9 @@
     <Content Include="TestUrls.txt" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CoreWCF.Http" Version="1.3.2" />
+    <PackageReference Include="CoreWCF.Primitives" Version="1.3.2" />
+    <PackageReference Include="CoreWCF.WebHttp" Version="1.3.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">

@@ -14,6 +14,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Diagnostics;
 using gip.mes.datamodel;
+using gip.core.wpfservices;
 
 namespace gip.mes.client
 {
@@ -67,7 +68,7 @@ namespace gip.mes.client
             ApplicationInitialize = applicationInitialize;
 
             _GlobalApp = this;
-            _StartUpManager = new ACStartUpRoot();
+            _StartUpManager = new ACStartUpRoot(new WPFServices());
             //this.Startup += new StartupEventHandler(App_Startup);
 
             // Add the event handler for handling non-UI thread exceptions to the event. 

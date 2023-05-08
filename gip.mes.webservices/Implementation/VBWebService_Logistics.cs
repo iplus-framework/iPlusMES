@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using gip.core.autocomponent;
-using System.Data.Objects;
 using gip.mes.facility;
 using gip.core.webservices;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.webservices
 {
@@ -44,7 +44,7 @@ namespace gip.mes.webservices
 
 
         public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_GetPicking =
-        CompiledQuery.Compile<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>>(
+        EF.CompileQuery<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>>(
             (dbApp, pickingID) =>
                 dbApp.Picking
                         .Include("PickingPos_Picking")
@@ -248,7 +248,7 @@ namespace gip.mes.webservices
         }
 
         public static readonly Func<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_SearchPicking =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>>(
+        EF.CompileQuery<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>>(
             (dbApp, pType, fromFacility, toFacility, fromDate, toDate) =>
                 dbApp.Picking
                         .Include("PickingPos_Picking")
@@ -346,7 +346,7 @@ namespace gip.mes.webservices
         }
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<gip.mes.datamodel.PickingPos>> s_cQry_GetPickingPos =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<gip.mes.datamodel.PickingPos>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<gip.mes.datamodel.PickingPos>>(
             (dbApp, pickingPosID) =>
                 dbApp.PickingPos
                         .Include("FromFacility")
@@ -442,7 +442,7 @@ namespace gip.mes.webservices
 
 
         public static readonly Func<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
-            CompiledQuery.Compile<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
+            EF.CompileQuery<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
             (ctx, pickingPos) =>
                 ctx
                 .FacilityBookingCharge
