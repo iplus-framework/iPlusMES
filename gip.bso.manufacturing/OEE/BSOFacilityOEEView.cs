@@ -68,8 +68,8 @@ namespace gip.bso.manufacturing
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            if (_FacilityOEEManager != null)
-                ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
+            ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
+            _FacilityOEEManager = null;
 
             var b = base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)

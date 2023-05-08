@@ -814,7 +814,8 @@ namespace gip.mes.processapplication
             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
             bookingParam.InwardQuantity = binSelectionModel.RestQuantity;
             bookingParam.InwardFacility = facility;
-
+            if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
             SetACMethodBookingPropertyACUrl(bookingParam);
             return new KeyValuePair<FacilityPreBooking, ACMethodBooking>(facilityPreBooking, bookingParam);
         }
@@ -836,6 +837,8 @@ namespace gip.mes.processapplication
             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
             bookingParam.InwardQuantity = binSelectionModel.RestQuantity;
             bookingParam.InwardFacility = facilityCharge.Facility;
+            if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
             SetACMethodBookingPropertyACUrl(bookingParam);
             return new KeyValuePair<FacilityPreBooking, ACMethodBooking>(facilityPreBooking, bookingParam);
         }

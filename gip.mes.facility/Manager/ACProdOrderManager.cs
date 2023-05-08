@@ -29,9 +29,43 @@ namespace gip.mes.facility
             _CalculateOEEs = new ACPropertyConfigValue<bool>(this, "CalculateOEEs", false);
         }
 
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            if (!base.ACInit(startChildMode))
+                return false;
+            _FacilityOEEManager = ACFacilityOEEManager.ACRefToServiceInstance(this);
+            return true;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            if (_FacilityOEEManager != null)
+            {
+                ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
+                _FacilityOEEManager = null;
+            }
+
+            return base.ACDeInit(deleteACClassTask);
+        }
+        #endregion
+
+
+        #region Properties
         public const string ClassName = "ACProdOrderManager";
         public const string C_DefaultServiceACIdentifier = "ProdOrderManager";
+
+        protected ACRef<ACFacilityOEEManager> _FacilityOEEManager = null;
+        public ACFacilityOEEManager FacilityOEEManager
+        {
+            get
+            {
+                if (_FacilityOEEManager == null)
+                    return null;
+                return _FacilityOEEManager.ValueT;
+            }
+        }
         #endregion
+
 
         #region PrecompiledQueries
         //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
@@ -3241,28 +3275,29 @@ namespace gip.mes.facility
                 Msg udpErrMsg = new Msg(eMsgLevel.Exception, $"{prodOrder.ProgramNo} error running udpRecalcActualQuantity! Message: " + ec.Message);
                 msg.AddDetailMessage(udpErrMsg);
             }
-            MsgWithDetails calcMsg = CalculateStatistics(databaseApp, prodOrder);
+            List<object> itemsForPostProcessing = new List<object>();
+            MsgWithDetails calcMsg = CalculateStatistics(databaseApp, prodOrder, itemsForPostProcessing);
             MsgWithDetails saveMsg = null;
             if (saveChanges && (calcMsg == null || calcMsg.IsSucceded()))
-            {
                 saveMsg = databaseApp.ACSaveChanges();
-            }
+
             if (calcMsg != null && calcMsg.MsgDetailsCount > 0)
-            {
                 msg.AddDetailMessage(calcMsg);
-            }
+            
             if (saveMsg != null && saveMsg.MsgDetailsCount > 0)
-            {
                 msg.AddDetailMessage(saveMsg);
+            else
+            {
+                if (CalculateOEEs && FacilityOEEManager != null)
+                    FacilityOEEManager.OnPostProcessingOEE(databaseApp, prodOrder, itemsForPostProcessing);
             }
-            if (msg == null)
-                return null;
-            if (msg.MsgDetailsCount <= 0)
+            
+            if (msg == null || msg.MsgDetailsCount <= 0)
                 return null;
             return msg;
         }
 
-        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrder prodOrder)
+        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, List<object> itemsForPostProcessing)
         {
             MsgWithDetails msg = new MsgWithDetails();
 
@@ -3277,7 +3312,7 @@ namespace gip.mes.facility
 
             if (finalPartslist != null)
             {
-                MsgWithDetails plMsg = CalculateStatistics(databaseApp, finalPartslist, finalPartslist);
+                MsgWithDetails plMsg = CalculateStatistics(databaseApp, finalPartslist, finalPartslist, itemsForPostProcessing);
                 if (plMsg != null && plMsg.MsgDetailsCount > 0)
                 {
                     msg.AddDetailMessage(plMsg);
@@ -3288,7 +3323,7 @@ namespace gip.mes.facility
             {
                 if (pl == finalPartslist)
                     continue;
-                MsgWithDetails plMsg = CalculateStatistics(databaseApp, pl, finalPartslist);
+                MsgWithDetails plMsg = CalculateStatistics(databaseApp, pl, finalPartslist, itemsForPostProcessing);
                 if (plMsg != null && plMsg.MsgDetailsCount > 0)
                 {
                     msg.AddDetailMessage(plMsg);
@@ -3301,7 +3336,7 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist finalPartslist)
+        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist finalPartslist, List<object> itemsForPostProcessing)
         {
             MsgWithDetails msg = new MsgWithDetails();
 
@@ -3398,10 +3433,8 @@ namespace gip.mes.facility
 
             CalculateStatisticProdPlPerAvg(prodOrderPartslist, components);
 
-            if (CalculateOEEs)
-            {
-                CalculateOEE(databaseApp, prodOrderPartslist, components, lastIntermediatePos, finalPartslist, lastIntermediatePosOfFinalPL);
-            }
+            if (CalculateOEEs && FacilityOEEManager != null)
+                FacilityOEEManager.CalculateOEE(databaseApp, prodOrderPartslist, components, lastIntermediatePos, finalPartslist, lastIntermediatePosOfFinalPL, itemsForPostProcessing);
 
             if (msg == null)
                 return null;
@@ -3465,204 +3498,6 @@ namespace gip.mes.facility
 
 
             return msg;
-        }
-
-        public void CalculateOEE(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, IEnumerable<ProdOrderPartslistPos> component, ProdOrderPartslistPos lastIntermediatePos, ProdOrderPartslist finalPartslist, ProdOrderPartslistPos lastIntermediatePosOfFinalPL)
-        {
-            using (Database database = new core.datamodel.Database())
-            {
-                Guid[] programIDs = databaseApp.OrderLog
-                                            .Where(c => ((c.ProdOrderPartslistPos != null
-                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
-                                                            || (c.ProdOrderPartslistPosRelation != null
-                                                                && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
-                                                          )
-                                                        && c.VBiACProgramLog.ACProgramLog1_ParentACProgramLog == null)
-                                           .Select(x => x.VBiACProgramLog.ACProgramID)
-                                           .Distinct()
-                                           .ToArray();
-                if (programIDs == null || !programIDs.Any())
-                    return;
-                List<ACPropertyLogSumOfProgram> machineDurations = new List<ACPropertyLogSumOfProgram>();
-                foreach (Guid programID in programIDs)
-                {
-                    IEnumerable<ACPropertyLogSumOfProgram> sumOfProgram = gip.core.datamodel.ACPropertyLog.GetSummarizedDurationsOfProgram(database, programID, new string[] { GlobalProcApp.AvailabilityStatePropName });
-                    if (sumOfProgram != null && sumOfProgram.Any())
-                    {
-                        machineDurations.AddRange(sumOfProgram);
-                    }
-                }
-
-                // TODO: Merke ob Menge bereits berechnet. Sonst Verteilung über Gesamtmenge.
-                // 
-                List<FacilityMaterialOEE> oeeEntriesOfCompleteOrder = new List<FacilityMaterialOEE>();
-                foreach (var machine in machineDurations.GroupBy(c => c.ACClass))
-                {
-                    Guid machineACClassID = machine.Key.ACClassID;
-                    Facility facility = databaseApp.Facility.Where(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == machineACClassID).FirstOrDefault();
-                    if (facility == null)
-                        continue;
-
-                    FacilityMaterial facilityMaterial = databaseApp.FacilityMaterial
-                                                                    .Include(c => c.Facility.VBiFacilityACClass)
-                                                                    .Where(c => c.FacilityID == facility.FacilityID && c.MaterialID == prodOrderPartslist.Partslist.MaterialID)
-                                                                    .FirstOrDefault();
-                    if (facilityMaterial == null)
-                    {
-                        facilityMaterial = FacilityMaterial.NewACObject(databaseApp, facility);
-                        // TODO Material could theoretically also be a component instead
-                        facilityMaterial.Material = prodOrderPartslist.Partslist.Material;
-                        facilityMaterial.Throughput = 0;
-                        facilityMaterial.ThroughputAuto = 1;
-                        databaseApp.FacilityMaterial.AddObject(facilityMaterial);
-                    }
-
-                    var propLogSumsByProgramLog = machine.SelectMany(c => c.Sum)
-                                            .Where(c => c.ProgramLog != null)
-                                            .GroupBy(c => c.ProgramLog);
-                    foreach (var propLogSumByProgramLog in propLogSumsByProgramLog)
-                    {
-                        FacilityMaterialOEE oeeEntry = null;
-                        if (facilityMaterial.EntityState != EntityState.Added)
-                            oeeEntry = databaseApp.FacilityMaterialOEE.Where(c => c.ACProgramLogID == propLogSumByProgramLog.Key.ACProgramLogID && c.FacilityMaterialID == facilityMaterial.FacilityMaterialID).FirstOrDefault();
-                        if (oeeEntry == null)
-                        {
-                            oeeEntry = FacilityMaterialOEE.NewACObject(databaseApp, facilityMaterial);
-                            oeeEntry.ACProgramLogID = propLogSumByProgramLog.Key.ACProgramLogID;
-                            databaseApp.FacilityMaterialOEE.AddObject(oeeEntry);
-                        }
-                        oeeEntriesOfCompleteOrder.Add(oeeEntry);
-
-                        DateTime minStartDate = DateTime.MaxValue;
-                        DateTime maxEndDate = DateTime.MinValue;
-                        TimeSpan idleTime = TimeSpan.Zero;
-                        TimeSpan maintenanceTime = TimeSpan.Zero;
-                        TimeSpan retoolingTime = TimeSpan.Zero;
-                        TimeSpan scheduledBreakTime = TimeSpan.Zero;
-                        TimeSpan unscheduledBreakTime = TimeSpan.Zero;
-                        TimeSpan standByTime = TimeSpan.Zero;
-                        TimeSpan operationTime = TimeSpan.Zero;
-                        foreach (var propLogSum in propLogSumByProgramLog)
-                        {
-                            if (propLogSum.StartDate.HasValue && propLogSum.StartDate.Value < minStartDate)
-                                minStartDate = propLogSum.StartDate.Value;
-                            if (propLogSum.EndDate.HasValue && propLogSum.EndDate.Value > maxEndDate)
-                                maxEndDate = propLogSum.EndDate.Value;
-                            GlobalProcApp.AvailabilityState availabilityState = (GlobalProcApp.AvailabilityState)propLogSum.PropertyValue;
-                            if (availabilityState == GlobalProcApp.AvailabilityState.Idle)
-                                idleTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.Standby)
-                                standByTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.InOperation)
-                                operationTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.ScheduledBreak)
-                                scheduledBreakTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.UnscheduledBreak)
-                                unscheduledBreakTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.Retooling)
-                                retoolingTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.Maintenance)
-                                maintenanceTime += propLogSum.Duration;
-                        }
-
-                        oeeEntry.StartDate = minStartDate;
-                        oeeEntry.EndDate = maxEndDate;
-                        oeeEntry.IdleTime = idleTime;
-                        oeeEntry.StandByTime = standByTime;
-                        oeeEntry.OperationTime = operationTime;
-                        oeeEntry.ScheduledBreakTime = scheduledBreakTime;
-                        oeeEntry.UnscheduledBreakTime = unscheduledBreakTime;
-                        oeeEntry.RetoolingTime = retoolingTime;
-                        oeeEntry.MaintenanceTime = maintenanceTime;
-
-                        //#region DEBUG
-                        //{
-                        //    Random random = new Random();
-                        //    PerformanceOEE = ((double)random.Next(1, 100)) / 100.0;
-                        //}
-                        //#endregion
-
-                        // TODO: Calc Quantities and Scrap
-
-                        bool quantityFound = false;
-                        /// 1. Prüfe ob es in der Gruppe eine Zugangsbuchung (Beziehung zu ProdORderPartslistPos in Booking) gibt -> Nehme diese Mengen zur Ermittlung
-                        ///     Achtung wenn Zwischenprodukt mit Partslist-Buchung, dann nehme das richtige Endprodukt material
-                        FacilityBookingCharge[] postingsOnThisMachine =
-                        databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
-                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue
-                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
-                                                                && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ProdOrderPosInward
-                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead!
-                                                                && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
-                                                    .ToArray();
-                        if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
-                        {
-                            quantityFound = true;
-                            oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.InwardQuantity)
-                                                                    .DefaultIfEmpty()
-                                                                    .Sum();
-                            oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
-                                                 .Select(c => c.InwardQuantity)
-                                                 .DefaultIfEmpty()
-                                                 .Sum();
-                        }
-
-                        /// 2. Prüfe ob es OperationsLogs gibt. Wenn ja, dann nehme diese Quantmengen solange es nicht 0-Mengen-Buchungen sind (z.B. Stikkenwägen mit 1 Stück weil man die MEnge nicht kennt)
-                        if (!quantityFound)
-                        {
-                            postingsOnThisMachine = databaseApp.FacilityBookingCharge
-                                                    .Include(c => c.MDMovementReason)
-                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue
-                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
-                                                                && c.InwardFacilityCharge != null 
-                                                                && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID 
-                                                                                                                            && d.ACProgramLogID.HasValue 
-                                                                                                                            && d.ACProgramLogID == oeeEntry.ACProgramLogID))
-                                                    .ToArray();
-
-                            if (postingsOnThisMachine == null || !postingsOnThisMachine.Any())
-                            {
-                                postingsOnThisMachine = databaseApp.FacilityBookingCharge
-                                                        .Include(c => c.MDMovementReason)
-                                                        .Where(c => c.ProdOrderPartslistPosID.HasValue
-                                                                    && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
-                                                                    && c.InwardFacilityCharge != null
-                                                                    && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID
-                                                                                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate))
-                                                        .ToArray();
-
-                            }
-                            if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
-                            {
-                                quantityFound = true;
-                                oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.InwardQuantity)
-                                                                        .DefaultIfEmpty()
-                                                                        .Sum();
-                                oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
-                                                     .Select(c => c.InwardQuantity)
-                                                     .DefaultIfEmpty()
-                                                     .Sum();
-                            }
-                        }
-
-                        /// 3. Prüfe ob es Verbrauchsbuchungen gibt und finde die Hauptkomponente heraus (Halbfabrikat aus Vorstufe) und ermittle darüber
-                        /// TODO: Problem ist hier, dass man keine Informationen über den Ausschuss hat
-                        //if (!quantityFound)
-                        //{
-                        //}
-                        oeeEntry.CalcOEE();
-                    }
-
-                    var oeeGroupedEntriesWithoutQ = oeeEntriesOfCompleteOrder.Where(c => c.Quantity <= 0.00001 && c.FacilityMaterial.Facility.VBiFacilityACClass.BasedOnACClassID.HasValue)
-                                                                      .GroupBy(c => c.FacilityMaterial.Facility.VBiFacilityACClass.BasedOnACClassID.Value);
-                    foreach (var key in oeeGroupedEntriesWithoutQ)
-                    {
-                    }
-                    /// 4. Ermittle Menge anhand des Endproduktes und errechne den theoretischen Durchsatz anhand des Mittelwertes
-                    /// 5. Falls Verfügbakeit = 100 und AutoKorrektur gesetzt, berechne neuen Mittelwert.
-
-                }
-            }
         }
 
         #endregion

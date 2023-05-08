@@ -1542,7 +1542,9 @@ namespace gip.bso.masterdata
             using (DatabaseApp dbApp = new DatabaseApp()) 
             {
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
-                FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
+                Msg msg = FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
+                if (msg != null)
+                    Messages.Msg(msg);
             }
         }
 
@@ -1575,7 +1577,9 @@ namespace gip.bso.masterdata
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
                 return;
 
-            FacilityOEEManager.RecalcThroughputAverage(this.DatabaseApp, SelectedFacilityMaterial, false);
+            Msg msg = FacilityOEEManager.RecalcThroughputAverage(this.DatabaseApp, SelectedFacilityMaterial, false);
+            if (msg != null)
+                Messages.Msg(msg);
         }
 
         public bool IsEnabledRecalcThroughputAverage()
@@ -1592,7 +1596,9 @@ namespace gip.bso.masterdata
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
-                FacilityOEEManager.RecalcThroughputAndOEE(dbApp, facilityMaterial, null, null);
+                Msg msg = FacilityOEEManager.RecalcThroughputAndOEE(dbApp, facilityMaterial, null, null);
+                if (msg != null)
+                    Messages.Msg(msg);
             }
         }
 
