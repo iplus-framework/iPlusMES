@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.ObjectModel;
 using gip.bso.masterdata;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.sales.Sales
 {
@@ -449,7 +450,7 @@ namespace gip.bso.sales.Sales
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PriceList), PriceList.NoColumnName, PriceList.FormatNewNo, this);
             SelectedPriceList = PriceList.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.PriceList.AddObject(SelectedPriceList);
+            DatabaseApp.PriceList.Add(SelectedPriceList);
             OnPropertyChanged("PriceListList");
             ACState = Const.SMNew;
             PostExecute("New");

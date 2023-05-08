@@ -5,11 +5,11 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using gip.core.reporthandler.Flowdoc;
+using gip.core.reporthandlerwpf.Flowdoc;
 using System.Windows.Media;
 using System.Windows.Documents;
 using gip.mes.facility;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.sales
 {
@@ -154,7 +154,7 @@ namespace gip.bso.sales
 
         private IQueryable<OutOffer> _AccessPrimary_NavSearchExecuting(IQueryable<OutOffer> result)
         {
-            ObjectQuery<OutOffer> query = result as ObjectQuery<OutOffer>;
+            IQueryable<OutOffer> query = result as IQueryable<OutOffer>;
             if (query != null)
             {
                 query.Include(c => c.MDOutOfferState)
@@ -484,8 +484,8 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOffer == null || CurrentOutOffer.CustomerCompany == null)
                     return null;
-                if (!CurrentOutOffer.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentOutOffer.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentOutOffer.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentOutOffer.CustomerCompany.CompanyAddress_CompanyReference, CurrentOutOffer);
                 return CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
@@ -497,8 +497,8 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOffer == null || CurrentOutOffer.CustomerCompany == null)
                     return null;
-                if (!CurrentOutOffer.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentOutOffer.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentOutOffer.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentOutOffer.CustomerCompany.CompanyAddress_CompanyReference, CurrentOutOffer);
                 return CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
@@ -953,7 +953,7 @@ namespace gip.bso.sales
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOffer), OutOffer.NoColumnName, OutOffer.FormatNewNo, this);
             OutOffer outOffer = OutOffer.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.OutOffer.AddObject(outOffer);
+            DatabaseApp.OutOffer.Add(outOffer);
             if (CurrentUserSettings != null)
             {
                 outOffer.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
@@ -984,7 +984,7 @@ namespace gip.bso.sales
             newOfferVersion.OutOfferID = Guid.NewGuid();
             newOfferVersion.OutOfferVersion = DatabaseApp.OutOffer.Where(c => c.OutOfferNo == CurrentOutOffer.OutOfferNo).Max(v => v.OutOfferVersion) + 1;
 
-            DatabaseApp.OutOffer.AddObject(newOfferVersion);
+            DatabaseApp.OutOffer.Add(newOfferVersion);
 
             foreach (OutOfferPos pos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => !c.GroupOutOfferPosID.HasValue))
             {
@@ -1012,7 +1012,7 @@ namespace gip.bso.sales
             newPos.GroupOutOfferPosID = groupPos?.OutOfferPosID;
 
             outOffer.OutOfferPos_OutOffer.Add(newPos);
-            DatabaseApp.OutOfferPos.AddObject(newPos);
+            DatabaseApp.OutOfferPos.Add(newPos);
 
             foreach (OutOfferPos subPos in pos.OutOfferPos_GroupOutOfferPos)
             {

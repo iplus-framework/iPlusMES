@@ -3,17 +3,13 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 
 namespace gip.bso.sales
 {
-    /// <summary>
-    /// Ansicht von Lieferscheinen 
-    /// Solange die Lieferscheine nicht ausgedruckt wurden, können diese manuell Bearbeitet werden.
-    /// </summary>
     [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Delivery Note'}de{'Lieferschein (Verkauf)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + DeliveryNote.ClassName)]
     [ACQueryInfo(Const.PackName_VarioSales, Const.QueryPrefix + "OutOrderPosOpen", "en{'Open Sales Order Pos.'}de{'Offene Auftragsposition'}", typeof(OutOrderPos), OutOrderPos.ClassName, "MDDelivPosState\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioSales, Const.QueryPrefix + "BookingFacility", ConstApp.Facility, typeof(Facility), Facility.ClassName, "MDFacilityType\\MDFacilityTypeIndex", "FacilityNo")]
@@ -139,7 +135,7 @@ namespace gip.bso.sales
         #region DeliveryNote
         protected IQueryable<DeliveryNote> _AccessPrimary_NavSearchExecuting(IQueryable<DeliveryNote> result)
         {
-            ObjectQuery<DeliveryNote> query = result as ObjectQuery<DeliveryNote>;
+            IQueryable<DeliveryNote> query = result as IQueryable<DeliveryNote>;
             if (query != null)
             {
                 query.Include(c => c.MDDelivNoteState)
@@ -309,7 +305,7 @@ namespace gip.bso.sales
                 {
                     _SelectedDeliveryNotePos = value;
                     if (_SelectedDeliveryNotePos != null && _SelectedDeliveryNotePos.OutOrderPos != null)
-                        _SelectedDeliveryNotePos.OutOrderPos.LabOrder_OutOrderPos.AutoLoad(this.DatabaseApp);
+                        _SelectedDeliveryNotePos.OutOrderPos.LabOrder_OutOrderPos.AutoLoad(_SelectedDeliveryNotePos.OutOrderPos.LabOrder_OutOrderPosReference, _SelectedDeliveryNotePos);
                     OnPropertyChanged("SelectedDeliveryNotePos");
                 }
                 CurrentDeliveryNotePos = value;
@@ -438,7 +434,7 @@ namespace gip.bso.sales
                     return null;
                 if (CurrentDeliveryNote != null)
                 {
-                    IEnumerable<OutOrderPos> addedPositions = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == System.Data.EntityState.Added
+                    IEnumerable<OutOrderPos> addedPositions = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == EntityState.Added
                         && c.OutOrderPos != null
                         && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null
                         && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.MDDelivPosState == StateCompletelyAssigned
@@ -1180,7 +1176,7 @@ namespace gip.bso.sales
             {
                 if (CurrentFacilityBooking != null)
                 {
-                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
+                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(CurrentFacilityBooking.FacilityBookingCharge_FacilityBookingReference, CurrentFacilityBooking);
                     return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo).ToList();
                 }
                 return null;
@@ -1413,8 +1409,8 @@ namespace gip.bso.sales
             _UnSavedUnAssignedOutOrderPos = new List<OutOrderPos>();
             _UnSavedAssignedPickingOutOrderPos = new List<OutOrderPos>();
             RefreshOutOrderPosList();
-            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState != System.Data.EntityState.Added)
-                CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Load();
+            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState != EntityState.Added)
+                CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(CurrentDeliveryNote.DeliveryNotePos_DeliveryNoteReference, CurrentDeliveryNote);
             OnPropertyChanged("DeliveryNotePosList");
             OnPropertyChanged("OutOrderPosFromPickingList");
             base.OnPostUndoSave();
@@ -1448,7 +1444,7 @@ namespace gip.bso.sales
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(DeliveryNote), DeliveryNote.NoColumnName, DeliveryNote.FormatNewNo, this);
             CurrentDeliveryNote = DeliveryNote.NewACObject(DatabaseApp, null, secondaryKey);
             CurrentDeliveryNote.DeliveryNoteType = GlobalApp.DeliveryNoteType.Issue;
-            DatabaseApp.DeliveryNote.AddObject(CurrentDeliveryNote);
+            DatabaseApp.DeliveryNote.Add(CurrentDeliveryNote);
             SelectedDeliveryNote = CurrentDeliveryNote;
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(CurrentDeliveryNote);

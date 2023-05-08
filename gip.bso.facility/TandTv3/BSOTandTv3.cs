@@ -4,12 +4,13 @@ using gip.mes;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
@@ -433,7 +434,7 @@ namespace gip.bso.facility
 
         IQueryable<TandTv3FilterTracking> _AccessPrimary_NavSearchExecuting(IQueryable<TandTv3FilterTracking> result)
         {
-            ObjectQuery<TandTv3FilterTracking> query = result as ObjectQuery<TandTv3FilterTracking>;
+            IQueryable<TandTv3FilterTracking> query = result as IQueryable<TandTv3FilterTracking>;
             if (query != null)
             {
                 query.Include(c => c.TandTv3MDTrackingDirection);
@@ -1603,7 +1604,7 @@ namespace gip.bso.facility
             bool success = false;
             try
             {
-                DatabaseApp.udpTandTv3FilterTrackingDelete(null);
+                DatabaseApp.Database.ExecuteSql(FormattableStringFactory.Create("udpTandTv3FilterTrackingDelete @p0", null));
                 success = true;
             }
             catch (Exception ec)

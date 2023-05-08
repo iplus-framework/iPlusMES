@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+/*
 using System;
 using System.Windows;
 using Microsoft.Maps.MapControl.WPF;
@@ -150,3 +151,4 @@ namespace gip.bso.logistics
         #endregion //RouteLineLayer
     }
 }
+*/

@@ -22,7 +22,7 @@ using gip.mes.autocomponent;
 using gip.bso.sales;
 using gip.bso.purchasing;
 using gip.mes.facility;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
@@ -64,7 +64,7 @@ namespace gip.bso.logistics
 
         private IQueryable<ProdOrderPartslistPos> _AccessProdOrderPartslistPos_NavSearchExecuting(IQueryable<ProdOrderPartslistPos> result)
         {
-            result = (result as ObjectQuery<ProdOrderPartslistPos>)
+            result = (result as IQueryable<ProdOrderPartslistPos>)
                             .Include(c => c.ProdOrderPartslist)
                             .Include(c => c.ProdOrderPartslist.ProdOrder)
                             .Include(c => c.ProdOrderPartslist.Partslist)
@@ -137,7 +137,7 @@ namespace gip.bso.logistics
                     return null;
                 if (CurrentPicking != null)
                 {
-                    IEnumerable<ProdOrderPartslistPos> addedPositions = CurrentPicking.PickingPos_Picking.Where(c => c.EntityState == System.Data.EntityState.Added
+                    IEnumerable<ProdOrderPartslistPos> addedPositions = CurrentPicking.PickingPos_Picking.Where(c => c.EntityState == EntityState.Added
                         && c.PickingPosProdOrderPartslistPos_PickingPos.Any()
                         ).SelectMany(c => c.PickingPosProdOrderPartslistPos_PickingPos).Select(c=>c.ProdorderPartslistPos);
                         //&& c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos != null

@@ -15,9 +15,9 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -325,13 +325,13 @@ namespace gip.bso.facility
 
         private IQueryable<FacilityCharge> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityCharge> result)
         {
-            ObjectQuery<FacilityCharge> query = result as ObjectQuery<FacilityCharge>;
+            IQueryable<FacilityCharge> query = result as IQueryable<FacilityCharge>;
             if (query != null)
             {
                 query.Include("FacilityLotStock_FacilityLot");
                 //if (ShowNotAvailable.HasValue)
                 //{
-                //    query = query.Where(c => c.NotAvailable == ShowNotAvailable.Value) as ObjectQuery<FacilityCharge>;
+                //    query = query.Where(c => c.NotAvailable == ShowNotAvailable.Value) as IQueryable<FacilityCharge>;
                 //}
             }
             return query;

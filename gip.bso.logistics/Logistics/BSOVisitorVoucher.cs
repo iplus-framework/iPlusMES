@@ -19,6 +19,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
@@ -865,7 +866,7 @@ namespace gip.bso.logistics
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(VisitorVoucher), VisitorVoucher.NoColumnName, VisitorVoucher.FormatNewNo, this);
             VisitorVoucher voucher = VisitorVoucher.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.VisitorVoucher.AddObject(voucher);
+            DatabaseApp.VisitorVoucher.Add(voucher);
             TempNewVisitor = null;
             AccessPrimary.NavList.Add(voucher);
             OnPropertyChanged("VisitorVoucherList");

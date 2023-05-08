@@ -123,7 +123,7 @@ namespace gip.bso.sales
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOrderPosUtilization), OutOrderPosUtilization.NoColumnName, OutOrderPosUtilization.FormatNewNo, this);
             CurrentOutOrderPosUtilization = OutOrderPosUtilization.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.OutOrderPosUtilization.AddObject(CurrentOutOrderPosUtilization);
+            DatabaseApp.OutOrderPosUtilization.Add(CurrentOutOrderPosUtilization);
             ACState = Const.SMNew;
             PostExecute("New");
            

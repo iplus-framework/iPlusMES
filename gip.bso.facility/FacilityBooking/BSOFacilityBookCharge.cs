@@ -16,10 +16,10 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -504,7 +504,7 @@ namespace gip.bso.facility
 
         protected virtual IQueryable<FacilityCharge> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityCharge> result)
         {
-            ObjectQuery<FacilityCharge> query = result as ObjectQuery<FacilityCharge>;
+            IQueryable<FacilityCharge> query = result as IQueryable<FacilityCharge>;
             query =
                 query
                 .Include(c => c.Facility)
@@ -783,7 +783,7 @@ namespace gip.bso.facility
         {
             if (!PreExecute("New")) return;
             CurrentFacilityCharge = FacilityCharge.NewACObject(DatabaseApp, null);
-            DatabaseApp.FacilityCharge.AddObject(CurrentFacilityCharge);
+            DatabaseApp.FacilityCharge.Add(CurrentFacilityCharge);
             ACState = Const.SMNew;
             PostExecute("New");
 
@@ -816,7 +816,7 @@ namespace gip.bso.facility
             if (CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && CurrentFacilityCharge.Material.IsLotManaged
                                               && CurrentFacilityCharge.FacilityLot == null)
             {
-                if (CurrentFacilityCharge.EntityState != System.Data.EntityState.Added)
+                if (CurrentFacilityCharge.EntityState != EntityState.Added)
                     return msg;
 
                 //Error50552: Lot managed quants must have a lot assigned!!
@@ -1052,7 +1052,7 @@ namespace gip.bso.facility
                 case "CurrentFacilityCharge\\Material":
                 case "CurrentFacilityCharge\\Facility":
                 case "CurrentFacilityCharge\\SplitNo":
-                    if (CurrentFacilityCharge == null || CurrentFacilityCharge.EntityState != System.Data.EntityState.Added)
+                    if (CurrentFacilityCharge == null || CurrentFacilityCharge.EntityState != EntityState.Added)
                         return Global.ControlModes.Disabled;
                     break;
                 case "CurrentFacilityCharge\\FacilityLot":
@@ -1867,7 +1867,7 @@ namespace gip.bso.facility
         {
             if (!IsEnabledFacilityChargeLotGenerateDlg())
                 return;
-            if (CurrentFacilityCharge.EntityState != System.Data.EntityState.Added && !ACSaveChanges())
+            if (CurrentFacilityCharge.EntityState != EntityState.Added && !ACSaveChanges())
                 return;
             ACComponent childBSO = ACUrlCommand("?" + ConstApp.BSOFacilityLot_ChildName) as ACComponent;
             if (childBSO == null)

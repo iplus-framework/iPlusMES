@@ -18,10 +18,10 @@ using System.Text;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
-using System.Data.Objects;
 using System.ComponentModel;
 using gip.mes.facility;
 using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.facility
 {
@@ -566,8 +566,7 @@ namespace gip.bso.facility
                         .Where(c => c.FacilityID == SelectedFacility.FacilityID));
             if (CurrentFacility != null && CurrentFacility.CurrentFacilityStock != null)
             {
-                CurrentFacility.FacilityStock_Facility.AutoLoad(DatabaseApp);
-                CurrentFacility.CurrentFacilityStock.AutoRefresh(DatabaseApp);
+                CurrentFacility.FacilityStock_Facility.AutoLoad(CurrentFacility.FacilityStock_FacilityReference, CurrentFacility);
             }
 
             PostExecute("Load");
@@ -587,7 +586,7 @@ namespace gip.bso.facility
 
         IQueryable<Facility> _AccessPrimary_NavSearchExecuting(IQueryable<Facility> result)
         {
-            ObjectQuery<Facility> query = result as ObjectQuery<Facility>;
+            IQueryable<Facility> query = result as IQueryable<Facility>;
             if (query == null) return null;
 
             var testQuery = query

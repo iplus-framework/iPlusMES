@@ -14,7 +14,7 @@ using System.Linq;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics.Logistics
 {
@@ -135,7 +135,7 @@ namespace gip.bso.logistics.Logistics
 
         private IQueryable<Weighing> AccessPrimary_NavSearchExecuting(IQueryable<Weighing> result)
         {
-            return (result as ObjectQuery<Weighing>).Include("InOrderPos.DeliveryNotePos_InOrderPos.DeliveryNote");
+            return (result as IQueryable<Weighing>).Include("InOrderPos.DeliveryNotePos_InOrderPos.DeliveryNote");
         }
 
         #endregion

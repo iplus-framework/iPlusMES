@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+/*
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
@@ -407,3 +408,4 @@ namespace gip.bso.logistics
 
     }
 }
+*/

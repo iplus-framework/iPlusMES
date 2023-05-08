@@ -1,12 +1,13 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.reporthandler.Flowdoc;
+using gip.core.reporthandlerwpf;
+using gip.core.reporthandlerwpf.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -331,7 +332,7 @@ namespace gip.bso.sales
 
         private IQueryable<Invoice> _AccessPrimary_NavSearchExecuting(IQueryable<Invoice> result)
         {
-            ObjectQuery<Invoice> query = result as ObjectQuery<Invoice>;
+            IQueryable<Invoice> query = result as IQueryable<Invoice>;
             if (query != null)
             {
                 query.Include(c => c.CustomerCompany)
@@ -544,7 +545,7 @@ namespace gip.bso.sales
             {
                 if (CurrentInvoice == null)
                     return null;
-                return CurrentInvoice.InvoicePos_Invoice.Where(c => c.EntityState != System.Data.EntityState.Deleted).OrderBy(c => c.Sequence);
+                return CurrentInvoice.InvoicePos_Invoice.Where(c => c.EntityState != EntityState.Deleted).OrderBy(c => c.Sequence);
             }
         }
 
@@ -768,8 +769,8 @@ namespace gip.bso.sales
             {
                 if (CurrentInvoice == null || CurrentInvoice.CustomerCompany == null)
                     return null;
-                if (!CurrentInvoice.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentInvoice.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentInvoice.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentInvoice.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentInvoice.CustomerCompany.CompanyAddress_CompanyReference, CurrentInvoice);
                 return CurrentInvoice.CustomerCompany.CompanyAddress_Company
                     .Where(c => c.IsBillingCompanyAddress)
                     .OrderBy(c => c.Name1);
@@ -783,8 +784,8 @@ namespace gip.bso.sales
             {
                 if (CurrentInvoice == null || CurrentInvoice.CustomerCompany == null)
                     return null;
-                if (!CurrentInvoice.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentInvoice.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentInvoice.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentInvoice.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentInvoice.CustomerCompany.CompanyAddress_CompanyReference, CurrentInvoice);
                 return CurrentInvoice.CustomerCompany.CompanyAddress_Company
                     .Where(c => c.IsDeliveryCompanyAddress)
                     .OrderBy(c => c.Name1);
@@ -1447,8 +1448,8 @@ namespace gip.bso.sales
         {
             _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
             RefreshOpenContractPosList();
-            if (CurrentInvoice != null && CurrentInvoice.EntityState != System.Data.EntityState.Added)
-                CurrentInvoice.InvoicePos_Invoice.Load();
+            if (CurrentInvoice != null && CurrentInvoice.EntityState != EntityState.Added)
+                CurrentInvoice.InvoicePos_Invoice.AutoLoad(CurrentInvoice.InvoicePos_InvoiceReference, CurrentInvoice);
             OnPropertyChanged("InvoicePosList");
             base.OnPostUndoSave();
         }
@@ -1481,7 +1482,7 @@ namespace gip.bso.sales
                 newInvoice.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
                 newInvoice.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
             }
-            DatabaseApp.Invoice.AddObject(newInvoice);
+            DatabaseApp.Invoice.Add(newInvoice);
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(newInvoice);
             CurrentInvoice = newInvoice;

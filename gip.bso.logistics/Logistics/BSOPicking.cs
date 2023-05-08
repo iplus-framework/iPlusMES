@@ -18,12 +18,12 @@ using gip.core.manager;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.Objects;
-using System.Globalization;
 using System.Linq;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
@@ -897,7 +897,7 @@ namespace gip.bso.logistics
 
         protected IQueryable<Picking> _AccessPrimary_NavSearchExecuting(IQueryable<Picking> result)
         {
-            ObjectQuery<Picking> query = result as ObjectQuery<Picking>;
+            IQueryable<Picking> query = result as IQueryable<Picking>;
             if (query != null)
             {
                 query.Include(c => c.VisitorVoucher).Include(c => c.MDPickingType);
@@ -962,7 +962,7 @@ namespace gip.bso.logistics
                     SelectedProcessWorkflow = null;
                 OnPropertyChanged(nameof(CurrentPicking));
                 if (value != null && _InLoad)
-                    value.PickingPos_Picking.AutoRefresh(this.DatabaseApp);
+                    value.PickingPos_Picking.AutoRefresh(value.PickingPos_PickingReference, value);
                 OnPropertyChanged(nameof(PickingPosList));
                 if (value != null && CurrentPickingPos != null)
                 {
@@ -1100,20 +1100,16 @@ namespace gip.bso.logistics
                         if (_CurrentPickingPos.InOrderPos != null)
                         {
                             _CurrentPickingPos.InOrderPos.AutoRefresh();
-                            _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad();
-                            _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoRefresh();
+                            _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad(_CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPosReference, _CurrentPickingPos);
                         }
                         else if (_CurrentPickingPos.OutOrderPos != null)
                         {
                             _CurrentPickingPos.OutOrderPos.AutoRefresh();
-                            _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad();
-                            _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoRefresh();
+                            _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad(_CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPosReference, _CurrentPickingPos);
                         }
-                        _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoLoad();
-                        _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoRefresh();
+                        _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoLoad(_CurrentPickingPos.FacilityPreBooking_PickingPosReference, _CurrentPickingPos);
 
-                        _CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad();
-                        _CurrentPickingPos.FacilityBooking_PickingPos.AutoRefresh();
+                        _CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad(_CurrentPickingPos.FacilityBooking_PickingPosReference, _CurrentPickingPos);
                     }
                     OnPropertyChanged(nameof(CurrentPickingPos));
                     OnPropertyChanged(nameof(FacilityPreBookingList));
@@ -1840,29 +1836,26 @@ namespace gip.bso.logistics
                 if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                   || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle) && CurrentPickingPos.InOrderPos != null)
                 {
-                    CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad();
-                    CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoRefresh(this.DatabaseApp);
+                    CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad(CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPosReference, CurrentPickingPos);
                     return CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
                 else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
                        || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle) && CurrentPickingPos.OutOrderPos != null)
                 {
-                    CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoLoad();
-                    CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoRefresh(this.DatabaseApp);
+                    CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoLoad(CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPosReference, CurrentPickingPos);
                     return CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
                 List<FacilityBooking> bookingList = null;
                 if (CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any())
                 {
                     foreach (var pickingPosRef in CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos)
-                        pickingPosRef.ProdorderPartslistPos.FacilityBooking_ProdOrderPartslistPos.AutoRefresh(this.DatabaseApp);
+                        pickingPosRef.ProdorderPartslistPos.FacilityBooking_ProdOrderPartslistPos.AutoRefresh(pickingPosRef.ProdorderPartslistPos.FacilityBooking_ProdOrderPartslistPosReference, pickingPosRef);
                     bookingList = CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.SelectMany(c => c.ProdorderPartslistPos.FacilityBooking_ProdOrderPartslistPos).OrderBy(c => c.FacilityBookingNo).ToList();
                 }
 
                 if (bookingList == null || !bookingList.Any())
                 {
-                    CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad();
-                    CurrentPickingPos.FacilityBooking_PickingPos.AutoRefresh(this.DatabaseApp);
+                    CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad(CurrentPickingPos.FacilityBooking_PickingPosReference, CurrentPickingPos);
                     bookingList = CurrentPickingPos.FacilityBooking_PickingPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
                 return bookingList;
@@ -1896,7 +1889,7 @@ namespace gip.bso.logistics
             {
                 if (CurrentFacilityBooking != null)
                 {
-                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
+                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(CurrentFacilityBooking.FacilityBookingCharge_FacilityBookingReference, CurrentFacilityBooking);
                     return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo).ToList();
                 }
                 return null;
@@ -2261,7 +2254,8 @@ namespace gip.bso.logistics
                 {
                     foreach (PickingPos deletedItem in deletedItems)
                     {
-                        DbDataRecord originalItem = DatabaseApp.GetOriginalValues(deletedItem.EntityKey);
+                        PropertyValues originalItem = DatabaseApp.ChangeTracker.Entries().Where(c => c.Entity == deletedItem).FirstOrDefault().OriginalValues;
+                        //DbDataRecord originalItem = DatabaseApp.GetOriginalValues(deletedItem.EntityKey);
                         Guid pickingID = (Guid)originalItem["PickingID"];
                         Picking picking = DatabaseApp.Picking.FirstOrDefault(c => c.PickingID == pickingID);
                         if (!string.IsNullOrEmpty(originalItem["FromFacilityID"].ToString()))
@@ -2354,8 +2348,8 @@ namespace gip.bso.logistics
             RefreshInOrderPosList(true);
             RefreshOutOrderPosList(true);
             RefreshProdOrderPartslistPosList(true);
-            if (CurrentPicking != null && CurrentPicking.EntityState != System.Data.EntityState.Detached)
-                CurrentPicking.PickingPos_Picking.Load();
+            if (CurrentPicking != null && CurrentPicking.EntityState != EntityState.Detached)
+                CurrentPicking.PickingPos_Picking.AutoLoad(CurrentPicking.PickingPos_PickingReference, CurrentPicking);
             OnPropertyChanged(nameof(PickingPosList));
             base.OnPostUndoSave();
         }
@@ -2406,7 +2400,7 @@ namespace gip.bso.logistics
                 if (CurrentPicking.VisitorVoucher != null)
                     CurrentPicking.VisitorVoucher.ACProperties.Refresh();
 
-                CurrentPicking.PickingPos_Picking.AutoRefresh();
+                CurrentPicking.PickingPos_Picking.AutoRefresh(CurrentPicking.PickingPos_PickingReference, CurrentPicking);
             }
             PostExecute("Load");
             OnPropertyChanged(nameof(PickingPosList));
@@ -2445,7 +2439,7 @@ namespace gip.bso.logistics
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
             Picking newPicking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
             newPicking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
-            DatabaseApp.Picking.AddObject(newPicking);
+            DatabaseApp.Picking.Add(newPicking);
             if (SelectedFilterMDPickingType != null)
                 newPicking.MDPickingType = SelectedFilterMDPickingType;
             if (SelectedFilterDeliveryAddress != null)
@@ -3680,7 +3674,7 @@ namespace gip.bso.logistics
                 gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(this.Database.ContextIPlus, null, secondaryKey);
                 program.ProgramACClassMethod = acClassMethod;
                 program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-                this.Database.ContextIPlus.ACProgram.AddObject(program);
+                this.Database.ContextIPlus.ACProgram.Add(program);
                 //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
                 if (ACSaveChanges())
                 {

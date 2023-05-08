@@ -261,7 +261,7 @@ namespace gip.bso.facility
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
             CurrentFacilityLot = FacilityLot.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.FacilityLot.AddObject(CurrentFacilityLot);
+            DatabaseApp.FacilityLot.Add(CurrentFacilityLot);
             ACState = Const.SMNew;
             PostExecute("New");
 

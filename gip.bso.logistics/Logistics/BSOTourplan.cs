@@ -21,6 +21,7 @@ using gip.mes.autocomponent;
 using gip.bso.sales;
 using gip.bso.purchasing;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
@@ -89,7 +90,7 @@ namespace gip.bso.logistics
             this._SelectedInOrderTourPos = null;
             this._SelectedOutOrderTourPos = null;
             this._AddedUnsavedDeliveryNotes = null;
-            this._BingMaps = null;
+            //this._BingMaps = null;
             this._StateCompletelyAssigned = null;
             this._UnSavedAssignedPickingInOrderPos = null;
             this._UnSavedAssignedPickingOutOrderPos = null;
@@ -529,11 +530,11 @@ namespace gip.bso.logistics
                 if (CurrentTourplan != null)
                 {
                     List<InOrderPos> addedPositions = new List<InOrderPos>();
-                    foreach (TourplanPos tourPos in CurrentTourplan.TourplanPos_Tourplan.Where(c => c.EntityState == System.Data.EntityState.Added))
+                    foreach (TourplanPos tourPos in CurrentTourplan.TourplanPos_Tourplan.Where(c => c.EntityState == EntityState.Added))
                     {
                         foreach (DeliveryNote addedDeliveryNote in tourPos.DeliveryNote_TourplanPos)
                         {
-                            addedPositions.AddRange(addedDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == System.Data.EntityState.Added
+                            addedPositions.AddRange(addedDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == EntityState.Added
                                 && c.InOrderPos != null
                                 && c.InOrderPos.InOrderPos1_ParentInOrderPos != null
                                 && c.InOrderPos.InOrderPos1_ParentInOrderPos.MDDelivPosState == StateCompletelyAssigned
@@ -703,11 +704,11 @@ namespace gip.bso.logistics
                 if (CurrentTourplan != null)
                 {
                     List<OutOrderPos> addedPositions = new List<OutOrderPos>();
-                    foreach (TourplanPos tourPos in CurrentTourplan.TourplanPos_Tourplan.Where(c => c.EntityState == System.Data.EntityState.Added))
+                    foreach (TourplanPos tourPos in CurrentTourplan.TourplanPos_Tourplan.Where(c => c.EntityState == EntityState.Added))
                     {
                         foreach (DeliveryNote addedDeliveryNote in tourPos.DeliveryNote_TourplanPos)
                         {
-                            addedPositions.AddRange(addedDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == System.Data.EntityState.Added
+                            addedPositions.AddRange(addedDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.EntityState == EntityState.Added
                                 && c.OutOrderPos != null
                                 && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null
                                 && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.MDDelivPosState == StateCompletelyAssigned
@@ -777,6 +778,7 @@ namespace gip.bso.logistics
         #endregion
 
         #region Map
+        /*
         /// <summary>
         /// The _ bing maps
         /// </summary>
@@ -797,6 +799,7 @@ namespace gip.bso.logistics
                 return _BingMaps;
             }
         }
+        */
         #endregion
 
         #endregion
@@ -897,7 +900,7 @@ namespace gip.bso.logistics
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Tourplan), Tourplan.NoColumnName, Tourplan.FormatNewNo, this);
             CurrentTourplan = Tourplan.NewACObject(DatabaseApp, null, secondaryKey);
             //Database.Tourplan.AddObject(CurrentTourplan);
-            DatabaseApp.Tourplan.AddObject(CurrentTourplan);
+            DatabaseApp.Tourplan.Add(CurrentTourplan);
             ACState = Const.SMNew;
             PostExecute("New");
 
@@ -975,7 +978,7 @@ namespace gip.bso.logistics
                 {
                     string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(DeliveryNote), DeliveryNote.NoColumnName, DeliveryNote.FormatNewNo, this);
                     deliveryNote = DeliveryNote.NewACObject(DatabaseApp, null, secondaryKey);
-                    DatabaseApp.DeliveryNote.AddObject(deliveryNote);
+                    DatabaseApp.DeliveryNote.Add(deliveryNote);
                     _AddedUnsavedDeliveryNotes.Add(deliveryNote);
                     deliveryNote.DeliveryCompanyAddress = SelectedInOrderPos.InOrder.DeliveryCompanyAddress;
                     deliveryNote.ShipperCompanyAddress = SelectedInOrderPos.InOrder.DeliveryCompanyAddress;
@@ -1079,7 +1082,7 @@ namespace gip.bso.logistics
                 {
                     deliveryNote.TourplanPos = null;
                     _AddedUnsavedDeliveryNotes.Remove(deliveryNote);
-                    if (deliveryNote.EntityState != System.Data.EntityState.Added)
+                    if (deliveryNote.EntityState != EntityState.Added)
                         deliveryNote.DeleteACObject(DatabaseApp, true);
                 }
             }
@@ -1168,7 +1171,7 @@ namespace gip.bso.logistics
                 {
                     string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(DeliveryNote), DeliveryNote.NoColumnName, DeliveryNote.FormatNewNo, this);
                     deliveryNote = DeliveryNote.NewACObject(DatabaseApp, null, secondaryKey);
-                    DatabaseApp.DeliveryNote.AddObject(deliveryNote);
+                    DatabaseApp.DeliveryNote.Add(deliveryNote);
                     _AddedUnsavedDeliveryNotes.Add(deliveryNote);
                     deliveryNote.DeliveryCompanyAddress = SelectedOutOrderPos.OutOrder.DeliveryCompanyAddress;
                     deliveryNote.ShipperCompanyAddress = SelectedOutOrderPos.OutOrder.DeliveryCompanyAddress;
@@ -1270,7 +1273,7 @@ namespace gip.bso.logistics
                 {
                     deliveryNote.TourplanPos = null;
                     _AddedUnsavedDeliveryNotes.Remove(deliveryNote);
-                    if (deliveryNote.EntityState != System.Data.EntityState.Added)
+                    if (deliveryNote.EntityState != EntityState.Added)
                         deliveryNote.DeleteACObject(DatabaseApp, true);
                 }
             }

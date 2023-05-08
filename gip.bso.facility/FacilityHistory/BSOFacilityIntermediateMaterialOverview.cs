@@ -4,10 +4,10 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.facility
 {
@@ -67,7 +67,7 @@ namespace gip.bso.facility
         #region PrecompiledQueries
 
         static readonly Func<DatabaseApp, string, IQueryable<IntermediateMaterialOverview>> s_cQry_IntermediateMaterialOverview =
-        CompiledQuery.Compile<DatabaseApp, string, IQueryable<IntermediateMaterialOverview>>(
+        EF.CompileQuery<DatabaseApp, string, IQueryable<IntermediateMaterialOverview>>(
             (ctx, excludedBins) =>
                 ctx.MaterialWFRelation
                 .Select(x => x.TargetMaterial)

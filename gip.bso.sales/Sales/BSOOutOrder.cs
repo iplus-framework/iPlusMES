@@ -1,12 +1,12 @@
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.reporthandler.Flowdoc;
+using gip.core.reporthandlerwpf.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -356,7 +356,7 @@ namespace gip.bso.sales
 
         private IQueryable<OutOrder> _AccessPrimary_NavSearchExecuting(IQueryable<OutOrder> result)
         {
-            ObjectQuery<OutOrder> query = result as ObjectQuery<OutOrder>;
+            IQueryable<OutOrder> query = result as IQueryable<OutOrder>;
             if (query != null)
             {
                 query.Include(c => c.MDOutOrderType)
@@ -720,8 +720,8 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOrder == null || CurrentOutOrder.CustomerCompany == null)
                     return null;
-                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentOutOrder.CustomerCompany.CompanyAddress_CompanyReference, CurrentOutOrder);
                 return CurrentOutOrder.CustomerCompany.CompanyAddress_Company
                     .Where(c => c.IsBillingCompanyAddress)
                     .OrderBy(c => c.Name1);
@@ -735,8 +735,8 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOrder == null || CurrentOutOrder.CustomerCompany == null)
                     return null;
-                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentOutOrder.CustomerCompany.CompanyAddress_CompanyReference, CurrentOutOrder);
                 return CurrentOutOrder.CustomerCompany.CompanyAddress_Company
                     .Where(c => c.IsDeliveryCompanyAddress)
                     .OrderBy(c => c.Name1);
@@ -1021,7 +1021,7 @@ namespace gip.bso.sales
                     return null;
                 if (CurrentOutOrderPos != null)
                 {
-                    IEnumerable<OutOrderPos> addedPositions = CurrentOutOrderPos.OutOrderPos_ParentOutOrderPos.Where(c => c.EntityState == System.Data.EntityState.Added
+                    IEnumerable<OutOrderPos> addedPositions = CurrentOutOrderPos.OutOrderPos_ParentOutOrderPos.Where(c => c.EntityState == EntityState.Added
                         && c != null
                         && c.OutOrderPos1_ParentOutOrderPos != null
                         && c.OutOrderPos1_ParentOutOrderPos.MDDelivPosState == StateCompletelyAssigned
@@ -1537,9 +1537,9 @@ namespace gip.bso.sales
             _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
             RefreshOpenContractPosList();
             if (CurrentOutOrder != null
-                && CurrentOutOrder.EntityState != System.Data.EntityState.Added
-                && CurrentOutOrder.EntityState != System.Data.EntityState.Detached)
-                CurrentOutOrder.OutOrderPos_OutOrder.Load();
+                && CurrentOutOrder.EntityState != EntityState.Added
+                && CurrentOutOrder.EntityState != EntityState.Detached)
+                CurrentOutOrder.OutOrderPos_OutOrder.AutoLoad(CurrentOutOrder.OutOrderPos_OutOrderReference, CurrentOutOrder);
             OnPropertyChanged("OutOrderPosList");
             base.OnPostUndoSave();
         }
@@ -1574,7 +1574,7 @@ namespace gip.bso.sales
                 outOrder.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
                 outOrder.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
             }
-            DatabaseApp.OutOrder.AddObject(outOrder);
+            DatabaseApp.OutOrder.Add(outOrder);
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(CurrentOutOrder);
             CurrentOutOrder = outOrder;
@@ -1946,7 +1946,7 @@ namespace gip.bso.sales
         [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
         public void DialogCancel()
         {
-            if (CurrentOutOrder != null && CurrentOutOrder.EntityState == System.Data.EntityState.Added)
+            if (CurrentOutOrder != null && CurrentOutOrder.EntityState == EntityState.Added)
                 Delete();
             DialogResult = new VBDialogResult();
             DialogResult.SelectedCommand = eMsgButton.Cancel;

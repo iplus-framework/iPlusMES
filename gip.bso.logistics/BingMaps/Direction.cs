@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+/*
 using System;
 using Microsoft.Maps.MapControl.WPF;
 using gip.mes.datamodel; using gip.core.datamodel;
@@ -35,4 +36,4 @@ namespace gip.bso.logistics
         public Location Location { get; set; }
     }
 }
-
+*/

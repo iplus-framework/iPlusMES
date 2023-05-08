@@ -288,8 +288,8 @@ namespace gip.bso.logistics
             {
                 if (CurrentVisitor == null || CurrentVisitor.VisitedCompany == null)
                     return null;
-                if (!CurrentVisitor.VisitedCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentVisitor.VisitedCompany.CompanyAddress_Company.Load();
+                if (!CurrentVisitor.VisitedCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentVisitor.VisitedCompany.CompanyAddress_Company.AutoLoad(CurrentVisitor.VisitedCompany.CompanyAddress_CompanyReference, CurrentVisitor);
                 return CurrentVisitor.VisitedCompany.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).OrderBy(c => c.Name1);
             }
         }
@@ -305,8 +305,8 @@ namespace gip.bso.logistics
             {
                 if (CurrentVisitor == null || CurrentVisitor.VisitedCompany == null)
                     return null;
-                if (!CurrentVisitor.VisitedCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentVisitor.VisitedCompany.CompanyAddress_Company.Load();
+                if (!CurrentVisitor.VisitedCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentVisitor.VisitedCompany.CompanyAddress_Company.AutoLoad(CurrentVisitor.VisitedCompany.CompanyAddress_CompanyReference, CurrentVisitor);
                 return CurrentVisitor.VisitedCompany.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1);
             }
         }
@@ -498,7 +498,7 @@ namespace gip.bso.logistics
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Visitor), Visitor.NoColumnName, Visitor.FormatNewNo, this);
             CurrentVisitor = Visitor.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.Visitor.AddObject(CurrentVisitor);
+            DatabaseApp.Visitor.Add(CurrentVisitor);
             ACState = Const.SMNew;
             PostExecute("New");
         }

@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.facility
 {
@@ -335,7 +335,7 @@ namespace gip.bso.facility
 
         #region precompiled queries
         protected static readonly Func<DatabaseApp, Guid, IQueryable<TandTFastViewModel>> s_cQry_FastViewFC =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<TandTFastViewModel>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<TandTFastViewModel>>(
         (ctx, facilityChargeID) =>
                 ctx
                 .ProdOrderPartslist
@@ -410,7 +410,7 @@ namespace gip.bso.facility
         );
 
         protected static readonly Func<DatabaseApp, Guid, IQueryable<TandTFastViewModel>> s_cQry_FastViewFL =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<TandTFastViewModel>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<TandTFastViewModel>>(
         (ctx, facilityLotID) =>
                 ctx
                 .ProdOrderPartslist

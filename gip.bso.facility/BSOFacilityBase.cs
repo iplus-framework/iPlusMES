@@ -20,7 +20,6 @@ using System.Threading;
 using gip.mes.datamodel; using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
-using System.Data.Objects;
 using gip.mes.autocomponent;
 using System.Runtime.CompilerServices;
 using gip.mes.processapplication;
@@ -600,7 +599,7 @@ namespace gip.bso.facility
             gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(this.Database.ContextIPlus, null, secondaryKey);
             program.ProgramACClassMethod = acClassMethod;
             program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-            this.Database.ContextIPlus.ACProgram.AddObject(program);
+            this.Database.ContextIPlus.ACProgram.Add(program);
             if (ACSaveChanges())
             {
                 ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
@@ -630,7 +629,7 @@ namespace gip.bso.facility
             gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(this.Database.ContextIPlus, null, secondaryKey);
             program.ProgramACClassMethod = acClassMethod;
             program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-            this.Database.ContextIPlus.ACProgram.AddObject(program);
+            this.Database.ContextIPlus.ACProgram.Add(program);
             if (ACSaveChanges())
             {
                 ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);

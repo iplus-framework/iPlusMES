@@ -19,7 +19,6 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
-using System.Data.Objects;
 using System.ComponentModel;
 using gip.mes.processapplication;
 

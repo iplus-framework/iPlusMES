@@ -8,8 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.facility
@@ -915,7 +915,7 @@ namespace gip.bso.facility
 
         public virtual IQueryable<FacilityInventory> AccessPrimaryNavSearchExecuting(IQueryable<FacilityInventory> result)
         {
-            ObjectQuery<FacilityInventory> query = result as ObjectQuery<FacilityInventory>;
+            IQueryable<FacilityInventory> query = result as IQueryable<FacilityInventory>;
             if (query != null)
             {
                 query
@@ -1127,7 +1127,7 @@ namespace gip.bso.facility
         private List<FacilityInventoryPos> LoadFacilityInventoryPosList()
         {
             if (SelectedFacilityInventory == null) return null;
-            SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
+            SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad(SelectedFacilityInventory.FacilityInventoryPos_FacilityInventoryReference, SelectedFacilityInventory);
             return SelectedFacilityInventory
                 .FacilityInventoryPos_FacilityInventory
                 .Where(c =>
@@ -1488,7 +1488,7 @@ namespace gip.bso.facility
             List<FacilityBooking> bookings = null;
             if (SelectedFacilityInventoryPos != null)
             {
-                SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.AutoLoad();
+                SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.AutoLoad(SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPosReference, SelectedFacilityInventoryPos);
                 bookings = SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.OrderBy(c => c.FacilityBookingNo).ToList();
             }
             return bookings;
@@ -2180,7 +2180,7 @@ namespace gip.bso.facility
             {
                 FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
                 facilityInventoryPos.FacilityCharge = SelectedNotUsedFacilityCharge;
-                DatabaseApp.FacilityInventoryPos.AddObject(facilityInventoryPos);
+                DatabaseApp.FacilityInventoryPos.Add(facilityInventoryPos);
                 FacilityInventoryPosList.Add(facilityInventoryPos);
                 SelectedFacilityInventoryPos = facilityInventoryPos;
                 OnPropertyChanged(nameof(FacilityInventoryPosList));
@@ -2503,7 +2503,7 @@ namespace gip.bso.facility
 
             if (refreshPos)
             {
-                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
+                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad(SelectedFacilityInventory.FacilityInventoryPos_FacilityInventoryReference, SelectedFacilityInventory);
                 SetFacilityInventoryPosList();
             }
 

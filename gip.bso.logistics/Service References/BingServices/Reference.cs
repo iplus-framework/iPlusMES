@@ -26,8 +26,8 @@ namespace gip.bso.logistics.BingServices {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Microsoft.Maps.MapControl.WPF.Credentials CredentialsField;
+        //[System.Runtime.Serialization.OptionalFieldAttribute()]
+        //private Microsoft.Maps.MapControl.WPF.Credentials CredentialsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string CultureField;
@@ -48,6 +48,7 @@ namespace gip.bso.logistics.BingServices {
             }
         }
         
+        /*
         [System.Runtime.Serialization.DataMemberAttribute()]
         public Microsoft.Maps.MapControl.WPF.Credentials Credentials {
             get {
@@ -60,6 +61,7 @@ namespace gip.bso.logistics.BingServices {
                 }
             }
         }
+        */
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string Culture {

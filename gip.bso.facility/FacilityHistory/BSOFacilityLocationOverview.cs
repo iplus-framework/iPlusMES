@@ -18,9 +18,9 @@ using System.Text;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
-using System.Data.Objects;
 using gip.mes.facility;
 using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.facility
 {
@@ -512,7 +512,7 @@ namespace gip.bso.facility
 
         IQueryable<Facility> _AccessPrimary_NavSearchExecuting(IQueryable<Facility> result)
         {
-            ObjectQuery<Facility> query = result as ObjectQuery<Facility>;
+            IQueryable<Facility> query = result as IQueryable<Facility>;
             if (query != null)
             {
                 query.Include("FacilityStock_Facility");

@@ -111,7 +111,7 @@ namespace gip.bso.logistics
                     return null;
                 if (CurrentPicking != null)
                 {
-                    IEnumerable<InOrderPos> addedPositions = CurrentPicking.PickingPos_Picking.Where(c => c.EntityState == System.Data.EntityState.Added
+                    IEnumerable<InOrderPos> addedPositions = CurrentPicking.PickingPos_Picking.Where(c => c.EntityState == Microsoft.EntityFrameworkCore.EntityState.Added
                         && c.InOrderPos != null
                         && c.InOrderPos.InOrderPos1_ParentInOrderPos != null
                         && c.InOrderPos.InOrderPos1_ParentInOrderPos.MDDelivPosState == StateCompletelyAssigned

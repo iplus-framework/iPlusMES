@@ -15,9 +15,9 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -650,7 +650,7 @@ namespace gip.bso.facility
 
         IQueryable<MaterialStock> _AccessPrimary_NavSearchExecuting(IQueryable<MaterialStock> result)
         {
-            ObjectQuery<MaterialStock> query = result as ObjectQuery<MaterialStock>;
+            IQueryable<MaterialStock> query = result as IQueryable<MaterialStock>;
             if (query != null)
             {
                 query.Include(c => c.Material);

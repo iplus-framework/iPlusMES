@@ -137,8 +137,8 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOrder == null || CurrentOutOrder.CustomerCompany == null)
                     return null;
-                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentOutOrder.CustomerCompany.CompanyAddress_CompanyReference, CurrentOutOrder);
                 return CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Where(c => c.IsBillingCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
@@ -150,8 +150,8 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOrder == null || CurrentOutOrder.CustomerCompany == null)
                     return null;
-                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
-                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
+                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company_IsLoaded)
+                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.AutoLoad(CurrentOutOrder.CustomerCompany.CompanyAddress_CompanyReference, CurrentOutOrder);
                 return CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
