@@ -7,6 +7,7 @@ using System.Collections;
 using System.Transactions; using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -26,6 +27,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CalendarShift>) })]
     public partial class CalendarShift
     {
+        [NotMapped]
         public const string ClassName = "CalendarShift";
 
         #region New/Delete
@@ -59,6 +61,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -73,6 +76,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Calendar</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -122,6 +126,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -133,6 +138,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -157,8 +163,10 @@ namespace gip.mes.datamodel
         #endregion
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACProject _ACProject;
         [ACPropertyInfo(9999, "", "en{'Project'}de{'Projekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACProject.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACProject ACProject
         {
             get

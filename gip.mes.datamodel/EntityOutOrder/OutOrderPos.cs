@@ -5,6 +5,7 @@ using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -214,6 +215,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -230,6 +232,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to OutOrder</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -280,6 +283,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -291,6 +295,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -317,6 +322,7 @@ namespace gip.mes.datamodel
         #region IOutOrderPos
 
         [ACPropertyInfo(30)]
+        [NotMapped]
         public string Position
         {
             get
@@ -336,6 +342,7 @@ namespace gip.mes.datamodel
         //}
 
         [ACPropertyInfo(31)]
+        [NotMapped]
         public List<OutOrderPos> Items
         {
             get
@@ -344,6 +351,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public GlobalApp.MaterialPosTypes MaterialPosType
         {
             get
@@ -357,6 +365,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(34)]
+        [NotMapped]
         public string PriceNetPrinted
         {
             get
@@ -367,8 +376,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public string _TotalPricePrinted;
         [ACPropertyInfo(35)]
+        [NotMapped]
         public string TotalPricePrinted
         {
             get
@@ -385,8 +396,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _MaterialNo;
         [ACPropertyInfo(36)]
+        [NotMapped]
         public string MaterialNo
         {
             get
@@ -403,6 +416,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(38)]
+        [NotMapped]
         public string SalesTaxPrinted
         {
             get
@@ -414,6 +428,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(32, "", ConstApp.VATPerUnit)]
+        [NotMapped]
         public decimal SalesTaxAmount
         {
             get
@@ -423,6 +438,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(33, "", ConstApp.PriceNetTotal)]
+        [NotMapped]
         public decimal TotalPrice
         {
             get
@@ -432,6 +448,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(34, "", ConstApp.VATTotal)]
+        [NotMapped]
         public decimal TotalSalesTax
         {
             get
@@ -441,6 +458,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(35, "", ConstApp.PriceGrossTotal)]
+        [NotMapped]
         public decimal TotalPriceWithTax
         {
             get
@@ -450,6 +468,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(36)]
+        [NotMapped]
         public string QuantityWithUnitPrinted
         {
             get
@@ -461,6 +480,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(37)]
+        [NotMapped]
         public MDUnit DerivedMDUnit
         {
             get
@@ -473,6 +493,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public bool InRecalculation { get; set; }
 
         #endregion
@@ -513,6 +534,7 @@ namespace gip.mes.datamodel
         }
 
         #region partial methods
+        [NotMapped]
         bool _OnCalledUpQuantityChanging = false;
         protected void OnCalledUpQuantityChanged()
         {
@@ -539,6 +561,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantity");
         }
 
+        [NotMapped]
         bool _OnCalledUpQuantityUOMChanging = false;
         protected void OnCalledUpQuantityUOMChanged()
         {
@@ -565,6 +588,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantityUOM");
         }
 
+        [NotMapped]
         bool _OnTargetQuantityChanging = false;
         protected void OnTargetQuantityChanged()
         {
@@ -591,6 +615,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantity");
         }
 
+        [NotMapped]
         bool _OnTargetQuantityUOMChanging = false;
         protected void OnTargetQuantityUOMChanged()
         {
@@ -617,6 +642,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantityUOM");
         }
 
+        [NotMapped]
         bool _OnActualQuantityChanging = false;
         protected void OnActualQuantityChanged()
         {
@@ -642,6 +668,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnActualQuantityUOMChanging = false;
         protected void OnActualQuantityUOMChanged()
         {
@@ -667,6 +694,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnExternQuantityChanging = false;
         protected void OnExternQuantityChanged()
         {
@@ -692,6 +720,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnExternQuantityUOMChanging = false;
         protected void OnExternQuantityUOMChanged()
         {
@@ -718,6 +747,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(24, "", "en{'Remaining Quantity'}de{'Restmenge'}")]
+        [NotMapped]
         public double RemainingCallQuantity
         {
             get
@@ -727,6 +757,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Remaining Quantity(UOM)'}de{'Restmenge(BME)'}")]
+        [NotMapped]
         public double RemainingCallQuantityUOM
         {
             get
@@ -736,6 +767,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(26, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        [NotMapped]
         public double DifferenceQuantity
         {
             get
@@ -745,6 +777,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(27, "", "en{'Difference Quantity (UOM)'}de{'Differenzmenge (BME)'}")]
+        [NotMapped]
         public double DifferenceQuantityUOM
         {
             get
@@ -754,6 +787,7 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         public OutOrderPos TopParentOutOrderPos
         {
             get

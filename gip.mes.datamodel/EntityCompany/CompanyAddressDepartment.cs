@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyAddressDepartment>) })]
     public partial class CompanyAddressDepartment
     {
+        [NotMapped]
         public const string ClassName = "CompanyAddressDepartment";
 
         #region New/Delete
@@ -44,6 +46,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -58,6 +61,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to CompanyAddress</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -95,6 +99,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -108,6 +113,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {

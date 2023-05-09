@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -36,6 +37,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialHistory>) })]
     public partial class MaterialHistory
     {
+        [NotMapped]
         public const string ClassName = "MaterialHistory";
 
         #region New/Delete
@@ -66,6 +68,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -78,6 +81,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -88,6 +92,7 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -114,6 +119,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(90, "", "en{'Reserved Quantity'}de{'Reservierte Menge'}")]
+        [NotMapped]
         public Double ReservedQuantity
         {
             get
@@ -124,6 +130,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(90)]
+        [NotMapped]
         public Double Diff
         {
             get
@@ -137,6 +144,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property AvailableQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(91, "", "en{'Available Quantity'}de{'Verfügbare Menge'}")]
+        [NotMapped]
         public Double AvailableQuantity
         {
             get
@@ -146,6 +154,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(94, "", "en{'Min. Stock Diff.'}de{'Min. Bestand Diff.'}")]
+        [NotMapped]
         public Double? MinStockQuantityDiff
         {
             get
@@ -157,6 +166,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(95, "", "en{'Min. Stock Exceeded'}de{'Min. Bestand überschritten'}")]
+        [NotMapped]
         public bool MinStockQuantityExceeded
         {
             get
@@ -168,6 +178,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(96, "", "en{'Opt. Stock Diff.'}de{'Opt. Bestand Diff.'}")]
+        [NotMapped]
         public Double? OptStockQuantityDiff
         {
             get
@@ -179,6 +190,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(7, "", "en{'Opt. Stock Exceeded'}de{'Opt. Bestand überschritten'}")]
+        [NotMapped]
         public bool OptStockQuantityExceeded
         {
             get

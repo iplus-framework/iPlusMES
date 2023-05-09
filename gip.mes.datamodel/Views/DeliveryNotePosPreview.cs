@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace gip.mes.datamodel
@@ -109,41 +110,55 @@ namespace gip.mes.datamodel
         #region Properties
 
         [ACPropertyInfo(9999, "Sn", "en{'Sn'}de{'Sn'}")]
+        [NotMapped]
         public int Sn { get; set; }
 
+        [NotMapped]
         public Guid DeliveryNotePosID { get; set; }
 
         [ACPropertyInfo(9999, "DeliveryNoteNo", "en{'Deliverynote-No.'}de{'Lieferschein-Nr.'}")]
+        [NotMapped]
         public string DeliveryNoteNo { get; set; }
 
         [ACPropertyInfo(9999, "MaterialNo", ConstApp.MaterialNo)]
+        [NotMapped]
         public string MaterialNo { get; set; }
 
         [ACPropertyInfo(9999, "MaterialName", "en{'Material Desc. 1'}de{'Materialbez. 1'}")]
+        [NotMapped]
         public string MaterialName { get; set; }
 
         [ACPropertyInfo(9999, "DeliveryAddress", "en{'Delivery address'}de{'Lieferadresse'}")]
+        [NotMapped]
         public string DeliveryAddress { get; set; }
 
         [ACPropertyInfo(9999, "TrackingAndTracingDeliveryNote", "en{'Shipper address'}de{'Speditionsadresse'}")]
+        [NotMapped]
         public string ShipperAddress { get; set; }
 
         [ACPropertyInfo(9999, "DeliveryDate", "en{'Delivery Date'}de{'Lieferdatum'}")]
+        [NotMapped]
         public DateTime DeliveryDate { get; set; }
 
         [ACPropertyInfo(9999, "TargetQuantity", ConstApp.TargetQuantity)]
+        [NotMapped]
         public double TargetQuantity { get; set; }
 
         [ACPropertyInfo(9999, "ActualQuantity", ConstApp.ActualQuantity)]
+        [NotMapped]
         public double ActualQuantity { get; set; }
 
         [ACPropertyInfo(9999, "MDUnitName", "en{'Unit'}de{'Einheit'}")]
+        [NotMapped]
         public string MDUnitName { get; set; }
 
+        [NotMapped]
         public List<string> ExternLotList { get; set; }
 
+        [NotMapped]
         private string _ExternLots;
         [ACPropertyInfo(9999, "ExternLots", ConstApp.ExternLotNo)]
+        [NotMapped]
         public string ExternLots
         {
             get
@@ -157,10 +172,13 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public List<string> LotList { get; set; }
 
+        [NotMapped]
         private string _lots;
         [ACPropertyInfo(9999, "Lots", ConstApp.LotNo)]
+        [NotMapped]
         public string Lots
         {
             get
@@ -175,12 +193,14 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999, "FacilityNo", ConstApp.FacilityNo)]
+        [NotMapped]
         public string FacilityNo { get; set; }
 
         /// <summary>
         /// How many material is spended
         /// </summary>
         [ACPropertyInfo(9999, "DosedQuantity", "en{'Dosed quantity'}de{'Dosierte Menge'}")]
+        [NotMapped]
         public double DosedQuantity { get; set; }
 
         #endregion

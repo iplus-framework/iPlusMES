@@ -7,6 +7,7 @@ using System.Transactions;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.Isam.Esent.Interop.EnumeratedColumn;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -30,6 +31,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Calendar>) })]
     public partial class Calendar
     {
+        [NotMapped]
         public const string ClassName = "Calendar";
         #region New/Delete
         public static Calendar NewACObject(DatabaseApp dbApp, IACObject parentACObject)
@@ -53,6 +55,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -110,6 +113,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -121,6 +125,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {

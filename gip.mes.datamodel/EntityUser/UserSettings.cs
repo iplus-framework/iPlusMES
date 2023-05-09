@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -11,6 +12,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<UserSettings>) })]
     public partial class UserSettings
     {
+        [NotMapped]
         public const string ClassName = "UserSettings";
 
         #region New/Delete

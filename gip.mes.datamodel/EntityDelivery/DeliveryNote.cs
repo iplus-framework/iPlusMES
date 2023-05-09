@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -41,8 +42,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DeliveryNote>) })]
     public partial class DeliveryNote
     {
+        [NotMapped]
         public const string ClassName = "DeliveryNote";
+        [NotMapped]
         public const string NoColumnName = "DeliveryNoteNo";
+        [NotMapped]
         public const string FormatNewNo = "DN{0}";
 
         #region New/Delete
@@ -70,6 +74,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -102,6 +107,7 @@ namespace gip.mes.datamodel
         #region IACObjectEntity Members
 
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -113,6 +119,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -137,6 +144,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region AdditionalProperties
+        [NotMapped]
         public GlobalApp.DeliveryNoteType DeliveryNoteType
         {
             get

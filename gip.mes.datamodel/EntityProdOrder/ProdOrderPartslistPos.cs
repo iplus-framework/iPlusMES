@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using static Microsoft.Isam.Esent.Interop.EnumeratedColumn;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -118,6 +119,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -134,6 +136,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to ProdOrderPartslist</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -147,6 +150,7 @@ namespace gip.mes.datamodel
         #region IACObjectEntity Members
 
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -187,7 +191,9 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
+        [NotMapped]
         private bool _OnMDUnitChanging = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -231,6 +237,7 @@ namespace gip.mes.datamodel
 
         #region Alternative Positionen
         [ACPropertyInfo(9999, "", "en{'Alternative'}de{'Alternative'}")]
+        [NotMapped]
         public bool IsAlternative
         {
             get
@@ -246,6 +253,7 @@ namespace gip.mes.datamodel
         /// Define is material finall product (final mixure)
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public bool IsFinalMixure
         {
             get
@@ -261,6 +269,7 @@ namespace gip.mes.datamodel
         /// Check is this batch for final product
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public bool IsFinalMixureBatch
         {
             get
@@ -273,6 +282,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Material BookingMaterial
         {
             get
@@ -284,6 +294,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public string MaterialNo
         {
             get
@@ -296,6 +307,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public string MaterialName
         {
             get
@@ -307,6 +319,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public string PosCaption
         {
             get
@@ -315,6 +328,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public GlobalApp.MaterialPosTypes MaterialPosType
         {
             get
@@ -331,11 +345,14 @@ namespace gip.mes.datamodel
         /// Used for display rest of quantity in production order editor
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public double RestQuantity { get; set; }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public double RestQuantityUOM { get; set; }
 
+        [NotMapped]
         public double TargetWeight
         {
             get
@@ -344,6 +361,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double ActualWeight
         {
             get
@@ -357,6 +375,7 @@ namespace gip.mes.datamodel
         /// Test is current pos OutwardRoot type - for enabling in Prod Order editor
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public bool IsOutwardRoot
         {
             get
@@ -365,6 +384,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double BatchFraction
         {
             get
@@ -376,8 +396,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private int _PositionUsedCount;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public int PositionUsedCount
         {
             get
@@ -397,6 +419,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables ProdOrderPartslistPos->BasedOnPartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Backflushing
         {
             get
@@ -417,6 +440,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the Anterograde-Fields in Tables ProdOrderPartslistPos->BasedOnPartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Foreflushing
         {
             get
@@ -435,7 +459,9 @@ namespace gip.mes.datamodel
 
         //[ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
 
+        [NotMapped]
         public ProdOrderPartslist _FinalProdOrderPartslist;
+        [NotMapped]
         public ProdOrderPartslist FinalProdOrderPartslist
         {
             get
@@ -487,6 +513,7 @@ namespace gip.mes.datamodel
         }
 
         #region Partial methods
+        [NotMapped]
         public ProdOrderPartslistPos TopParentPartslistPos
         {
             get
@@ -497,6 +524,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnCalledUpQuantityChanging = false;
         protected void OnCalledUpQuantityChanged()
         {
@@ -523,6 +551,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantity");
         }
 
+        [NotMapped]
         bool _OnCalledUpQuantityUOMChanging = false;
         protected void OnCalledUpQuantityUOMChanged()
         {
@@ -549,6 +578,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantityUOM");
         }
 
+        [NotMapped]
         bool _OnTargetQuantityChanging = false;
         protected void OnTargetQuantityChanged()
         {
@@ -585,6 +615,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("RemainingCallQuantity");
         }
 
+        [NotMapped]
         bool _OnTargetQuantityUOMChanging = false;
         protected void OnTargetQuantityUOMChanged()
         {
@@ -620,6 +651,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
+        [NotMapped]
         bool _OnActualQuantityChanging = false;
         protected void OnActualQuantityChanged()
         {
@@ -647,6 +679,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
+        [NotMapped]
         bool _OnActualQuantityUOMChanging = false;
         protected void OnActualQuantityUOMChanged()
         {
@@ -703,6 +736,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(24, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        [NotMapped]
         public double DifferenceQuantity
         {
             get
@@ -712,6 +746,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Difference Quantity (UOM)'}de{'Differenzmenge (BME)'}")]
+        [NotMapped]
         public double DifferenceQuantityUOM
         {
             get
@@ -721,6 +756,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(24, "", "en{'Remaining Quantity'}de{'Restmenge'}")]
+        [NotMapped]
         public double RemainingCallQuantity
         {
             get
@@ -730,6 +766,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Remaining Quantity (UOM)'}de{'Restmenge (BME)'}")]
+        [NotMapped]
         public double RemainingCallQuantityUOM
         {
             get
@@ -1039,11 +1076,13 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IPartslistPos implementation
+        [NotMapped]
         public IEnumerable<IPartslistPosRelation> I_PartslistPosRelation_TargetPartslistPos
         {
             get { return this.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos; }
         }
 
+        [NotMapped]
         public IEnumerable<IPartslistPosRelation> I_PartslistPosRelation_SourcePartslistPos
         {
             get { return this.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos; }

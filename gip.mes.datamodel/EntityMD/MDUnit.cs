@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -69,6 +71,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -80,6 +83,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -105,6 +109,7 @@ namespace gip.mes.datamodel
 
         #region Additional Properties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDUnitName
         {
             get
@@ -119,6 +124,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(2, "", "en{'Symbol comm.'}de{'Zeichen kommerz.'}", MinLength = 1)]
+        [NotMapped]
         public String Symbol
         {
             get
@@ -136,6 +142,7 @@ namespace gip.mes.datamodel
         /// Gets or sets the Dimension
         /// </summary>
         /// <value>Dimension</value>
+        [NotMapped]
         public GlobalApp.SIDimensions SIDimension
         {
             get
@@ -153,6 +160,7 @@ namespace gip.mes.datamodel
         /// e.g. this is gram and returns kilogram
         /// e.g. this is kilometre and returns metre
         /// </summary>
+        [NotMapped]
         public MDUnit SIUnit
         {
             get
@@ -176,6 +184,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Returns a list in which MDUnits this Unit can be converted
         /// </summary>
+        [NotMapped]
         public List<MDUnit> ConvertableUnits
         {
             get

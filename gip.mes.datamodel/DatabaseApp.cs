@@ -11,6 +11,7 @@ using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Data.SqlClient;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -647,7 +648,9 @@ namespace gip.mes.datamodel
             _ObjectContextHelper.LeaveCS();
         }
 
+        [NotMapped]
         private ACMonitorObject _11000_QueryLock_ = new ACMonitorObject(11000);
+        [NotMapped]
         public ACMonitorObject QueryLock_1X000
         {
             get
@@ -662,6 +665,7 @@ namespace gip.mes.datamodel
 
         #region Lists
 
+        [NotMapped]
         public IEnumerable<ACValueItem> InOrderStatesList
         {
             get
@@ -672,6 +676,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ZeroStockStatesList
         {
             get
@@ -681,6 +686,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ReservationModesList
         {
             get
@@ -690,6 +696,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ReleaseStatesList
         {
             get
@@ -699,6 +706,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> OutOrderStatesList
         {
             get
@@ -708,6 +716,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> InvoiceStatesList
         {
             get
@@ -717,6 +726,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> OutOrderPosStatesList
         {
             get
@@ -726,6 +736,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> OutOrderPlanStatesList
         {
             get
@@ -735,6 +746,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> OutOfferStatesList
         {
             get
@@ -743,9 +755,11 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private IEnumerable<ACValueItem> _MovementReasonsList;
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MovementReasonsList
         {
             get
@@ -764,6 +778,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> InRequestStatesList
         {
             get
@@ -773,6 +788,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> InOrderPosStatesList
         {
             get
@@ -782,8 +798,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         ACValueItemList _FacilityTypesEnumList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public ACValueItemList FacilityTypesList
         {
             get
@@ -801,6 +819,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> FacilityManagementTypesList
         {
             get
@@ -810,6 +829,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> BookingNotAvailableModesList
         {
             get
@@ -819,6 +839,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> BalancingModesList
         {
             get
@@ -828,6 +849,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> LabOrderPosStatesList
         {
             get
@@ -837,6 +859,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> LabOrderStatesList
         {
             get
@@ -846,6 +869,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> LabTagsList
         {
             get
@@ -855,6 +879,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MaterialGroupTypesList
         {
             get
@@ -864,6 +889,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> VisitorVoucherStatesList
         {
             get
@@ -873,6 +899,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> VisitorCardStatesList
         {
             get
@@ -882,6 +909,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> DelivPosLoadStateList
         {
             get
@@ -891,6 +919,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> DelivPosStatesList
         {
             get
@@ -900,6 +929,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> DelivNoteStatesList
         {
             get
@@ -909,6 +939,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> DelivTypesList
         {
             get
@@ -918,6 +949,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> TransportModesList
         {
             get
@@ -927,6 +959,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> TourplanPosStatesList
         {
             get
@@ -936,6 +969,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> TourplanStatesList
         {
             get
@@ -945,6 +979,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ProdOrderPartslistPosStatesList
         {
             get
@@ -954,6 +989,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ProcessErrorActionsList
         {
             get
@@ -963,6 +999,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> DemandOrderStatesList
         {
             get
@@ -972,6 +1009,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ToleranceStateList
         {
             get
@@ -981,6 +1019,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MaintOrderStateList
         {
             get
@@ -990,6 +1029,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MaintModesList
         {
             get
@@ -999,6 +1039,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> FacilityVehicleTypesList
         {
             get
@@ -1008,6 +1049,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> OrderTypesList
         {
             get
@@ -1017,6 +1059,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> InvoiceTypesList
         {
             get
@@ -1026,6 +1069,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> FacilityBookingTypeList
         {
             get
@@ -1035,6 +1079,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> SIDimensionList
         {
             get
@@ -1044,6 +1089,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> PetroleumGroupList
         {
             get
@@ -1053,6 +1099,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> DeliveryNoteTypeList
         {
             get
@@ -1062,6 +1109,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> PickingTypeList
         {
             get
@@ -1070,8 +1118,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private ACValueItemList _PickingStateList;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public ACValueItemList PickingStateList
         {
             get
@@ -1089,6 +1139,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> TimePeriodsList
         {
             get
@@ -1097,8 +1148,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         ACValueItemList _PostingBehaviourEnumList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public ACValueItemList PostingBehaviourEnumList
         {
             get
@@ -1119,6 +1172,7 @@ namespace gip.mes.datamodel
         /// Liste aller Adressen, die eine Factory sind und dem eigenen Unternehmen angehören
         /// </summary>
         [ACPropertyInfo(9999, "")]
+        [NotMapped]
         public IEnumerable<CompanyAddress> FactoryCompanyAddressList
         {
             get
@@ -1132,6 +1186,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IQueryable<MDUnit> MDUnitList
         {
             get
@@ -1144,6 +1199,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IQueryable<Facility> FacilityLocation
         {
             get
@@ -1156,6 +1212,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999, "", "en{'Tenant/Contractual partner'}de{'Mandant/Vertragspartner'}")]
+        [NotMapped]
         public IQueryable<Company> CPartnerCompanyList
         {
             get
@@ -1168,8 +1225,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         static ACValueItemList _BatchPlanModeList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> BatchPlanModeList
         {
             get
@@ -1184,8 +1243,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static ACValueItemList _BatchPlanStartModeEnumList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public static IEnumerable<ACValueItem> BatchPlanStartModeEnumList
         {
             get
@@ -1201,6 +1262,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> BatchPlanStateList
         {
             get
@@ -1210,6 +1272,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ReservationStateList
         {
             get
@@ -1219,6 +1282,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> LabOrderTypeList
         {
             get
@@ -1228,6 +1292,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> TrackAndTracingSearchModelList
         {
             get
@@ -1237,6 +1302,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MaterialProcessStateList
         {
             get

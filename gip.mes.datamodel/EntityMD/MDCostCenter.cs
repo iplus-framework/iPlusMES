@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 
@@ -38,6 +39,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -50,6 +52,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -62,6 +65,7 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDCostCenterName
         {
             get

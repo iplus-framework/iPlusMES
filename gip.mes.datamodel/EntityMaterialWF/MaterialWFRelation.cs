@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace gip.mes.datamodel
 
         #region IACUrl member
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -57,6 +59,7 @@ namespace gip.mes.datamodel
         /// Reference to the From-Node (Source)
         /// </summary>
         /// <value>Reference to the From-Node (Source)</value>
+        [NotMapped]
         public IACWorkflowNode FromWFNode
         {
             get
@@ -73,6 +76,7 @@ namespace gip.mes.datamodel
         /// Reference to the To-Node (Destination)
         /// </summary>
         /// <value>Reference to the To-Node (Destination)</value>
+        [NotMapped]
         public IACWorkflowNode ToWFNode
         {
             get
@@ -85,6 +89,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public Global.ConnectionTypes ConnectionType
         {
             get
@@ -100,6 +105,7 @@ namespace gip.mes.datamodel
         /// ACIdentifier of the FromWFNode
         /// </summary>
         /// <value>ACIdentifier of the FromWFNode</value>
+        [NotMapped]
         public string SourceACName
         {
             get
@@ -108,11 +114,13 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         core.datamodel.ACClassProperty _SourceACClassProperty;
         /// <summary>
         /// Connection-Point of the FromWFNode
         /// </summary>
         /// <value>Connection-Point of the FromWFNode</value>
+        [NotMapped]
         public core.datamodel.ACClassProperty SourceACClassProperty
         {
             get
@@ -131,6 +139,7 @@ namespace gip.mes.datamodel
         /// for indentify the connector in the Logical-Tree
         /// </summary>
         /// <value>WPF-x:Name of the FromWFNode + \\ + SourceACClassProperty.ACIdentifier</value>
+        [NotMapped]
         public string SourceACConnector
         {
             get 
@@ -143,6 +152,7 @@ namespace gip.mes.datamodel
         /// ACIdentifier of the ToWFNode
         /// </summary>
         /// <value>ACIdentifier of the ToWFNode</value>
+        [NotMapped]
         public string TargetACName
         {
             get
@@ -151,11 +161,13 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         core.datamodel.ACClassProperty _TargetACClassProperty;
         /// <summary>
         /// Connection-Point of the ToWFNode
         /// </summary>
         /// <value>Connection-Point of the ToWFNode</value>
+        [NotMapped]
         public core.datamodel.ACClassProperty TargetACClassProperty
         {
             get
@@ -173,6 +185,7 @@ namespace gip.mes.datamodel
         /// for indentify the connector in the Logical-Tree
         /// </summary>
         /// <value>WPF-x:Name of the ToWFNode + \\ + TargetACClassProperty.ACIdentifier</value>
+        [NotMapped]
         public string TargetACConnector
         {
             get 
@@ -185,6 +198,7 @@ namespace gip.mes.datamodel
         /// Unique ID of the Workflow Edge
         /// </summary>
         /// <value>returns MaterialWFRelationID</value>
+        [NotMapped]
         public Guid WFObjectID
         {
             get { return MaterialWFRelationID; }
@@ -194,6 +208,7 @@ namespace gip.mes.datamodel
         /// Reference to the parent Workflow-Node that groups more child-nodes together
         /// </summary>
         /// <value>Parent Workflow-Node (Group)</value>
+        [NotMapped]
         public IACWorkflowNode WFGroup
         {
             get
@@ -209,6 +224,7 @@ namespace gip.mes.datamodel
         /// WPF's x:Name to indentify this instance in the Logical-Tree
         /// </summary>
         /// <value>x:Name (WPF)</value>
+        [NotMapped]
         public string XName
         {
             get 
@@ -222,6 +238,7 @@ namespace gip.mes.datamodel
         /// NOT THREAD-SAFE USE QueryLock_1X000!
         /// </summary>
         /// <value>Reference to MaterialWF</value>
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -232,6 +249,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Unique Identifier in a Parent-/Child-Relationship.</summary>
         /// <value>The Unique Identifier as string</value>
+        [NotMapped]
         public override string ACIdentifier
         {
             get

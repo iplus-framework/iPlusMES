@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -91,6 +92,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -145,6 +147,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -158,6 +161,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -182,6 +186,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Additional
+        [NotMapped]
         public bool IsReverseCharge
         {
             get
@@ -191,6 +196,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(31, "", "en{'Net total'}de{'Netto Gesamt'}")]
+        [NotMapped]
         public decimal PosPriceNetTotal
         {
             get
@@ -200,6 +206,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(32, "", "en{'Discount'}de{'Rabatt'}")]
+        [NotMapped]
         public decimal PosPriceNetDiscount
         {
             get
@@ -213,6 +220,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(33, "", "en{'Net'}de{'Netto'}")]
+        [NotMapped]
         public decimal PosPriceNetSum
         {
             get
@@ -226,6 +234,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(34, "", "en{'Net in f. currency'}de{'Netto in Fremdwährung'}")]
+        [NotMapped]
         public decimal? ForeginPosPriceNetSum
         {
             get
@@ -237,6 +246,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(35, "", "en{'Discount in f. currency'}de{'Rabatt in Fremdwährung'}")]
+        [NotMapped]
         public decimal? ForeginPosPriceNetDiscount
         {
             get
@@ -248,6 +258,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(36, "", "en{'Net total in f. currency'}de{'Netto Gesamt in Fremdwährung'}")]
+        [NotMapped]
         public decimal? ForeginPosPriceNetTotal
         {
             get
@@ -259,6 +270,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(37, "", ConstApp.ForeignPriceGross)]
+        [NotMapped]
         public decimal? ForeignPriceGross
         {
             get
@@ -289,6 +301,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(38, "", "en{'Due date'}de{'Fälligkeitsdatum'}")]
+        [NotMapped]
         public DateTime DueDate
         {
             get
@@ -317,6 +330,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public bool IsExchangeRateValid
         {
             get

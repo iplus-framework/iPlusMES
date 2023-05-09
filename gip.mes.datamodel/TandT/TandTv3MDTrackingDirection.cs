@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 /*
  
@@ -13,9 +14,7 @@ namespace gip.mes.datamodel
 
     public partial class TandTv3MDTrackingDirection
     {
+        [NotMapped]
         public const string ClassName = "TandTv3_MDTrackingDirection";
-
-
-
     }
 }

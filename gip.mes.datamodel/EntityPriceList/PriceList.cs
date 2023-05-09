@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -21,8 +22,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PriceList>) })]
     public partial class PriceList
     {
+        [NotMapped]
         public const string ClassName = "PriceList";
+        [NotMapped]
         public const string NoColumnName = "PriceListNo";
+        [NotMapped]
         public const string FormatNewNo = "PriceList{0}";
 
         #region New/Delete
@@ -42,6 +46,7 @@ namespace gip.mes.datamodel
 
         #region Properties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String PriceListName
         {
             get

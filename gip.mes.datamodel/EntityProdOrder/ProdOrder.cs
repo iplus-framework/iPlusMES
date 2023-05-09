@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using gip.core.datamodel;
@@ -48,6 +49,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -60,6 +62,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -99,6 +102,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -124,8 +128,10 @@ namespace gip.mes.datamodel
 
         #region Properties
 
+        [NotMapped]
         private string _ProducedMaterialNos;
         [ACPropertyInfo(9999, "ProducedMaterialNos", "en{'Produced materials No'}de{'Material Nummers'}")]
+        [NotMapped]
         public string ProducedMaterialNos
         {
             get
@@ -142,8 +148,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _ProducedMaterialNames;
         [ACPropertyInfo(9999, "ProducedMaterialNames", "en{'Product names'}de{'Produktnamen'}")]
+        [NotMapped]
         public string ProducedMaterialNames
         {
             get
@@ -162,8 +170,10 @@ namespace gip.mes.datamodel
 
 
 
+        [NotMapped]
         private string _PartslistName1;
         [ACPropertyInfo(9999, "PartslistName1", "en{'1.Product'}de{'1.Produkt'}")]
+        [NotMapped]
         public string PartslistName1
         {
             get
@@ -174,8 +184,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _PartslistName2;
         [ACPropertyInfo(9999, "PartslistName2", "en{'2.Product'}de{'2.Produkt'}")]
+        [NotMapped]
         public string PartslistName2
         {
             get
@@ -186,8 +198,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _PartslistName3;
         [ACPropertyInfo(9999, "PartslistName3", "en{'3.Product'}de{'3.Produkt'}")]
+        [NotMapped]
         public string PartslistName3
         {
             get
@@ -209,8 +223,10 @@ namespace gip.mes.datamodel
             return name;
         }
 
+        [NotMapped]
         private bool _IsSelected;
         [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get
@@ -230,8 +246,10 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
+        [NotMapped]
         private string _DepartmentUserNames;
         [ACPropertyInfo(505, nameof(DepartmentUserNames), ConstApp.DepartmentUserName)]
+        [NotMapped]
         public string DepartmentUserNames
         {
             get

@@ -6,6 +6,7 @@ using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -106,6 +107,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -120,6 +122,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Partslist</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -187,6 +190,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -198,6 +202,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -223,6 +228,7 @@ namespace gip.mes.datamodel
 
         #region Properties
         [ACPropertyInfo(9999, "", "en{'Materialnummer'}de{'Materialnummer'}")]
+        [NotMapped]
         public string MaterialNo
         {
             get
@@ -236,6 +242,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999, "", "en{'Materialname'}de{'Materialname'}")]
+        [NotMapped]
         public string MaterialName
         {
             get
@@ -248,6 +255,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public GlobalApp.MaterialPosTypes MaterialPosType
         {
             get
@@ -265,6 +273,7 @@ namespace gip.mes.datamodel
         /// Only input positions shuld be editable, mixures not in part of material selection
         /// </summary>
         [ACPropertyInfo(9999, "", "en{'IsOutwardRoot'}de{'IsOutwardRoot'}")]
+        [NotMapped]
         public bool IsOutwardRoot
         {
             get
@@ -277,18 +286,21 @@ namespace gip.mes.datamodel
         /// This rest quantity is calculated quantity - difference between input and used 
         /// </summary>
         [ACPropertyInfo(9999, "", "en{'RestQuantity'}de{'RestQuantity'}")]
+        [NotMapped]
         public double RestQuantity { get; set; }
 
         /// <summary>
         /// This rest quantity is calculated quantity - difference between input and used 
         /// </summary>
         [ACPropertyInfo(9999, "", "en{'RestQuantityUOM'}de{'RestQuantityUOM'}")]
+        [NotMapped]
         public double RestQuantityUOM { get; set; }
 
         /// <summary>
         /// This is used now only for handling value in new partslist version process
         /// not reference value in database
         /// </summary>
+        [NotMapped]
         public PartslistPos NewVersion
         {
             get;
@@ -316,6 +328,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables PartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Backflushing
         {
             get
@@ -331,6 +344,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the Anterograde-Fields in Tables PartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Foreflushing
         {
             get
@@ -343,8 +357,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private bool _IsChecked;
         [ACPropertyInfo(9999, "", "en{'Selected'}de{'Ausgewählt'}")]
+        [NotMapped]
         public bool IsChecked
         {
             get => _IsChecked;
@@ -362,6 +378,7 @@ namespace gip.mes.datamodel
         /// If its in tolerance then the quant will be posted to zero stock.
         /// </summary>
         [ACPropertyInfo(9999, "", "en{'Consume entire quant quantity'}de{'Vollständige Quantmenge verbrauchen'}", "", true)]
+        [NotMapped]
         public bool SuggestQuantQOnPosting
         {
             get
@@ -394,6 +411,7 @@ namespace gip.mes.datamodel
 
         #region Partial Methods
 
+        [NotMapped]
         bool _OnTargetQuantityChanging = false;
         protected void OnTargetQuantityChanged()
         {
@@ -419,6 +437,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnTargetQuantityUOMChanging = false;
         protected void OnTargetQuantityUOMChanged()
         {
@@ -509,11 +528,13 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IPartslistPos implementation
+        [NotMapped]
         public IEnumerable<IPartslistPosRelation> I_PartslistPosRelation_TargetPartslistPos
         {
             get { return this.PartslistPosRelation_TargetPartslistPos; }
         }
 
+        [NotMapped]
         public IEnumerable<IPartslistPosRelation> I_PartslistPosRelation_SourcePartslistPos
         {
             get { return this.PartslistPosRelation_SourcePartslistPos; }

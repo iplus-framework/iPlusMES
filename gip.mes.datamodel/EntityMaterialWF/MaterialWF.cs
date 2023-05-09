@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -26,10 +27,14 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWF>) })]
     public partial class MaterialWF : IACWorkflowDesignContext, IACWorkflowNode, IACClassDesignProvider
     {
+        [NotMapped]
         public const string ClassName = "MaterialWF";
+        [NotMapped]
         public const string NoColumnName = "MaterialWFNo";
+        [NotMapped]
         public const string FormatNewNo = "MW{0}";
 
+        [NotMapped]
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
         #region c'tors and instancing
@@ -48,6 +53,7 @@ namespace gip.mes.datamodel
 
         #region IACEntityProperty
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -88,8 +94,11 @@ namespace gip.mes.datamodel
 
         #region IACWorkflowDesignContext
 
+        [NotMapped]
         public Material FromNode;
+        [NotMapped]
         public Material ToNode;
+        [NotMapped]
         public core.datamodel.ACClass WorkflowTypeACClass
         {
             get
@@ -98,6 +107,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public IACWorkflowNode RootWFNode
         {
             get
@@ -106,6 +116,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public IEnumerable<IACWorkflowEdge> AllWFEdges
         {
             get { return this.MaterialWFRelation_MaterialWF; }
@@ -123,6 +134,7 @@ namespace gip.mes.datamodel
         {
         }
 
+        [NotMapped]
         public IEnumerable<IACWorkflowNode> AllWFNodes
         {
             get { return this.GetMaterials(); }
@@ -159,6 +171,7 @@ namespace gip.mes.datamodel
 
         #region IACWorkflowDesignContext -> IACConfigStore
 
+        [NotMapped]
         public string ConfigStoreName
         {
             get
@@ -173,6 +186,7 @@ namespace gip.mes.datamodel
         /// ACConfigKeyACUrl returns the relative Url to the "main table" in group a group of semantically related tables.
         /// This property is used when NewACConfig() is called. NewACConfig() creates a new IACConfig-Instance and set the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
         /// </summary>
+        [NotMapped]
         public string ACConfigKeyACUrl
         {
             get
@@ -201,11 +215,13 @@ namespace gip.mes.datamodel
         {
         }
 
+        [NotMapped]
         public decimal OverridingOrder { get; set; }
 
         /// <summary>
         /// A thread-safe and cached list of Configuration-Values of type IACConfig.
         /// </summary>
+        [NotMapped]
         public IEnumerable<IACConfig> ConfigurationEntries
         {
             get
@@ -315,6 +331,7 @@ namespace gip.mes.datamodel
         /// Returns a ACUrl, to be able to find this instance in the WPF-Logical-Tree.
         /// </summary>
         /// <value>ACUrl as string</value>
+        [NotMapped]
         public string VisualACUrl
         {
             get { return this.ACIdentifier; }
@@ -325,6 +342,7 @@ namespace gip.mes.datamodel
         /// The Runtime-type of the Workflow-Class that will be instantiated when the Workflow is loaded.
         /// </summary>
         /// <value>Reference to a ACClass</value>
+        [NotMapped]
         public core.datamodel.ACClass PWACClass
         {
             get { return this.GetObjectContext().ContextIPlus.GetACType(typeof(PWMaterialGroup)); }
@@ -336,6 +354,7 @@ namespace gip.mes.datamodel
         /// Therefore interface IACWorkflowNode is implemented.
         /// </summary>
         /// <value>Returns MaterialID</value>
+        [NotMapped]
         public Guid WFObjectID
         {
             get { return MaterialWFID; }
@@ -345,6 +364,7 @@ namespace gip.mes.datamodel
         /// Reference to the parent Workflow-Node that groups more child-nodes together
         /// </summary>
         /// <value>Parent Workflow-Node (Group)</value>
+        [NotMapped]
         public IACWorkflowNode WFGroup
         {
             get
@@ -360,6 +380,7 @@ namespace gip.mes.datamodel
         /// WPF's x:Name to indentify this instance in the Logical-Tree
         /// </summary>
         /// <value>x:Name (WPF)</value>
+        [NotMapped]
         public string XName
         {
             get { return this.MaterialWFNo; }

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using gip.core.datamodel;
@@ -109,6 +110,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -123,6 +125,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to ProdOrderPartslist</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -153,6 +156,7 @@ namespace gip.mes.datamodel
         //    return null;
         //}
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -164,7 +168,9 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
+        [NotMapped]
         BatchPlanMode _PreviousMode = BatchPlanMode.UseBatchCount;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -197,6 +203,7 @@ namespace gip.mes.datamodel
         #region Properties
 
         [ACPropertyInfo(999, "", "en{'Mode'}de{'Modus'}", Const.ContextDatabase + "\\BatchPlanModeList")]
+        [NotMapped]
         public BatchPlanMode PlanMode
         {
             get
@@ -210,6 +217,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public GlobalApp.BatchPlanState PlanState
         {
             get
@@ -224,6 +232,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "", "en{'State'}de{'Status'}")]
+        [NotMapped]
         public string PlanStateIndexName
         {
             get
@@ -236,6 +245,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(999, "", "en{'Yield [%]'}de{'Ausbeute [%]'}")]
+        [NotMapped]
         public double YieldPerc
         {
             get
@@ -245,6 +255,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "", "en{'Yield'}de{'Ausbeute'}")]
+        [NotMapped]
         public double Yield
         {
             get
@@ -266,6 +277,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "", "en{'Effective batch size'}de{'Effektive Batchgröße'}")]
+        [NotMapped]
         public double YieldBatchSize
         {
             get
@@ -277,6 +289,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "", "en{'Effective total size'}de{'Effektive Gesamtgröße'}")]
+        [NotMapped]
         public double YieldTotalSize
         {
             get
@@ -287,8 +300,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private double _YieldTotalSizeExpected;
         [ACPropertyInfo(999, "", "en{'Expected Eff. total size'}de{'Erwartete eff. Gesamtgröße'}")]
+        [NotMapped]
         public double YieldTotalSizeExpected
         {
             get
@@ -311,8 +326,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClassWF _IplusVBiACClassWF;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public gip.core.datamodel.ACClassWF IplusVBiACClassWF
         {
             get
@@ -331,8 +348,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private bool _IsSelected;
         [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get
@@ -357,6 +376,7 @@ namespace gip.mes.datamodel
         /// <value>
         /// The difference partial count.
         /// </value>
+        [NotMapped]
         public int? DiffPartialCount
         {
             get
@@ -368,8 +388,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private string _MatNameWithFinalProductName;
         [ACPropertyInfo(999, "MatNameWithFinalProductName", ConstApp.MaterialName1)]
+        [NotMapped]
         public string MatNameWithFinalProductName
         {
             get
@@ -420,6 +442,7 @@ namespace gip.mes.datamodel
 
         #region Partial methods
 
+        [NotMapped]
         bool _OnBatchBatchNoFromChanging = false;
         protected void OnBatchNoFromChanged()
         {
@@ -457,6 +480,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnBatchBatchNoToChanging = false;
         protected void OnBatchNoToChanged()
         {
@@ -494,6 +518,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnBatchTargetCountChanging = false;
         protected void OnBatchTargetCountChanged()
         {
@@ -524,6 +549,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnBatchSizeChanging = false;
         protected void OnBatchSizeChanged()
         {
@@ -569,6 +595,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnTotalSizeChanging = false;
         protected void OnTotalSizeChanged()
         {
@@ -592,6 +619,7 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         bool _OnPlanModeIndexChanging = false;
         //partial void OnPlanModeIndexChanging(global::System.Int16 value)
         //{
@@ -663,6 +691,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(15, "", "en{'Called-up Quantity'}de{'Abgerufene Menge'}")]
+        [NotMapped]
         public double CalledUpQuantity
         {
             get
@@ -698,6 +727,7 @@ namespace gip.mes.datamodel
         //}
 
         [ACPropertyInfo(16, "", "en{'Actual Quantity'}de{'Istmenge'}")]
+        [NotMapped]
         public double ActualQuantity
         {
             get
@@ -716,6 +746,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(17, "", "en{'Remaining Quantity'}de{'Restmenge'}")]
+        [NotMapped]
         public double RemainingQuantity
         {
             get
@@ -725,6 +756,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(18, "", "en{'Difference quantity'}de{'Differenzmenge'}")]
+        [NotMapped]
         public double DifferenceQuantity
         {
             get
@@ -733,6 +765,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public bool IsValid
         {
             get
@@ -744,6 +777,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(17, "", "en{'Batch-S. UOM alt.'}de{'Batchgr. ME alt.'}")]
+        [NotMapped]
         public double? BatchSizeAltUOM
         {
             get
@@ -753,6 +787,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(18, "", "en{'Total-S. UOM alt.'}de{'Gesamtgr. ME alt.'}")]
+        [NotMapped]
         public double? TotalSizeAltUOM
         {
             get
@@ -761,6 +796,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public MaterialUnit FirstAltMatUnit
         {
             get
@@ -774,6 +810,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(19, "", "en{'UOM alt.'}de{'ME Alt.'}")]
+        [NotMapped]
         public MDUnit FirstAltUOM
         {
             get

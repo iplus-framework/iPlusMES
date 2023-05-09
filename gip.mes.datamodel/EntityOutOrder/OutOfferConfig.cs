@@ -5,6 +5,7 @@ using System.Linq;
 using gipCoreData = gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -61,6 +62,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -79,6 +81,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to OutOffer</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -116,6 +119,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -127,6 +131,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -156,6 +161,7 @@ namespace gip.mes.datamodel
         #region IACConfig
 
         [ACPropertyInfo(101, Const.PN_ConfigACUrl, "en{'WF Property URL'}de{'WF Eigenschaft URL'}")]
+        [NotMapped]
         public string ConfigACUrl
         {
             get
@@ -167,6 +173,7 @@ namespace gip.mes.datamodel
         /// <summary>Gets or sets the encapsulated value as a boxed type</summary>
         /// <value>The boxed value.</value>
         [ACPropertyInfo(9999, "", "en{'Value'}de{'Wert'}")]
+        [NotMapped]
         public object Value
         {
             get
@@ -186,6 +193,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(6, "", "en{'Source']de{'Quelle'}")]
+        [NotMapped]
         public IACConfigStore ConfigStore
         {
             get
@@ -204,6 +212,7 @@ namespace gip.mes.datamodel
 
         /// <summary>OutOfferConfig-Childs</summary>
         /// <value>OutOfferConfig-Childs</value>
+        [NotMapped]
         public IEnumerable<IACContainerWithItems> Items
         {
             get
@@ -215,6 +224,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Gets the parent container.</summary>
         /// <value>The parent container.</value>
+        [NotMapped]
         public IACContainerWithItems ParentContainer
         {
             get
@@ -225,6 +235,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Gets the root container.</summary>
         /// <value>The root container.</value>
+        [NotMapped]
         public IACContainerWithItems RootContainer
         {
             get
@@ -260,6 +271,7 @@ namespace gip.mes.datamodel
             return false;
         }
 
+        [NotMapped]
         public gipCoreData.ACClass VBACClass
         {
             get
@@ -269,6 +281,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public Guid? ACClassWFID
         {
             get
@@ -280,8 +293,10 @@ namespace gip.mes.datamodel
         #endregion
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACClass _ACClass;
         [ACPropertyInfo(9999, "", "en{'Class'}de{'Klasse'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass ACClass
         {
             get
@@ -324,12 +339,14 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClass _ValueTypeACClass;
         /// <summary>
         /// Metadata (iPlus-Type) of the Value-Property. ATTENTION: ACClass is a EF-Object. Therefore the access to Navigation-Properties must be secured using the QueryLock_1X000 of the Global Database-Context!
         /// </summary>
         /// <value>Metadata (iPlus-Type) of the Value-Property as ACClass</value>
         [ACPropertyInfo(9999, "", "en{'Datatype'}de{'Datentyp'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass ValueTypeACClass
         {
             get
@@ -372,8 +389,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClassPropertyRelation _ACClassPropertyRelation;
         [ACPropertyInfo(9999, "", "en{'Relation'}de{'Beziehung'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassPropertyRelation.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClassPropertyRelation ACClassPropertyRelation
         {
             get

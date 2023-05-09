@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -24,12 +25,16 @@ namespace gip.mes.datamodel
     public partial class PlanningMR
     {
         #region const
+        [NotMapped]
         public const string ClassName = "PlanningMR";
+        [NotMapped]
         public const string NoColumnName = "PlanningMRNo";
+        [NotMapped]
         public const string FormatNewNo = "MR{0}";
         #endregion
 
         #region IACObjectEntity Members
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get

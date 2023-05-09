@@ -1,11 +1,13 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
     public partial class ProdOrderPartslistPos
     {
+        [NotMapped]
         public bool IsExcludedFromStat
         {
             get
@@ -20,6 +22,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "DifferenceQuantityPer", "en{'Difference Quantity (%)'}de{'Difference Quantity (%)'}")]
+        [NotMapped]
         public double DifferenceQuantityPer
         {
             get
@@ -38,6 +41,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputPer )]
+        [NotMapped]
         public double? InputQForActualOutputPer
         {
             get
@@ -54,6 +58,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputDiff)]
+        [NotMapped]
         public double? InputQForActualOutputDiff
         {
             get
@@ -70,6 +75,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForGoodActualOutput", ConstIInputQForActual.InputQForGoodActualOutputPer)]
+        [NotMapped]
         public double? InputQForGoodActualOutputPer
         {
             get
@@ -83,6 +89,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "InputQForGoodActualOutput", ConstIInputQForActual.InputQForGoodActualOutputDiff)]
+        [NotMapped]
         public double? InputQForGoodActualOutputDiff
         {
             get
@@ -96,6 +103,7 @@ namespace gip.mes.datamodel
         #region InputQForScrapActualOutput
 
         [ACPropertyInfo(999, "InputQForScrapActualOutput", ConstIInputQForActual.InputQForScrapActualOutputPer)]
+        [NotMapped]
         public double? InputQForScrapActualOutputPer
         {
             get
@@ -109,6 +117,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "InputQForScrapActualOutput", ConstIInputQForActual.InputQForScrapActualOutputDiff)]
+        [NotMapped]
         public double? InputQForScrapActualOutputDiff
         {
             get
@@ -125,6 +134,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalActualOutput", ConstIInputQForActual.InputQForFinalActualOutputPer)]
+        [NotMapped]
         public double? InputQForFinalActualOutputPer
         {
             get
@@ -141,6 +151,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalActualOutput", ConstIInputQForActual.InputQForFinalActualOutputDiff)]
+        [NotMapped]
         public double? InputQForFinalActualOutputDiff
         {
             get
@@ -157,6 +168,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", ConstIInputQForActual.InputQForFinalGoodActualOutputPer)]
+        [NotMapped]
         public double? InputQForFinalGoodActualOutputPer
         {
             get
@@ -173,6 +185,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", ConstIInputQForActual.InputQForFinalGoodActualOutputDiff)]
+        [NotMapped]
         public double? InputQForFinalGoodActualOutputDiff
         {
             get
@@ -189,6 +202,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", ConstIInputQForActual.InputQForFinalScrapActualOutputPer)]
+        [NotMapped]
         public double? InputQForFinalScrapActualOutputPer
         {
             get
@@ -205,6 +219,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", ConstIInputQForActual.InputQForFinalScrapActualOutputDiff)]
+        [NotMapped]
         public double? InputQForFinalScrapActualOutputDiff
         {
             get

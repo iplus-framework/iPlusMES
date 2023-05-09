@@ -20,16 +20,19 @@ using gip.core.datamodel;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
     public partial class Material : IACConfigStore
     {
+        [NotMapped]
         public const double DensityInAirOffset = 0.0011; // = Dichte in Trockenluft 1.092 / 1000;
         /// <summary>
         /// Gets or sets the Dimension
         /// </summary>
         /// <value>Dimension</value>
+        [NotMapped]
         public GlobalApp.PetroleumGroups PetroleumGroup
         {
             get
@@ -42,7 +45,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private static Nullable<bool> _CalcWithACTMTables;
+        [NotMapped]
         public static bool CalcWithACTMTables
         {
             get

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999)]
+        [NotMapped]
         public core.datamodel.VBGroup VBGroupTask
         {
             get

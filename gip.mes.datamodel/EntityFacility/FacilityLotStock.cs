@@ -6,6 +6,7 @@ using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -101,6 +102,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityLotStock>) })]
     public partial class FacilityLotStock
     {
+        [NotMapped]
         public const string ClassName = "FacilityLotStock";
 
         #region New/Delete
@@ -132,6 +134,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -146,6 +149,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to FacilityLot</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -158,6 +162,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -170,6 +175,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -225,6 +231,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayInwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(7, "", "en{'Day Inward Qty Difference'}de{'Tageszugang Differenz'}")]
+        [NotMapped]
         public Double DayInwardDiff
         {
             get
@@ -238,6 +245,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayInwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(8, "", "en{'Day Inward Qty Difference in %'}de{'Tageszugang Differenz in %'}")]
+        [NotMapped]
         public Double DayInwardDiffPercent
         {
             get
@@ -252,6 +260,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(11, "", "en{'Day Outward Qty Difference'}de{'Tagesabgang Differenz'}")]
+        [NotMapped]
         public Double DayOutwardDiff
         {
             get
@@ -264,6 +273,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayOutwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(12, "", "en{'Day Outward Qty Difference in %'}de{'Tagesabgang Differenz in %'}")]
+        [NotMapped]
         public Double DayOutwardDiffPercent
         {
             get
@@ -278,6 +288,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekInwardDiff in the schema.
         /// </summary>       
         [ACPropertyInfo(15, "", "en{'Week Inward Qty Difference'}de{'Wochenzugang Differenz'}")]
+        [NotMapped]
         public Double WeekInwardDiff
         {
             get
@@ -290,6 +301,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekInwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(16, "", "en{'Week Inward Qty Difference in %'}de{'Wochenzugang Differenz in %'}")]
+        [NotMapped]
         public Double WeekInwardDiffPercent
         {
             get
@@ -305,6 +317,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(19, "", "en{'Week Outward Qty Difference'}de{'Wochenabgang Differenz'}")]
+        [NotMapped]
         public Double WeekOutwardDiff
         {
             get
@@ -317,6 +330,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekOutwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(20, "", "en{'Week Outward Qty Difference in %'}de{'Wochenabgang Differenz in %'}")]
+        [NotMapped]
         public Double WeekOutwardDiffPercent
         {
             get
@@ -332,6 +346,7 @@ namespace gip.mes.datamodel
         /// </summary>
 
         [ACPropertyInfo(23, "", "en{'Month Inward Qty Difference'}de{'Monatszugang Differenz'}")]
+        [NotMapped]
         public Double MonthInwardDiff
         {
             get
@@ -344,6 +359,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthInwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(24, "", "en{'Month Inward Qty Difference in %'}de{'Monatszugang Differenz in %'}")]
+        [NotMapped]
         public Double MonthInwardDiffPercent
         {
             get
@@ -359,6 +375,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(27, "", "en{'Month Outward Qty Difference'}de{'Monatsabgang Differenz in %'}")]
+        [NotMapped]
         public Double MonthOutwardDiff
         {
             get
@@ -371,6 +388,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthOutwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(28, "", "en{'Month Outward Qty Difference in %'}de{'Monatsabgang Differenz in %'}")]
+        [NotMapped]
         public Double MonthOutwardDiffPercent
         {
             get
@@ -385,6 +403,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearInwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(31, "", "en{'Year Inward Qty Difference'}de{'Jahreseingang Differenz'}")]
+        [NotMapped]
         public Double YearInwardDiff
         {
             get
@@ -397,6 +416,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearInwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(32, "", "en{'Year Inward Qty Difference in %'}de{'Jahreseingang Differenz in %'}")]
+        [NotMapped]
         public Double YearInwardDiffPercent
         {
             get
@@ -411,6 +431,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(35, "", "en{'Year Outward Qty Difference'}de{'Jahresabgang Differenz'}")]
+        [NotMapped]
         public Double YearOutwardDiff
         {
             get
@@ -424,6 +445,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearOutwardDiffPercent in the schema.
         /// </summary>
         [ACPropertyInfo(36, "", "en{'Year Outward Qty Difference in %'}de{'Jahresabgang Differenz in %'}")]
+        [NotMapped]
         public Double YearOutwardDiffPercent
         {
             get
@@ -483,6 +505,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(59, "", "en{'Reserved Quantity'}de{'Reservierte Menge'}")]
+        [NotMapped]
         public Double ReservedQuantity
         {
             get
@@ -496,6 +519,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property AvailableQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(60, "", "en{'Available Quantity'}de{'Verfügbare Menge'}")]
+        [NotMapped]
         public Double AvailableQuantity
         {
             get

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -78,6 +79,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -90,6 +92,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -101,6 +104,7 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDReservationModeName
         {
             get
@@ -118,6 +122,7 @@ namespace gip.mes.datamodel
 
 #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -142,6 +147,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region enums
+        [NotMapped]
         public ReservationModes ReservationMode
         {
             get
@@ -167,10 +173,12 @@ namespace gip.mes.datamodel
             CancelComplete = 3, // Löse Reservierung vollständig auf
         }
 
+        [NotMapped]
         static ACValueItemList _ReservationModesList = null;
         /// <summary>
         /// Gibt eine Liste mit Übersetzungen an die GUI zurück
         /// </summary>
+        [NotMapped]
         public static ACValueItemList ReservationModesList
         {
             get

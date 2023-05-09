@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +37,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<LabOrder>) })]
     public partial class LabOrder
     {
+        [NotMapped]
         public const string ClassName = "LabOrder";
+        [NotMapped]
         public const string NoColumnName = "LabOrderNo";
+        [NotMapped]
         public const string FormatNewNo = "LO{0}";
 
         #region New/Delete
@@ -88,6 +92,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -126,6 +131,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IACObjectEntity Members
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -137,6 +143,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -161,6 +168,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Additional Properties
+        [NotMapped]
         public GlobalApp.LabOrderType LabOrderType
         {
             get
@@ -173,8 +181,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private bool _IsSelected;
         [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get
@@ -194,8 +204,10 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
+        [NotMapped]
         private string _OrderNo;
         [ACPropertyInfo(999, "DocumentNo", ConstApp.OrderNo)]
+        [NotMapped]
         public string OrderNo
         {
             get

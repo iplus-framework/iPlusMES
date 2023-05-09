@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -75,6 +76,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Facility>) })]
     public partial class Facility : ICloneable
     {
+        [NotMapped]
         public const string ClassName = "Facility";
 
         #region New/Delete
@@ -337,6 +339,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -403,6 +406,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         private bool _ContextEventSubscr = false;
         /// <summary>
         /// Method for validating values and references in this EF-Object.
@@ -422,6 +426,7 @@ namespace gip.mes.datamodel
             return baseResult;
         }
 
+        [NotMapped]
         public const string MN_RefreshFacility = "RefreshFacility";
 
         void OnContextACChangesExecuted(object sender, ACChangesEventArgs e)
@@ -439,6 +444,7 @@ namespace gip.mes.datamodel
             CallMethodOnInstance(MN_RefreshFacility, preventBroadcast, fbID);
         }
 
+        [NotMapped]
         public const string MN_SendPicking = "SendPicking";
         public void CallSendPicking(bool preventBroadcast, Guid? keyID)
         {
@@ -491,6 +497,7 @@ namespace gip.mes.datamodel
             return this.LastFCSortNoReverse--;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -502,6 +509,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -528,6 +536,7 @@ namespace gip.mes.datamodel
         /// </summary>
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(9999, "", ConstApp.NotAvailable)]
+        [NotMapped]
         public bool NotAvailable
         {
             get
@@ -551,13 +560,16 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private FacilityStock _CurrentFacilityStock;
+        [NotMapped]
         private bool _CurrentFacilityStockLoaded;
         /// <summary>
         /// There are no comments for Property CurrentFacilityStock in the schema.
         /// </summary>
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(9999, "", "en{'Current facility stock'} de{'Aktueller Lagerbestand'}")]
+        [NotMapped]
         public FacilityStock CurrentFacilityStock
         {
             get
@@ -593,8 +605,10 @@ namespace gip.mes.datamodel
         }
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACClass _FacilityACClass;
         [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass FacilityACClass
         {
             get
@@ -664,6 +678,7 @@ namespace gip.mes.datamodel
                 return this.VBiFacilityACClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
         }
 
+        [NotMapped]
         public bool IsMirroredOnMoreDatabases
         {
             get
@@ -676,8 +691,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClass _StackCalculatorACClass;
         [ACPropertyInfo(9999, "", "en{'Stack Posting Type'}de{'Stapelbuchungsart'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass StackCalculatorACClass
         {
             get
@@ -751,6 +768,7 @@ namespace gip.mes.datamodel
 
         #region Addititional Properties
         [ACPropertyInfo(36, "", "en{'First Quant'}de{'Erstes Quant'}")]
+        [NotMapped]
         public FacilityCharge FirstQuant
         {
             get
@@ -759,6 +777,7 @@ namespace gip.mes.datamodel
             }
         }
         [ACPropertyInfo(37, "", "en{'Last Quant'}de{'Letztes Quant'}")]
+        [NotMapped]
         public FacilityCharge LastQuant
         {
             get
@@ -768,6 +787,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(38, "", "en{'First Expired Quant'}de{'Erstes abgelaufenes Quant'}")]
+        [NotMapped]
         public FacilityCharge FirstExpiredQuant
         {
             get
@@ -776,6 +796,7 @@ namespace gip.mes.datamodel
             }
         }
         [ACPropertyInfo(39, "", "en{'Last Expired Quant'}de{'Letztes abgelaufenes Quant'}")]
+        [NotMapped]
         public FacilityCharge LastExpiredQuant
         {
             get
@@ -785,6 +806,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(40, "", "en{'First Storage Date'}de{'Erstes Einlagerdatum'}")]
+        [NotMapped]
         public DateTime? FirstQuantDate
         {
             get
@@ -795,6 +817,7 @@ namespace gip.mes.datamodel
             }
         }
         [ACPropertyInfo(41, "", "en{'Last Inward Date'}de{'Letztes Einlagerdatum'}")]
+        [NotMapped]
         public DateTime? LastQuantDate
         {
             get
@@ -806,6 +829,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(42, "", "en{'First Expiration Date'}de{'Ältestes MHD Ablaufdatum'}")]
+        [NotMapped]
         public DateTime? FirstExpirationQuantDate
         {
             get
@@ -817,6 +841,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(43, "", "en{'Last Expiration Date'}de{'Letztes MHD Ablaufdatum'}")]
+        [NotMapped]
         public DateTime? LastExpirationQuantDate
         {
             get
@@ -828,6 +853,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(44, "", "en{'Has blocked Quant'}de{'Hat gesperrte Quants'}")]
+        [NotMapped]
         public bool HasBlockedQuant
         {
             get
@@ -839,6 +865,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public IQueryable<FacilityCharge> QryHasBlockedQuants
         {
             get
@@ -849,6 +876,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public IQueryable<FacilityCharge> QryHasFreeQuants
         {
             get
@@ -861,6 +889,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(45, "", "en{'Available Space'}de{'Verfügbarer Platz'}")]
+        [NotMapped]
         public double AvailableSpace
         {
             get
@@ -886,6 +915,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(37, "", "en{'Posting behaviour'}de{'Buchungsverhalten'}", Const.ContextDatabase + "\\PostingBehaviourEnumList", true)]
+        [NotMapped]
         public PostingBehaviourEnum PostingBehaviour
         {
             get

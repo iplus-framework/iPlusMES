@@ -1,11 +1,12 @@
 ﻿
 using gip.core.datamodel;
+using System.ComponentModel.DataAnnotations.Schema;
 /*
 TandTv3_Step
-	StepID
-	JobID
-	StepNo
-	StepName
+StepID
+JobID
+StepNo
+StepName
 */
 namespace gip.mes.datamodel
 {
@@ -15,6 +16,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "StepName", "en{'Name'}de{'Name'}", "", "", true)]
     public partial class TandTv3Step
     {
+        [NotMapped]
         public const string ClassName = "TandTv3Step";
 
         #region overriden methods

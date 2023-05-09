@@ -5,6 +5,7 @@ using System.Text;
 using System.Transactions; 
 using gip.core.datamodel;
 using System.Runtime.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -17,6 +18,7 @@ namespace gip.mes.datamodel
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + OrderLog.ClassName, "en{'Programlog'}de{'Programlog'}", typeof(OrderLog), OrderLog.ClassName, "VBiACProgramLogID", "VBiACProgramLogID")]
     public partial class OrderLog : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "OrderLog";
 
         #region New/Delete
@@ -46,6 +48,7 @@ namespace gip.mes.datamodel
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
         [IgnoreDataMember]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -60,6 +63,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
         [IgnoreDataMember]
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -71,9 +75,11 @@ namespace gip.mes.datamodel
 
         #region VBIplus-Context
         [IgnoreDataMember]
+        [NotMapped]
         private gip.core.datamodel.ACProgramLog _ACProgramLog;
         [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
         [IgnoreDataMember]
+        [NotMapped]
         public gip.core.datamodel.ACProgramLog ACProgramLog
         {
             get

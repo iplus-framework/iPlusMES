@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Transactions;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -27,8 +28,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DemandOrder>) })]
     public partial class DemandOrder
     {
+        [NotMapped]
         public const string ClassName = "DemandOrder";
+        [NotMapped]
         public const string NoColumnName = "DemandOrderNo";
+        [NotMapped]
         public const string FormatNewNo = "DO{0}";
 
         #region New/Delete
@@ -56,6 +60,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -112,6 +117,7 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -123,6 +129,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {

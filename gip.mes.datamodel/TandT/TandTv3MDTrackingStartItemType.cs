@@ -1,7 +1,8 @@
 ﻿using gip.core.datamodel;
+using System.ComponentModel.DataAnnotations.Schema;
 /*
 TandTv3_ItemType
-    ItemTypeID
+ItemTypeID
 */
 namespace gip.mes.datamodel
 {
@@ -9,6 +10,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, "ACCaptionTranslation", "en{'Translation'}de{'Übersetzung'}", "", "", true)]
     public partial class TandTv3MDTrackingStartItemType
     {
+        [NotMapped]
         public const string ClassName = "TandTv3MDTrackingStartItemType";
 
         #region IACTypeMember
@@ -16,6 +18,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(2, "ACCaption", "en{'Description'}de{'Bezeichnung'}")]
+        [NotMapped]
         public override string ACCaption
         {
             get

@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -11,6 +12,7 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "DifferenceQuantityPer", "en{'Differenz [%] to Target-Quantity'}de{'Differenz [%] zu Sollmenge'}")]
+        [NotMapped]
         public double DifferenceQuantityPer
         {
             get
@@ -22,6 +24,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Good Quantity [%]'}de{'Gutmenge [%]'}")]
+        [NotMapped]
         public double ActualQuantityGoodPer
         {
             get
@@ -34,6 +37,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(25, "", "en{'Scrapped Quantity [%]'}de{'Ausschussmenge [%]'}")]
+        [NotMapped]
         public double ActualQuantityScrapPer
         {
             get

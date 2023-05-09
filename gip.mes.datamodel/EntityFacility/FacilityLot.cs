@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -31,8 +32,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityLot>) })]
     public partial class FacilityLot
     {
+        [NotMapped]
         public const string ClassName = "FacilityLot";
+        [NotMapped]
         public const string NoColumnName = "LotNo";
+        [NotMapped]
         public const string FormatNewNo = "FL{0}";
 
         #region New/Delete
@@ -71,6 +75,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -99,6 +104,7 @@ namespace gip.mes.datamodel
             return facilityStock;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -108,6 +114,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999, "", "en{'Storage Life Remaining'}de{'Verbleibende Haltbarkeit'}")]
+        [NotMapped]
         public int StorageLifeRemaining
         {
             get
@@ -125,6 +132,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -150,6 +158,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property CurrentFacilityStock in the schema.
         /// </summary>
         [global::System.Runtime.Serialization.DataMemberAttribute()]
+        [NotMapped]
         public FacilityLotStock CurrentFacilityLotStock
         {
             get

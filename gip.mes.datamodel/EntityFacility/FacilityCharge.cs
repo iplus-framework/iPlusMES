@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -182,6 +183,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -198,6 +200,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Facility</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -396,6 +399,7 @@ namespace gip.mes.datamodel
                 this.Partslist.FacilityCharge_Partslist.Add(this);
         }
 
+        [NotMapped]
         public bool IsStockZero
         {
             get
@@ -406,6 +410,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -417,6 +422,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -504,6 +510,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(12, "", "en{'Reserved Quantity'}de{'Reservierte Menge'}")]
+        [NotMapped]
         public Double ReservedQuantity
         {
             get
@@ -516,6 +523,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property AvailableQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(13, "", "en{'Available Quantity'}de{'Verfügbare Menge'}")]
+        [NotMapped]
         public Double AvailableQuantity
         {
             get
@@ -530,6 +538,7 @@ namespace gip.mes.datamodel
         /// Charge is direct input into stock from outside
         /// recived from distributor company
         /// </summary>
+        [NotMapped]
         public bool IsInputOutside
         {
             get
@@ -544,6 +553,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Charge belong to final product (placed on stock but shuld not be delivered until yet
         /// </summary>
+        [NotMapped]
         public bool IsFinalOutput
         {
             get
@@ -555,6 +565,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Charge belong to delivered final product
         /// </summary>
+        [NotMapped]
         public bool IsFinalOutputDelivered
         {
             get
@@ -569,6 +580,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// @aagincic: this is implemented temporaly before InOrder preparing (for export purpurose)
         /// </summary>
+        [NotMapped]
         public bool IsNoConnectionWithProduction
         {
             get
@@ -580,6 +592,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public ProdOrderPartslistPos FinalRootPositionFromFB
         {
             get
@@ -598,6 +611,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public ProdOrderPartslistPos FinalPositionFromFB
         {
             get
@@ -610,6 +624,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public ProdOrderPartslistPos FinalRootPositionFromFbc
         {
             get
@@ -627,6 +642,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public ProdOrderPartslistPos FinalPositionFromFbc
         {
             get
@@ -643,6 +659,7 @@ namespace gip.mes.datamodel
         #endregion
 
         [ACPropertyInfo(999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
+        [NotMapped]
         public string ProdOrderProgramNo
         {
             get
@@ -662,6 +679,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "BatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
+        [NotMapped]
         public string BatchNo
         {
             get
@@ -682,6 +700,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(999, "InOrderNo", "en{'Purchase Order Number'}de{'Bestellnummer'}")]
+        [NotMapped]
         public string InOrderNo
         {
             get

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using gip.core.datamodel;
@@ -159,6 +160,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -229,6 +231,7 @@ namespace gip.mes.datamodel
             return facilityStock;
         }
 
+        [NotMapped]
         public PartslistStock CurrentPartslistStock
         {
             get
@@ -237,6 +240,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -248,6 +252,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -273,7 +278,9 @@ namespace gip.mes.datamodel
 
         #region IACConfigStore
 
+        [NotMapped]
         private string configStoreName;
+        [NotMapped]
         public string ConfigStoreName
         {
             get
@@ -291,6 +298,7 @@ namespace gip.mes.datamodel
         /// ACConfigKeyACUrl returns the relative Url to the "main table" in group a group of semantically related tables.
         /// This property is used when NewACConfig() is called. NewACConfig() creates a new IACConfig-Instance and set the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
         /// </summary>
+        [NotMapped]
         public string ACConfigKeyACUrl
         {
             get
@@ -350,11 +358,13 @@ namespace gip.mes.datamodel
             ClearCacheOfConfigurationEntries();
         }
 
+        [NotMapped]
         public decimal OverridingOrder { get; set; }
 
         /// <summary>
         /// A thread-safe and cached list of Configuration-Values of type IACConfig.
         /// </summary>
+        [NotMapped]
         public IEnumerable<IACConfig> ConfigurationEntries
         {
             get
@@ -363,7 +373,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private SafeList<IACConfig> _ACConfigListCache;
+        [NotMapped]
         private SafeList<IACConfig> ACConfigListCache
         {
             get
@@ -462,6 +474,7 @@ namespace gip.mes.datamodel
         /// Mapping partslist name
         /// </summary>
         [ACPropertyInfo(9999, "", "en{'Based on'}de{'Basiert auf'}")]
+        [NotMapped]
         public string ViewPreviousPartslistName
         {
             get
@@ -475,6 +488,7 @@ namespace gip.mes.datamodel
         /// Mappint MDUnit - Name
         /// </summary>
         [ACPropertyInfo(9999, "", "en{'Unit of measurement'}de{'Maßeinheit'}")]
+        [NotMapped]
         public string ViewMDUnitName
         {
             get
@@ -485,8 +499,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private bool _IsSelected;
         [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get
@@ -519,6 +535,7 @@ namespace gip.mes.datamodel
         }
 
         #region partial methods
+        [NotMapped]
         bool _OnTargetQuantityChanging = false;
         protected void OnTargetQuantityChanged()
         {
@@ -544,6 +561,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnTargetQuantityUOMChanging = false;
         protected void OnTargetQuantityUOMChanged()
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -32,8 +33,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityReservation>) })]
     public partial class FacilityReservation
     {
+        [NotMapped]
         public const string ClassName = "FacilityReservation";
+        [NotMapped]
         public const string NoColumnName = "FacilityReservationNo";
+        [NotMapped]
         public const string FormatNewNo = "FR{0}";
 
         #region New/Delete
@@ -80,6 +84,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -94,6 +99,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Facility</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -106,6 +112,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -117,6 +124,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -141,6 +149,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Additional Properties
+        [NotMapped]
         public GlobalApp.ReservationState ReservationState
         {
             get
@@ -154,8 +163,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private gip.core.datamodel.ACClass _FacilityACClass;
         [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass FacilityACClass
         {
             get

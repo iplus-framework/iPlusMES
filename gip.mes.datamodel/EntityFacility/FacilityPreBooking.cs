@@ -5,6 +5,7 @@ using System.Text;
 using System.Transactions;
 using gip.core.datamodel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -21,8 +22,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityPreBooking>) })]
     public partial class FacilityPreBooking : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "FacilityPreBooking";
+        [NotMapped]
         public const string NoColumnName = "FacilityPreBookingNo";
+        [NotMapped]
         public const string FormatNewNo = "FPB{0}";
 
         #region New/Delete
@@ -103,6 +107,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -142,6 +147,7 @@ namespace gip.mes.datamodel
 
         // Buchungssätze werden nur einmalig eingefügt und danach nie
         // mehr geändert
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -166,7 +172,9 @@ namespace gip.mes.datamodel
         //        ACProperties.Refresh();
         //}
 
+        [NotMapped]
         private gip.core.datamodel.ACClass _TypeOfACMethodBooking = null;
+        [NotMapped]
         private gip.core.datamodel.ACClass TypeOfACMethodBooking
         {
             get
@@ -184,8 +192,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private ACMethod _ACMethodBooking = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public ACMethod ACMethodBooking
         {
             get
@@ -240,6 +250,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Nullable<Double> InwardQuantity
         {
             get
@@ -254,6 +265,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Nullable<Double> OutwardQuantity
         {
             get
@@ -268,6 +280,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public MDUnit MDUnit
         {
             get
@@ -282,6 +295,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Facility InwardFacility
         {
             get
@@ -296,6 +310,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Facility OutwardFacility
         {
             get
@@ -310,6 +325,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public FacilityLot InwardFacilityLot
         {
             get
@@ -324,6 +340,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public FacilityLot OutwardFacilityLot
         {
             get
@@ -338,6 +355,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public FacilityCharge InwardFacilityCharge
         {
             get
@@ -352,6 +370,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public FacilityCharge OutwardFacilityCharge
         {
             get
@@ -366,6 +385,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Material InwardMaterial
         {
             get
@@ -380,6 +400,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Material OutwardMaterial
         {
             get

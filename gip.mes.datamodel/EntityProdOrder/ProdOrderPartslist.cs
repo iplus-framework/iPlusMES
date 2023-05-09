@@ -5,6 +5,7 @@ using System.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -81,6 +82,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -97,6 +99,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to ProdOrder</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -138,6 +141,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -188,6 +192,7 @@ namespace gip.mes.datamodel
         #region AdditionalProperties
 
         [ACPropertyInfo(24, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        [NotMapped]
         public double DifferenceQuantity
         {
             get
@@ -197,6 +202,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Good Quantity'}de{'Gutmenge'}")]
+        [NotMapped]
         public double ActualQuantityGoodUOM
         {
             get
@@ -206,6 +212,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "", "en{'Sum Components'}de{'Summe Komponenten'}")]
+        [NotMapped]
         public double OutwardRootTargetQuantitySum
         {
             get
@@ -219,6 +226,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "", "en{'Loss Factor'}de{'Verlustfaktor'}")]
+        [NotMapped]
         public double TargetQuantityLossFactor
         {
             get
@@ -242,6 +250,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public ProdOrderPartslistPos FinalIntermediate
         {
             get
@@ -317,7 +326,9 @@ namespace gip.mes.datamodel
 
         #region IACConfigStore
 
+        [NotMapped]
         private string configStoreName;
+        [NotMapped]
         public string ConfigStoreName
         {
             get
@@ -335,6 +346,7 @@ namespace gip.mes.datamodel
         /// ACConfigKeyACUrl returns the relative Url to the "main table" in group a group of semantically related tables.
         /// This property is used when NewACConfig() is called. NewACConfig() creates a new IACConfig-Instance and set the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
         /// </summary>
+        [NotMapped]
         public string ACConfigKeyACUrl
         {
             get
@@ -393,12 +405,14 @@ namespace gip.mes.datamodel
             ClearCacheOfConfigurationEntries();
         }
 
+        [NotMapped]
         public decimal OverridingOrder { get; set; }
 
         /// <summary>
         /// A thread-safe and cached list of Configuration-Values of type IACConfig.
         /// </summary>
         [ACPropertyInfo(999)]
+        [NotMapped]
         public IEnumerable<IACConfig> ConfigurationEntries
         {
             get
@@ -407,7 +421,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private SafeList<IACConfig> _ACConfigListCache;
+        [NotMapped]
         private SafeList<IACConfig> ACConfigListCache
         {
             get
@@ -476,6 +492,7 @@ namespace gip.mes.datamodel
         /// <value>
         /// XAML-Code for Presentation
         /// </value>
+        [NotMapped]
         public string XMLDesign
         {
             get;

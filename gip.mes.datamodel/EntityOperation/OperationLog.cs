@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,8 +31,10 @@ namespace gip.mes.datamodel
 
         #region Additional properties
 
+        [NotMapped]
         private TimeSpan _MinDuration;
         [ACPropertyInfo(9999, "", "en{'Min. duration'}de{'Min. Dauer'}")]
+        [NotMapped]
         public TimeSpan MinDuration
         {
             get => _MinDuration;
@@ -43,8 +46,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private DateTime _CompleteTime;
         [ACPropertyInfo(9999, "", "en{'Completed at'}de{'Abgeschlossen am'}")]
+        [NotMapped]
         public DateTime CompleteTime
         {
             get => _CompleteTime;

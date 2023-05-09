@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using gip.core.datamodel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -22,6 +23,7 @@ namespace gip.mes.datamodel
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintACClassProperty.ClassName, "en{'Maintenance ACClassProperty'}de{'Maintenance ACClassProperty'}", typeof(MaintACClassProperty), MaintACClassProperty.ClassName, "", "")]
     public partial class MaintACClassProperty
     {
+        [NotMapped]
         public const string ClassName = "MaintACClassProperty";
 
         public static MaintACClassProperty NewACObject(DatabaseApp dbApp, IACObject parentObject)
@@ -35,8 +37,10 @@ namespace gip.mes.datamodel
             return entity;
         }
 
+        [NotMapped]
         private ACValueItem _MaxValueShow;
         [ACPropertyInfo(999, "","en{'Maximum value'}de{'Maximaler Wert'}")]
+        [NotMapped]
         public ACValueItem MaxValueShow
         {
             get
@@ -60,8 +64,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private ACValueItem _WarningValueShow;
         [ACPropertyInfo(999, "", "en{'Warning value difference'}de{'Warnungswertdifferenz'}")]
+        [NotMapped]
         public ACValueItem WarningValueShow
         {
             get
@@ -105,8 +111,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClassProperty _ACClassProperty;
         [ACPropertyInfo(9999, "", "en{'Property'}de{'Eigenschaft'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassProperty.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClassProperty ACClassProperty
         {
             get

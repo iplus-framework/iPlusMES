@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -157,6 +158,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -171,6 +173,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to OutOffer</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -208,6 +211,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -219,6 +223,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -245,6 +250,7 @@ namespace gip.mes.datamodel
         #region Additional properties
 
         [ACPropertyInfo(30)]
+        [NotMapped]
         public string Position
         {
             get
@@ -271,6 +277,7 @@ namespace gip.mes.datamodel
         #region Report helper
 
         [ACPropertyInfo(31)]
+        [NotMapped]
         public List<OutOfferPos> Items
         {
             get
@@ -280,6 +287,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(32, "", ConstApp.PriceNetTotal)]
+        [NotMapped]
         public decimal TotalPrice
         {
             get
@@ -289,6 +297,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(33)]
+        [NotMapped]
         public string QuantityWithUnitPrinted
         {
             get
@@ -300,6 +309,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(34)]
+        [NotMapped]
         public string PriceNetPrinted
         {
             get
@@ -310,8 +320,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public string _TotalPricePrinted;
         [ACPropertyInfo(35)]
+        [NotMapped]
         public string TotalPricePrinted
         {
             get
@@ -328,8 +340,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _MaterialNo;
         [ACPropertyInfo(36)]
+        [NotMapped]
         public string MaterialNo
         {
             get
@@ -346,6 +360,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(38)]
+        [NotMapped]
         public string SalesTaxPrinted
         {
             get
@@ -357,6 +372,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(31, "", ConstApp.VATPerUnit)]
+        [NotMapped]
         public decimal SalesTaxAmount
         {
             get
@@ -366,6 +382,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(32, "", ConstApp.VATTotal)]
+        [NotMapped]
         public decimal TotalSalesTax
         {
             get
@@ -375,6 +392,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(33, "", ConstApp.PriceGrossTotal)]
+        [NotMapped]
         public decimal TotalPriceWithTax
         {
             get
@@ -384,6 +402,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(37)]
+        [NotMapped]
         public MDUnit DerivedMDUnit
         {
             get

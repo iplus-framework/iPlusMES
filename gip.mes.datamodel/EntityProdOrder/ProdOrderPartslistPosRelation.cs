@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -76,6 +77,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -90,6 +92,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to SourceProdOrderPartslistPos</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -122,6 +125,7 @@ namespace gip.mes.datamodel
 
         #region Partial methods
 
+        [NotMapped]
         public ProdOrderPartslistPosRelation TopParentPartslistPosRelation
         {
             get
@@ -132,6 +136,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnTargetQuantityChanging = false;
         protected void OnTargetQuantityChanged()
         {
@@ -165,6 +170,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("DifferenceQuantity");
         }
 
+        [NotMapped]
         bool _OnTargetQuantityUOMChanging = false;
         protected void OnTargetQuantityUOMChanged()
         {
@@ -198,6 +204,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("DifferenceQuantityUOM");
         }
 
+        [NotMapped]
         bool _OnActualQuantityChanging = false;
         protected void OnActualQuantityChanged()
         {
@@ -225,6 +232,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("DifferenceQuantity");
         }
 
+        [NotMapped]
         bool _OnActualQuantityUOMChanging = false;
         protected void OnActualQuantityUOMChanged()
         {
@@ -253,6 +261,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(24, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        [NotMapped]
         public double DifferenceQuantity
         {
             get
@@ -262,6 +271,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Difference Quantity (UOM)'}de{'Differenzmenge (BME)'}")]
+        [NotMapped]
         public double DifferenceQuantityUOM
         {
             get
@@ -274,6 +284,7 @@ namespace gip.mes.datamodel
         /// The value is negative if the actual quantity is lower than the target quantity
         /// </summary>
         [ACPropertyInfo(26, "", "en{'Remaining Dosing Quantity (UOM)'}de{'Dosierrestmenge (BME)'}")]
+        [NotMapped]
         public double RemainingDosingQuantityUOM
         {
             get
@@ -284,6 +295,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double RemainingDosingWeight
         {
             get
@@ -300,6 +312,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double TargetWeight
         {
             get
@@ -316,6 +329,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double ActualWeight
         {
             get
@@ -467,6 +481,7 @@ namespace gip.mes.datamodel
             //this.ActualQuantityUOM = sumActualQuantityUOM;
         }
 
+        [NotMapped]
         public string RemainingDosingWeightError
         {
             get
@@ -490,6 +505,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -505,6 +521,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables PartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Backflushing
         {
             get
@@ -522,6 +539,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the Anterograde-Fields in Tables PartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Foreflushing
         {
             get
@@ -568,11 +586,13 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IPartslistPosRelation implementation
+        [NotMapped]
         public IPartslistPos I_SourcePartslistPos
         {
             get { return this.SourceProdOrderPartslistPos; }
         }
 
+        [NotMapped]
         public IPartslistPos I_TargetPartslistPos
         {
             get { return this.TargetProdOrderPartslistPos; }

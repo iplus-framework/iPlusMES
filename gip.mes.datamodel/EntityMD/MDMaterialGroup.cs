@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -79,6 +80,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -91,6 +93,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -144,6 +147,7 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDMaterialGroupName
         {
             get
@@ -160,6 +164,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region enums
+        [NotMapped]
         public MaterialGroupTypes MaterialGroupType
         {
             get
@@ -196,8 +201,10 @@ namespace gip.mes.datamodel
             Licence = 120       // Nur für Softwarelizenzen
         }
 
+        [NotMapped]
         static ACValueItemList _MaterialGroupTypesList = null;
 
+        [NotMapped]
         public static ACValueItemList MaterialGroupTypesList
         {
             get
@@ -256,6 +263,7 @@ namespace gip.mes.datamodel
          */
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -281,14 +289,17 @@ namespace gip.mes.datamodel
 
         #region Image
 
+        [NotMapped]
         public bool IsImageLoaded;
 
+        [NotMapped]
         private string _DefaultImage;
         /// <summary>
         /// Doc  DefaultImage
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "DefaultImage", "en{'DefaultImage'}de{'DefaultImage'}")]
+        [NotMapped]
         public string DefaultImage
         {
             get
@@ -306,12 +317,14 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private string _DefaultThumbImage;
         /// <summary>
         /// Doc  DefaultThumbImage
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "DefaultThumbImage", "en{'DefaultThumbImage'}de{'DefaultThumbImage'}")]
+        [NotMapped]
         public string DefaultThumbImage
         {
             get

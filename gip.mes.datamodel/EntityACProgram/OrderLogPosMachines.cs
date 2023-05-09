@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -18,6 +19,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OrderLogPosMachines>) })]
     public partial class OrderLogPosMachines
     {
+        [NotMapped]
         public const string ClassName = "OrderLogPosMachines";
     }
 }

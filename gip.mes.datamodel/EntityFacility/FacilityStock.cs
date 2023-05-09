@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -107,6 +108,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityStock>) })]
     public partial class FacilityStock
     {
+        [NotMapped]
         public const string ClassName = "FacilityStock";
 
         #region New/Delete
@@ -138,6 +140,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -154,6 +157,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Facility</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -220,6 +224,7 @@ namespace gip.mes.datamodel
         //    _ContextEventSubscr = false;
         //}
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -231,6 +236,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -271,6 +277,7 @@ namespace gip.mes.datamodel
         /// </summary>
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(11, "", "en{'Day Inward Qty Difference'}de{'Tageszugang Differenz'}")]
+        [NotMapped]
         public float DayInwardDiff
         {
             get
@@ -286,6 +293,7 @@ namespace gip.mes.datamodel
                 this.OnDayInwardDiffChanged();
             }
         }
+        [NotMapped]
         private float _DayInwardDiff;
         partial void OnDayInwardDiffChanging(float value);
         partial void OnDayInwardDiffChanged();
@@ -296,6 +304,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(12, "", "en{'Day Inward Qty Difference in %'}de{'Tageszugang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> DayInwardDiffPercent
         {
             get
@@ -311,6 +320,7 @@ namespace gip.mes.datamodel
                 this.OnDayInwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _DayInwardDiffPercent;
         partial void OnDayInwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnDayInwardDiffPercentChanged();
@@ -321,6 +331,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(15, "", "en{'Day Outward Qty Difference'}de{'Tagesabgang Differenz'}")]
+        [NotMapped]
         public global::System.Nullable<float> DayOutwardDiff
         {
             get
@@ -336,6 +347,7 @@ namespace gip.mes.datamodel
                 this.OnDayOutwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _DayOutwardDiff;
         partial void OnDayOutwardDiffChanging(global::System.Nullable<float> value);
         partial void OnDayOutwardDiffChanged();
@@ -346,6 +358,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(16, "", "en{'Day Outward Qty Difference in %'}de{'Tagesabgang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> DayOutwardDiffPercent
         {
             get
@@ -361,6 +374,7 @@ namespace gip.mes.datamodel
                 this.OnDayOutwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _DayOutwardDiffPercent;
         partial void OnDayOutwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnDayOutwardDiffPercentChanged();
@@ -371,6 +385,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(19, "", "en{'Week Inward Qty Difference'}de{'Wochenzugang Differenz'}")]
+        [NotMapped]
         public global::System.Nullable<float> WeekInwardDiff
         {
             get
@@ -386,6 +401,7 @@ namespace gip.mes.datamodel
                 this.OnWeekInwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _WeekInwardDiff;
         partial void OnWeekInwardDiffChanging(global::System.Nullable<float> value);
         partial void OnWeekInwardDiffChanged();
@@ -396,6 +412,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(20, "", "en{'Week Inward Qty Difference in %'}de{'Wochenzugang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> WeekInwardDiffPercent
         {
             get
@@ -411,6 +428,7 @@ namespace gip.mes.datamodel
                 this.OnWeekInwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _WeekInwardDiffPercent;
         partial void OnWeekInwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnWeekInwardDiffPercentChanged();
@@ -422,6 +440,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(23, "", "en{'Week Outward Qty Difference'}de{'Wochenabgang Differenz'}")]
+        [NotMapped]
         public global::System.Nullable<float> WeekOutwardDiff
         {
             get
@@ -437,6 +456,7 @@ namespace gip.mes.datamodel
                 this.OnWeekOutwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _WeekOutwardDiff;
         partial void OnWeekOutwardDiffChanging(global::System.Nullable<float> value);
         partial void OnWeekOutwardDiffChanged();
@@ -447,6 +467,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(24, "", "en{'Week Outward Qty Difference in %'}de{'Wochenabgang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> WeekOutwardDiffPercent
         {
             get
@@ -462,6 +483,7 @@ namespace gip.mes.datamodel
                 this.OnWeekOutwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _WeekOutwardDiffPercent;
         partial void OnWeekOutwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnWeekOutwardDiffPercentChanged();
@@ -472,6 +494,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(27, "", "en{'Month Inward Qty Difference'}de{'Monatszugang Differenz'}")]
+        [NotMapped]
         public global::System.Nullable<float> MonthInwardDiff
         {
             get
@@ -487,6 +510,7 @@ namespace gip.mes.datamodel
                 this.OnMonthInwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _MonthInwardDiff;
         partial void OnMonthInwardDiffChanging(global::System.Nullable<float> value);
         partial void OnMonthInwardDiffChanged();
@@ -497,6 +521,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(28, "", "en{'Month Inward Qty Difference in %'}de{'Monatszugang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> MonthInwardDiffPercent
         {
             get
@@ -512,6 +537,7 @@ namespace gip.mes.datamodel
                 this.OnMonthInwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _MonthInwardDiffPercent;
         partial void OnMonthInwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnMonthInwardDiffPercentChanged();
@@ -523,6 +549,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(31, "", "en{'Month Outward Qty Difference'}de{'Monatsabgang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> MonthOutwardDiff
         {
             get
@@ -538,6 +565,7 @@ namespace gip.mes.datamodel
                 this.OnMonthOutwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _MonthOutwardDiff;
         partial void OnMonthOutwardDiffChanging(global::System.Nullable<float> value);
         partial void OnMonthOutwardDiffChanged();
@@ -548,6 +576,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(32, "", "en{'Month Outward Qty Difference in %'}de{'Monatsabgang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> MonthOutwardDiffPercent
         {
             get
@@ -563,6 +592,7 @@ namespace gip.mes.datamodel
                 this.OnMonthOutwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _MonthOutwardDiffPercent;
         partial void OnMonthOutwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnMonthOutwardDiffPercentChanged();
@@ -573,6 +603,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(35, "", "en{'Year Inward Qty Difference'}de{'Jahreseingang Differenz'}")]
+        [NotMapped]
         public global::System.Nullable<float> YearInwardDiff
         {
             get
@@ -588,6 +619,7 @@ namespace gip.mes.datamodel
                 this.OnYearInwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _YearInwardDiff;
         partial void OnYearInwardDiffChanging(global::System.Nullable<float> value);
         partial void OnYearInwardDiffChanged();
@@ -598,6 +630,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(36, "", "en{'Year Inward Qty Difference in %'}de{'Jahreseingang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> YearInwardDiffPercent
         {
             get
@@ -613,6 +646,7 @@ namespace gip.mes.datamodel
                 this.OnYearInwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _YearInwardDiffPercent;
         partial void OnYearInwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnYearInwardDiffPercentChanged();
@@ -623,6 +657,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(39, "", "en{'Year Outward Qty Difference'}de{'Jahresabgang Differenz'}")]
+        [NotMapped]
         public global::System.Nullable<float> YearOutwardDiff
         {
             get
@@ -638,6 +673,7 @@ namespace gip.mes.datamodel
                 this.OnYearOutwardDiffChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _YearOutwardDiff;
         partial void OnYearOutwardDiffChanging(global::System.Nullable<float> value);
         partial void OnYearOutwardDiffChanged();
@@ -648,6 +684,7 @@ namespace gip.mes.datamodel
 
         [global::System.Runtime.Serialization.DataMemberAttribute()]
         [ACPropertyInfo(40, "", "en{'Year Outward Qty Difference in %'}de{'Jahresabgang Differenz in %'}")]
+        [NotMapped]
         public global::System.Nullable<float> YearOutwardDiffPercent
         {
             get
@@ -663,6 +700,7 @@ namespace gip.mes.datamodel
                 this.OnYearOutwardDiffPercentChanged();
             }
         }
+        [NotMapped]
         private global::System.Nullable<float> _YearOutwardDiffPercent;
         partial void OnYearOutwardDiffPercentChanging(global::System.Nullable<float> value);
         partial void OnYearOutwardDiffPercentChanged();
@@ -731,6 +769,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(90, "", "en{'Reserved Quantity'}de{'Reservierte Menge'}")]
+        [NotMapped]
         public Double ReservedQuantity
         {
             get
@@ -744,6 +783,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property AvailableQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(91, "", "en{'Available Quantity'}de{'Verfügbare Menge'}")]
+        [NotMapped]
         public Double AvailableQuantity
         {
             get
@@ -756,6 +796,7 @@ namespace gip.mes.datamodel
         /// Get weight. It's calculated over Density and StockQuantity - only if Dimension of BaseMDUnit is Volume
         /// </summary>
         [ACPropertyInfo(92, "", "en{'Weight 15°C'}de{'Gewicht 15°C'}")]
+        [NotMapped]
         public Double Weight15FromVolume
         {
             get
@@ -775,6 +816,7 @@ namespace gip.mes.datamodel
         /// Get weight. It's calculated over Density and ambien5t StockQuantity - only if Dimension of BaseMDUnit is Volume
         /// </summary>
         [ACPropertyInfo(93, "", "en{'Weight Ambient'}de{'Gewicht Ambient'}")]
+        [NotMapped]
         public Double WeightAmbFromVolume
         {
             get
@@ -803,6 +845,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(94, "", "en{'Min. Stock Diff.'}de{'Min. Bestand Diff.'}")]
+        [NotMapped]
         public Double? MinStockQuantityDiff
         {
             get
@@ -816,6 +859,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(95, "", "en{'Min. Stock Exceeded'}de{'Min. Bestand überschritten'}")]
+        [NotMapped]
         public bool MinStockQuantityExceeded
         {
             get
@@ -827,6 +871,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(96, "", "en{'Opt. Stock Diff.'}de{'Opt. Bestand Diff.'}")]
+        [NotMapped]
         public Double? OptStockQuantityDiff
         {
             get
@@ -840,6 +885,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(7, "", "en{'Opt. Stock Exceeded'}de{'Opt. Bestand überschritten'}")]
+        [NotMapped]
         public bool OptStockQuantityExceeded
         {
             get

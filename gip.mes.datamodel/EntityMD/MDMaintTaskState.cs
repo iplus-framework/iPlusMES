@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -26,6 +27,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDMaintTaskStateName
         {
             get

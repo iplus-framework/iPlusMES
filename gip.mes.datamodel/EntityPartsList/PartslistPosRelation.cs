@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -59,7 +60,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IACObjectEntity Members
-
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -74,6 +75,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Partslist</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -98,6 +100,7 @@ namespace gip.mes.datamodel
 
         #region Partial Methods
 
+        [NotMapped]
         bool _OnTargetQuantityChanging = false;
         protected void OnTargetQuantityChanged()
         {
@@ -123,6 +126,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnTargetQuantityUOMChanging = false;
         protected void OnTargetQuantityUOMChanged()
         {
@@ -154,6 +158,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables PartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Backflushing
         {
             get
@@ -169,6 +174,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Property that evaluates the override of the Anterograde-Fields in Tables PartslistPos->Material
         /// </summary>
+        [NotMapped]
         public bool Foreflushing
         {
             get
@@ -205,11 +211,13 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IPartslistPosRelation implementation
+        [NotMapped]
         public IPartslistPos I_SourcePartslistPos
         {
             get { return this.SourcePartslistPos; }
         }
 
+        [NotMapped]
         public IPartslistPos I_TargetPartslistPos
         {
             get { return this.TargetPartslistPos; }

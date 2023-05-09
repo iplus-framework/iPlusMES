@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -46,9 +47,11 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InOrderPos>) })]
     public partial class InOrderPos
     {
+        [NotMapped]
         public const string ClassName = "InOrderPos";
 
         #region Private members
+        [NotMapped]
         private string PropertyChangedName;
         #endregion
 
@@ -186,6 +189,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -202,6 +206,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to InOrder</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -213,6 +218,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IACObjectEntity Members
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -224,6 +230,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -277,6 +284,7 @@ namespace gip.mes.datamodel
         #endregion
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public string Position
         {
             get
@@ -286,8 +294,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _CachedDeliveryNoteNo;
         [ACPropertyInfo(999, "LocalDeliveryNoteNo", "en{'Delivery Note No.'}de{'Lieferschein-Nr.'}")]
+        [NotMapped]
         public string CachedDeliveryNoteNo
         {
             get
@@ -302,6 +312,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public GlobalApp.MaterialPosTypes MaterialPosType
         {
             get
@@ -316,6 +327,7 @@ namespace gip.mes.datamodel
 
 
         #region Partial Methods
+        [NotMapped]
         bool _OnCalledUpQuantityChanging = false;
         protected void OnCalledUpQuantityChanged()
         {
@@ -343,6 +355,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("DifferenceQuantity");
         }
 
+        [NotMapped]
         bool _OnCalledUpQuantityUOMChanging = false;
         protected void OnCalledUpQuantityUOMChanged()
         {
@@ -461,6 +474,7 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged("DifferenceQuantityUOM");
         }
 
+        [NotMapped]
         bool _OnActualQuantityChanging = false;
         protected void OnActualQuantityChanged()
         {
@@ -486,6 +500,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         bool _OnActualQuantityUOMChanging = false;
         protected void OnActualQuantityUOMChanged()
         {
@@ -512,6 +527,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(24, "", "en{'Remaining Quantity'}de{'Restmenge'}")]
+        [NotMapped]
         public double RemainingCallQuantity
         {
             get
@@ -521,6 +537,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(25, "", "en{'Remaining Quantity (UOM)'}de{'Restmenge (BME)'}")]
+        [NotMapped]
         public double RemainingCallQuantityUOM
         {
             get
@@ -530,6 +547,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(26, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        [NotMapped]
         public double DifferenceQuantity
         {
             get
@@ -539,6 +557,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(27, "", "en{'Difference Quantity (UOM)'}de{'Differenzmenge (BME)'}")]
+        [NotMapped]
         public double DifferenceQuantityUOM
         {
             get
@@ -548,6 +567,7 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         public double DifferenceWeight
         {
             get
@@ -556,6 +576,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double TargetWeight
         {
             get
@@ -564,6 +585,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double ActualWeight
         {
             get
@@ -572,6 +594,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public InOrderPos TopParentInOrderPos
         {
             get

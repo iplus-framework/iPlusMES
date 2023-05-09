@@ -21,6 +21,7 @@ using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -88,7 +89,9 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Material>) })]
     public partial class Material : IACConfigStore, IACWorkflowNode, IACClassDesignProvider, IImageInfo, ICloneable
     {
+        [NotMapped]
         public const string ClassName = "Material";
+        [NotMapped]
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
         #region New/Delete
@@ -132,6 +135,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -175,6 +179,7 @@ namespace gip.mes.datamodel
         /// Gets the key AC identifier.
         /// </summary>
         /// <value>The key AC identifier.</value>
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -217,6 +222,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -242,6 +248,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property CurrentMaterialStock in the schema.
         /// </summary>
         /// <value>The current material stock.</value>
+        [NotMapped]
         public MaterialStock CurrentMaterialStock
         {
             get
@@ -259,12 +266,14 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Gibt eine Liste von Mengeneneinheiten zurück in denen das Material im Lager verwaltet werden darf
         /// </summary>
+        [NotMapped]
         List<MDUnit> _MaterialUnitList = null;
         /// <summary>
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
         [ACPropertyInfo(9999, "", "en{'Mat. Unit'}de{'Mat. Einheiten'}")]
+        [NotMapped]
         public List<MDUnit> MaterialUnitList
         {
             get
@@ -292,12 +301,14 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Gibt eine Liste von Mengeneneinheiten zurück in denen das Material im Lager verwaltet werden darf
         /// </summary>
+        [NotMapped]
         List<MDUnit> _MDUnitList = null;
         /// <summary>
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
         [ACPropertyInfo(9999, "", "en{'Unit'}de{'Einheiten'}")]
+        [NotMapped]
         public List<MDUnit> MDUnitList
         {
             get
@@ -744,6 +755,7 @@ namespace gip.mes.datamodel
         #region Properties
 
         [ACPropertyInfo(15, "", "en{'Lot Managed'}de{'Chargenführung'}")]
+        [NotMapped]
         public bool IsLotManaged
         {
             get
@@ -784,6 +796,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public bool IsDensityValid
         {
             get
@@ -799,6 +812,7 @@ namespace gip.mes.datamodel
 
         private bool _IsSelected;
         [ACPropertyInfo(999, "IsSelected", "en{'Selected'}de{'Ausgewählt'}")]
+        [NotMapped]
         public bool IsSelected
         {
             get
@@ -819,7 +833,9 @@ namespace gip.mes.datamodel
 
         #region IACConfigStore
 
+        [NotMapped]
         private string configStoreName;
+        [NotMapped]
         public string ConfigStoreName
         {
             get
@@ -837,6 +853,7 @@ namespace gip.mes.datamodel
         /// ACConfigKeyACUrl returns the relative Url to the "main table" in group a group of semantically related tables.
         /// This property is used when NewACConfig() is called. NewACConfig() creates a new IACConfig-Instance and set the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
         /// </summary>
+        [NotMapped]
         public string ACConfigKeyACUrl
         {
             get
@@ -894,11 +911,13 @@ namespace gip.mes.datamodel
             ClearCacheOfConfigurationEntries();
         }
 
+        [NotMapped]
         public decimal OverridingOrder { get; set; }
 
         /// <summary>
         /// A thread-safe and cached list of Configuration-Values of type IACConfig.
         /// </summary>
+        [NotMapped]
         public IEnumerable<IACConfig> ConfigurationEntries
         {
             get
@@ -907,7 +926,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private SafeList<IACConfig> _ACConfigListCache;
+        [NotMapped]
         private SafeList<IACConfig> ACConfigListCache
         {
             get
@@ -983,8 +1004,10 @@ namespace gip.mes.datamodel
         }
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACClassMethod _ProgramACClassMethod;
         [ACPropertyInfo(9999, "", "en{'Program Method'}de{'Programmmethode'}", Const.ContextDatabaseIPlus + "\\ACClassMethod")]
+        [NotMapped]
         public gip.core.datamodel.ACClassMethod ProgramACClassMethod
         {
             get
@@ -1034,8 +1057,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClass _StackCalculatorACClass;
         [ACPropertyInfo(9999, "", "en{'Stack Posting Type'}de{'Stapelbuchungsart'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass StackCalculatorACClass
         {
             get
@@ -1089,6 +1114,7 @@ namespace gip.mes.datamodel
 
         #region Others
 
+        [NotMapped]
         public int MixingLevel { get; set; }
 
         #endregion
@@ -1180,6 +1206,7 @@ namespace gip.mes.datamodel
         /// NOT THREAD-SAFE USE QueryLock_1X000!
         /// </summary>
         /// <value>null</value>
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -1192,6 +1219,7 @@ namespace gip.mes.datamodel
         /// Returns a ACUrl, to be able to find this instance in the WPF-Logical-Tree.
         /// </summary>
         /// <value>ACUrl as string</value>
+        [NotMapped]
         public string VisualACUrl
         {
             get
@@ -1205,6 +1233,7 @@ namespace gip.mes.datamodel
         /// The Runtime-type of the Workflow-Class that will be instantiated when the Workflow is loaded.
         /// </summary>
         /// <value>Reference to a ACClass</value>
+        [NotMapped]
         public core.datamodel.ACClass PWACClass
         {
             get
@@ -1217,6 +1246,7 @@ namespace gip.mes.datamodel
         /// Unique ID of the Workflow Node
         /// </summary>
         /// <value>Returns MaterialID</value>
+        [NotMapped]
         public Guid WFObjectID
         {
             get { return MaterialID; }
@@ -1226,6 +1256,7 @@ namespace gip.mes.datamodel
         /// Reference to the parent Workflow-Node that groups more child-nodes together
         /// </summary>
         /// <value>Parent Workflow-Node (Group)</value>
+        [NotMapped]
         public IACWorkflowNode WFGroup
         {
             get
@@ -1241,6 +1272,7 @@ namespace gip.mes.datamodel
         /// WPF's x:Name to indentify this instance in the Logical-Tree
         /// </summary>
         /// <value>x:Name (WPF)</value>
+        [NotMapped]
         public string XName
         {
             get
@@ -1276,12 +1308,14 @@ namespace gip.mes.datamodel
 
         #region Image
 
+        [NotMapped]
         private string _DefaultImage;
         /// <summary>
         /// Doc  DefaultImage
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "DefaultImage", "en{'Image'}de{'Bild'}")]
+        [NotMapped]
         public string DefaultImage
         {
             get
@@ -1299,12 +1333,14 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private string _DefaultThumbImage;
         /// <summary>
         /// Doc  DefaultThumbImage
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "DefaultThumbImage", "en{'Image'}de{'Bild'}")]
+        [NotMapped]
         public string DefaultThumbImage
         {
             get

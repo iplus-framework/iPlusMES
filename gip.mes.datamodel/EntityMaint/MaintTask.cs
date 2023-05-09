@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintTask>) })]
     public partial class MaintTask
     {
+        [NotMapped]
         public const string ClassName = "MaintTask";
 
         public static MaintTask NewACObject(DatabaseApp dbApp, IACObject parentACObject)

@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -33,6 +34,7 @@ namespace gip.mes.datamodel
         #region Properties
 
         [ACPropertyInfo(9999, "ACClassWF", "en{'ACClassWF'}de{'ACClassWF'}")]
+        [NotMapped]
         public gip.core.datamodel.ACClassWF ACClassWF
         {
             get

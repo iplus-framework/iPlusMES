@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -99,6 +100,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -111,6 +113,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -122,6 +125,7 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDReleaseStateName
         {
             get
@@ -139,6 +143,7 @@ namespace gip.mes.datamodel
 
 #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -175,6 +180,7 @@ namespace gip.mes.datamodel
             AbsLocked = 4 // absolut gesperrter Bestand. Kann nur mit AbsFree zurückgesetzt werden
         }
 
+        [NotMapped]
         public ReleaseStates ReleaseState
         {
             get
@@ -188,10 +194,12 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static ACValueItemList _ReleaseStatesList = null;
         /// <summary>
         /// Gibt eine Liste mit Übersetzungen an die GUI zurück
         /// </summary>
+        [NotMapped]
         public static ACValueItemList ReleaseStatesList
         {
             get

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -51,6 +52,7 @@ namespace gip.mes.datamodel
 
         #region IACConfigStore
 
+        [NotMapped]
         public string ACConfigKeyACUrl
         {
             get
@@ -59,6 +61,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -86,6 +89,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Partial Properties
+        [NotMapped]
         public Phase UsedInPhase
         {
             get

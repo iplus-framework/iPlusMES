@@ -6,6 +6,7 @@ using System.Text;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -142,6 +143,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -156,6 +158,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to FacilityBooking</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -196,6 +199,7 @@ namespace gip.mes.datamodel
         // Buchungssätze werden nur einmalig eingefügt und danach nie
         // mehr geändert
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -208,6 +212,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -236,6 +241,7 @@ namespace gip.mes.datamodel
         /// Gets or sets the FacilityBookingType
         /// </summary>
         /// <value>Dimension</value>
+        [NotMapped]
         public GlobalApp.FacilityBookingType FacilityBookingType
         {
             get
@@ -248,7 +254,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         FacilityStock _InwardFacilityStock;
+        [NotMapped]
         public FacilityStock InwardFacilityStock
         {
             get
@@ -261,7 +269,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         MaterialStock _InwardMaterialStock;
+        [NotMapped]
         public MaterialStock InwardMaterialStock
         {
             get
@@ -274,7 +284,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         FacilityLotStock _InwardFacilityLotStock;
+        [NotMapped]
         public FacilityLotStock InwardFacilityLotStock
         {
             get
@@ -287,7 +299,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         PartslistStock _InwardPartslistStock;
+        [NotMapped]
         public PartslistStock InwardPartslistStock
         {
             get
@@ -300,7 +314,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         CompanyMaterialStock _InwardCompanyMaterialStock;
+        [NotMapped]
         public CompanyMaterialStock InwardCompanyMaterialStock
         {
             get
@@ -313,7 +329,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         CompanyMaterialStock _InwardCPartnerCompMatStock;
+        [NotMapped]
         public CompanyMaterialStock InwardCPartnerCompMatStock
         {
             get
@@ -326,7 +344,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         FacilityStock _OutwardFacilityStock;
+        [NotMapped]
         public FacilityStock OutwardFacilityStock
         {
             get
@@ -339,7 +359,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         MaterialStock _OutwardMaterialStock;
+        [NotMapped]
         public MaterialStock OutwardMaterialStock
         {
             get
@@ -352,7 +374,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         FacilityLotStock _OutwardFacilityLotStock;
+        [NotMapped]
         public FacilityLotStock OutwardFacilityLotStock
         {
             get
@@ -365,7 +389,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         PartslistStock _OutwardPartslistStock;
+        [NotMapped]
         public PartslistStock OutwardPartslistStock
         {
             get
@@ -378,7 +404,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         CompanyMaterialStock _OutwardCompanyMaterialStock;
+        [NotMapped]
         public CompanyMaterialStock OutwardCompanyMaterialStock
         {
             get
@@ -391,7 +419,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         CompanyMaterialStock _OutwardCPartnerCompMatStock;
+        [NotMapped]
         public CompanyMaterialStock OutwardCPartnerCompMatStock
         {
             get
@@ -408,6 +438,7 @@ namespace gip.mes.datamodel
         /// Is Booking without reference to a Businessprocess
         /// e.g. Zero-Stock-Bookings, Stock-Corrections or Inventory-Bookings
         /// </summary>
+        [NotMapped]
         public bool IsAdjustmentBooking
         {
             get
@@ -420,8 +451,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private gip.core.datamodel.ACClass _StackCalculatorACClass;
         [ACPropertyInfo(9999, "", "en{'Stack Posting Type'}de{'Stapelbuchungsart'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass StackCalculatorACClass
         {
             get

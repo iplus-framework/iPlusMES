@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 
@@ -28,6 +29,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// 
         /// </summary>
+        [NotMapped]
         public MDTrackingDirectionEnum MDTrackingDirectionEnum
         {
             get
@@ -40,6 +42,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public MDTrackingStartItemTypeEnum MDTrackingStartItemTypeEnum
         {
             get
@@ -54,6 +57,7 @@ namespace gip.mes.datamodel
 
         private string _TrackingStyleACCaption;
         [ACPropertyInfo(999, "TrackingStyleACCaption", "en{'Direction'}de{'Richtung'}")]
+        [NotMapped]
         public string TrackingStyleACCaption
         {
             get
@@ -78,6 +82,7 @@ namespace gip.mes.datamodel
 
         private string _TrackingStartItemTypeACCaption;
         [ACPropertyInfo(999, "TrackingStartItemTypeACCaption", "en{'Item type'}de{'Typ'}")]
+        [NotMapped]
         public string TrackingStartItemTypeACCaption
         {
             get
@@ -158,6 +163,7 @@ namespace gip.mes.datamodel
         #region Additional members
 
         [ACPropertyInfo(9999, "MaterialNOs", "en{'Query Materials'}de{'Abfragematerialen'}")]
+        [NotMapped]
         public string MaterialNOs
         {
             get
@@ -173,6 +179,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public List<Guid> MaterialIDs { get; set; }
 
 
@@ -180,29 +187,38 @@ namespace gip.mes.datamodel
         /// If job is found - old job is deleted, new created, calculated again
         /// option calling from production wehre order items changed countinous
         /// </summary>
+        [NotMapped]
         public bool RecalcAgain { get; set; }
 
         /// <summary>
         /// When is parameter forwarded as report
         /// </summary>
+        [NotMapped]
         public bool IsReport { get; set; }
 
         /// <summary>
         /// If no need result to be saved
         /// </summary>
+        [NotMapped]
         public bool IsDynamic { get; set; }
 
+        [NotMapped]
         public bool IsNew { get; set; }
+        [NotMapped]
         public bool IsDisableReworkTracking { get; set; }
 
+        [NotMapped]
         public StreamWriter LogFileStream { get; set; }
 
+        [NotMapped]
         public int? OrderDepth { get; set; }
 
+        [NotMapped]
         private List<string> _MaterialNOsForStopTracking;
         /// <summary>
         /// Materials where stop Inward booking search
         /// </summary>
+        [NotMapped]
         public List<string> MaterialNOsForStopTracking
         {
             get
@@ -217,11 +233,14 @@ namespace gip.mes.datamodel
 
         #region Filter methods
 
+        [NotMapped]
         public Func<object, bool> BreakTrackingCondition { get; set; }
 
 
+        [NotMapped]
         public bool AggregateOrderData { get; set; }
 
+        [NotMapped]
         short[] _FilteredBookingTypes = new short[]
         {
             (short)GlobalApp.FacilityBookingType.InOrderPosInwardMovement,
@@ -230,6 +249,7 @@ namespace gip.mes.datamodel
             (short)GlobalApp.FacilityBookingType.PickingRelocation
         };
 
+        [NotMapped]
         public short[] FilteredBookingTypes
         {
             get
@@ -249,7 +269,9 @@ namespace gip.mes.datamodel
 
         #region Background Worker Cancel
 
+        [NotMapped]
         public ACBackgroundWorker BackgroundWorker { get; set; }
+        [NotMapped]
         public DoWorkEventArgs DoWorkEventArgs { get; set; }
 
         public bool CheckCancelWork()

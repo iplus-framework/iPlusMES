@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -126,6 +127,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -140,6 +142,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Picking</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -152,6 +155,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -163,6 +167,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -188,6 +193,7 @@ namespace gip.mes.datamodel
 
         #region Partial Properties
         [ACPropertyInfo(3, "", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName)]
+        [NotMapped]
         public Material Material
         {
             get
@@ -205,8 +211,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private MDUnit _MDUnit;
         [ACPropertyInfo(4, "", "en{'Unit of Measurement'}de{'Maßeinheit'}", Const.ContextDatabase + "\\MDUnitList")]
+        [NotMapped]
         public MDUnit MDUnit
         {
             get
@@ -292,6 +300,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(5, "", ConstApp.TargetQuantity)]
+        [NotMapped]
         public double TargetQuantity
         {
             get
@@ -331,6 +340,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(6, "", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}")]
+        [NotMapped]
         public double TargetQuantityUOM
         {
             get
@@ -366,6 +376,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(7, "", "en{'Actual Quantity'}de{'Istmenge'}")]
+        [NotMapped]
         public double ActualQuantity
         {
             get
@@ -383,6 +394,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(8, "", "en{'Actual Quantity (UOM)'}de{'Istmenge (BME)'}")]
+        [NotMapped]
         public double ActualQuantityUOM
         {
             get
@@ -399,6 +411,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double DiffQuantityUOM
         {
             get
@@ -407,6 +420,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double PickingDiffQuantityUOM
         {
             get
@@ -420,6 +434,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Returns ActualQuantity - TargetQuantity (A negative value)
         /// </summary>
+        [NotMapped]
         public double RemainingDosingQuantityUOM
         {
             get
@@ -431,6 +446,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double RemainingDosingWeight
         {
             get
@@ -447,6 +463,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public string RemainingDosingWeightError
         {
             get
@@ -463,6 +480,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double TargetWeight
         {
             get
@@ -471,6 +489,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public double ActualWeight
         {
             get
@@ -480,6 +499,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public double CompleteFactor
         {
             get => (ActualQuantity / TargetQuantity) * 100;

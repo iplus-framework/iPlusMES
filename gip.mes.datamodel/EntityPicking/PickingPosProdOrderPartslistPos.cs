@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -9,7 +10,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "ProdOrderPartslistPos", "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     public partial class PickingPosProdOrderPartslistPos
     {
-
+        [NotMapped]
         public const string ClassName = "PickingPosProdOrderPartslistPos";
 
         #region New/Delete

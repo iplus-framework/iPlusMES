@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,10 +26,12 @@ namespace gip.mes.datamodel
     {
 
         #region const
+        [NotMapped]
         public const string ClassName = "PlanningMRProposal";
         #endregion
 
         #region IACObjectEntity Members
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get

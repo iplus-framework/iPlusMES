@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -37,6 +38,7 @@ namespace gip.mes.datamodel
         #region IACObjectEntity
 
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        [NotMapped]
         public String MDSchedulingGroupName
         {
             get
@@ -51,6 +53,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get

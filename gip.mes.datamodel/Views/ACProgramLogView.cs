@@ -5,6 +5,7 @@ using System.Text;
 using System.Transactions;
 using gip.core.datamodel;
 using System.Runtime.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -22,11 +23,14 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ACProgramLogView>) })]
     public partial class ACProgramLogView
     {
+        [NotMapped]
         public const string ClassName = "ACProgramLogView";
 
         [ACPropertyInfo(999, "Sn", "en{'Sn'}de{'Sn'}")]
+        [NotMapped]
         public int Sn { get; set; }
 
+        [NotMapped]
         private int Test { get; set; }
 
     }

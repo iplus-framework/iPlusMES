@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -23,6 +24,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialUnit>) })]
     public partial class MaterialUnit //, IPackagingHierarchy
     {
+        [NotMapped]
         public const string ClassName = "MaterialUnit";
 
         #region New/Delete
@@ -53,6 +55,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -69,6 +72,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to Material</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -92,6 +96,7 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity Members
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -103,6 +108,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -165,6 +171,7 @@ namespace gip.mes.datamodel
         #region additional properties
 
         [ACPropertyInfo(9999, "", "en{'BaseMDUnit'}de{'de-BaseMDUnit'}")]
+        [NotMapped]
         public MDUnit BaseMDUnit
         {
             get
@@ -175,6 +182,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private MaterialStock MaterialStock
         {
             get
@@ -193,6 +201,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double DayInward
         {
             get
@@ -217,6 +226,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayTargetInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double DayTargetInward
         {
             get
@@ -241,6 +251,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayInwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double DayInwardDiff
         {
             get
@@ -257,6 +268,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double DayOutward
         {
             get
@@ -286,6 +298,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayTargetOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double DayTargetOutward
         {
             get
@@ -310,6 +323,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property DayOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double DayOutwardDiff
         {
             get
@@ -326,6 +340,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double WeekInward
         {
             get
@@ -350,6 +365,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekTargetInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double WeekTargetInward
         {
             get
@@ -374,6 +390,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekInwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double WeekInwardDiff
         {
             get
@@ -390,6 +407,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double WeekOutward
         {
             get
@@ -414,6 +432,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekTargetOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double WeekTargetOutward
         {
             get
@@ -438,6 +457,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property WeekOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double WeekOutwardDiff
         {
             get
@@ -454,6 +474,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double MonthInward
         {
             get
@@ -478,6 +499,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthTargetInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double MonthTargetInward
         {
             get
@@ -502,6 +524,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthInwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double MonthInwardDiff
         {
             get
@@ -518,6 +541,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double MonthOutward
         {
             get
@@ -542,6 +566,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthTargetOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double MonthTargetOutward
         {
             get
@@ -566,6 +591,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property MonthOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double MonthOutwardDiff
         {
             get
@@ -582,6 +608,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double YearInward
         {
             get
@@ -606,6 +633,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearTargetInward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double YearTargetInward
         {
             get
@@ -630,6 +658,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearInwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double YearInwardDiff
         {
             get
@@ -646,6 +675,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double YearOutward
         {
             get
@@ -670,6 +700,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearTargetOutward in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double YearTargetOutward
         {
             get
@@ -694,6 +725,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property YearOutwardDiff in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double YearOutwardDiff
         {
             get
@@ -710,6 +742,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedInwardQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double ReservedInwardQuantity
         {
             get
@@ -734,6 +767,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedOutwardQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double ReservedOutwardQuantity
         {
             get
@@ -758,6 +792,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property ReservedQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double ReservedQuantity
         {
             get
@@ -774,6 +809,7 @@ namespace gip.mes.datamodel
         /// There are no comments for Property AvailableQuantity in the schema.
         /// </summary>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public Double AvailableQuantity
         {
             get
@@ -788,6 +824,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IPackagingHierarchy Members
+        [NotMapped]
         public string PackagingHierarchyName
         {
             get
@@ -824,6 +861,7 @@ namespace gip.mes.datamodel
         //    }
         //}
 
+        [NotMapped]
         public Single TotalPackagingQuantity
         {
             get
@@ -834,6 +872,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public Single TotalPackagingGrossWeight
         {
             get
@@ -844,6 +883,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public Single TotalPackagingNetWeight
         {
             get

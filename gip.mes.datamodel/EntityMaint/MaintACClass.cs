@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace gip.mes.datamodel
@@ -111,6 +112,7 @@ namespace gip.mes.datamodel
 
         //private DateTime? _NextMaintTerm;
         [ACPropertyInfo(999, "", "en{'Next Maintenance on'}de{'Nächste Wartung am'}")]
+        [NotMapped]
         public DateTime? NextMaintTerm
         {
             get
@@ -126,8 +128,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _ACClassACUrl;
         [ACPropertyInfo(999, "", "en{'Component URL'}de{'Component url'}")]
+        [NotMapped]
         public string ACClassACUrl
         {
             get
@@ -140,7 +144,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private IEnumerable<MaintACClassProperty> _LocalPropertyCache = null;
+        [NotMapped]
         public IEnumerable<MaintACClassProperty> LocalPropertyCache
         {
             get
@@ -155,8 +161,10 @@ namespace gip.mes.datamodel
         }
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACClass _ACClass;
         [ACPropertyInfo(9999, "", "en{'Maintenance objekt'}de{'Wartungsobjekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass ACClass
         {
             get

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -21,6 +22,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyPersonRole>) })]
     public partial class CompanyPersonRole
     {
+        [NotMapped]
         public const string ClassName = "CompanyPersonRole";
 
         #region New/Delete
@@ -72,6 +74,7 @@ namespace gip.mes.datamodel
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override string ACCaption
         {
             get
@@ -86,6 +89,7 @@ namespace gip.mes.datamodel
         /// </summary>
         /// <value>Reference to CompanyPerson</value>
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public override IACObject ParentACObject
         {
             get
@@ -123,6 +127,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
@@ -136,6 +141,7 @@ namespace gip.mes.datamodel
 
         #region IEntityProperty Members
 
+        [NotMapped]
         bool bRefreshConfig = false;
         protected override void OnPropertyChanging<T>(T newValue, string propertyName, bool afterChange)
         {
@@ -160,8 +166,10 @@ namespace gip.mes.datamodel
         #endregion
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACClass _RoleACClass;
         [ACPropertyInfo(9999, "", "en{'Role'}de{'Rolle'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [NotMapped]
         public gip.core.datamodel.ACClass RoleACClass
         {
             get
