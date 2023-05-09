@@ -109,9 +109,10 @@ namespace gip.bso.masterdata
             this._SelectedUnitConvertTest = null;
             if (_VarioConfigManager != null)
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
+            _VarioConfigManager = null;
             if (_FacilityOEEManager != null)
                 ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
-            _VarioConfigManager = null;
+            _FacilityOEEManager = null;
             var b = base.ACDeInit(deleteACClassTask);
             if (_AccessMaterialUnit != null)
             {
@@ -731,9 +732,6 @@ namespace gip.bso.masterdata
         #endregion
 
         #region FacilityMaterial
-
-
-        #region FacilityMaterial
         private FacilityMaterial _SelectedFacilityMaterial;
         /// <summary>
         /// Selected property for FacilityMaterial
@@ -788,10 +786,6 @@ namespace gip.bso.masterdata
                 .OrderBy(c => c.Facility.FacilityNo)
                 .ToList();
         }
-        #endregion
-
-
-
         #endregion
 
         #endregion

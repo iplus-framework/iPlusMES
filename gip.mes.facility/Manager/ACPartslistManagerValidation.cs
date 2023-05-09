@@ -605,6 +605,7 @@ namespace gip.mes.facility
                         if (nodes2CheckForRouting.Any())
                         {
                             List<IPartslistPosRelation> dosableRelations = new List<IPartslistPosRelation>();
+                            List<IPartslistPosRelation> allRelations = new List<IPartslistPosRelation>();
 
                             foreach (MapPosToWFConn node2Check in nodes2CheckForRouting)
                             {
@@ -616,6 +617,8 @@ namespace gip.mes.facility
                                     IPartslistPosRelation[] materialsToCheck = node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.ToArray();
                                     foreach (IPartslistPosRelation mat4Dosing in materialsToCheck)
                                     {
+                                        if (!allRelations.Contains(mat4Dosing))
+                                            allRelations.Add(mat4Dosing);
                                         if (!collectingData && dosableRelations.Contains(mat4Dosing))
                                             continue;
                                         if (!IsRouteValidationNeededForPos(mat4Dosing, dbApp, dbIPlus, pList, configStores, mapPosToWFConn, validationBehaviour, detailMessages))
@@ -647,28 +650,42 @@ namespace gip.mes.facility
 
                                                     KeyValuePair<Material, List<Route>> mat4DosingRoute = subItem.Mat4DosingAndRoutes.FirstOrDefault(c => c.Key.MaterialNo == mat4Dosing.I_SourcePartslistPos.MaterialNo);
                                                     mat4DosingRoute.Value.AddRange(routes);
-                                                    if(!collectingData)
+                                                    if (!collectingData)
                                                     {
                                                         break;
                                                     }
                                                 }
                                             }
                                         }
-                                        if (routes == null || !routes.Any())
-                                        {
-                                            // Keine Route gefunden über die Material {0} {1} dosiert werden könnte.
-                                            detailMessages.AddDetailMessage(new Msg
-                                            {
-                                                Source = GetACUrl(),
-                                                MessageLevel = eMsgLevel.Warning,
-                                                ACIdentifier = "CheckResourcesAndRouting(20)",
-                                                Message = Root.Environment.TranslateMessage(this, "Warning50016",
-                                                                mat4Dosing.I_SourcePartslistPos.Material.MaterialNo,
-                                                                mat4Dosing.I_SourcePartslistPos.Material.MaterialName1)
-                                            });
-                                        }
+                                        //if (routes == null || !routes.Any())
+                                        //{
+                                        //    // Keine Route gefunden über die Material {0} {1} dosiert werden könnte.
+                                        //    detailMessages.AddDetailMessage(new Msg
+                                        //    {
+                                        //        Source = GetACUrl(),
+                                        //        MessageLevel = eMsgLevel.Warning,
+                                        //        ACIdentifier = "CheckResourcesAndRouting(20)",
+                                        //        Message = Root.Environment.TranslateMessage(this, "Warning50016",
+                                        //                        mat4Dosing.I_SourcePartslistPos.Material.MaterialNo,
+                                        //                        mat4Dosing.I_SourcePartslistPos.Material.MaterialName1)
+                                        //    });
+                                        //}
                                     }
                                 }
+                            }
+
+                            allRelations.RemoveAll(c => dosableRelations.Contains(c));
+                            foreach (var unsolvedRelation in allRelations)
+                            {
+                                detailMessages.AddDetailMessage(new Msg
+                                {
+                                    Source = GetACUrl(),
+                                    MessageLevel = eMsgLevel.Warning,
+                                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                                    Message = Root.Environment.TranslateMessage(this, "Warning50016",
+                                                    unsolvedRelation.I_SourcePartslistPos.Material.MaterialNo,
+                                                    unsolvedRelation.I_SourcePartslistPos.Material.MaterialName1)
+                                });
                             }
                         }
 

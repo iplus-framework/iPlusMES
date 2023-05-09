@@ -394,9 +394,31 @@ namespace gip.mes.facility
 
                         /// 3. Check whether there are consumption postings and find out the main component and determine about it (semi-finished product from preliminary stage) 
                         /// TODO: The problem here ist, that we dont have any information about scrap
-                        //if (!quantityFound)
-                        //{
-                        //}
+                        if (!quantityFound && Math.Abs(prodOrderPartslist.ActualQuantity) <= FacilityConst.C_ZeroCompare)
+                        {
+                            var mainConsumptionPos = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.SourceProdOrderPartslistID.HasValue).FirstOrDefault();
+                            if (mainConsumptionPos != null && facilityMaterial.Material.BaseMDUnitID == mainConsumptionPos.Material.BaseMDUnitID)
+                            {
+                                postingsOnThisMachine =
+                                    databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
+                                                                .Where(c => c.ProdOrderPartslistPosRelationID.HasValue
+                                                                            && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPosID == mainConsumptionPos.ProdOrderPartslistPosID
+                                                                            && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead
+                                                                            && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
+                                                                .ToArray();
+                                if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
+                                {
+                                    quantityFound = true;
+                                    oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.OutwardQuantity)
+                                                                            .DefaultIfEmpty()
+                                                                            .Sum();
+                                    oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
+                                                         .Select(c => c.OutwardQuantity)
+                                                         .DefaultIfEmpty()
+                                                         .Sum();
+                                }
+                            }
+                        }
                         oeeEntry.CalcOEE();
                     }
                 }
