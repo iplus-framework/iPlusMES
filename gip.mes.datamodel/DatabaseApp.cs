@@ -663,6 +663,2520 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region DBSetToList
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACAssembly> ACAssemblyList
+        {
+            get
+            {
+                return ACAssembly.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACChangeLog> ACChangeLogList
+        {
+            get
+            {
+                return ACChangeLog.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClass> ACClassList
+        {
+            get
+            {
+                return ACClass.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassConfig> ACClassConfigList
+        {
+            get
+            {
+                return ACClassConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassDesign> ACClassDesignList
+        {
+            get
+            {
+                return ACClassDesign.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassMessage> ACClassMessageList
+        {
+            get
+            {
+                return ACClassMessage.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassMethod> ACClassMethodList
+        {
+            get
+            {
+                return ACClassMethod.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassMethodConfig> ACClassMethodConfigList
+        {
+            get
+            {
+                return ACClassMethodConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassProperty> ACClassPropertyList
+        {
+            get
+            {
+                return ACClassProperty.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassPropertyRelation> ACClassPropertyRelationList
+        {
+            get
+            {
+                return ACClassPropertyRelation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassTask> ACClassTaskList
+        {
+            get
+            {
+                return ACClassTask.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassTaskValue> ACClassTaskValueList
+        {
+            get
+            {
+                return ACClassTaskValue.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassTaskValuePos> ACClassTaskValuePosList
+        {
+            get
+            {
+                return ACClassTaskValuePos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassText> ACClassTextList
+        {
+            get
+            {
+                return ACClassText.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassWF> ACClassWFList
+        {
+            get
+            {
+                return ACClassWF.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACClassWFEdge> ACClassWFEdgeList
+        {
+            get
+            {
+                return ACClassWFEdge.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACPackage> ACPackageList
+        {
+            get
+            {
+                return ACPackage.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACProgram> ACProgramList
+        {
+            get
+            {
+                return ACProgram.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACProgramConfig> ACProgramConfigList
+        {
+            get
+            {
+                return ACProgramConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACProgramLog> ACProgramLogList
+        {
+            get
+            {
+                return ACProgramLog.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACProgramLogTask> ACProgramLogTaskList
+        {
+            get
+            {
+                return ACProgramLogTask.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACProgramLogView> ACProgramLogViewList
+        {
+            get
+            {
+                return ACProgramLogView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACProject> ACProjectList
+        {
+            get
+            {
+                return ACProject.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACPropertyLog> ACPropertyLogList
+        {
+            get
+            {
+                return ACPropertyLog.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ACPropertyLogRule> ACPropertyLogRuleList
+        {
+            get
+            {
+                return ACPropertyLogRule.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Calendar> CalendarList
+        {
+            get
+            {
+                return Calendar.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CalendarHoliday> CalendarHolidayList
+        {
+            get
+            {
+                return CalendarHoliday.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CalendarShift> CalendarShiftList
+        {
+            get
+            {
+                return CalendarShift.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CalendarShiftPerson> CalendarShiftPersonList
+        {
+            get
+            {
+                return CalendarShiftPerson.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Company> CompanyList
+        {
+            get
+            {
+                return Company.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyAddress> CompanyAddressList
+        {
+            get
+            {
+                return CompanyAddress.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyAddressDepartment> CompanyAddressDepartmentList
+        {
+            get
+            {
+                return CompanyAddressDepartment.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyAddressUnloadingpoint> CompanyAddressUnloadingpointList
+        {
+            get
+            {
+                return CompanyAddressUnloadingpoint.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyMaterial> CompanyMaterialList
+        {
+            get
+            {
+                return CompanyMaterial.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyMaterialHistory> CompanyMaterialHistoryList
+        {
+            get
+            {
+                return CompanyMaterialHistory.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyMaterialPickup> CompanyMaterialPickupList
+        {
+            get
+            {
+                return CompanyMaterialPickup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyMaterialStock> CompanyMaterialStockList
+        {
+            get
+            {
+                return CompanyMaterialStock.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyPerson> CompanyPersonList
+        {
+            get
+            {
+                return CompanyPerson.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<CompanyPersonRole> CompanyPersonRoleList
+        {
+            get
+            {
+                return CompanyPersonRoleList.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ControlScriptSyncInfo> ControlScriptSyncInfoList
+        {
+            get
+            {
+                return ControlScriptSyncInfo.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DbSyncerInfo> DbSyncerInfoList
+        {
+            get
+            {
+                return DbSyncerInfo.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DbSyncerInfoContext> DbSyncerInfoContextList
+        {
+            get
+            {
+                return DbSyncerInfoContext.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DBSyncerVersion> DBSyncerVersionList
+        {
+            get
+            {
+                return DBSyncerVersion.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DeliveryNote> DeliveryNoteList
+        {
+            get
+            {
+                return DeliveryNote.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DeliveryNotePos> DeliveryNotePosList
+        {
+            get
+            {
+                return DeliveryNotePos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DemandOrder> DemandOrderList
+        {
+            get
+            {
+                return DemandOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DemandOrderPos> DemandOrderPosList
+        {
+            get
+            {
+                return DemandOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DemandPrimary> DemandPrimaryList
+        {
+            get
+            {
+                return DemandPrimary.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<DemandProdOrder> DemandProdOrderList
+        {
+            get
+            {
+                return DemandProdOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Facility> FacilityList
+        {
+            get
+            {
+                return Facility.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityBooking> FacilityBookingList
+        {
+            get
+            {
+                return FacilityBooking.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityBookingCharge> FacilityBookingChargeList
+        {
+            get
+            {
+                return FacilityBookingCharge.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityCharge> FacilityChargeList
+        {
+            get
+            {
+                return FacilityCharge.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityHistory> FacilityHistoryList
+        {
+            get
+            {
+                return FacilityHistory.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityInventory> FacilityInventoryList
+        {
+            get
+            {
+                return FacilityInventory.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityInventoryPos> FacilityInventoryPosList
+        {
+            get
+            {
+                return FacilityInventoryPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityLot> FacilityLotList
+        {
+            get
+            {
+                return FacilityLot.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityLotStock> FacilityLotStockList
+        {
+            get
+            {
+                return FacilityLotStock.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityMaterial> FacilityMaterialList
+        {
+            get
+            {
+                return FacilityMaterial.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityMaterialOEE> FacilityMaterialOEEList
+        {
+            get
+            {
+                return FacilityMaterialOEE.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityMDSchedulingGroup> FacilityMDSchedulingGroupList
+        {
+            get
+            {
+                return FacilityMDSchedulingGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityPreBooking> FacilityPreBookingList
+        {
+            get
+            {
+                return FacilityPreBooking.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityReservation> FacilityReservationList
+        {
+            get
+            {
+                return FacilityReservation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<FacilityStock> FacilityStockList
+        {
+            get
+            {
+                return FacilityStock.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<History> HistoryList
+        {
+            get
+            {
+                return History.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<HistoryConfig> HistoryConfigList
+        {
+            get
+            {
+                return HistoryConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InOrder> InOrderList
+        {
+            get
+            {
+                return InOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InOrderConfig> InOrderConfigList
+        {
+            get
+            {
+                return InOrderConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InOrderPos> InOrderPosList
+        {
+            get
+            {
+                return InOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InRequest> InRequestList
+        {
+            get
+            {
+                return InRequest.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InRequestConfig> InRequestConfigList
+        {
+            get
+            {
+                return InRequestConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InRequestPos> InRequestPosList
+        {
+            get
+            {
+                return InRequestPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Invoice> InvoiceList
+        {
+            get
+            {
+                return Invoice.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<InvoicePos> InvoicePosList
+        {
+            get
+            {
+                return InvoicePos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<JobTableRecalcActualQuantity> JobTableRecalcActualQuantityList
+        {
+            get
+            {
+                return JobTableRecalcActualQuantity.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Label> LabelList
+        {
+            get
+            {
+                return Label.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<LabelTranslation> LabelTranslationList
+        {
+            get
+            {
+                return LabelTranslation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<LabOrder> LabOrderList
+        {
+            get
+            {
+                return LabOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<LabOrderPos> LabOrderPosList
+        {
+            get
+            {
+                return LabOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MachineMaterialPosView> MachineMaterialPosViewList
+        {
+            get
+            {
+                return MachineMaterialPosView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MachineMaterialRelView> MachineMaterialRelViewList
+        {
+            get
+            {
+                return MachineMaterialRelView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MachineMaterialView> MachineMaterialViewList
+        {
+            get
+            {
+                return MachineMaterialView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintACClass> MaintACClassList
+        {
+            get
+            {
+                return MaintACClass.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintACClassProperty> MaintACClassPropertyList
+        {
+            get
+            {
+                return MaintACClassProperty.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintACClassVBGroup> MaintACClassVBGroupList
+        {
+            get
+            {
+                return MaintACClassVBGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintOrder> MaintOrderList
+        {
+            get
+            {
+                return MaintOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintOrderProperty> MaintOrderPropertyList
+        {
+            get
+            {
+                return MaintOrderProperty.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintTask> MaintTaskList
+        {
+            get
+            {
+                return MaintTask.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Material> MaterialList
+        {
+            get
+            {
+                return Material.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialCalculation> MaterialCalculationList
+        {
+            get
+            {
+                return MaterialCalculation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialConfig> MaterialConfigList
+        {
+            get
+            {
+                return MaterialConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialGMPAdditive> MaterialGMPAdditiveList
+        {
+            get
+            {
+                return MaterialGMPAdditive.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialHistory> MaterialHistoryList
+        {
+            get
+            {
+                return MaterialHistory.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialStock> MaterialStockList
+        {
+            get
+            {
+                return MaterialStock.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialUnit> MaterialUnitList
+        {
+            get
+            {
+                return MaterialUnit.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialWF> MaterialWFList
+        {
+            get
+            {
+                return MaterialWF.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialWFACClassMethod> MaterialWFACClassMethodList
+        {
+            get
+            {
+                return MaterialWFACClassMethod.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfigList
+        {
+            get
+            {
+                return MaterialWFACClassMethodConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialWFConnection> MaterialWFConnectionList
+        {
+            get
+            {
+                return MaterialWFConnection.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaterialWFRelation> MaterialWFRelationList
+        {
+            get
+            {
+                return MaterialWFRelation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDBalancingMode> MDBalancingModeList
+        {
+            get
+            {
+                return MDBalancingMode.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDBatchPlanGroup> MDBatchPlanGroupList
+        {
+            get
+            {
+                return MDBatchPlanGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDBookingNotAvailableMode> MDBookingNotAvailableModeList
+        {
+            get
+            {
+                return MDBookingNotAvailableMode.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCostCenter> MDCostCenterList
+        {
+            get
+            {
+                return MDCostCenter.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCountry> MDCountryList
+        {
+            get
+            {
+                return MDCountry.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCountryLand> MDCountryLandList
+        {
+            get
+            {
+                return MDCountryLand.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCountrySalesTax> MDCountrySalesTaxList
+        {
+            get
+            {
+                return MDCountrySalesTax.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterialList
+        {
+            get
+            {
+                return MDCountrySalesTaxMaterial.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroupList
+        {
+            get
+            {
+                return MDCountrySalesTaxMDMaterialGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCurrency> MDCurrencyList
+        {
+            get
+            {
+                return MDCurrency.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDCurrencyExchange> MDCurrencyExchangeList
+        {
+            get
+            {
+                return MDCurrencyExchange.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDDelivNoteState> MDDelivNoteStateList
+        {
+            get
+            {
+                return MDDelivNoteState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDDelivPosLoadState> MDDelivPosLoadStateList
+        {
+            get
+            {
+                return MDDelivPosLoadState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDDelivPosState> MDDelivPosStateList
+        {
+            get
+            {
+                return MDDelivPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDDelivType> MDDelivTypeList
+        {
+            get
+            {
+                return MDDelivType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDDemandOrderState> MDDemandOrderStateList
+        {
+            get
+            {
+                return MDDemandOrderState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDFacilityInventoryPosState> MDFacilityInventoryPosStatesList
+        {
+            get
+            {
+                return MDFacilityInventoryPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDFacilityInventoryState> MDFacilityInventoryStateList
+        {
+            get
+            {
+                return MDFacilityInventoryState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDFacilityManagementType> MDFacilityManagementTypeList
+        {
+            get
+            {
+                return MDFacilityManagementType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDFacilityType> MDFacilityTypeList
+        {
+            get
+            {
+                return MDFacilityType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDFacilityVehicleType> MDFacilityVehicleTypeList
+        {
+            get
+            {
+                return MDFacilityVehicleType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDGMPAdditive> MDGMPAdditiveList
+        {
+            get
+            {
+                return MDGMPAdditive.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDGMPMaterialGroup> MDGMPMaterialGroupList
+        {
+            get
+            {
+                return MDGMPMaterialGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDGMPMaterialGroupPos> MDGMPMaterialGroupPosList
+        {
+            get
+            {
+                return MDGMPMaterialGroupPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInOrderPosState> MDInOrderPosStateList
+        {
+            get
+            {
+                return MDInOrderPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInOrderState> MDInOrderStateList
+        {
+            get
+            {
+                return MDInOrderState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInOrderType> MDInOrderTypeList
+        {
+            get
+            {
+                return MDInOrderType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInRequestState> MDInRequestStateList
+        {
+            get
+            {
+                return MDInRequestState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInventoryManagementType> MDInventoryManagementTypeList
+        {
+            get
+            {
+                return MDInventoryManagementType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInvoiceState> MDInvoiceStateList
+        {
+            get
+            {
+                return MDInvoiceState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDInvoiceType> MDInvoiceTypeList
+        {
+            get
+            {
+                return MDInvoiceType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDLabOrderPosState> MDLabOrderPosStateList
+        {
+            get
+            {
+                return MDLabOrderPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDLabOrderState> MDLabOrderStateList
+        {
+            get
+            {
+                return MDLabOrderState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDLabTag> MDLabTagList
+        {
+            get
+            {
+                return MDLabTag.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMaintMode> MDMaintModeList
+        {
+            get
+            {
+                return MDMaintMode.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMaintOrderPropertyState> MDMaintOrderPropertyStateList
+        {
+            get
+            {
+                return MDMaintOrderPropertyState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMaintOrderState> MDMaintOrderStateList
+        {
+            get
+            {
+                return MDMaintOrderState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMaintTaskState> MDMaintTaskStateList
+        {
+            get
+            {
+                return MDMaintTaskState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMaterialGroup> MDMaterialGroupList
+        {
+            get
+            {
+                return MDMaterialGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMaterialType> MDMaterialTypeList
+        {
+            get
+            {
+                return MDMaterialType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDMovementReason> MDMovementReasonList
+        {
+            get
+            {
+                return MDMovementReason.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDOutOfferState> MDOutOfferStateList
+        {
+            get
+            {
+                return MDOutOfferState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDOutOrderPlanState> MDOutOrderPlanStateList
+        {
+            get
+            {
+                return MDOutOrderPlanState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDOutOrderPosState> MDOutOrderPosStateList
+        {
+            get
+            {
+                return MDOutOrderPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDOutOrderState> MDOutOrderStateList
+        {
+            get
+            {
+                return MDOutOrderState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDOutOrderType> MDOutOrderTypeList
+        {
+            get
+            {
+                return MDOutOrderType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDPickingType> MDPickingTypeList
+        {
+            get
+            {
+                return MDPickingType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDProcessErrorAction> MDProcessErrorActionList
+        {
+            get
+            {
+                return MDProcessErrorAction.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDProdOrderPartslistPosState> MDProdOrderPartslistPosStateList
+        {
+            get
+            {
+                return MDProdOrderPartslistPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDProdOrderState> MDProdOrderStateList
+        {
+            get
+            {
+                return MDProdOrderState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDRatingComplaintType> MDRatingComplaintTypeList
+        {
+            get
+            {
+                return MDRatingComplaintType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDReleaseState> MDReleaseStateList
+        {
+            get
+            {
+                return MDReleaseState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDReservationMode> MDReservationModeList
+        {
+            get
+            {
+                return MDReservationMode.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDSchedulingGroup> MDSchedulingGroupList
+        {
+            get
+            {
+                return MDSchedulingGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDSchedulingGroupWF> MDSchedulingGroupWFList
+        {
+            get
+            {
+                return MDSchedulingGroupWF.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDTermOfPayment> MDTermOfPaymentList
+        {
+            get
+            {
+                return MDTermOfPayment.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDTimeRange> MDTimeRangeList
+        {
+            get
+            {
+                return MDTimeRange.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDToleranceState> MDToleranceStateList
+        {
+            get
+            {
+                return MDToleranceState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDTour> MDTourList
+        {
+            get
+            {
+                return MDTour.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDTourplanPosState> MDTourplanPosStateList
+        {
+            get
+            {
+                return MDTourplanPosState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDTourplanState> MDTourplanStateList
+        {
+            get
+            {
+                return MDTourplanState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDTransportMode> MDTransportModeList
+        {
+            get
+            {
+                return MDTransportMode.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDUnit> MDUnitList
+        {
+            get
+            {
+                return MDUnit.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDUnitConversion> MDUnitConversionList
+        {
+            get
+            {
+                return MDUnitConversion.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDVisitorCard> MDVisitorCardList
+        {
+            get
+            {
+                return MDVisitorCard.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDVisitorCardState> MDVisitorCardStateList
+        {
+            get
+            {
+                return MDVisitorCardState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDVisitorVoucherState> MDVisitorVoucherStateList
+        {
+            get
+            {
+                return MDVisitorVoucherState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MDZeroStockState> MDZeroStockStateList
+        {
+            get
+            {
+                return MDZeroStockState.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MsgAlarmLog> MsgAlarmLogList
+        {
+            get
+            {
+                return MsgAlarmLog.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OperationLog> OperationLogList
+        {
+            get
+            {
+                return OperationLog.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OrderLog> OrderLogList
+        {
+            get
+            {
+                return OrderLog.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OrderLogPosMachines> OrderLogPosMachinesList
+        {
+            get
+            {
+                return OrderLogPosMachines.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OrderLogPosView> OrderLogPosViewList
+        {
+            get
+            {
+                return OrderLogPosView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OrderLogRelView> OrderLogRelViewList
+        {
+            get
+            {
+                return OrderLogRelView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOffer> OutOfferList
+        {
+            get
+            {
+                return OutOffer.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOfferConfig> OutOfferConfigList
+        {
+            get
+            {
+                return OutOfferConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOfferPos> OutOfferPosList
+        {
+            get
+            {
+                return OutOfferPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOrder> OutOrderList
+        {
+            get
+            {
+                return OutOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOrderConfig> OutOrderConfigList
+        {
+            get
+            {
+                return OutOrderConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOrderPos> OutOrderPosList
+        {
+            get
+            {
+                return OutOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOrderPosSplit> OutOrderPosSplitList
+        {
+            get
+            {
+                return OutOrderPosSplit.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<OutOrderPosUtilization> OutOrderPosUtilizationList
+        {
+            get
+            {
+                return OutOrderPosUtilization.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Partslist> PartslistList
+        {
+            get
+            {
+                return Partslist.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PartslistACClassMethod> PartslistACClassMethodList
+        {
+            get
+            {
+                return PartslistACClassMethod.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PartslistConfig> PartslistConfigList
+        {
+            get
+            {
+                return PartslistConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PartslistPos> PartslistPosList
+        {
+            get
+            {
+                return PartslistPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PartslistPosRelation> PartslistPosRelationList
+        {
+            get
+            {
+                return PartslistPosRelation.ToArray();
+            }
+        }
+        
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PartslistPosSplit> PartslistPosSplitList
+        {
+            get
+            {
+                return PartslistPosSplit.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PartslistStock> PartslistStockList
+        {
+            get
+            {
+                return PartslistStock.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Picking> PickingList
+        {
+            get
+            {
+                return Picking.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PickingConfig> PickingConfigList
+        {
+            get
+            {
+                return PickingConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PickingPos> PickingPosList
+        {
+            get
+            {
+                return PickingPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPosList
+        {
+            get
+            {
+                return PickingPosProdOrderPartslistPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PlanningMR> PlanningMRList
+        {
+            get
+            {
+                return PlanningMR.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PlanningMRProposal> PlanningMRProposalList
+        {
+            get
+            {
+                return PlanningMRProposal.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PriceList> PriceListList
+        {
+            get
+            {
+                return PriceList.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<PriceListMaterial> PriceListMaterialList
+        {
+            get
+            {
+                return PriceListMaterial.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrder> ProdOrderList
+        {
+            get
+            {
+                return ProdOrder.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderBatch> ProdOrderBatchList
+        {
+            get
+            {
+                return ProdOrderBatch.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderBatchPlan> ProdOrderBatchPlanList
+        {
+            get
+            {
+                return ProdOrderBatchPlan.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderConnectionsDetailView> ProdOrderConnectionsDetailViewList
+        {
+            get
+            {
+                return ProdOrderConnectionsDetailView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderConnectionsView> ProdOrderConnectionsViewList
+        {
+            get
+            {
+                return ProdOrderConnectionsView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderInwardsView> ProdOrderInwardsViewList
+        {
+            get
+            {
+                return ProdOrderInwardsView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderOutwardsView> ProdOrderOutwardsViewList
+        {
+            get
+            {
+                return ProdOrderOutwardsView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderPartslist> ProdOrderPartslistList
+        {
+            get
+            {
+                return ProdOrderPartslist.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderPartslistConfig> ProdOrderPartslistConfigList
+        {
+            get
+            {
+                return ProdOrderPartslistConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderPartslistPos> ProdOrderPartslistPosList
+        {
+            get
+            {
+                return ProdOrderPartslistPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLotList
+        {
+            get
+            {
+                return ProdOrderPartslistPosFacilityLot.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelationList
+        {
+            get
+            {
+                return ProdOrderPartslistPosRelation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<ProdOrderPartslistPosSplit> ProdOrderPartslistPosSplitList
+        {
+            get
+            {
+                return ProdOrderPartslistPosSplit.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Rating> RatingList
+        {
+            get
+            {
+                return Rating.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<RatingComplaint> RatingComplaintList
+        {
+            get
+            {
+                return RatingComplaint.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3FilterTracking> TandTv3FilterTrackingList
+        {
+            get
+            {
+                return TandTv3FilterTracking.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterialList
+        {
+            get
+            {
+                return TandTv3FilterTrackingMaterial.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MDBookingDirection> TandTv3MDBookingDirectionList
+        {
+            get
+            {
+                return TandTv3MDBookingDirection.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MDTrackingDirection> TandTv3MDTrackingDirectionList
+        {
+            get
+            {
+                return TandTv3MDTrackingDirection.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MDTrackingStartItemType> TandTv3MDTrackingStartItemTypeList
+        {
+            get
+            {
+                return TandTv3MDTrackingStartItemType.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPoint> TandTv3MixPointList
+        {
+            get
+            {
+                return TandTv3MixPoint.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePosList 
+        {
+            get
+            {
+                return TandTv3MixPointDeliveryNotePos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointFacility> TandTv3MixPointFacilityList
+        {
+            get
+            {
+                return TandTv3MixPointFacility.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingChargeList
+        {
+            get
+            {
+                return TandTv3MixPointFacilityBookingCharge.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLotList
+        {
+            get
+            {
+                return TandTv3MixPointFacilityLot.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBookingList
+        {
+            get
+            {
+                return TandTv3MixPointFacilityPreBooking.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPosList
+        {
+            get
+            {
+                return TandTv3MixPointInOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPosList
+        {
+            get
+            {
+                return TandTv3MixPointOutOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointPickingPos> TandTv3MixPointPickingPosList
+        {
+            get
+            {
+                return TandTv3MixPointPickingPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPosList
+        {
+            get
+            {
+                return TandTv3MixPointProdOrderPartslistPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelationList
+        {
+            get
+            {
+                return TandTv3MixPointProdOrderPartslistPosRelation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3MixPointRelation> TandTv3MixPointRelationList
+        {
+            get
+            {
+                return TandTv3MixPointRelation.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TandTv3Step> TandTv3StepList
+        {
+            get
+            {
+                return TandTv3Step.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Tourplan> TourplanList
+        {
+            get
+            {
+                return Tourplan.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TourplanConfig> TourplanConfigList
+        {
+            get
+            {
+                return TourplanConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<TourplanPos> TourplanPosList
+        {
+            get
+            {
+                return TourplanPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<UserSettings> UserSettingsList
+        {
+            get
+            {
+                return UserSettings.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBConfig> VBConfigList
+        {
+            get
+            {
+                return VBConfig.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBGroup> VBGroupList
+        {
+            get
+            {
+                return VBGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBGroupRight> VBGroupRightList
+        {
+            get
+            {
+                return VBGroupRight.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBLanguage> VBLanguageList
+        {
+            get
+            {
+                return VBLanguage.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBLicense> VBLicenseList
+        {
+            get
+            {
+                return VBLicense.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBNoConfiguration> VBNoConfigurationList
+        {
+            get
+            {
+                return VBNoConfiguration.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBSystem> VBSystemList
+        {
+            get
+            {
+                return VBSystem.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBSystemColumns> VBSystemColumnsList
+        {
+            get
+            {
+                return VBSystemColumns.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBTranslationView> VBTranslationViewList
+        {
+            get
+            {
+                return VBTranslationView.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBUser> VBUserList
+        {
+            get
+            {
+                return VBUser.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBUserACClassDesign> VBUserACClassDesignList
+        {
+            get
+            {
+                return VBUserACClassDesign.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBUserACProject> VBUserACProjectList
+        {
+            get
+            {
+                return VBUserACProject.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBUserGroup> VBUserGroupList
+        {
+            get
+            {
+                return VBUserGroup.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VBUserInstance> VBUserInstanceList
+        {
+            get
+            {
+                return VBUserInstance.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Visitor> VisitorList
+        {
+            get
+            {
+                return Visitor.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<VisitorVoucher> VisitorVoucherList
+        {
+            get
+            {
+                return VisitorVoucher.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<Weighing> WeighingList
+        {
+            get
+            {
+                return Weighing.ToArray();
+            }
+        }
+
+        #endregion
+
         #region Lists
 
         [NotMapped]
