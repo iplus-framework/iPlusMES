@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using gip.mes.facility;
 using gip.core.datamodel;
+using gip.core.processapplication;
 
 namespace gip.mes.webservices
 {
@@ -27,6 +28,20 @@ namespace gip.mes.webservices
         public core.webservices.ACClass ACClass
         {
             get; set;
+        }
+
+        [DataMember(Name = "xMM")]
+        public bool? MachineMalfunction
+        {
+            get;
+            set;
+        }
+
+        [DataMember(Name = "xMA")]
+        public AvailabilityState? MachineAvailability
+        {
+            get;
+            set;
         }
         
         [DataMember(Name = "xM")]

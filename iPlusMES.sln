@@ -147,7 +147,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.cmdlet", "gip.mes.c
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.core.sql", "..\iPlus\gip.core.sql\gip.core.sql.sqlproj", "{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.mes.sql", "gip.mes.sql\gip.mes.sql.sqlproj", "{D2F4E983-CF1F-4689-BF8D-4D56A6615491}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "gip.core.processapplication.shared", "..\iPlus\gip.core.processapplication.shared\gip.core.processapplication.shared.shproj", "{38889580-0345-42CC-AB4D-931CA15AFA85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -472,14 +472,6 @@ Global
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.DebugDiag|Any CPU.Deploy.0 = Debug|Any CPU
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.DebugDiag|Any CPU.Deploy.0 = Debug|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -552,7 +544,7 @@ Global
 		{AE832FBC-6E4E-4AD5-A2D6-04B45C1B1B5E} = {F4A3E5B7-F8EA-41BB-A00A-C75D60754CAE}
 		{71C000C3-7BEF-410E-9922-7282476FCEAD} = {3C7E5EA9-3F24-4077-BD6D-28C8B8B805E3}
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12} = {B5C7FEEF-A87E-4FDE-8092-3A03B1E092A9}
-		{D2F4E983-CF1F-4689-BF8D-4D56A6615491} = {F4A3E5B7-F8EA-41BB-A00A-C75D60754CAE}
+		{38889580-0345-42CC-AB4D-931CA15AFA85} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3D892D3-D698-40B1-927D-CB943150F1E1}
@@ -562,9 +554,11 @@ Global
 		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{0c232936-48b8-4ccd-951e-8ad3d439d264}*SharedItemsImports = 13
 		gip.mes.webservices.shared\gip.mes.webservices.shared.projitems*{1131f03b-f0f7-4ab7-ad22-8207d49c2e24}*SharedItemsImports = 13
 		..\iPlus\gip.core.datamodel.shared\gip.core.datamodel.shared.projitems*{16fb4111-5110-46e5-851d-38a4d7522f85}*SharedItemsImports = 4
+		..\iPlus\gip.core.processapplication.shared\gip.core.processapplication.shared.projitems*{38889580-0345-42cc-ab4d-931ca15afa85}*SharedItemsImports = 13
 		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{47f013c1-e869-419e-8b17-c56313acc34b}*SharedItemsImports = 13
 		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{52dc947d-677d-42ca-bca6-153a4e027272}*SharedItemsImports = 4
 		gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems*{5a0c15dd-ad10-43e7-9113-c4fb1b92d3b9}*SharedItemsImports = 4
+		..\iPlus\gip.core.processapplication.shared\gip.core.processapplication.shared.projitems*{66484708-85bd-47c4-92dd-3010387465f4}*SharedItemsImports = 4
 		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{6d353dd2-970b-45bb-9ab6-d23a28e0233f}*SharedItemsImports = 13
 		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{7931f65b-3c2a-4db9-a5a6-4bc5b4d12c00}*SharedItemsImports = 4
 		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{893d3b1b-dc55-4684-8b5d-941f1049151b}*SharedItemsImports = 4

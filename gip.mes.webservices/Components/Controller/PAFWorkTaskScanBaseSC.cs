@@ -51,7 +51,8 @@ namespace gip.mes.webservices
                 facilityChargeID, 
                 sequence.Sequence.Count,
                 sequence.State == BarcodeSequenceBase.ActionState.Question ? (short?)sequence.Sequence.LastOrDefault().MsgResult : null,
-                sequence.Sequence.LastOrDefault().WFMethod) as WorkTaskScanResult;
+                sequence.Sequence.LastOrDefault().WFMethod,
+                (sequence.Sequence.FirstOrDefault(c => c.ACClass != null) != null ? sequence.Sequence.FirstOrDefault(c => c.ACClass != null).MachineMalfunction : null)) as WorkTaskScanResult;
             if (result != null)
             {
                 if (result.Result.State == BarcodeSequenceBase.ActionState.Selection
@@ -71,6 +72,14 @@ namespace gip.mes.webservices
                 {
                     sequence.State = result.Result.State;
                     sequence.Message = result.Result.Message;
+                }
+
+                PAProcessModuleVB paProcessModule = component.FindParentComponent<PAProcessModuleVB>(c => c is PAProcessModuleVB);
+                if (paProcessModule != null)
+                {
+                    BarcodeEntity barcodeEntity = sequence.Sequence.FirstOrDefault(c => c.ACClass != null);
+                    if (barcodeEntity != null)
+                        barcodeEntity.MachineAvailability = paProcessModule.AvailabilityState.ValueT;
                 }
             }
             else

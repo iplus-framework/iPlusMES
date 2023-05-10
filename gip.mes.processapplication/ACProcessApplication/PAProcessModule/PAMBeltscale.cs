@@ -63,7 +63,7 @@ namespace gip.mes.processapplication
 
         PAPoint _PAPointMatOut1;
         [ACPropertyConnectionPoint(9999, "PointMaterial")]
-        [ACPointStateInfo(GlobalProcApp.AvailabilityStatePropName, GlobalProcApp.AvailabilityState.Idle, GlobalProcApp.AvailabilityStateGroupName, "", Global.Operators.none)]
+        [ACPointStateInfo(GlobalProcApp.AvailabilityStatePropName, core.processapplication.AvailabilityState.Idle, GlobalProcApp.AvailabilityStateGroupName, "", Global.Operators.none)]
         public PAPoint PAPointMatOut1
         {
             get

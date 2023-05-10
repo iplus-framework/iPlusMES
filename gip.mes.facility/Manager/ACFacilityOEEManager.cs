@@ -277,20 +277,20 @@ namespace gip.mes.facility
                                 minStartDate = propLogSum.StartDate.Value;
                             if (propLogSum.EndDate.HasValue && propLogSum.EndDate.Value > maxEndDate)
                                 maxEndDate = propLogSum.EndDate.Value;
-                            GlobalProcApp.AvailabilityState availabilityState = (GlobalProcApp.AvailabilityState)propLogSum.PropertyValue;
-                            if (availabilityState == GlobalProcApp.AvailabilityState.Idle)
+                            AvailabilityState availabilityState = (AvailabilityState)propLogSum.PropertyValue;
+                            if (availabilityState == AvailabilityState.Idle)
                                 idleTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.Standby)
+                            else if (availabilityState == AvailabilityState.Standby)
                                 standByTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.InOperation)
+                            else if (availabilityState == AvailabilityState.InOperation)
                                 operationTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.ScheduledBreak)
+                            else if (availabilityState == AvailabilityState.ScheduledBreak)
                                 scheduledBreakTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.UnscheduledBreak)
+                            else if (availabilityState == AvailabilityState.UnscheduledBreak)
                                 unscheduledBreakTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.Retooling)
+                            else if (availabilityState == AvailabilityState.Retooling)
                                 retoolingTime += propLogSum.Duration;
-                            else if (availabilityState == GlobalProcApp.AvailabilityState.Maintenance)
+                            else if (availabilityState == AvailabilityState.Maintenance)
                                 maintenanceTime += propLogSum.Duration;
                         }
                         if (countPropertyLogs == 0
