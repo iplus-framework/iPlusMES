@@ -13,7 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Folge'}","", "", true)]
     [ACPropertyEntity(2, "TargetQuantity", ConstApp.TargetQuantity,"", "", true)]
     [ACPropertyEntity(3, "TargetWeight", "en{'Target Weight'}de{'Zielgewicht'}","", "", true)]
-    [ACPropertyEntity(4, "ProdOrderPartslistPos", "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
+    [ACPropertyEntity(4, "ProdOrderPartslistPos", "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

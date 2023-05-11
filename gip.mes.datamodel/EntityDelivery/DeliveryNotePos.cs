@@ -11,10 +11,10 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.DeliveryNotePos, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
-    [ACPropertyEntity(2, OutOrderPos.ClassName, "en{'Outorderpos'}de{'Auftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
-    [ACPropertyEntity(3, InOrderPos.ClassName, "en{'Inorderpos'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
+    [ACPropertyEntity(2, OutOrderPos.ClassName, "en{'Outorderpos'}de{'Auftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, InOrderPos.ClassName, "en{'Inorderpos'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "LineNumber", "en{'Item Number'}de{'Positionsnummer'}", "", "", true)]
-    [ACPropertyEntity(5, DeliveryNote.ClassName, "en{'Deliverynote'}de{'Lieferschein'}", Const.ContextDatabase + "\\" + DeliveryNote.ClassName, "", true)]
+    [ACPropertyEntity(5, DeliveryNote.ClassName, "en{'Deliverynote'}de{'Lieferschein'}", Const.ContextDatabase + "\\" + DeliveryNote.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

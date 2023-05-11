@@ -5,8 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, "en{'MDSchedulingGroupWF'}de{'MDSchedulingGroupWF'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, gip.core.datamodel.ACClassWF.ClassName, "en{'To Workflownode'}de{'Workflownode'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassWF.ClassName, "", true)]
-    [ACPropertyEntity(2, "MDSchedulingGroup", "en{'MateriaWF-ACClassMethod'}de{'MateriaWF-ACClassMethod'}", Const.ContextDatabase + "\\" + MDSchedulingGroup.ClassName, "", true)]
+    [ACPropertyEntity(1, gip.core.datamodel.ACClassWF.ClassName, "en{'To Workflownode'}de{'Workflownode'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassWF.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, "MDSchedulingGroup", "en{'MateriaWF-ACClassMethod'}de{'MateriaWF-ACClassMethod'}", Const.ContextDatabase + "\\" + MDSchedulingGroup.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

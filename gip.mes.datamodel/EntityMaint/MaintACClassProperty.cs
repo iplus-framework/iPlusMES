@@ -10,8 +10,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance ACClassProperty'}de{'Maintenance ACClassProperty'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "VBiACClassProperty", "en{'ACClassProperty'}de{'ACClassProperty'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassProperty.ClassName, "", true)]
-    [ACPropertyEntity(5, MaintACClass.ClassName, "en{'Maintenance rule'}de{'Wartungsregel'}", Const.ContextDatabase + "\\" + MaintACClass.ClassName, "", true)]
+    [ACPropertyEntity(1, "VBiACClassProperty", "en{'ACClassProperty'}de{'ACClassProperty'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassProperty.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(5, MaintACClass.ClassName, "en{'Maintenance rule'}de{'Wartungsregel'}", Const.ContextDatabase + "\\" + MaintACClass.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "MaxValue", "en{'Maximum value'}de{'Maximaler Wert'}", "", "", true)]
     [ACPropertyEntity(5, "IsActive","en{'Is Active'}de{'Ist Aktiv'}","","",true)]
     [ACPropertyEntity(6, "IsWarningActive", "en{'Warning'}de{'Warnung'}", "", "", true)]

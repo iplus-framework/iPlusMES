@@ -13,8 +13,8 @@ namespace gip.mes.datamodel
     /// Partslist 
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Materialworkflow'}de{'Materialworkflow'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaterialWF")]
-    [ACPropertyEntity(4, MaterialWF.ClassName, "en{'Materialflow'}de{'Materialfluss'}", Const.ContextDatabase + "\\" + MaterialWF.ClassName, "", true)]
-    [ACPropertyEntity(5, gip.core.datamodel.ACClassMethod.ClassName, "en{'Workflow'}de{'Workflow'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassMethod.ClassName, "", true)]
+    [ACPropertyEntity(4, MaterialWF.ClassName, "en{'Materialflow'}de{'Materialfluss'}", Const.ContextDatabase + "\\" + MaterialWF.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(5, gip.core.datamodel.ACClassMethod.ClassName, "en{'Workflow'}de{'Workflow'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassMethod.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(6, Const.IsDefault, "en{'Default workflow'}de{'Standard workflow'}")]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

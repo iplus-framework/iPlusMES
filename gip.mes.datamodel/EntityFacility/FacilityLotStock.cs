@@ -12,8 +12,8 @@ namespace gip.mes.datamodel
 {
     // FacilityLotStock (Artikel-Bestand)
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Facilitylotstock'}de{'Artikel-Bestand'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, FacilityLot.ClassName, ConstApp.Lot, Const.ContextDatabase + "\\" + FacilityLot.ClassName, "", true)]
-    [ACPropertyEntity(2, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName, "", true)]
+    [ACPropertyEntity(1, FacilityLot.ClassName, ConstApp.Lot, Const.ContextDatabase + "\\" + FacilityLot.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "StockQuantity", ConstApp.StockQuantity, "", "", true)]
     [ACPropertyEntity(4, "StockWeight", ConstApp.StockWeight, "", "", true)]
 

@@ -10,10 +10,10 @@ namespace gip.mes.datamodel
 {
     // MaterialStock (Artikel-Bestand)
     [ACClassInfo(Const.PackName_VarioMaterial, ConstApp.MaterialStock, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(1, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "StockQuantity", ConstApp.StockQuantity, "", "", true)]
     [ACPropertyEntity(3, "StockWeight", ConstApp.StockWeight, "", "", true)]
-    [ACPropertyEntity(4, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName, "", true)]
+    [ACPropertyEntity(4, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
 
     [ACPropertyEntity(5, "DayInward", ConstApp.DayInward, "", "", true)]
     [ACPropertyEntity(6, "DayTargetInward", ConstApp.DayTargetInward, "", "", true)]

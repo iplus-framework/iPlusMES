@@ -4,9 +4,9 @@ using System;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityMDSchedulingGroup, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
-    [ACPropertyEntity(2, MDSchedulingGroup.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + MDSchedulingGroup.ClassName, "", true)]
-    [ACPropertyEntity(3, MDPickingType.ClassName, ConstApp.PickingType, Const.ContextDatabase + "\\" + MDPickingType.ClassName, "", true)]
+    [ACPropertyEntity(1, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, MDSchedulingGroup.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + MDSchedulingGroup.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, MDPickingType.ClassName, ConstApp.PickingType, Const.ContextDatabase + "\\" + MDPickingType.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

@@ -12,10 +12,10 @@ namespace gip.mes.datamodel
 {
     // CompanyMaterialStock (Artikel-Bestand)
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'CompanyMaterialStock'}de{'Materialbestand'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, CompanyMaterial.ClassName, "en{'Material Contractor'}de{'Material Vertragspartner'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName, "", true)]
+    [ACPropertyEntity(1, CompanyMaterial.ClassName, "en{'Material Contractor'}de{'Material Vertragspartner'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "StockQuantity", ConstApp.StockQuantity, "", "", true)]
     [ACPropertyEntity(3, "StockWeight", ConstApp.StockWeight, "", "", true)]
-    [ACPropertyEntity(4, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName, "", true)]
+    [ACPropertyEntity(4, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
 
     [ACPropertyEntity(5, "DayInward", "en{'Day Inward Qty'}de{'Tageszugang'}", "", "", true)]
     [ACPropertyEntity(6, "DayTargetInward", "en{'Day Inward Target Qty'}de{'Tageszugang Soll'}", "", "", true)]

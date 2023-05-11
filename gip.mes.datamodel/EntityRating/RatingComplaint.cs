@@ -10,8 +10,8 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioCompany, "en{'Rating Complaint'}de{'Beanstandung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSORatingComplaint")]
     [ACPropertyEntity(1, "Score", "en{'Score'}de{'Punktestand'}","", "", true)]
-    [ACPropertyEntity(2, "MDRatingComplaintType", "en{'Rating Complaint Type'}de{'Beanstandungstyp'}", Const.ContextDatabase + "\\" + MDRatingComplaintType.ClassName, "", true)]
-    [ACPropertyEntity(4, "Rating", "en{'Rating'}de{'Rating'}", Const.ContextDatabase + "\\" + Rating.ClassName, "", true)]
+    [ACPropertyEntity(2, "MDRatingComplaintType", "en{'Rating Complaint Type'}de{'Beanstandungstyp'}", Const.ContextDatabase + "\\" + MDRatingComplaintType.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, "Rating", "en{'Rating'}de{'Rating'}", Const.ContextDatabase + "\\" + Rating.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "Comment", "en{'Comment'}de{'Kommentar'}","", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

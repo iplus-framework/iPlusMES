@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_System, ConstApp.ESUserSettings, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "TenantCompanyID", ConstApp.Company, Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
-    [ACPropertyEntity(2, "InvoiceCompanyAddressID", ConstApp.BillingCompanyAddress, Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
-    [ACPropertyEntity(3, "TenantCompanyID", ConstApp.IssuerCompanyPerson, Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
+    [ACPropertyEntity(1, "TenantCompanyID", ConstApp.Company, Const.ContextDatabase + "\\" + Company.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, "InvoiceCompanyAddressID", ConstApp.BillingCompanyAddress, Const.ContextDatabase + "\\" + CompanyAddress.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, "TenantCompanyID", ConstApp.IssuerCompanyPerson, Const.ContextDatabase + "\\" + CompanyPerson.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + UserSettings.ClassName, ConstApp.ESInOrderState, typeof(UserSettings), UserSettings.ClassName, "", Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<UserSettings>) })]
     public partial class UserSettings

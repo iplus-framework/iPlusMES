@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Task'}de{'Wartungsaufgabe'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
-    [ACPropertyEntity(1, "MaintACClassVBGroup", "en{'MaintACClassVBGroup'}de{'MaintACClassVBGroup'}", Const.ContextDatabase + "\\" + MaintACClassVBGroup.ClassName, "", true)]
-    [ACPropertyEntity(2, "MDMaintTaskState", "en{'Status of Work Task'}de{'Aufgabenstatus'}", Const.ContextDatabase + "\\" + MDMaintTaskState.ClassName, "", true)]
+    [ACPropertyEntity(1, "MaintACClassVBGroup", "en{'MaintACClassVBGroup'}de{'MaintACClassVBGroup'}", Const.ContextDatabase + "\\" + MaintACClassVBGroup.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, "MDMaintTaskState", "en{'Status of Work Task'}de{'Aufgabenstatus'}", Const.ContextDatabase + "\\" + MDMaintTaskState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "StartTaskDate", "en{'Task commenced on'}de{'Aufgabe begonnen am'}", "", "", true)]
     [ACPropertyEntity(4, "EndTaskDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
     [ACPropertyEntity(5, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]

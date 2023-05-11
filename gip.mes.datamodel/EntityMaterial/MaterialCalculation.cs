@@ -9,7 +9,7 @@ namespace gip.mes.datamodel
     // MaterialUnit (Artikel)
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Calculation'}de{'Materialkalkulation'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "MaterialCalculationNo", "en{'Calculation No.'}de{'Kalkulationsnr.'}", "", "", true)]
-    [ACPropertyEntity(2, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(2, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "ProductionQuantity", "en{'Production Quantity'}de{'Produktionsmenge'}", "", "", true)]
     [ACPropertyEntity(4, "ValidFromDate", ConstApp.ValidFromDate, "", "", true)]
     [ACPropertyEntity(5, "ValidToDate", ConstApp.ValidToDate, "", "", true)]

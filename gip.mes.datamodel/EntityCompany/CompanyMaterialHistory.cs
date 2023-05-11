@@ -7,7 +7,7 @@ namespace gip.mes.datamodel
 {
     // CompanyMaterialHistory (LagerHistorie)
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Company Material History'}de{'Unternehmensmaterial Historie'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, CompanyMaterial.ClassName, "en{'Company Material'}de{'Unternehmensmaterial'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName, "", true)]
+    [ACPropertyEntity(1, CompanyMaterial.ClassName, "en{'Company Material'}de{'Unternehmensmaterial'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "StockQuantity", ConstApp.StockQuantity, "", "", true)]
     [ACPropertyEntity(3, "Inward", "en{'Inward Quantity'}de{'Zugangsmenge'}", "", "", true)]
     [ACPropertyEntity(4, "Outward", "en{'Outward Quantity'}de{'Abgangsmenge'}", "", "", true)]
@@ -26,7 +26,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(18, "OptStockQuantity", ConstApp.OptStockQuantity, "", "", true)]
     [ACPropertyEntity(19, "ReservedInwardQuantity", ConstApp.ReservedInwardQuantity, "", "", true)]
     [ACPropertyEntity(20, "ReservedOutwardQuantity", ConstApp.ReservedOutwardQuantity, "", "", true)]
-    [ACPropertyEntity(9999, History.ClassName, "en{'Balance Sheet History'}de{'Bilanzhistorie'}", Const.ContextDatabase + "\\" + History.ClassName, "", true)]
+    [ACPropertyEntity(9999, History.ClassName, "en{'Balance Sheet History'}de{'Bilanzhistorie'}", Const.ContextDatabase + "\\" + History.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

@@ -5,8 +5,8 @@ using gip.core.datamodel;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'ProdOrderPartslistPosFacilityLot'}de{'ProdOrderPartslistPosFacilityLot'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, ProdOrderPartslistPos.ClassName, "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
-    [ACPropertyEntity(2, FacilityLot.ClassName, "en{'Facility Lot'}de{'Chargen-Los'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName, "", true)]
+    [ACPropertyEntity(1, ProdOrderPartslistPos.ClassName, "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, FacilityLot.ClassName, "en{'Facility Lot'}de{'Chargen-Los'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "IsActive", "en{'Is active'}de{'Ist aktiv'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

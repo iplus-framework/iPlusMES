@@ -1827,7 +1827,7 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999)]
         [NotMapped]
-        public IEnumerable<MDFacilityInventoryPosState> MDFacilityInventoryPosStatesList
+        public IEnumerable<MDFacilityInventoryPosState> MDFacilityInventoryPosStateList
         {
             get
             {
@@ -2284,7 +2284,7 @@ namespace gip.mes.datamodel
                 return MDTransportMode.ToArray();
             }
         }
-
+        /*
         [ACPropertyInfo(9999)]
         [NotMapped]
         public IEnumerable<MDUnit> MDUnitList
@@ -2294,7 +2294,7 @@ namespace gip.mes.datamodel
                 return MDUnit.ToArray();
             }
         }
-
+        */
         [ACPropertyInfo(9999)]
         [NotMapped]
         public IEnumerable<MDUnitConversion> MDUnitConversionList

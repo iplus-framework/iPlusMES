@@ -11,9 +11,9 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'ProductionorderBillOfMaterials'}de{'Produktionsauftragsstückliste'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sort'}de{'Sortierung'}", "", "", true)]
-    [ACPropertyEntity(2, "Partslist", "en{'Bill of Materials Master'}de{'Stamm-Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
-    [ACPropertyEntity(3, ProdOrder.ClassName, "en{'Production Order'}de{'Produktionsauftrag'}", Const.ContextDatabase + "\\" + ProdOrder.ClassName, "", true)]
-    [ACPropertyEntity(4, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName, "", true)]
+    [ACPropertyEntity(2, "Partslist", "en{'Bill of Materials Master'}de{'Stamm-Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, ProdOrder.ClassName, "en{'Production Order'}de{'Produktionsauftrag'}", Const.ContextDatabase + "\\" + ProdOrder.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(5, "DepartmentUserDate", "en{'Ended by User on'}de{'Beendet von Bediener am'}", "", "", true)]
     [ACPropertyEntity(6, "DepartmentUserName", ConstApp.DepartmentUserName, "", "", true)]
     [ACPropertyEntity(7, "StartDate", "en{'Production Start'}de{'Produktionsstart'}", "", "", true)]

@@ -8,14 +8,14 @@ namespace gip.mes.datamodel
 {
     // MaterialUnit (Artikel)
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Unit'}de{'Materialeinheit'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "ToMDUnit", "en{'To Unit'}de{'Nach Einheit'}", Const.ContextDatabase + "\\" + MDUnit.ClassName, "", true)]
+    [ACPropertyEntity(1, "ToMDUnit", "en{'To Unit'}de{'Nach Einheit'}", Const.ContextDatabase + "\\" + MDUnit.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "Multiplier", "en{'Multiplier(From)'}de{'Multiplikator(Von)'}", "", "", true, DefaultValue = 1)]
     [ACPropertyEntity(3, "Divisor", "en{'Divisor(To)'}de{'Teiler(Nach)'}", "", "", true, DefaultValue = 1)]
     [ACPropertyEntity(4, "NetWeight", "en{'Net Weight'}de{'Nettogewicht'}", "", "", true)]
     [ACPropertyEntity(5, "GrossWeight", "en{'Gross Weight'}de{'Bruttogewicht'}", "", "", true)]
     [ACPropertyEntity(6, "ProductionWeight", "en{'Production Weight'}de{'Produktionsgewicht'}", "", "", true)]
     [ACPropertyEntity(7, "Comment", ConstApp.Comment, "", "", true)]
-    [ACPropertyEntity(9999, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(9999, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

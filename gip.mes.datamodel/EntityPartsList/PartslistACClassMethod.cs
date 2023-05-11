@@ -13,8 +13,8 @@ namespace gip.mes.datamodel
     /// Partslist 
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'PartslistACClassMethod'}de{'PartslistACClassMethod'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPartslist")]
-    [ACPropertyEntity(1, MaterialWFACClassMethod.ClassName, "en{'MaterialWFACClassMethod'}de{'MaterialWFACClassMethod'}", Const.ContextDatabase + "\\" + MaterialWFACClassMethod.ClassName, "", true)]
-    [ACPropertyEntity(2, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
+    [ACPropertyEntity(1, MaterialWFACClassMethod.ClassName, "en{'MaterialWFACClassMethod'}de{'MaterialWFACClassMethod'}", Const.ContextDatabase + "\\" + MaterialWFACClassMethod.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "UsedInPhaseIndex", "en{'Valid for Phase'}de{'Gültig für Phase'}", typeof(PartslistACClassMethod.Phase), "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

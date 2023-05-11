@@ -7,7 +7,7 @@ using gip.core.datamodel;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, ConstApp.ESCurrencyExchange, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "ToMDCurrency", "en{'To Currency'}de{'Nach Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
+    [ACPropertyEntity(1, "ToMDCurrency", "en{'To Currency'}de{'Nach Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "ExchangeRate", ConstApp.ESCurrencyExchange, "", "", true)]
     [ACPropertyEntity(3, "ExchangeNo", "en{'Exchange number'}de{'Wechselkursnummer'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDCurrencyExchange.ClassName, ConstApp.ESCurrencyExchange, typeof(MDCurrencyExchange), MDCurrencyExchange.ClassName, "ToMDCurrency\\MDCurrencyShortname", "ToMDCurrency\\MDCurrencyShortname")]

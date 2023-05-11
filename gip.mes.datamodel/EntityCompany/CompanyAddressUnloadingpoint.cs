@@ -12,7 +12,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioCompany, "en{'Unloadingpoint'}de{'Abladestelle'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}","", "", true)]
     [ACPropertyEntity(2, "UnloadingPointName", "en{'Unloadingpoint'}de{'Abladestelle'}","", "", true)]
-    [ACPropertyEntity(3, CompanyAddress.ClassName, "en{'Company Address'}de{'Unternehmensadresse'}", Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
+    [ACPropertyEntity(3, CompanyAddress.ClassName, "en{'Company Address'}de{'Unternehmensadresse'}", Const.ContextDatabase + "\\" + CompanyAddress.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "Comment", "en{'Comment'}de{'Bemerkung'}","", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

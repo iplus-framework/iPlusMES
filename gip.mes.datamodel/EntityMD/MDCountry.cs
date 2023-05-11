@@ -14,7 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "IsEUMember", "en{'EU-Member'}de{'EU-Mitglied'}", "", "", true)]
     [ACPropertyEntity(4, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACPropertyEntity(5, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
-    [ACPropertyEntity(6, MDCurrency.ClassName, "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
+    [ACPropertyEntity(6, MDCurrency.ClassName, "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

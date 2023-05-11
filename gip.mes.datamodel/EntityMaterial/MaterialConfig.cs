@@ -18,7 +18,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "XMLValue", "en{'Value'}de{'Wert'}")]
     [ACPropertyEntity(4, "Expression", "en{'Expression'}de{'Ausdruck'}","", "", true)]
     [ACPropertyEntity(5, "Comment", ConstApp.Comment,"", "", true)]
-    [ACPropertyEntity(6, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(6, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     // 6 Source
     // 7 Value
     [ACPropertyEntity(100, Const.PN_KeyACUrl, Const.EntityKey,"", "", true)]

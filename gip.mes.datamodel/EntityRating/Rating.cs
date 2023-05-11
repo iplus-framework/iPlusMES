@@ -11,9 +11,9 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioCompany, "en{'Rating'}de{'Bewertung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSORating")]
     [ACPropertyEntity(1, "Score", "en{'Score'}de{'Punktestand'}","", "", true)]
-    [ACPropertyEntity(2, Company.ClassName, "en{'Company'}de{'Unternehmen'}", Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
-    [ACPropertyEntity(3, CompanyPerson.ClassName, "en{'Person'}de{'Person'}", Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
-    [ACPropertyEntity(4, DeliveryNote.ClassName, "en{'Indeliverynote'}de{'Eingangslieferschein'}", Const.ContextDatabase + "\\" + DeliveryNote.ClassName, "", true)]
+    [ACPropertyEntity(2, Company.ClassName, "en{'Company'}de{'Unternehmen'}", Const.ContextDatabase + "\\" + Company.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, CompanyPerson.ClassName, "en{'Person'}de{'Person'}", Const.ContextDatabase + "\\" + CompanyPerson.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, DeliveryNote.ClassName, "en{'Indeliverynote'}de{'Eingangslieferschein'}", Const.ContextDatabase + "\\" + DeliveryNote.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(5, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

@@ -6,8 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials Stock'}de{'Stücklistenbestand'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "Partslist", ConstApp.BOM, Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
-    [ACPropertyEntity(2, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName, "", true)]
+    [ACPropertyEntity(1, "Partslist", ConstApp.BOM, Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "StockQuantity", ConstApp.StockQuantity, "", "", true)]
     [ACPropertyEntity(4, "StockWeight", ConstApp.StockWeight, "", "", true)]
 

@@ -10,8 +10,8 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Order'}de{'Produktionsauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOProdOrder")]
     [ACPropertyEntity(1, "ProgramNo", "en{'Order Number'}de{'Auftragsnummer'}", "", "", true)]
-    [ACPropertyEntity(3, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName, "", true)]
-    [ACPropertyEntity(4, "CPartnerCompany", "en{'Contractual Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
+    [ACPropertyEntity(3, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, "CPartnerCompany", "en{'Contractual Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\" + Company.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(5, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

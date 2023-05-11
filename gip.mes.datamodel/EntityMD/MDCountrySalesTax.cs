@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, ConstApp.ESCountrySalesTax, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(9999, MDCountry.ClassName, ConstApp.ESCountry, Const.ContextDatabase + "\\" + MDCountry.ClassName, "", true)]
+    [ACPropertyEntity(9999, MDCountry.ClassName, ConstApp.ESCountry, Const.ContextDatabase + "\\" + MDCountry.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
     [ACPropertyEntity(1, "SalesTax", ConstApp.ESCountrySalesTax, "", "", true)]
     [ACPropertyEntity(2, Const.IsDefault, Const.EntityIsDefault, "", "", true)]

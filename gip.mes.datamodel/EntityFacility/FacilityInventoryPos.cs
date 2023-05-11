@@ -12,7 +12,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventoryposition'}de{'Inventurposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
     [ACPropertyEntity(2, "Comment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]
-    [ACPropertyEntity(3, FacilityCharge.ClassName, "en{'Charge'}de{'Charge'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName, "", true)]
+    [ACPropertyEntity(3, FacilityCharge.ClassName, "en{'Charge'}de{'Charge'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "FacilityInventory", "en{'Inventory'}de{'Inventur'}", Const.ContextDatabase + "\\FacilityInventoryList", "", true)]
     [ACPropertyEntity(5, "MDFacilityInventoryPosState", "en{'Inventorypositionstate'}de{'Inventurpositionsstatus'}", Const.ContextDatabase + "\\MDFacilityInventoryPosStateList", "", true)]
     [ACPropertyEntity(6, "NewStockQuantity", "en{'New Stockquantity'}de{'Neue Lagermenge'}", "", "", true)]

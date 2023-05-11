@@ -9,9 +9,9 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, ConstApp.ESGMPMaterialGroupPos, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
-    [ACPropertyEntity(2, "MDGMPAdditive", ConstApp.ESGMPAdditives, Const.ContextDatabase + "\\MDGMPAdditive", "", true)]
+    [ACPropertyEntity(2, "MDGMPAdditive", ConstApp.ESGMPAdditives, Const.ContextDatabase + "\\MDGMPAdditive" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "MaxConcentration", "en{'Max Concentration'}de{'Max. Konzentration'}", "", "", true)]
-    [ACPropertyEntity(9999, MDGMPMaterialGroup.ClassName, ConstApp.ESGMPMaterialGroup, Const.ContextDatabase + "\\" + MDGMPMaterialGroup.ClassName, "", true)]
+    [ACPropertyEntity(9999, MDGMPMaterialGroup.ClassName, ConstApp.ESGMPMaterialGroup, Const.ContextDatabase + "\\" + MDGMPMaterialGroup.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

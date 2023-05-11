@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'MaterialWFConection'}de{'MaterialWFConection'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaterialWF")]
-    [ACPropertyEntity(1, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
-    [ACPropertyEntity(2, "MaterialWFACClassMethod", "en{'MateriaWF-ACClassMethod'}de{'MateriaWF-ACClassMethod'}", Const.ContextDatabase + "\\" + MaterialWFACClassMethod.ClassName, "", true)]
-    [ACPropertyEntity(3, gip.core.datamodel.ACClassWF.ClassName, "en{'To Workflownode'}de{'Workflownode'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassWF.ClassName, "", true)]
+    [ACPropertyEntity(1, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, "MaterialWFACClassMethod", "en{'MateriaWF-ACClassMethod'}de{'MateriaWF-ACClassMethod'}", Const.ContextDatabase + "\\" + MaterialWFACClassMethod.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, gip.core.datamodel.ACClassWF.ClassName, "en{'To Workflownode'}de{'Workflownode'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassWF.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWFConnection>) })]
     public partial class MaterialWFConnection : IACObjectEntity
     {

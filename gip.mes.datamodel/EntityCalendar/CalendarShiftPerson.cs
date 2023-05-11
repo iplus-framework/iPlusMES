@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioScheduling, "en{'Shift'}de{'Schicht'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, CompanyPerson.ClassName, "en{'Person'}de{'Person'}", Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
+    [ACPropertyEntity(1, CompanyPerson.ClassName, "en{'Person'}de{'Person'}", Const.ContextDatabase + "\\" + CompanyPerson.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "Percantage", "en{'Percent'}de{'Prozent'}","", "", true)]
     [ACPropertyEntity(3, "TimeFrom", "en{'Begin of Shift'}de{'Schichtanfang'}","", "", true)]
     [ACPropertyEntity(4, "TimeTo", "en{'End of Shift'}de{'Schichtende'}","", "", true)]

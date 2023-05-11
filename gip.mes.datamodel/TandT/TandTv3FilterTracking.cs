@@ -9,8 +9,8 @@ using System.Linq;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Filter'}de{'Filter'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
-    [ACPropertyEntity(1, TandTv3MDTrackingDirection.ClassName, "en{'TrackingStyle'}de{'TrackingStyle'}", Const.ContextDatabase + "\\" + TandTv3MDTrackingDirection.ClassName, "", true)]
-    [ACPropertyEntity(2, TandTv3MDTrackingStartItemType.ClassName, "en{'ItemType'}de{'ItemType'}", Const.ContextDatabase + "\\" + TandTv3MDTrackingStartItemType.ClassName, "", true)]
+    [ACPropertyEntity(1, TandTv3MDTrackingDirection.ClassName, "en{'TrackingStyle'}de{'TrackingStyle'}", Const.ContextDatabase + "\\" + TandTv3MDTrackingDirection.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, TandTv3MDTrackingStartItemType.ClassName, "en{'ItemType'}de{'ItemType'}", Const.ContextDatabase + "\\" + TandTv3MDTrackingStartItemType.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, "FilterNo", "en{'FilterNo'}de{'FilterNo'}", "", "", true)]
     [ACPropertyEntity(4, "StartTime", "en{'Tracking started at'}de{'Verfolgung gestartet am'}", "", "", true)]
     [ACPropertyEntity(5, "EndTime", "en{'Tracking completed at'}de{'Verfolgung beendet am'}", "", "", true)]

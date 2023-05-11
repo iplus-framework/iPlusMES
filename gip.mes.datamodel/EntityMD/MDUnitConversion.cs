@@ -7,7 +7,7 @@ using gip.core.datamodel;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, ConstApp.ESUnitConversion, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "ToMDUnit", "en{'To Unit'}de{'Nach Einheit'}", Const.ContextDatabase + "\\" + MDUnit.ClassName, "", true)]
+    [ACPropertyEntity(1, "ToMDUnit", "en{'To Unit'}de{'Nach Einheit'}", Const.ContextDatabase + "\\" + MDUnit.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "Multiplier", "en{'Multiplier (From)'}de{'Multiplikator (Von)'}", "", "", true, DefaultValue = 1)]
     [ACPropertyEntity(3, "Divisor", "en{'Divisor (To)'}de{'Teiler (Nach)'}", "", "", true, DefaultValue = 1)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDUnitConversion.ClassName, ConstApp.ESUnitConversion, typeof(MDUnitConversion), MDUnitConversion.ClassName, "ToMDUnit\\ISOCode", "ToMDUnit\\ISOCode")]

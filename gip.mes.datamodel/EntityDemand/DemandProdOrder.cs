@@ -12,7 +12,7 @@ namespace gip.mes.datamodel
     //    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Productionorder'}de{'Produktionsauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSODemandProdOrder")]
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Productionorder'}de{'Produktionsauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
     [ACPropertyEntity(1, "ProgramNo", "en{'ProgramNo'}de{'Programmnummer'}","", "", true)]
-    [ACPropertyEntity(2, "TenantCompany", "en{'Tenant'}de{'Besitzer'}", Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
+    [ACPropertyEntity(2, "TenantCompany", "en{'Tenant'}de{'Besitzer'}", Const.ContextDatabase + "\\" + Company.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

@@ -10,11 +10,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Programlog variobatch'}de{'Programlog variobatch'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, false, "", "MDBSOBalancingMode")]
-    [ACPropertyEntity(1, "VBiACProgramLog", "en{'Program log'}de{'Program log'}", Const.ContextDatabase + "\\ACProgramLog", "", true)]
-    [ACPropertyEntity(2, ProdOrderPartslistPos.ClassName, "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
-    [ACPropertyEntity(3, ProdOrderPartslistPosRelation.ClassName, "en{'ProdOrderPartslistPosRelation'}de{'ProdOrderPartslistPosRelation'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName, "", true)]
-    [ACPropertyEntity(3, "DeliveryNotePos", "en{'DeliveryNotePos'}de{'DeliveryNotePos'}", Const.ContextDatabase + "\\DeliveryNotePos", "", true)]
-    [ACPropertyEntity(4, "PickingPos", "en{'PickingPos'}de{'PickingPos'}", Const.ContextDatabase + "\\PickingPos", "", true)]
+    [ACPropertyEntity(1, "VBiACProgramLog", "en{'Program log'}de{'Program log'}", Const.ContextDatabase + "\\ACProgramLog" + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, ProdOrderPartslistPos.ClassName, "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, ProdOrderPartslistPosRelation.ClassName, "en{'ProdOrderPartslistPosRelation'}de{'ProdOrderPartslistPosRelation'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, "DeliveryNotePos", "en{'DeliveryNotePos'}de{'DeliveryNotePos'}", Const.ContextDatabase + "\\DeliveryNotePos" + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, "PickingPos", "en{'PickingPos'}de{'PickingPos'}", Const.ContextDatabase + "\\PickingPos" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + OrderLog.ClassName, "en{'Programlog'}de{'Programlog'}", typeof(OrderLog), OrderLog.ClassName, "VBiACProgramLogID", "VBiACProgramLogID")]
     public partial class OrderLog : IACObjectEntity
     {

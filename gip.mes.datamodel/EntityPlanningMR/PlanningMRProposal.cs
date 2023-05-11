@@ -10,10 +10,10 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'PlanningMRProposal'}de{'PlanningMRProposal'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPlanningMR")]
 
-    [ACPropertyEntity(1, PlanningMR.ClassName, ConstApp.PlanningMR, Const.ContextDatabase + "\\" + PlanningMR.ClassName, "", true)]
-    [ACPropertyEntity(2, ProdOrder.ClassName, ConstApp.ProdOrder, Const.ContextDatabase + "\\" + ProdOrder.ClassName, "", true)]
-    [ACPropertyEntity(3, ProdOrderPartslist.ClassName, ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName, "", true)]
-    [ACPropertyEntity(4, InOrder.ClassName, ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + InOrder.ClassName, "", true)]
+    [ACPropertyEntity(1, PlanningMR.ClassName, ConstApp.PlanningMR, Const.ContextDatabase + "\\" + PlanningMR.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, ProdOrder.ClassName, ConstApp.ProdOrder, Const.ContextDatabase + "\\" + ProdOrder.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, ProdOrderPartslist.ClassName, ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, InOrder.ClassName, ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + InOrder.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
 
     [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]
     [ACPropertyEntity(495, Const.EntityDeleteName, Const.EntityTransDeleteName)]

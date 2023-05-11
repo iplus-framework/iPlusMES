@@ -12,8 +12,8 @@ namespace gip.mes.datamodel
     // FacilityLot (Chargenplatz)
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Lot, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "LotNo", ConstApp.LotNo, "", "", true)]
-    [ACPropertyEntity(2, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName, "", true)]
-    [ACPropertyEntity(3, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(2, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(6, "ExpirationDate", ConstApp.ExpirationDate, "", "", true)]
     [ACPropertyEntity(7, "FillingDate", ConstApp.FillingDate, "", "", true)]
     [ACPropertyEntity(8, "ProductionDate", ConstApp.ProductionDate, "", "", true)]

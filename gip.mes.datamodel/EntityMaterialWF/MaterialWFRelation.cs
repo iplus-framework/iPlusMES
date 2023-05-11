@@ -10,8 +10,8 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaterialWF")]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Reihenfolge'}","", "", true)]
-    [ACPropertyEntity(2, "SourceMaterial", "en{'From Material'}de{'Von Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
-    [ACPropertyEntity(3, "TargetMaterial", "en{'To Material'}de{'Nach Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(2, "SourceMaterial", "en{'From Material'}de{'Von Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, "TargetMaterial", "en{'To Material'}de{'Nach Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialWFRelation.ClassName, "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", typeof(MaterialWFRelation), MaterialWFRelation.ClassName, "", "MaterialWFRelationID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWFRelation>) })]
     public partial class MaterialWFRelation : IACWorkflowEdge

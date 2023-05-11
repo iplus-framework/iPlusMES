@@ -9,9 +9,9 @@ namespace gip.mes.datamodel
 {
     // CompanyMaterialPickup (LagerHistorie)
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Companymaterial pickup'}de{'Unternehmensmaterial Abholung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, CompanyMaterial.ClassName, "en{'Company material'}de{'Unternehmensmaterial'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName, "", true)]
-    [ACPropertyEntity(9999, OutOrderPos.ClassName, "en{'Outorderpos'}de{'Auftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
-    [ACPropertyEntity(9999, InOrderPos.ClassName, "en{'Inorderpos'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
+    [ACPropertyEntity(1, CompanyMaterial.ClassName, "en{'Company material'}de{'Unternehmensmaterial'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(9999, OutOrderPos.ClassName, "en{'Outorderpos'}de{'Auftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(9999, InOrderPos.ClassName, "en{'Inorderpos'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + CompanyMaterialPickup.ClassName, "en{'Companymaterial pickup'}de{'Unternehmensmaterial Abholung'}", typeof(CompanyMaterialPickup), CompanyMaterialPickup.ClassName, "", "CompanyMaterialPickupID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyMaterialPickup>) })]
     public partial class CompanyMaterialPickup : IACObjectEntity

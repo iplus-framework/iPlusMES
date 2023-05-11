@@ -12,7 +12,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "MDGMPAdditiveNo", "en{'Additive No.'}de{'Zusatzstoff Nr.'}", "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACPropertyEntity(4, "DeleteLevel", "en{'Delete Level'}de{'Löschebene'}", "", "", true)]
-    [ACPropertyEntity(5, "MDProcessErrorAction", "en{'Action on Process Error'}de{'Aktion bei Prozessfehler'}", Const.ContextDatabase + "\\MDProcessErrorAction", "", true)]
+    [ACPropertyEntity(5, "MDProcessErrorAction", "en{'Action on Process Error'}de{'Aktion bei Prozessfehler'}", Const.ContextDatabase + "\\MDProcessErrorAction" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(6, "MDQuantityUnit", ConstApp.MDUnit, Const.ContextDatabase + "\\MDUnitList", "", true)]
     [ACPropertyEntity(7, "SafetyFactor", "en{'Safety Factor'}de{'Sicherheitsfaktor'}", "", "", true)]
     [ACPropertyEntity(8, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]

@@ -10,8 +10,8 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioSystem, "en{'LabelTranslation'}de{'LabelTranslation'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Name", "en{'Name'}de{'Name'}","", "", true)]
     [ACPropertyEntity(2, "Desc", "en{'Description'}de{'Beschreibung'}","", "", true)]
-    [ACPropertyEntity(3, "VBLanguage", "en{'Language'}de{'Sprache'}", Const.ContextDatabase + "\\VBLanguage", "", true)]
-    [ACPropertyEntity(4, "Label", "en{'Label'}de{'Label'}", Const.ContextDatabase + "\\Label", "", true)]
+    [ACPropertyEntity(3, "VBLanguage", "en{'Language'}de{'Sprache'}", Const.ContextDatabase + "\\VBLanguage" + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(4, "Label", "en{'Label'}de{'Label'}", Const.ContextDatabase + "\\Label" + Const.DBSetAsEnumerablePostfix, "", true)]
     public partial class LabelTranslation
     {
 
