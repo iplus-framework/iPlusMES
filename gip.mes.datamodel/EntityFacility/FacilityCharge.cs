@@ -10,7 +10,7 @@ namespace gip.mes.datamodel
     // FacilityCharge (Chargenplatz)
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Batch Location'}de{'Chargenplatz'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOFacilityBookCharge")]
     [ACPropertyEntity(1, FacilityLot.ClassName, ConstApp.Lot, Const.ContextDatabase + "\\" + FacilityLot.ClassName, "", true)]
-    [ACPropertyEntity(2, "SplitNo", "en{'Split No.'}de{'Splitnr'}", "", "", true)]
+    [ACPropertyEntity(2, nameof(SplitNo), ConstApp.SplitNo, "", "", true)]
     [ACPropertyEntity(3, MDReleaseState.ClassName, ConstApp.ESReleaseState, Const.ContextDatabase + "\\" + MDReleaseState.ClassName, "", true)]
     [ACPropertyEntity(4, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
     [ACPropertyEntity(5, "Partslist", ConstApp.BOM, Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]

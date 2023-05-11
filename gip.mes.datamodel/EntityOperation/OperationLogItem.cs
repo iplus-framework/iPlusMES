@@ -41,19 +41,27 @@ namespace gip.mes.datamodel
         public string MaterialName { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(4, nameof(ProgramNo), ConstApp.ProdOrderProgramNo)]
+        [ACPropertyInfo(4, nameof(LotNo), ConstApp.LotNo)]
+        public string LotNo { get; set; }
+
+        [DataMember]
+        [ACPropertyInfo(5, nameof(SplitNo), ConstApp.SplitNo)]
+        public int SplitNo { get; set; }
+
+        [DataMember]
+        [ACPropertyInfo(6, nameof(ProgramNo), ConstApp.ProdOrderProgramNo)]
         public string ProgramNo { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(5, nameof(TimeEntered), ConstApp.TimeEntered)]
+        [ACPropertyInfo(7, nameof(TimeEntered), ConstApp.TimeEntered)]
         public DateTime TimeEntered { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(6, nameof(Duration), ConstApp.Duration)]
+        [ACPropertyInfo(8, nameof(Duration), ConstApp.Duration)]
         public TimeSpan Duration { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(7, nameof(HintDuration), ConstApp.HintDuration)]
+        [ACPropertyInfo(9, nameof(HintDuration), ConstApp.HintDuration)]
         public TimeSpan HintDuration { get; set; }
 
         #endregion
@@ -71,7 +79,7 @@ namespace gip.mes.datamodel
         }
 
         [IgnoreDataMember]
-        [ACPropertyInfo(9, nameof(FinishTime), ConstApp.FinishTime)]
+        [ACPropertyInfo(10, nameof(FinishTime), ConstApp.FinishTime)]
         public DateTime FinishTime
         {
             get

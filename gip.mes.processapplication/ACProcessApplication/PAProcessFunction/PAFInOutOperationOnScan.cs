@@ -499,6 +499,10 @@ namespace gip.mes.processapplication
                 resultSequence.Message = msg;
                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
             }
+            else
+            {
+                OperationLogItems.ValueT = GetOperationList();
+            }
 
             // Info50087: Output operation is successfully performed!
             resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50087");
@@ -537,8 +541,10 @@ namespace gip.mes.processapplication
                          .OrderBy(c => c.ol.InsertDate)
                          .Select(c => new OperationLogItem()
                          {
-                             MaterialNo = c.ol.FacilityCharge.Material.MaterialNo,
-                             MaterialName = c.ol.FacilityCharge.Material.MaterialName1,
+                             MaterialNo = c.ol.FacilityCharge.Partslist.Material.MaterialNo,
+                             MaterialName = c.ol.FacilityCharge.Partslist.Material.MaterialName1,
+                             LotNo = c.ol.FacilityCharge.FacilityLot.LotNo,
+                             SplitNo = c.ol.FacilityCharge.SplitNo,
                              ProgramNo = c.orlog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                              TimeEntered = c.ol.InsertDate,
                              ACProgramLog = c.ol.ACProgramLog

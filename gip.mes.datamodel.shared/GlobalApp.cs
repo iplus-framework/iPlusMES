@@ -1427,5 +1427,11 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Others
+
+        public const string WFParam_InwardPostingSuggestionQ = @"InwardPostingSuggestionQ";
+
+        #endregion
+
     }
 }
