@@ -7,6 +7,7 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.manager;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +15,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using System.Runtime.InteropServices;
 using static gip.mes.datamodel.GlobalApp;
 
 namespace gip.bso.manufacturing
@@ -5121,15 +5123,25 @@ namespace gip.bso.manufacturing
                 SelectedProdOrderPartslist.ProdOrderPartslistID);
         }
 
+        private Type _TypeOfPWNodeProcessWorkflow;
+        protected Type TypeOfPWNodeProcessWorkflow
+        {
+            get
+            {
+                if (_TypeOfPWNodeProcessWorkflow == null)
+                    _TypeOfPWNodeProcessWorkflow = typeof(PWNodeProcessWorkflowVB);
+                return _TypeOfPWNodeProcessWorkflow;
+            }
+        }
+
         public bool IsEnabledShowDialogSelectSources()
         {
-            return
-                SelectedProdOrderPartslist != null
-                && CurrentProcessWorkflow != null
-                && ProcessWorkflowPresenter != null
-                && ProcessWorkflowPresenter.SelectedWFNode != null
-                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null
-                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.IsWFProdNode("PWNodeProcessWorkflowVB");
+            if (SelectedProdOrderPartslist == null || CurrentProcessWorkflow == null)
+                return false;
+            Type typeOfSelectedNode = ProcessWorkflowPresenter?.SelectedWFNode?.ContentACClassWF?.PWACClass?.ObjectType;
+            if (typeOfSelectedNode == null)
+                return false;
+            return TypeOfPWNodeProcessWorkflow.IsAssignableFrom(typeOfSelectedNode);
         }
 
         #endregion

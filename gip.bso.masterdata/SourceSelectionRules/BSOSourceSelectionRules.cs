@@ -274,6 +274,17 @@ namespace gip.bso.masterdata
 
         #region Methods
 
+        private Type _TypeOfPWNodeProcessWorkflow;
+        protected Type TypeOfPWNodeProcessWorkflow
+        {
+            get
+            {
+                if (_TypeOfPWNodeProcessWorkflow == null)
+                    _TypeOfPWNodeProcessWorkflow = typeof(PWNodeProcessWorkflow);
+                return _TypeOfPWNodeProcessWorkflow;
+            }
+        }
+
         private SourceSelectionRulesResult DoShowDialogSelectSources(dbMes.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
             ACClassWF invokerPWNode = databaseApp.ContextIPlus.ACClassWF.Where(c => c.ACClassWFID == acClassWFID).FirstOrDefault();
@@ -296,13 +307,12 @@ namespace gip.bso.masterdata
             List<ACClassWF> filteredSubs = new List<ACClassWF>();
             foreach(ACClassWF subWf in allSubWf)
             {
-                if(subWf.IsWFProdNodeAll("PWNodeProcessWorkflowVB") || subWf.IsWFProdNodeAll("PWNodeProcessWorkflow"))
-                {
+                Type nodeType =  subWf.PWACClass?.ObjectType;
+                if (nodeType != null && TypeOfPWNodeProcessWorkflow.IsAssignableFrom(nodeType) )
                     filteredSubs.Add(subWf);
-                }
             }
 
-            if(filteredSubs.Any())
+            if (filteredSubs.Any())
             {
                 string preConfigACUrl = invokerPWNode.ConfigACUrl;
                 if (!preConfigACUrl.EndsWith("\\"))
