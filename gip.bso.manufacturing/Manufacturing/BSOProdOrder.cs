@@ -5074,6 +5074,12 @@ namespace gip.bso.manufacturing
                 case nameof(ConnectSourceProdOrderPartslist):
                     ConnectSourceProdOrderPartslist();
                     return true;
+                case nameof(ShowDialogSelectSources):
+                    ShowDialogSelectSources();
+                    return true;
+                case nameof(IsEnabledShowDialogSelectSources):
+                    result = IsEnabledShowDialogSelectSources();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -5107,7 +5113,7 @@ namespace gip.bso.manufacturing
 
         #region ShowDialogSelectSources
 
-        [ACMethodInfo("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655)]
+        [ACMethodCommand("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
         public void ShowDialogSelectSources()
         {
             if (!IsEnabledShowDialogSelectSources())
