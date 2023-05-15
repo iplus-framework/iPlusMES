@@ -39,10 +39,14 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InOrder>) })]
+    [NotMapped]
     public partial class InOrder : IACConfigStore
     {
+        [NotMapped]
         public const string ClassName = "InOrder";
+        [NotMapped]
         public const string NoColumnName = "InOrderNo";
+        [NotMapped]
         public const string FormatNewNo = "I{0}";
 
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);

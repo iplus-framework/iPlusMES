@@ -32,6 +32,11 @@
         // Don't scaffold these
         return "";
     }
+    if ((EntityType.Name).Contains("@"))
+    {
+        // Don't scaffold these
+        return "";
+    }
 
     var services = (IServiceProvider)Host;
     var annotationCodeGenerator = services.GetRequiredService<IAnnotationCodeGenerator>();
@@ -117,14 +122,7 @@ namespace <#= "gip.mes.datamodel" #>;
     }
 
     string entityTypeNewName = "";
-    if ((EntityType.Name).Substring(0, 1) == "@")
-    {
-        entityTypeNewName = EntityType.Name.Remove(0,1);
-    }
-    else
-    {
-        entityTypeNewName = EntityType.Name;
-    }
+    entityTypeNewName = EntityType.Name;
 #>
 public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdateInterface ? ", IInsertInfo, IUpdateInfo" : "" #><#= setDeleteInfoInterface ? ", IDeleteInfo" : "" #><#= setMDTransInterface ? ", IMDTrans" : "" #><#= setISequenceInterface ? ", ISequence" : "" #><#= setTargetQuantityInterface ? ", ITargetQuantity" : "" #><#= setScheduledOrderInterface ? ", IScheduledOrder" : "" #>
 {
@@ -201,11 +199,9 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
         }
 
         var targetType = navigation.TargetEntityType.Name;
-        if (targetType.Contains("@"))
-            targetType = targetType.Remove(0,1);
         string navName = navigation.Name;
         string relName = "";
-        if (navigation.IsCollection && !(navName.Contains("TandTv2")))
+        if (navigation.IsCollection && !(navName.Contains("TandTv2")) && !(navName.Contains("@")))
         {
             if(navName.Contains("Inverse"))
             {
@@ -217,10 +213,6 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
                 string pkName = navigation.ForeignKey.PrincipalToDependent.ToString();
                 string pkIdName = pkName.Split("Inverse: ").Last();
                 relName = targetType+"_"+pkIdName;
-            }
-            if (relName.Contains("@"))
-            {
-                relName = relName.Remove(0,1);
             }
 #>
     private ICollection<<#= targetType #>> _<#= relName #>;
@@ -244,7 +236,7 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
     }
 <#
         }
-        else if(!(navigation.Name.Contains("TandTv2")))
+        else if(!(navigation.Name.Contains("TandTv2")) && !(navigation.Name.Contains("@")))
         {
             var needsNullable = Options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
             var needsInitializer = Options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;

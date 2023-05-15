@@ -1,6 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -10,8 +10,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "Price", "en{'Price'}de{'Preis'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + PriceListMaterial.ClassName, ConstApp.ESPriceListMaterial, typeof(PriceListMaterial), PriceListMaterial.ClassName, Material.ClassName + "\\MaterialNo", Material.ClassName + "\\MaterialNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PriceListMaterial>) })]
+    [NotMapped]
     public partial class PriceListMaterial
     {
+        [NotMapped]
         public const string ClassName = "PriceListMaterial";
 
         #region New/Delete

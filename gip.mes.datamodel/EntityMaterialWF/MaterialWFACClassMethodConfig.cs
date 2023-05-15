@@ -27,6 +27,7 @@ namespace gip.mes.datamodel
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MaterialWFACClassMethodConfig.ClassName, "en{'MaterialWFACClassMethod.config'}de{'MaterialWFACClassMethod.config'}", typeof(MaterialWFACClassMethodConfig), MaterialWFACClassMethodConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWFACClassMethodConfig>) })]
 
+    [NotMapped]
     public partial class MaterialWFACClassMethodConfig : IACConfig
     {
         [NotMapped]

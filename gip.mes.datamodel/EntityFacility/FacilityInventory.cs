@@ -20,13 +20,17 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityInventory.ClassName, "en{'Inventory'}de{'Inventur'}", typeof(FacilityInventory), FacilityInventory.ClassName, "FacilityInventoryNo", "FacilityInventoryNo")] // TODO: Defin child entities to FacilityInventoryPos.ClassName
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityInventory>) })]
+    [NotMapped]
     public partial class FacilityInventory
     {
 
         #region constants
 
+        [NotMapped]
         public const string ClassName = "FacilityInventory";
+        [NotMapped]
         public const string NoColumnName = "FacilityInventoryNo";
+        [NotMapped]
         public const string FormatNewNo = "";
         #endregion
 

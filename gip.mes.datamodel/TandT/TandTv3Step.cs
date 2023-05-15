@@ -14,6 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, TandTv3FilterTracking.ClassName, "en{'Filter'}de{'Filter'}", Const.ContextDatabase + "\\" + TandTv3FilterTracking.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "StepNo", "en{'StepNo'}de{'StepNo'}", "", "", true)]
     [ACPropertyEntity(3, "StepName", "en{'Name'}de{'Name'}", "", "", true)]
+    [NotMapped]
     public partial class TandTv3Step
     {
         [NotMapped]

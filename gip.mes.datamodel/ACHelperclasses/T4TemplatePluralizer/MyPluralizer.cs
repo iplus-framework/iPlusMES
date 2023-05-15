@@ -485,10 +485,6 @@ namespace gip.mes.datamodel
 
         string InternalPluralize(string word)
         {
-            if (word.Contains("@"))
-            {
-                word = word.Remove(0,1);
-            }
 
             if (IsNoOpWord(word))
                 return word;
@@ -671,10 +667,6 @@ namespace gip.mes.datamodel
 
         string InternalSingularize(string word)
         {
-            if (word.Contains("@"))
-            {
-                word = word.Remove(0,1);
-            }
 
             if (IsNoOpWord(word))
                 return word;

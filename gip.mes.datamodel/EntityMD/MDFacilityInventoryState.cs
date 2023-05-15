@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDFacilityInventoryState.ClassName, ConstApp.ESFacilityInventoryState, typeof(MDFacilityInventoryState), MDFacilityInventoryState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDFacilityInventoryState>) })]
+    [NotMapped]
     public partial class MDFacilityInventoryState
     {
+        [NotMapped]
         public const string ClassName = "MDFacilityInventoryState";
 
         #region New/Delete

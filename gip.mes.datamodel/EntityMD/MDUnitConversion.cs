@@ -12,8 +12,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "Divisor", "en{'Divisor (To)'}de{'Teiler (Nach)'}", "", "", true, DefaultValue = 1)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDUnitConversion.ClassName, ConstApp.ESUnitConversion, typeof(MDUnitConversion), MDUnitConversion.ClassName, "ToMDUnit\\ISOCode", "ToMDUnit\\ISOCode")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDUnitConversion>) })]
+    [NotMapped]
     public partial class MDUnitConversion : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDUnitConversion";
 
         #region New/Delete

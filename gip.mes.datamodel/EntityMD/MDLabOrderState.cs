@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDLabOrderState.ClassName, ConstApp.ESLabOrderState, typeof(MDLabOrderState), MDLabOrderState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDLabOrderState>) })]
+    [NotMapped]
     public partial class MDLabOrderState
     {
+        [NotMapped]
         public const string ClassName = "MDLabOrderState";
 
         #region New/Delete

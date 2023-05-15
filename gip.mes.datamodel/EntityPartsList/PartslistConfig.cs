@@ -29,8 +29,10 @@ namespace gip.mes.datamodel
     [ACDeleteAction("PartslistConfig_ParentPartslistConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + PartslistConfig.ClassName, "en{'Program.config'}de{'Programm.config'}", typeof(PartslistConfig), PartslistConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistConfig>) })]
+    [NotMapped]
     public partial class PartslistConfig : IACConfig
     {
+        [NotMapped]
         public const string ClassName = "PartslistConfig";
 
         #region New/Delete

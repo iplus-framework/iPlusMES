@@ -13,8 +13,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, Const.IsEnabled, Const.EntityIsEnabled, "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDCostCenter.ClassName, ConstApp.ESCostCenter, typeof(MDCostCenter), MDCostCenter.ClassName, "MDCostCenterNo,MDNameTrans", "MDCostCenterNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCostCenter>) })]
+    [NotMapped]
     public partial class MDCostCenter : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDCostCenter";
 
         #region New/Delete

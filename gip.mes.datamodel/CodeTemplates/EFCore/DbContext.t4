@@ -71,16 +71,8 @@ public partial class <#= Options.ContextName #> : DbContext
 <#
     foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
     {
-    if ((entityType.Name).Substring(0, 1) == "@")
-    {
-
-#>
-    public virtual DbSet<<#= entityType.Name.Remove(0,1) #>> <#= entityType.Name.Remove(0,1) #> { get; set; }
-
-<#
-    } 
     
-    else if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")))
+    if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")) && !(entityType.Name.Contains("@")))
     {
 #>
     public virtual DbSet<<#= entityType.Name #>> <#= entityType.Name #> { get; set; }
@@ -126,14 +118,7 @@ public partial class <#= Options.ContextName #> : DbContext
     string entityTypeNewName = "";
     foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
     {        
-        if ((entityType.Name).Substring(0, 1) == "@")
-        {
-            entityTypeNewName = entityType.Name.Remove(0,1);
-        }
-        else
-        {
-            entityTypeNewName = entityType.Name;
-        }
+        entityTypeNewName = entityType.Name;
         // Save all previously generated code, and start generating into a new temporary environment
         mainEnvironment = GenerationEnvironment;
         GenerationEnvironment = new StringBuilder();
@@ -144,7 +129,7 @@ public partial class <#= Options.ContextName #> : DbContext
         }
 
         var anyEntityTypeConfiguration = false;
-        if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")))
+        if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")) && !(entityType.Name.Contains("@")))
         {
 #>
         modelBuilder.Entity<<#= entityTypeNewName #>>(entity =>

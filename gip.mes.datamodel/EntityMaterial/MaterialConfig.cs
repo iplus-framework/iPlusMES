@@ -29,6 +29,7 @@ namespace gip.mes.datamodel
     [ACDeleteAction("MaterialConfig_ParentMaterialConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MaterialConfig.ClassName, "en{'Program.config'}de{'Programm.config'}", typeof(MaterialConfig), MaterialConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialConfig>) })]
+    [NotMapped]
     public partial class MaterialConfig : IACConfig
     {
         [NotMapped]

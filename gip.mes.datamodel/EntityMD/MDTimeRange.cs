@@ -23,8 +23,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioScheduling, Const.QueryPrefix + MDTimeRange.ClassName, ConstApp.ESTimeRange, typeof(MDTimeRange), MDTimeRange.ClassName, Const.MDNameTrans, Const.MDKey)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDInOrderState>) })]
+    [NotMapped]
     public partial class MDTimeRange
     {
+        [NotMapped]
         public const string ClassName = "MDTimeRange";
 
         #region New/Delete

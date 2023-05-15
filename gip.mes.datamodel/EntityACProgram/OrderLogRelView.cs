@@ -25,6 +25,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(18, "ProdOrderProgramNo", "en{'Ordernumber'}de{'Auftragsnummer'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + OrderLogRelView.ClassName, "en{'OrderLogRelView'}de{'OrderLogRelView'}", typeof(OrderLogRelView), OrderLogRelView.ClassName, "PosBatchNo", "PosBatchNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OrderLogRelView>) })]
+    [NotMapped]
     public partial class OrderLogRelView
     {
         [NotMapped]

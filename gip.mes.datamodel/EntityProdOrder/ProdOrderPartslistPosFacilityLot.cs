@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 
 
@@ -14,8 +15,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPosFacilityLot.ClassName, "en{'ProdOrderPartslistPosFacilityLot'}de{'ProdOrderPartslistPosFacilityLot'}", typeof(ProdOrderPartslistPosFacilityLot), ProdOrderPartslistPosFacilityLot.ClassName, "IsActiv", "IsActiv")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderPartslistPosFacilityLot>) })]
+    [NotMapped]
     public partial class ProdOrderPartslistPosFacilityLot
     {
+        [NotMapped]
         public const string ClassName = "ProdOrderPartslistPosFacilityLot";
 
         #region New/Delete

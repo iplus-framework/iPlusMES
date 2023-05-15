@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + nameof(MDBatchPlanGroup), "en{'Batchplan group'}de{'Batchplan Gruppe'}", typeof(MDBatchPlanGroup), nameof(MDBatchPlanGroup), Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDBatchPlanGroup>) })]
+    [NotMapped]
     public partial class MDBatchPlanGroup
     {
         #region c'tors

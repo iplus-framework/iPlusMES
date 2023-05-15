@@ -12,6 +12,7 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'TandTv3MDTrackingDirection'}de{'TandTv3MDTrackingDirection'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
 
+    [NotMapped]
     public partial class TandTv3MDTrackingDirection
     {
         [NotMapped]

@@ -20,8 +20,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDReleaseState.ClassName, ConstApp.ESReleaseState, typeof(MDReleaseState), MDReleaseState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDReleaseState>) })]
+    [NotMapped]
     public partial class MDReleaseState
     {
+        [NotMapped]
         public const string ClassName = "MDReleaseState";
 
         #region New/Delete

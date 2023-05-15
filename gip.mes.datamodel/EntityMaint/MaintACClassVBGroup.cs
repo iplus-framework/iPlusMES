@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintACClassVBGroup.ClassName, "en{'MaintACClassVBGroup'}de{'MaintACClassVBGroup'}", typeof(MaintACClassVBGroup), MaintACClassVBGroup.ClassName, "", "")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintACClassVBGroup>) })]
+    [NotMapped]
     public partial class MaintACClassVBGroup
     {
+        [NotMapped]
         public const string ClassName = "MaintACClassVBGroup";
 
         #region New

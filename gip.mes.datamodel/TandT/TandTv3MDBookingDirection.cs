@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'TandTv3MDBookingDirection'}de{'TandTv3MDBookingDirection'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
+    [NotMapped]
     public partial class TandTv3MDBookingDirection
     {
         [NotMapped]

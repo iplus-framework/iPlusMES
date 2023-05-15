@@ -7,6 +7,7 @@ using System.Linq;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'DeliveryNotePosPreview'}de{'DeliveryNotePosPreview'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [NotMapped]
     public class DeliveryNotePosPreview
     {
 

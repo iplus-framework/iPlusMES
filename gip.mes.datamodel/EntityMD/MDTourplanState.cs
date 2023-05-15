@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + MDTourplanState.ClassName, ConstApp.ESTourplanState, typeof(MDTourplanState), MDTourplanState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDTourplanState>) })]
+    [NotMapped]
     public partial class MDTourplanState
     {
+        [NotMapped]
         public const string ClassName = "MDTourplanState";
 
         #region New/Delete

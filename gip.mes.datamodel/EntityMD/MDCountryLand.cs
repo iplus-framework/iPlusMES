@@ -14,8 +14,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDCountryLand.ClassName, ConstApp.ESCountryLand, typeof(MDCountryLand), MDCountryLand.ClassName, "MDCountryLandCode,MDNameTrans", "MDCountryLandCode")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCountryLand>) })]
+    [NotMapped]
     public partial class MDCountryLand : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDCountryLand";
 
         #region New/Delete

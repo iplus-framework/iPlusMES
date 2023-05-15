@@ -21,8 +21,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistPosRelation.ClassName, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", typeof(PartslistPosRelation), PartslistPosRelation.ClassName, "", PartslistPosRelation.ClassName + "ID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistPosRelation>) })]
+    [NotMapped]
     public partial class PartslistPosRelation : IPartslistPosRelation
     {
+        [NotMapped]
         public const string ClassName = "PartslistPosRelation";
 
         #region static mehtods

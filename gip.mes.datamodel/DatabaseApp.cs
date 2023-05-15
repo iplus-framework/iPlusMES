@@ -1057,46 +1057,6 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999)]
         [NotMapped]
-        public IEnumerable<ControlScriptSyncInfo> ControlScriptSyncInfoList
-        {
-            get
-            {
-                return ControlScriptSyncInfo.ToArray();
-            }
-        }
-
-        [ACPropertyInfo(9999)]
-        [NotMapped]
-        public IEnumerable<DbSyncerInfo> DbSyncerInfoList
-        {
-            get
-            {
-                return DbSyncerInfo.ToArray();
-            }
-        }
-
-        [ACPropertyInfo(9999)]
-        [NotMapped]
-        public IEnumerable<DbSyncerInfoContext> DbSyncerInfoContextList
-        {
-            get
-            {
-                return DbSyncerInfoContext.ToArray();
-            }
-        }
-
-        [ACPropertyInfo(9999)]
-        [NotMapped]
-        public IEnumerable<DBSyncerVersion> DBSyncerVersionList
-        {
-            get
-            {
-                return DBSyncerVersion.ToArray();
-            }
-        }
-
-        [ACPropertyInfo(9999)]
-        [NotMapped]
         public IEnumerable<DeliveryNote> DeliveryNoteList
         {
             get

@@ -22,6 +22,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialUnit.ClassName, "en{'Material Unit'}de{'Materialeinheit'}", typeof(MaterialUnit), MaterialUnit.ClassName, "ToMDUnit\\ISOCode", "ToMDUnit\\SortIndex")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialUnit>) })]
+    [NotMapped]
     public partial class MaterialUnit //, IPackagingHierarchy
     {
         [NotMapped]

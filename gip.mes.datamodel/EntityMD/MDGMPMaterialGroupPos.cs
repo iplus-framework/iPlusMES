@@ -18,8 +18,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDGMPMaterialGroupPos.ClassName, ConstApp.ESGMPMaterialGroupPos, typeof(MDGMPMaterialGroupPos), MDGMPMaterialGroupPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDGMPMaterialGroupPos>) })]
+    [NotMapped]
     public partial class MDGMPMaterialGroupPos
     {
+        [NotMapped]
         public const string ClassName = "MDGMPMaterialGroupPos";
 
         #region New/Delete

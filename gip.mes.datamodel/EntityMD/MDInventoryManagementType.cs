@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDInventoryManagementType.ClassName, ConstApp.ESInventoryManagementType, typeof(MDInventoryManagementType), MDInventoryManagementType.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDInventoryManagementType>) })]
+    [NotMapped]
     public partial class MDInventoryManagementType
     {
+        [NotMapped]
         public const string ClassName = "MDInventoryManagementType";
 
         #region New/Delete

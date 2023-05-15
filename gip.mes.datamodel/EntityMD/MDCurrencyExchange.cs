@@ -12,8 +12,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "ExchangeNo", "en{'Exchange number'}de{'Wechselkursnummer'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDCurrencyExchange.ClassName, ConstApp.ESCurrencyExchange, typeof(MDCurrencyExchange), MDCurrencyExchange.ClassName, "ToMDCurrency\\MDCurrencyShortname", "ToMDCurrency\\MDCurrencyShortname")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCurrencyExchange>) })]
+    [NotMapped]
     public partial class MDCurrencyExchange : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDCurrencyExchange";
 
         #region New/Delete

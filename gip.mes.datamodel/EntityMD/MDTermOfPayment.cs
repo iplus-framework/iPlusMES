@@ -20,8 +20,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDTermOfPayment.ClassName, ConstApp.ESTermOfPayment, typeof(MDTermOfPayment), MDTermOfPayment.ClassName, Const.MDNameTrans, Const.MDKey)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDTermOfPayment>) })]
+    [NotMapped]
     public partial class MDTermOfPayment
     {
+        [NotMapped]
         public const string ClassName = "MDTermOfPayment";
 
         #region New/Delete

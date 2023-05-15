@@ -100,6 +100,7 @@ namespace gip.mes.datamodel
 
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityLotStock.ClassName, "en{'Facilitylotstock'}de{'Artikel-Bestand'}", typeof(FacilityLotStock), FacilityLotStock.ClassName, FacilityLot.ClassName + "\\LotNo", FacilityLot.ClassName + "\\LotNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityLotStock>) })]
+    [NotMapped]
     public partial class FacilityLotStock
     {
         [NotMapped]

@@ -22,8 +22,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDGMPAdditive.ClassName, ConstApp.ESGMPAdditives, typeof(MDGMPAdditive), MDGMPAdditive.ClassName, "MDGMPAdditiveNo", "MDGMPAdditiveNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDGMPAdditive>) })]
+    [NotMapped]
     public partial class MDGMPAdditive
     {
+        [NotMapped]
         public const string ClassName = "MDGMPAdditive";
 
         #region New/Delete

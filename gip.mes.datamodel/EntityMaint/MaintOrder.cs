@@ -30,10 +30,14 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintOrder>) })]
+    [NotMapped]
     public partial class MaintOrder
     {
+        [NotMapped]
         public const string ClassName = "MaintOrder";
+        [NotMapped]
         public const string NoColumnName = "MaintOrderNo";
+        [NotMapped]
         public const string FormatNewNo = "MO{0}";
 
         #region New/Delete

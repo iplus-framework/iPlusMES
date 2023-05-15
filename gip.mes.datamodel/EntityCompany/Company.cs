@@ -48,6 +48,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Company>) })]
+    [NotMapped]
     public partial class Company
     {
         [NotMapped]

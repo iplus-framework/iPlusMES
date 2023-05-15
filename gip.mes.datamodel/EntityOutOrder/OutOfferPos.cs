@@ -37,8 +37,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOfferPos.ClassName, "en{'Offer Position'}de{'Angebotsposition'}", typeof(OutOfferPos), OutOfferPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOfferPos>) })]
+    [NotMapped]
     public partial class OutOfferPos : IOutOrderPos, ICloneable
     {
+        [NotMapped]
         public const string ClassName = "OutOfferPos";
 
         #region New/Delete

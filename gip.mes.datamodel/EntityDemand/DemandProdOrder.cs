@@ -19,6 +19,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + DemandProdOrder.ClassName, "en{'Productionorder'}de{'Produktionsauftrag'}", typeof(DemandProdOrder), DemandProdOrder.ClassName, "ProgramNo", "ProgramNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DemandProdOrder>) })]
+    [NotMapped]
     public partial class DemandProdOrder : IACObject
     {
         [NotMapped]

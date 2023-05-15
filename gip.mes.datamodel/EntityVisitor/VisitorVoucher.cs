@@ -26,10 +26,14 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioCompany, Const.QueryPrefix + VisitorVoucher.ClassName, "en{'Visitor Voucher'}de{'Besucherbeleg'}", typeof(VisitorVoucher), VisitorVoucher.ClassName, "VisitorVoucherNo", "VisitorVoucherNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<VisitorVoucher>) })]
+    [NotMapped]
     public partial class VisitorVoucher
     {
+        [NotMapped]
         public const string ClassName = "VisitorVoucher";
+        [NotMapped]
         public const string NoColumnName = "VisitorVoucherNo";
+        [NotMapped]
         public const string FormatNewNo = null;
 
         #region New/Delete

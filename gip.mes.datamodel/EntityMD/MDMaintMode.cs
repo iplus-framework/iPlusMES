@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MDMaintMode.ClassName, ConstApp.ESMaintMode, typeof(MDMaintMode), MDMaintMode.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDMaintMode>) })]
+    [NotMapped]
     public partial class MDMaintMode
     {
+        [NotMapped]
         public const string ClassName = "MDMaintMode";
 
         #region New/Delete

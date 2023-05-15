@@ -18,8 +18,10 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCurrency>) })]
+    [NotMapped]
     public partial class MDCurrency : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDCurrency";
 
         #region New/Delete

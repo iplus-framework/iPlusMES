@@ -40,6 +40,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DeliveryNote>) })]
+    [NotMapped]
     public partial class DeliveryNote
     {
         [NotMapped]

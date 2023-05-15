@@ -24,7 +24,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + HistoryConfig.ClassName, "en{'History.config'}de{'History.config'}", typeof(HistoryConfig), HistoryConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<HistoryConfig>) })]
-
+    [NotMapped]
     public partial class HistoryConfig : IACConfig
     {
         [NotMapped]

@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDReservationMode.ClassName, ConstApp.ESReservationMode, typeof(MDReservationMode), MDReservationMode.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDReservationMode>) })]
+    [NotMapped]
     public partial class MDReservationMode
     {
+        [NotMapped]
         public const string ClassName = "MDReservationMode";
 
         #region New/Delete

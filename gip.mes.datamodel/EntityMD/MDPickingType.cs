@@ -21,10 +21,12 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + MDPickingType.ClassName, "en{'Picking type'}de{'Kommissionierung Typ'}", typeof(MDPickingType), MDPickingType.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDPickingType>) })]
+    [NotMapped]
     public partial class MDPickingType
     {
         #region c'tors
 
+        [NotMapped]
         public const string ClassName = "MDPickingType";
 
         public static MDPickingType NewACObject(DatabaseApp dbApp, IACObject parentACObject)

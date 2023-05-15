@@ -37,8 +37,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityHistory.ClassName, "en{'Facility History'}de{'Lagerhistorie'}", typeof(FacilityHistory), FacilityHistory.ClassName, Facility.ClassName + "\\FacilityNo,History\\BalanceDate", Facility.ClassName + "\\FacilityNo,History\\BalanceDate")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityHistory>) })]
+    [NotMapped]
     public partial class FacilityHistory
     {
+        [NotMapped]
         public const string ClassName = "FacilityHistory";
 
         #region New/Delete

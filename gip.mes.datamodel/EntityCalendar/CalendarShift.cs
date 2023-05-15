@@ -25,6 +25,7 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CalendarShift>) })]
+    [NotMapped]
     public partial class CalendarShift
     {
         [NotMapped]

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
+    [NotMapped]
     public partial class ACClass
     {
         public void CopyFrom(ACClass from, bool withReferences)

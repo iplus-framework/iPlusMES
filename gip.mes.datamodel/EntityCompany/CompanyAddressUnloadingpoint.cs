@@ -20,6 +20,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioCompany, Const.QueryPrefix + CompanyAddressUnloadingpoint.ClassName, "en{'Unloadingpoint'}de{'Abladestelle'}", typeof(CompanyAddressUnloadingpoint), CompanyAddressUnloadingpoint.ClassName, "UnloadingPointName", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyAddressUnloadingpoint>) })]
+    [NotMapped]
     public partial class CompanyAddressUnloadingpoint
     {
         [NotMapped]

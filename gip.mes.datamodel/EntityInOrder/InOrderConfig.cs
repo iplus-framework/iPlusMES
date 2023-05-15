@@ -28,8 +28,10 @@ namespace gip.mes.datamodel
     [ACDeleteAction("InOrderConfig_ParentInOrderConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + InOrderConfig.ClassName, "en{'Program.config'}de{'Programm.config'}", typeof(InOrderConfig), InOrderConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InOrderConfig>) })]
+    [NotMapped]
     public partial class InOrderConfig : IACConfig
     {
+        [NotMapped]
         public const string ClassName = "InOrderConfig";
 
         #region New/Delete

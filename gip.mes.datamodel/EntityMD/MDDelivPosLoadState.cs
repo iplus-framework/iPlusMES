@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + MDDelivPosLoadState.ClassName, ConstApp.ESDelivPosLoadState, typeof(MDDelivPosLoadState), MDDelivPosLoadState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDDelivPosLoadState>) })]
+    [NotMapped]
     public partial class MDDelivPosLoadState
     {
+        [NotMapped]
         public const string ClassName = "MDDelivPosLoadState";
 
         #region New/Delete

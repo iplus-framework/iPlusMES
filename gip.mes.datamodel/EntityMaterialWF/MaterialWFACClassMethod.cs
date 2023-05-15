@@ -20,10 +20,13 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialWFACClassMethod.ClassName, "en{'MaterialWF-Workflow-Mapping'}de{'MaterialWF-Workflow-Mapping'}", typeof(MaterialWFACClassMethod), MaterialWFACClassMethod.ClassName, "", "MaterialWFACClassMethodID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWFACClassMethod>) })]
+    [NotMapped]
     public partial class MaterialWFACClassMethod : IACConfigStore
     {
+        [NotMapped]
         public const string ClassName = "MaterialWFACClassMethod";
 
+        [NotMapped]
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
         #region New / Delete

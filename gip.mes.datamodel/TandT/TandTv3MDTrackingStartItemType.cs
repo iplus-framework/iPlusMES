@@ -8,6 +8,7 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'TandTv3MDTrackingStartItemType'}de{'TandTv3MDTrackingStartItemType'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
     [ACPropertyEntity(1, "ACCaptionTranslation", "en{'Translation'}de{'Übersetzung'}", "", "", true)]
+    [NotMapped]
     public partial class TandTv3MDTrackingStartItemType
     {
         [NotMapped]

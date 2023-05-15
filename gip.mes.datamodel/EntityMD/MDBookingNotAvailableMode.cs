@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDBookingNotAvailableMode.ClassName, ConstApp.ESBookingNotAvailableMode, typeof(MDBookingNotAvailableMode), MDBookingNotAvailableMode.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDBookingNotAvailableMode>) })]
+    [NotMapped]
     public partial class MDBookingNotAvailableMode
     {
+        [NotMapped]
         public const string ClassName = "MDBookingNotAvailableMode";
 
         #region New/Delete

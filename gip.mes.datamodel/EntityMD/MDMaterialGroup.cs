@@ -20,8 +20,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDMaterialGroup.ClassName, ConstApp.ESMaterialGroup, typeof(MDMaterialGroup), MDMaterialGroup.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDMaterialGroup>) })]
+    [NotMapped]
     public partial class MDMaterialGroup : IImageInfo
     {
+        [NotMapped]
         public const string ClassName = "MDMaterialGroup";
 
         #region New/Delete

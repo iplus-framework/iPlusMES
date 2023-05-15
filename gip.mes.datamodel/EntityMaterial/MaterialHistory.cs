@@ -35,6 +35,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MaterialHistory.ClassName, "en{'Material History'}de{'Materialhistorie'}", typeof(MaterialHistory), MaterialHistory.ClassName, Material.ClassName + "\\MaterialNo," + History.ClassName + "\\BalanceDate", Material.ClassName + "\\MaterialNo," + History.ClassName + "\\BalanceDate")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialHistory>) })]
+    [NotMapped]
     public partial class MaterialHistory
     {
         [NotMapped]

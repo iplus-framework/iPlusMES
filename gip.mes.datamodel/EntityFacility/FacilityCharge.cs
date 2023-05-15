@@ -52,8 +52,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityCharge.ClassName, "en{'Facilitycharge'}de{'Chargenplatz'}", typeof(FacilityCharge), FacilityCharge.ClassName, FacilityLot.ClassName + "\\LotNo", FacilityLot.ClassName + "\\LotNo,SplitNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityCharge>) })]
+    [NotMapped]
     public partial class FacilityCharge
     {
+        [NotMapped]
         public const string ClassName = "FacilityCharge";
 
         #region New/Delete

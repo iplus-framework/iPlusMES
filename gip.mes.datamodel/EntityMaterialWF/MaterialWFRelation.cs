@@ -14,8 +14,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "TargetMaterial", "en{'To Material'}de{'Nach Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialWFRelation.ClassName, "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", typeof(MaterialWFRelation), MaterialWFRelation.ClassName, "", "MaterialWFRelationID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWFRelation>) })]
+    [NotMapped]
     public partial class MaterialWFRelation : IACWorkflowEdge
     {
+        [NotMapped]
         public const string ClassName = "MaterialWFRelation";
 
         public static MaterialWFRelation NewACObject(DatabaseApp dbApp, IACObject parentACObject)

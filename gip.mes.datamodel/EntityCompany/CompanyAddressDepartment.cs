@@ -15,6 +15,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioCompany, Const.QueryPrefix + CompanyAddressDepartment.ClassName, "en{'Department'}de{'Abteilung'}", typeof(CompanyAddressDepartment), CompanyAddressDepartment.ClassName, "DepartmentName", "DepartmentName")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyAddressDepartment>) })]
+    [NotMapped]
     public partial class CompanyAddressDepartment
     {
         [NotMapped]

@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + DeliveryNotePos.ClassName, "en{'Indeliverynotepos'}de{'Eingangslieferscheinposition'}", typeof(DeliveryNotePos), DeliveryNotePos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DeliveryNotePos>) })]
+    [NotMapped]
     public partial class DeliveryNotePos
     {
         [NotMapped]

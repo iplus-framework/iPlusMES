@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDMovementReason.ClassName, ConstApp.ESMovementReason, typeof(MDMovementReason), MDMovementReason.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDMovementReason>) })]
+    [NotMapped]
     public partial class MDMovementReason
     {
+        [NotMapped]
         public const string ClassName = "MDMovementReason";
 
         #region New/Delete

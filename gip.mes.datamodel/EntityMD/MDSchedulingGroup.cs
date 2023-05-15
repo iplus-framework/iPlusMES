@@ -15,9 +15,11 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDSchedulingGroup.ClassName, "en{'Scheduling Group'}de{'Scheduling Group'}", typeof(MDSchedulingGroup), MDSchedulingGroup.ClassName, Const.MDKey, Const.MDKey)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDSchedulingGroup>) })]
+    [NotMapped]
     public partial class MDSchedulingGroup : IACObjectEntity
     {
 
+        [NotMapped]
         public const string ClassName = "MDSchedulingGroup";
 
         #region New/Delete

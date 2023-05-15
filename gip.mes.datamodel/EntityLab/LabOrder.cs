@@ -35,6 +35,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<LabOrder>) })]
+    [NotMapped]
     public partial class LabOrder
     {
         [NotMapped]

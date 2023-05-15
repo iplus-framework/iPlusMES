@@ -28,8 +28,10 @@ namespace gip.mes.datamodel
     [ACDeleteAction(TourplanConfig.ClassName + "_ParentTourplanConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + TourplanConfig.ClassName, "en{'TourplanConfig'}de{'TourplanConfig'}", typeof(TourplanConfig), TourplanConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<TourplanConfig>) })]
+    [NotMapped]
     public partial class TourplanConfig : IACConfig
     {
+        [NotMapped]
         public const string ClassName = "TourplanConfig";
 
         #region New/Delete

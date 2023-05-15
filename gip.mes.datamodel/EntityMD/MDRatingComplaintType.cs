@@ -20,8 +20,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioCompany, Const.QueryPrefix + MDRatingComplaintType.ClassName, ConstApp.ESRatingComplaintType, typeof(MDRatingComplaintType), MDRatingComplaintType.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDRatingComplaintType>) })]
+    [NotMapped]
     public partial class MDRatingComplaintType
     {
+        [NotMapped]
         public const string ClassName = "MDRatingComplaintType";
 
         #region New/Delete

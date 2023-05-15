@@ -28,6 +28,7 @@ namespace gip.mes.datamodel
     [ACDeleteAction("InRequestConfig_ParentInRequestConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + InRequestConfig.ClassName, "en{'Program.config'}de{'Programm.config'}", typeof(InRequestConfig), InRequestConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InRequestConfig>) })]
+    [NotMapped]
     public partial class InRequestConfig : IACConfig
     {
         [NotMapped]

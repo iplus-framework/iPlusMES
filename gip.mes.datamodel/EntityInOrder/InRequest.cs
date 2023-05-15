@@ -35,6 +35,7 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InRequest>) })]
+    [NotMapped]
     public partial class InRequest : IACConfigStore
     {
         [NotMapped]

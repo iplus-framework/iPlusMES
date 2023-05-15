@@ -30,10 +30,14 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Picking>) })]
+    [NotMapped]
     public partial class Picking : IACConfigStore
     {
+        [NotMapped]
         public const string ClassName = "Picking";
+        [NotMapped]
         public const string NoColumnName = "PickingNo";
+        [NotMapped]
         public const string FormatNewNo = "PK{0}";
 
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);

@@ -46,13 +46,18 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOrder>) })]
+    [NotMapped]
     public partial class OutOrder : IACConfigStore, IOutOrder
     {
+        [NotMapped]
         public const string ClassName = "OutOrder";
+        [NotMapped]
         public const string NoColumnName = "OutOrderNo";
+        [NotMapped]
         public const string FormatNewNo = "O{0}";
 
 
+        [NotMapped]
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
         #region New/Delete

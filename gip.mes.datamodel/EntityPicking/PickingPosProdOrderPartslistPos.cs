@@ -8,6 +8,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking Order'}de{'Kommissionierauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPicking")]
     [ACPropertyEntity(1, "PickingPos", "en{'PickingPos'}de{'PickingPos'}", Const.ContextDatabase + "\\" + PickingPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "ProdOrderPartslistPos", "en{'ProdOrderPartslistPos'}de{'ProdOrderPartslistPos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [NotMapped]
     public partial class PickingPosProdOrderPartslistPos
     {
         [NotMapped]

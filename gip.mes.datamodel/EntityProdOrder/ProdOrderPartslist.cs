@@ -47,11 +47,15 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderPartslist>) })]
+    [NotMapped]
     public partial class ProdOrderPartslist : IACObjectEntity, IACConfigStore, IPartslist
     {
+        [NotMapped]
         public const string ClassName = "ProdOrderPartslist";
         //public const string NoColumnName = "LotNo";
+        [NotMapped]
         public const string FormatNewNo = "PPL{0}";
+        [NotMapped]
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
         #region New/Delete

@@ -14,6 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, InOrderPos.ClassName, "en{'Inorderpos'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + CompanyMaterialPickup.ClassName, "en{'Companymaterial pickup'}de{'Unternehmensmaterial Abholung'}", typeof(CompanyMaterialPickup), CompanyMaterialPickup.ClassName, "", "CompanyMaterialPickupID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyMaterialPickup>) })]
+    [NotMapped]
     public partial class CompanyMaterialPickup : IACObjectEntity
     {
         [NotMapped]

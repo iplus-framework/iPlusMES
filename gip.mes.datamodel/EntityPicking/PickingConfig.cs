@@ -27,6 +27,7 @@ namespace gip.mes.datamodel
     [ACDeleteAction("PickingConfig_ParentPickingConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + PickingConfig.ClassName, "en{'Picking.config'}de{'Picking.config'}", typeof(PickingConfig), PickingConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PickingConfig>) })]
+    [NotMapped]
     public partial class PickingConfig : IACConfig
     {
         [NotMapped]

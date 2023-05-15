@@ -99,6 +99,7 @@ namespace gip.mes.datamodel
 
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialStock.ClassName, ConstApp.MaterialStock, typeof(MaterialStock), MaterialStock.ClassName, Material.ClassName + "\\MaterialNo," + Material.ClassName + "\\MaterialName1", Material.ClassName + "\\MaterialNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialStock>) })]
+    [NotMapped]
     public partial class MaterialStock
     {
         [NotMapped]

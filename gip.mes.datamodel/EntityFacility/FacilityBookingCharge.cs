@@ -75,6 +75,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityBookingCharge.ClassName, "en{'Facilitybookingcharge'}de{'Lagerbewegung Charge'}", typeof(FacilityBookingCharge), FacilityBookingCharge.ClassName, "FacilityBookingChargeNo", "FacilityBookingChargeNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityBookingCharge>) })]
+    [NotMapped]
     public partial class FacilityBookingCharge
     {
         public const string ClassName = "FacilityBookingCharge";

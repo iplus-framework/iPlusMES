@@ -45,6 +45,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + InOrderPos.ClassName, "en{'Purchase Order Pos.'}de{'Bestellposition'}", typeof(InOrderPos), InOrderPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InOrderPos>) })]
+    [NotMapped]
     public partial class InOrderPos
     {
         [NotMapped]

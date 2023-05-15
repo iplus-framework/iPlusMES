@@ -23,8 +23,10 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDGMPMaterialGroup>) })]
+    [NotMapped]
     public partial class MDGMPMaterialGroup
     {
+        [NotMapped]
         public const string ClassName = "MDGMPMaterialGroup";
 
         #region New/Delete

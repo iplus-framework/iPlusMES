@@ -20,10 +20,14 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistACClassMethod.ClassName, "en{'MaterialWF-Workflow-Mapping'}de{'MaterialWF-Workflow-Mapping'}", typeof(PartslistACClassMethod), PartslistACClassMethod.ClassName, "", "PartslistACClassMethodID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistACClassMethod>) })]
+    [NotMapped]
     public partial class PartslistACClassMethod
     {
+        [NotMapped]
         public const string ClassName = "PartslistACClassMethod";
+        [NotMapped]
         public const string NoColumnName = "LotNo";
+        [NotMapped]
         public const string FormatNewNo = "PLAC{0}";
 
         #region New / Delete

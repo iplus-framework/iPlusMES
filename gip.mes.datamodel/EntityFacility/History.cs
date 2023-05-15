@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<History>) })]
+    [NotMapped]
     public partial class History : IACConfigStore
     {
         [NotMapped]

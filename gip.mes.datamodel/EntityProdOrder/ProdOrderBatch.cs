@@ -15,6 +15,7 @@ namespace gip.mes.datamodel
 
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderBatch.ClassName, "en{'Batch'}de{'Batch'}", typeof(ProdOrderBatch), ProdOrderBatch.ClassName, "ProdOrderBatchNo", "ProdOrderBatchNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderBatch>) })]
+    [NotMapped]
     public partial class ProdOrderBatch : IACObjectEntity
     {
         [NotMapped]

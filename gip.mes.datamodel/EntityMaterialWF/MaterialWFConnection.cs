@@ -13,8 +13,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "MaterialWFACClassMethod", "en{'MateriaWF-ACClassMethod'}de{'MateriaWF-ACClassMethod'}", Const.ContextDatabase + "\\" + MaterialWFACClassMethod.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, gip.core.datamodel.ACClassWF.ClassName, "en{'To Workflownode'}de{'Workflownode'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassWF.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWFConnection>) })]
+    [NotMapped]
     public partial class MaterialWFConnection : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MaterialWFConnection";
 
         public static MaterialWFConnection NewACObject(DatabaseApp dbApp, IACObject parentACObject)

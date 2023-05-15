@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintTask.ClassName, "en{'Maintenance Task'}de{'Wartungsaufgabe'}", typeof(MaintTask), MaintTask.ClassName, Const.EntityInsertDate, Const.EntityInsertDate)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintTask>) })]
+    [NotMapped]
     public partial class MaintTask
     {
         [NotMapped]

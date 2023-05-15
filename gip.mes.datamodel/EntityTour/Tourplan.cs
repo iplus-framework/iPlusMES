@@ -43,10 +43,14 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Tourplan>) })]
+    [NotMapped]
     public partial class Tourplan : IACConfigStore
     {
+        [NotMapped]
         public const string ClassName = "Tourplan";
+        [NotMapped]
         public const string NoColumnName = "TourplanNo";
+        [NotMapped]
         public const string FormatNewNo = "TP{0}";
 
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);

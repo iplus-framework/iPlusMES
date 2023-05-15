@@ -25,10 +25,14 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, "WeighingTotalXML", "en{'Serialized Weighingdata'}de{'Serialisierte Wägedaten'}", "", "", false)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + Weighing.ClassName, "en{'Weighing'}de{'Wägung'}", typeof(Weighing), Weighing.ClassName, "WeighingNo", "WeighingNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Weighing>) })]
+    [NotMapped]
     public partial class Weighing
     {
+        [NotMapped]
         public const string ClassName = "Weighing";
+        [NotMapped]
         public const string NoColumnName = "WeighingNo";
+        [NotMapped]
         public const string FormatNewNo = "WG{0}";
 
         #region New/Delete

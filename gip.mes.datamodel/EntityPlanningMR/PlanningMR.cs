@@ -22,6 +22,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + PlanningMR.ClassName, "en{'Planning'}de{'Planung'}", typeof(PlanningMR), PlanningMR.ClassName, "PlanningMRNo,PlanningName", "PlanningMRNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PlanningMR>) })]
+    [NotMapped]
     public partial class PlanningMR
     {
         #region const

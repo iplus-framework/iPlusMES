@@ -31,6 +31,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityReservation.ClassName, "en{'Reservation'}de{'Reservierung'}", typeof(FacilityReservation), FacilityReservation.ClassName, "FacilityReservationNo", "FacilityReservationNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityReservation>) })]
+    [NotMapped]
     public partial class FacilityReservation
     {
         [NotMapped]

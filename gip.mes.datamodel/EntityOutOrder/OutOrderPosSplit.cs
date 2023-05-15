@@ -16,8 +16,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + OutOrderPosSplit.ClassName, "en{'Inorderpossplit'}de{'Bestellpositionsplittung'}", typeof(OutOrderPosSplit), OutOrderPosSplit.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOrderPosSplit>) })]
+    [NotMapped]
     public partial class OutOrderPosSplit
     {
+        [NotMapped]
         public const string ClassName = "OutOrderPosSplit";
 
         #region New/Delete

@@ -29,6 +29,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialCalculation.ClassName, "en{'MaterialCalculation'}de{'Materialkalkulation'}", typeof(MaterialCalculation), MaterialCalculation.ClassName, "MaterialCalculationNo", "MaterialCalculationNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialUnit>) })]
+    [NotMapped]
     public partial class MaterialCalculation
     {
         [NotMapped]

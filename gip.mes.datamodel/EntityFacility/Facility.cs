@@ -74,6 +74,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + Facility.ClassName, ConstApp.Facility, typeof(Facility), Facility.ClassName, "FacilityNo", "FacilityNo")] // TODO: Define Child-Entites for Import/Export
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Facility>) })]
+    [NotMapped]
     public partial class Facility : ICloneable
     {
         [NotMapped]

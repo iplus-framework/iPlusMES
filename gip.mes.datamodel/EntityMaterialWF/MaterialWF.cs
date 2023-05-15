@@ -25,6 +25,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialWF>) })]
+    [NotMapped]
     public partial class MaterialWF : IACWorkflowDesignContext, IACWorkflowNode, IACClassDesignProvider
     {
         [NotMapped]

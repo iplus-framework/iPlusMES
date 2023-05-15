@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9, "InwardActualQuantityUOM", "en{'Output Actual Quantity'}de{'Ergebnis-Ist'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + ACProgramLogView.ClassName, "en{'ACProgramLogView'}de{'ACProgramLogView'}", typeof(ACProgramLogView), ACProgramLogView.ClassName, "ProgramNo", "ProgramNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ACProgramLogView>) })]
+    [NotMapped]
     public partial class ACProgramLogView
     {
         [NotMapped]

@@ -21,8 +21,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDCountrySalesTax.ClassName, ConstApp.ESCountrySalesTax, typeof(MDCountrySalesTax), MDCountrySalesTax.ClassName, Const.MDNameTrans, Const.MDKey)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCountrySalesTax>) })]
+    [NotMapped]
     public partial class MDCountrySalesTax : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDCountrySalesTax";
 
         #region New/Delete

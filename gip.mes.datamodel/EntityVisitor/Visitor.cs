@@ -30,10 +30,14 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Visitor>) })]
+    [NotMapped]
     public partial class Visitor
     {
+        [NotMapped]
         public const string ClassName = "Visitor";
+        [NotMapped]
         public const string NoColumnName = "VisitorNo";
+        [NotMapped]
         public const string FormatNewNo = "V{0}";
 
         #region New/Delete

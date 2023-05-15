@@ -16,6 +16,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "DeliveryNotePos", "en{'DeliveryNotePos'}de{'DeliveryNotePos'}", Const.ContextDatabase + "\\DeliveryNotePos" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "PickingPos", "en{'PickingPos'}de{'PickingPos'}", Const.ContextDatabase + "\\PickingPos" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + OrderLog.ClassName, "en{'Programlog'}de{'Programlog'}", typeof(OrderLog), OrderLog.ClassName, "VBiACProgramLogID", "VBiACProgramLogID")]
+    [NotMapped]
     public partial class OrderLog : IACObjectEntity
     {
         [NotMapped]

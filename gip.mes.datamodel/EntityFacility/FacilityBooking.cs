@@ -72,6 +72,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityBooking.ClassName, "en{'Stock Movement'}de{'Lagerbewegung'}", typeof(FacilityBooking), FacilityBooking.ClassName, "FacilityBookingNo", "FacilityBookingNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityBooking>) })]
+    [NotMapped]
     public partial class FacilityBooking
     {
         [NotMapped]

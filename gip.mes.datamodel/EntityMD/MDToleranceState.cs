@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + MDToleranceState.ClassName, ConstApp.ESToleranceState, typeof(MDToleranceState), MDToleranceState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDToleranceState>) })]
+    [NotMapped]
     public partial class MDToleranceState
     {
+        [NotMapped]
         public const string ClassName = "MDToleranceState";
 
         #region New/Delete

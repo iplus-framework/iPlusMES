@@ -87,6 +87,7 @@ namespace gip.mes.datamodel
     ]
     //[ACSerializeableInfo(new Type[] { typeof(ACRef<Material>), typeof(Material) })]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Material>) })]
+    [NotMapped]
     public partial class Material : IACConfigStore, IACWorkflowNode, IACClassDesignProvider, IImageInfo, ICloneable
     {
         [NotMapped]

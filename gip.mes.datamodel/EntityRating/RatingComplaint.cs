@@ -18,8 +18,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + RatingComplaint.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", typeof(RatingComplaint), RatingComplaint.ClassName, Const.EntityInsertDate, Const.EntityInsertDate)]
+    [NotMapped]
     public partial class RatingComplaint
     {
+        [NotMapped]
         public const string ClassName = "RatingComplaint";
 
         #region New/Delete

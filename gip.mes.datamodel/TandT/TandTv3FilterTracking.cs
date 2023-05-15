@@ -20,8 +20,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9, "PrimaryKeyID", "en{'PrimaryKeyID'}de{'PrimaryKeyID'}", "", "", true)]
     [ACPropertyEntity(10, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + TandTv3FilterTracking.ClassName, "en{'FilterTracking'}de{'FilterTracking'}", typeof(TandTv3FilterTracking), TandTv3FilterTracking.ClassName, "ItemSystemNo", "StartTime")]
+    [NotMapped]
     public partial class TandTv3FilterTracking
     {
+        [NotMapped]
         public const string ClassName = "TandTv3FilterTracking";
 
         #region Enum

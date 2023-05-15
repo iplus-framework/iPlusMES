@@ -20,6 +20,7 @@ namespace gip.mes.datamodel
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + PriceList.ClassName, ConstApp.ESPriceList, typeof(PriceList), PriceList.ClassName, "PriceListNo", "PriceListNo")]
 
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PriceList>) })]
+    [NotMapped]
     public partial class PriceList
     {
         [NotMapped]

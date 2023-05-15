@@ -13,7 +13,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "OperationTime", "en{'Time'}de{'Zeit'}", "", "", true)]
     [ACPropertyEntity(31, "Operation", "en{'Operation'}de{'Operation'}", "", "", true)]
     [ACPropertyEntity(31, "OperationState", "en{'State'}de{'Status'}", "", "", true)]
-    public partial class OperationLog 
+    [NotMapped]
+    public partial class OperationLog
     {
         public static OperationLog NewACObject(DatabaseApp dbApp, IACObject parentACObject)
         {

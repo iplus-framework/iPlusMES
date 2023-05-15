@@ -37,16 +37,26 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderBatchPlan.ClassName, "en{'ProdOrderBatchPlan'}de{'ProdOrderBatchPlan'}", typeof(ProdOrderBatchPlan), ProdOrderBatchPlan.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderBatchPlan>) })]
+    [NotMapped]
     public partial class ProdOrderBatchPlan
     {
+        [NotMapped]
         public const string ClassName = "ProdOrderBatchPlan";
+        [NotMapped]
         public const string C_DurationSecAVG = "DurationSecAVG";
+        [NotMapped]
         public const string C_StartOffsetSecAVG = "StartOffsetSecAVG";
+        [NotMapped]
         public const string C_OffsetToEndTime = "OffsetToEndTime";
+        [NotMapped]
         public const string C_BatchSuggestionMode = "BatchSuggestionMode";
+        [NotMapped]
         public const string C_PlanMode = "PlanMode";
+        [NotMapped]
         public const string C_BatchSizeStandard = "BatchSizeStandard";
+        [NotMapped]
         public const string C_BatchSizeMin = "BatchSizeMin";
+        [NotMapped]
         public const string C_BatchSizeMax = "BatchSizeMax";
 
         #region New/Delete

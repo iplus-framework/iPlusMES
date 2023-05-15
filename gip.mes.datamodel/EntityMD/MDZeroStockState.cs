@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDZeroStockState.ClassName, ConstApp.ESZeroStockState, typeof(MDZeroStockState), MDZeroStockState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDZeroStockState>) })]
+    [NotMapped]
     public partial class MDZeroStockState
     {
+        [NotMapped]
         public const string ClassName = "MDZeroStockState";
 
         #region New/Delete

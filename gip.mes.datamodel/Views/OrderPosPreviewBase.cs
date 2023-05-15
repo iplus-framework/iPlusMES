@@ -1,20 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioPurchase, "en{'OrderPosPreviewBase'}de{'OrderPosPreviewBase'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [NotMapped]
     public class OrderPosPreviewBase : IACObject
     {
         [ACPropertyInfo(9999, "MaterialNo", ConstApp.MaterialNo)]
+        [NotMapped]
         public string MaterialNo { get; set; }
 
         [ACPropertyInfo(9999, "MaterialName", "en{'Material Desc. 1'}de{'Materialbez. 1'}")]
+        [NotMapped]
         public string MaterialName { get; set; }
 
         [ACPropertyInfo(9999, "TargetQuantity", ConstApp.TargetQuantity)]
+        [NotMapped]
         public double TargetQuantity { get; set; }
 
 
@@ -24,6 +29,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Unique Identifier in a Parent-/Child-Relationship.</summary>
         /// <value>The Unique Identifier as string</value>
+        [NotMapped]
         public string ACIdentifier
         {
             get;
@@ -31,6 +37,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
+        [NotMapped]
         public string ACCaption
         {
             get;
@@ -40,6 +47,7 @@ namespace gip.mes.datamodel
         /// Metadata (iPlus-Type) of this instance. ATTENTION: IACType are EF-Objects. Therefore the access to Navigation-Properties must be secured using the QueryLock_1X000 of the Global Database-Context!
         /// </summary>
         /// <value>  iPlus-Type (EF-Object from ACClass*-Tables)</value>
+        [NotMapped]
         public IACType ACType
         {
             get
@@ -52,6 +60,7 @@ namespace gip.mes.datamodel
         /// A "content list" contains references to the most important data that this instance primarily works with. It is primarily used to control the interaction between users, visual objects, and the data model in a generic way. For example, drag-and-drop or context menu operations. A "content list" can also be null.
         /// </summary>
         /// <value> A nullable list ob IACObjects.</value>
+        [NotMapped]
         public IEnumerable<IACObject> ACContentList
         {
             get
@@ -64,6 +73,7 @@ namespace gip.mes.datamodel
         /// Returns the parent object
         /// </summary>
         /// <value>Reference to the parent object</value>
+        [NotMapped]
         public IACObject ParentACObject
         {
             get

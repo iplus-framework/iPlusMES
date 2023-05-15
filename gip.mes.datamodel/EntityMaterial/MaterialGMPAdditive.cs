@@ -14,6 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialGMPAdditive.ClassName, "en{'Material GMP-Additive'}de{'Material GMP-Zusatzstoffe'}", typeof(MaterialGMPAdditive), MaterialGMPAdditive.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaterialGMPAdditive>) })]
+    [NotMapped]
     public partial class MaterialGMPAdditive : IACObjectEntity
     {
         [NotMapped]

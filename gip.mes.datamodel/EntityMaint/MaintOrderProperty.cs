@@ -11,8 +11,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(4, "MDMaintOrderPropertyState", "en{'Maintenance Order Property'}de{'Wartungsauftrag Eigenschaften'}", Const.ContextDatabase + "\\MDMaintOrderPropertyState" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintOrderProperty.ClassName, "en{'Maintenance Order Property'}de{'Wartungsauftrag Eigenschaften'}", typeof(MaintOrderProperty), MaintOrderProperty.ClassName, gip.core.datamodel.ACClassProperty.ClassName + "\\ACIdentifier", gip.core.datamodel.ACClassProperty.ClassName + "\\ACIdentifier")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintOrderProperty>) })]
+    [NotMapped]
     public partial class MaintOrderProperty : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MaintOrderProperty";
 
         #region New/Delete

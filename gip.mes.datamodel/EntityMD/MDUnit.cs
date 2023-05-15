@@ -27,8 +27,10 @@ namespace gip.mes.datamodel
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDUnit>) })]
+    [NotMapped]
     public partial class MDUnit
     {
+        [NotMapped]
         public const string ClassName = "MDUnit";
 
         #region New/Delete

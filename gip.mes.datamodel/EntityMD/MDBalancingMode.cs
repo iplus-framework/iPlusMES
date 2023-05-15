@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDBalancingMode.ClassName, ConstApp.ESBalancingMode, typeof(MDBalancingMode), MDBalancingMode.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDBalancingMode>) })]
+    [NotMapped]
     public partial class MDBalancingMode
     {
+        [NotMapped]
         public const string ClassName = "MDBalancingMode";
 
         #region New/Delete

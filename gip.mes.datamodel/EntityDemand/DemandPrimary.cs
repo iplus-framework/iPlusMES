@@ -17,6 +17,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + DemandPrimary.ClassName, "en{'DemandPrimary'}de{'DemandPrimary'}", typeof(DemandPrimary), DemandPrimary.ClassName, "DemandPrimaryNo", "DemandPrimaryNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DemandPrimary>) })]
+    [NotMapped]
     public partial class DemandPrimary
     {
         [NotMapped]

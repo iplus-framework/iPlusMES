@@ -24,10 +24,14 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOrderPosUtilization.ClassName, "en{'Outorderposutilization'}de{'Auftragspositionaufwand'}", typeof(OutOrderPosUtilization), OutOrderPosUtilization.ClassName, "OutOrderPosUtilizationNo", "OutOrderPosUtilizationNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOrderPosUtilization>) })]
+    [NotMapped]
     public partial class OutOrderPosUtilization
     {
+        [NotMapped]
         public const string ClassName = "OutOrderPosUtilization";
+        [NotMapped]
         public const string NoColumnName = "OutOrderPosUtilizationNo";
+        [NotMapped]
         public const string FormatNewNo = "OPU{0}";
 
 

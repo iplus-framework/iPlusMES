@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "Desc", "en{'Description'}de{'Beschreibung'}","", "", true)]
     [ACPropertyEntity(3, "VBLanguage", "en{'Language'}de{'Sprache'}", Const.ContextDatabase + "\\VBLanguage" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "Label", "en{'Label'}de{'Label'}", Const.ContextDatabase + "\\Label" + Const.DBSetAsEnumerablePostfix, "", true)]
+    [NotMapped]
     public partial class LabelTranslation
     {
 

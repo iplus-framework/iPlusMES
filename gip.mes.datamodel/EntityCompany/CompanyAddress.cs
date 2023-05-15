@@ -37,6 +37,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioCompany, Const.QueryPrefix + CompanyAddress.ClassName, "en{'Adress'}de{'Adresse'}", typeof(CompanyAddress), CompanyAddress.ClassName, "Name1", "Name1")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CompanyAddress>) })]
+    [NotMapped]
     public partial class CompanyAddress
     {
         [NotMapped]

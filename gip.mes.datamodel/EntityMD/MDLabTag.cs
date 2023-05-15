@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MDLabTag.ClassName, ConstApp.ESLabTag, typeof(MDLabTag), MDLabTag.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDLabTag>) })]
+    [NotMapped]
     public partial class MDLabTag
     {
+        [NotMapped]
         public const string ClassName = "MDLabTag";
 
         #region New/Delete

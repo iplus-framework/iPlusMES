@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MDProcessErrorAction.ClassName, ConstApp.ESProcessErrorAction, typeof(MDProcessErrorAction), MDProcessErrorAction.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDProcessErrorAction>) })]
+    [NotMapped]
     public partial class MDProcessErrorAction
     {
+        [NotMapped]
         public const string ClassName = "MDProcessErrorAction";
 
         #region New/Delete

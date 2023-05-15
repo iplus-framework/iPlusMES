@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + MDFacilityManagementType.ClassName, ConstApp.ESFacilityManagementType, typeof(MDFacilityManagementType), MDFacilityManagementType.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDFacilityManagementType>) })]
+    [NotMapped]
     public partial class MDFacilityManagementType
     {
+        [NotMapped]
         public const string ClassName = "MDFacilityManagementType";
 
         #region New/Delete

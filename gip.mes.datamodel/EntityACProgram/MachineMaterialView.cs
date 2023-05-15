@@ -17,6 +17,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(10, "OutwardActualQuantityUOM", "en{'Input Actual Quantity'}de{'Einsatz-Ist'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MachineMaterialView.ClassName, "en{'MachineMaterialView'}de{'MachineMaterialView'}", typeof(MachineMaterialView), MachineMaterialView.ClassName, "Nr", "Nr")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MachineMaterialView>) })]
+    [NotMapped]
     public partial class MachineMaterialView
     {
         [NotMapped]

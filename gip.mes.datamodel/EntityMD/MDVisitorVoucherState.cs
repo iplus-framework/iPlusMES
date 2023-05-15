@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + MDVisitorVoucherState.ClassName, ConstApp.ESVisitorVoucherState, typeof(MDVisitorVoucherState), MDVisitorVoucherState.ClassName, "MDTransName", Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDVisitorVoucherState>) })]
+    [NotMapped]
     public partial class MDVisitorVoucherState
     {
+        [NotMapped]
         public const string ClassName = "MDVisitorVoucherState";
 
         #region New/Delete

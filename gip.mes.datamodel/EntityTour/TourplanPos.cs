@@ -25,8 +25,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + TourplanPos.ClassName, "en{'TourplanPos'}de{'TourplanPos'}", typeof(TourplanPos), TourplanPos.ClassName, Const.SortIndex, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<TourplanPos>) })]
+    [NotMapped]
     public partial class TourplanPos
     {
+        [NotMapped]
         public const string ClassName = "TourplanPos";
 
         #region New/Delete

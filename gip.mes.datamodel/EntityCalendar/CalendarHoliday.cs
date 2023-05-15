@@ -19,6 +19,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioScheduling, Const.QueryPrefix + CalendarHoliday.ClassName, "en{'Holiday'}de{'Feiertag'}", typeof(CalendarHoliday), CalendarHoliday.ClassName, "HolidayName", "HolidayName")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CalendarHoliday>) })]
+    [NotMapped]
     public partial class CalendarHoliday
     {
         [NotMapped]

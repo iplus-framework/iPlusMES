@@ -12,8 +12,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDSchedulingGroupWF>) })]
+    [NotMapped]
     public partial class MDSchedulingGroupWF : IACObjectEntity
     {
+        [NotMapped]
         public const string ClassName = "MDSchedulingGroupWF";
 
 

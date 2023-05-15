@@ -28,8 +28,10 @@ namespace gip.mes.datamodel
     [ACDeleteAction("OutOrderConfig_ParentOutOrderConfig", Global.DeleteAction.CascadeManual)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOrderConfig.ClassName, "en{'Program.config'}de{'Programm.config'}", typeof(OutOrderConfig), OutOrderConfig.ClassName, Const.PN_LocalConfigACUrl, Const.PN_LocalConfigACUrl)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOrderConfig>) })]
+    [NotMapped]
     public partial class OutOrderConfig : IACConfig
     {
+        [NotMapped]
         public const string ClassName = "OutOrderConfig";
 
         #region New/Delete

@@ -13,8 +13,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MDMaintTaskState.ClassName, ConstApp.ESMaintTaskState, typeof(MDMaintTaskState), MDMaintTaskState.ClassName, Const.MDNameTrans, Const.SortIndex)]
+    [NotMapped]
     public partial class MDMaintTaskState
     {
+        [NotMapped]
         public const string ClassName = "MDMaintTaskState";
 
         public static MDMaintTaskState NewACObject(DatabaseApp dbApp, IACObject parent)

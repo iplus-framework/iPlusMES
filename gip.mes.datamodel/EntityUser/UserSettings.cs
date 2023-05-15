@@ -10,6 +10,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "TenantCompanyID", ConstApp.IssuerCompanyPerson, Const.ContextDatabase + "\\" + CompanyPerson.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioPurchase, Const.QueryPrefix + UserSettings.ClassName, ConstApp.ESInOrderState, typeof(UserSettings), UserSettings.ClassName, "", Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<UserSettings>) })]
+    [NotMapped]
     public partial class UserSettings
     {
         [NotMapped]

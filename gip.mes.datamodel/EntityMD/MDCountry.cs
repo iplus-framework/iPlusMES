@@ -26,8 +26,10 @@ namespace gip.mes.datamodel
 
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCountry>) })]
+    [NotMapped]
     public partial class MDCountry
     {
+        [NotMapped]
         public const string ClassName = "MDCountry";
 
         #region New/Delete

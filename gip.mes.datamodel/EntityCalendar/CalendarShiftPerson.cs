@@ -23,6 +23,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioScheduling, Const.QueryPrefix + CalendarShiftPerson.ClassName, "en{'Person'}de{'Person'}", typeof(CalendarShiftPerson), CalendarShiftPerson.ClassName, CompanyPerson.ClassName + "\\Name1", CompanyPerson.ClassName + "\\Name1")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<CalendarShiftPerson>) })]
+    [NotMapped]
     public partial class CalendarShiftPerson
     {
         [NotMapped]

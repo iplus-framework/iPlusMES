@@ -28,8 +28,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + PickingPos.ClassName, "en{'Picking Line'}de{'Kommissionierposition'}", typeof(PickingPos), PickingPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PickingPos>) })]
+    [NotMapped]
     public partial class PickingPos
     {
+        [NotMapped]
         public const string ClassName = "PickingPos";
 
         #region New/Delete

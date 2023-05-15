@@ -19,8 +19,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + MDInvoiceState.ClassName, ConstApp.ESInvoiceState, typeof(MDInvoiceState), MDInvoiceState.ClassName, Const.MDNameTrans, Const.SortIndex)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDInvoiceState>) })]
+    [NotMapped]
     public partial class MDInvoiceState
     {
+        [NotMapped]
         public const string ClassName = "MDInvoiceState";
 
         #region New/Delete

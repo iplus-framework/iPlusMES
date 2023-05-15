@@ -23,8 +23,10 @@ namespace gip.mes.datamodel
                 new object[] {Const.QueryPrefix + RatingComplaint.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", typeof(TourplanPos), RatingComplaint.ClassName + "_" + Rating.ClassName, Const.EntityInsertDate, Const.EntityInsertDate}
         }
     )]
+    [NotMapped]
     public partial class Rating
     {
+        [NotMapped]
         public const string ClassName = "Rating";
 
         #region New/Delete

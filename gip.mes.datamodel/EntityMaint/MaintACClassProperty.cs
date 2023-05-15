@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintACClassProperty.ClassName, "en{'Maintenance ACClassProperty'}de{'Maintenance ACClassProperty'}", typeof(MaintACClassProperty), MaintACClassProperty.ClassName, "", "")]
+    [NotMapped]
     public partial class MaintACClassProperty
     {
         [NotMapped]

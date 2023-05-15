@@ -26,6 +26,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<DemandOrder>) })]
+    [NotMapped]
     public partial class DemandOrder
     {
         [NotMapped]

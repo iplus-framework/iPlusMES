@@ -48,8 +48,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPos.ClassName, "en{'Production Component'}de{'Produktionskomponente'}", typeof(ProdOrderPartslistPos), ProdOrderPartslistPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderPartslistPos>) })]
+    [NotMapped]
     public partial class ProdOrderPartslistPos : IPartslistPos
     {
+        [NotMapped]
         public const string ClassName = "ProdOrderPartslistPos";
 
         #region New/Delete

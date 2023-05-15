@@ -20,6 +20,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, "ACMethodBookingXML", "en{'ACMethodBooking'}de{'ACMethodBooking'}")]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityPreBooking.ClassName, "en{'Planned posting'}de{'Geplante Buchung'}", typeof(FacilityPreBooking), FacilityPreBooking.ClassName, "FacilityPreBookingNo", "FacilityPreBookingNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityPreBooking>) })]
+    [NotMapped]
     public partial class FacilityPreBooking : IACObjectEntity
     {
         [NotMapped]

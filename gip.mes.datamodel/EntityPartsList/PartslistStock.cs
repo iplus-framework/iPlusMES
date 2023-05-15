@@ -66,8 +66,10 @@ namespace gip.mes.datamodel
 
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistStock.ClassName, "en{'Bill of Materials Stock'}de{'Stücklistenbestand'}", typeof(PartslistStock), PartslistStock.ClassName, Partslist.ClassName + "\\PartslistNo", Partslist.ClassName + "\\PartslistNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistStock>) })]
+    [NotMapped]
     public partial class PartslistStock
     {
+        [NotMapped]
         public const string ClassName = "PartslistStock";
 
         #region New/Delete
