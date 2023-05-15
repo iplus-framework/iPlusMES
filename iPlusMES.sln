@@ -592,6 +592,7 @@ Global
 		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{47f013c1-e869-419e-8b17-c56313acc34b}*SharedItemsImports = 13
 		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{52dc947d-677d-42ca-bca6-153a4e027272}*SharedItemsImports = 5
 		gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems*{5a0c15dd-ad10-43e7-9113-c4fb1b92d3b9}*SharedItemsImports = 5
+		..\iPlus\gip.core.processapplication.shared\gip.core.processapplication.shared.projitems*{66484708-85bd-47c4-92dd-3010387465f4}*SharedItemsImports = 5
 		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{6d353dd2-970b-45bb-9ab6-d23a28e0233f}*SharedItemsImports = 13
 		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{7931f65b-3c2a-4db9-a5a6-4bc5b4d12c00}*SharedItemsImports = 5
 		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{893d3b1b-dc55-4684-8b5d-941f1049151b}*SharedItemsImports = 5
