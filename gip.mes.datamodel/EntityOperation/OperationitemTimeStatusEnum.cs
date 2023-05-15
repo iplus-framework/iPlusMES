@@ -12,8 +12,9 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioSystem, "en{'OperationitemTimeStatusEnum'}de{'OperationitemTimeStatusEnum'}", Global.ACKinds.TACEnum)]
     public enum OperationitemTimeStatusEnum : short
     {
-        Elapsing = 0,
-        TimeReaching = 1,
-        TimeExceeded = 2
+        Elapsing = 0, // blue
+        NotifyTimeReaching = 1, // yellow
+        TimeReached = 2, // green
+        TimeExceeded = 3 // red | if maxduration have value
     }
 }
