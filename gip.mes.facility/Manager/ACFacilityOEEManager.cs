@@ -2,10 +2,12 @@
 using gip.core.datamodel;
 using gip.core.processapplication;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.facility
 {
@@ -60,7 +62,7 @@ namespace gip.mes.facility
 
                 FacilityMaterialOEE oeeEntry = FacilityMaterialOEE.NewACObject(dbApp, facilityMaterial);
                 oeeEntry.ACProgramLogID = facilityMaterial.FacilityMaterialID;
-                dbApp.FacilityMaterialOEE.AddObject(oeeEntry);
+                dbApp.FacilityMaterialOEE.Add(oeeEntry);
                 oeeEntry.StartDate = startDate;
                 oeeEntry.EndDate = endDate;
                 oeeEntry.IdleTime = TimeSpan.FromMinutes(minutesIdle);
@@ -93,7 +95,7 @@ namespace gip.mes.facility
         {
             if (facilityMaterial == null || dbApp == null)
                 return -1;
-            return dbApp.ExecuteStoreCommand("DELETE FROM FacilityMaterialOEE WHERE ACProgramLogID = {0}", facilityMaterial.FacilityMaterialID);
+            return dbApp.Database.ExecuteSql(FormattableStringFactory.Create("DELETE FROM FacilityMaterialOEE WHERE ACProgramLogID = @p0", facilityMaterial.FacilityMaterialID));
         }
 
         public Msg RecalcThroughputAverage(DatabaseApp dbApp, FacilityMaterial facilityMaterial, bool saveChanges = true, int countLatestEntries = 500, double availabilityThreshold = C_AvailabilityThreasholdForAutoCalc)
@@ -231,7 +233,7 @@ namespace gip.mes.facility
                         facilityMaterial.Material = prodOrderPartslist.Partslist.Material;
                         facilityMaterial.Throughput = 0;
                         facilityMaterial.ThroughputAuto = 1;
-                        databaseApp.FacilityMaterial.AddObject(facilityMaterial);
+                        databaseApp.FacilityMaterial.Add(facilityMaterial);
                     }
 
                     var propLogSumsByProgramLog = machine.SelectMany(c => c.Sum)
@@ -246,7 +248,7 @@ namespace gip.mes.facility
                         {
                             oeeEntry = FacilityMaterialOEE.NewACObject(databaseApp, facilityMaterial);
                             oeeEntry.ACProgramLogID = propLogSumByProgramLog.Key.ACProgramLogID;
-                            databaseApp.FacilityMaterialOEE.AddObject(oeeEntry);
+                            databaseApp.FacilityMaterialOEE.Add(oeeEntry);
                         }
                         else
                         {

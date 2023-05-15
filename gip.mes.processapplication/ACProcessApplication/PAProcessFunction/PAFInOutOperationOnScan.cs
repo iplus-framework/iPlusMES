@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
 using gip.mes.facility;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {

@@ -697,7 +697,7 @@ namespace gip.mes.facility
         );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_LastAvailable =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
             (ctx, facilityID) => ctx.FacilityBooking.Include("FacilityBookingCharge_FacilityBooking")
                                                     .Where(c => c.InwardFacilityID == facilityID && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
                                                     .OrderByDescending(c => c.InsertDate)

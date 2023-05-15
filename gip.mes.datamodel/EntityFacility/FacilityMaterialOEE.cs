@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,6 +52,39 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region PropertyChanging
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            switch (propertyName)
+            {
+                case nameof(IdleTime):
+                    _IdleTime = null;
+                    break;
+                case nameof(MaintenanceTime):
+                    _MaintenanceTime = null;
+                    break;
+                case nameof(RetoolingTime):
+                    _RetoolingTime = null;
+                    break;
+                case nameof(ScheduledBreakTime):
+                    _ScheduledBreakTime = null;
+                    break;
+                case nameof(UnscheduledBreakTime):
+                    _UnscheduledBreakTime = null;
+                    break;
+                case nameof(OperationTime):
+                    _OperationTime = null;
+                    break;
+                case nameof(StandByTime):
+                    _StandByTime = null;
+                    break;
+            }
+            base.OnPropertyChanged(propertyName);
+        }
+
+        #endregion
+
         #region Properties
 
         private TimeSpan? _IdleTime;
@@ -70,13 +104,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnIdleTimeSecChanged()
-        {
-            _IdleTime = null;
-            OnPropertyChanged(nameof(IdleTime));
-        }
-
-
         private TimeSpan? _MaintenanceTime;
         [ACPropertyInfo(101, "", "en{'Maintenance'}de{'Wartung'}")]
         public TimeSpan MaintenanceTime
@@ -93,13 +120,6 @@ namespace gip.mes.datamodel
                 OnPropertyChanged(nameof(MaintenanceTime));
             }
         }
-
-        partial void OnMaintenanceTimeSecChanged()
-        {
-            _MaintenanceTime = null;
-            OnPropertyChanged(nameof(MaintenanceTime));
-        }
-
 
         private TimeSpan? _RetoolingTime;
         [ACPropertyInfo(102, "", "en{'Retooling'}de{'Rüstzeit'}")]
@@ -118,13 +138,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnRetoolingTimeSecChanged()
-        {
-            _RetoolingTime = null;
-            OnPropertyChanged(nameof(RetoolingTime));
-        }
-
-
         private TimeSpan? _ScheduledBreakTime;
         [ACPropertyInfo(103, "", "en{'Schedule break time'}de{'Geplante Unterbrechung'}")]
         public TimeSpan ScheduledBreakTime
@@ -141,13 +154,6 @@ namespace gip.mes.datamodel
                 OnPropertyChanged(nameof(ScheduledBreakTime));
             }
         }
-
-        partial void OnScheduledBreakTimeSecChanged()
-        {
-            _ScheduledBreakTime = null;
-            OnPropertyChanged(nameof(ScheduledBreakTime));
-        }
-
 
         private TimeSpan? _UnscheduledBreakTime;
         [ACPropertyInfo(104, "", "en{'Unscheduled break time'}de{'Ungeplante Unterbrechung'}")]
@@ -166,13 +172,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnUnscheduledBreakTimeSecChanged()
-        {
-            _UnscheduledBreakTime = null;
-            OnPropertyChanged(nameof(UnscheduledBreakTime));
-        }
-
-
         private TimeSpan? _OperationTime;
         [ACPropertyInfo(105, "", "en{'Operationtime'}de{'Betriebszeit'}")]
         public TimeSpan OperationTime
@@ -188,12 +187,6 @@ namespace gip.mes.datamodel
                 OperationTimeSec = (int)value.TotalSeconds;
                 OnPropertyChanged(nameof(OperationTime));
             }
-        }
-
-        partial void OnOperationTimeSecChanged()
-        {
-            _OperationTime = null;
-            OnPropertyChanged(nameof(OperationTime));
         }
 
         private TimeSpan? _StandByTime;
@@ -213,13 +206,6 @@ namespace gip.mes.datamodel
             }
         }
 
-
-        partial void OnStandByTimeSecChanged()
-        {
-            _StandByTime = null;
-            OnPropertyChanged(nameof(StandByTime));
-        }
-
         [ACPropertyInfo(110, "", "en{'Availability [%]'}de{'Verfügbarkeit [%]'}")]
         public double AvailabilityOEEPer
         {
@@ -227,11 +213,6 @@ namespace gip.mes.datamodel
             {
                 return AvailabilityOEE * 100;
             }
-        }
-
-        partial void OnAvailabilityOEEChanged()
-        {
-            OnPropertyChanged(nameof(AvailabilityOEEPer));
         }
 
         [ACPropertyInfo(111, "", "en{'Performance [%]'}de{'Leistung [%]'}")]
@@ -243,11 +224,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnPerformanceOEEChanged()
-        {
-            OnPropertyChanged(nameof(PerformanceOEEPer));
-        }
-
         [ACPropertyInfo(112, "", "en{'Quality [%]'}de{'Qualität [%]'}")]
         public double QualityOEEPer
         {
@@ -257,11 +233,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnQualityOEEChanged()
-        {
-            OnPropertyChanged(nameof(QualityOEEPer));
-        }
-
         [ACPropertyInfo(113, "", "en{'OEE [%]'}de{'OEE [%]'}")]
         public double TotalOEEPer
         {
@@ -269,11 +240,6 @@ namespace gip.mes.datamodel
             {
                 return TotalOEE * 100;
             }
-        }
-
-        partial void OnTotalOEEChanged()
-        {
-            OnPropertyChanged(nameof(TotalOEEPer));
         }
 
         public void CalcAvailabilityOEE()
