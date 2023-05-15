@@ -1,4 +1,9 @@
-﻿CREATE VIEW [dbo].[MachineMaterialPosView]
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'MachineMaterialPosView')
+	BEGIN
+		DROP  view  dbo.[MachineMaterialPosView]
+	END
+GO
+CREATE VIEW [dbo].[MachineMaterialPosView]
 	AS 
 select 
 	t.ProgramNo,

@@ -840,8 +840,12 @@ namespace gip.mes.facility
         {
             BatchPlanSuggestion = new BatchPlanSuggestion(this);
             double targetQuantity = GetTargetQuantityUOM();
-            TargetQuantityUOM = targetQuantity;
-            ProdOrderPartslistPos.TargetQuantityUOM = targetQuantity;
+            // Fix TargetQuantityUOM <> TargetQuantity in case when changed from other context
+            if (TargetQuantityUOM != targetQuantity)
+            {
+                TargetQuantityUOM = targetQuantity;
+                ProdOrderPartslistPos.TargetQuantityUOM = targetQuantity;
+            }
             BatchPlanSuggestion.RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
@@ -945,14 +949,16 @@ namespace gip.mes.facility
                 return;
             gip.mes.datamodel.ACClassWF vbACClassWF = WFNodeMES;
 
-            IACConfig batchSizeMin = GetConfig(ProdOrderBatchPlan.C_BatchSizeMin, partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSizeMax = GetConfig(ProdOrderBatchPlan.C_BatchSizeMax, partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSizeStandard = GetConfig(ProdOrderBatchPlan.C_BatchSizeStandard, partslist, aCClassWF, vbACClassWF);
-            IACConfig batchPlanMode = GetConfig(ProdOrderBatchPlan.C_PlanMode, partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSuggestionMode = GetConfig(ProdOrderBatchPlan.C_BatchSuggestionMode, partslist, aCClassWF, vbACClassWF);
-            IACConfig durationSecAVG = GetConfig(ProdOrderBatchPlan.C_DurationSecAVG, partslist, aCClassWF, vbACClassWF);
-            IACConfig startOffsetSecAVG = GetConfig(ProdOrderBatchPlan.C_StartOffsetSecAVG, partslist, aCClassWF, vbACClassWF);
-            IACConfig offsetToEndTime = GetConfig(ProdOrderBatchPlan.C_OffsetToEndTime, partslist, aCClassWF, vbACClassWF);
+            PartslistConfigExtract partslistConfigExtract = new PartslistConfigExtract(VarioConfigManager, ProdOrderManager, partslist, WFNode, WFNodeMES);
+
+            IACConfig batchSizeMin = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_BatchSizeMin);
+            IACConfig batchSizeMax = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_BatchSizeMax);
+            IACConfig batchSizeStandard = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_BatchSizeStandard);
+            IACConfig batchPlanMode = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_PlanMode);
+            IACConfig batchSuggestionMode = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_BatchSuggestionMode);
+            IACConfig durationSecAVG = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_DurationSecAVG);
+            IACConfig startOffsetSecAVG = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_StartOffsetSecAVG);
+            IACConfig offsetToEndTime = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_OffsetToEndTime);
 
             if (batchSizeMin != null && batchSizeMin.Value != null)
                 BatchSizeMinUOM = (double)batchSizeMin.Value;
@@ -999,33 +1005,6 @@ namespace gip.mes.facility
         {
             PlanMode = mode;
             PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)mode).ACCaption;
-        }
-
-        public List<IACConfigStore> GetCurrentConfigStores()
-        {
-            List<IACConfigStore> configStores = new List<IACConfigStore>();
-            if (Partslist != null)
-            {
-                configStores.Add(Partslist);
-                MaterialWFConnection matWFConnection = ProdOrderManager.GetMaterialWFConnection(WFNodeMES, Partslist.MaterialWFID);
-                configStores.Add(matWFConnection.MaterialWFACClassMethod);
-                configStores.Add(WFNode.ACClassMethod);
-                if (WFNode.RefPAACClassMethod != null)
-                    configStores.Add(WFNode.RefPAACClassMethod);
-            }
-            return configStores;
-        }
-
-        private IACConfig GetConfig(string propertyName, Partslist partslist, core.datamodel.ACClassWF aCClassWF, gip.mes.datamodel.ACClassWF vbACClassWF)
-        {
-            int priorityLevel = 0;
-            List<IACConfigStore> mandatoryConfigStores = GetCurrentConfigStores();
-            foreach (var item in mandatoryConfigStores)
-                item.ClearCacheOfConfigurationEntries();
-            string preValueACUrl = null; //(LocalBSOBatchPlan.CurrentPWInfo as IACConfigURL).PreValueACUrl
-            string localConfigACUrl = aCClassWF.ConfigACUrl + @"\" + ACStateConst.SMStarting.ToString() + @"\" + propertyName;
-            IACConfig aCConfig = VarioConfigManager.GetConfiguration(mandatoryConfigStores, preValueACUrl, localConfigACUrl, null, out priorityLevel);
-            return aCConfig;
         }
 
         #endregion

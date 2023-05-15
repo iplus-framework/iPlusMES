@@ -19,7 +19,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(7, "StartDate", "en{'Production Start'}de{'Produktionsstart'}", "", "", true)]
     [ACPropertyEntity(8, "EndDate", "en{'Production End'}de{'Produktionsende'}", "", "", true)]
     [ACPropertyEntity(9, Const.IsEnabled, "en{'Enabled'}de{'Freigegeben'}", "", "", true)]
-    [ACPropertyEntity(11, "LossComment", "en{'Loss Comment'}de{'Schwundbemerkung'}", "", "", true)]
+    [ACPropertyEntity(11, "LossComment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]
     [ACPropertyEntity(12, "TargetQuantity", ConstApp.TargetQuantity, "", "", true)]
     [ACPropertyEntity(13, "ActualQuantity", ConstApp.ActualQuantity, "", "", true)]
     [ACPropertyEntity(14, "ExternProdOrderNo", "en{'Ext prod. ord. No'}de{'Ext FANr'}", "", "", true)]

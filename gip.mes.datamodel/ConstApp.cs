@@ -107,6 +107,7 @@
         public const string TargetQuantityUOM = "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}";
         public const string ActualQuantity = "en{'Actual Quantity'}de{'Istmenge'}";
         public const string ActualQuantityUOM = "en{'Actual Quantity (UOM)'}de{'Istmenge (BME)'}";
+        public const string RejectQuantityUOM = "en{'Reject Quantity (UOM)'}de{'Menge ablehnen (BME)'}";
         public const string StockQuantity = "en{'Stock Quantity'}de{'Lagermenge'}";
         public const string StockQuantityAmb = "en{'Stock Quantity Ambient'}de{'Lagermenge ambient'}";
         public const string StockWeight = "en{'Stock Weight'}de{'Lagergewicht'}";
@@ -201,6 +202,7 @@
 
         public const string Lot = "en{'Lot'}de{'Los'}";
         public const string LotNo = "en{'Lot No.'}de{'Los-Nr.'}";
+        public const string SplitNo = "en{'Split No.'}de{'Splitnr'}";
 
         public const string Company = "en{'Company'}de{'Unternehmen'}";
 
@@ -330,12 +332,12 @@
 
         #region OrderLotItem
 
-        public const string TimeEntered     = "en{'Time Entered'}de{'Eingabezeit'}";
-        public const string Duration        = "en{'Duration'}de{'Dauer'}";
-        public const string HintDuration    = "en{'Hint Duration'}de{'Hinweisdauer'}";
-        public const string ElapsedTime     = "en{'Elapsed Time'}de{'Verstrichene Zeit'}";
-        public const string FinishTime      = "en{'Finish Time'}de{'Endzeit'}";
-        public const string RestTime        = "en{'Rest Time'}de{'Verbleibende Zeit'}";
+        public const string TimeEntered = "en{'Time Entered'}de{'Eingabezeit'}";
+        public const string Duration = "en{'Duration'}de{'Dauer'}";
+        public const string HintDuration = "en{'Hint Duration'}de{'Hinweisdauer'}";
+        public const string ElapsedTime = "en{'Elapsed Time'}de{'Verstrichene Zeit'}";
+        public const string FinishTime = "en{'Finish Time'}de{'Endzeit'}";
+        public const string RestTime = "en{'Rest Time'}de{'Verbleibende Zeit'}";
         public const string OperationitemTimeStatus = "en{'Operation item status'}de{'Vorgangspositionsstatus'}";
 
         #endregion

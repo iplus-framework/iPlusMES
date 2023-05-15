@@ -47,6 +47,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue(nameof(PWWorkTaskGeneric.ValidSeqNoPostingQSMode2), typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add(nameof(PWWorkTaskGeneric.ValidSeqNoPostingQSMode2), "en{'Valid sequence no. on posting quantity suggestion 2'}de{'Gültige laufende Nummer auf Buchungsmengenvorschlag 2'}");
 
+            method.ParameterValueList.Add(new ACValue(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), typeof(double), null, Global.ParamOption.Optional));
+            paramTranslation.Add(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), "en{'Suggestion Quantity for Inward Posting (- = Zero Stock)'}de{'Vorschlagsmenge für Zugangsbuchung (- = Nullbestand)'}");
+
             return new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", thisType, paramTranslation, null);
         }
 
@@ -121,6 +124,21 @@ namespace gip.mes.processapplication
                         return acValue.Value as string;
                 }
                 return null;
+            }
+        }
+
+        public double InwardPostingSuggestionQ
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue(nameof(InwardPostingSuggestionQ));
+                    if (acValue != null)
+                        return (double)acValue.Value;
+                }
+                return 0;
             }
         }
 

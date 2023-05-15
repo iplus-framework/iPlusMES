@@ -208,6 +208,10 @@ namespace gip.mes.datamodel
 
             // Der Nullbestands-Zustand soll aufgehoben werden
             ResetIfNotAvailable = 3,
+
+            ResetIfNotAvailableFacility = 4,
+
+            RestoreQuantityIfNotAvailable = 5,
         }
 
         [NotMapped]
@@ -227,6 +231,8 @@ namespace gip.mes.datamodel
                     _ZeroStockStatesList.AddEntry((short)ZeroStockStates.BookToZeroStock, "en{'Post to Zero Stock'}de{'Buchen auf Nullbestand'}");
                     _ZeroStockStatesList.AddEntry((short)ZeroStockStates.SetNotAvailable, "en{'Set Not Available'}de{'Auf nicht verfügbar setzen'}");
                     _ZeroStockStatesList.AddEntry((short)ZeroStockStates.ResetIfNotAvailable, "en{'Reset If Not Available'}de{'Zurücksetzen, wenn nicht verfügbar'}");
+                    _ZeroStockStatesList.AddEntry((short)ZeroStockStates.ResetIfNotAvailableFacility, "en{'Reset If Not Available on the facility'}de{'Zurücksetzen, wenn nicht verfügbar auf der Anlage'}");
+                    _ZeroStockStatesList.AddEntry((short)ZeroStockStates.RestoreQuantityIfNotAvailable, "en{'Restore quantity if not available'}de{'Menge wiederherstellen, wenn nicht verfügbar'}");
                 }
                 return _ZeroStockStatesList;
             }

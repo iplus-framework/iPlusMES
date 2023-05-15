@@ -69,6 +69,7 @@ namespace gip.mes.webservices
 #endif
         #endregion
 
+
 #if NETFRAMEWORK
         [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UriProdOrderInputMaterials, ResponseFormat = WebMessageFormat.Json)]
@@ -124,6 +125,15 @@ namespace gip.mes.webservices
         WSResponse<List<Facility>> GetPOBatchTargetFacilities(string intermBatchID);
 #elif NETSTANDARD
         Task<WSResponse<List<Facility>>> GetPOBatchTargetFacilitiesAsync(string intermBatchID);
+#endif
+
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriNFBatchTargetFacility, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<Facility> GetNFBatchTargetFacility(string machineFunctionID);
+#elif NETSTANDARD
+        Task<WSResponse<Facility>> GetNFBatchTargetFacilityAsync(string machineFunctionID);
 #endif
 
 #if NETFRAMEWORK

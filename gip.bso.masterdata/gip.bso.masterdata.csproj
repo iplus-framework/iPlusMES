@@ -252,7 +252,19 @@
     <None Update="VBControlScripts\2023-03-23 09-25_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="VBControlScripts\2023-04-12 09-26_aagincic.zip">
+    <None Include="VBControlScripts\2023-04-13 09-55_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-27 17-05_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-27 08-58_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-27 19-06_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-05-05 13-36_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

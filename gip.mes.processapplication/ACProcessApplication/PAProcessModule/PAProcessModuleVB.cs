@@ -89,7 +89,7 @@ namespace gip.mes.processapplication
         }
 
         [ACPropertyBindingTarget(400, "Read from PLC", "en{'Availability-State for OEE'}de{'Verfügbarkeitsstatus für OEE'}", "", false, false)]
-        public IACContainerTNet<GlobalProcApp.AvailabilityState> AvailabilityState { get; set; }
+        public IACContainerTNet<AvailabilityState> AvailabilityState { get; set; }
 
 
         #endregion

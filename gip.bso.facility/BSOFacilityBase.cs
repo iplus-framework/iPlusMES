@@ -424,7 +424,22 @@ namespace gip.bso.facility
                     return false;
                 }
 
-                SourceModuleList = result.Routes.Select(c => c.FirstOrDefault().Source).ToList();
+                // Remove Components that are not in automatic operation mode
+                List<RouteItem> routeItemsWithComp = result.Routes.Select(c => c.FirstOrDefault()).ToList();
+                if (routeItemsWithComp != null && routeItemsWithComp.Any())
+                {
+                    foreach (RouteItem routeItem in routeItemsWithComp.ToArray()) 
+                    {
+                        if (routeItem.SourceACComponent != null && routeItem.SourceACComponent.ConnectionState == ACObjectConnectionState.ValuesReceived)
+                        {
+                            IACContainerTNet<Global.OperatingMode> property = routeItem.SourceACComponent.GetPropertyNet(nameof(PAClassPhysicalBase.OperatingMode)) as IACContainerTNet<Global.OperatingMode>;
+                            if (property != null && property.ValueT != Global.OperatingMode.Automatic)
+                                routeItemsWithComp.Remove(routeItem);
+                        }
+                    }
+                }
+
+                SourceModuleList = routeItemsWithComp.Select(c => c.Source).OrderBy(c => c.ACIdentifier).ToList();
                 if (SourceModuleList.Count <= 0)
                     return false;
                 else if (SourceModuleList.Count > 1)

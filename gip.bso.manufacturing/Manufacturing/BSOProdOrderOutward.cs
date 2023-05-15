@@ -210,7 +210,9 @@ namespace gip.bso.manufacturing
             if (ProdOrderPartslistPosList != null)
             {
                 foreach (ProdOrderPartslistPos pos in ProdOrderPartslistPosList)
-                    ProdOrderManager.RecalcRemainingOutwardQuantity(pos);
+                {
+                    ProdOrderManager?.RecalcRemainingOutwardQuantity(pos);
+                }
             }
             OnPropertyChanged(nameof(ProdOrderPartslistPosList));
         }

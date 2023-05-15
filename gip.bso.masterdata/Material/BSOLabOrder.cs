@@ -845,6 +845,7 @@ namespace gip.bso.masterdata
             OnLaborderCopied(DatabaseApp, CurrentLabOrder, _DialogSelectedTemplate);
             _IsNewLabOrderDialogOpen = false;
             CloseTopDialog();
+            LoadLabOrderPosList(CurrentLabOrder);
             _IsLabOrderPosViewDialog = false;
             if (!IsLabOrderParent)
             {
@@ -1142,8 +1143,8 @@ namespace gip.bso.masterdata
                 AccessPrimary.NavACQueryDefinition.TakeCount = 500;
             else
                 AccessPrimary.NavACQueryDefinition.TakeCount = 50;
+                base.Search();
 
-            base.Search();
             _LabOrderPosAVGList = null;
             OnPropertyChanged(nameof(LabOrderPosAVGList));
         }

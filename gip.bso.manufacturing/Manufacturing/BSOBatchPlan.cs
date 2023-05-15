@@ -196,13 +196,22 @@ namespace gip.bso.manufacturing
                 if (_SelectedWFProductionLine != value)
                 {
                     _SelectedWFProductionLine = value;
-                    if (CurrentACClassWF != null)
-                        SetSchedulingGroup(value, CurrentACClassWF);
                     OnPropertyChanged("SelectedWFProductionLine");
                 }
             }
         }
 
+
+        private Type _TypeOfPWNodeProcessWorkflow;
+        protected Type TypeOfPWNodeProcessWorkflow
+        {
+            get
+            {
+                if (_TypeOfPWNodeProcessWorkflow == null)
+                    _TypeOfPWNodeProcessWorkflow = typeof(PWNodeProcessWorkflowVB);
+                return _TypeOfPWNodeProcessWorkflow;
+            }
+        }
 
         private List<MDSchedulingGroup> _WFProductionLineList;
         /// <summary>
@@ -225,30 +234,16 @@ namespace gip.bso.manufacturing
             return DatabaseApp.MDSchedulingGroup.OrderBy(c => c.MDKey).ToList();
         }
 
-        public void SetSchedulingGroup(MDSchedulingGroup group, core.datamodel.ACClassWF aclassWF)
-        {
-            if (IsWFProdNode(aclassWF))
-            {
-                bool isThere = DatabaseApp.MDSchedulingGroupWF.Where(c => c.MDSchedulingGroupID == group.MDSchedulingGroupID && c.VBiACClassWFID == aclassWF.ACClassWFID).Any();
-                if (!isThere)
-                {
-                    MDSchedulingGroupWF mDSchedulingGroupWF = MDSchedulingGroupWF.NewACObject(DatabaseApp, group);
-                    mDSchedulingGroupWF.ACClassWF = aclassWF;
-                    DatabaseApp.MDSchedulingGroupWF.Add(mDSchedulingGroupWF);
-                }
-            }
-        }
 
         public MDSchedulingGroup GetSchedulingGroup(core.datamodel.ACClassWF aclassWF)
         {
-            if (aclassWF == null || !IsWFProdNode(aclassWF))
+            Type typeOfSelectedNode = aclassWF?.PWACClass?.ObjectType;
+            if (typeOfSelectedNode == null)
                 return null;
-            return DatabaseApp.MDSchedulingGroupWF.Where(c => c.VBiACClassWFID == aclassWF.ACClassWFID).Select(c => c.MDSchedulingGroup).FirstOrDefault();
-        }
+            if (!TypeOfPWNodeProcessWorkflow.IsAssignableFrom(typeOfSelectedNode))
+                return null;
 
-        public bool IsWFProdNode(core.datamodel.ACClassWF aclassWF)
-        {
-            return aclassWF.IsWFProdNode(PWNodeProcessWorkflowVB.PWClassName);
+            return DatabaseApp.MDSchedulingGroupWF.Where(c => c.VBiACClassWFID == aclassWF.ACClassWFID).Select(c => c.MDSchedulingGroup).FirstOrDefault();
         }
         #endregion
 

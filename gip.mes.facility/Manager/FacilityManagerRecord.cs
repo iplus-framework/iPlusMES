@@ -393,6 +393,53 @@ namespace gip.mes.facility
                         //FBC.InwardTargetWeight = FBC.InwardWeight;
                         //FBC.InwardTargetWeightInMU = FBC.InwardWeightInMU;
                     }
+                    else if (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable)
+                    {
+                        if (!inwardQuantity.HasValue)
+                        {
+                            FacilityBookingCharge fbc = inwardFacilityCharge.FacilityBookingCharge_InwardFacilityCharge
+                                                                            .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                                            .OrderByDescending(c => c.InsertDate)
+                                                                            .FirstOrDefault();
+
+                            inwardQuantity = fbc.InwardQuantity * (-1);
+                        }
+
+                        floatVal = 0;
+                        if (inwardQuantity.HasValue)
+                        {
+                            floatVal = 0;
+                            if (ConvertQuantityToMaterialBaseUnit(BP, inwardQuantity, mdQuantityUnit, FBC.InwardMaterial, ref floatVal) == Global.ACMethodResultState.Failed)
+                                return Global.ACMethodResultState.Failed;
+                            FBC.InwardQuantityUOM = floatVal;
+                            FBC.InwardQuantityUOMAmb = floatVal * BP.FactorInwardAmbient;
+
+                            floatVal = 0;
+                            if (ConvertQuantityInFacilityChargeUnit(BP, FBC.InwardQuantityUOM, FBC.InwardMaterial.BaseMDUnit, FBC.InwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
+                                return Global.ACMethodResultState.Failed;
+                            if (inwardFacilityCharge.MDUnit.Rounding >= 0)
+                                FBC.InwardQuantity = inwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
+                            else
+                                FBC.InwardQuantity = floatVal;
+                        }
+
+                        if (inwardTargetQuantity.HasValue)
+                        {
+                            floatVal = 0;
+                            if (ConvertQuantityToMaterialBaseUnit(BP, inwardTargetQuantity, mdQuantityUnit, FBC.InwardMaterial, ref floatVal) == Global.ACMethodResultState.Failed)
+                                return Global.ACMethodResultState.Failed;
+                            FBC.InwardTargetQuantityUOM = floatVal;
+                            FBC.InwardTargetQuantityUOMAmb = floatVal * BP.FactorInwardTargetAmbient;
+
+                            floatVal = 0;
+                            if (ConvertQuantityInFacilityChargeUnit(BP, FBC.InwardTargetQuantityUOM, FBC.InwardMaterial.BaseMDUnit, FBC.InwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
+                                return Global.ACMethodResultState.Failed;
+                            if (inwardFacilityCharge.MDUnit.Rounding >= 0)
+                                FBC.InwardTargetQuantity = inwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
+                            else
+                                FBC.InwardTargetQuantity = floatVal;
+                        }
+                    }
                     else // (BP.Adjusted.ZeroStock == Global.ZeroStockState.ResetIfNotAvailable)
                     {
                         FBC.InwardQuantity = 0;

@@ -1,4 +1,9 @@
-﻿CREATE VIEW [dbo].[OrderLogPosMachines]
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'OrderLogPosMachines')
+	BEGIN
+		DROP  view  dbo.[OrderLogPosMachines]
+	END
+GO
+CREATE VIEW [dbo].[OrderLogPosMachines]
 	AS 
 select
 	-- order log part

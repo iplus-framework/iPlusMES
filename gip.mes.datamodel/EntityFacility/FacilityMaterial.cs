@@ -14,6 +14,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "MinStockQuantity", ConstApp.MinStockQuantity, "", "", true)]
     [ACPropertyEntity(4, "OptStockQuantity", ConstApp.OptStockQuantity, "", "", true)]
     [ACPropertyEntity(5, "MaxStockQuantity", ConstApp.MaxStockQuantity, "", "", true)]
+    [ACPropertyEntity(6, "Throughput", "en{'Throughput [UOM/h]'}de{'Durchsatz [BME/h]'}", "", "", true)]
+    [ACPropertyEntity(7, "ThroughputMax", "en{'Throughput max. [UOM/h]'}de{'Durchsatz max. [BME/h]'}", "", "", true)]
+    [ACPropertyEntity(8, "ThroughputMin", "en{'Throughput min. [UOM/h]'}de{'Durchsatz min. [BME/h]'}", "", "", true)]
+    [ACPropertyEntity(9, "ThroughputAuto", "en{'Throughput Autoupdate mode'}de{'Durchsatz Autoupdate Modus'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -28,7 +32,7 @@ namespace gip.mes.datamodel
             FacilityMaterial entity = new FacilityMaterial();
             entity.FacilityMaterialID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            if(parentACObject is Facility)
+            if (parentACObject is Facility)
             {
                 entity.Facility = parentACObject as Facility;
             }

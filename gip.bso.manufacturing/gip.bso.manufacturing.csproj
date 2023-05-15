@@ -50,6 +50,7 @@
     <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
     <ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj" />
     <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj" />
+    <ProjectReference Include="..\gip.bso.facility\gip.bso.facility.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="VBControlScripts\2021-01-28 08-41_ihrastinski.zip">
@@ -443,6 +444,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="VBControlScripts\2023-04-05 17-21_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-24 17-00_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-26 14-36_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-04-27 17-06_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

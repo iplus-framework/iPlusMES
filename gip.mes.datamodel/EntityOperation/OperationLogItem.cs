@@ -1,7 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace gip.mes.datamodel
@@ -26,40 +25,43 @@ namespace gip.mes.datamodel
 - RestTime (TimeSpan)= FinishTime - Now
          */
 
+        public Guid ACProgramLogID;
+
         #region DataMembers
         [DataMember]
         [ACPropertyInfo(1, "Sn", "en{'Sn'}de{'Sn'}")]
-        [NotMapped]
         public int Sn { get; set; }
 
         [DataMember]
         [ACPropertyInfo(2, nameof(MaterialNo), ConstApp.MaterialNo)]
-        [NotMapped]
         public string MaterialNo { get; set; }
 
         [DataMember]
         [ACPropertyInfo(3, nameof(MaterialName), ConstApp.MaterialName1)]
-        [NotMapped]
         public string MaterialName { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(4, nameof(ProgramNo), ConstApp.ProdOrderProgramNo)]
-        [NotMapped]
+        [ACPropertyInfo(4, nameof(LotNo), ConstApp.LotNo)]
+        public string LotNo { get; set; }
+
+        [DataMember]
+        [ACPropertyInfo(5, nameof(SplitNo), ConstApp.SplitNo)]
+        public int SplitNo { get; set; }
+
+        [DataMember]
+        [ACPropertyInfo(6, nameof(ProgramNo), ConstApp.ProdOrderProgramNo)]
         public string ProgramNo { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(5, nameof(TimeEntered), ConstApp.TimeEntered)]
-        [NotMapped]
+        [ACPropertyInfo(7, nameof(TimeEntered), ConstApp.TimeEntered)]
         public DateTime TimeEntered { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(6, nameof(Duration), ConstApp.Duration)]
-        [NotMapped]
+        [ACPropertyInfo(8, nameof(Duration), ConstApp.Duration)]
         public TimeSpan Duration { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(7, nameof(HintDuration), ConstApp.HintDuration)]
-        [NotMapped]
+        [ACPropertyInfo(9, nameof(HintDuration), ConstApp.HintDuration)]
         public TimeSpan HintDuration { get; set; }
 
         #endregion
@@ -68,7 +70,6 @@ namespace gip.mes.datamodel
 
         [IgnoreDataMember]
         [ACPropertyInfo(8, nameof(ElapsedTime), ConstApp.ElapsedTime)]
-        [NotMapped]
         public TimeSpan ElapsedTime
         {
             get
@@ -78,8 +79,7 @@ namespace gip.mes.datamodel
         }
 
         [IgnoreDataMember]
-        [ACPropertyInfo(9, nameof(FinishTime), ConstApp.FinishTime)]
-        [NotMapped]
+        [ACPropertyInfo(10, nameof(FinishTime), ConstApp.FinishTime)]
         public DateTime FinishTime
         {
             get
@@ -90,7 +90,6 @@ namespace gip.mes.datamodel
 
         [IgnoreDataMember]
         [ACPropertyInfo(10, nameof(RestTime), ConstApp.RestTime)]
-        [NotMapped]
         public TimeSpan RestTime
         {
             get
@@ -99,12 +98,10 @@ namespace gip.mes.datamodel
             }
         }
 
-        [NotMapped]
         public ACProgramLog ACProgramLog { get; set; }
 
         [IgnoreDataMember]
         [ACPropertyInfo(11, nameof(OperationitemTimeStatus), ConstApp.OperationitemTimeStatus)]
-        [NotMapped]
         public OperationitemTimeStatusEnum OperationitemTimeStatus
         {
             get
@@ -129,7 +126,6 @@ namespace gip.mes.datamodel
 
         [IgnoreDataMember]
         [ACPropertyInfo(12, nameof(OperationitemTimeStatusShort), ConstApp.OperationitemTimeStatus)]
-        [NotMapped]
         public short OperationitemTimeStatusShort
         {
             get

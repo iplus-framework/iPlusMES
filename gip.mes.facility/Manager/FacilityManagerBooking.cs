@@ -2149,11 +2149,11 @@ namespace gip.mes.facility
                         || (BP.ParamsAdjusted.MDBookingNotAvailableMode.BookingNotAvailableMode == MDBookingNotAvailableMode.BookingNotAvailableModes._null)
                         || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable))
                     && (facilityCharge.NotAvailable == false))
-                {
+                {   
                     facilityCharge.NotAvailable = true;
                     FBC.SetCompleted = true;
                 }
-                else if ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailable)
+                else if ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState >= MDZeroStockState.ZeroStockStates.ResetIfNotAvailable)
                     && (facilityCharge.NotAvailable == true))
                     facilityCharge.NotAvailable = false;
             }

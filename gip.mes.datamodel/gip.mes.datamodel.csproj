@@ -210,6 +210,30 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json" />
+    <None Include="DbScripts\iPlusMES\dbsync_2023-05-02_09-40_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-28_15-23_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-27_08-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-25_09-48_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-25_08-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-17_21-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-17_08-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-13_09-40_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="DbScripts\iPlusMES\dbsync_2023-03-07_17-37_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

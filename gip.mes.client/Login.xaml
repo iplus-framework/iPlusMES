@@ -68,6 +68,7 @@
                     </Border>
                     <vbcontrols:VBProgressBar x:Name="progressBar" Grid.Row="3" Grid.Column="1" IsIndeterminate="True"></vbcontrols:VBProgressBar>
                     <vbcontrols:VBListBox x:Name="listboxInfo" Grid.Row="5" Grid.Column="1" ItemsSource="{Binding MsgDetails}" DisplayMemberPath="Message" IsSynchronizedWithCurrentItem="True" ShowCaption="False"></vbcontrols:VBListBox>
+                    <!--<vbcontrols:VBOEEControl Grid.Row="5" Grid.Column="1" AvailabilityOEE="98" PerformanceOEE="90" QualityOEE="80" TotalOEE="70"  />-->
                 </Grid>
             </Grid>
             <Grid x:Name="LoginGrid" Visibility="Collapsed">

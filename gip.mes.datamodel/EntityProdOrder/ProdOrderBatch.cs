@@ -4,7 +4,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch'}de{'Charge'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch'}de{'Charge'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOProdOrder")]
     [ACPropertyEntity(1, "ProdOrderBatchNo", "en{'Batch-No.'}de{'Batch-Nr.'}", "", "", true)]
     [ACPropertyEntity(2, "BatchSeqNo", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
     [ACPropertyEntity(5, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]

@@ -104,8 +104,8 @@ namespace gip.mes.processapplication
     {
         #region Constructors
 
-        public const string ClassName = "PAFWorkTaskScanBase";
-        public const string MN_OnScanEvent = "OnScanEvent";
+        public const string ClassName = nameof(PAFWorkTaskScanBase);
+        public const string MN_OnScanEvent = nameof(OnScanEvent);
 
         static PAFWorkTaskScanBase()
         {
@@ -139,7 +139,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(OnScanEvent):
-                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], acParameter[5] as ACMethod);
+                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], acParameter[5] as ACMethod, acParameter[6] as bool?);
                     return true;
                 case nameof(GetOrderInfos):
                     result = GetOrderInfos();
@@ -152,7 +152,8 @@ namespace gip.mes.processapplication
 
         #region public
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
-        public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
+        public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, 
+                                                      short? sQuestionResult, ACMethod acMethod, bool? malfunction)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
@@ -163,6 +164,27 @@ namespace gip.mes.processapplication
                 scanResult.Result.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(10)", 10, "Error50367");
                 scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
                 return scanResult;
+            }
+
+            if (malfunction.HasValue && this.CurrentACState != ACStateEnum.SMIdle)
+            {
+                if (malfunction.Value)
+                {
+                    Malfunction.ValueT = PANotifyState.AlarmOrFault;
+                    Pause();
+                    scanResult.Result.Message = new Msg();
+                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+                    return scanResult;
+                }
+                else
+                {
+                    Malfunction.ValueT = PANotifyState.Off;
+                    AcknowledgeAlarms();
+                    Resume();
+                    scanResult.Result.Message = new Msg();
+                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+                    return scanResult;
+                }
             }
 
             if (scanSequence == 1)

@@ -1,4 +1,9 @@
-﻿CREATE view [dbo].[VBSystemColumns] as
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'ACProgramLogView')
+	BEGIN
+		DROP  view  dbo.[VBSystemColumns]
+	END
+GO
+CREATE view [dbo].[VBSystemColumns] as
 select 
     ISNULL(t.name, 'idx1') as 'tablename',
 	ISNULL(c.name, 'idx2') as 'columnname',

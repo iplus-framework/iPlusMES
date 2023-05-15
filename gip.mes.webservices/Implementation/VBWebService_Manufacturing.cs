@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -400,7 +402,7 @@ namespace gip.mes.webservices
                 {
                     ProdOrderPartslistPosID = c.TargetProdOrderPartslistPosID
                 }
-            }) ;
+            });
         }
 
         public WSResponse<List<ProdOrderPartslistPosRelation>> GetProdOrderInputMaterials(string targetPOPLPosID)
@@ -478,7 +480,7 @@ namespace gip.mes.webservices
                                                    .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos")
                                                    .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos.Material")
                                                    .Include("Material.MaterialWFRelation_SourceMaterial")
-                                                   .Where(c => (        c.ProdOrderBatch != null
+                                                   .Where(c => (c.ProdOrderBatch != null
                                                                     && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
                                                                         || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
                                                             || (batchIntermediateID != null
@@ -512,6 +514,10 @@ namespace gip.mes.webservices
                     {
                         ProdOrderID = c.ProdOrderPartslist.ProdOrderID,
                         ProgramNo = c.ProdOrderPartslist.ProdOrder.ProgramNo
+                    },
+                    Partslist = new Partslist()
+                    {
+                        PartlistID = c.ProdOrderPartslist.PartslistID ?? Guid.Empty
                     }
                 },
                 Material = new Material()
@@ -878,6 +884,78 @@ namespace gip.mes.webservices
                 myServiceHost.OnMethodReturned(perfEvent, nameof(GetPOBatchTargetFacilities));
             }
             return new WSResponse<List<Facility>>(result);
+        }
+
+        public WSResponse<Facility> GetNFBatchTargetFacility(string machineFunctionID)
+        {
+            WSResponse<Facility> result = new WSResponse<Facility>();
+
+            Guid idMachineFunction;
+            if (!Guid.TryParse(machineFunctionID, out idMachineFunction))
+            {
+                result.Message = new Msg(eMsgLevel.Error, "The given parameter machineID is incorrect!");
+            }
+            else
+            {
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                if (myServiceHost == null)
+                    return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetNFBatchTargetFacility));
+                try
+                {
+                    using (Database db = new Database())
+                    using (DatabaseApp dbApp = new DatabaseApp(db))
+                    {
+                        ACRoutingService routingService = ACRoutingService.GetServiceInstance(myServiceHost);
+
+                        core.datamodel.ACClass machineFunction = db.ACClass.Where(c => c.ACClassID == idMachineFunction).FirstOrDefault();
+                        if (machineFunction == null)
+                        {
+                            result.Message = new Msg(eMsgLevel.Error, $"Not finded machine with machineID={machineFunction}!");
+                        }
+                        else
+                        {
+                            Facility facility = null;
+                            RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, db, false, machineFunction.ACClass1_ParentACClass, PAMParkingspace.SelRuleID_ParkingSpace, RouteDirections.Forwards,
+                                                                        null, null, null, 0, true, true);
+                            if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
+                            {
+                                Route route = rResult.Routes.FirstOrDefault();
+                                RouteItem routeItem = route.GetRouteTarget();
+                                core.datamodel.ACClass facilityClass = routeItem.Target;
+                                mes.datamodel.Facility dbFacility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == facilityClass.ACClassID).FirstOrDefault();
+                                facility = new Facility()
+                                {
+                                    FacilityID = dbFacility.FacilityID,
+                                    FacilityName = dbFacility.FacilityName,
+                                    FacilityNo = dbFacility.FacilityNo,
+                                    ParentFacilityID = dbFacility.ParentFacilityID
+                                };
+                            }
+
+                            if (facility == null)
+                            {
+                                result.Message = new Msg(eMsgLevel.Error, "Unable to find Faciltiy connected with machine!");
+                            }
+                            else
+                            {
+                                result.Data = facility;
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetNFBatchTargetFacility) + "(10)", e);
+                    result.Message = new Msg(eMsgLevel.Exception, e.Message);
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetNFBatchTargetFacility));
+                }
+            }
+
+            return result;
         }
 
         #endregion

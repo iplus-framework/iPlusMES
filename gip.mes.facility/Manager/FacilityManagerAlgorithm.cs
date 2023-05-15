@@ -1411,12 +1411,22 @@ namespace gip.mes.facility
                     else if (BP.ParamsAdjusted.InwardMaterial != null)
                     {
                         Guid? guidNull = null;
-                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
-                                                                                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
-                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false), BP);
+
+                        if (BP.MDZeroStockState != null && (BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility 
+                                                         || BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable))
+                        {
+                            facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_LastAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.InwardFacility.FacilityID), BP);
+                        }
+                        else
+                        {
+                            facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                                                                                                    BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                                                                                    BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                    false), BP);
+                        }
                     }
                     // Keine Materialnummer vorgegeben
                     else
@@ -2389,7 +2399,7 @@ namespace gip.mes.facility
                 if (_BookParamOutwardMovementClone != null)
                     return _BookParamOutwardMovementClone.Clone() as ACMethodBooking;
             }
-            var clone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            var clone = ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             using (ACMonitor.Lock(_40010_ValueLock))
             {
                 _BookParamOutwardMovementClone = clone;
@@ -2611,7 +2621,7 @@ namespace gip.mes.facility
                 if (_BookParamInwardMovementClone != null)
                     return _BookParamInwardMovementClone.Clone() as ACMethodBooking;
             }
-            var clone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            var clone = ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             using (ACMonitor.Lock(_40010_ValueLock))
             {
                 _BookParamInwardMovementClone = clone;

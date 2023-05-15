@@ -1,4 +1,9 @@
-﻿CREATE VIEW [dbo].[RecapitulationMaterialMachineView]
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'ACProgramLogView')
+	BEGIN
+		DROP  view  dbo.[RecapitulationMaterialMachineView]
+	END
+GO
+CREATE VIEW [dbo].[RecapitulationMaterialMachineView]
 	AS 
 select
 	isnull(ROW_NUMBER() OVER(ORDER BY un.ProgramNo, un.MachineName), -1) AS Sn,

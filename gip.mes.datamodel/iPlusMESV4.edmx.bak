@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="iPlusMESV4_Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="iPlusMESV4_Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="ACAssembly">
           <Key>
             <PropertyRef Name="ACAssemblyID" />
@@ -1401,6 +1401,38 @@
           <Property Name="MinStockQuantity" Type="float" />
           <Property Name="OptStockQuantity" Type="float" />
           <Property Name="MaxStockQuantity" Type="float" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="Throughput" Type="float" />
+          <Property Name="ThroughputMax" Type="float" />
+          <Property Name="ThroughputMin" Type="float" />
+          <Property Name="ThroughputAuto" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FacilityMaterialOEE">
+          <Key>
+            <PropertyRef Name="FacilityMaterialOEEID" />
+          </Key>
+          <Property Name="FacilityMaterialOEEID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FacilityMaterialID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ACProgramLogID" Type="uniqueidentifier" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="IdleTimeSec" Type="int" Nullable="false" />
+          <Property Name="StandByTimeSec" Type="int" Nullable="false" />
+          <Property Name="OperationTimeSec" Type="int" Nullable="false" />
+          <Property Name="ScheduledBreakTimeSec" Type="int" Nullable="false" />
+          <Property Name="UnscheduledBreakTimeSec" Type="int" Nullable="false" />
+          <Property Name="RetoolingTimeSec" Type="int" Nullable="false" />
+          <Property Name="MaintenanceTimeSec" Type="int" Nullable="false" />
+          <Property Name="AvailabilityOEE" Type="float" Nullable="false" />
+          <Property Name="Quantity" Type="float" Nullable="false" />
+          <Property Name="Throughput" Type="float" Nullable="false" />
+          <Property Name="PerformanceOEE" Type="float" Nullable="false" />
+          <Property Name="QuantityScrap" Type="float" Nullable="false" />
+          <Property Name="QualityOEE" Type="float" Nullable="false" />
+          <Property Name="TotalOEE" Type="float" Nullable="false" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
@@ -3164,6 +3196,10 @@
           <Property Name="MDSchedulingGroupWFID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MDSchedulingGroupID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="VBiACClassWFID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="MDTermOfPayment">
           <Key>
@@ -4334,7 +4370,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4866,7 +4902,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.TandTv2TempPos' does not have a pri
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4887,7 +4923,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a p
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4899,7 +4935,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4923,7 +4959,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4947,7 +4983,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4972,7 +5008,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5001,7 +5037,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5031,7 +5067,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5081,7 +5117,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5101,7 +5137,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' doe
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5115,7 +5151,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5137,7 +5173,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5161,7 +5197,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not hav
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5174,7 +5210,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a pr
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -7953,6 +7989,20 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_FacilityMaterialOEE_FacilityMaterial">
+          <End Role="FacilityMaterial" Type="Self.FacilityMaterial" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FacilityMaterialOEE" Type="Self.FacilityMaterialOEE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FacilityMaterial">
+              <PropertyRef Name="FacilityMaterialID" />
+            </Principal>
+            <Dependent Role="FacilityMaterialOEE">
+              <PropertyRef Name="FacilityMaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_FacilityMDSchedulingGroup_Facility">
           <End Role="Facility" Type="Self.Facility" Multiplicity="1" />
           <End Role="FacilityMDSchedulingGroup" Type="Self.FacilityMDSchedulingGroup" Multiplicity="*" />
@@ -10268,6 +10318,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="OperationLog">
               <PropertyRef Name="FacilityChargeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OperationLog_OperationLogRefACClassID">
+          <End Role="ACClass" Type="Self.ACClass" Multiplicity="0..1" />
+          <End Role="OperationLog" Type="Self.OperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClass">
+              <PropertyRef Name="ACClassID" />
+            </Principal>
+            <Dependent Role="OperationLog">
+              <PropertyRef Name="RefACClassID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -13957,6 +14019,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="FacilityLot" EntityType="Self.FacilityLot" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FacilityLotStock" EntityType="Self.FacilityLotStock" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FacilityMaterial" EntityType="Self.FacilityMaterial" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FacilityMaterialOEE" EntityType="Self.FacilityMaterialOEE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FacilityMDSchedulingGroup" EntityType="Self.FacilityMDSchedulingGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FacilityPreBooking" EntityType="Self.FacilityPreBooking" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FacilityReservation" EntityType="Self.FacilityReservation" Schema="dbo" store:Type="Tables" />
@@ -15247,6 +15310,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Material" EntitySet="Material" />
             <End Role="FacilityMaterial" EntitySet="FacilityMaterial" />
           </AssociationSet>
+          <AssociationSet Name="FK_FacilityMaterialOEE_FacilityMaterial" Association="Self.FK_FacilityMaterialOEE_FacilityMaterial">
+            <End Role="FacilityMaterial" EntitySet="FacilityMaterial" />
+            <End Role="FacilityMaterialOEE" EntitySet="FacilityMaterialOEE" />
+          </AssociationSet>
           <AssociationSet Name="FK_FacilityMDSchedulingGroup_Facility" Association="Self.FK_FacilityMDSchedulingGroup_Facility">
             <End Role="Facility" EntitySet="Facility" />
             <End Role="FacilityMDSchedulingGroup" EntitySet="FacilityMDSchedulingGroup" />
@@ -15997,6 +16064,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           </AssociationSet>
           <AssociationSet Name="FK_OperationLog_FacilityCharge" Association="Self.FK_OperationLog_FacilityCharge">
             <End Role="FacilityCharge" EntitySet="FacilityCharge" />
+            <End Role="OperationLog" EntitySet="OperationLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OperationLog_OperationLogRefACClassID" Association="Self.FK_OperationLog_OperationLogRefACClassID">
+            <End Role="ACClass" EntitySet="ACClass" />
             <End Role="OperationLog" EntitySet="OperationLog" />
           </AssociationSet>
           <AssociationSet Name="FK_OrderLog_ACProgramLogID" Association="Self.FK_OrderLog_ACProgramLogID">
@@ -17172,8 +17243,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Partslist1" EntitySet="Partslist" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="iPlusMESV4_Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -17187,10 +17257,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <Parameter Name="FacilityChargeSortNo" Mode="InOut" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="udpTandTv2JobDelete">
-            <Parameter Name="jobID" Mode="In" Type="Guid" />
+          <Parameter Name="jobID" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="udpTandTv3FilterTrackingDelete">
-            <Parameter Name="filterTrackingID" Mode="In" Type="Guid" />
+          <Parameter Name="filterTrackingID" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="udpACClassClone">
             <Parameter Name="acClassID" Mode="In" Type="Guid" />
@@ -17205,7 +17275,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <Parameter Name="userID" Mode="In" Type="String" />
           </FunctionImport>
           <FunctionImport Name="udpRestoreLastManipulationDT">
-            <Parameter Name="DifferenceDays" Mode="In" Type="Int32" />
+          <Parameter Name="DifferenceDays" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="udpTranslation">
             <Parameter Name="onlyClassTables" Mode="In" Type="Boolean" />
@@ -20285,6 +20355,15 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="FacilityCharge" EntitySet="FacilityCharge" />
             <End Role="OperationLog" EntitySet="OperationLog" />
           </AssociationSet>
+          <EntitySet Name="FacilityMaterialOEE" EntityType="iPlusMESV4_Model.FacilityMaterialOEE" />
+          <AssociationSet Name="FK_FacilityMaterialOEE_FacilityMaterial" Association="iPlusMESV4_Model.FK_FacilityMaterialOEE_FacilityMaterial">
+            <End Role="FacilityMaterial" EntitySet="FacilityMaterial" />
+            <End Role="FacilityMaterialOEE" EntitySet="FacilityMaterialOEE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OperationLog_OperationLogRefACClassID" Association="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID">
+            <End Role="ACClass" EntitySet="ACClass" />
+            <End Role="OperationLog" EntitySet="OperationLog" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -20427,6 +20506,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="VBGroupRight_ACClass" Relationship="iPlusMESV4_Model.FK_VBGroupRight_ACClassID" FromRole="ACClass" ToRole="VBGroupRight" />
           <NavigationProperty Name="Facility_VBiFacilityACClass" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID" FromRole="ACClass" ToRole="Facility" />
           <NavigationProperty Name="Facility_VBiStackCalculatorACClass" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" FromRole="ACClass" ToRole="Facility" />
+          <NavigationProperty Name="OperationLog" Relationship="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID" FromRole="ACClass" ToRole="OperationLog" />
         </EntityType>
         <EntityType Name="ACClassConfig">
           <Key>
@@ -24193,6 +24273,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="MDSchedulingGroupWFID" Type="Guid" Nullable="false" />
           <Property Name="MDSchedulingGroupID" Type="Guid" Nullable="false" />
           <Property Name="VBiACClassWFID" Type="Guid" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_MDSchedulingGroupWF_VBiACClassWF" FromRole="MDSchedulingGroupWF" ToRole="ACClassWF" />
           <NavigationProperty Name="MDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_MDSchedulingGroupWF_MDSchedulingGroup" FromRole="MDSchedulingGroupWF" ToRole="MDSchedulingGroup" />
         </EntityType>
@@ -33809,7 +33893,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -34711,6 +34795,11 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility" FromRole="FacilityMaterial" ToRole="Facility" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Material" FromRole="FacilityMaterial" ToRole="Material" />
+          <Property Name="Throughput" Type="Double" />
+          <Property Name="ThroughputMax" Type="Double" />
+          <Property Name="ThroughputMin" Type="Double" />
+          <Property Name="ThroughputAuto" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="FacilityMaterialOEE_FacilityMaterial" Relationship="iPlusMESV4_Model.FK_FacilityMaterialOEE_FacilityMaterial" FromRole="FacilityMaterial" ToRole="FacilityMaterialOEE" />
         </EntityType>
         <EntityType Name="FacilityMDSchedulingGroup">
           <Key>
@@ -35501,6 +35590,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ACProgramLog" Relationship="iPlusMESV4_Model.FK_OperationLog_ACProgramLog" FromRole="OperationLog" ToRole="ACProgramLog" />
           <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" FromRole="OperationLog" ToRole="FacilityCharge" />
+          <NavigationProperty Name="ACClass" Relationship="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID" FromRole="OperationLog" ToRole="ACClass" />
         </EntityType>
         <Association Name="FK_OperationLog_ACProgramLog">
           <End Type="iPlusMESV4_Model.ACProgramLog" Role="ACProgramLog" Multiplicity="0..1" />
@@ -35523,6 +35613,61 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="OperationLog">
               <PropertyRef Name="FacilityChargeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="FacilityMaterialOEE">
+          <Key>
+            <PropertyRef Name="FacilityMaterialOEEID" />
+          </Key>
+          <Property Name="FacilityMaterialOEEID" Type="Guid" Nullable="false" />
+          <Property Name="FacilityMaterialID" Type="Guid" Nullable="false" />
+          <Property Name="IdleTimeSec" Type="Int32" Nullable="false" />
+          <Property Name="MaintenanceTimeSec" Type="Int32" Nullable="false" />
+          <Property Name="RetoolingTimeSec" Type="Int32" Nullable="false" />
+          <Property Name="ScheduledBreakTimeSec" Type="Int32" Nullable="false" />
+          <Property Name="UnscheduledBreakTimeSec" Type="Int32" Nullable="false" />
+          <Property Name="OperationTimeSec" Type="Int32" Nullable="false" />
+          <Property Name="AvailabilityOEE" Type="Double" Nullable="false" />
+          <Property Name="Quantity" Type="Double" Nullable="false" />
+          <Property Name="Throughput" Type="Double" Nullable="false" />
+          <Property Name="PerformanceOEE" Type="Double" Nullable="false" />
+          <Property Name="QuantityScrap" Type="Double" Nullable="false" />
+          <Property Name="QualityOEE" Type="Double" Nullable="false" />
+          <Property Name="TotalOEE" Type="Double" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="FacilityMaterial" Relationship="iPlusMESV4_Model.FK_FacilityMaterialOEE_FacilityMaterial" FromRole="FacilityMaterialOEE" ToRole="FacilityMaterial" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ACProgramLogID" Type="Guid" />
+          <Property Name="StandByTimeSec" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_FacilityMaterialOEE_FacilityMaterial">
+          <End Type="iPlusMESV4_Model.FacilityMaterial" Role="FacilityMaterial" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.FacilityMaterialOEE" Role="FacilityMaterialOEE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FacilityMaterial">
+              <PropertyRef Name="FacilityMaterialID" />
+            </Principal>
+            <Dependent Role="FacilityMaterialOEE">
+              <PropertyRef Name="FacilityMaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OperationLog_OperationLogRefACClassID">
+          <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OperationLog" Role="OperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClass">
+              <PropertyRef Name="ACClassID" />
+            </Principal>
+            <Dependent Role="OperationLog">
+              <PropertyRef Name="RefACClassID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -38742,6 +38887,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="VBiACClassWFID" ColumnName="VBiACClassWFID" />
                 <ScalarProperty Name="MDSchedulingGroupID" ColumnName="MDSchedulingGroupID" />
                 <ScalarProperty Name="MDSchedulingGroupWFID" ColumnName="MDSchedulingGroupWFID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -40715,6 +40864,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="FacilityMaterial">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityMaterial">
               <MappingFragment StoreEntitySet="FacilityMaterial">
+                <ScalarProperty Name="ThroughputAuto" ColumnName="ThroughputAuto" />
+                <ScalarProperty Name="ThroughputMin" ColumnName="ThroughputMin" />
+                <ScalarProperty Name="ThroughputMax" ColumnName="ThroughputMax" />
+                <ScalarProperty Name="Throughput" ColumnName="Throughput" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -40866,6 +41019,35 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="ACProgramLogID" ColumnName="ACProgramLogID" />
                 <ScalarProperty Name="RefACClassID" ColumnName="RefACClassID" />
                 <ScalarProperty Name="OperationLogID" ColumnName="OperationLogID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FacilityMaterialOEE">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityMaterialOEE">
+              <MappingFragment StoreEntitySet="FacilityMaterialOEE">
+                <ScalarProperty Name="StandByTimeSec" ColumnName="StandByTimeSec" />
+                <ScalarProperty Name="ACProgramLogID" ColumnName="ACProgramLogID" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="TotalOEE" ColumnName="TotalOEE" />
+                <ScalarProperty Name="QualityOEE" ColumnName="QualityOEE" />
+                <ScalarProperty Name="QuantityScrap" ColumnName="QuantityScrap" />
+                <ScalarProperty Name="PerformanceOEE" ColumnName="PerformanceOEE" />
+                <ScalarProperty Name="Throughput" ColumnName="Throughput" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="AvailabilityOEE" ColumnName="AvailabilityOEE" />
+                <ScalarProperty Name="OperationTimeSec" ColumnName="OperationTimeSec" />
+                <ScalarProperty Name="UnscheduledBreakTimeSec" ColumnName="UnscheduledBreakTimeSec" />
+                <ScalarProperty Name="ScheduledBreakTimeSec" ColumnName="ScheduledBreakTimeSec" />
+                <ScalarProperty Name="RetoolingTimeSec" ColumnName="RetoolingTimeSec" />
+                <ScalarProperty Name="MaintenanceTimeSec" ColumnName="MaintenanceTimeSec" />
+                <ScalarProperty Name="IdleTimeSec" ColumnName="IdleTimeSec" />
+                <ScalarProperty Name="FacilityMaterialID" ColumnName="FacilityMaterialID" />
+                <ScalarProperty Name="FacilityMaterialOEEID" ColumnName="FacilityMaterialOEEID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -41854,6 +42036,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <EntityTypeShape EntityType="iPlusMESV4_Model.OperationLog" Width="1.5" PointX="30.5" PointY="311.5" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OperationLog_ACProgramLog" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityMaterialOEE" Width="1.5" PointX="81.5" PointY="303.75" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMaterialOEE_FacilityMaterial" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID" />
       </Diagram>
     </Diagrams>
   </Designer>

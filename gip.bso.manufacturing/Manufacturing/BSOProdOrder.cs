@@ -7,6 +7,7 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.manager;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -64,10 +65,15 @@ namespace gip.bso.manufacturing
             if (_MatReqManager == null)
                 throw new Exception("MatReqManager not configured");
 
-            AccessFilterPlanningMR.NavSearch();
-            SelectedFilterPlanningMR = null;
-            SelectedPOPosTimeFilterMode = POPosTimeFilterModeList?.FirstOrDefault();
-            Search();
+            bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
+            if (!skipSearchOnStart)
+            {
+                AccessFilterPlanningMR.NavSearch();
+                SelectedFilterPlanningMR = null;
+                SelectedPOPosTimeFilterMode = POPosTimeFilterModeList?.FirstOrDefault();
+                Search();
+            }
+
             return true;
         }
 
@@ -209,19 +215,6 @@ namespace gip.bso.manufacturing
                 if (_BSOFacilityExplorer_Child == null)
                     _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
                 return _BSOFacilityExplorer_Child;
-            }
-        }
-
-        ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
-        [ACPropertyInfo(600)]
-        [ACChildInfo("BSOSourceSelectionRules_Child", typeof(BSOSourceSelectionRules))]
-        public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
-        {
-            get
-            {
-                if (_BSOSourceSelectionRules_Child == null)
-                    _BSOSourceSelectionRules_Child = new ACChildItem<BSOSourceSelectionRules>(this, "BSOSourceSelectionRules_Child");
-                return _BSOSourceSelectionRules_Child;
             }
         }
 
@@ -5080,6 +5073,12 @@ namespace gip.bso.manufacturing
                 case nameof(ConnectSourceProdOrderPartslist):
                     ConnectSourceProdOrderPartslist();
                     return true;
+                case nameof(ShowDialogSelectSources):
+                    ShowDialogSelectSources();
+                    return true;
+                case nameof(IsEnabledShowDialogSelectSources):
+                    result = IsEnabledShowDialogSelectSources();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -5108,6 +5107,47 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #endregion
+
+        #region ShowDialogSelectSources
+
+        [ACMethodCommand("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
+        public void ShowDialogSelectSources()
+        {
+            if (!IsEnabledShowDialogSelectSources())
+                return;
+
+            ACComponent bso = this.Root.Businessobjects.ACUrlCommand("?" + nameof(BSOSourceSelectionRules)) as ACComponent;
+            if (bso == null)
+                bso = this.Root.Businessobjects.StartComponent(nameof(BSOSourceSelectionRules), null, new object[] { }) as ACComponent;
+
+            (bso as BSOSourceSelectionRules).ShowDialogSelectSources(
+                ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
+                SelectedProdOrderPartslist.Partslist.PartslistID,
+                SelectedProdOrderPartslist.ProdOrderPartslistID);
+        }
+
+        private Type _TypeOfPWNodeProcessWorkflow;
+        protected Type TypeOfPWNodeProcessWorkflow
+        {
+            get
+            {
+                if (_TypeOfPWNodeProcessWorkflow == null)
+                    _TypeOfPWNodeProcessWorkflow = typeof(PWNodeProcessWorkflowVB);
+                return _TypeOfPWNodeProcessWorkflow;
+            }
+        }
+
+        public bool IsEnabledShowDialogSelectSources()
+        {
+            if (SelectedProdOrderPartslist == null || CurrentProcessWorkflow == null)
+                return false;
+            Type typeOfSelectedNode = ProcessWorkflowPresenter?.SelectedWFNode?.ContentACClassWF?.PWACClass?.ObjectType;
+            if (typeOfSelectedNode == null)
+                return false;
+            return TypeOfPWNodeProcessWorkflow.IsAssignableFrom(typeOfSelectedNode);
+        }
 
         #endregion
 

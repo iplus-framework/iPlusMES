@@ -158,7 +158,7 @@ namespace gip.bso.facility
             protected set
             {
                 _ActBookingParam = value;
-                OnPropertyChanged("CurrentBookParam");
+                OnPropertyChanged();
             }
         }
 
@@ -176,7 +176,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamInwardMovement = value;
-                OnPropertyChanged("CurrentBookParamInwardMovement");
+                OnPropertyChanged();
             }
         }
 
@@ -194,7 +194,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamOutwardMovement = value;
-                OnPropertyChanged("CurrentBookParamOutwardMovement");
+                OnPropertyChanged();
             }
         }
 
@@ -212,7 +212,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamRelocation = value;
-                OnPropertyChanged("CurrentBookParamRelocation");
+                OnPropertyChanged();
             }
         }
 
@@ -230,7 +230,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamReleaseAndLock = value;
-                OnPropertyChanged("CurrentBookParamReleaseAndLock");
+                OnPropertyChanged();
             }
         }
 
@@ -248,7 +248,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamNotAvailable = value;
-                OnPropertyChanged("CurrentBookParamNotAvailable");
+                OnPropertyChanged();
             }
         }
 
@@ -266,7 +266,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamMatching = value;
-                OnPropertyChanged("CurrentBookParamMatching");
+                OnPropertyChanged();
             }
         }
 
@@ -284,7 +284,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamReassignMat = value;
-                OnPropertyChanged("CurrentBookParamReassignMat");
+                OnPropertyChanged();
             }
         }
 
@@ -300,9 +300,9 @@ namespace gip.bso.facility
             set
             {
                 _BookingFilterMaterial = value;
-                OnPropertyChanged("BookingFilterMaterial");
+                OnPropertyChanged();
                 RefreshFilterFacilityAccess();
-                OnPropertyChanged("BookingFacilityList");
+                OnPropertyChanged(nameof(BookingFacilityList));
             }
         }
 
@@ -343,7 +343,7 @@ namespace gip.bso.facility
             if (acAccess == _AccessBookingFacility)
             {
                 _AccessBookingFacility.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("BookingFacilityList");
+                OnPropertyChanged(nameof(BookingFacilityList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -391,13 +391,14 @@ namespace gip.bso.facility
                 {
                     if (filterItem.FilterType != Global.FilterTypes.filter)
                         continue;
-                    if (filterItem.PropertyName == "MDFacilityType\\MDFacilityTypeIndex")
+                    if (filterItem.PropertyName == nameof(MDFacilityType) + "\\" + nameof(MDFacilityType.MDFacilityTypeIndex))
                     {
                         if ((BookingFilterMaterial && filterItem.SearchWord == fcTypeContainer.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
                             || (!BookingFilterMaterial && filterItem.SearchWord == fcTypeBin.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal))
                             countFoundCorrect++;
                     }
-                    else if (BookingFilterMaterial && filterItem.PropertyName == "Material\\MaterialNo" && CurrentFacility != null && CurrentFacility.Material != null)
+                    else if (BookingFilterMaterial && filterItem.PropertyName == nameof(Material) + "\\" + nameof(Material.MaterialNo) 
+                                                   && CurrentFacility != null && CurrentFacility.Material != null)
                     {
                         if (filterItem.SearchWord == CurrentFacility.Material.MaterialNo)
                             countFoundCorrect++;
@@ -413,19 +414,19 @@ namespace gip.bso.facility
                 AccessBookingFacility.NavACQueryDefinition.ClearFilter(true);
                 if (BookingFilterMaterial)
                 {
-                    AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, fcTypeContainer.ToString(), true));
+                    AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(MDFacilityType) + "\\" + nameof(MDFacilityType.MDFacilityTypeIndex), Global.LogicalOperators.equal, Global.Operators.and, fcTypeContainer.ToString(), true));
                     if (CurrentFacility != null && CurrentFacility.Material != null)
                     {
                         AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, false));
-                        AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, CurrentFacility.Material.MaterialNo, false));
+                        AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(Material) + "\\" + nameof(Material.MaterialNo), Global.LogicalOperators.equal, Global.Operators.or, CurrentFacility.Material.MaterialNo, false));
                         if (CurrentFacility.Material.Material1_ProductionMaterial != null)
-                            AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, CurrentFacility.Material.Material1_ProductionMaterial.MaterialNo, false));
+                            AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(Material) + "\\" + nameof(Material.MaterialNo), Global.LogicalOperators.equal, Global.Operators.or, CurrentFacility.Material.Material1_ProductionMaterial.MaterialNo, false));
                         AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, false));
                     }
                 }
                 else
                 {
-                    AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, fcTypeBin.ToString(), true));
+                    AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(MDFacilityType) + "\\" + nameof(MDFacilityType.MDFacilityTypeIndex), Global.LogicalOperators.equal, Global.Operators.and, fcTypeBin.ToString(), true));
                 }
                 AccessBookingFacility.NavACQueryDefinition.SaveConfig(false);
             }
@@ -467,10 +468,10 @@ namespace gip.bso.facility
                 return new List<ACFilterItem>()
                 {
                     new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
-                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
-                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Facility.FacilityNo), Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Facility.FacilityName), Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
-                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((Int16)(int)FacilityTypesEnum.StorageBinContainer).ToString(), true)
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(MDFacilityType) + "\\" + nameof(MDFacilityType.MDFacilityTypeIndex), Global.LogicalOperators.equal, Global.Operators.and, ((Int16)(int)FacilityTypesEnum.StorageBinContainer).ToString(), true)
                 };
             }
         }
@@ -493,7 +494,7 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedFacility");
+                OnPropertyChanged();
             }
         }
 
@@ -521,22 +522,22 @@ namespace gip.bso.facility
                 if (value != null)
                     value.PropertyChanged += CurrentFacility_PropertyChanged;
 
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityLotList");
-                OnPropertyChanged("FacilityChargeList");
-                OnPropertyChanged("ContractualPartnerList");
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FacilityLotList));
+                OnPropertyChanged(nameof(FacilityChargeList));
+                OnPropertyChanged(nameof(ContractualPartnerList));
                 ClearBookingData();
             }
         }
 
         void CurrentFacility_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "MaterialID")
+            if (e.PropertyName == nameof(Material.MaterialID))
             {
-                OnPropertyChanged("StorageUnitTestList");
-                OnPropertyChanged("ContractualPartnerList");
+                OnPropertyChanged(nameof(StorageUnitTestList));
+                OnPropertyChanged(nameof(ContractualPartnerList));
                 if (CurrentFacility != null)
-                    CurrentFacility.OnEntityPropertyChanged("Material");
+                    CurrentFacility.OnEntityPropertyChanged(nameof(Material));
             }
         }
 
@@ -576,7 +577,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentFacilityCharge = value;
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged();
             }
         }
 
@@ -614,7 +615,7 @@ namespace gip.bso.facility
             set
             {
                 _SelectedFacilityCharge = value;
-                OnPropertyChanged("SelectedFacilityCharge");
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -698,7 +699,7 @@ namespace gip.bso.facility
             set
             {
                 _BSOMsg = value;
-                OnPropertyChanged("BSOMsg");
+                OnPropertyChanged();
             }
         }
 
@@ -750,7 +751,7 @@ namespace gip.bso.facility
         [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacility", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
-            if (!PreExecute("Load"))
+            if (!PreExecute())
                 return;
             LoadEntity<Facility>(requery, () => SelectedFacility, () => CurrentFacility, c => CurrentFacility = c,
                         DatabaseApp.Facility
@@ -760,7 +761,7 @@ namespace gip.bso.facility
                         .Where(c => c.FacilityID == SelectedFacility.FacilityID));
             if (CurrentFacility != null && CurrentFacility.CurrentFacilityStock != null)
                 CurrentFacility.CurrentFacilityStock.AutoRefresh(DatabaseApp);
-            PostExecute("Load");
+            PostExecute();
             ClearBookingData();
         }
 
@@ -782,7 +783,7 @@ namespace gip.bso.facility
             if (AccessPrimary == null)
                 return;
             AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
-            OnPropertyChanged("FacilityList");
+            OnPropertyChanged(nameof(FacilityList));
         }
 
         /// <summary>
@@ -934,7 +935,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void InwardFacilityMovement()
         {
-            if (!PreExecute("InwardFacilityMovement")) return;
+            if (!PreExecute()) return;
             if (CurrentFacility.Partslist != null)
             {
                 CurrentBookParamInwardMovement.InwardPartslist = CurrentFacility.Partslist;
@@ -1011,7 +1012,7 @@ namespace gip.bso.facility
             else
                 BookInwardFacilityMovement();
 
-            PostExecute("InwardFacilityMovement");
+            PostExecute();
         }
 
         protected virtual bool BookInwardFacilityMovement()
@@ -1028,8 +1029,8 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
 
             return true;
@@ -1061,7 +1062,7 @@ namespace gip.bso.facility
                 FacilityLot lot = dlgResult.ReturnValue as FacilityLot;
                 CurrentFacility.Material.FacilityLot_Material.Add(lot);
                 CurrentBookParamInwardMovement.InwardFacilityLot = lot;
-                OnPropertyChanged("FacilityLotList");
+                OnPropertyChanged(nameof(FacilityLotList));
             }
             if (childBSO != null)
                 childBSO.Stop();
@@ -1080,7 +1081,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Post Outward Movement'}de{'Buche Lagerabgang'}", 704, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void OutwardFacilityMovement()
         {
-            if (!PreExecute("OutwardFacilityMovement")) return;
+            if (!PreExecute()) return;
             if (CurrentFacility.Partslist != null)
             {
                 CurrentBookParamOutwardMovement.OutwardPartslist = CurrentFacility.Partslist;
@@ -1099,10 +1100,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
-            PostExecute("OutwardFacilityMovement");
+            PostExecute();
         }
         /// <summary>
         /// Determines whether [is enabled outward facility movement].
@@ -1123,7 +1124,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Post Stock Transfer'}de{'Buche Umlagerung'}", 705, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityRelocation()
         {
-            if (!PreExecute("FacilityRelocation")) return;
+            if (!PreExecute()) return;
 
             if (IsPhysicalTransportPossible)
             {
@@ -1195,7 +1196,7 @@ namespace gip.bso.facility
             else
                 BookRelocation();
 
-            PostExecute("FacilityRelocation");
+            PostExecute();
         }
         /// <summary>
         /// Determines whether [is enabled facility relocation].
@@ -1227,8 +1228,8 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
             return true;
         }
@@ -1457,7 +1458,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Silo empty'}de{'Silo leer'}", 710, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void NotAvailableFacility()
         {
-            if (!PreExecute("NotAvailableFacility")) return;
+            if (!PreExecute()) return;
             CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
@@ -1471,10 +1472,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
-            PostExecute("NotAvailableFacility");
+            PostExecute();
         }
 
         /// <summary>
@@ -1502,10 +1503,21 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Silo not empty'}de{'Silo nicht leer'}", 711, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void AvailableFacility()
         {
-            if (!PreExecute("AvailableFacility")) return;
-            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamMatching, this.DatabaseApp) as ACMethodEventArgs;
-            if (!CurrentBookParamMatching.ValidMessage.IsSucceded() || CurrentBookParamMatching.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamMatching.ValidMessage);
+            if (!PreExecute()) return;
+
+            //Question50097: Do you want to restore a last stock?
+            if (Messages.Question(this, "Question50098") == Global.MsgResult.Yes)
+            {
+                CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable);
+            }
+            else
+            {
+                CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility);
+            }
+            
+            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
+            if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
+                Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
@@ -1515,10 +1527,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
-            PostExecute("AvailableFacility");
+            PostExecute();
         }
 
         /// <summary>
@@ -1532,13 +1544,77 @@ namespace gip.bso.facility
             bool isEnabled = CurrentFacility.NotAvailable;
             if (isEnabled)
             {
-                CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailable);
+                CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility);
                 isEnabled = CurrentBookParamNotAvailable.IsEnabled();
                 CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.Off);
                 UpdateBSOMsg();
             }
             return isEnabled;
         }
+
+        //[ACMethodCommand(Facility.ClassName, "en{'Restore last quants'}de{'Letzte Quanten wiederherstellen'}", 711, true, Global.ACKinds.MSMethodPrePost)]
+        //public virtual void AvailableLastQuants()
+        //{
+        //    CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility);
+
+        //    ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
+
+        //    ClearBookingData();
+
+        //    //FacilityBooking fb = DatabaseApp.FacilityBooking.Include(c => c.FacilityBookingCharge_FacilityBooking)
+        //    //                                                .Where(c => c.InwardFacilityID == CurrentFacility.FacilityID
+        //    //                                                         && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+        //    //                                                .OrderByDescending(c => c.InsertDate)
+        //    //                                                .FirstOrDefault();
+        //    //if (fb == null)
+        //    //    return;
+
+        //    //FacilityBookingCharge[] charges = fb.FacilityBookingCharge_FacilityBooking.ToArray();
+
+        //    //bool bookLastQuantity = false;
+
+        //    ////Question50097: Do you want to restore a last stock?
+        //    //if (Messages.Question(this, "Question50097") == Global.MsgResult.Yes)
+        //    //{
+        //    //    bookLastQuantity = true;
+        //    //}
+
+        //    //foreach (FacilityBookingCharge fbc in charges)
+        //    //{
+        //    //    FacilityCharge fc = fbc.InwardFacilityCharge;
+        //    //    if (fc == null)
+        //    //        continue;
+
+        //    //    if (!bookLastQuantity)
+        //    //    {
+        //    //        fc.NotAvailable = false;
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        ClearBookingData();
+
+        //    //        CurrentBookParamInwardMovement.InwardFacilityCharge = fc;
+        //    //        CurrentBookParamInwardMovement.InwardQuantity = fbc.InwardQuantity * -1;
+
+        //    //        BookInwardFacilityMovement();
+        //    //    }
+        //    //}
+
+        //    //Save();
+
+        //    OnPropertyChanged(nameof(CurrentFacility));
+        //    OnPropertyChanged(nameof(FacilityChargeList));
+        //}
+
+        //public bool IsEnabledAvailableLastQuants()
+        //{
+        //    if (CurrentFacility == null)
+        //        return false;
+        //    bool isEnabled = CurrentFacility.NotAvailable;
+
+        //    return isEnabled;
+        //}
+
         #endregion
 
         #region Abgleich Lagerplatz
@@ -1549,7 +1625,7 @@ namespace gip.bso.facility
         public virtual void StartFacilityAdjust()
         {
             // Starte Hintergrundthread
-            if (!PreExecute("StartFacilityAdjust")) return;
+            if (!PreExecute()) return;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamMatching, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamMatching.ValidMessage.IsSucceded() || CurrentBookParamMatching.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamMatching.ValidMessage);
@@ -1562,10 +1638,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
-            PostExecute("StartFacilityAdjust");
+            PostExecute();
         }
 
         /// <summary>
@@ -1588,7 +1664,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 713, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityReassign()
         {
-            if (!PreExecute("FacilityReassign")) return;
+            if (!PreExecute()) return;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReassignMat, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReassignMat.ValidMessage.IsSucceded() || CurrentBookParamReassignMat.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamReassignMat.ValidMessage);
@@ -1601,10 +1677,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                OnPropertyChanged(nameof(CurrentFacility));
+                OnPropertyChanged(nameof(FacilityChargeList));
             }
-            PostExecute("FacilityReassign");
+            PostExecute();
         }
 
         /// <summary>
@@ -1657,7 +1733,7 @@ namespace gip.bso.facility
             ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "FacilityNo").FirstOrDefault();
             if (filterItem == null)
             {
-                filterItem = new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.contains, Global.Operators.and, facilityNo, false);
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, nameof(Facility.FacilityNo), Global.LogicalOperators.contains, Global.Operators.and, facilityNo, false);
                 AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
             }
             else
@@ -1708,7 +1784,7 @@ namespace gip.bso.facility
         [ACMethodInfo(Facility.ClassName, "en{'Activate'}de{'Aktivieren'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public void OnActivate(string page)
         {
-            if (!PreExecute("OnActivate"))
+            if (!PreExecute())
                 return;
             if (page == "ActivateInwardMovement" || page == "InwardBookingTab" || page == "*InwardBookingTab")
             {
@@ -1734,7 +1810,7 @@ namespace gip.bso.facility
             {
                 CurrentBookParam = CurrentBookParamReassignMat;
             }
-            PostExecute("OnActivate");
+            PostExecute();
         }
 
         /// <summary>
@@ -1743,7 +1819,7 @@ namespace gip.bso.facility
         /// <param name="dataContent">Content of the data.</param>
         void BSOFacilityBookCell_OnValueChanged(string dataContent)
         {
-            if (dataContent == "CurrentFacility.Material")
+            if (dataContent == nameof(CurrentFacility) + "." + nameof(CurrentFacility.Material))
             {
                 //CurrentFacility.Partslist = null;
                 //OnPropertyChanged("PartslistList");
@@ -1796,7 +1872,7 @@ namespace gip.bso.facility
                     string url = CurrentFacility.FacilityACClass.GetACUrlComponent();
                     if (!String.IsNullOrEmpty(url))
                     {
-                        object result = ACUrlCommand(url + "!IsDischargingToThisSiloActive", null);
+                        object result = ACUrlCommand(url + "!" + nameof(mes.processapplication.PAMSilo.IsDischargingToThisSiloActive), null);
                         if (   result != null 
                             && result is string[]
                             && (result as string[]).Any())
@@ -1817,112 +1893,112 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "ClearBookingData":
+                case nameof(ClearBookingData):
                     ClearBookingData();
                     return true;
-                case "IsEnabledClearBookingData":
+                case nameof(IsEnabledClearBookingData):
                     result = IsEnabledClearBookingData();
                     return true;
-                case "InwardFacilityMovement":
+                case nameof(InwardFacilityMovement):
                     InwardFacilityMovement();
                     return true;
-                case "IsEnabledInwardFacilityMovement":
+                case nameof(IsEnabledInwardFacilityMovement):
                     result = IsEnabledInwardFacilityMovement();
                     return true;
-                case "InwardFacilityLotGenerateDlg":
+                case nameof(InwardFacilityLotGenerateDlg):
                     InwardFacilityLotGenerateDlg();
                     return true;
-                case "OutwardFacilityMovement":
+                case nameof(OutwardFacilityMovement):
                     OutwardFacilityMovement();
                     return true;
-                case "IsEnabledOutwardFacilityMovement":
+                case nameof(IsEnabledOutwardFacilityMovement):
                     result = IsEnabledOutwardFacilityMovement();
                     return true;
-                case "FacilityRelocation":
+                case nameof(FacilityRelocation):
                     FacilityRelocation();
                     return true;
-                case "IsEnabledFacilityRelocation":
+                case nameof(IsEnabledFacilityRelocation):
                     result = IsEnabledFacilityRelocation();
                     return true;
-                case "LockFacility":
+                case nameof(LockFacility):
                     LockFacility();
                     return true;
-                case "IsEnabledLockFacility":
+                case nameof(IsEnabledLockFacility):
                     result = IsEnabledLockFacility();
                     return true;
-                case "LockFacilityAbsolute":
+                case nameof(LockFacilityAbsolute):
                     LockFacilityAbsolute();
                     return true;
-                case "IsEnabledLockFacilityAbsolute":
+                case nameof(IsEnabledLockFacilityAbsolute):
                     result = IsEnabledLockFacilityAbsolute();
                     return true;
-                case "ReleaseFacility":
+                case nameof(ReleaseFacility):
                     ReleaseFacility();
                     return true;
-                case "IsEnabledReleaseFacility":
+                case nameof(IsEnabledReleaseFacility):
                     result = IsEnabledReleaseFacility();
                     return true;
-                case "ReleaseFacilityAbsolute":
+                case nameof(ReleaseFacilityAbsolute):
                     ReleaseFacilityAbsolute();
                     return true;
-                case "IsEnabledReleaseFacilityAbsolute":
+                case nameof(IsEnabledReleaseFacilityAbsolute):
                     result = IsEnabledReleaseFacilityAbsolute();
                     return true;
-                case "NotAvailableFacility":
+                case nameof(NotAvailableFacility):
                     NotAvailableFacility();
                     return true;
-                case "IsEnabledNotAvailableFacility":
+                case nameof(IsEnabledNotAvailableFacility):
                     result = IsEnabledNotAvailableFacility();
                     return true;
-                case "AvailableFacility":
+                case nameof(AvailableFacility):
                     AvailableFacility();
                     return true;
-                case "IsEnabledAvailableFacility":
+                case nameof(IsEnabledAvailableFacility):
                     result = IsEnabledAvailableFacility();
                     return true;
-                case "StartFacilityAdjust":
+                case nameof(StartFacilityAdjust):
                     StartFacilityAdjust();
                     return true;
-                case "IsEnabledStartFacilityAdjust":
+                case nameof(IsEnabledStartFacilityAdjust):
                     result = IsEnabledStartFacilityAdjust();
                     return true;
-                case "FacilityReassign":
+                case nameof(FacilityReassign):
                     FacilityReassign();
                     return true;
-                case "IsEnabledFacilityReassign":
+                case nameof(IsEnabledFacilityReassign):
                     result = IsEnabledFacilityReassign();
                     return true;
-                case "ShowDialogFacility":
+                case nameof(ShowDialogFacility):
                     ShowDialogFacility((String)acParameter[0]);
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "OnActivate":
+                case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
                     return true;
             }

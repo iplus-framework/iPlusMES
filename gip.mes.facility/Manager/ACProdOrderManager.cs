@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
+using gip.core.processapplication;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
@@ -25,11 +26,46 @@ namespace gip.mes.facility
         {
             _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, "TolRemainingCallQ", 20);
             _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, "IsActiveMatReqCheck", false);
+            _CalculateOEEs = new ACPropertyConfigValue<bool>(this, "CalculateOEEs", false);
         }
 
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            if (!base.ACInit(startChildMode))
+                return false;
+            _FacilityOEEManager = ACFacilityOEEManager.ACRefToServiceInstance(this);
+            return true;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            if (_FacilityOEEManager != null)
+            {
+                ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
+                _FacilityOEEManager = null;
+            }
+
+            return base.ACDeInit(deleteACClassTask);
+        }
+        #endregion
+
+
+        #region Properties
         public const string ClassName = "ACProdOrderManager";
         public const string C_DefaultServiceACIdentifier = "ProdOrderManager";
+
+        protected ACRef<ACFacilityOEEManager> _FacilityOEEManager = null;
+        public ACFacilityOEEManager FacilityOEEManager
+        {
+            get
+            {
+                if (_FacilityOEEManager == null)
+                    return null;
+                return _FacilityOEEManager.ValueT;
+            }
+        }
         #endregion
+
 
         #region PrecompiledQueries
         //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
@@ -86,7 +122,7 @@ namespace gip.mes.facility
                 return _BookParamInwardMovementClone;
             if (facilityManager == null)
                 return null;
-            _BookParamInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamInwardMovementClone;
         }
 
@@ -97,7 +133,7 @@ namespace gip.mes.facility
                 return _BookParamInCancelClone;
             if (facilityManager == null)
                 return null;
-            _BookParamInCancelClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInCancelClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosInwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamInCancelClone;
         }
 
@@ -108,7 +144,7 @@ namespace gip.mes.facility
                 return _BookParamOutwardMovementClone;
             if (facilityManager == null)
                 return null;
-            _BookParamOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamOutwardMovementClone;
         }
 
@@ -119,7 +155,7 @@ namespace gip.mes.facility
                 return _BookParamOutCancelClone;
             if (facilityManager == null)
                 return null;
-            _BookParamOutCancelClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutCancelClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamOutCancelClone;
         }
 
@@ -130,7 +166,7 @@ namespace gip.mes.facility
                 return _BookParamOutwardMovementOnEmptyingFacilityClone;
             if (facilityManager == null)
                 return null;
-            _BookParamOutwardMovementOnEmptyingFacilityClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutwardOnEmptyingFacility.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutwardMovementOnEmptyingFacilityClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ProdOrderPosOutwardOnEmptyingFacility.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             return _BookParamOutwardMovementOnEmptyingFacilityClone;
         }
 
@@ -159,6 +195,20 @@ namespace gip.mes.facility
             set
             {
                 _IsActiveMatReqCheck.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _CalculateOEEs;
+        [ACPropertyConfig("en{'OEE-Calculation active'}de{'OEE-Berechnung aktiv'}")]
+        public bool CalculateOEEs
+        {
+            get
+            {
+                return _CalculateOEEs.ValueT;
+            }
+            set
+            {
+                _CalculateOEEs.ValueT = value;
             }
         }
 
@@ -3225,28 +3275,29 @@ namespace gip.mes.facility
                 Msg udpErrMsg = new Msg(eMsgLevel.Exception, $"{prodOrder.ProgramNo} error running udpRecalcActualQuantity! Message: " + ec.Message);
                 msg.AddDetailMessage(udpErrMsg);
             }
-            MsgWithDetails calcMsg = CalculateStatistics(databaseApp, prodOrder);
+            List<object> itemsForPostProcessing = new List<object>();
+            MsgWithDetails calcMsg = CalculateStatistics(databaseApp, prodOrder, itemsForPostProcessing);
             MsgWithDetails saveMsg = null;
             if (saveChanges && (calcMsg == null || calcMsg.IsSucceded()))
-            {
                 saveMsg = databaseApp.ACSaveChanges();
-            }
+
             if (calcMsg != null && calcMsg.MsgDetailsCount > 0)
-            {
                 msg.AddDetailMessage(calcMsg);
-            }
+            
             if (saveMsg != null && saveMsg.MsgDetailsCount > 0)
-            {
                 msg.AddDetailMessage(saveMsg);
+            else
+            {
+                if (CalculateOEEs && FacilityOEEManager != null)
+                    FacilityOEEManager.OnPostProcessingOEE(databaseApp, prodOrder, itemsForPostProcessing);
             }
-            if (msg == null)
-                return null;
-            if (msg.MsgDetailsCount <= 0)
+            
+            if (msg == null || msg.MsgDetailsCount <= 0)
                 return null;
             return msg;
         }
 
-        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrder prodOrder)
+        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, List<object> itemsForPostProcessing)
         {
             MsgWithDetails msg = new MsgWithDetails();
 
@@ -3261,7 +3312,7 @@ namespace gip.mes.facility
 
             if (finalPartslist != null)
             {
-                MsgWithDetails plMsg = CalculateStatistics(databaseApp, finalPartslist, finalPartslist);
+                MsgWithDetails plMsg = CalculateStatistics(databaseApp, finalPartslist, finalPartslist, itemsForPostProcessing);
                 if (plMsg != null && plMsg.MsgDetailsCount > 0)
                 {
                     msg.AddDetailMessage(plMsg);
@@ -3272,7 +3323,7 @@ namespace gip.mes.facility
             {
                 if (pl == finalPartslist)
                     continue;
-                MsgWithDetails plMsg = CalculateStatistics(databaseApp, pl, finalPartslist);
+                MsgWithDetails plMsg = CalculateStatistics(databaseApp, pl, finalPartslist, itemsForPostProcessing);
                 if (plMsg != null && plMsg.MsgDetailsCount > 0)
                 {
                     msg.AddDetailMessage(plMsg);
@@ -3285,7 +3336,7 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist finalPartslist)
+        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist finalPartslist, List<object> itemsForPostProcessing)
         {
             MsgWithDetails msg = new MsgWithDetails();
 
@@ -3381,6 +3432,9 @@ namespace gip.mes.facility
             }
 
             CalculateStatisticProdPlPerAvg(prodOrderPartslist, components);
+
+            if (CalculateOEEs && FacilityOEEManager != null)
+                FacilityOEEManager.CalculateOEE(databaseApp, prodOrderPartslist, components, lastIntermediatePos, finalPartslist, lastIntermediatePosOfFinalPL, itemsForPostProcessing);
 
             if (msg == null)
                 return null;

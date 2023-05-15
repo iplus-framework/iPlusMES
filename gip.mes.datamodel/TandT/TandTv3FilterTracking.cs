@@ -242,24 +242,6 @@ namespace gip.mes.datamodel
         [NotMapped]
         public bool AggregateOrderData { get; set; }
 
-        [NotMapped]
-        short[] _FilteredBookingTypes = new short[]
-        {
-            (short)GlobalApp.FacilityBookingType.InOrderPosInwardMovement,
-            (short)GlobalApp.FacilityBookingType.ProdOrderPosOutward,
-            (short)GlobalApp.FacilityBookingType.ProdOrderPosInward,
-            (short)GlobalApp.FacilityBookingType.PickingRelocation
-        };
-
-        [NotMapped]
-        public short[] FilteredBookingTypes
-        {
-            get
-            {
-                return _FilteredBookingTypes;
-            }
-        }
-
         #endregion
 
         #region Overrides

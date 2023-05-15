@@ -9,6 +9,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
+
+    public class MapPosToWFConnSubItem
+    {
+        public core.datamodel.ACClassWF PWNode { get; set; }
+        public Dictionary<Material, List<Route>> Mat4DosingAndRoutes { get; set; } = new Dictionary<Material, List<Route>>();
+    }
+
     public class MapPosToWFConn
     {
         public IPartslistPos Pos { get; set; }
@@ -28,6 +35,8 @@ namespace gip.mes.facility
             }
         }
 
+        public List<MapPosToWFConnSubItem> MapPosToWFConnSubItems { get; set; } = new List<MapPosToWFConnSubItem>();
+
         public double CalcExpectedBatchWeightAtThisIntermPos(DatabaseApp dbApp, double batchScaleFactor)
         {
             double targetQuantityUOM = Pos.TargetQuantityUOM * batchScaleFactor;
@@ -45,7 +54,7 @@ namespace gip.mes.facility
                     if (ec.InnerException != null && ec.InnerException.Message != null)
                         msg += " Inner:" + ec.InnerException.Message;
 
-                     this.Root().Messages.LogException("MapPosToWFConn", "CalcExpectedBatchWeightAtThisIntermPos", msg);
+                    this.Root().Messages.LogException("MapPosToWFConn", "CalcExpectedBatchWeightAtThisIntermPos", msg);
                 }
             }
             return targetQuantityUOM;
@@ -213,7 +222,7 @@ namespace gip.mes.facility
 
         private void ValidateFinalQuantity(Partslist partslist, MsgWithDetails msg)
         {
-            if (partslist.PartslistPos_Partslist.Where(x=>x.MaterialPosTypeIndex == (short) gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern).Any())
+            if (partslist.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern).Any())
             {
                 var lastIntermediate = partslist
                     .PartslistPos_Partslist
@@ -258,7 +267,7 @@ namespace gip.mes.facility
                 item.InwardQuantityUOM =
                     mixures
                     .ToList()
-                    .SelectMany(x => x.PartslistPosRelation_TargetPartslistPos.Where(y=>y.SourcePartslistPos.MaterialID == item.Material.MaterialID).Select(z => z.TargetQuantityUOM))
+                    .SelectMany(x => x.PartslistPosRelation_TargetPartslistPos.Where(y => y.SourcePartslistPos.MaterialID == item.Material.MaterialID).Select(z => z.TargetQuantityUOM))
                     .Sum(x => x);
             }
             if (listMaterialUsageCheck.Where(x => !x.IsQuantityValid).Any())
@@ -341,9 +350,28 @@ namespace gip.mes.facility
         }
 
         #region Virtual and protected
-        public void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, IPartslist iPartslist, List<IACConfigStore> configStores, 
-                                        PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="dbiPlus"></param>
+        /// <param name="iPartslist"></param>
+        /// <param name="configStores"></param>
+        /// <param name="validationBehaviour"></param>
+        /// <param name="detailMessages"></param>
+        /// <param name="checkAll">return all combination if true - otherwise only first finded</param>
+        /// <returns></returns>
+        public PartslistValidationInfo CheckResourcesAndRouting(
+            DatabaseApp dbApp,
+            Database dbiPlus,
+            IPartslist iPartslist,
+            List<IACConfigStore> configStores,
+            PARole.ValidationBehaviour validationBehaviour,
+            MsgWithDetails detailMessages,
+            core.datamodel.ACClassWF invokerPWNode = null,
+            bool collectingData = false)
         {
+            PartslistValidationInfo validationInfo = new PartslistValidationInfo();
             List<MapPosToWFConn> matWFConnections = new List<MapPosToWFConn>();
 
             Partslist partslist = iPartslist is ProdOrderPartslist ? (iPartslist as ProdOrderPartslist).Partslist : iPartslist as Partslist;
@@ -407,18 +435,25 @@ namespace gip.mes.facility
 
             if (detailMessages.IsSucceded())
             {
-                CheckResourcesAndRouting(dbApp, dbiPlus, iPartslist, configStores, matWFConnections, validationBehaviour, detailMessages);
+                validationInfo = CheckResourcesAndRouting(dbApp, dbiPlus, iPartslist, configStores, matWFConnections, validationBehaviour, detailMessages, invokerPWNode, collectingData);
             }
+            return validationInfo;
         }
 
 
-        protected virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbIPlus, IPartslist pList,
+        protected virtual PartslistValidationInfo CheckResourcesAndRouting(DatabaseApp dbApp, Database dbIPlus, IPartslist pList,
                                                     List<IACConfigStore> configStores, List<MapPosToWFConn> mapPosToWFConn,
-                                                    PARole.ValidationBehaviour validationBehaviour, 
-                                                    MsgWithDetails detailMessages)
+                                                    PARole.ValidationBehaviour validationBehaviour,
+                                                    MsgWithDetails detailMessages,
+                                                    core.datamodel.ACClassWF invokerPWNode = null,
+                                                    bool collectingData = false)
         {
+            PartslistValidationInfo validationInfo = new PartslistValidationInfo();
             if (!mapPosToWFConn.Any() || configStores == null)
-                return;
+            {
+                validationInfo.IsSucceded = false;
+                return validationInfo;
+            }
             foreach (var mapElement in mapPosToWFConn)
             {
                 if (mapElement.PWNode == null && mapElement.MatWFConn.ACClassWF != null)
@@ -436,7 +471,14 @@ namespace gip.mes.facility
             Type typeCheckWeight = typeof(IPWNodeCheckWeight);
 
             // 1. Determine which Nodes in workflow are PWNodeProcessWorkflow-Instance which invokes Subworkflows for each Batch
-            var connToBatchInvocNodes = mapPosToWFConn.Where(c => c.MatWFConn.ACClassWF.RefPAACClassMethod != null && c.MatWFConn.ACClassWF.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow);
+            var connToBatchInvocNodes =
+                mapPosToWFConn
+                .Where(c =>
+                            c.MatWFConn.ACClassWF.RefPAACClassMethod != null
+                            && c.MatWFConn.ACClassWF.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                            && (invokerPWNode == null || c.MatWFConn.ACClassWF.ACClassWFID == invokerPWNode.ACClassWFID)
+                      );
+            validationInfo.MapPosToWFConnections = connToBatchInvocNodes.ToList();
             // Loop through Batch-Nodes
             foreach (var mapPosWF in connToBatchInvocNodes)
             {
@@ -460,7 +502,7 @@ namespace gip.mes.facility
                     {
                         Guid[] possibleProjectIDs = possibleClassProjects.Select(c => c.ACProjectID).ToArray();
                         // Determine all PWGroups of the subworkflow and determine which ProcessModules could be mapped
-                        var mapPWGroup2Modules = dbIPlus.ACClassWF
+                        MapPWGroup2Modules[] mapPWGroup2Modules = dbIPlus.ACClassWF
                                                             .Include(c => c.RefPAACClass.ACClass_BasedOnACClass)
                                                             .Where(c => c.ACClassMethodID == mapPosWF.MatWFConn.ACClassWF.RefPAACClassMethodID
                                                                 && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWGroup
@@ -527,7 +569,7 @@ namespace gip.mes.facility
                                             {
                                                 foreach (var batchPlan in openPlans)
                                                 {
-                                                    double factor = batchPlan.PlanMode == BatchPlanMode.UseTotalSize ? batchPlan.TotalSize / prodOrderPartsList.TargetQuantity  : batchPlan.BatchSize / prodOrderPartsList.TargetQuantity;
+                                                    double factor = batchPlan.PlanMode == BatchPlanMode.UseTotalSize ? batchPlan.TotalSize / prodOrderPartsList.TargetQuantity : batchPlan.BatchSize / prodOrderPartsList.TargetQuantity;
                                                     double expectedBatchWeight = node2Check.CalcExpectedBatchWeightAtThisIntermPos(dbApp, factor);
                                                     double totalSumMinMax = minMaxWeight.Value;
                                                     if (maxRepeatsInterDis.HasValue && maxRepeatsInterDis > 0)
@@ -557,14 +599,16 @@ namespace gip.mes.facility
 
 
                         // Find Dosing-Nodes in Subworkflow which are connected to a intermediate Material
-                        var nodes2CheckForRouting = mapPosToWFConn.Where(c => c.PWNode != null
+                        IEnumerable<MapPosToWFConn> nodes2CheckForRouting = mapPosToWFConn.Where(c => c.PWNode != null
                                             && c.PWNode.ACClassMethodID == mapPosWF.MatWFConn.ACClassWF.RefPAACClassMethodID
                                             && c.PWNode.PWACClass != null
                                             && typeReceiveMat.IsAssignableFrom(c.PWObjectType));
                         if (nodes2CheckForRouting.Any())
                         {
                             List<IPartslistPosRelation> dosableRelations = new List<IPartslistPosRelation>();
-                            foreach (var node2Check in nodes2CheckForRouting)
+                            List<IPartslistPosRelation> allRelations = new List<IPartslistPosRelation>();
+
+                            foreach (MapPosToWFConn node2Check in nodes2CheckForRouting)
                             {
                                 if (!node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.Any())
                                     continue;
@@ -572,15 +616,30 @@ namespace gip.mes.facility
                                 if (node2Check.PWNode.ACClassWF1_ParentACClassWF != null)
                                 {
                                     IPartslistPosRelation[] materialsToCheck = node2Check.Pos.I_PartslistPosRelation_TargetPartslistPos.ToArray();
-                                    foreach (var mat4Dosing in materialsToCheck)
+                                    foreach (IPartslistPosRelation mat4Dosing in materialsToCheck)
                                     {
-                                        if (dosableRelations.Contains(mat4Dosing))
+                                        if (!allRelations.Contains(mat4Dosing))
+                                            allRelations.Add(mat4Dosing);
+                                        if (!collectingData && dosableRelations.Contains(mat4Dosing))
                                             continue;
                                         if (!IsRouteValidationNeededForPos(mat4Dosing, dbApp, dbIPlus, pList, configStores, mapPosToWFConn, validationBehaviour, detailMessages))
                                             continue;
+
+                                        MapPosToWFConnSubItem subItem = mapPosWF.MapPosToWFConnSubItems.Where(c => c.PWNode.ACClassWFID == node2Check.PWNode.ACClassWFID).FirstOrDefault();
+                                        if (subItem == null)
+                                        {
+                                            subItem = new MapPosToWFConnSubItem() { PWNode = node2Check.PWNode };
+                                            mapPosWF.MapPosToWFConnSubItems.Add(subItem);
+                                        }
+
+                                        if (!subItem.Mat4DosingAndRoutes.Select(x => x.Key.MaterialNo).Contains(mat4Dosing.I_SourcePartslistPos.MaterialNo))
+                                        {
+                                            subItem.Mat4DosingAndRoutes.Add(mat4Dosing.I_SourcePartslistPos.Material, new List<Route>());
+                                        }
                                         IEnumerable<Route> routes = null;
                                         // Find mappingInfo for PWGroup (which ProcessModules could be used)
-                                        foreach (var pwGroup2Check in mapPWGroup2Modules.Where(c => c.PWGroup == node2Check.PWNode.ACClassWF1_ParentACClassWF))
+                                        MapPWGroup2Modules[] submapPWGroup2Modules = mapPWGroup2Modules.Where(c => c.PWGroup == node2Check.PWNode.ACClassWF1_ParentACClassWF).ToArray();
+                                        foreach (var pwGroup2Check in submapPWGroup2Modules)
                                         {
                                             foreach (var acClassPM in pwGroup2Check.ProcessModuleList)
                                             {
@@ -589,25 +648,45 @@ namespace gip.mes.facility
                                                 if (routes != null && routes.Any())
                                                 {
                                                     dosableRelations.Add(mat4Dosing);
-                                                    break;
+
+                                                    KeyValuePair<Material, List<Route>> mat4DosingRoute = subItem.Mat4DosingAndRoutes.FirstOrDefault(c => c.Key.MaterialNo == mat4Dosing.I_SourcePartslistPos.MaterialNo);
+                                                    mat4DosingRoute.Value.AddRange(routes);
+                                                    if (!collectingData)
+                                                    {
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
-                                        if (routes == null || !routes.Any())
-                                        {
-                                            // Keine Route gefunden über die Material {0} {1} dosiert werden könnte.
-                                            detailMessages.AddDetailMessage(new Msg
-                                            {
-                                                Source = GetACUrl(),
-                                                MessageLevel = eMsgLevel.Warning,
-                                                ACIdentifier = "CheckResourcesAndRouting(20)",
-                                                Message = Root.Environment.TranslateMessage(this, "Warning50016",
-                                                                mat4Dosing.I_SourcePartslistPos.Material.MaterialNo,
-                                                                mat4Dosing.I_SourcePartslistPos.Material.MaterialName1)
-                                            });
-                                        }
+                                        //if (routes == null || !routes.Any())
+                                        //{
+                                        //    // Keine Route gefunden über die Material {0} {1} dosiert werden könnte.
+                                        //    detailMessages.AddDetailMessage(new Msg
+                                        //    {
+                                        //        Source = GetACUrl(),
+                                        //        MessageLevel = eMsgLevel.Warning,
+                                        //        ACIdentifier = "CheckResourcesAndRouting(20)",
+                                        //        Message = Root.Environment.TranslateMessage(this, "Warning50016",
+                                        //                        mat4Dosing.I_SourcePartslistPos.Material.MaterialNo,
+                                        //                        mat4Dosing.I_SourcePartslistPos.Material.MaterialName1)
+                                        //    });
+                                        //}
                                     }
                                 }
+                            }
+
+                            allRelations.RemoveAll(c => dosableRelations.Contains(c));
+                            foreach (var unsolvedRelation in allRelations)
+                            {
+                                detailMessages.AddDetailMessage(new Msg
+                                {
+                                    Source = GetACUrl(),
+                                    MessageLevel = eMsgLevel.Warning,
+                                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                                    Message = Root.Environment.TranslateMessage(this, "Warning50016",
+                                                    unsolvedRelation.I_SourcePartslistPos.Material.MaterialNo,
+                                                    unsolvedRelation.I_SourcePartslistPos.Material.MaterialName1)
+                                });
                             }
                         }
 
@@ -615,6 +694,8 @@ namespace gip.mes.facility
                     }
                 }
             }
+
+            return validationInfo;
         }
 
         protected gip.mes.datamodel.ACClass[] ApplyRulesOnProjects(Database dbiPlus, gip.mes.datamodel.ACClass[] possibleProjects, MapPosToWFConn mapPosWF, List<IACConfigStore> configStores)
@@ -678,7 +759,7 @@ namespace gip.mes.facility
                                                     MsgWithDetails detailMessages)
         {
             ProdOrderPartslistPos poPos = mat4Dosing.I_SourcePartslistPos as ProdOrderPartslistPos;
-            return (   poPos != null
+            return (poPos != null
                     && !mat4Dosing.I_SourcePartslistPos.Material.IsIntermediate
                     && (poPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState < MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
                         || poPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState > MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))

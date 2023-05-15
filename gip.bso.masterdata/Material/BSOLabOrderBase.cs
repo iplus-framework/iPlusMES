@@ -59,8 +59,11 @@ namespace gip.bso.masterdata
             _LabOrderManager = ACLabOrderManager.ACRefToServiceInstance(this);
             if (_LabOrderManager == null)
                 throw new Exception("LabOrderManager not configured");
-
-            Search();
+            bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
+            if(!skipSearchOnStart)
+            {
+                Search();
+            }
             return true;
         }
 
@@ -354,12 +357,14 @@ namespace gip.bso.masterdata
             }
         }
 
-        private void LoadLabOrderPosList(LabOrder labOrder)
+        public void LoadLabOrderPosList(LabOrder labOrder)
         {
             _LabOrderPosList = null;
             if (labOrder != null)
             {
-                labOrder.LabOrderPos_LabOrder.AutoRefresh(labOrder.LabOrderPos_LabOrderReference, labOrder);
+                if(labOrder.EntityState != EntityState.Added)
+                {
+                	labOrder.LabOrderPos_LabOrder.AutoRefresh(labOrder.LabOrderPos_LabOrderReference, labOrder);				}
                 _LabOrderPosList = labOrder.LabOrderPos_LabOrder.OrderBy(c => c.Sequence).ToList();
             }
             if(_LabOrderPosList == null)
@@ -653,7 +658,9 @@ namespace gip.bso.masterdata
         [ACMethodCommand("LabOrder", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public virtual void Search()
         {
-            if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
+            if (AccessPrimary == null) 
+				return;
+            AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged(nameof(LabOrderList));
         }
         #endregion
@@ -693,6 +700,7 @@ namespace gip.bso.masterdata
             CurrentLabOrderPos = LabOrderPos.NewACObject(DatabaseApp, CurrentLabOrder);
             CurrentLabOrderPos.LabOrder = CurrentLabOrder;
             CurrentLabOrder.LabOrderPos_LabOrder.Add(CurrentLabOrderPos);
+            LabOrderPosList.Add(CurrentLabOrderPos);
             OnPropertyChanged(nameof(LabOrderPosList));
             PostExecute("NewLabOrderPos");
         }
@@ -716,6 +724,7 @@ namespace gip.bso.masterdata
         public void DeleteLabOrderPos()
         {
             if (!PreExecute("DeleteLabOrderPos")) return;
+            LabOrderPosList.Remove(CurrentLabOrderPos);
             Msg msg = CurrentLabOrderPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {

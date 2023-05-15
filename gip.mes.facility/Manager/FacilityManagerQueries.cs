@@ -696,6 +696,14 @@ namespace gip.mes.facility
                         .ThenByDescending(c => c.FacilityChargeSortNo)
         );
 
+        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_LastAvailable =
+        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+            (ctx, facilityID) => ctx.FacilityBooking.Include("FacilityBookingCharge_FacilityBooking")
+                                                    .Where(c => c.InwardFacilityID == facilityID && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                    .OrderByDescending(c => c.InsertDate)
+                                                    .FirstOrDefault().FacilityBookingCharge_FacilityBooking.Select(x => x.InwardFacilityCharge).AsQueryable()
+        );
+
         public static readonly Func<DatabaseApp, Guid, Guid, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Mat_LotNotNull_NotAvailable =
         EF.CompileQuery<DatabaseApp, Guid, Guid, bool, IQueryable<FacilityCharge>>(
             (ctx, facilityID, materialID, notAvailable) => ctx.FacilityCharge

@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
-using Microsoft.EntityFrameworkCore;
+using gip.mes.facility;
+
 
 namespace gip.mes.processapplication
 {
@@ -499,6 +500,10 @@ namespace gip.mes.processapplication
                 resultSequence.Message = msg;
                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
             }
+            else
+            {
+                OperationLogItems.ValueT = GetOperationList();
+            }
 
             // Info50087: Output operation is successfully performed!
             resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50087");
@@ -537,8 +542,10 @@ namespace gip.mes.processapplication
                          .OrderBy(c => c.ol.InsertDate)
                          .Select(c => new OperationLogItem()
                          {
-                             MaterialNo = c.ol.FacilityCharge.Material.MaterialNo,
-                             MaterialName = c.ol.FacilityCharge.Material.MaterialName1,
+                             MaterialNo = c.ol.FacilityCharge.Partslist.Material.MaterialNo,
+                             MaterialName = c.ol.FacilityCharge.Partslist.Material.MaterialName1,
+                             LotNo = c.ol.FacilityCharge.FacilityLot.LotNo,
+                             SplitNo = c.ol.FacilityCharge.SplitNo,
                              ProgramNo = c.orlog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                              TimeEntered = c.ol.InsertDate,
                              ACProgramLog = c.ol.ACProgramLog
@@ -558,11 +565,13 @@ namespace gip.mes.processapplication
                         item.Duration = defDuration;
                         item.HintDuration = defHintDuration;
 
+                        WriteDurationFromConfiguration(databaseApp, item);
+
                         Guid? parentProgramLogID = item.ACProgramLog?.ACProgramLog1_ParentACProgramLog?.ACProgramLogID;
                         if (parentProgramLogID != null)
                         {
                             OrderLog orderLog = databaseApp.OrderLog.Where(c => c.VBiACProgramLogID == (parentProgramLogID ?? Guid.Empty)).FirstOrDefault();
-                            if(orderLog != null)
+                            if (orderLog != null)
                             {
                                 item.ProgramNo = orderLog.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
                             }
@@ -581,6 +590,63 @@ namespace gip.mes.processapplication
             return list;
         }
 
+        private void WriteDurationFromConfiguration(vd.DatabaseApp databaseApp, vd.OperationLogItem item)
+        {
+            vd.ProdOrderPartslistPos pos = null;
+            vd.ProdOrderPartslist prodOrderPartslist = null;
+            vd.OrderLog orderLog = databaseApp.OrderLog.Where(c => c.VBiACProgramLogID == item.ACProgramLogID).FirstOrDefault();
+            if (orderLog != null)
+            {
+                if (orderLog.ProdOrderPartslistPos != null)
+                {
+                    pos = orderLog.ProdOrderPartslistPos;
+                    prodOrderPartslist = pos.ProdOrderPartslist;
+                }
+                else if (orderLog.ProdOrderPartslistPosRelation != null)
+                {
+                    pos = orderLog.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos;
+                    prodOrderPartslist = pos.ProdOrderPartslist;
+                }
+            }
+
+            if (prodOrderPartslist != null)
+            {
+                ACProdOrderManager prodOrderManager = ApplicationManager.FindChildComponents<ACProdOrderManager>().FirstOrDefault();
+                ConfigManagerIPlus configManager = ApplicationManager.FindChildComponents<ConfigManagerIPlus>().FirstOrDefault();
+
+                if (prodOrderManager != null && configManager != null)
+                {
+                    vd.PartslistACClassMethod method = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                    if (method != null)
+                    {
+
+                        vd.ACClassWF wfMES = pos.ProdOrderBatch.ProdOrderBatchPlan.VBiACClassWF;
+                      
+                        if (wfMES != null)
+                        {
+                            gip.core.datamodel.ACClassWF wfNode = wfMES.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
+                            PartslistConfigExtract partslistConfigExtract = new PartslistConfigExtract(configManager, prodOrderManager, prodOrderPartslist.Partslist, wfNode, wfMES);
+
+                            partslistConfigExtract.MandatoryConfigStores.Add(prodOrderPartslist);
+
+                            IACConfig configDuration = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_DurationSecAVG);
+                            if (configDuration != null)
+                            {
+                                int duration = (int)configDuration.Value;
+                                item.Duration = TimeSpan.FromSeconds(duration);
+                            }
+                            IACConfig configOffset = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_OffsetToEndTime);
+                            if (configOffset != null)
+                            {
+                                item.HintDuration = (TimeSpan)configOffset.Value;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+        }
         #endregion
     }
 }

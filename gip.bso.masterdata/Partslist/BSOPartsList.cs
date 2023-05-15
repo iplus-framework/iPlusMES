@@ -668,7 +668,9 @@ namespace gip.bso.masterdata
                     .OrderBy(x => x.Sequence)
                     .ToList();
                 foreach (var pos in list)
-                    pos.PositionUsedCount = pos.PartslistPosRelation_SourcePartslistPos.Count();
+                {
+                    pos.CalcPositionUsedCount();
+                }
                 return list;
             }
         }
@@ -1156,6 +1158,8 @@ namespace gip.bso.masterdata
                     _SelectedIntermediateParts.OnEntityPropertyChanged(nameof(PartslistPosRelation.TargetQuantityUOM));
                     OnPropertyChanged(nameof(SelectedIntermediateParts));
                     OnPropertyChanged(nameof(IntermediatePartsList));
+
+                    _SelectedIntermediateParts.SourcePartslistPos.CalcPositionUsedCount();
                 }
             }
         }
@@ -1193,6 +1197,7 @@ namespace gip.bso.masterdata
         public void DeleteIntermediateParts()
         {
             if (!PreExecute()) return;
+            PartslistPos sourcePos = SelectedIntermediateParts.SourcePartslistPos;
             Msg msg = SelectedIntermediateParts.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
@@ -1212,6 +1217,7 @@ namespace gip.bso.masterdata
                 SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Remove(SelectedIntermediateParts);
                 SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
+                sourcePos.CalcPositionUsedCount();
                 OnPropertyChanged(nameof(IntermediatePartsList));
                 OnPropertyChanged(nameof(PartslistPosList));
             }
@@ -1502,7 +1508,7 @@ namespace gip.bso.masterdata
                 }
 
                 OnPropertyChanged();
-                if(_ProcessWorkflow != null)
+                if (_ProcessWorkflow != null)
                 {
                     AccessConfigurationTransfer.NavSearch();
                 }
@@ -2535,33 +2541,6 @@ namespace gip.bso.masterdata
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
-        }
-
-        #endregion
-
-        #region ShowDialogSelectSources
-
-        [ACMethodInfo("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655)]
-        public void ShowDialogSelectSources()
-        {
-            if (!IsEnabledShowDialogSelectSources())
-                return;
-
-            gip.core.datamodel.ACClassWF wf = ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF;
-            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID, CurrentPartslist.PartslistID);
-        }
-
-        public bool IsEnabledShowDialogSelectSources()
-        {
-            return
-                CurrentPartslist != null
-                && CurrentProcessWorkflow != null
-                && BSOSourceSelectionRules_Child != null
-                && BSOSourceSelectionRules_Child.Value != null
-                && ProcessWorkflowPresenter != null
-                && ProcessWorkflowPresenter.SelectedWFNode != null
-                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
-                //&& ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.IsWFProdNode("PWNodeProcessWorkflowVB");
         }
 
         #endregion

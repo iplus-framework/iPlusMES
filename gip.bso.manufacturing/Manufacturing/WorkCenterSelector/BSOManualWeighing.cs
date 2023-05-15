@@ -117,7 +117,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         #region Private fields
 
         private bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
@@ -603,7 +602,13 @@ namespace gip.bso.manufacturing
                         _StartWeighingFromF_FC = true;
                         _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
 
-                        if (AutoSelectLot)
+                        if (DiffWeighing && SelectedWeighingMaterial.DiffWeighOnEnd && SelectedWeighingMaterial.QuantInWeighing.HasValue)
+                        {
+                            var fc = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == SelectedWeighingMaterial.QuantInWeighing.Value);
+                            if (fc != null)
+                                SelectedFacilityCharge = fc;
+                        }
+                        else if (AutoSelectLot)
                         {
                             if (FacilityChargeListCount > 1 && MultipleLotsSelectionRule.HasValue && MultipleLotsSelectionRule.Value > LotSelectionRuleEnum.None)
                             {

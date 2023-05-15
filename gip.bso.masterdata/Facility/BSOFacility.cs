@@ -1,11 +1,13 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
-using Microsoft.EntityFrameworkCore;
+using gip.mes.facility;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-
+using Microsoft.EntityFrameworkCore;
 namespace gip.bso.masterdata
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
@@ -42,11 +44,15 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _FacilityOEEManager = ACFacilityOEEManager.ACRefToServiceInstance(this);
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_FacilityOEEManager != null)
+                ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
+            _FacilityOEEManager = null;
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -64,9 +70,93 @@ namespace gip.bso.masterdata
 
         #endregion
 
+
+        #region Properties
+
+        #region Managers
+        protected ACRef<ACFacilityOEEManager> _FacilityOEEManager = null;
+        public ACFacilityOEEManager FacilityOEEManager
+        {
+            get
+            {
+                if (_FacilityOEEManager == null)
+                    return null;
+                return _FacilityOEEManager.ValueT;
+            }
+        }
+        #endregion
+
+        #region FacilityMaterial
+        private FacilityMaterial _SelectedFacilityMaterial;
+        /// <summary>
+        /// Selected property for FacilityMaterial
+        /// </summary>
+        /// <value>The selected FacilityMaterial</value>
+        [ACPropertySelected(9999, "FacilityMaterial", "en{'TODO: FacilityMaterial'}de{'TODO: FacilityMaterial'}")]
+        public FacilityMaterial SelectedFacilityMaterial
+        {
+            get
+            {
+                return _SelectedFacilityMaterial;
+            }
+            set
+            {
+                if (_SelectedFacilityMaterial != value)
+                {
+                    _SelectedFacilityMaterial = value;
+                    OnPropertyChanged(nameof(SelectedFacilityMaterial));
+                }
+            }
+        }
+
+
+        private List<FacilityMaterial> _FacilityMaterialList;
+        /// <summary>
+        /// List property for FacilityMaterial
+        /// </summary>
+        /// <value>The FacilityMaterial list</value>
+        [ACPropertyList(9999, "FacilityMaterial")]
+        public List<FacilityMaterial> FacilityMaterialList
+        {
+            get
+            {
+                if (_FacilityMaterialList == null)
+                    _FacilityMaterialList = LoadFacilityMaterialList();
+                return _FacilityMaterialList;
+            }
+            set
+            {
+                _FacilityMaterialList = value;
+                OnPropertyChanged(nameof(FacilityMaterialList));
+            }
+        }
+
+        private List<FacilityMaterial> LoadFacilityMaterialList()
+        {
+            if (SelectedFacility == null)
+                return new List<FacilityMaterial>();
+            return
+                SelectedFacility
+                .FacilityMaterial_Facility
+                .OrderBy(c => c.Material.MaterialNo)
+                .ToList();
+        }
+        #endregion
+
+        #endregion
+
         #region Methods
 
-        #region Mehtods ->  BSO -> ACMethod
+        #region BSO
+
+        public override void OnPropertyChanged([CallerMemberName] string name = "")
+        {
+            base.OnPropertyChanged(name);
+            if (name == nameof(SelectedFacility))
+            {
+                FacilityMaterialList = LoadFacilityMaterialList();
+            }
+        }
 
         /// <summary>
         /// Saves this instance.
@@ -228,7 +318,204 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region FacilityMaterial and OEE
+        [ACMethodInfo("", "en{'Add'}de{'Neu'}", 700)]
+        public void AddFacilityMaterial()
+        {
+            if (!IsEnabledAddFacilityMaterial())
+                return;
+
+            FacilityMaterial facilityMaterial = FacilityMaterial.NewACObject(DatabaseApp, null);
+            facilityMaterial.Facility = SelectedFacility;
+            SelectedFacility.FacilityMaterial_Facility.Add(facilityMaterial);
+            FacilityMaterialList.Add(facilityMaterial);
+            OnPropertyChanged(nameof(FacilityMaterialList));
+
+            SelectedFacilityMaterial = facilityMaterial;
+        }
+
+        public bool IsEnabledAddFacilityMaterial()
+        {
+            return SelectedFacility != null;
+        }
+
+
+        /// <summary>
+        /// Source Property: DeleteFacility
+        /// </summary>
+        [ACMethodInfo("", "en{'Delete'}de{'Löschen'}", 701)]
+        public void DeleteFacilityMaterial()
+        {
+            if (!IsEnabledDeleteFacilityMaterial())
+                return;
+
+            SelectedFacility.FacilityMaterial_Facility.Remove(SelectedFacilityMaterial);
+            FacilityMaterialList.Remove(SelectedFacilityMaterial);
+
+            SelectedFacilityMaterial.DeleteACObject(DatabaseApp, false);
+
+            OnPropertyChanged(nameof(FacilityMaterialList));
+        }
+
+        public bool IsEnabledDeleteFacilityMaterial()
+        {
+            return SelectedFacilityMaterial != null;
+        }
+
+
+        [ACMethodInfo("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703)]
+        public void GenerateTestOEEData()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
+                Msg msg = FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
+                if (msg != null)
+                    Messages.Msg(msg);
+            }
+        }
+
+        public bool IsEnabledGenerateTestOEEData()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
+
+        [ACMethodInfo("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704)]
+        public void DeleteTestOEEData()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
+                FacilityOEEManager.DeleteTestOEEData(dbApp, facilityMaterial);
+            }
+        }
+
+        public bool IsEnabledDeleteTestOEEData()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
+
+
+        [ACMethodInfo("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705)]
+        public void RecalcThroughputAverage()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+
+            Msg msg = FacilityOEEManager.RecalcThroughputAverage(this.DatabaseApp, SelectedFacilityMaterial, false);
+            if (msg != null)
+                Messages.Msg(msg);
+        }
+
+        public bool IsEnabledRecalcThroughputAverage()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
+
+        [ACMethodInfo("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706)]
+        public void RecalcThroughputAndOEE()
+        {
+            if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
+                return;
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
+                Msg msg = FacilityOEEManager.RecalcThroughputAndOEE(dbApp, facilityMaterial, null, null);
+                if (msg != null)
+                    Messages.Msg(msg);
+            }
+        }
+
+        public bool IsEnabledRecalcThroughputAndOEE()
+        {
+            return SelectedFacilityMaterial != null && FacilityOEEManager != null;
+        }
         #endregion
 
+        #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(AddFacility):
+                    AddFacility();
+                    return true;
+                case nameof(IsEnabledAddFacility):
+                    result = IsEnabledAddFacility();
+                    return true;
+                case nameof(DeleteFacility):
+                    DeleteFacility();
+                    return true;
+                case nameof(IsEnabledDeleteFacility):
+                    result = IsEnabledDeleteFacility();
+                    return true;
+                case nameof(AddFacilityMaterial):
+                    AddFacilityMaterial();
+                    return true;
+                case nameof(IsEnabledAddFacilityMaterial):
+                    result = IsEnabledAddFacilityMaterial();
+                    return true;
+                case nameof(DeleteFacilityMaterial):
+                    DeleteFacilityMaterial();
+                    return true;
+                case nameof(IsEnabledDeleteFacilityMaterial):
+                    result = IsEnabledDeleteFacilityMaterial();
+                    return true;
+                case nameof(GenerateTestOEEData):
+                    GenerateTestOEEData();
+                    return true;
+                case nameof(IsEnabledGenerateTestOEEData):
+                    result = IsEnabledGenerateTestOEEData();
+                    return true;
+                case nameof(DeleteTestOEEData):
+                    DeleteTestOEEData();
+                    return true;
+                case nameof(IsEnabledDeleteTestOEEData):
+                    result = IsEnabledDeleteTestOEEData();
+                    return true;
+                case nameof(RecalcThroughputAverage):
+                    RecalcThroughputAverage();
+                    return true;
+                case nameof(IsEnabledRecalcThroughputAverage):
+                    result = IsEnabledRecalcThroughputAverage();
+                    return true;
+                case nameof(RecalcThroughputAndOEE):
+                    RecalcThroughputAndOEE();
+                    return true;
+                case nameof(IsEnabledRecalcThroughputAndOEE):
+                    result = IsEnabledRecalcThroughputAndOEE();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
+
+        #endregion
     }
 }
