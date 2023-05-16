@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using gip.core.datamodel;
+using System.Configuration;
 
 namespace gip.mes.datamodel;
 
@@ -516,8 +517,10 @@ public partial class iPlusMESV5Context : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(new ACMaterializationInterceptor())
-            //.UseModel(iPlusV5CompiledModels.iPlusV5ContextModel.Instance) TODO Mario
+            .UseModel(iPlusMESV5ContextModel.Instance)
             .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
+            //Uncomment connection string when generating new CompiledModels
+            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV4_Entities"].ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

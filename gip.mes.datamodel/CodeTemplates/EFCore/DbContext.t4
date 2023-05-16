@@ -33,7 +33,8 @@
         "System.Collections.Generic",
         "Microsoft.EntityFrameworkCore",
         "gip.core.datamodel",
-        "Microsoft.EntityFrameworkCore.Diagnostics"
+        "Microsoft.EntityFrameworkCore.Diagnostics",
+        "System.Configuration"
     };
 
     if (NamespaceHint != Options.ModelNamespace
@@ -86,6 +87,11 @@ public partial class <#= Options.ContextName #> : DbContext
 #>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.AddInterceptors(new ACMaterializationInterceptor())
+            .UseModel(iPlusMESV5ContextModel.Instance)
+            .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
+            //Uncomment connection string when generating new CompiledModels
+            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV4_Entities"].ConnectionString);
 <#
     if (!Options.SuppressConnectionStringWarning)
     {
