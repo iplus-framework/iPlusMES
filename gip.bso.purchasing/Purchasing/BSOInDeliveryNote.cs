@@ -366,7 +366,7 @@ namespace gip.bso.purchasing
             get
             {
                 decimal rating = 0;
-                if (CurrentDeliveryNote != null && CurrentDeliveryNote.DeliveryCompanyAddressID != null)
+                if (CurrentDeliveryNote != null && CurrentDeliveryNote.DeliveryCompanyAddressID != Guid.Empty)
                 {
                     Rating item = CurrentDeliveryNote.Rating_DeliveryNote.Where(x => x.CompanyID == CurrentDeliveryNote.DeliveryCompanyAddress.CompanyID).FirstOrDefault();
                     if (item != null)
@@ -376,7 +376,7 @@ namespace gip.bso.purchasing
             }
             set
             {
-                if (CurrentDeliveryNote != null && CurrentDeliveryNote.DeliveryCompanyAddressID != null)
+                if (CurrentDeliveryNote != null && CurrentDeliveryNote.DeliveryCompanyAddressID != Guid.Empty)
                 {
                     Rating item = CurrentDeliveryNote.Rating_DeliveryNote.Where(x => x.CompanyID == CurrentDeliveryNote.DeliveryCompanyAddress.CompanyID).FirstOrDefault();
                     if (item == null)
@@ -404,7 +404,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                return CurrentDeliveryNote != null && CurrentDeliveryNote.DeliveryCompanyAddressID != null;
+                return CurrentDeliveryNote != null && CurrentDeliveryNote.DeliveryCompanyAddressID != Guid.Empty;
             }
         }
 
