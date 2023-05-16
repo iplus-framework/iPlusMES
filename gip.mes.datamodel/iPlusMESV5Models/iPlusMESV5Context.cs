@@ -515,6 +515,9 @@ public partial class iPlusMESV5Context : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.AddInterceptors(new ACMaterializationInterceptor())
+            //.UseModel(iPlusV5CompiledModels.iPlusV5ContextModel.Instance) TODO Mario
+            .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

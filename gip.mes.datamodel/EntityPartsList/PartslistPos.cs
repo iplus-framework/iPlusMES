@@ -309,6 +309,7 @@ namespace gip.mes.datamodel
 
         private int _PositionUsedCount;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public int PositionUsedCount
         {
             get
