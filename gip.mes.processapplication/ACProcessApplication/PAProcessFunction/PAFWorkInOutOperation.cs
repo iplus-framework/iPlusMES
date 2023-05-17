@@ -151,7 +151,13 @@ namespace gip.mes.processapplication
                     }
 
                     ProdOrder pOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == fc.ProdOrderProgramNo);
-                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == fc.Partslist.Material.MaterialID);
+
+                    Guid materialID = fc.MaterialID;
+                    if (fc.Partslist != null)
+                    {
+                        materialID = fc.Partslist.MaterialID;
+                    }
+                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == materialID);
 
                     PAProdOrderPartslistWFInfo orderForOccup = null;
                     PAProdOrderPartslistWFInfo orderForRelease = null;
@@ -253,13 +259,33 @@ namespace gip.mes.processapplication
                                     }
                                     else
                                     {
-                                        //TODO check is any quants on facility that are not processed over operationlog
+                                        string quants = "-";
+                                        if (poPl != null && inOperationLog != null && inOperationLog.FacilityCharge.Partslist != null)
+                                        {
+                                            List<FacilityCharge> facilityCharges =
+                                                poPl
+                                                .ProdOrderPartslistPos_ProdOrderPartslist
+                                                .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPos)
+                                                .Select(c => c.InwardFacilityCharge)
+                                                .Where(c=>c.MaterialID == inOperationLog.FacilityCharge.MaterialID)
+                                                .GroupBy(c => c.FacilityChargeID)
+                                                .Select(c => c.FirstOrDefault())
+                                                .ToList();
 
-                                        
+                                            facilityCharges = facilityCharges.Where(c => !c.OperationLog_FacilityCharge.Any()).ToList();
+
+                                            if (facilityCharges.Any())
+                                            {
+                                                quants = string.Join(",", facilityCharges.Select(c => c.FacilityLot.LotNo + " " + c.SplitNo));
+                                            }
+                                        }
+                                        // Question50100
+                                        // Do you want pause order on machine. Answer with <Yes>, with <No> you will release machine? Not processed quants: {0}.
+                                        // Möchten Sie die Bestellung am Maschine pausieren? Antworten Sie mit <Ja>, mit <Nein> geben Sie die Maschine frei? Nicht verarbeitete Quants: {0}.
 
                                         sequence.QuestionSequence = 2;
                                         sequence.State = BarcodeSequenceBase.ActionState.Question;
-                                        sequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Do you want pause order on machine. Answer with <Yes>, with <No> you will release machine?", eMsgButton.YesNo);
+                                        sequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Question50100", eMsgButton.YesNo, quants);
                                         result.Result = sequence;
                                         return result;
                                     }
@@ -354,11 +380,12 @@ namespace gip.mes.processapplication
                         {
                             if (durationToCheck < minDuration)
                             {
-                                // 
-                                // Question50092: The quant is not long enough in a object. Do you want to continue with a output operation?TODO: better translation
+                                // Question50099
+                                // The quant has not been processed long enough! Do you want to continue with a quit operation?
+                                // Das Quantum wurde nicht lange genug verarbeitet! Möchten Sie mit einem Quit-Vorgang fortfahren?
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Question;
                                 resultSequence.QuestionSequence = 1;
-                                resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "The duration time is not reached. Do you want to continue with a output operation?", eMsgButton.YesNo);
+                                resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Question50099", eMsgButton.YesNo);
                                 return;
                             }
                         }
@@ -651,8 +678,15 @@ namespace gip.mes.processapplication
 
             OperationLogItem logItem = new OperationLogItem();
             logItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
-            logItem.MaterialNo = operationLog.FacilityCharge.Partslist?.Material.MaterialNo;
-            logItem.MaterialName = operationLog.FacilityCharge.Partslist?.Material.MaterialName1;
+
+            Material material = operationLog.FacilityCharge.Material;
+            if (operationLog.FacilityCharge.Partslist != null)
+            {
+                material = operationLog.FacilityCharge.Partslist.Material;
+            }
+            logItem.MaterialNo = material.MaterialNo;
+            logItem.MaterialName = material.MaterialName1;
+
             logItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
             logItem.SplitNo = operationLog.FacilityCharge.SplitNo;
             logItem.TimeEntered = operationLog.OperationTime;
@@ -710,7 +744,7 @@ namespace gip.mes.processapplication
             }
             catch (Exception e)
             {
-                //todo
+                Messages.LogException(this.GetACUrl(), "WriteParametersToOperationLogItem(0)", e.Message);
             }
         }
 
@@ -735,15 +769,23 @@ namespace gip.mes.processapplication
                 {
                     OperationLogItem logItem = new OperationLogItem();
                     logItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
-                    logItem.MaterialNo = operationLog.FacilityCharge.Partslist?.Material.MaterialNo;
-                    logItem.MaterialName = operationLog.FacilityCharge.Partslist?.Material.MaterialName1;
+
+                    Material material = operationLog.FacilityCharge.Material;
+                    if (operationLog.FacilityCharge.Partslist != null)
+                    {
+                        material = operationLog.FacilityCharge.Partslist.Material;
+                    }
+                    logItem.MaterialNo = material.MaterialNo;
+                    logItem.MaterialName = material.MaterialName1;
+
                     logItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
                     logItem.SplitNo = operationLog.FacilityCharge.SplitNo;
                     logItem.TimeEntered = operationLog.OperationTime;
                     logItem.ProgramNo = operationLog.FacilityCharge.ProdOrderProgramNo;
 
                     ProdOrder pOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == logItem.ProgramNo);
-                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == operationLog.FacilityCharge.Partslist.MaterialID);
+
+                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == material.MaterialID);
 
                     PWWorkTaskScanBase pwNode = null;
 
