@@ -128,6 +128,7 @@ namespace gip.mes.processapplication
                     OperationLog inOperationLog = dbApp.OperationLog.Include(c => c.FacilityCharge)
                                                                     .Include(c => c.FacilityCharge.Material)
                                                                     .Include(c => c.FacilityCharge.FacilityLot)
+                                                                    .Include(c => c.FacilityCharge.Partslist)
                                                                     .Where(c => c.RefACClassID == ComponentClass.ACClassID
                                                                                  && c.FacilityChargeID != null
                                                                                  && c.FacilityChargeID == facilityChargeID
@@ -138,6 +139,7 @@ namespace gip.mes.processapplication
                     FacilityCharge fc = inOperationLog != null ? inOperationLog.FacilityCharge : dbApp.FacilityCharge
                                                                                                       .Include(c => c.Material)
                                                                                                       .Include(c => c.FacilityLot)
+                                                                                                      .Include(c => c.Partslist)
                                                                                                       .FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
                     if (fc == null)
                     {
@@ -149,7 +151,7 @@ namespace gip.mes.processapplication
                     }
 
                     ProdOrder pOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == fc.ProdOrderProgramNo);
-                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == fc.MaterialID);
+                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == fc.Partslist.Material.MaterialID);
 
                     PAProdOrderPartslistWFInfo orderForOccup = null;
                     PAProdOrderPartslistWFInfo orderForRelease = null;
@@ -649,9 +651,9 @@ namespace gip.mes.processapplication
 
             OperationLogItem logItem = new OperationLogItem();
             logItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
-            logItem.MaterialNo = operationLog.FacilityCharge.Material.MaterialNo;
-            logItem.MaterialName = operationLog.FacilityCharge.Material.MaterialName1;
-            logItem.LotNo = operationLog.FacilityCharge.FacilityLot.LotNo;
+            logItem.MaterialNo = operationLog.FacilityCharge.Partslist?.Material.MaterialNo;
+            logItem.MaterialName = operationLog.FacilityCharge.Partslist?.Material.MaterialName1;
+            logItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
             logItem.SplitNo = operationLog.FacilityCharge.SplitNo;
             logItem.TimeEntered = operationLog.OperationTime;
             logItem.ProgramNo = operationLog.FacilityCharge.ProdOrderProgramNo;
@@ -720,6 +722,7 @@ namespace gip.mes.processapplication
             {
                 var operationLogs = dbApp.OperationLog.Include(c => c.FacilityCharge.Material)
                                                       .Include(c => c.FacilityCharge.FacilityLot)
+                                                      .Include(c => c.FacilityCharge.Partslist)
                                                       .Where(c => c.RefACClassID == this.ComponentClass.ACClassID
                                                                && c.OperationState == (short)OperationLogStateEnum.Open)
                                                       .OrderBy(c => c.InsertDate)
@@ -732,15 +735,15 @@ namespace gip.mes.processapplication
                 {
                     OperationLogItem logItem = new OperationLogItem();
                     logItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
-                    logItem.MaterialNo = operationLog.FacilityCharge.Material.MaterialNo;
-                    logItem.MaterialName = operationLog.FacilityCharge.Material.MaterialName1;
-                    logItem.LotNo = operationLog.FacilityCharge.FacilityLot.LotNo;
+                    logItem.MaterialNo = operationLog.FacilityCharge.Partslist?.Material.MaterialNo;
+                    logItem.MaterialName = operationLog.FacilityCharge.Partslist?.Material.MaterialName1;
+                    logItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
                     logItem.SplitNo = operationLog.FacilityCharge.SplitNo;
                     logItem.TimeEntered = operationLog.OperationTime;
                     logItem.ProgramNo = operationLog.FacilityCharge.ProdOrderProgramNo;
 
                     ProdOrder pOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == logItem.ProgramNo);
-                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == operationLog.FacilityCharge.MaterialID);
+                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == operationLog.FacilityCharge.Partslist.MaterialID);
 
                     PWWorkTaskScanBase pwNode = null;
 

@@ -91,10 +91,10 @@ namespace gip.mes.processapplication
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
 
             method.ParameterValueList.Add(new ACValue("MinDuration", typeof(TimeSpan), null, Global.ParamOption.Optional));
-            paramTranslation.Add("MinDuration", "en{'Minimum duration'}de{'Minimum duration'}");
+            paramTranslation.Add("MinDuration", ConstApp.MinDuration);
 
             method.ParameterValueList.Add(new ACValue("MaxDuration", typeof(TimeSpan), null, Global.ParamOption.Optional));
-            paramTranslation.Add("MaxDuration", "en{'Maximum duration'}de{'Maximum duration'}");
+            paramTranslation.Add("MaxDuration", ConstApp.MaxDuration);
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
 
@@ -532,8 +532,8 @@ namespace gip.mes.processapplication
                     List<OperationLogItem> items =
                          databaseApp
                          .OperationLog
+                         .Where(c => c.OperationState == 10 && c.RefACClassID == this.ComponentClass.ACClassID)
                          .GroupBy(c => new { c.ACProgramLogID, c.FacilityChargeID })
-                         .Where(c => c.Count() == 1)
                          .Select(c => c.FirstOrDefault())
                          .Join(databaseApp.ACProgramLog, ol => ol.ACProgramLogID, acPr => acPr.ACProgramLogID, (ol, acPr) => new { ol, acPr })
                          .Join(databaseApp.ACProgramLog, ol => ol.acPr.ParentACProgramLogID, parAcPr => parAcPr.ACProgramLogID, (ol, parAcPr) => new { ol.ol, ol.acPr, parAcPr })
@@ -552,7 +552,9 @@ namespace gip.mes.processapplication
                          .ToList();
 
                     // TODO: @aagincic replace with values read from workflow configuration
-                    TimeSpan defDuration = TimeSpan.FromMinutes(4);
+                    TimeSpan minDuration = TimeSpan.FromMinutes(3);
+                    TimeSpan maxDuration = TimeSpan.FromMinutes(7);
+                    TimeSpan duration = TimeSpan.FromMinutes(5);
                     TimeSpan defHintDuration = TimeSpan.FromMinutes(1);
 
 
@@ -561,10 +563,12 @@ namespace gip.mes.processapplication
                     {
                         nr++;
                         item.Sn = nr;
-                        item.Duration = defDuration;
+
+                        item.MinDuration = minDuration;
+                        item.MaxDuration = maxDuration;
+                        item.Duration = duration;
                         item.HintDuration = defHintDuration;
 
-                        WriteDurationFromConfiguration(databaseApp, item);
 
                         Guid? parentProgramLogID = item.ACProgramLog?.ACProgramLog1_ParentACProgramLog?.ACProgramLogID;
                         if (parentProgramLogID != null)
@@ -589,63 +593,6 @@ namespace gip.mes.processapplication
             return list;
         }
 
-        private void WriteDurationFromConfiguration(vd.DatabaseApp databaseApp, vd.OperationLogItem item)
-        {
-            vd.ProdOrderPartslistPos pos = null;
-            vd.ProdOrderPartslist prodOrderPartslist = null;
-            vd.OrderLog orderLog = databaseApp.OrderLog.Where(c => c.VBiACProgramLogID == item.ACProgramLogID).FirstOrDefault();
-            if (orderLog != null)
-            {
-                if (orderLog.ProdOrderPartslistPos != null)
-                {
-                    pos = orderLog.ProdOrderPartslistPos;
-                    prodOrderPartslist = pos.ProdOrderPartslist;
-                }
-                else if (orderLog.ProdOrderPartslistPosRelation != null)
-                {
-                    pos = orderLog.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos;
-                    prodOrderPartslist = pos.ProdOrderPartslist;
-                }
-            }
-
-            if (prodOrderPartslist != null)
-            {
-                ACProdOrderManager prodOrderManager = ApplicationManager.FindChildComponents<ACProdOrderManager>().FirstOrDefault();
-                ConfigManagerIPlus configManager = ApplicationManager.FindChildComponents<ConfigManagerIPlus>().FirstOrDefault();
-
-                if (prodOrderManager != null && configManager != null)
-                {
-                    vd.PartslistACClassMethod method = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                    if (method != null)
-                    {
-
-                        vd.ACClassWF wfMES = pos.ProdOrderBatch.ProdOrderBatchPlan.VBiACClassWF;
-                      
-                        if (wfMES != null)
-                        {
-                            gip.core.datamodel.ACClassWF wfNode = wfMES.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
-                            PartslistConfigExtract partslistConfigExtract = new PartslistConfigExtract(configManager, prodOrderManager, prodOrderPartslist.Partslist, wfNode, wfMES);
-
-                            partslistConfigExtract.MandatoryConfigStores.Add(prodOrderPartslist);
-
-                            IACConfig configDuration = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_DurationSecAVG);
-                            if (configDuration != null)
-                            {
-                                int duration = (int)configDuration.Value;
-                                item.Duration = TimeSpan.FromSeconds(duration);
-                            }
-                            IACConfig configOffset = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_OffsetToEndTime);
-                            if (configOffset != null)
-                            {
-                                item.HintDuration = (TimeSpan)configOffset.Value;
-                            }
-                        }
-
-                    }
-                }
-            }
-
-        }
         #endregion
     }
 }
