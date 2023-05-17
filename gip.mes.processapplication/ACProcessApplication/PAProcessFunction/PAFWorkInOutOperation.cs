@@ -210,12 +210,10 @@ namespace gip.mes.processapplication
                         if (sequence.QuestionSequence < 2)
                         {
                             CloseOperationLog(dbApp, inOperationLog, fc, sequence, sQuestionResult, currentACMethod);
+                            result.Result = sequence;
 
                             if (sequence.State == BarcodeSequenceBase.ActionState.Question || sequence.State == BarcodeSequenceBase.ActionState.Cancelled)
-                            {
-                                result.Result = sequence;
                                 return result;
-                            }
                         }
 
                         if (orderForRelease != null)
@@ -360,27 +358,6 @@ namespace gip.mes.processapplication
                                 resultSequence.QuestionSequence = 1;
                                 resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "The duration time is not reached. Do you want to continue with a output operation?", eMsgButton.YesNo);
                                 return;
-                            }
-                        }
-                    }
-
-                    ACValue maxDurationValue = acMethod.ParameterValueList.GetACValue("MaxDuration");
-                    if (maxDurationValue == null)
-                    {
-                        // Error50567: Maximum duration setting is not exist.
-                        resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(50)", 50, "Error50567");
-                        resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
-                    }
-
-                    if (maxDurationValue.Value != null)
-                    {
-                        TimeSpan maxDuration = maxDurationValue.ParamAsTimeSpan;
-                        if (maxDuration.TotalSeconds > 0)
-                        {
-                            if (durationToCheck > maxDuration)
-                            {
-                                // Warning50057 : The quant was too long in the object.
-                                resultSequence.Message = new Msg(this, eMsgLevel.Warning, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(60)", 60, "Warning50057");
                             }
                         }
                     }
