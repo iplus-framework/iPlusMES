@@ -73,6 +73,7 @@
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFPickingByMaterial.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkInOutOperation.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFInOutOperationOnScan.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskOnHold.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Picking.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeLoop.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWPickingByMaterial.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkInOutOperation.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskOnHold.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\ScaleBoundaries.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Rework.cs" />

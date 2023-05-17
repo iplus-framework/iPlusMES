@@ -91,7 +91,8 @@ namespace gip.mes.datamodel
             Completed = 2,
             Question = 10,
             Selection = 11,
-            FastSelection = 12
+            FastSelection = 12,
+            SelectionScanAgain = 13
         }
 
         public enum BarcodeIssuerEnum : short

@@ -358,7 +358,7 @@ namespace gip.mes.processapplication
 
 
         #region Private
-        private List<PAProdOrderPartslistWFInfo> GetWaitingProdOrderPartslistWFInfo()
+        protected List<PAProdOrderPartslistWFInfo> GetWaitingProdOrderPartslistWFInfo()
         {
             PAProcessModule parentPM = ParentACComponent as PAProcessModule;
             if (parentPM == null || ApplicationManager == null)
@@ -388,7 +388,7 @@ namespace gip.mes.processapplication
             return infoList;
         }
 
-        private List<PAProdOrderPartslistWFInfo> GetActivatedProdOrderPartslistWFInfo()
+        protected List<PAProdOrderPartslistWFInfo> GetActivatedProdOrderPartslistWFInfo()
         {
             PAProcessModule parentPM = ParentACComponent as PAProcessModule;
             if (parentPM == null || parentPM.Semaphore.ConnectionListCount <= 0)

@@ -28,6 +28,15 @@ namespace gip.mes.datamodel
         public Guid ACProgramLogID;
 
         #region DataMembers
+
+        [DataMember]
+        [ACPropertyInfo(9999)]
+        public Guid FacilityChargeID
+        {
+            get;
+            set;
+        }
+
         [DataMember]
         [ACPropertyInfo(1, "Sn", "en{'Sn'}de{'Sn'}")]
         public int Sn { get; set; }
