@@ -683,28 +683,13 @@ namespace gip.mes.processapplication
                 itemList = new OperationLogItemList();
             }
 
-            OperationLogItem logItem = new OperationLogItem();
-            logItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
-
-            Material material = operationLog.FacilityCharge.Material;
-            if (operationLog.FacilityCharge.Partslist != null)
-            {
-                material = operationLog.FacilityCharge.Partslist.Material;
-            }
-            logItem.MaterialNo = material.MaterialNo;
-            logItem.MaterialName = material.MaterialName1;
-
-            logItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
-            logItem.SplitNo = operationLog.FacilityCharge.SplitNo;
-            logItem.TimeEntered = operationLog.OperationTime;
-            logItem.ProgramNo = operationLog.FacilityCharge.ProdOrderProgramNo;
-
+            OperationLogItem logItem = NewOperationLogItem(operationLog);
             WriteParametersToOperationLogItem(logItem, parameters);
-
             itemList.Add(logItem);
-
             OperationLogItems.ValueT = itemList;
         }
+
+        
 
         public void RemoveFromOperationLogList(OperationLog operationLog)
         {
@@ -719,6 +704,27 @@ namespace gip.mes.processapplication
 
                 OperationLogItems.ValueT = tempList;
             }
+        }
+
+        private static OperationLogItem NewOperationLogItem(OperationLog operationLog)
+        {
+            OperationLogItem operationLogItem = new OperationLogItem();
+            operationLogItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
+
+            Material material = operationLog.FacilityCharge.Material;
+            if (operationLog.FacilityCharge.Partslist != null)
+            {
+                material = operationLog.FacilityCharge.Partslist.Material;
+            }
+            operationLogItem.MaterialID = material.MaterialID;
+            operationLogItem.MaterialNo = material.MaterialNo;
+            operationLogItem.MaterialName = material.MaterialName1;
+
+            operationLogItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
+            operationLogItem.SplitNo = operationLog.FacilityCharge.SplitNo;
+            operationLogItem.TimeEntered = operationLog.OperationTime;
+            operationLogItem.ProgramNo = operationLog.FacilityCharge.ProdOrderProgramNo;
+            return operationLogItem;
         }
 
         private void WriteParametersToOperationLogItem(OperationLogItem logItem, ACMethod parameters)
@@ -774,25 +780,11 @@ namespace gip.mes.processapplication
 
                 foreach (OperationLog operationLog in operationLogs)
                 {
-                    OperationLogItem logItem = new OperationLogItem();
-                    logItem.FacilityChargeID = operationLog.FacilityChargeID.Value;
-
-                    Material material = operationLog.FacilityCharge.Material;
-                    if (operationLog.FacilityCharge.Partslist != null)
-                    {
-                        material = operationLog.FacilityCharge.Partslist.Material;
-                    }
-                    logItem.MaterialNo = material.MaterialNo;
-                    logItem.MaterialName = material.MaterialName1;
-
-                    logItem.LotNo = operationLog.FacilityCharge.FacilityLot?.LotNo;
-                    logItem.SplitNo = operationLog.FacilityCharge.SplitNo;
-                    logItem.TimeEntered = operationLog.OperationTime;
-                    logItem.ProgramNo = operationLog.FacilityCharge.ProdOrderProgramNo;
+                    OperationLogItem logItem = NewOperationLogItem(operationLog);
 
                     ProdOrder pOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == logItem.ProgramNo);
 
-                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == material.MaterialID);
+                    ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == logItem.MaterialID);
 
                     PWWorkTaskScanBase pwNode = null;
 
@@ -806,7 +798,7 @@ namespace gip.mes.processapplication
                             pwNode = ACUrlCommand(order.ACUrlWF) as PWWorkTaskGeneric;
                     }
 
-                    ACMethod parameters = GetParameters(pwNode, dbApp, material.MaterialID);
+                    ACMethod parameters = GetParameters(pwNode, dbApp, logItem.MaterialID);
                     WriteParametersToOperationLogItem(logItem, parameters);
 
                     result.Add(logItem);

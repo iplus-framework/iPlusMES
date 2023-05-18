@@ -26,6 +26,7 @@ namespace gip.mes.datamodel
          */
 
         public Guid ACProgramLogID;
+        public Guid MaterialID;
 
         #region DataMembers
 
