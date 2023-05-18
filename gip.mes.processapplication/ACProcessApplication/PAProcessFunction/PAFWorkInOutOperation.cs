@@ -105,7 +105,7 @@ namespace gip.mes.processapplication
             {
                 result = base.OnScanEvent(sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, acMethod, malfunction);
 
-                if (result.Result.State == BarcodeSequenceBase.ActionState.Selection)
+                if (result.Result.State == BarcodeSequenceBase.ActionState.Selection ||result.Result.State == BarcodeSequenceBase.ActionState.Cancelled)
                 {
                     result.Result.State = BarcodeSequenceBase.ActionState.SelectionScanAgain;
                 }
