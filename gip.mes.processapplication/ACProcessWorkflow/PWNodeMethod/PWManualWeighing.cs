@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using DocumentFormat.OpenXml.Vml.Office;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -3174,7 +3175,7 @@ namespace gip.mes.processapplication
                 acMethod["Route"] = new Route();
             }
 
-            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))
                 return StartNextCompResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -3219,7 +3220,7 @@ namespace gip.mes.processapplication
             UpdateCurrentACMethod();
 
             _LastOpenMaterial = CurrentOpenMaterial;
-
+            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, responsibleFunc);
             return StartNextCompResult.NextCompStarted;
         }
 

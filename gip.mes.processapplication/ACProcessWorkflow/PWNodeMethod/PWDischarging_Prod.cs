@@ -308,7 +308,7 @@ namespace gip.mes.processapplication
                             OnSetLastBatchParam(acValue, acMethod, targetModule, dbApp, batchPlan, currentBatchPos);
 
                         NoTargetWait = null;
-                        if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
+                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
 
                         if (!acMethod.IsValid())
@@ -361,6 +361,7 @@ namespace gip.mes.processapplication
                             return StartDisResult.CycleWait;
                         }
                         AcknowledgeAlarms();
+                        ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule, responsibleFunc);
                         return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
                         //return StartDisResult.WaitForCallback;
                     }
@@ -502,7 +503,7 @@ namespace gip.mes.processapplication
                                     if (acValue != null)
                                         acValue.Value = (double)targetWeight;
                                 }
-                                if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
+                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
 
@@ -549,6 +550,7 @@ namespace gip.mes.processapplication
                                 UpdateCurrentACMethod();
 
                                 AcknowledgeAlarms();
+                                ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule, responsibleFunc);
                                 return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
                                 //return StartDisResult.WaitForCallback;
                             }
@@ -1051,7 +1053,7 @@ namespace gip.mes.processapplication
 
                     if (isNewACMethod)
                     {
-                        if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
+                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
                             return StartDisResult.CycleWait;
                     }
 
@@ -1080,6 +1082,7 @@ namespace gip.mes.processapplication
 
                         NoTargetWait = null;
                         this.TaskSubscriptionPoint.Persist(false);
+                        ExecuteMethod(nameof(OnACMethodSended), acMethod, false, dbApp, batchPlan, currentBatchPos, targetContainer, discharging);
                         OnSwitchedToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, plannedSilo);
                     }
                 }

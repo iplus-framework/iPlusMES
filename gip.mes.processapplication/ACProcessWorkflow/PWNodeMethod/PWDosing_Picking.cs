@@ -393,7 +393,7 @@ namespace gip.mes.processapplication
                     if (dosingRoute != null)
                         dosingRoute.Detach(true);
 
-                    if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, pickingPos, sourceSilo))
+                    if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, sourceSilo))
                     {
                         return StartNextCompResult.CycleWait;
                     }
@@ -453,6 +453,7 @@ namespace gip.mes.processapplication
                         OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Exception, PWClassName, "StartNextPickingPos", 1060), true);
                         return StartNextCompResult.CycleWait;
                     }
+                    ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, pickingPos, sourceSilo, responsibleFunc);
                     AcknowledgeAlarms();
 
                     return StartNextCompResult.NextCompStarted;
@@ -829,13 +830,15 @@ namespace gip.mes.processapplication
                         }
 
                         changePosState = true;
+                        double postingQuantity = actualQuantity.HasValue ? actualQuantity.Value : 0;
+                        OnDoDosingBookingPickingGetPostingQuantity(collectedMessages, sender, e, wrapObject, dbApp, pickingPos, outwardFacility, dosingFuncResultState, ref postingQuantity);
                         // Falls dosiert
-                        if (actualQuantity > 0.00001)
+                        if (postingQuantity > 0.00001 || postingQuantity < -0.00001)
                         {
                             // 1. Bereite Buchung vor
-                            FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
+                            FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, postingQuantity);
                             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                            bookingParam.OutwardQuantity = (double)actualQuantity;
+                            bookingParam.OutwardQuantity = (double)postingQuantity;
                             bookingParam.OutwardFacility = outwardFacility;
                             if (outwardFacility.Material != null)
                                 bookingParam.MDUnit = outwardFacility.Material.BaseMDUnit;
@@ -1098,6 +1101,12 @@ namespace gip.mes.processapplication
             }
 
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
+        }
+
+        public virtual void OnDoDosingBookingPickingGetPostingQuantity(MsgWithDetails collectedMessages, IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
+                                        DatabaseApp dbApp, PickingPos pickingPos, Facility outwardFacility,
+                                        PADosingAbortReason dosingFuncResultState, ref double postingQuantity)
+        {
         }
 
         /// <summary>

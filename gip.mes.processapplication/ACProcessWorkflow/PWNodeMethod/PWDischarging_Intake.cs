@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
+using DocumentFormat.OpenXml.Vml.Office;
 
 namespace gip.mes.processapplication
 {
@@ -422,7 +423,7 @@ namespace gip.mes.processapplication
                 acValueTargetQ.Value = targetQuantity;
 
             NoTargetWait = null;
-            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, dnPos, targetModule))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, dnPos, targetModule))
                 return StartDisResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -474,6 +475,7 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
             AcknowledgeAlarms();
+            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, dnPos, targetModule, responsibleFunc);
             return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
             //return StartDisResult.WaitForCallback;
         }
@@ -706,7 +708,7 @@ namespace gip.mes.processapplication
 
             if (isNewACMethod)
             {
-                if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, dnPos, targetSilo))
+                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, dnPos, targetSilo))
                     return StartDisResult.CycleWait;
             }
 
@@ -742,6 +744,8 @@ namespace gip.mes.processapplication
                 NoTargetWait = null;
                 // Quittiere Alarm
                 discharging.AcknowledgeAlarms();
+                ExecuteMethod(nameof(OnACMethodSended), acMethod, false, dbApp, dnPos, targetSilo, discharging);
+
                 if (discharging.CurrentACState == ACStateEnum.SMPaused)
                     discharging.Resume();
                 this.TaskSubscriptionPoint.Persist(false);

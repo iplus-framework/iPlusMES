@@ -771,7 +771,7 @@ namespace gip.mes.processapplication
                             if (dosingRoute != null)
                                 dosingRoute.Detach(true);
 
-                            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
                                 return StartNextCompResult.CycleWait;
 
                             if (!acMethod.IsValid())
@@ -829,6 +829,7 @@ namespace gip.mes.processapplication
                                 return StartNextCompResult.CycleWait;
                             }
                             AcknowledgeAlarms();
+                            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo, responsibleFunc);
                             return StartNextCompResult.NextCompStarted;
                             #endregion
                         }
@@ -1475,8 +1476,9 @@ namespace gip.mes.processapplication
 
                         // Positionstate must be set at last because of conccurrency-Problems if another Scale(PWGroup) is waiting for starting this dosing in the Applicationthread
                         if (changePosState)
-                        {
                             dosingPosRelation.MDProdOrderPartslistPosState = posState;
+                        if (changePosState || dbApp.IsChanged)
+                        { 
                             msg = dbApp.ACSaveChanges();
                             if (msg != null)
                             {
@@ -1583,8 +1585,8 @@ namespace gip.mes.processapplication
                     if (needKompScaling && !ScaleOtherComp && dosingPosRelation.ProdOrderBatch != null)
                     {
                         var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                            .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                            && c.MDProdOrderPartslistPosState != null
+                            .Where(c => //c.RemainingDosingWeight < -0.1 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                c.MDProdOrderPartslistPosState != null
                             && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                 || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
 
@@ -1762,8 +1764,8 @@ namespace gip.mes.processapplication
                             //dosingPosRelation.MDProdOrderPartslistPosState = posState;
 
                             var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                                .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                                && c.MDProdOrderPartslistPosState != null
+                                .Where(c => //c.RemainingDosingWeight < -0.1 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                   c.MDProdOrderPartslistPosState != null
                                 && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                     || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
 

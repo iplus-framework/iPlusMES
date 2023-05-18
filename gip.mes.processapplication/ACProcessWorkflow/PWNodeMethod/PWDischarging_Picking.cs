@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
+using System.Net;
 
 namespace gip.mes.processapplication
 {
@@ -306,7 +307,7 @@ namespace gip.mes.processapplication
             }
 
             NoTargetWait = null;
-            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, pickingPos, targetModule))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 return StartDisResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -359,6 +360,7 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
             AcknowledgeAlarms();
+            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, pickingPos, targetModule, responsibleFunc);
             return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
             //return StartDisResult.WaitForCallback;
         }
@@ -613,7 +615,7 @@ namespace gip.mes.processapplication
                     acValue.Value = (Int16)ParentPWMethod<PWMethodTransportBase>().IsLastBatch;
             }
 
-            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, pickingPos, targetModule))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 return StartDisResult.CycleWait;
 
             if (CurrentDischargingRoute != null)
@@ -647,6 +649,7 @@ namespace gip.mes.processapplication
                 NoTargetWait = null;
                 // Quittiere Alarm
                 discharging.AcknowledgeAlarms();
+                ExecuteMethod(nameof(OnACMethodSended), acMethod, false, dbApp, pickingPos, targetModule, discharging);
             }
             return StartDisResult.WaitForCallback;
         }
