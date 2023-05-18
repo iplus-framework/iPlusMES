@@ -194,7 +194,7 @@ namespace gip.mes.processapplication
                             pwNode = ACUrlCommand(orderForRelease.ACUrlWF) as PWWorkTaskScanBase;
                         }
 
-                        ACMethod currentACMethod = GetParameters(pwNode, dbApp, fc.MaterialID);
+                        ACMethod currentACMethod = GetParameters(pwNode, dbApp, materialID);
 
                         CreateOperationLog(dbApp, fc, sequence, currentACMethod);
 
@@ -212,7 +212,7 @@ namespace gip.mes.processapplication
                         if (orderForRelease != null)
                         {
                             pwNode = ACUrlCommand(orderForRelease.ACUrlWF) as PWWorkTaskGeneric;
-                            currentACMethod = GetParameters(pwNode, dbApp, fc.MaterialID);
+                            currentACMethod = GetParameters(pwNode, dbApp, materialID);
                         }
 
                         if (sequence.QuestionSequence < 2)
@@ -259,7 +259,7 @@ namespace gip.mes.processapplication
                                     }
                                     else
                                     {
-                                        string quants = "-";
+                                        string translationID = "Question50100";
                                         if (poPl != null && inOperationLog != null && inOperationLog.FacilityCharge.Partslist != null)
                                         {
                                             List<FacilityCharge> facilityCharges =
@@ -267,7 +267,7 @@ namespace gip.mes.processapplication
                                                 .ProdOrderPartslistPos_ProdOrderPartslist
                                                 .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPos)
                                                 .Select(c => c.InwardFacilityCharge)
-                                                .Where(c=>c.MaterialID == inOperationLog.FacilityCharge.MaterialID)
+                                                .Where(c => c.MaterialID == inOperationLog.FacilityCharge.MaterialID)
                                                 .GroupBy(c => c.FacilityChargeID)
                                                 .Select(c => c.FirstOrDefault())
                                                 .ToList();
@@ -276,28 +276,31 @@ namespace gip.mes.processapplication
 
                                             if (facilityCharges.Any())
                                             {
-                                                quants = string.Join(",", facilityCharges.Select(c => c.FacilityLot.LotNo + " " + c.SplitNo));
+                                                translationID = "Question50101";
                                             }
+
+                                            // Question50100
+                                            // Do you want pause order on machine. Answer with <Yes> if you want, with <No> you will release machine?
+                                            // Möchten Sie die Bestellung am Maschine pausieren? Antworten Sie mit <Ja>, mit <Nein> geben Sie die Maschine frei?
+
+                                            // Question50101
+                                            // On Facility exist not processed quants! Do you want pause order on machine. Answer with <Yes> if you want, with <No> you will release machine? 
+                                            // Auf der Anlage liegen keine verarbeiteten Mengen vor! Möchten Sie die Bestellung am Automaten unterbrechen? Antworten Sie mit <Ja>, wenn Sie möchten, mit <Nein> geben Sie die Maschine frei?
+
+                                            sequence.QuestionSequence = 2;
+                                            sequence.State = BarcodeSequenceBase.ActionState.Question;
+                                            sequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, translationID, eMsgButton.YesNo);
+                                            result.Result = sequence;
+                                            return result;
                                         }
-                                        // Question50100
-                                        // Do you want pause order on machine. Answer with <Yes>, with <No> you will release machine? Not processed quants: {0}.
-                                        // Möchten Sie die Bestellung am Maschine pausieren? Antworten Sie mit <Ja>, mit <Nein> geben Sie die Maschine frei? Nicht verarbeitete Quants: {0}.
 
-                                        sequence.QuestionSequence = 2;
-                                        sequence.State = BarcodeSequenceBase.ActionState.Question;
-                                        sequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Question50100", eMsgButton.YesNo, quants);
-                                        result.Result = sequence;
-                                        return result;
                                     }
-
                                 }
                             }
                         }
                     }
                 }
             }
-
-
             return result;
         }
 
@@ -330,8 +333,10 @@ namespace gip.mes.processapplication
                 AddToOperationLogList(inOperationLog, parameters, dbApp);
             }
 
-            // Info50086: Input operation is successfully performed!
-            resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50086");
+            // Info50091
+            // Operation is successfully performed!
+            // Die Operation wurde erfolgreich durchgeführt!
+            resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50091");
             resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
         }
 
@@ -381,8 +386,8 @@ namespace gip.mes.processapplication
                             if (durationToCheck < minDuration)
                             {
                                 // Question50099
-                                // The quant has not been processed long enough! Do you want to continue with a quit operation?
-                                // Das Quantum wurde nicht lange genug verarbeitet! Möchten Sie mit einem Quit-Vorgang fortfahren?
+                                // The quant has not been processed long enough! Do you want to continue with a output operation?
+                                // Das Quantum wurde nicht lange genug verarbeitet! Möchten Sie mit einem -- fortfahren?
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Question;
                                 resultSequence.QuestionSequence = 1;
                                 resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Question50099", eMsgButton.YesNo);
@@ -402,8 +407,10 @@ namespace gip.mes.processapplication
 
             RemoveFromOperationLogList(inOperationLog);
 
-            // Info50087: Output operation is successfully performed!
-            resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50087");
+            // Info50092
+            // Output operation is successfully performed!
+            // Der Ausgabevorgang wurde erfolgreich durchgeführt!
+            resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50092");
             resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
         }
 
@@ -799,7 +806,7 @@ namespace gip.mes.processapplication
                             pwNode = ACUrlCommand(order.ACUrlWF) as PWWorkTaskGeneric;
                     }
 
-                    ACMethod parameters = GetParameters(pwNode, dbApp, operationLog.FacilityCharge.MaterialID);
+                    ACMethod parameters = GetParameters(pwNode, dbApp, material.MaterialID);
                     WriteParametersToOperationLogItem(logItem, parameters);
 
                     result.Add(logItem);
