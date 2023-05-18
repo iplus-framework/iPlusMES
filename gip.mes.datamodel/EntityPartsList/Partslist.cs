@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     /// <summary>
     /// Partslist 
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Material'}de{'Stückliste'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPartslist")]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Material'}de{'Stückliste'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPartslist")] 
     [ACPropertyEntity(1, "PartslistName", "en{'Name'}de{'Name'}", "", "", true)]
     [ACPropertyEntity(2, "PartslistNo", ConstApp.Number, "", "", true)]
     [ACPropertyEntity(3, "PartslistVersion", "en{'Version'}de{'Version'}", "", "", true)]

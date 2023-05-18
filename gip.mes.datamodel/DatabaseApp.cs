@@ -3661,7 +3661,7 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999)]
         [NotMapped]
-        public IQueryable<MDUnit> MDUnitList
+        public IEnumerable<MDUnit> MDUnitList
         {
             get
             {
@@ -3674,7 +3674,7 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999)]
         [NotMapped]
-        public IQueryable<Facility> FacilityLocation
+        public IEnumerable<Facility> FacilityLocation
         {
             get
             {
@@ -3687,7 +3687,7 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999, "", "en{'Tenant/Contractual partner'}de{'Mandant/Vertragspartner'}")]
         [NotMapped]
-        public IQueryable<Company> CPartnerCompanyList
+        public IEnumerable<Company> CPartnerCompanyList
         {
             get
             {

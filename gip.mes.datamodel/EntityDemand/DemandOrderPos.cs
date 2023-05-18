@@ -241,7 +241,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (this.VBiProgramACClassMethodID == null || this.VBiProgramACClassMethodID == Guid.Empty)
+                if (this.VBiProgramACClassMethodID == Guid.Empty)
                     return null;
                 if (_ProgramACClassMethod != null)
                     return _ProgramACClassMethod;

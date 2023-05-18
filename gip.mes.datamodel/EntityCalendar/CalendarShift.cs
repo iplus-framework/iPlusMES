@@ -172,7 +172,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (this.VBiACProjectID == null || this.VBiACProjectID == Guid.Empty)
+                if (this.VBiACProjectID == Guid.Empty)
                     return null;
                 if (_ACProject != null)
                     return _ACProject;

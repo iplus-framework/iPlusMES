@@ -10,7 +10,7 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'MaintACClassVBGroup'}de{'MaintACClassVBGroup'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
     [ACPropertyEntity(1, "Comment", "en{'Tasks'}de{'Aufgaben'}")]
-    [ACPropertyEntity(2, core.datamodel.VBGroup.ClassName, "en{'Group'}de{'Gruppe'}", Const.ContextDatabaseIPlus + "\\" + core.datamodel.VBGroup.ClassName, "", true)]
+    [ACPropertyEntity(2, core.datamodel.VBGroup.ClassName, "en{'Group'}de{'Gruppe'}", Const.ContextDatabaseIPlus + "\\" + core.datamodel.VBGroup.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(5, MaintACClass.ClassName, "en{'Maintenance rule'}de{'Wartungsregel'}", Const.ContextDatabase + "\\" + MaintACClass.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(6, MaintACClassProperty.ClassName, "en{'Maintenance property'}de{'Wartungseigenschaft'}", Const.ContextDatabase + "\\" + MaintACClassProperty.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]

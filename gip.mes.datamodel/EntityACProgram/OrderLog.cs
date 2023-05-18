@@ -85,7 +85,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (this.VBiACProgramLogID == null || this.VBiACProgramLogID == Guid.Empty)
+                if (this.VBiACProgramLogID == Guid.Empty)
                     return null;
                 if (_ACProgramLog != null)
                     return _ACProgramLog;

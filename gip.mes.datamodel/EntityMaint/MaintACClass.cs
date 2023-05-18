@@ -165,13 +165,13 @@ namespace gip.mes.datamodel
         #region VBIplus-Context
         [NotMapped]
         private gip.core.datamodel.ACClass _ACClass;
-        [ACPropertyInfo(9999, "", "en{'Maintenance objekt'}de{'Wartungsobjekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Maintenance objekt'}de{'Wartungsobjekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACClass ACClass
         {
             get
             {
-                if (this.VBiACClassID == null || this.VBiACClassID == Guid.Empty)
+                if (this.VBiACClassID == Guid.Empty)
                     return null;
                 if (_ACClass != null)
                     return _ACClass;
@@ -211,7 +211,7 @@ namespace gip.mes.datamodel
 
         public gip.core.datamodel.ACClass GetACClass(Database db)
         {
-            if (this.VBiACClassID == null || this.VBiACClassID == Guid.Empty)
+            if (this.VBiACClassID == Guid.Empty)
                 return null;
             if (this.VBiACClass == null)
             {

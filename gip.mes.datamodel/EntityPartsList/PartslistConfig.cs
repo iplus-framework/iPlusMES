@@ -431,7 +431,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (this.VBiValueTypeACClassID == null || this.VBiValueTypeACClassID == Guid.Empty)
+                if (this.VBiValueTypeACClassID == Guid.Empty)
                     return null;
                 if (_ValueTypeACClass != null)
                     return _ValueTypeACClass;

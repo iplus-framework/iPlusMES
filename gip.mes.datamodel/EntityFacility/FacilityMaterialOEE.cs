@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'OEE-Log'}de{'OEE-Log'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, nameof(FacilityMaterial), ConstApp.FacilityMaterial, Const.ContextDatabase + "\\" + nameof(FacilityMaterial), "", true)]
+    [ACPropertyEntity(1, nameof(FacilityMaterial), ConstApp.FacilityMaterial, Const.ContextDatabase + "\\" + nameof(FacilityMaterial) + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "ACProgramLogID", "en{'Program Log'}de{'Program Log'}", "", "", true)]
     [ACPropertyEntity(3, "StartDate", "en{'Production Start'}de{'Produktionsstart'}", "", "", true)]
     [ACPropertyEntity(4, "EndDate", "en{'Production End'}de{'Produktionsende'}", "", "", true)]

@@ -28,7 +28,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, "InwardFacilityLot", "en{'Lot/Batch Stock (Inward Post)'}de{'Los/Charge (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(15, "InwardFacilityCharge", "en{'Quant (Inward Post)'}de{'Quant (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(16, "InwardFacilityLocation", "en{'Storage Location (Inward Post)'}de{'Lagerort (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
-    [ACPropertyEntity(17, "InwardPartslist", "en{'Inward Bill of Materials'}de{'Eingang Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
+    [ACPropertyEntity(17, "InwardPartslist", "en{'Inward Bill of Materials'}de{'Eingang Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(18, "InwardCompanyMaterialID", "en{'Manufact. Material (In)'}de{'Materialhersteller (Eing.)'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(19, "InwardCPartnerCompMatID", "en{'Contr. Partner Material (In)'}de{'Vertragspart. Material (Eing.)'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(20, "OutwardMaterial", "en{'Material (Outward Post)'}de{'Material (Ausgangsbuchung)'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]

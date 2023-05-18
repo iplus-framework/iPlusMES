@@ -175,7 +175,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (this.VBiRoleACClassID == null || this.VBiRoleACClassID == Guid.Empty)
+                if (this.VBiRoleACClassID == Guid.Empty)
                     return null;
                 if (_RoleACClass != null)
                     return _RoleACClass;

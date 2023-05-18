@@ -114,13 +114,13 @@ namespace gip.mes.datamodel
 
         [NotMapped]
         private gip.core.datamodel.ACClassProperty _ACClassProperty;
-        [ACPropertyInfo(9999, "", "en{'Property'}de{'Eigenschaft'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassProperty.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Property'}de{'Eigenschaft'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassProperty.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACClassProperty ACClassProperty
         {
             get
             {
-                if (this.VBiACClassPropertyID == null || this.VBiACClassPropertyID == Guid.Empty)
+                if (this.VBiACClassPropertyID == Guid.Empty)
                     return null;
                 if (_ACClassProperty != null)
                     return _ACClassProperty;

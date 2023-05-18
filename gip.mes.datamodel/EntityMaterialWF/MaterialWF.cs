@@ -156,7 +156,7 @@ namespace gip.mes.datamodel
             if (FromNode != null && ToNode != null)
                 return this.MaterialWFRelation_MaterialWF.FirstOrDefault(c => c.SourceMaterial == FromNode && c.TargetMaterial == ToNode);
             else if (database is DatabaseApp)
-                return MaterialWFRelation.NewACObject(database as DatabaseApp, this);
+                return MaterialWFRelation.NewACObject(database as DatabaseApp, this); 
             return null;
         }
 
