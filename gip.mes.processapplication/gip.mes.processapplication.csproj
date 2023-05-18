@@ -73,6 +73,7 @@
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFPickingByMaterial.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkInOutOperation.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFInOutOperationOnScan.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskOnHold.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Picking.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeLoop.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWPickingByMaterial.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkInOutOperation.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskOnHold.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\ScaleBoundaries.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Rework.cs" />
@@ -310,7 +312,7 @@
     <None Include="VBControlScripts\2023-03-23 13-49_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2023-05-11 19-12_aagincic.zip">
+    <None Include="VBControlScripts\2023-05-18 12-44_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2023-05-16 11-51_dlisak.zip">

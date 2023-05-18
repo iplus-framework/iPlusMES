@@ -333,6 +333,8 @@
         #region OrderLotItem
 
         public const string TimeEntered = "en{'Time Entered'}de{'Eingabezeit'}";
+        public const string MinDuration = "en{'Minimum duration'}de{'Minimum duration'}";
+        public const string MaxDuration = "en{'Maximum duration'}de{'Maximum duration'}";
         public const string Duration = "en{'Duration'}de{'Dauer'}";
         public const string HintDuration = "en{'Hint Duration'}de{'Hinweisdauer'}";
         public const string ElapsedTime = "en{'Elapsed Time'}de{'Verstrichene Zeit'}";

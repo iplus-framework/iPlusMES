@@ -56,7 +56,8 @@ namespace gip.mes.webservices
             if (result != null)
             {
                 if (result.Result.State == BarcodeSequenceBase.ActionState.Selection
-                    || result.Result.State == BarcodeSequenceBase.ActionState.FastSelection)
+                    || result.Result.State == BarcodeSequenceBase.ActionState.FastSelection
+                    || result.Result.State == BarcodeSequenceBase.ActionState.SelectionScanAgain)
                 {
                     BarcodeEntity barcodeEntity = new BarcodeEntity();
                     List<ProdOrderPartslistWFInfo> orderInfoList = new List<ProdOrderPartslistWFInfo>();
@@ -66,8 +67,11 @@ namespace gip.mes.webservices
                     sequence.State = result.Result.State;
                     sequence.Sequence.Add(barcodeEntity);
                 }
-                else if (result.Result.Message.MessageLevel == eMsgLevel.Question)
+                else if (result.Result.Message != null && result.Result.Message.MessageLevel == eMsgLevel.Question)
+                {
                     sequence.AddQuestion(result.Result.Message);
+                    sequence.QuestionSequence = result.Result.QuestionSequence;
+                }
                 else
                 {
                     sequence.State = result.Result.State;

@@ -14,7 +14,7 @@ namespace gip.mes.webservices
     public abstract class PAScannedCompContrBase : PAClassAlarmingBase
     {
         #region c'tors
-        public const string ClassName = "PAScannedCompContrBase";
+        public const string ClassName = nameof(PAScannedCompContrBase);
 
         public PAScannedCompContrBase(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)

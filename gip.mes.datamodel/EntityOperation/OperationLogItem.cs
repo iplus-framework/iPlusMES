@@ -26,8 +26,18 @@ namespace gip.mes.datamodel
          */
 
         public Guid ACProgramLogID;
+        public Guid MaterialID;
 
         #region DataMembers
+
+        [DataMember]
+        [ACPropertyInfo(9999)]
+        public Guid FacilityChargeID
+        {
+            get;
+            set;
+        }
+
         [DataMember]
         [ACPropertyInfo(1, "Sn", "en{'Sn'}de{'Sn'}")]
         public int Sn { get; set; }
@@ -57,11 +67,19 @@ namespace gip.mes.datamodel
         public DateTime TimeEntered { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(8, nameof(Duration), ConstApp.Duration)]
+        [ACPropertyInfo(8, nameof(MinDuration), ConstApp.MinDuration)]
+        public TimeSpan MinDuration { get; set; }
+
+        [DataMember]
+        [ACPropertyInfo(9, nameof(MaxDuration), ConstApp.MaxDuration)]
+        public TimeSpan? MaxDuration { get; set; }
+
+        [DataMember]
+        [ACPropertyInfo(10, nameof(Duration), ConstApp.Duration)]
         public TimeSpan Duration { get; set; }
 
         [DataMember]
-        [ACPropertyInfo(9, nameof(HintDuration), ConstApp.HintDuration)]
+        [ACPropertyInfo(11, nameof(HintDuration), ConstApp.HintDuration)]
         public TimeSpan HintDuration { get; set; }
 
         #endregion
@@ -107,19 +125,29 @@ namespace gip.mes.datamodel
             get
             {
                 OperationitemTimeStatusEnum item = OperationitemTimeStatusEnum.Elapsing;
+
                 /*
-                 - Elapsing      - Now < (FinishTime - HintDuration) (bez boje)
-                - TimeReaching   - (FinishTime - HintDuration) <= Now <= FinishTime (žuto)
-                - TimeExceeded   - Now > FinishTime (crveno)
+                Elapsing = 0, // blue
+                NotifyTimeReaching = 1, // yellow
+                TimeReached = 2, // green
+                TimeExceeded = 3 // red | if maxduration have value
                 */
+
                 if ((FinishTime - HintDuration) <= DateTime.Now && DateTime.Now <= FinishTime)
                 {
-                    item = OperationitemTimeStatusEnum.TimeReaching;
+                    item = OperationitemTimeStatusEnum.NotifyTimeReaching;
                 }
-                else if (DateTime.Now > FinishTime)
+
+                if (DateTime.Now > FinishTime)
+                {
+                    item = OperationitemTimeStatusEnum.TimeReached;
+                }
+
+                if (MaxDuration != null && DateTime.Now >= (TimeEntered + MaxDuration))
                 {
                     item = OperationitemTimeStatusEnum.TimeExceeded;
                 }
+
                 return item;
             }
         }
