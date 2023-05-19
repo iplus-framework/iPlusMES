@@ -17,4 +17,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)GlobalApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PostingBehaviourEnum.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="$(MSBuildThisFileDirectory)Images\iPlusIconDesktop.ico" />
+    <Resource Include="$(MSBuildThisFileDirectory)Images\Login.png" />
+  </ItemGroup>
 </Project>

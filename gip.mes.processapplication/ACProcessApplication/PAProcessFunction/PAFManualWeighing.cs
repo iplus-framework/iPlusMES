@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
 using gip.core.autocomponent;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using gip.core.processapplication;
 using gip.mes.datamodel;
 using System.Linq.Expressions;
@@ -365,7 +365,7 @@ namespace gip.mes.processapplication
 
                 try
                 {
-                    newACMethod.ParameterValueList[vd.Material.ClassName] = "";
+                    newACMethod.ParameterValueList[VD.Material.ClassName] = "";
                     newACMethod.ParameterValueList["PLPosRelation"] = Guid.Empty;
                     newACMethod.ParameterValueList["FacilityCharge"] = Guid.Empty;
                     newACMethod.ParameterValueList["Facility"] = Guid.Empty;
@@ -404,7 +404,7 @@ namespace gip.mes.processapplication
 
         protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
         {
-            string matName = CurrentACMethod.ValueT[vd.Material.ClassName] as string;
+            string matName = CurrentACMethod.ValueT[VD.Material.ClassName] as string;
             CurrentWeighingMaterial.ValueT = matName;
 
             ACValue value = acMethod.ParameterValueList.GetACValue("Route");
@@ -531,7 +531,7 @@ namespace gip.mes.processapplication
             }
             RouteItem sourceRouteItem = route.FirstOrDefault();
 
-            List<vd.MaterialConfig> materialConfigList = null;
+            List<VD.MaterialConfig> materialConfigList = null;
             gip.core.datamodel.ACClass thisACClass = ComponentClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
             gip.core.datamodel.ACClassConfig config = null;
             gip.core.datamodel.ACClassPropertyRelation logicalRelation = db.ACClassPropertyRelation
@@ -558,7 +558,7 @@ namespace gip.mes.processapplication
                     if (plPosRelVal != null && plPosRelVal.Value is Guid)
                     {
                         Guid plPosRelID = plPosRelVal.ParamAsGuid;
-                        using (var dbApp = new vd.DatabaseApp())
+                        using (var dbApp = new VD.DatabaseApp())
                         {
                             ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelID);
                             if (rel != null)
@@ -1403,8 +1403,8 @@ namespace gip.mes.processapplication
             ACMethod method = new ACMethod(acIdentifier);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
 
-            method.ParameterValueList.Add(new ACValue(vd.Material.ClassName, typeof(string), null, Global.ParamOption.Optional));
-            paramTranslation.Add(vd.Material.ClassName, "en{'Material'}de{'Material'}");
+            method.ParameterValueList.Add(new ACValue(VD.Material.ClassName, typeof(string), null, Global.ParamOption.Optional));
+            paramTranslation.Add(VD.Material.ClassName, "en{'Material'}de{'Material'}");
 
             method.ParameterValueList.Add(new ACValue("PLPosRelation", typeof(Guid), null, Global.ParamOption.Optional));
             paramTranslation.Add("PLPosRelation", "en{'Order position'}de{'Auftragsposition'}");
@@ -1413,7 +1413,7 @@ namespace gip.mes.processapplication
             paramTranslation.Add("FacilityCharge", "en{'Batch Location'}de{'Chargenplatz'}");
 
             method.ParameterValueList.Add(new ACValue("Facility", typeof(Guid), null, Global.ParamOption.Optional));
-            paramTranslation.Add("Facility", vd.ConstApp.Facility);
+            paramTranslation.Add("Facility", VD.ConstApp.Facility);
 
             method.ParameterValueList.Add(new ACValue("Route", typeof(Route), null, Global.ParamOption.Required));
             paramTranslation.Add("Route", "en{'Route'}de{'Route'}");

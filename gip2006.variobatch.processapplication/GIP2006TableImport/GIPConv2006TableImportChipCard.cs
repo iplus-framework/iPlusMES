@@ -57,7 +57,7 @@ namespace gip2006.variobatch.processapplication
             {
                 mdVisitorCard = MDVisitorCard.NewACObject(dbApp, null);
                 mdVisitorCard.MDVisitorCardNo = chipNo;
-                dbApp.MDVisitorCard.AddObject(mdVisitorCard);
+                dbApp.MDVisitorCard.Add(mdVisitorCard);
             }
 
             Visitor currentVisitor = null;

@@ -52,7 +52,7 @@ namespace gip2006.variobatch.processapplication
             {
                 material = Material.NewACObject(dbApp, null);
                 material.MaterialNo = materialNo;
-                dbApp.Material.AddObject(material);
+                dbApp.Material.Add(material);
             }
 
             // TODO: @aagincic: Rewrite progress -  ReadArtikelFields()

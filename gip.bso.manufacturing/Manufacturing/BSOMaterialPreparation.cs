@@ -1,5 +1,5 @@
 ﻿using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Linq;
@@ -298,13 +298,13 @@ namespace gip.bso.manufacturing
         // Picking
 
         #region Picking
-        private vd.Picking _SelectedPicking;
+        private VD.Picking _SelectedPicking;
         /// <summary>
         /// Selected property for Picking
         /// </summary>
         /// <value>The selected Picking</value>
         [ACPropertySelected(506, "Picking", "en{'TODO: Picking'}de{'TODO: Picking'}")]
-        public vd.Picking SelectedPicking
+        public VD.Picking SelectedPicking
         {
             get
             {
@@ -322,13 +322,13 @@ namespace gip.bso.manufacturing
         }
 
 
-        private List<vd.Picking> _PickingList;
+        private List<VD.Picking> _PickingList;
         /// <summary>
         /// List property for Picking
         /// </summary>
         /// <value>The Picking list</value>
         [ACPropertyList(507, "Picking")]
-        public List<vd.Picking> PickingList
+        public List<VD.Picking> PickingList
         {
             get
             {
@@ -342,13 +342,13 @@ namespace gip.bso.manufacturing
 
         // PickingPos
         #region PickingPos
-        private vd.PickingPos _SelectedPickingPos;
+        private VD.PickingPos _SelectedPickingPos;
         /// <summary>
         /// Selected property for PickingPos
         /// </summary>
         /// <value>The selected PickingPos</value>
         [ACPropertySelected(508, "PickingPos", "en{'TODO: PickingPos'}de{'TODO: PickingPos'}")]
-        public vd.PickingPos SelectedPickingPos
+        public VD.PickingPos SelectedPickingPos
         {
             get
             {
@@ -365,13 +365,13 @@ namespace gip.bso.manufacturing
         }
 
 
-        private List<vd.PickingPos> _PickingPosList;
+        private List<VD.PickingPos> _PickingPosList;
         /// <summary>
         /// List property for PickingPos
         /// </summary>
         /// <value>The PickingPos list</value>
         [ACPropertyList(509, "PickingPos")]
-        public List<vd.PickingPos> PickingPosList
+        public List<VD.PickingPos> PickingPosList
         {
             get
             {
@@ -481,9 +481,9 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("NewPickingPos", "en{'Take'}de{'Übernehmen'}", (short)MISort.New, false, false, true)]
         public void NewPickingPos()
         {
-            vd.PickingPos pickingPos = vd.PickingPos.NewACObject(DatabaseApp, SelectedPicking);
+            VD.PickingPos pickingPos = VD.PickingPos.NewACObject(DatabaseApp, SelectedPicking);
             pickingPos.PickingQuantityUOM = PickingQuantityUOM;
-            vd.Material pickingMaterial = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedPreparedMaterial.MaterialNo);
+            VD.Material pickingMaterial = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedPreparedMaterial.MaterialNo);
             pickingPos.PickingMaterial = pickingMaterial;
             pickingPos.FromFacility = SelectedSourceStorageBin.Facility;
             pickingPos.ToFacility = SelectedTargetStorageBin.Facility;
@@ -532,7 +532,7 @@ namespace gip.bso.manufacturing
         public void DeletePickingPos()
         {
             if (!IsEnabledDeletePickingPos()) return;
-            vd.PickingPos pickingPos = SelectedPickingPos;
+            VD.PickingPos pickingPos = SelectedPickingPos;
             PickingPosList.Remove(pickingPos);
             SelectedPreparedMaterial.PickingPosQuantityUOM -= pickingPos.PickingQuantityUOM ?? 0;
             SelectedPreparedMaterial.MissingQuantityUOM = SelectedPreparedMaterial.TargetQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
@@ -698,7 +698,7 @@ namespace gip.bso.manufacturing
             List<PreparedMaterial> preparedMaterials = new List<PreparedMaterial>();
             var queryResearchedFacilities = researchedFacilities.GroupBy(c => c.MaterialID);
             Guid[] materialIDs = queryResearchedFacilities.Select(c => c.Key).ToArray();
-            List<vd.Material> materials = DatabaseApp.Material.Where(c => materialIDs.Contains(c.MaterialID)).ToList();
+            List<VD.Material> materials = DatabaseApp.Material.Where(c => materialIDs.Contains(c.MaterialID)).ToList();
             int nr = 0;
             foreach (var item in queryResearchedFacilities)
             {

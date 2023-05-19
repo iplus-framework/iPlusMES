@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 
 namespace gip.mes.maintenance
 {
@@ -128,7 +128,7 @@ namespace gip.mes.maintenance
             if (_this.Database is mes.datamodel.DatabaseApp)
             {
                 Guid componentClassID = _this.ComponentClass.ACClassID;
-                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+                VD.DatabaseApp dbApp = _this.Database as VD.DatabaseApp;
 
                 using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                 {
@@ -171,15 +171,15 @@ namespace gip.mes.maintenance
             if (maintService == null)
                 return false;
 
-            if (_this.Database is vd.DatabaseApp)
+            if (_this.Database is VD.DatabaseApp)
             {
                 Guid componentClassID = _this.ComponentClass.ACClassID;
-                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+                VD.DatabaseApp dbApp = _this.Database as VD.DatabaseApp;
 
                 using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                 {
                     if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
-                   && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+                   && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
                         return true;
                 }
             }

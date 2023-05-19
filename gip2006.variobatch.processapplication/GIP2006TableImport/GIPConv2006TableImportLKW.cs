@@ -66,7 +66,7 @@ namespace gip2006.variobatch.processapplication
                 facilityVehicle.FacilityNo = vehicleNo.Length <= 20 ? vehicleNo : vehicleNo.Substring(0,20);
                 facilityVehicle.FacilityName = vehicleNo.Length <= 40 ? vehicleNo : vehicleNo.Substring(0, 40);
                 facilityVehicle.MDFacilityType = facilityTypeVehicle;
-                dbApp.Facility.AddObject(facilityVehicle);
+                dbApp.Facility.Add(facilityVehicle);
             }
             // TODO: @aagincic: Rewrite progress - ReadLKWFields()
             //if (bgWorker != null)

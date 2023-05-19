@@ -1,6 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,7 +123,7 @@ namespace gip.mes.processapplication
             }
             RouteItem sourceRouteItem = route.FirstOrDefault();
 
-            List<vd.MaterialConfig> materialConfigList = null;
+            List<VD.MaterialConfig> materialConfigList = null;
             gip.core.datamodel.ACClass thisACClass = ComponentClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
             gip.core.datamodel.ACClassConfig config = null;
             gip.core.datamodel.ACClassPropertyRelation logicalRelation = db.ACClassPropertyRelation
@@ -155,7 +155,7 @@ namespace gip.mes.processapplication
                             if (materialID.HasValue && materialID != Guid.Empty)
                             {
                                 Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
-                                using (var dbApp = new vd.DatabaseApp())
+                                using (var dbApp = new VD.DatabaseApp())
                                 {
                                     // 1. Hole Material-Konfiguration spezielle für diesen Weg
                                     materialConfigList = dbApp.MaterialConfig.Where(c => c.VBiACClassPropertyRelationID == logicalRelation.ACClassPropertyRelationID && c.MaterialID == materialID.Value).AsNoTracking().ToList();
@@ -273,7 +273,7 @@ namespace gip.mes.processapplication
 
                 //try
                 //{
-                //    newACMethod.ParameterValueList[vd.Material.ClassName] = "";
+                //    newACMethod.ParameterValueList[VD.Material.ClassName] = "";
                 //    newACMethod.ParameterValueList["PLPosRelation"] = Guid.Empty;
                 //    newACMethod.ParameterValueList["FacilityCharge"] = Guid.Empty;
                 //    newACMethod.ParameterValueList["Facility"] = Guid.Empty;
@@ -590,11 +590,11 @@ namespace gip.mes.processapplication
             return list;
         }
 
-        private void WriteDurationFromConfiguration(vd.DatabaseApp databaseApp, vd.OperationLogItem item)
+        private void WriteDurationFromConfiguration(VD.DatabaseApp databaseApp, VD.OperationLogItem item)
         {
-            vd.ProdOrderPartslistPos pos = null;
-            vd.ProdOrderPartslist prodOrderPartslist = null;
-            vd.OrderLog orderLog = databaseApp.OrderLog.Where(c => c.VBiACProgramLogID == item.ACProgramLogID).FirstOrDefault();
+            VD.ProdOrderPartslistPos pos = null;
+            VD.ProdOrderPartslist prodOrderPartslist = null;
+            VD.OrderLog orderLog = databaseApp.OrderLog.Where(c => c.VBiACProgramLogID == item.ACProgramLogID).FirstOrDefault();
             if (orderLog != null)
             {
                 if (orderLog.ProdOrderPartslistPos != null)
@@ -616,11 +616,11 @@ namespace gip.mes.processapplication
 
                 if (prodOrderManager != null && configManager != null)
                 {
-                    vd.PartslistACClassMethod method = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                    VD.PartslistACClassMethod method = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
                     if (method != null)
                     {
 
-                        vd.ACClassWF wfMES = pos.ProdOrderBatch.ProdOrderBatchPlan.VBiACClassWF;
+                        VD.ACClassWF wfMES = pos.ProdOrderBatch.ProdOrderBatchPlan.VBiACClassWF;
                       
                         if (wfMES != null)
                         {

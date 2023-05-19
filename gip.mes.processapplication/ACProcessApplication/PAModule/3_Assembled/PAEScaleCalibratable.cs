@@ -1,6 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.core.processapplication;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System;
 using gip.core.autocomponent;
 
@@ -105,10 +105,10 @@ namespace gip.mes.processapplication
             }
 
             using (Database db = new Database())
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
-                string secondaryKey = Root.NoManager.GetNewNo(db, typeof(vd.Weighing), vd.Weighing.NoColumnName, vd.Weighing.FormatNewNo, this);
-                vd.Weighing weighing = vd.Weighing.NewACObject(dbApp, parentPos, secondaryKey);
+                string secondaryKey = Root.NoManager.GetNewNo(db, typeof(VD.Weighing), VD.Weighing.NoColumnName, VD.Weighing.FormatNewNo, this);
+                VD.Weighing weighing = VD.Weighing.NewACObject(dbApp, parentPos, secondaryKey);
                 weighing.Weight = AlibiWeight.ValueT;
                 weighing.IdentNr = AlibiNo.ValueT;
                 dbApp.Weighing.Add(weighing);

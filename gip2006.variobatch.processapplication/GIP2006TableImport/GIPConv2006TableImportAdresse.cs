@@ -97,7 +97,7 @@ namespace gip2006.variobatch.processapplication
                 }
                 isNewCompany = true;
 
-                dbApp.Company.AddObject(company);
+                dbApp.Company.Add(company);
             }
 
             switch (addressTyp)

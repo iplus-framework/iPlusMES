@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System.ComponentModel;
 
 namespace gip.mes.maintenance
@@ -22,7 +22,7 @@ namespace gip.mes.maintenance
         }
 
         [ACPropertyInfo(999)]
-        public vd.MaintACClassProperty MaintACClassProperty
+        public VD.MaintACClassProperty MaintACClassProperty
         {
             get;
             set;

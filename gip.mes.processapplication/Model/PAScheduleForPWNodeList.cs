@@ -1,5 +1,5 @@
 ﻿using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;

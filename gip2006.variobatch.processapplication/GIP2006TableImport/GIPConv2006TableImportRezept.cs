@@ -53,7 +53,7 @@ namespace gip2006.variobatch.processapplication
             {
                 partsList = Partslist.NewACObject(dbApp, null, rezeptNo);
                 partsList.PartslistNo = rezeptNo;
-                dbApp.Partslist.AddObject(partsList);
+                dbApp.Partslist.Add(partsList);
             }
             // TODO: @aagincic: Rewrite progress - ReadRezeptFields()
             //if (bgWorker != null)
