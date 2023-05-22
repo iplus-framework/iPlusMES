@@ -44,8 +44,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Queries
-        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityReservation>> s_cQry_OpenReservations =
-            EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityReservation>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityReservation>> s_cQry_OpenReservations =
+            EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityReservation>>(
                 (ctx, acClassID) => ctx.FacilityReservation
                             .Include(InOrderPos.ClassName)
                             .Include("InOrderPos.DeliveryNotePos_InOrderPos")

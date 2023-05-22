@@ -37,13 +37,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDFacilityVehicleType>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDFacilityVehicleType>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDFacilityVehicleType>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDFacilityVehicleType>>(
             (database) => from c in database.MDFacilityVehicleType where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDFacilityVehicleType>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDFacilityVehicleType>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDFacilityVehicleType>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDFacilityVehicleType>>(
             (database, index) => from c in database.MDFacilityVehicleType where c.MDFacilityVehicleTypeIndex == index select c
         );
 

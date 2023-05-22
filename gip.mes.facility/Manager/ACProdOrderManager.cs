@@ -83,8 +83,8 @@ namespace gip.mes.facility
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         //);
 
-        public static Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>> s_cQry_ProdOrderAlternativePositions =
-            EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>>(
+        public static Func<DatabaseApp, Guid, Guid, IEnumerable<ProdOrderPartslistPos>> s_cQry_ProdOrderAlternativePositions =
+            EF.CompileQuery<DatabaseApp, Guid, Guid, IEnumerable<ProdOrderPartslistPos>>(
             (db, selectedProdOrderPartslistID, selectedProdOrderPartslistPosID) =>
                     db.ProdOrderPartslistPos.Where(c =>
                     c.ProdOrderPartslistID == selectedProdOrderPartslistID &&
@@ -1773,8 +1773,8 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")

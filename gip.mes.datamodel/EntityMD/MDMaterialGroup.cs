@@ -39,13 +39,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDMaterialGroup>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDMaterialGroup>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDMaterialGroup>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDMaterialGroup>>(
             (database) => from c in database.MDMaterialGroup where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDMaterialGroup>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDMaterialGroup>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDMaterialGroup>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDMaterialGroup>>(
             (database, index) => from c in database.MDMaterialGroup where c.MDMaterialGroupIndex == index select c
         );
 

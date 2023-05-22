@@ -39,13 +39,13 @@ namespace gip.mes.datamodel
 
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDInventoryManagementType>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDInventoryManagementType>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDInventoryManagementType>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDInventoryManagementType>>(
             (database) => from c in database.MDInventoryManagementType where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDInventoryManagementType>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDInventoryManagementType>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDInventoryManagementType>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDInventoryManagementType>>(
             (database, index) => from c in database.MDInventoryManagementType where c.MDInventoryManagementTypeIndex == index select c
         );
 

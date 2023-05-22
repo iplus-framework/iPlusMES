@@ -84,8 +84,8 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDCountryLand>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDCountryLand>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDCountryLand>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDCountryLand>>(
             (database) => from c in database.MDCountryLand where c.IsDefault select c
         );
 

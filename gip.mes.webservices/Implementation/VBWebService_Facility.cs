@@ -17,8 +17,8 @@ namespace gip.mes.webservices
     {
         #region FacilityCharge
 
-        public static readonly Func<DatabaseApp, Guid?, IQueryable<FacilityCharge>> s_cQry_GetFacilityCharge =
-        EF.CompileQuery<DatabaseApp, Guid?, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<FacilityCharge>> s_cQry_GetFacilityCharge =
+        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<FacilityCharge>>(
             (dbApp, facilityChargeID) =>
                 dbApp.FacilityCharge
                 //.Include(gip.mes.datamodel.Material.ClassName)
@@ -78,8 +78,8 @@ namespace gip.mes.webservices
              )
         );
 
-        public static readonly Func<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
-                EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid?, int?, IEnumerable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
+                EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, int?, IEnumerable<FacilityCharge>>(
                     (dbApp, facilityID, materialID, facilityLotID, splitNo) =>
                         dbApp.FacilityCharge
                         .Include(gip.mes.datamodel.Material.ClassName)
@@ -727,8 +727,8 @@ namespace gip.mes.webservices
 
         #region FacilityLot
 
-        public static readonly Func<DatabaseApp, IQueryable<FacilityLot>> s_cQry_GetFacilityLots =
-        EF.CompileQuery<DatabaseApp, IQueryable<FacilityLot>>(
+        public static readonly Func<DatabaseApp, IEnumerable<FacilityLot>> s_cQry_GetFacilityLots =
+        EF.CompileQuery<DatabaseApp, IEnumerable<FacilityLot>>(
             (dbApp) =>
                 dbApp.FacilityCharge
                         .Where(c => !c.NotAvailable && c.FacilityLotID.HasValue)
@@ -745,8 +745,8 @@ namespace gip.mes.webservices
                         })
         );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityLotStock>> s_cQry_GetFacilityLotStock =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityLotStock>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityLotStock>> s_cQry_GetFacilityLotStock =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityLotStock>>(
             (dbApp, facilityLotID) =>
                 dbApp.FacilityLotStock
                         .Where(c => c.FacilityLotID == facilityLotID)
@@ -792,8 +792,8 @@ namespace gip.mes.webservices
         }
 
 
-        public static readonly Func<DatabaseApp, Guid?, string, IQueryable<FacilityLot>> s_cQry_GetFacilityLot =
-        EF.CompileQuery<DatabaseApp, Guid?, string, IQueryable<FacilityLot>>(
+        public static readonly Func<DatabaseApp, Guid?, string, IEnumerable<FacilityLot>> s_cQry_GetFacilityLot =
+        EF.CompileQuery<DatabaseApp, Guid?, string, IEnumerable<FacilityLot>>(
             (dbApp, facilityLotID, facilityLotNo) =>
                 dbApp.FacilityLot
                 .Where(c => (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
@@ -812,8 +812,8 @@ namespace gip.mes.webservices
              )
         );
 
-        public static readonly Func<DatabaseApp, string, IQueryable<FacilityLot>> s_cQry_GetFacilityLotByMaterial =
-        EF.CompileQuery<DatabaseApp, string, IQueryable<FacilityLot>>(
+        public static readonly Func<DatabaseApp, string, IEnumerable<FacilityLot>> s_cQry_GetFacilityLotByMaterial =
+        EF.CompileQuery<DatabaseApp, string, IEnumerable<FacilityLot>>(
             (dbApp, materialNo) =>
                 dbApp.FacilityLot
                 .Include(nameof(Material))
@@ -1069,8 +1069,8 @@ namespace gip.mes.webservices
 
         #region Material
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<MaterialStock>> s_cQry_GetMaterialStock =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<MaterialStock>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<MaterialStock>> s_cQry_GetMaterialStock =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<MaterialStock>>(
             (dbApp, MaterialID) =>
                 dbApp.MaterialStock
                         .Where(c => c.MaterialID == MaterialID)
@@ -1201,8 +1201,8 @@ namespace gip.mes.webservices
 
         #region Facility
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityStock>> s_cQry_GetFacilityStock =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityStock>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityStock>> s_cQry_GetFacilityStock =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityStock>>(
             (dbApp, FacilityID) =>
                 dbApp.FacilityStock
                         .Where(c => c.FacilityID == FacilityID)
@@ -1896,8 +1896,8 @@ namespace gip.mes.webservices
 
         #region Inventory -> Get
 
-        public static readonly Func<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>> s_cQry_GetFacilityInventories =
-        EF.CompileQuery<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>>(
+        public static readonly Func<DatabaseApp, short?, DateTime, DateTime, IEnumerable<datamodel.FacilityInventory>> s_cQry_GetFacilityInventories =
+        EF.CompileQuery<DatabaseApp, short?, DateTime, DateTime, IEnumerable<datamodel.FacilityInventory>>(
             (dbApp, inventoryState, dateFrom, dateTo) =>
                 dbApp.FacilityInventory
                         .Where(c => (inventoryState == null || c.MDFacilityInventoryState.MDFacilityInventoryStateIndex == inventoryState)
@@ -2130,8 +2130,8 @@ namespace gip.mes.webservices
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
 
-        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
-        EF.CompileQuery<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
+        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IEnumerable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
+        EF.CompileQuery<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IEnumerable<FacilityInventoryPos>>(
            (dbApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal) =>
                dbApp.FacilityInventoryPos
                        .Where(c =>
@@ -2568,8 +2568,8 @@ namespace gip.mes.webservices
 
         #region Movement reason
 
-        public static readonly Func<DatabaseApp, IQueryable<MDMovementReason>> s_cQry_GetMovementReasons =
-                EF.CompileQuery<DatabaseApp, IQueryable<MDMovementReason>>(
+        public static readonly Func<DatabaseApp, IEnumerable<MDMovementReason>> s_cQry_GetMovementReasons =
+                EF.CompileQuery<DatabaseApp, IEnumerable<MDMovementReason>>(
                     (dbApp) =>
                         dbApp.MDMovementReason
                              .OrderBy(x => x.SortIndex)

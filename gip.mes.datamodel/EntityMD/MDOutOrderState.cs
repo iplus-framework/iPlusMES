@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
@@ -37,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDOutOrderState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDOutOrderState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDOutOrderState>>(
             (database) => from c in database.MDOutOrderState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDOutOrderState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDOutOrderState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDOutOrderState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDOutOrderState>>(
             (database, index) => from c in database.MDOutOrderState where c.MDOutOrderStateIndex == index select c
         );
 

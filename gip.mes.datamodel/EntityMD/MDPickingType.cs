@@ -41,13 +41,13 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        public static readonly Func<DatabaseApp, IQueryable<MDPickingType>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDPickingType>>(
+        public static readonly Func<DatabaseApp, IEnumerable<MDPickingType>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDPickingType>>(
             (database) => from c in database.MDPickingType where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDPickingType>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDPickingType>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDPickingType>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDPickingType>>(
             (database, index) => from c in database.MDPickingType where c.MDPickingTypeIndex == index select c
         );
 

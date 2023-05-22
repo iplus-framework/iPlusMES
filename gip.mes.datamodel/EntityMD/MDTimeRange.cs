@@ -52,8 +52,8 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDTimeRange>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDTimeRange>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDTimeRange>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDTimeRange>>(
             (database) => from c in database.MDTimeRange where c.IsDefault select c
         );
 

@@ -1742,8 +1742,8 @@ namespace gip.bso.manufacturing
                     && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName));
         };
 
-        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>> s_cQry_ProdOrderPartslistOverview =
-        EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>>(
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IEnumerable<ProdOrderPartslistOverview>> s_cQry_ProdOrderPartslistOverview =
+        EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IEnumerable<ProdOrderPartslistOverview>>(
             (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName) =>
                 ctx
                 .ProdOrderPartslist
@@ -1845,8 +1845,8 @@ namespace gip.bso.manufacturing
         );
 
 
-        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>> s_cQry_Inputs =
-       EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>>(
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IEnumerable<InputOverview>> s_cQry_Inputs =
+       EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IEnumerable<InputOverview>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo, calculateStatistics) =>
                ctx
                .ProdOrderPartslistPos
@@ -1941,8 +1941,8 @@ namespace gip.bso.manufacturing
                .OrderBy(c => c.MaterialNo)
        );
 
-        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>> s_cQry_FinalInput =
-       EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>>(
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IEnumerable<ProdOrderPartslistPos>> s_cQry_FinalInput =
+       EF.CompileQuery<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IEnumerable<ProdOrderPartslistPos>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, calculateStatistics) =>
               ctx
               .ProdOrderPartslistPos

@@ -37,13 +37,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDMaintMode>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDMaintMode>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDMaintMode>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDMaintMode>>(
             (database) => from c in database.MDMaintMode where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDMaintMode>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDMaintMode>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDMaintMode>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDMaintMode>>(
             (database, index) => from c in database.MDMaintMode where c.MDMaintModeIndex == index select c
         );
 

@@ -37,13 +37,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDVisitorVoucherState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDVisitorVoucherState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDVisitorVoucherState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDVisitorVoucherState>>(
             (database) => from c in database.MDVisitorVoucherState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDVisitorVoucherState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDVisitorVoucherState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDVisitorVoucherState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDVisitorVoucherState>>(
             (database, index) => from c in database.MDVisitorVoucherState where c.MDVisitorVoucherStateIndex == index select c
         );
 

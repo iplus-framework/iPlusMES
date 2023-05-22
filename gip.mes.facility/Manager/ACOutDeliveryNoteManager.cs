@@ -20,28 +20,28 @@ namespace gip.mes.facility
         #endregion
 
         #region PrecompiledQueries
-        static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_CompletelyAssigned =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_SubsetAssigned =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_NotPlanned =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_OutOrderInProcess =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDOutOrderPosState>> s_cQry_OutOrderInProcess =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.InProcess select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_OutOrderCompleted =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDOutOrderPosState>> s_cQry_OutOrderCompleted =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.Completed select c
         );
         #endregion

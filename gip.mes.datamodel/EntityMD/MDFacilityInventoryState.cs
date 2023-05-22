@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDFacilityInventoryState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDFacilityInventoryState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDFacilityInventoryState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDFacilityInventoryState>>(
             (database) => from c in database.MDFacilityInventoryState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDFacilityInventoryState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDFacilityInventoryState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDFacilityInventoryState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDFacilityInventoryState>>(
             (database, index) => from c in database.MDFacilityInventoryState where c.MDFacilityInventoryStateIndex == index select c
         );
 

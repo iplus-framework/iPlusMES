@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDLabOrderPosState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDLabOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDLabOrderPosState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDLabOrderPosState>>(
             (database) => from c in database.MDLabOrderPosState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDLabOrderPosState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDLabOrderPosState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDLabOrderPosState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDLabOrderPosState>>(
             (database, index) => from c in database.MDLabOrderPosState where c.MDLabOrderPosStateIndex == index select c
         );
 

@@ -37,13 +37,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDTransportMode>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDTransportMode>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDTransportMode>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDTransportMode>>(
             (database) => from c in database.MDTransportMode where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDTransportMode>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDTransportMode>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDTransportMode>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDTransportMode>>(
             (database, index) => from c in database.MDTransportMode where c.MDTransportModeIndex == index select c
         );
 

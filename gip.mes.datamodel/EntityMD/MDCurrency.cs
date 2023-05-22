@@ -35,13 +35,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDCurrency>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDCurrency>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDCurrency>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDCurrency>>(
             (database) => from c in database.MDCurrency where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, string, IQueryable<MDCurrency>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, string, IQueryable<MDCurrency>>(
+        static readonly Func<DatabaseApp, string, IEnumerable<MDCurrency>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, string, IEnumerable<MDCurrency>>(
             (database, index) => from c in database.MDCurrency where c.MDCurrencyShortname == index select c
         );
 

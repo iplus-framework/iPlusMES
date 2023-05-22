@@ -49,8 +49,8 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDTour>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDTour>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDTour>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDTour>>(
             (database) => from c in database.MDTour where c.IsDefault select c
         );
 

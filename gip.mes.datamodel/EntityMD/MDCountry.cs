@@ -44,13 +44,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDCountry>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDCountry>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDCountry>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDCountry>>(
             (database) => from c in database.MDCountry where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, string, IQueryable<MDCountry>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, string, IQueryable<MDCountry>>(
+        static readonly Func<DatabaseApp, string, IEnumerable<MDCountry>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, string, IEnumerable<MDCountry>>(
             (database, index) => from c in database.MDCountry where c.CountryCode == index select c
         );
 

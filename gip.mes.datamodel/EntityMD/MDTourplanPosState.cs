@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDTourplanPosState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDTourplanPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDTourplanPosState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDTourplanPosState>>(
             (database) => from c in database.MDTourplanPosState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDTourplanPosState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDTourplanPosState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDTourplanPosState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDTourplanPosState>>(
             (database, index) => from c in database.MDTourplanPosState where c.MDTourplanPosStateIndex == index select c
         );
 

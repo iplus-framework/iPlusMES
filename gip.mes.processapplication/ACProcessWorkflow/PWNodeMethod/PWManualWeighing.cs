@@ -2170,8 +2170,8 @@ namespace gip.mes.processapplication
                                                         .ToArray();
         }
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>> s_cQry_WeighMaterials =
-                EF.CompileQuery<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<ProdOrderPartslistPosRelation>> s_cQry_WeighMaterials =
+                EF.CompileQuery<DatabaseApp, Guid, IEnumerable<ProdOrderPartslistPosRelation>>(
                     (ctx, intermediateChildPOPLPosID) => ctx.ProdOrderPartslistPosRelation
                                                             .Include("SourceProdOrderPartslistPos")
                                                             .Include("SourceProdOrderPartslistPos.BasedOnPartslistPos")

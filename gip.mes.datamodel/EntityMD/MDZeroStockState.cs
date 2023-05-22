@@ -38,19 +38,19 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDZeroStockState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDZeroStockState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDZeroStockState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDZeroStockState>>(
             (database) => from c in database.MDZeroStockState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDZeroStockState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDZeroStockState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDZeroStockState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDZeroStockState>>(
             (database, index) => from c in database.MDZeroStockState where c.MDZeroStockStateIndex == index select c
         );
 
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDZeroStockState>> s_cQry_IndexDefault =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDZeroStockState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDZeroStockState>> s_cQry_IndexDefault =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDZeroStockState>>(
             (database, index) => from c in database.MDZeroStockState where c.IsDefault && c.MDZeroStockStateIndex == index select c
         );
 

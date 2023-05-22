@@ -1876,8 +1876,8 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Get ACClass by based on base ACClass ACIdentifier. Max depth is 5 levels.
         /// </summary>
-        public static readonly Func<Database, string, string, IQueryable<gip.core.datamodel.ACClass>> s_cQry_GetRelevantPAProcessFunctions =
-        EF.CompileQuery<Database, string, string, IQueryable<gip.core.datamodel.ACClass>>(
+        public static readonly Func<Database, string, string, IEnumerable<gip.core.datamodel.ACClass>> s_cQry_GetRelevantPAProcessFunctions =
+        EF.CompileQuery<Database, string, string, IEnumerable<gip.core.datamodel.ACClass>>(
             (ctx, pafACIdentifier, configKeyACUrl) => ctx.ACClass.Where(c => (c.BasedOnACClassID.HasValue
                                                             && (c.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 1. Ableitungsstufe
                                                                 || (c.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue

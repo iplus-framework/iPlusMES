@@ -16,8 +16,8 @@ namespace gip.mes.webservices
     {
         #region Material
 
-        public static readonly Func<DatabaseApp, Guid?, string, IQueryable<Material>> s_cQry_GetMaterial =
-        EF.CompileQuery<DatabaseApp, Guid?, string, IQueryable<Material>>(
+        public static readonly Func<DatabaseApp, Guid?, string, IEnumerable<Material>> s_cQry_GetMaterial =
+        EF.CompileQuery<DatabaseApp, Guid?, string, IEnumerable<Material>>(
             (dbApp, materialID, term) =>
                 dbApp.Material
                 .Where(c => (!materialID.HasValue || c.MaterialID == materialID)
@@ -217,8 +217,8 @@ namespace gip.mes.webservices
 
         #region Facility
 
-        public static readonly Func<DatabaseApp, Guid?, string, Guid?, short?, IQueryable<Facility>> s_cQry_GetFacility =
-        EF.CompileQuery<DatabaseApp, Guid?, string, Guid?, short?, IQueryable<Facility>>(
+        public static readonly Func<DatabaseApp, Guid?, string, Guid?, short?, IEnumerable<Facility>> s_cQry_GetFacility =
+        EF.CompileQuery<DatabaseApp, Guid?, string, Guid?, short?, IEnumerable<Facility>>(
             (dbApp, facilityID, term, parentFacilityID, facilityTypeIndex) =>
                 dbApp.Facility
                 .Where(c => (!facilityID.HasValue || c.FacilityID == facilityID)

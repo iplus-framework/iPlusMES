@@ -150,8 +150,8 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Precompiled Queries
-        protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>> s_cQry_ReadyBatchPlansForPWNode =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
+        protected static readonly Func<DatabaseApp, Guid, Guid, IEnumerable<ProdOrderBatchPlan>> s_cQry_ReadyBatchPlansForPWNode =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IEnumerable<ProdOrderBatchPlan>>(
                 (ctx, mdSchedulingGroupID, appDefManagerID) => ctx.ProdOrderBatchPlan
                                     .Where(c => c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.ProdFinished
                                                 && c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.ProdFinished
@@ -223,7 +223,7 @@ namespace gip.mes.processapplication
 
                         if (startMode == BatchPlanStartModeEnum.AutoTime)
                         {
-                            IQueryable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
+                            IEnumerable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
                             DateTime dateTimeIfNull = DateTime.Now.AddDays(1);
                             startableBatchPlans = readyBatchPlans.Where(c => (c.ScheduledStartDate ?? dateTimeIfNull) <= DateTime.Now).ToList();
                         }
@@ -238,7 +238,7 @@ namespace gip.mes.processapplication
                                                             .Any())
                                     continue;
                             }
-                            IQueryable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
+                            IEnumerable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
                             if (!readyBatchPlans.Any())
                                 continue;
                             ProdOrderBatchPlan nextBatchPlan = null;

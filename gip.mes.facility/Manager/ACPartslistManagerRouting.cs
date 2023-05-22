@@ -85,8 +85,8 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<Facility>> s_cQry_PlSilosWithMaterialTime =
-        EF.CompileQuery<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithMaterialTime =
+        EF.CompileQuery<DatabaseApp, PartslistPos, DateTime, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
@@ -163,8 +163,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<Facility>> s_cQry_PlSilosWithIntermediateMaterialTime =
-        EF.CompileQuery<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithIntermediateMaterialTime =
+        EF.CompileQuery<DatabaseApp, PartslistPos, DateTime, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
@@ -251,8 +251,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<Facility>> s_cQry_PlSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -321,8 +321,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<Facility>> s_cQry_PlSilosWithIntermediateMaterial =
-        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithIntermediateMaterial =
+        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -405,8 +405,8 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>> s_cQry_PoSilosWithMaterialTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosWithMaterialTime =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                             .Include("Facility.FacilityStock_Facility")
                                                                             .Where(c => c.NotAvailable == false
@@ -483,8 +483,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>> s_cQry_PoSilosWithIntermediateMaterialTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosWithIntermediateMaterialTime =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
@@ -570,8 +570,8 @@ namespace gip.mes.facility
         /// AND must pe produced form the same order in a previous stage
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>> s_cQry_PoSilosFromPrevStageTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosFromPrevStageTime =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue
@@ -657,8 +657,8 @@ namespace gip.mes.facility
         /// AND must pe produced form the same order in a previous stage
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>> s_cQry_PoSilosFromPrevIntermediateTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosFromPrevIntermediateTime =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
@@ -739,8 +739,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>> s_cQry_PoSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -809,8 +809,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>> s_cQry_PoSilosWithIntermediateMaterial =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosWithIntermediateMaterial =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -886,8 +886,8 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>> s_cQry_PoSilosFromPrevStage =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosFromPrevStage =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
@@ -959,8 +959,8 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>> s_cQry_PoSilosFromPrevIntermediate =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PoSilosFromPrevIntermediate =
+        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID

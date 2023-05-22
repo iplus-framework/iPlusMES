@@ -37,8 +37,8 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDTermOfPayment>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDTermOfPayment>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDTermOfPayment>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDTermOfPayment>>(
             (database) => from c in database.MDTermOfPayment where c.IsDefault select c
         );
 

@@ -37,13 +37,13 @@ namespace gip.mes.datamodel
             return entity;
         }
 
-        static readonly Func<DatabaseApp, IQueryable<MDMovementReason>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDMovementReason>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDMovementReason>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDMovementReason>>(
             (database) => from c in database.MDMovementReason where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDMovementReason>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDMovementReason>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDMovementReason>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDMovementReason>>(
             (database, index) => from c in database.MDMovementReason where c.MDMovementReasonIndex == index select c
         );
 

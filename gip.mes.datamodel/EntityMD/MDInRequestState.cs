@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDInRequestState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDInRequestState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDInRequestState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDInRequestState>>(
             (database) => from c in database.MDInRequestState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDInRequestState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDInRequestState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDInRequestState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDInRequestState>>(
             (database, index) => from c in database.MDInRequestState where c.MDInRequestStateIndex == index select c
         );
 

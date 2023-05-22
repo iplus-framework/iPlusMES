@@ -43,8 +43,8 @@ namespace gip.mes.webservices
 
 
 
-        public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_GetPicking =
-        EF.CompileQuery<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>>(
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.Picking>> s_cQry_GetPicking =
+        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.Picking>>(
             (dbApp, pickingID) =>
                 dbApp.Picking
                         .Include("PickingPos_Picking")
@@ -66,7 +66,7 @@ namespace gip.mes.webservices
                               )
         );
 
-        protected virtual IEnumerable<Picking> ConvertToWSPicking(DatabaseApp dbApp, IQueryable<gip.mes.datamodel.Picking> query)
+        protected virtual IEnumerable<Picking> ConvertToWSPicking(DatabaseApp dbApp, IEnumerable<gip.mes.datamodel.Picking> query)
         {
             FacilityManager facilityManager = null;
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
@@ -247,8 +247,8 @@ namespace gip.mes.webservices
             return new WSResponse<List<Picking>>(result);
         }
 
-        public static readonly Func<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_SearchPicking =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IEnumerable<gip.mes.datamodel.Picking>> s_cQry_SearchPicking =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IEnumerable<gip.mes.datamodel.Picking>>(
             (dbApp, pType, fromFacility, toFacility, fromDate, toDate) =>
                 dbApp.Picking
                         .Include("PickingPos_Picking")
@@ -345,8 +345,8 @@ namespace gip.mes.webservices
             return new WSResponse<bool>(true);
         }
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<gip.mes.datamodel.PickingPos>> s_cQry_GetPickingPos =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<gip.mes.datamodel.PickingPos>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<gip.mes.datamodel.PickingPos>> s_cQry_GetPickingPos =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<gip.mes.datamodel.PickingPos>>(
             (dbApp, pickingPosID) =>
                 dbApp.PickingPos
                         .Include("FromFacility")
@@ -366,7 +366,7 @@ namespace gip.mes.webservices
 
         );
 
-        protected virtual IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, FacilityManager facilityManager)
+        protected virtual IEnumerable<PickingPos> ConvertToWSPickingPos(IEnumerable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, FacilityManager facilityManager)
         {
             return query.AsEnumerable().Select(d => new PickingPos()
             {
@@ -441,8 +441,8 @@ namespace gip.mes.webservices
         }
 
 
-        public static readonly Func<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
-            EF.CompileQuery<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
+        public static readonly Func<DatabaseApp, datamodel.PickingPos, IEnumerable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
+            EF.CompileQuery<DatabaseApp, datamodel.PickingPos, IEnumerable<IGrouping<string, FacilityBookingCharge>>>(
             (ctx, pickingPos) =>
                 ctx
                 .FacilityBookingCharge

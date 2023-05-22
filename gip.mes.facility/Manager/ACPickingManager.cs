@@ -55,38 +55,38 @@ namespace gip.mes.facility
         #endregion
 
         #region PrecompiledQueries
-        static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_CompletelyAssigned =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_SubsetAssigned =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_NotPlanned =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
             (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDInOrderPosState>> s_cQry_InOrderInProcess =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDInOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDInOrderPosState>> s_cQry_InOrderInProcess =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDInOrderPosState>>(
             (ctx) => from c in ctx.MDInOrderPosState where c.MDInOrderPosStateIndex == (Int16)MDInOrderPosState.InOrderPosStates.InProcess select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDInOrderPosState>> s_cQry_InOrderCompleted =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDInOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDInOrderPosState>> s_cQry_InOrderCompleted =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDInOrderPosState>>(
             (ctx) => from c in ctx.MDInOrderPosState where c.MDInOrderPosStateIndex == (Int16)MDInOrderPosState.InOrderPosStates.Completed select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_OutOrderInProcess =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDOutOrderPosState>> s_cQry_OutOrderInProcess =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.InProcess select c
         );
 
-        static readonly Func<DatabaseApp, IQueryable<MDOutOrderPosState>> s_cQry_OutOrderCompleted =
-        EF.CompileQuery<DatabaseApp, IQueryable<MDOutOrderPosState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDOutOrderPosState>> s_cQry_OutOrderCompleted =
+        EF.CompileQuery<DatabaseApp, IEnumerable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.Completed select c
         );
         #endregion
@@ -1835,8 +1835,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, Material, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, Material, bool, bool, IEnumerable<Facility>> s_cQry_PickingSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, Material, bool, bool, IEnumerable<Facility>>(
             (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -1860,8 +1860,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterialTime =
-        EF.CompileQuery<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IEnumerable<Facility>> s_cQry_PickingSilosWithMaterialTime =
+        EF.CompileQuery<DatabaseApp, Material, bool, DateTime, bool, IEnumerable<Facility>>(
             (ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false

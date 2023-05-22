@@ -109,8 +109,8 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Precompiled Queries
-        protected static readonly Func<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IQueryable<MaterialWFConnection>> s_cQry_IsSubBatchCreation =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IQueryable<MaterialWFConnection>>(
+        protected static readonly Func<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IEnumerable<MaterialWFConnection>> s_cQry_IsSubBatchCreation =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IEnumerable<MaterialWFConnection>>(
             (ctx, materialID, materialWFACClassMethodID, contentACClassWFVB) => ctx.MaterialWFConnection
                                                                     .Where(c => c.MaterialID == materialID
                                                                            && c.MaterialWFACClassMethodID == materialWFACClassMethodID

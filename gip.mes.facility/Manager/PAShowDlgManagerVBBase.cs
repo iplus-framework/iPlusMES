@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace gip.mes.facility
 {
@@ -380,8 +381,8 @@ namespace gip.mes.facility
         #endregion
 
         #region Precompiled Query
-        public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderBatch>> s_cQry_BatchInfo =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<ProdOrderBatch>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<ProdOrderBatch>> s_cQry_BatchInfo =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<ProdOrderBatch>>(
             (ctx, id) => ctx.ProdOrderBatch.Include("ProdOrderPartslist")
                                  .Include("ProdOrderPartslist.ProdOrder")
                                  .Include("ProdOrderPartslist.Partslist")
@@ -392,8 +393,8 @@ namespace gip.mes.facility
                                  .Where(c => c.ProdOrderBatchID == id)
         );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPos>> s_cQry_POPosInfo =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPos>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<ProdOrderPartslistPos>> s_cQry_POPosInfo =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<ProdOrderPartslistPos>>(
             (ctx, id) => ctx.ProdOrderPartslistPos.Include("ProdOrderPartslist")
                                  .Include("ProdOrderPartslist.ProdOrder")
                                  .Include("ProdOrderPartslist.Partslist")
@@ -405,15 +406,15 @@ namespace gip.mes.facility
                                  .Where(c => c.ProdOrderPartslistPosID == id)
         );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<Picking>> s_cQry_PickingInfo =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<Picking>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<Picking>> s_cQry_PickingInfo =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<Picking>>(
             (ctx, id) => ctx.Picking.Include("PickingPos_Picking")
                                  .Include("PickingPos_Picking.ToFacility")
                                  .Where(c => c.PickingID == id)
         );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<DeliveryNotePos>> s_cQry_DeliveryNotePosInfo =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<DeliveryNotePos>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<DeliveryNotePos>> s_cQry_DeliveryNotePosInfo =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<DeliveryNotePos>>(
             (ctx, id) => ctx.DeliveryNotePos.Include("DeliveryNote")
                                     .Include("InOrderPos")
                                     .Include("InOrderPos.Material")
@@ -422,8 +423,8 @@ namespace gip.mes.facility
                                  .Where(c => c.DeliveryNotePosID == id)
         );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityBooking>> s_cQry_FacilityBookingInfo =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityBooking>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityBooking>> s_cQry_FacilityBookingInfo =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityBooking>>(
             (ctx, id) => ctx.FacilityBooking.Include("OutwardMaterial")
                                             .Include("InwardMaterial")
                                     .Include("OutwardFacility")

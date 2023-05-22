@@ -18,8 +18,8 @@ namespace gip.mes.webservices
     {
         #region ProdOrderPartslist
 
-        public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslist>> s_cQry_GetProdOrderPartslist =
-            EF.CompileQuery<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslist>>(
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslist>> s_cQry_GetProdOrderPartslist =
+            EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslist>>(
                 (dbApp, prodOrderPartslistID) =>
                     dbApp.ProdOrderPartslist
                                    .Include("ProdOrder")
@@ -32,8 +32,8 @@ namespace gip.mes.webservices
                                    .OrderByDescending(x => x.UpdateDate)
             );
 
-        public static readonly Func<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslist>> s_cQry_GetProdOrderPartslists =
-            EF.CompileQuery<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslist>>(
+        public static readonly Func<DatabaseApp, Guid[], IEnumerable<gip.mes.datamodel.ProdOrderPartslist>> s_cQry_GetProdOrderPartslists =
+            EF.CompileQuery<DatabaseApp, Guid[], IEnumerable<gip.mes.datamodel.ProdOrderPartslist>>(
                 (dbApp, prodOrderPartslistID) =>
                     dbApp.ProdOrderPartslist
                                    .Include("ProdOrder")
@@ -46,7 +46,7 @@ namespace gip.mes.webservices
                                    .OrderByDescending(x => x.UpdateDate)
             );
 
-        public virtual IEnumerable<ProdOrderPartslist> ConvertToWSProdOrderPartslists(IQueryable<gip.mes.datamodel.ProdOrderPartslist> query)
+        public virtual IEnumerable<ProdOrderPartslist> ConvertToWSProdOrderPartslists(IEnumerable<gip.mes.datamodel.ProdOrderPartslist> query)
         {
             return query.AsEnumerable().Select(c => new ProdOrderPartslist()
             {
@@ -146,8 +146,8 @@ namespace gip.mes.webservices
 
         #region Intermediates
 
-        public static readonly Func<DatabaseApp, Guid?, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderPLIntermediates =
-                        EF.CompileQuery<DatabaseApp, Guid?, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>>(
+        public static readonly Func<DatabaseApp, Guid?, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderPLIntermediates =
+                        EF.CompileQuery<DatabaseApp, Guid?, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>>(
                             (dbApp, prodOrderPartslistID, prodOrderPartslistPosID) =>
                                 dbApp.ProdOrderPartslistPos.Include("Material")
                                                            .Include("Material.BaseMDUnit")
@@ -168,8 +168,8 @@ namespace gip.mes.webservices
                                                            .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
                         );
 
-        public static readonly Func<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderPLIntermediatesFromArray =
-                        EF.CompileQuery<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>>(
+        public static readonly Func<DatabaseApp, Guid[], IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderPLIntermediatesFromArray =
+                        EF.CompileQuery<DatabaseApp, Guid[], IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>>(
                             (dbApp, prodOrderPartslistPosID) =>
                                     dbApp.ProdOrderPartslistPos.Include("Material")
                                                                .Include("Material.BaseMDUnit")
@@ -187,7 +187,7 @@ namespace gip.mes.webservices
                                                                .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
                         );
 
-        public IEnumerable<ProdOrderPartslistPos> ConvertToWSProdOrderPLIntermediates(IQueryable<gip.mes.datamodel.ProdOrderPartslistPos> query)
+        public IEnumerable<ProdOrderPartslistPos> ConvertToWSProdOrderPLIntermediates(IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos> query)
         {
             return query.AsEnumerable().Select(c => new ProdOrderPartslistPos()
             {
@@ -320,8 +320,8 @@ namespace gip.mes.webservices
 
         #region InputMaterials
 
-        public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslistPosRelation>> s_cQry_GetProdOrderInputMaterials =
-                EF.CompileQuery<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslistPosRelation>>(
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslistPosRelation>> s_cQry_GetProdOrderInputMaterials =
+                EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslistPosRelation>>(
                     (dbApp, targetProdOrderPLPosID) =>
                         dbApp.ProdOrderPartslistPosRelation.Include("SourceProdOrderPartslistPos")
                                                            .Include("SourceProdOrderPartslistPos.Material")
@@ -338,7 +338,7 @@ namespace gip.mes.webservices
                 );
 
 
-        public IEnumerable<ProdOrderPartslistPosRelation> ConvertToWSProdOrderPLPosInputMaterials(IQueryable<gip.mes.datamodel.ProdOrderPartslistPosRelation> query)
+        public IEnumerable<ProdOrderPartslistPosRelation> ConvertToWSProdOrderPLPosInputMaterials(IEnumerable<gip.mes.datamodel.ProdOrderPartslistPosRelation> query)
         {
             return query.AsEnumerable().Select(c => new ProdOrderPartslistPosRelation()
             {
@@ -442,8 +442,8 @@ namespace gip.mes.webservices
 
         #region Batches
 
-        public static readonly Func<DatabaseApp, Guid?, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderIntermBatches =
-                EF.CompileQuery<DatabaseApp, Guid?, Guid?, IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>>(
+        public static readonly Func<DatabaseApp, Guid?, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderIntermBatches =
+                EF.CompileQuery<DatabaseApp, Guid?, Guid?, IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>>(
                     (dbApp, parentIntermediateID, batchIntermediateID) =>
                         dbApp.ProdOrderPartslistPos.Include("Material")
                                                    .Include("ProdOrderBatch")
@@ -467,8 +467,8 @@ namespace gip.mes.webservices
                                                    .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
                 );
 
-        public static readonly Func<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderIntermBatchesFromArray =
-                EF.CompileQuery<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>>(
+        public static readonly Func<DatabaseApp, Guid[], IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderIntermBatchesFromArray =
+                EF.CompileQuery<DatabaseApp, Guid[], IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos>>(
                     (dbApp, batchIntermediateID) =>
                         dbApp.ProdOrderPartslistPos.Include("Material")
                                                    .Include("ProdOrderBatch")
@@ -490,7 +490,7 @@ namespace gip.mes.webservices
                                                    .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
                 );
 
-        public IEnumerable<ProdOrderPartslistPos> ConvertToWSProdOrderIntermBatches(IQueryable<gip.mes.datamodel.ProdOrderPartslistPos> query)
+        public IEnumerable<ProdOrderPartslistPos> ConvertToWSProdOrderIntermBatches(IEnumerable<gip.mes.datamodel.ProdOrderPartslistPos> query)
         {
             return query.AsEnumerable().Select(c => new ProdOrderPartslistPos()
             {
@@ -615,8 +615,8 @@ namespace gip.mes.webservices
 
         #region Booking
 
-        public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.FacilityBookingCharge>> s_cQry_GetProdOrderFacilityBookings =
-        EF.CompileQuery<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.FacilityBookingCharge>>(
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>> s_cQry_GetProdOrderFacilityBookings =
+        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>>(
             (dbApp, posRelationID) =>
                     dbApp.FacilityBookingCharge.Include("OutwardMaterial")
                                                .Include("InwardMaterial")
@@ -675,8 +675,8 @@ namespace gip.mes.webservices
             return new WSResponse<PostingOverview>();
         }
 
-        public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.FacilityBookingCharge>> s_cQry_GetProdOrderPosFacilityBookings =
-        EF.CompileQuery<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.FacilityBookingCharge>>(
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>> s_cQry_GetProdOrderPosFacilityBookings =
+        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>>(
             (dbApp, posID) =>
                     dbApp.FacilityBookingCharge.Include("OutwardMaterial")
                                                .Include("InwardMaterial")

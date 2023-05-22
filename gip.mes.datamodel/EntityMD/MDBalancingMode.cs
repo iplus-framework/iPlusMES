@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDBalancingMode>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDBalancingMode>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDBalancingMode>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDBalancingMode>>(
             (database) => from c in database.MDBalancingMode where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDBalancingMode>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDBalancingMode>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDBalancingMode>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDBalancingMode>>(
             (database, index) => from c in database.MDBalancingMode where c.MDBalancingModeIndex == index select c
         );
 

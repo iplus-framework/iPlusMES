@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDBookingNotAvailableMode>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDBookingNotAvailableMode>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDBookingNotAvailableMode>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDBookingNotAvailableMode>>(
             (database) => from c in database.MDBookingNotAvailableMode where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDBookingNotAvailableMode>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDBookingNotAvailableMode>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDBookingNotAvailableMode>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDBookingNotAvailableMode>>(
             (database, index) => from c in database.MDBookingNotAvailableMode where c.MDBookingNotAvailableModeIndex == index select c
         );
 

@@ -3801,43 +3801,43 @@ namespace gip.mes.datamodel
         #endregion
 
         #region precompiled Queries
-        public static readonly Func<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>> s_cQry_GetMDProdOrderPosState =
-        EF.CompileQuery<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>>(
+        public static readonly Func<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IEnumerable<MDProdOrderPartslistPosState>> s_cQry_GetMDProdOrderPosState =
+        EF.CompileQuery<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IEnumerable<MDProdOrderPartslistPosState>>(
             (ctx, state) => ctx.MDProdOrderPartslistPosState.Where(c => c.MDProdOrderPartslistPosStateIndex == (short)state)
         );
 
-        public static readonly Func<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>> s_cQry_GetMDDelivPosState =
-        EF.CompileQuery<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>>(
+        public static readonly Func<DatabaseApp, MDDelivPosState.DelivPosStates, IEnumerable<MDDelivPosState>> s_cQry_GetMDDelivPosState =
+        EF.CompileQuery<DatabaseApp, MDDelivPosState.DelivPosStates, IEnumerable<MDDelivPosState>>(
             (ctx, state) => ctx.MDDelivPosState.Where(c => c.MDDelivPosStateIndex == (short)state)
         );
 
-        public static readonly Func<DatabaseApp, string, IQueryable<MDPickingType>> s_cQry_GetMDPickingType =
-        EF.CompileQuery<DatabaseApp, string, IQueryable<MDPickingType>>(
+        public static readonly Func<DatabaseApp, string, IEnumerable<MDPickingType>> s_cQry_GetMDPickingType =
+        EF.CompileQuery<DatabaseApp, string, IEnumerable<MDPickingType>>(
             (ctx, key) => ctx.MDPickingType.Where(c => c.MDKey == key)
         );
 
-        public static readonly Func<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>> s_cQry_GetMDDelivPosLoadState =
-        EF.CompileQuery<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>>(
+        public static readonly Func<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IEnumerable<MDDelivPosLoadState>> s_cQry_GetMDDelivPosLoadState =
+        EF.CompileQuery<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IEnumerable<MDDelivPosLoadState>>(
             (ctx, state) => ctx.MDDelivPosLoadState.Where(c => c.MDDelivPosLoadStateIndex == (short)state)
         );
 
-        public static readonly Func<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>> s_cQry_GetMDProdOrderState =
-        EF.CompileQuery<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>>(
+        public static readonly Func<DatabaseApp, MDProdOrderState.ProdOrderStates, IEnumerable<MDProdOrderState>> s_cQry_GetMDProdOrderState =
+        EF.CompileQuery<DatabaseApp, MDProdOrderState.ProdOrderStates, IEnumerable<MDProdOrderState>>(
             (ctx, state) => ctx.MDProdOrderState.Where(c => c.MDProdOrderStateIndex == (short)state)
         );
 
-        public static readonly Func<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>> s_cQry_GetMDDelivNoteState =
-        EF.CompileQuery<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>>(
+        public static readonly Func<DatabaseApp, MDDelivNoteState.DelivNoteStates, IEnumerable<MDDelivNoteState>> s_cQry_GetMDDelivNoteState =
+        EF.CompileQuery<DatabaseApp, MDDelivNoteState.DelivNoteStates, IEnumerable<MDDelivNoteState>>(
             (ctx, state) => ctx.MDDelivNoteState.Where(c => c.MDDelivNoteStateIndex == (short)state)
         );
 
-        public static readonly Func<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>> s_cQry_GetMDBookingNotAvailableMode =
-        EF.CompileQuery<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>>(
+        public static readonly Func<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IEnumerable<MDBookingNotAvailableMode>> s_cQry_GetMDBookingNotAvailableMode =
+        EF.CompileQuery<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IEnumerable<MDBookingNotAvailableMode>>(
             (ctx, mode) => ctx.MDBookingNotAvailableMode.Where(c => c.MDBookingNotAvailableModeIndex == (short)mode)
         );
 
-        public static readonly Func<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>> s_cQry_GetMDBalancingMode =
-        EF.CompileQuery<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>>(
+        public static readonly Func<DatabaseApp, MDBalancingMode.BalancingModes, IEnumerable<MDBalancingMode>> s_cQry_GetMDBalancingMode =
+        EF.CompileQuery<DatabaseApp, MDBalancingMode.BalancingModes, IEnumerable<MDBalancingMode>>(
             (ctx, mode) => ctx.MDBalancingMode.Where(c => c.MDBalancingModeIndex == (short)mode)
         );
 

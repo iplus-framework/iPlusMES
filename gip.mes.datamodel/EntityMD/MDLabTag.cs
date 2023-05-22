@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDLabTag>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDLabTag>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDLabTag>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDLabTag>>(
             (database) => from c in database.MDLabTag where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDLabTag>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDLabTag>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDLabTag>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDLabTag>>(
             (database, index) => from c in database.MDLabTag where c.MDLabTagIndex == index select c
         );
 

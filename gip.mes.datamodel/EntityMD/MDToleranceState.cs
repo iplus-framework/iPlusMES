@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDToleranceState>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDToleranceState>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDToleranceState>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDToleranceState>>(
             (database) => from c in database.MDToleranceState where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDToleranceState>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDToleranceState>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDToleranceState>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDToleranceState>>(
             (database, index) => from c in database.MDToleranceState where c.MDToleranceStateIndex == index select c
         );
 

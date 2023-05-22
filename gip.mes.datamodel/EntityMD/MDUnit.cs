@@ -457,8 +457,8 @@ namespace gip.mes.datamodel
         //    (database) => from c in database.MDUnit where c.IsDefault select c
         //);
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDUnit>> s_cQry_SiUnit =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDUnit>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDUnit>> s_cQry_SiUnit =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDUnit>>(
             (database, index) => from c in database.MDUnit where c.SIDimensionIndex == index && c.IsSIUnit select c
         );
 

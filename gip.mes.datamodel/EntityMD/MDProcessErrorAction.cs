@@ -38,13 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
-        static readonly Func<DatabaseApp, IQueryable<MDProcessErrorAction>> s_cQry_Default =
-            EF.CompileQuery<DatabaseApp, IQueryable<MDProcessErrorAction>>(
+        static readonly Func<DatabaseApp, IEnumerable<MDProcessErrorAction>> s_cQry_Default =
+            EF.CompileQuery<DatabaseApp, IEnumerable<MDProcessErrorAction>>(
             (database) => from c in database.MDProcessErrorAction where c.IsDefault select c
         );
 
-        static readonly Func<DatabaseApp, short, IQueryable<MDProcessErrorAction>> s_cQry_Index =
-            EF.CompileQuery<DatabaseApp, short, IQueryable<MDProcessErrorAction>>(
+        static readonly Func<DatabaseApp, short, IEnumerable<MDProcessErrorAction>> s_cQry_Index =
+            EF.CompileQuery<DatabaseApp, short, IEnumerable<MDProcessErrorAction>>(
             (database, index) => from c in database.MDProcessErrorAction where c.MDProcessErrorActionIndex == index select c
         );
 
