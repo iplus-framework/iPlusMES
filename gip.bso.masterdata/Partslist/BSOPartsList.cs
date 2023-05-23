@@ -1312,7 +1312,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                return DatabaseApp.MaterialWF.OrderBy(x => x.Name);
+                return DatabaseApp.MaterialWF.OrderBy(x => x.Name).ToList();
             }
         }
         #endregion

@@ -17,8 +17,7 @@ namespace gip.mes.facility
     {
         #region FacilityBooking
 
-        static readonly Func<DatabaseApp, DateTime, DateTime, short?, Guid?, Guid?, Guid?, Guid?, Guid?, IQueryable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FacilityBookingChargeOverview =
-            EF.CompileQuery<DatabaseApp, DateTime, DateTime, short?, Guid?, Guid?, Guid?, Guid?, Guid?, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
+        static readonly Func<DatabaseApp, DateTime, DateTime, short?, Guid?, Guid?, Guid?, Guid?, Guid?, IEnumerable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FacilityBookingChargeOverview =
             (ctx, searchFrom, searchTo, filterFBTypeValue, facilityID, facilityLotID, facilityChargeID, facilityLocationID, materialID) =>
                 ctx
                 .FacilityBookingCharge
@@ -42,6 +41,7 @@ namespace gip.mes.facility
                 .Include("OutwardFacilityCharge")
                 .Include("OutwardFacilityCharge.FacilityLot")
                 // Where cause
+                .AsEnumerable()
                 .Where(fbc =>
                         // filtering by period
                         fbc.FacilityBooking.InsertDate >= searchFrom
@@ -83,8 +83,7 @@ namespace gip.mes.facility
                  )
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .GroupBy(c => c.FacilityBooking.FacilityBookingNo)
-                .OrderBy(c => c.Key)
-            );
+                .OrderBy(c => c.Key);
 
         public virtual List<FacilityBookingOverview> GroupFacilityBookingOverviewList(IEnumerable<FacilityBookingOverview> query)
         {

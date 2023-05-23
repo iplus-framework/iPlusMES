@@ -67,7 +67,6 @@ namespace gip.bso.facility
         #region PrecompiledQueries
 
         static readonly Func<DatabaseApp, string, IEnumerable<IntermediateMaterialOverview>> s_cQry_IntermediateMaterialOverview =
-        EF.CompileQuery<DatabaseApp, string, IEnumerable<IntermediateMaterialOverview>>(
             (ctx, excludedBins) =>
                 ctx.MaterialWFRelation
                 .AsEnumerable()
@@ -96,7 +95,7 @@ namespace gip.bso.facility
                         StockQuantity = x.Sum(a => (double?)a.Fc.StockQuantity),
                         DayInward = x.SelectMany(fbc => fbc.Fc.FacilityBookingCharge_InwardFacilityCharge).Where(a => a.InsertDate >= DayFilterStart && a.InsertDate < DayFilterEnd).Sum(a => (double?)a.InwardQuantity),
                         DayOutward = x.SelectMany(fbc => fbc.Fc.FacilityBookingCharge_OutwardFacilityCharge).Where(a => a.InsertDate >= DayFilterStart && a.InsertDate < DayFilterEnd).Sum(a => (double?)a.OutwardQuantity),
-                    }).AsEnumerable());
+                    }).AsEnumerable();
 
         #endregion
 

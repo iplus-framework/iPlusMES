@@ -38,11 +38,13 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         static readonly Func<DatabaseApp, IEnumerable<MDBookingNotAvailableMode>> s_cQry_Default =
             EF.CompileQuery<DatabaseApp, IEnumerable<MDBookingNotAvailableMode>>(
             (database) => from c in database.MDBookingNotAvailableMode where c.IsDefault select c
         );
 
+        [NotMapped]
         static readonly Func<DatabaseApp, short, IEnumerable<MDBookingNotAvailableMode>> s_cQry_Index =
             EF.CompileQuery<DatabaseApp, short, IEnumerable<MDBookingNotAvailableMode>>(
             (database, index) => from c in database.MDBookingNotAvailableMode where c.MDBookingNotAvailableModeIndex == index select c
@@ -129,6 +131,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region enums
+        [NotMapped]
         public BookingNotAvailableModes BookingNotAvailableMode
         {
             get

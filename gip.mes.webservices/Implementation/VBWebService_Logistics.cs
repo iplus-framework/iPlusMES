@@ -442,7 +442,6 @@ namespace gip.mes.webservices
 
 
         public static readonly Func<DatabaseApp, datamodel.PickingPos, IEnumerable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
-            EF.CompileQuery<DatabaseApp, datamodel.PickingPos, IEnumerable<IGrouping<string, FacilityBookingCharge>>>(
             (ctx, pickingPos) =>
                 ctx
                 .FacilityBookingCharge
@@ -472,8 +471,7 @@ namespace gip.mes.webservices
                             || (pickingPos.OutOrderPosID.HasValue && fbc.OutOrderPosID == pickingPos.OutOrderPosID))
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .GroupBy(c => c.FacilityBooking.FacilityBookingNo)
-                .OrderBy(c => c.Key)
-            );
+                .OrderBy(c => c.Key);
 
 
         public WSResponse<PostingOverview> GetPickingPostingsPos(string pickingPosID)

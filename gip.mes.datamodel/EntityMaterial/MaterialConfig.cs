@@ -452,7 +452,7 @@ namespace gip.mes.datamodel
 
         [NotMapped]
         private core.datamodel.ACClassWF _ACClassWF;
-        [ACPropertyInfo(9999, "", "en{'Workflow class'}de{'Workflow-Klasse'}", Const.ContextDatabaseIPlus + "\\" + core.datamodel.ACClassWF.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Workflow class'}de{'Workflow-Klasse'}", Const.ContextDatabaseIPlus + "\\" + core.datamodel.ACClassWF.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public core.datamodel.ACClassWF ACClassWF
         {

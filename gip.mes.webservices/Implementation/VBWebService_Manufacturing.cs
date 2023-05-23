@@ -616,7 +616,6 @@ namespace gip.mes.webservices
         #region Booking
 
         public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>> s_cQry_GetProdOrderFacilityBookings =
-        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>>(
             (dbApp, posRelationID) =>
                     dbApp.FacilityBookingCharge.Include("OutwardMaterial")
                                                .Include("InwardMaterial")
@@ -632,8 +631,7 @@ namespace gip.mes.webservices
                                                .Include("FacilityBooking.InwardFacilityCharge")
                                                .Include("FacilityBooking.OutwardFacilityCharge")
                                                .Include("ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder")
-                                               .Where(c => c.FacilityBooking.ProdOrderPartslistPosRelationID == posRelationID)
-        );
+                                               .Where(c => c.FacilityBooking.ProdOrderPartslistPosRelationID == posRelationID);
 
 
         public WSResponse<PostingOverview> GetProdOrderPosRelFacilityBooking(string POPLPosRelID)
@@ -676,7 +674,6 @@ namespace gip.mes.webservices
         }
 
         public static readonly Func<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>> s_cQry_GetProdOrderPosFacilityBookings =
-        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<gip.mes.datamodel.FacilityBookingCharge>>(
             (dbApp, posID) =>
                     dbApp.FacilityBookingCharge.Include("OutwardMaterial")
                                                .Include("InwardMaterial")
@@ -692,8 +689,7 @@ namespace gip.mes.webservices
                                                .Include("FacilityBooking.InwardFacilityCharge")
                                                .Include("FacilityBooking.OutwardFacilityCharge")
                                                .Include("ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder")
-                                               .Where(c => c.FacilityBooking.ProdOrderPartslistPosID == posID)
-        );
+                                               .Where(c => c.FacilityBooking.ProdOrderPartslistPosID == posID);
 
 
         public WSResponse<PostingOverview> GetProdOrderPosFacilityBooking(string POPLPosID)
