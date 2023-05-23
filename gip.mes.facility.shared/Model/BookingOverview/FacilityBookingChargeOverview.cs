@@ -15,7 +15,7 @@ namespace gip.mes.facility
     public class FacilityBookingChargeOverview : BookingOverviewBase
     {
 #if NETFRAMEWORK
-        [ACPropertyInfo(9999, "FacilityBookingChargeNo", "en{'Posting No.'}de{'Buchungsnr.'}")]
+        [ACPropertyInfo(800, "FacilityBookingChargeNo", "en{'Posting No.'}de{'Buchungsnr.'}")]
 #endif
         [DataMember(Name = "FBCNo")]
         public string FacilityBookingChargeNo { get; set; }
@@ -27,16 +27,28 @@ namespace gip.mes.facility
         public Guid? OutwardFacilityChargeID { get; set; }
 
 #if NETFRAMEWORK
-        [ACPropertyInfo(9999, "InwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
+        [ACPropertyInfo(801, "OutwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
+#endif
+        [DataMember(Name = "OFCELNo")]
+        public string OutwardFacilityChargeExternLotNo { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(802, "InwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
 #endif
         [DataMember(Name = "IFCELNo")]
         public string InwardFacilityChargeExternLotNo { get; set; }
 
 #if NETFRAMEWORK
-        [ACPropertyInfo(9999, "InwardFacilityChargeFillingDate", ConstApp.FillingDate)]
+        [ACPropertyInfo(803, "InwardFacilityChargeFillingDate", ConstApp.FillingDate)]
 #endif
         [DataMember(Name = "IFCFDt")]
         public DateTime? InwardFacilityChargeFillingDate { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(804, "OutwardFacilityChargeFillOutgDate", ConstApp.FillingDate)]
+#endif
+        [DataMember(Name = "OFCFDt")]
+        public DateTime? OutwardFacilityChargeFillingDate { get; set; }
 
         [DataMember(Name = "IFPB")]
         public short InwardFacilityPostingBehaviour

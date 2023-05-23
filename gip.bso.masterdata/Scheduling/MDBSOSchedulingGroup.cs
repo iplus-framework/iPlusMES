@@ -274,8 +274,21 @@ namespace gip.bso.masterdata.Scheduling
                      && c.RefPAACClassID.HasValue
                      && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
                      && c.RefPAACClassMethod.PWACClass != null
-                     && (c.RefPAACClassMethod.PWACClass.ACIdentifier == ProcessWFClassName
-                         || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName)
+                     && (   c.RefPAACClassMethod.PWACClass.ACIdentifier == ProcessWFClassName
+                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                    && (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName // 2. Ableitungsstufe
+                                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                    && (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName // 3. Ableitungsstufe
+                                                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                            && c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName) // 4. Ableitungsstufe
+                                                                || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                    && c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName) // 5. Ableitungsstufe
+                                                                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                        && c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName)
+                                                        )
+                                            )
+                                        )
+                                ))
                      && !string.IsNullOrEmpty(c.Comment)
                      && !assignedWorkflowNodeIds.Contains(c.ACClassWFID));
                 }

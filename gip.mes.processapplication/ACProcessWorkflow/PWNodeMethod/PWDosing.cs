@@ -846,12 +846,14 @@ namespace gip.mes.processapplication
             Guid[] otherDosingNodes = GetParallelDosingNodes(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
             //if (otherDosingNodes == null)
             //    parallelDosingWFs = new List<IPWNodeReceiveMaterial>();
-            if (otherDosingNodes != null)
+            if (otherDosingNodes != null && otherDosingNodes.Any())
             {
                 parallelDosingWFs = this.RootPW.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial
                                                                             && (c as IPWNodeReceiveMaterial).ContentACClassWF != null
                                                                             && otherDosingNodes.Contains((c as IPWNodeReceiveMaterial).ContentACClassWF.ACClassWFID));
             }
+            else
+                parallelDosingWFs = new List<IPWNodeReceiveMaterial>();
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _ParallelDosingWFs = parallelDosingWFs;
