@@ -935,7 +935,7 @@ namespace gip.mes.webservices
 
                             if (facility == null)
                             {
-                                result.Message = new Msg(eMsgLevel.Error, "Unable to find Faciltiy connected with machine!");
+                                result.Message = new Msg(eMsgLevel.Error, "Unable to find facility connected with machine!");
                             }
                             else
                             {

@@ -20,6 +20,12 @@ namespace gip.mes.webservices
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
+
+        public override bool ACPostInit()
+        {
+            return base.ACPostInit();
+        }
+
         #endregion
 
 
@@ -45,6 +51,15 @@ namespace gip.mes.webservices
             get
             {
                 return ParentACComponent as PAEScannerDecoderWS;
+            }
+        }
+
+        private int _ControllerLevel;
+        public int ControllerLevel
+        {
+            get
+            {
+                return _ControllerLevel;
             }
         }
 
@@ -101,6 +116,22 @@ namespace gip.mes.webservices
             }
             return acState.ValueT;
         }
+
+        private void GetHierarchyLevel()
+        {
+            //var chain = new List<Type>();
+            //Type controllerBaseType = typeof(PAScannedCompContrBase);
+
+
+            //while (firstType != typeof(object))
+            //{
+            //    chain.Add(firstType);
+            //    firstType = firstType.BaseType;
+            //}
+
+            //return chain.IndexOf(secondType);
+        }
+
         #endregion
     }
 
