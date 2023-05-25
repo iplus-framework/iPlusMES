@@ -1,0 +1,1 @@
+alter table OperationLog add XMLValue varchar(max) null;

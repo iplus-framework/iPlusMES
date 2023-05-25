@@ -12,6 +12,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "OperationTime", "en{'Time'}de{'Zeit'}", "", "", true)]
     [ACPropertyEntity(31, "Operation", "en{'Operation'}de{'Operation'}", "", "", true)]
     [ACPropertyEntity(31, "OperationState", "en{'State'}de{'Status'}", "", "", true)]
+    [ACPropertyEntity(9999, "XMLValue", "en{'Value'}de{'Wert'}")]
     public partial class OperationLog 
     {
         public static OperationLog NewACObject(DatabaseApp dbApp, IACObject parentACObject)
@@ -24,7 +25,7 @@ namespace gip.mes.datamodel
                 entity.RefACClassID = refACClass.ACClassID;
 
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
-
+            
             return entity;
         }
 
