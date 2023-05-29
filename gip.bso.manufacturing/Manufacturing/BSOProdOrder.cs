@@ -1352,7 +1352,7 @@ namespace gip.bso.manufacturing
             _OpenPostingsList = this.DatabaseApp
                 .FacilityPreBooking
                 .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material)
-                .Include(c => c.ProdOrderPartslistPosReference)
+                .Include(c => c.ProdOrderPartslistPos)
                 .Where(c => (c.ProdOrderPartslistPosID.HasValue
                           && c.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProdOrderID == this.CurrentProdOrder.ProdOrderID)
                          || (c.ProdOrderPartslistPosRelationID.HasValue

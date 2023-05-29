@@ -27,12 +27,6 @@ namespace gip.mes.datamodel
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             mDBookingNotAvailableModeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var bookingNotAvailableMode = runtimeEntityType.AddProperty(
-                "BookingNotAvailableMode",
-                typeof(MDBookingNotAvailableMode.BookingNotAvailableModes),
-                propertyInfo: typeof(MDBookingNotAvailableMode).GetProperty("BookingNotAvailableMode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            bookingNotAvailableMode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
             var insertDate = runtimeEntityType.AddProperty(
                 "InsertDate",
                 typeof(DateTime),

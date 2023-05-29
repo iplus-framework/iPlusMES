@@ -189,7 +189,7 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        [ACPropertyInfo(3, "", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName)]
+        [ACPropertyInfo(3, "", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public Material Material
         {

@@ -385,7 +385,7 @@ namespace gip.mes.facility
         /// Gibt an wie Buchungsklasse mit dem Nullbestandskennzeichen umgehen soll.
         /// Welche Modi möglich sind, sind im Global.BookingNotAvailableMode-Enumerator definert
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Mode at zero stock'}de{'Modus bei Nullbestand'}", Const.ContextDatabase + "\\" + MDBookingNotAvailableMode.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Mode at zero stock'}de{'Modus bei Nullbestand'}", Const.ContextDatabase + "\\" + MDBookingNotAvailableMode.ClassName + Const.DBSetAsEnumerablePostfix)]
         public MDBookingNotAvailableMode MDBookingNotAvailableMode
         {
             get
@@ -493,7 +493,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Kennzeichen ob auf Zugang- oder Abgangsfeldern gebucht werden soll
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Balancing Mode'}de{'Bilanzierungsmodus'}", Const.ContextDatabase + "\\" + MDBalancingMode.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Balancing Mode'}de{'Bilanzierungsmodus'}", Const.ContextDatabase + "\\" + MDBalancingMode.ClassName + Const.DBSetAsEnumerablePostfix)]
         public MDBalancingMode MDBalancingMode
         {
             get
@@ -559,7 +559,7 @@ namespace gip.mes.facility
         /// Wenn SetNotAvailable = NotAvailableState.Set, dann muss Facility(Silo), FacilityCharge oder FacilityLot auf Nullbestand gesetzt werdern
         /// Wenn SetNotAvailable = NotAvailableState.Reset, dann muss FacilityCharge zurückgesetzt werden
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Set to zero Stock'}de{'Auf Nullbestand setzen'}", Const.ContextDatabase + "\\" + MDZeroStockState.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Set to zero Stock'}de{'Auf Nullbestand setzen'}", Const.ContextDatabase + "\\" + MDZeroStockState.ClassName + Const.DBSetAsEnumerablePostfix)]
         public MDZeroStockState MDZeroStockState
         {
             get
@@ -586,7 +586,7 @@ namespace gip.mes.facility
         /// gibt an ob ein Material/FacilityCharge/Facility/FacilityLot gesperrt oder freigegeben werden soll
         /// Wenn Release-State nicht gesetzt wird, dann bleibt der Zustand der FacilityChargen unberührt
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Release/Block'}de{'Freigeben/Sperren'}", Const.ContextDatabase + "\\" + MDReleaseState.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Release/Block'}de{'Freigeben/Sperren'}", Const.ContextDatabase + "\\" + MDReleaseState.ClassName + Const.DBSetAsEnumerablePostfix)]
         public MDReleaseState MDReleaseState
         {
             get
@@ -663,7 +663,7 @@ namespace gip.mes.facility
         /// dann kann über das Reservierungskennzeichen bestimmt werden ob Reservierungsmengen eingetragen oder aufgelöst werden
         /// Abhängig davon, ob das Inward oder Outward-Mengenfeld gesetzt wird, erfolgt eine Zu- oder Abgangsreservierung
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Reservation Mode'}de{'Reservierungsmodus'}", Const.ContextDatabase + "\\" + MDReservationMode.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Reservation Mode'}de{'Reservierungsmodus'}", Const.ContextDatabase + "\\" + MDReservationMode.ClassName + Const.DBSetAsEnumerablePostfix)]
         public MDReservationMode MDReservationMode
         {
             get
@@ -689,7 +689,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Infoparameter, der nur abgespeichert wird, aber sich keine Verarbeitungslogik dahinter befindet
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Movement Reason'}de{'Buchungsgrund'}", Const.ContextDatabase + "\\" + MDMovementReason.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Movement Reason'}de{'Buchungsgrund'}", Const.ContextDatabase + "\\" + MDMovementReason.ClassName + Const.DBSetAsEnumerablePostfix)]
         public MDMovementReason MDMovementReason
         {
             get
@@ -740,7 +740,7 @@ namespace gip.mes.facility
         /// Entitäten die sich auf die ZUGANGsfelder (INward) auswirken
         /// </summary>
 
-        [ACPropertyInfo(9999, "", "en{'Material (Inward Posting)'}de{'Material (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Material.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Material (Inward Posting)'}de{'Material (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Material InwardMaterial
         {
             get
@@ -762,7 +762,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Storage Bin (Inward Posting)'}de{'Lagerplatz (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Storage Bin (Inward Posting)'}de{'Lagerplatz (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Facility InwardFacility
         {
             get
@@ -784,7 +784,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Lot (Inward Posting)'}de{'Los (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Lot (Inward Posting)'}de{'Los (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName + Const.DBSetAsEnumerablePostfix)]
         public FacilityLot InwardFacilityLot
         {
             get
@@ -806,7 +806,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Quant (Inward Posting)'}de{'Quant (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Quant (Inward Posting)'}de{'Quant (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName + Const.DBSetAsEnumerablePostfix)]
         public FacilityCharge InwardFacilityCharge
         {
             get
@@ -828,7 +828,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Storage Location (Inward Posting)'}de{'Lagerort (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Storage Location (Inward Posting)'}de{'Lagerort (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Facility InwardFacilityLocation
         {
             get
@@ -894,7 +894,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Bill of Materials (Inward Posting)'}de{'Stückliste (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Partslist.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Bill of Materials (Inward Posting)'}de{'Stückliste (Zugangsbuchung)'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Partslist InwardPartslist
         {
             get
@@ -916,7 +916,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Material Manufact. (Inward)'}de{'Materialhersteller (Zugang)'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Material Manufact. (Inward)'}de{'Materialhersteller (Zugang)'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix)]
         public CompanyMaterial InwardCompanyMaterial
         {
             get
@@ -967,7 +967,7 @@ namespace gip.mes.facility
         /// Entitäten die sich auf die ABGANGsfelder (OUTward) auswirken
         /// </summary>
 
-        [ACPropertyInfo(9999, "", "en{'Material (Outward Posting)'}de{'Material (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Material.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Material (Outward Posting)'}de{'Material (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Material OutwardMaterial
         {
             get
@@ -989,7 +989,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Storage Bin (Outward Posting)'}de{'Lagerplatz (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Storage Bin (Outward Posting)'}de{'Lagerplatz (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Facility OutwardFacility
         {
             get
@@ -1015,7 +1015,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Lot (Outward Posting)'}de{'Los (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Lot (Outward Posting)'}de{'Los (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName + Const.DBSetAsEnumerablePostfix)]
         public FacilityLot OutwardFacilityLot
         {
             get
@@ -1037,7 +1037,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Quant (Outward Posting)'}de{'Quant (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Quant (Outward Posting)'}de{'Quant (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName + Const.DBSetAsEnumerablePostfix)]
         public FacilityCharge OutwardFacilityCharge
         {
             get
@@ -1065,7 +1065,7 @@ namespace gip.mes.facility
             set;
         }
 
-        [ACPropertyInfo(9999, "", "en{'Storage Location (Outward Posting)'}de{'Lagerort (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Storage Location (Outward Posting)'}de{'Lagerort (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Facility OutwardFacilityLocation
         {
             get
@@ -1131,7 +1131,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Bill of Materials (Outward Posting)'}de{'Stückliste (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Partslist.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Bill of Materials (Outward Posting)'}de{'Stückliste (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix)]
         public Partslist OutwardPartslist
         {
             get
@@ -1153,7 +1153,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Material manufact. (Outward)'}de{'Materialhersteller (Abgang)'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Material manufact. (Outward)'}de{'Materialhersteller (Abgang)'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix)]
         public CompanyMaterial OutwardCompanyMaterial
         {
             get
@@ -1467,7 +1467,7 @@ namespace gip.mes.facility
             set;
         }
 
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + InOrderPos.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + InOrderPos.ClassName + Const.DBSetAsEnumerablePostfix)]
         public InOrderPos InOrderPos
         {
             get
@@ -1502,7 +1502,7 @@ namespace gip.mes.facility
         //    }
         //}
 
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + OutOrderPos.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + OutOrderPos.ClassName + Const.DBSetAsEnumerablePostfix)]
         public OutOrderPos OutOrderPos
         {
             get
@@ -1542,7 +1542,7 @@ namespace gip.mes.facility
         /// Reference to a ProdOrderPartslistPos which represents a intermediate-Material or the final material
         /// "INward"
         /// </summary>
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName + Const.DBSetAsEnumerablePostfix)]
         public ProdOrderPartslistPos PartslistPos
         {
             get
@@ -1568,7 +1568,7 @@ namespace gip.mes.facility
         /// Reference to a ProdOrderPartslistPosRelation which represents a material which is consumed from an Order
         /// "OUTward"
         /// </summary>
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName + Const.DBSetAsEnumerablePostfix)]
         public ProdOrderPartslistPosRelation PartslistPosRelation
         {
             get
@@ -1594,7 +1594,7 @@ namespace gip.mes.facility
         /// Reference to a ProdOrderPartslistPosRelation which represents a material which is consumed from an Order
         /// "OUTward"
         /// </summary>
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + FacilityInventoryPos.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + FacilityInventoryPos.ClassName + Const.DBSetAsEnumerablePostfix)]
         public FacilityInventoryPos FacilityInventoryPos
         {
             get
@@ -1620,7 +1620,7 @@ namespace gip.mes.facility
         /// Reference to a ProdOrderPartslistPosRelation which represents a material which is consumed from an Order
         /// "OUTward"
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Partial Lot'}de{'Teillos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosFacilityLot.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Partial Lot'}de{'Teillos'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosFacilityLot.ClassName + Const.DBSetAsEnumerablePostfix)]
         public ProdOrderPartslistPosFacilityLot ProdOrderPartslistPosFacilityLot
         {
             get
@@ -1664,7 +1664,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + PickingPos.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + PickingPos.ClassName + Const.DBSetAsEnumerablePostfix)]
         public PickingPos PickingPos
         {
             get
@@ -2183,7 +2183,7 @@ namespace gip.mes.facility
         }
 
         [ACPropertyInfo(9999)]
-        public IQueryable<gip.core.datamodel.ACClass> StackCalculatorACClassList
+        public IEnumerable<gip.core.datamodel.ACClass> StackCalculatorACClassList
         {
             get
             {
@@ -2196,8 +2196,7 @@ namespace gip.mes.facility
             }
         }
 
-        public static readonly Func<Database, IQueryable<gip.core.datamodel.ACClass>> s_cQry_StackCalculator =
-            EF.CompileQuery<Database, IQueryable<gip.core.datamodel.ACClass>>(
+        public static readonly Func<Database, IEnumerable<gip.core.datamodel.ACClass>> s_cQry_StackCalculator =
                 (db) =>
                     db.ACClass
                     .Where(c => (c.BasedOnACClassID.HasValue
@@ -2215,8 +2214,7 @@ namespace gip.mes.facility
                                             )
                                         )
                                     )
-                    )
-            );
+                    ).ToList();
 
         public Double FactorInwardTargetQuantityToQuantity
         {

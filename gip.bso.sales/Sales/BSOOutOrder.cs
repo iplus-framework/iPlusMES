@@ -1070,7 +1070,7 @@ namespace gip.bso.sales
         {
             get
             {
-                return DatabaseApp.MDTransportMode;
+                return DatabaseApp.MDTransportMode.ToList();
             }
         }
 

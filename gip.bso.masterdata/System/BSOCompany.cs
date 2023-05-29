@@ -830,7 +830,7 @@ namespace gip.bso.masterdata
             {
                 if (CurrentCompany == null)
                     return null;
-                var query = DatabaseApp.CompanyMaterialStock.Where(c => c.CompanyMaterial.CompanyID == CurrentCompany.CompanyID).OrderBy(c => c.CompanyMaterial.CompanyMaterialNo);
+                var query = DatabaseApp.CompanyMaterialStock.Where(c => c.CompanyMaterial.CompanyID == CurrentCompany.CompanyID).OrderBy(c => c.CompanyMaterial.CompanyMaterialNo).ToList();
                 //(query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
                 return query;
             }

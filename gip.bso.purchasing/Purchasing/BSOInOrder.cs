@@ -1184,7 +1184,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                return DatabaseApp.MDTransportMode;
+                return DatabaseApp.MDTransportMode.ToList();
             }
         }
 

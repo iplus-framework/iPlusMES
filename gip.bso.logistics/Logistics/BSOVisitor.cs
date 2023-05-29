@@ -273,7 +273,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return DatabaseApp.Company.Where( c => c.IsCustomer).OrderBy(c => c.CompanyName);
+                return DatabaseApp.Company.Where( c => c.IsCustomer).OrderBy(c => c.CompanyName).ToList();
             }
         }
 

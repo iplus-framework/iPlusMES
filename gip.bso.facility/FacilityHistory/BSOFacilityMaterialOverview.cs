@@ -272,7 +272,7 @@ namespace gip.bso.facility
         {
             get
             {
-                return DatabaseApp.MDMaterialGroup;
+                return DatabaseApp.MDMaterialGroup.ToList();
             }
         }
 

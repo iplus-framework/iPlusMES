@@ -2018,7 +2018,7 @@ namespace gip.mes.facility
         private FacilityCharge TryReactivateFacilityCharge(ACMethodBooking BP, Material material, Facility facility, FacilityLot lot, Partslist partsList)
         {
             FacilityCharge InwardFacilityCharge = null;
-            IQueryable<FacilityCharge> queryExistOld = null;
+            IEnumerable<FacilityCharge> queryExistOld = null;
             if (lot != null && partsList != null)
             {
                 queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp, facility.FacilityID, lot.FacilityLotID, material.MaterialID, null, partsList.PartslistID, true);

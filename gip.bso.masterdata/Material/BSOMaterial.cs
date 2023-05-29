@@ -654,7 +654,7 @@ namespace gip.bso.masterdata
             {
                 if (CurrentMaterial == null)
                     return null;
-                return CurrentMaterial.FacilityCharge_Material;
+                return CurrentMaterial.FacilityCharge_Material.ToList();
             }
         }
         #endregion

@@ -1746,8 +1746,8 @@ namespace gip.bso.manufacturing
             return query.Take(Const_MaxResultSize).ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        EF.CompileQuery<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
+        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IEnumerable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        EF.CompileQuery<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IEnumerable<ProdOrderPartslistPlanWrapper>>(
             (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo, materialNo) =>
                 ctx
                 .ProdOrderPartslist

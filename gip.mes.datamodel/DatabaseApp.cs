@@ -3358,7 +3358,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return gip.mes.datamodel.MDMaterialGroup.MaterialGroupTypesList;
+                return gip.mes.datamodel.MDMaterialGroup.MaterialGroupTypesList.ToList();
             }
         }
 
@@ -3653,7 +3653,7 @@ namespace gip.mes.datamodel
             {
                 using (ACMonitor.Lock(QueryLock_1X000))
                 {
-                    return this.CompanyAddress.Where(c => c.IsFactory && c.Company.IsOwnCompany);
+                    return this.CompanyAddress.Where(c => c.IsFactory && c.Company.IsOwnCompany).ToList();
                 }
             }
         }
@@ -3667,7 +3667,7 @@ namespace gip.mes.datamodel
             {
                 using (ACMonitor.Lock(QueryLock_1X000))
                 {
-                    return MDUnit.Where(c => c.IsQuantityUnit).OrderBy(c => c.SortIndex);
+                    return MDUnit.Where(c => c.IsQuantityUnit).OrderBy(c => c.SortIndex).ToList();
                 }
             }
         }
@@ -3680,7 +3680,7 @@ namespace gip.mes.datamodel
             {
                 using (ACMonitor.Lock(QueryLock_1X000))
                 {
-                    return Facility.Where(c => c.ParentFacilityID != null);
+                    return Facility.Where(c => c.ParentFacilityID != null).ToList();
                 }
             }
         }
@@ -3693,7 +3693,7 @@ namespace gip.mes.datamodel
             {
                 using (ACMonitor.Lock(QueryLock_1X000))
                 {
-                    return Company.Where(c => c.IsTenant == true);
+                    return Company.Where(c => c.IsTenant == true).ToList();
                 }
             }
         }

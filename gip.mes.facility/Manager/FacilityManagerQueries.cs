@@ -43,47 +43,48 @@ namespace gip.mes.facility
                 // Where cause
                 .AsEnumerable()
                 .Where(fbc =>
-                        // filtering by period
-                        fbc.FacilityBooking.InsertDate >= searchFrom
-                        && fbc.FacilityBooking.InsertDate <= searchTo
+                    // filtering by period
+                    fbc.FacilityBooking.InsertDate >= searchFrom
+                    && fbc.FacilityBooking.InsertDate <= searchTo
 
-                        // filterFBTypeValue
-                        && (filterFBTypeValue == null || fbc.FacilityBooking.FacilityBookingTypeIndex == filterFBTypeValue)
+                    // filterFBTypeValue
+                    && (filterFBTypeValue == null || fbc.FacilityBooking.FacilityBookingTypeIndex == filterFBTypeValue)
 
-                        // facilityID
-                        && (
-                            facilityID == null ||
-                            ((fbc.InwardFacilityID == facilityID) || (fbc.OutwardFacilityID == facilityID))
-                        )
+                    // facilityID
+                    && (
+                        facilityID == null ||
+                        ((fbc.InwardFacilityID == facilityID) || (fbc.OutwardFacilityID == facilityID))
+                    )
 
-                        // facilityLotID
-                        && (
-                            facilityLotID == null ||
-                            (fbc.InwardFacilityLot.FacilityLotID == facilityLotID) || (fbc.OutwardFacilityLot.FacilityLotID == facilityLotID)
-                        )
+                    // facilityLotID
+                    && (
+                        facilityLotID == null ||
+                        (fbc.InwardFacilityLot != null && fbc.InwardFacilityLot.FacilityLotID == facilityLotID) || (fbc.OutwardFacilityLot != null && fbc.OutwardFacilityLot.FacilityLotID == facilityLotID)
+                    )
 
-                        // facilityChargeID
-                        && (
-                            facilityChargeID == null ||
-                            (fbc.InwardFacilityCharge.FacilityChargeID == facilityChargeID) || (fbc.OutwardFacilityCharge.FacilityChargeID == facilityChargeID)
-                        )
+                    // facilityChargeID
+                    && (
+                        facilityChargeID == null ||
+                        ((fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityChargeID == facilityChargeID) || (fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityChargeID == facilityChargeID))
+                    )
 
-                        // facilityLocationID
-                        && (
-                            facilityLocationID == null ||
-                            (fbc.InwardFacility != null && fbc.InwardFacility.Facility1_ParentFacility != null && fbc.InwardFacility.Facility1_ParentFacility.FacilityID == facilityLocationID)
-                                           || (fbc.OutwardFacility != null && fbc.OutwardFacility.Facility1_ParentFacility != null && fbc.OutwardFacility.Facility1_ParentFacility.FacilityID == facilityLocationID)
-                        )
+                    // facilityLocationID
+                    && (
+                        facilityLocationID == null ||
+                        ((fbc.InwardFacility != null && fbc.InwardFacility.Facility1_ParentFacility != null && fbc.InwardFacility.Facility1_ParentFacility.FacilityID == facilityLocationID)
+                            || (fbc.OutwardFacility != null && fbc.OutwardFacility.Facility1_ParentFacility != null && fbc.OutwardFacility.Facility1_ParentFacility.FacilityID == facilityLocationID))
+                    )
 
-                        // materialID
-                        && (
-                            materialID == null ||
-                            ((fbc.InwardMaterial.MaterialID == materialID) || (fbc.OutwardMaterial.MaterialID == materialID))
-                        )
-                 )
+                    // materialID
+                    && (
+                        materialID == null ||
+                        ((fbc.InwardMaterial?.MaterialID == materialID) || (fbc.OutwardMaterial?.MaterialID == materialID))
+                    )
+                )
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .GroupBy(c => c.FacilityBooking.FacilityBookingNo)
                 .OrderBy(c => c.Key);
+
 
         public virtual List<FacilityBookingOverview> GroupFacilityBookingOverviewList(IEnumerable<FacilityBookingOverview> query)
         {
@@ -574,8 +575,8 @@ namespace gip.mes.facility
                         .ThenByDescending(c => c.FacilityChargeSortNo)
         );
 
-        public static readonly Func<DatabaseApp, Guid, Guid?, Guid, Guid?, Guid?, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable =
-        EF.CompileQuery<DatabaseApp, Guid, Guid?, Guid, Guid?, Guid?, bool, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid, Guid?, Guid, Guid?, Guid?, bool, IEnumerable<FacilityCharge>> s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable =
+        EF.CompileQuery<DatabaseApp, Guid, Guid?, Guid, Guid?, Guid?, bool, IEnumerable<FacilityCharge>>(
             (ctx, facilityID, facilityLotID, materialID, prodMaterialID, partslistID, notAvailable) => ctx.FacilityCharge
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
@@ -823,7 +824,7 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
             if (dbApp == null)
                 return null;
 
-            return dbApp.Material.Where(c => c.MDMaterialGroup.MDMaterialGroupIndex == (short)MDMaterialGroup.MaterialGroupTypes.Rework);
+            return dbApp.Material.Where(c => c.MDMaterialGroup.MDMaterialGroupIndex == (short)MDMaterialGroup.MaterialGroupTypes.Rework).ToList();
         }
 
         public virtual Msg IsAllowedReassignMaterial(DatabaseApp dbApp, Material currentMaterial, Material newMaterial)

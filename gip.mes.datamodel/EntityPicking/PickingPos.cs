@@ -194,7 +194,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Partial Properties
-        [ACPropertyInfo(3, "", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName)]
+        [ACPropertyInfo(3, "", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public Material Material
         {
@@ -387,7 +387,7 @@ namespace gip.mes.datamodel
                     return InOrderPos.ActualQuantity;
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.ActualQuantity;
-                else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                     return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantity);
                 else if (PickingActualUOM.HasValue)
                     return PickingActualUOM.Value;
@@ -405,7 +405,7 @@ namespace gip.mes.datamodel
                     return InOrderPos.ActualQuantityUOM;
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.ActualQuantityUOM;
-                else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                     return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantityUOM);
                 else if (PickingActualUOM.HasValue)
                     return PickingActualUOM.Value;

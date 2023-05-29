@@ -383,7 +383,7 @@ namespace gip.mes.maintenance
             {
                 if (_MaintOrderStateFilterList == null)
                 {
-                    _MaintOrderStateFilterList = DatabaseApp.MDMaintOrderState;
+                    _MaintOrderStateFilterList = DatabaseApp.MDMaintOrderState.ToList();
                     CurrentMaintOrderStateFilter = _MaintOrderStateFilterList.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
                     SearchFilter();
                 }

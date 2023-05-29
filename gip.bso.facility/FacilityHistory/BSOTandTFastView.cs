@@ -334,8 +334,8 @@ namespace gip.bso.facility
         #endregion
 
         #region precompiled queries
-        protected static readonly Func<DatabaseApp, Guid, IQueryable<TandTFastViewModel>> s_cQry_FastViewFC =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<TandTFastViewModel>>(
+        protected static readonly Func<DatabaseApp, Guid, IEnumerable<TandTFastViewModel>> s_cQry_FastViewFC =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<TandTFastViewModel>>(
         (ctx, facilityChargeID) =>
                 ctx
                 .ProdOrderPartslist
@@ -409,8 +409,8 @@ namespace gip.bso.facility
                 .OrderBy(c => c.OrderNo)
         );
 
-        protected static readonly Func<DatabaseApp, Guid, IQueryable<TandTFastViewModel>> s_cQry_FastViewFL =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<TandTFastViewModel>>(
+        protected static readonly Func<DatabaseApp, Guid, IEnumerable<TandTFastViewModel>> s_cQry_FastViewFL =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<TandTFastViewModel>>(
         (ctx, facilityLotID) =>
                 ctx
                 .ProdOrderPartslist

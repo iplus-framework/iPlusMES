@@ -701,7 +701,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (CurrentDeliveryNote == null)
+                if (CurrentDeliveryNote == null || CurrentDeliveryNote.DeliveryNotePos_DeliveryNote == null)
                     return null;
 
                 return CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.ToList();
@@ -932,7 +932,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                return DatabaseApp.MDTransportMode;
+                return DatabaseApp.MDTransportMode.ToList();
             }
         }
 

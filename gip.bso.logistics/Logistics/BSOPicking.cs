@@ -1107,9 +1107,11 @@ namespace gip.bso.logistics
                             _CurrentPickingPos.OutOrderPos.AutoRefresh();
                             _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad(_CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPosReference, _CurrentPickingPos);
                         }
-                        _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoLoad(_CurrentPickingPos.FacilityPreBooking_PickingPosReference, _CurrentPickingPos);
+                        if (_CurrentPickingPos.FacilityPreBooking_PickingPos != null && _CurrentPickingPos.FacilityPreBooking_PickingPos.Any())
+                            _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoLoad(_CurrentPickingPos.FacilityPreBooking_PickingPosReference, _CurrentPickingPos);
 
-                        _CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad(_CurrentPickingPos.FacilityBooking_PickingPosReference, _CurrentPickingPos);
+                        if (_CurrentPickingPos.FacilityBooking_PickingPos != null)
+                            _CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad(_CurrentPickingPos.FacilityBooking_PickingPosReference, _CurrentPickingPos);
                     }
                     OnPropertyChanged(nameof(CurrentPickingPos));
                     OnPropertyChanged(nameof(FacilityPreBookingList));
@@ -1304,12 +1306,16 @@ namespace gip.bso.logistics
                 {
                     return CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.ToList();
                 }
-                else
+                else if (CurrentPickingPos.FacilityPreBooking_PickingPos != null)
                 {
                     return CurrentPickingPos.FacilityPreBooking_PickingPos.ToList();
                     //if (CurrentPickingPos.ProdOrderPartslistPos == null)
                     //    return null;
                     //return CurrentPickingPos.ProdOrderPartslistPos.FacilityPreBooking_ProdOrderPartslistPos.ToList();
+                }
+                else
+                {
+                    return null;
                 }
                 //return null;
             }
@@ -2124,7 +2130,7 @@ namespace gip.bso.logistics
                     if (CurrentPickingPos == null
                         || CurrentPickingPos.InOrderPosID.HasValue
                         || CurrentPickingPos.OutOrderPosID.HasValue
-                        || CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                        || CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos != null && CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any())
                         return Global.ControlModes.Disabled;
                     break;
             }
