@@ -1050,6 +1050,20 @@ namespace gip.bso.manufacturing
                                                .Where(c => c.MaterialWFACClassMethod.ACClassMethodID == CurrentACClassMethod.ACClassMethodID)
                                                .Select(c => c.MaterialWFACClassMethod)
                                                .FirstOrDefault();
+            if (VarioConfigManager != null && ProdOrderManager != null && CurrentProdOrderPartslist.Partslist != null && VBCurrentACClassWF != null)
+            {
+                gip.core.datamodel.ACClassWF wfNode = VBCurrentACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(DatabaseApp.ContextIPlus);
+                PartslistConfigExtract partslistConfigExtract = new PartslistConfigExtract(VarioConfigManager, ProdOrderManager, CurrentProdOrderPartslist.Partslist, wfNode, VBCurrentACClassWF);
+                if (partslistConfigExtract != null)
+                {
+                    IACConfig batchPlanMode = partslistConfigExtract.GetConfig(ProdOrderBatchPlan.C_PlanMode);
+                    if (batchPlanMode != null && batchPlanMode.Value != null)
+                    {
+                        batchPlan.PlanMode = (BatchPlanMode)batchPlanMode.Value;
+                    }
+                }
+            }
+
 
             OnPropertyChanged("BatchPlanForIntermediateList");
 
