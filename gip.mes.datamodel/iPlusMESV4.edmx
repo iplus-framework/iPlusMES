@@ -3456,6 +3456,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+	      <Property Name="XMLValue" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="OrderLog">
           <Key>
@@ -34255,6 +34256,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+	      <Property Name="XMLValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ACProgramLog" Relationship="iPlusMESV4_Model.FK_OperationLog_ACProgramLog" FromRole="OperationLog" ToRole="ACProgramLog" />
           <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" FromRole="OperationLog" ToRole="FacilityCharge" />
           <NavigationProperty Name="RefACClass" Relationship="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID" FromRole="OperationLog" ToRole="ACClass" />
@@ -39549,6 +39551,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="ACProgramLogID" ColumnName="ACProgramLogID" />
                 <ScalarProperty Name="RefACClassID" ColumnName="RefACClassID" />
                 <ScalarProperty Name="OperationLogID" ColumnName="OperationLogID" />
+                <ScalarProperty Name="XMLValue" ColumnName="XMLValue" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
