@@ -252,25 +252,23 @@ namespace gip.mes.facility
         /// which contains this material 
         /// </summary>
         protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (   (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                && ((pos.Material.ProductionMaterialID != null && pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                    || (pos.Material.ProductionMaterialID == null && c.MaterialID == pos.MaterialID)))
                                                           || (  onlyContainer &&  c.Facility.MaterialID.HasValue
-                                                                && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                && (   (pos.Material.ProductionMaterialID != null && pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
+                                                                    || (pos.Material.ProductionMaterialID == null && c.Facility.MaterialID == pos.MaterialID)))
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .Select(c => c.Facility)
-        );
+                                               .Select(c => c.Facility).ToList();
         /// <summary>
         /// Queries Silos 
         /// which contains this material 

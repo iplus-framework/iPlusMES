@@ -586,7 +586,8 @@ namespace gip.mes.datamodel
         #region other methods
         public void CalcPositionUsedCount()
         {
-            PositionUsedCount = PartslistPosRelation_SourcePartslistPos.Count();
+            if (PartslistPosRelation_SourcePartslistPos != null)
+                PositionUsedCount = PartslistPosRelation_SourcePartslistPos.Count();
         }
         #endregion
 
