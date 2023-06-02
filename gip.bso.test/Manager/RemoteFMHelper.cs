@@ -4,6 +4,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.test
 {
@@ -190,7 +191,7 @@ namespace gip.bso.test
                 localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
                 localFC.CopyFrom(changedRemoteFC, true, false);
                 localFC.NotAvailable= false;
-                dbLocal.FacilityCharge.AddObject(localFC);
+                dbLocal.FacilityCharge.Add(localFC);
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
                 {
@@ -259,7 +260,7 @@ namespace gip.bso.test
             if (localPicking == null)
             {
                 localPicking = remotePicking.Clone(true) as Picking;
-                dbLocal.Picking.AddObject(localPicking);
+                dbLocal.Picking.Add(localPicking);
             }
             else
             {

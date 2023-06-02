@@ -584,7 +584,7 @@ namespace gip.bso.test
 
             companyAddress.RouteNo = rating;
 
-            DatabaseApp.Company.AddObject(company);
+            DatabaseApp.Company.Add(company);
             MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
             bool saveSuccess = msgWithDetails.IsSucceded();
         }
@@ -650,7 +650,7 @@ namespace gip.bso.test
 
             companyPerson.PostOfficeBox = rating.ToString();
 
-            DatabaseApp.Company.AddObject(company);
+            DatabaseApp.Company.Add(company);
             MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
             bool saveSuccess = msgWithDetails.IsSucceded();
         }
