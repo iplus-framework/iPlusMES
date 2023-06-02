@@ -158,6 +158,19 @@ namespace gip.mes.processapplication
                         materialID = fc.Partslist.MaterialID;
                     }
                     ProdOrderPartslist poPl = pOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == materialID);
+                    // if charge is for mixure (OperationLog)
+                    if(poPl == null)
+                    {
+                        poPl=
+                            pOrder?.
+                            ProdOrderPartslist_ProdOrder
+                            .Where(c=>
+                                      c.ProdOrderPartslistPos_ProdOrderPartslist
+                                      .SelectMany(x=>x.FacilityBookingCharge_ProdOrderPartslistPos)
+                                      .Where(x=>x.InwardMaterialID == materialID)
+                                      .Any())
+                            .FirstOrDefault();
+                    }
 
                     PAProdOrderPartslistWFInfo orderForOccup = null;
                     PAProdOrderPartslistWFInfo orderForRelease = null;
@@ -398,7 +411,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            Msg msg = OperationLog.CloseOperationLog(dbApp, inOperationLog);
+            Msg msg = OperationLog.CloseOperationLog(dbApp, inOperationLog, acMethod);
             if (msg != null)
             {
                 resultSequence.Message = msg;

@@ -60,7 +60,7 @@ namespace gip.mes.datamodel
 
         #region Methods
 
-        public static MsgWithDetails CloseOperationLog(DatabaseApp dbApp, OperationLog inOperationLog)
+        public static MsgWithDetails CloseOperationLog(DatabaseApp dbApp, OperationLog inOperationLog, ACMethod method)
         {
             inOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
 
@@ -71,6 +71,12 @@ namespace gip.mes.datamodel
             outOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
             outOperationLog.OperationTime = DateTime.Now;
             outOperationLog.ACProgramLogID = inOperationLog.ACProgramLogID;
+
+            if(method != null)
+            {
+                string xml = gip.core.datamodel.ACClassMethod.SerializeACMethod(method);
+                outOperationLog.XMLValue = xml;
+            }
 
             dbApp.OperationLog.AddObject(outOperationLog);
 

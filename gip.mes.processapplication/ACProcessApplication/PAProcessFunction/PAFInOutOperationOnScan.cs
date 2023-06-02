@@ -493,7 +493,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            Msg msg = OperationLog.CloseOperationLog(dbApp, inOperationLog);
+            Msg msg = OperationLog.CloseOperationLog(dbApp, inOperationLog, null);
             if (msg != null)
             {
                 resultSequence.Message = msg;
