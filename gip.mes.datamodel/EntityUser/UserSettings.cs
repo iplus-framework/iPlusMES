@@ -30,6 +30,7 @@ namespace gip.mes.datamodel
                     entity.VBUser = mesVBUser;
                 }
             }
+            entity.Context = dbApp;
             entity.DefaultValuesACObject();
             return entity;
         }

@@ -22,6 +22,7 @@ namespace gip.mes.datamodel
         {
             PriceListMaterial entity = new PriceListMaterial();
             entity.PriceListMaterialID = Guid.NewGuid();
+            entity.Context = dbApp;
             entity.DefaultValuesACObject();
             if (parentACObject != null && parentACObject is PriceList)
                 entity.PriceList = parentACObject as PriceList;

@@ -19,6 +19,7 @@ namespace gip.mes.datamodel
         {
             PickingPosProdOrderPartslistPos entity = new PickingPosProdOrderPartslistPos();
             entity.PickingPosProdOrderPartslistPosID = Guid.NewGuid();
+            entity.Context = dbApp;
             entity.PickingPos = pickingPos;
             entity.ProdorderPartslistPos = pos;
             return entity;

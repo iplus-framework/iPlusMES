@@ -30,6 +30,7 @@ namespace gip.mes.datamodel
         {
             MDInvoiceType entity = new MDInvoiceType();
             entity.MDInvoiceTypeID = Guid.NewGuid();
+            entity.Context = dbApp;
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
             entity.InvoiceType = GlobalApp.InvoiceTypes.Invoice;

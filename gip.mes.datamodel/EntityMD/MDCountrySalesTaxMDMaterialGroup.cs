@@ -23,6 +23,7 @@ namespace gip.mes.datamodel
         {
             MDCountrySalesTaxMDMaterialGroup entity = new MDCountrySalesTaxMDMaterialGroup();
             entity.MDCountrySalesTaxMDMaterialGroupID = Guid.NewGuid();
+            entity.Context = dbApp;
             entity.DefaultValuesACObject();
             if (parentACObject != null && parentACObject is MDCountrySalesTax)
                 (parentACObject as MDCountrySalesTax).MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.Add(entity);
