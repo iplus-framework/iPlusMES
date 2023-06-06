@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
+using System.Reflection.Emit;
 
 namespace gip.mes.processapplication
 {
@@ -1153,16 +1154,28 @@ namespace gip.mes.processapplication
                 && (   eM == null
                     || eM.ResultState < Global.ACMethodResultState.Failed))
             {
-                ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
-                if (prodOrderManager != null)
+                try
                 {
-                    double calculatedBatchWeight = 0;
-                    if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
+                    ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                    if (prodOrderManager != null)
                     {
-                        double diff = calculatedBatchWeight - currentBatchPos.ActualWeight;
-                        if (diff > 0.00001)
-                            actualWeight = diff;
+                        double calculatedBatchWeight = 0;
+                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
+                        {
+                            double diff = calculatedBatchWeight - currentBatchPos.ActualWeight;
+                            if (diff > 0.00001)
+                                actualWeight = diff;
+                        }
                     }
+                }
+                catch(Exception ex) 
+                {
+                    Messages.LogException(this.GetACUrl(), "OnTaskCallbackCheckQuantity(20)", ex);
+                    //ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                    //OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "OnTaskCallbackCheckQuantity", 1030), true);
+                    //discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
+                    //discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1020), true);
+                    //exceptionHandled = true;
                 }
             }
 
