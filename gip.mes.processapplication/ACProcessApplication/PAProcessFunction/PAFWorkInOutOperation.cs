@@ -1,14 +1,10 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.EMMA;
-using gip.core.autocomponent;
+﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.processapplication;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static gip.core.autocomponent.PAProcessFunction;
 
 namespace gip.mes.processapplication
 {
@@ -411,6 +407,18 @@ namespace gip.mes.processapplication
                 }
             }
 
+            CompleteResult completeResult = CompleteResult.Succeeded;
+            MsgWithDetails msgError = null;
+            if (ACStateConverter != null)
+            {
+                completeResult = ACStateConverter.ReceiveACMethodResult(this, acMethod, out msgError);
+                if(msgError != null && msgError.MsgDetails.Any())
+                {
+                    resultSequence.Message = msgError.MsgDetails.FirstOrDefault();
+                    Messages.LogMessageMsg(msgError);
+                }
+            }
+
             Msg msg = OperationLog.CloseOperationLog(dbApp, inOperationLog, acMethod);
             if (msg != null)
             {
@@ -702,7 +710,6 @@ namespace gip.mes.processapplication
             OperationLogItems.ValueT = itemList;
         }
 
-        
 
         public void RemoveFromOperationLogList(OperationLog operationLog)
         {
