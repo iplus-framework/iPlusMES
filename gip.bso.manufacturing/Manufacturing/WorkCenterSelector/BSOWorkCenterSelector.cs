@@ -1239,19 +1239,24 @@ namespace gip.bso.manufacturing
                     if (procModule == null)
                         continue;
 
-                    workCenterItem = new WorkCenterItem(procModule, this);
+                    workCenterItem = CreateWorkCenterItem(procModule, this);
                     workCenterItems.Add(workCenterItem);
                 }
                 if (workCenterItem.ProcessModule == null)
                     continue;
 
-                BSOs = OnAddFunctionBSOs(paf, BSOs);
+                BSOs = OnAddFunctionBSOs(paf, BSOs, workCenterItem);
 
                 WorkCenterItemFunction func = new WorkCenterItemFunction(workCenterItem.ProcessModule, paf.ACIdentifier, this, BSOs);
                 workCenterItem.AddItemFunction(func);
             }
 
             AccessPrimary.ToNavList(workCenterItems.OrderBy(c => c.SortIndex).ThenBy(c => c.ACCaption));
+        }
+
+        public virtual WorkCenterItem CreateWorkCenterItem(ACComponent processModule, BSOWorkCenterSelector workCenterSelector)
+        {
+            return new WorkCenterItem(processModule, workCenterSelector);
         }
 
         public virtual void SelectWorkCenterItem()
@@ -1274,7 +1279,7 @@ namespace gip.bso.manufacturing
             SelectedWorkCenterItem = selectedItem;
         }
 
-        public virtual ACComposition[] OnAddFunctionBSOs(core.datamodel.ACClass pafACClass, ACComposition[] bsos)
+        public virtual ACComposition[] OnAddFunctionBSOs(core.datamodel.ACClass pafACClass, ACComposition[] bsos, WorkCenterItem workCenterItem)
         {
             return bsos;
         }
