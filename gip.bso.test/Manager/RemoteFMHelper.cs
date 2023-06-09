@@ -10,7 +10,7 @@ namespace gip.bso.test
     public class RemoteFMHelper
     {
 
-        public void SynchronizeFacility(IACComponent component, IMessages messages, ACPickingManager PickingManager, string remoteConnString, RemoteStorePostingData remoteStorePosting, bool syncRemoteStore = true, bool LoggingOn = true)
+        public void SynchronizeFacility(IACComponent component, IMessages messages, FacilityManager facilityManager, ACPickingManager pickingManager, string remoteConnString, RemoteStorePostingData remoteStorePosting, bool syncRemoteStore = true, bool LoggingOn = true)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace gip.bso.test
                 using (DatabaseApp dbLocal = new DatabaseApp())
                 {
                     RSPDEntry addOrUpdateFacilityMD = remoteStorePosting.FBIds.FirstOrDefault(c => c.EntityType == Facility.ClassName);
-         
+
 
                     //remoteStorePosting.FacilityUrlOfRecipient
                     List<FacilityCharge> changedRemoteFCs = new List<FacilityCharge>();
@@ -69,11 +69,12 @@ namespace gip.bso.test
                                         changedRemoteFCs.Add(remoteFBC.OutwardFacilityCharge);
                                 }
 
-                                //if (remoteFBC.PickingPos != null && remoteFBC.InwardFacilityCharge != null && dbLocal.Facility.Any(c => c.FacilityID == remoteFBC.InwardFacilityID))
-                                //{
-                                //    if (!fbcForMirroringToPreBooking.Contains(remoteFBC))
-                                //        fbcForMirroringToPreBooking.Add(remoteFBC);
-                                //}
+                                if (remoteFBC.PickingPos != null && remoteFBC.InwardFacilityCharge != null && dbLocal.Facility.Any(c => c.FacilityID == remoteFBC.InwardFacilityID))
+                                {
+                                    if (!fbcForMirroringToPreBooking.Contains(remoteFBC))
+                                        fbcForMirroringToPreBooking.Add(remoteFBC);
+                                }
+
                             }
                         }
                         else if (entry.EntityType == Picking.ClassName)
@@ -112,7 +113,7 @@ namespace gip.bso.test
 
                                     PickingPos[] localPickingLines = localPicking.PickingPos_Picking.ToArray();
                                     foreach (PickingPos localPickingPos in localPickingLines)
-                                        PickingManager.UnassignPickingPos(localPickingPos, dbLocal);
+                                        pickingManager.UnassignPickingPos(localPickingPos, dbLocal);
 
                                     localPicking.DeleteACObject(dbLocal, false);
                                 }
@@ -127,21 +128,18 @@ namespace gip.bso.test
 
                     foreach (Picking remotePicking in changedRemotePickings)
                     {
-                        SynchronizePicking(dbLocal, PickingManager, remotePicking);
+                        SynchronizePicking(dbLocal, pickingManager, remotePicking);
                     }
 
                     msgWithDetails = dbLocal.ACSaveChanges();
                     if (msgWithDetails != null)
                         messages.LogMessageMsg(msgWithDetails);
 
-                    //if (MirroringBookingToPreBooking)
-                    //{
-                    //    foreach (FacilityBookingCharge fbcForMirroring in fbcForMirroringToPreBooking)
-                    //    {
-                    //        if (fbcForMirroring.InwardFacilityChargeID != null)
-                    //            AssignMirroredPreBooking(dbLocal, fbcForMirroring);
-                    //    }
-                    //}
+                    foreach (FacilityBookingCharge fbcForMirroring in fbcForMirroringToPreBooking)
+                    {
+                        if (fbcForMirroring.InwardFacilityChargeID != null)
+                            AssignMirroredPreBooking(dbLocal, facilityManager, fbcForMirroring);
+                    }
 
                     msgWithDetails = dbLocal.ACSaveChanges();
                     if (msgWithDetails != null)
@@ -189,7 +187,7 @@ namespace gip.bso.test
                 localFC = FacilityCharge.NewACObject(dbLocal, localLot);
                 localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
                 localFC.CopyFrom(changedRemoteFC, true, false);
-                localFC.NotAvailable= false;
+                localFC.NotAvailable = false;
                 dbLocal.FacilityCharge.AddObject(localFC);
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
@@ -300,6 +298,52 @@ namespace gip.bso.test
                     localPos.ToFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.FromFacility.FacilityNo);
                 else
                     localPos.ToFacility = null;
+
+                // make proposition to facility
+                if (localPos.ToFacility == null && remotePos.PickingMaterialID != null)
+                {
+                    PickingPos samplePickingPos = dbLocal.PickingPos.Where(c => c.PickingMaterialID != null && c.PickingMaterialID == remotePos.PickingMaterialID && c.ToFacilityID != null).FirstOrDefault();
+                    if(samplePickingPos != null)
+                    {
+                        localPos.ToFacility = samplePickingPos.ToFacility;
+                    }
+                }
+            }
+        }
+
+        private void AssignMirroredPreBooking(DatabaseApp dbLocal, FacilityManager facilityManager, FacilityBookingCharge fbcForMirroring)
+        {
+            PickingPos localPos = dbLocal.PickingPos.FirstOrDefault(c => c.PickingPosID == fbcForMirroring.PickingPosID);
+            if (localPos != null && !localPos.FacilityBooking_PickingPos.Any())
+            {
+                // FacilityCharge
+                FacilityCharge outwardFacilityCharge = null;
+                if (fbcForMirroring.InwardFacilityChargeID != null)
+                    outwardFacilityCharge = dbLocal.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fbcForMirroring.InwardFacilityChargeID);
+
+                FacilityPreBooking preBooking = null;
+                if (outwardFacilityCharge != null)
+                    preBooking = localPos.FacilityPreBooking_PickingPos.FirstOrDefault(c => c.InwardFacilityCharge != null && c.InwardFacilityCharge.FacilityChargeID == outwardFacilityCharge.FacilityChargeID);
+
+                if (preBooking == null)
+                {
+                    preBooking = facilityManager.NewFacilityPreBooking(dbLocal, localPos);
+                    localPos.FacilityPreBooking_PickingPos.Add(preBooking);
+                }
+
+                ACMethodBooking acMethod = preBooking.ACMethodBooking as ACMethodBooking;
+                acMethod.OutwardQuantity = fbcForMirroring.InwardQuantity;
+
+                // FacilityCharge
+                acMethod.OutwardFacilityCharge = outwardFacilityCharge;
+
+                // Facility
+                Facility facility = null;
+                if (fbcForMirroring.InwardFacilityID != null)
+                {
+                    facility = dbLocal.Facility.FirstOrDefault(c => c.FacilityID == fbcForMirroring.InwardFacilityID);
+                    acMethod.OutwardFacility = facility;
+                }
             }
         }
     }
