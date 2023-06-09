@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System.Collections.Generic;
@@ -55,7 +56,6 @@ namespace gip.bso.masterdata
 
 
         #endregion
-
 
         public UserSettings CurrentUserSettings { get; set; }
 
@@ -313,8 +313,39 @@ namespace gip.bso.masterdata
         }
 
 
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(SetUserSettings):
+                    SetUserSettings();
+                    return true;
+                case nameof(IsEnabledSetUserSettings):
+                    result = IsEnabledSetUserSettings();
+                    return true;
+                case nameof(ResetUserSettings):
+                    ResetUserSettings();
+                    return true;
+                case nameof(IsEnabledResetUserSettings):
+                    result = IsEnabledResetUserSettings();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
-
-
     }
 }

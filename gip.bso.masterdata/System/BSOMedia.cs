@@ -1,8 +1,6 @@
-﻿using gip.core.autocomponent;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
-using gip.mes.datamodel;
-using gip.mes.facility;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -11,7 +9,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows.Media.Imaging;
 
 namespace gip.bso.masterdata
 {
@@ -588,7 +585,7 @@ namespace gip.bso.masterdata
 
         public void LoadMedia(IACObject aCObject)
         {
-            if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder)) 
+            if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder))
                 return;
             currentACObject = aCObject;
             MediaController = new MediaController(MediaSettings, aCObject);
@@ -797,7 +794,7 @@ namespace gip.bso.masterdata
                 if (item.ThumbExistAndIsNotGeneric())
                     DeleteFilesNames.Add(item.ThumbPath);
 
-                KeyValuePair<string,bool> param = new KeyValuePair<string, bool>(BGWorkerMehtod_DeleteFile, item.IsDefault);
+                KeyValuePair<string, bool> param = new KeyValuePair<string, bool>(BGWorkerMehtod_DeleteFile, item.IsDefault);
                 BackgroundWorker.RunWorkerAsync(param);
                 ShowDialog(this, DesignNameProgressBar);
             }
@@ -893,6 +890,60 @@ namespace gip.bso.masterdata
                     _MsgList = new ObservableCollection<Msg>();
                 return _MsgList;
             }
+        }
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(SetFilePath):
+                    SetFilePath();
+                    return true;
+                case nameof(IsEnabledSetFilePath):
+                    result = IsEnabledSetFilePath();
+                    return true;
+                case nameof(SetFileThumbPath):
+                    SetFileThumbPath();
+                    return true;
+                case nameof(IsEnabledSetFileThumbPath):
+                    result = IsEnabledSetFileThumbPath();
+                    return true;
+                case nameof(UploadFile):
+                    UploadFile();
+                    return true;
+                case nameof(IsEnabledUploadFile):
+                    result = IsEnabledUploadFile();
+                    return true;
+                case nameof(DownloadItem):
+                    DownloadItem();
+                    return true;
+                case nameof(IsEnabledDownloadItem):
+                    result = IsEnabledDownloadItem();
+                    return true;
+                case nameof(OpenItem):
+                    OpenItem();
+                    return true;
+                case nameof(IsEnabledOpenItem):
+                    result = IsEnabledOpenItem();
+                    return true;
+                case nameof(ShowInFolder):
+                    ShowInFolder();
+                    return true;
+                case nameof(IsEnabledShowInFolder):
+                    result = IsEnabledShowInFolder();
+                    return true;
+                case nameof(Add):
+                    Add();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

@@ -1,5 +1,3 @@
-using System;
-using gip.core.autocomponent;
 // ***********************************************************************
 // Assembly         : gip.bso.masterdata
 // Author           : DLisak
@@ -13,6 +11,7 @@ using gip.core.autocomponent;
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
@@ -413,63 +412,61 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case"NewCountryLand":
+                case nameof(NewCountryLand):
                     NewCountryLand();
                     return true;
-                case"IsEnabledNewCountryLand":
+                case nameof(IsEnabledNewCountryLand):
                     result = IsEnabledNewCountryLand();
                     return true;
-                case"DeleteCountryLand":
+                case nameof(DeleteCountryLand):
                     DeleteCountryLand();
                     return true;
-                case"IsEnabledDeleteCountryLand":
+                case nameof(IsEnabledDeleteCountryLand):
                     result = IsEnabledDeleteCountryLand();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
-
 
     }
 }

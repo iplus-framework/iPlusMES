@@ -1474,54 +1474,11 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case nameof(DeleteFactory):
-                    DeleteFactory();
-                    return true;
-                case nameof(IsEnabledDeleteFactory):
-                    result = IsEnabledDeleteFactory();
-                    return true;
-                case nameof(LoadCompanyMaterial):
-                    LoadCompanyMaterial();
-                    return true;
-                case nameof(IsEnabledLoadCompanyMaterial):
-                    result = IsEnabledLoadCompanyMaterial();
-                    return true;
-                case nameof(NewCompanyMaterial):
-                    NewCompanyMaterial();
-                    return true;
-                case nameof(IsEnabledNewCompanyMaterial):
-                    result = IsEnabledNewCompanyMaterial();
-                    return true;
-                case nameof(DeleteCompanyMaterial):
-                    DeleteCompanyMaterial();
-                    return true;
-                case nameof(IsEnabledDeleteCompanyMaterial):
-                    result = IsEnabledDeleteCompanyMaterial();
-                    return true;
-                case nameof(LoadCompanyMaterialPickup):
-                    LoadCompanyMaterialPickup();
-                    return true;
-                case nameof(IsEnabledLoadCompanyMaterialPickup):
-                    result = IsEnabledLoadCompanyMaterialPickup();
-                    return true;
-                case nameof(NewCompanyMaterialPickup):
-                    NewCompanyMaterialPickup();
-                    return true;
-                case nameof(IsEnabledNewCompanyMaterialPickup):
-                    result = IsEnabledNewCompanyMaterialPickup();
-                    return true;
-                case nameof(DeleteCompanyMaterialPickup):
-                    DeleteCompanyMaterialPickup();
-                    return true;
-                case nameof(IsEnabledDeleteCompanyMaterialPickup):
-                    result = IsEnabledDeleteCompanyMaterialPickup();
-                    return true;
                 case nameof(Save):
                     Save();
                     return true;
@@ -1615,8 +1572,50 @@ namespace gip.bso.masterdata
                 case nameof(IsEnabledLoadFactory):
                     result = IsEnabledLoadFactory();
                     return true;
+                case nameof(DeleteFactory):
+                    DeleteFactory();
+                    return true;
+                case nameof(IsEnabledDeleteFactory):
+                    result = IsEnabledDeleteFactory();
+                    return true;
+                case nameof(LoadCompanyMaterial):
+                    LoadCompanyMaterial();
+                    return true;
+                case nameof(IsEnabledLoadCompanyMaterial):
+                    result = IsEnabledLoadCompanyMaterial();
+                    return true;
+                case nameof(NewCompanyMaterial):
+                    NewCompanyMaterial();
+                    return true;
+                case nameof(IsEnabledNewCompanyMaterial):
+                    result = IsEnabledNewCompanyMaterial();
+                    return true;
+                case nameof(DeleteCompanyMaterial):
+                    DeleteCompanyMaterial();
+                    return true;
+                case nameof(IsEnabledDeleteCompanyMaterial):
+                    result = IsEnabledDeleteCompanyMaterial();
+                    return true;
+                case nameof(LoadCompanyMaterialPickup):
+                    LoadCompanyMaterialPickup();
+                    return true;
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
+                    result = IsEnabledLoadCompanyMaterialPickup();
+                    return true;
+                case nameof(NewCompanyMaterialPickup):
+                    NewCompanyMaterialPickup();
+                    return true;
+                case nameof(IsEnabledNewCompanyMaterialPickup):
+                    result = IsEnabledNewCompanyMaterialPickup();
+                    return true;
+                case nameof(DeleteCompanyMaterialPickup):
+                    DeleteCompanyMaterialPickup();
+                    return true;
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
+                    result = IsEnabledDeleteCompanyMaterialPickup();
+                    return true;
             }
-            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

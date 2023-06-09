@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
@@ -752,6 +753,78 @@ namespace gip.bso.masterdata
             }
             return result;
         }
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(AssignMaterialToCountryTax):
+                    AssignMaterialToCountryTax();
+                    return true;
+                case nameof(IsEnabledAssignMaterialToCountryTax):
+                    result = IsEnabledAssignMaterialToCountryTax();
+                    return true;
+                case nameof(NewMDCountrySalesTaxMaterial):
+                    NewMDCountrySalesTaxMaterial();
+                    return true;
+                case nameof(IsEnabledNewMDCountrySalesTaxMaterial):
+                    result = IsEnabledNewMDCountrySalesTaxMaterial();
+                    return true;
+                case nameof(DeleteMDCountrySalesTaxMaterial):
+                    DeleteMDCountrySalesTaxMaterial();
+                    return true;
+                case nameof(IsEnabledDeleteMDCountrySalesTaxMaterial):
+                    result = IsEnabledDeleteMDCountrySalesTaxMaterial();
+                    return true;
+                case nameof(AddMDCountrySalesTaxMDMaterialGroup):
+                    AddMDCountrySalesTaxMDMaterialGroup();
+                    return true;
+                case nameof(DeleteMDCountrySalesTaxMDMaterialGroup):
+                    DeleteMDCountrySalesTaxMDMaterialGroup();
+                    return true;
+                case nameof(IsEnabledAddMDCountrySalesTaxMDMaterialGroup):
+                    result = IsEnabledAddMDCountrySalesTaxMDMaterialGroup();
+                    return true;
+                case nameof(IsEnabledDeleteMDCountrySalesTaxMDMaterialGroup):
+                    result = IsEnabledDeleteMDCountrySalesTaxMDMaterialGroup();
+                    return true;
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(Search):
+                    Search();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
     }
 }

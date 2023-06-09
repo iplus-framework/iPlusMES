@@ -1,4 +1,4 @@
-﻿using gip.core.autocomponent;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.facility;
@@ -578,14 +578,13 @@ namespace gip.bso.masterdata
             }
             return result ?? new List<ACClass>();
         }
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
                 case nameof(ShowDialogSelectSources):
-                    //ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Nullable<System.Guid>)acParameter[3]);
+                    ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Nullable<System.Guid>)acParameter[2]);
                     return true;
                 case nameof(DlgSelectSourcesOk):
                     DlgSelectSourcesOk();
@@ -594,7 +593,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledDlgSelectSourcesOk();
                     return true;
             }
-            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
