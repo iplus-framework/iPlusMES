@@ -274,7 +274,7 @@ namespace gip.bso.manufacturing
 
         }
 
-        public void DeInit()
+        public virtual void DeInit()
         {
             using (ACMonitor.Lock(_70200_ItemFunctionsLock))
             {
