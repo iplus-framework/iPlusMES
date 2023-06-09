@@ -1,11 +1,9 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -188,7 +186,7 @@ namespace gip.bso.masterdata
                         DatabaseApp.Facility
                          .Include(c => c.Material)
                          .Include(c => c.MDFacilityType)
-                       
+
                         .Where(c => c.FacilityID == SelectedFacility.FacilityID));
         }
 

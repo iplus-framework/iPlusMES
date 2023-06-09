@@ -525,61 +525,60 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadStorageBin":
+                case nameof(LoadStorageBin):
                     LoadStorageBin();
                     return true;
-                case "IsEnabledLoadStorageBin":
+                case nameof(IsEnabledLoadStorageBin):
                     result = IsEnabledLoadStorageBin();
                     return true;
-                case "NewStorageBin":
+                case nameof(NewStorageBin):
                     NewStorageBin();
                     return true;
-                case "IsEnabledNewStorageBin":
+                case nameof(IsEnabledNewStorageBin):
                     result = IsEnabledNewStorageBin();
                     return true;
-                case "DeleteStorageBin":
+                case nameof(DeleteStorageBin):
                     DeleteStorageBin();
                     return true;
-                case "IsEnabledDeleteStorageBin":
+                case nameof(IsEnabledDeleteStorageBin):
                     result = IsEnabledDeleteStorageBin();
                     return true;
             }
@@ -587,7 +586,6 @@ namespace gip.bso.masterdata
         }
 
         #endregion
-
 
     }
 }

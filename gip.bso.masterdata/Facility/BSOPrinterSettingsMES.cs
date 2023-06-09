@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.core.reporthandler;
 using gip.mes.datamodel;
 using System;
@@ -36,7 +37,7 @@ namespace gip.bso.masterdata
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             bool baseInit = base.ACInit(startChildMode);
-            using(DatabaseApp databaseApp = new DatabaseApp())
+            using (DatabaseApp databaseApp = new DatabaseApp())
             {
                 CurrentFacilityRoot = FacilityTree.LoadFacilityTree(databaseApp);
                 CurrentFacility = CurrentFacilityRoot;
@@ -186,13 +187,26 @@ namespace gip.bso.masterdata
                            (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
                         || (SelectedPrintServer != null && c.PrinterACUrl == SelectedPrintServer.PrinterACUrl)
                     )
-                    && (   (!String.IsNullOrEmpty(LocationName) && c.MachineACUrl == LocationName) 
+                    && ((!String.IsNullOrEmpty(LocationName) && c.MachineACUrl == LocationName)
                         || (SelectedFacility != null && c.FacilityID == SelectedFacility.FacilityID))
                 );
         }
 
         #endregion
 
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(IsEnabledAddPrinter):
+                    result = IsEnabledAddPrinter();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
+
     }
 }

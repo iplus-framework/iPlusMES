@@ -1,8 +1,9 @@
-﻿using gip.core.datamodel;
+using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace gip.bso.masterdata
 {
@@ -176,7 +177,7 @@ namespace gip.bso.masterdata
                                 aCFSItem.IsVisible = false;
                                 Facility facility = aCFSItem.ACObject as Facility;
                                 if (
-                                        facility.FacilityNo.ToLower().Contains(value.ToLower()) 
+                                        facility.FacilityNo.ToLower().Contains(value.ToLower())
                                         || facility.FacilityName.ToLower().Contains(value.ToLower())
                                         || (!string.IsNullOrEmpty(facility.KeyOfExtSys) && facility.KeyOfExtSys.Contains(value))
                                    )
@@ -274,6 +275,30 @@ namespace gip.bso.masterdata
             if (clone != null)
                 clone.CurrentFacility = CurrentFacility;
             return clone;
+        }
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(ShowDialog):
+                    result = ShowDialog(acParameter.Count() == 1 ? (gip.mes.datamodel.Facility)acParameter[0] : null);
+                    return true;
+                case nameof(IsEnabledShowDialog):
+                    result = IsEnabledShowDialog();
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
