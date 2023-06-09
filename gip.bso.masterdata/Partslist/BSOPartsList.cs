@@ -2368,12 +2368,32 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
+                case nameof(RemoveProcessWorkflow):
+                    RemoveProcessWorkflow();
+                    return true;
+                case nameof(IsEnabledRemoveProcessWorkflow):
+                    result = IsEnabledRemoveProcessWorkflow();
+                    return true;
+                case nameof(NewProcessWorkflowOk):
+                    NewProcessWorkflowOk();
+                    return true;
+                case nameof(IsEnabledNewProcessWorkflowOk):
+                    result = IsEnabledNewProcessWorkflowOk();
+                    return true;
+                case nameof(NewProcessWorkflowCancel):
+                    NewProcessWorkflowCancel();
+                    return true;
+                case nameof(ValidateRoutes):
+                    ValidateRoutes();
+                    return true;
+                case nameof(IsEnabledValidateRoutes):
+                    result = IsEnabledValidateRoutes();
+                    return true;
                 case nameof(Save):
                     Save();
                     return true;
@@ -2392,20 +2412,23 @@ namespace gip.bso.masterdata
                 case nameof(Delete):
                     Delete();
                     return true;
-                case nameof(IsEnabledNew):
-                    result = IsEnabledNew();
-                    return true;
                 case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
+                    return true;
+                case nameof(Restore):
+                    Restore();
+                    return true;
+                case nameof(IsEnabledRestore):
+                    result = IsEnabledRestore();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
                     return true;
                 case nameof(IsEnabledNewVersion):
                     result = IsEnabledNewVersion();
                     return true;
-                case nameof(Search):
-                    Search(acParameter.Count() == 1 ? (Partslist)acParameter[0] : null);
-                    return true;
                 case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(NewPartslistPos):
                     NewPartslistPos();
@@ -2432,7 +2455,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledAlternativeDeletePartslistPos();
                     return true;
                 case nameof(SearchIntermediate):
-                    SearchIntermediate(acParameter.Count() == 1 ? (PartslistPos)acParameter[0] : null);
+                    SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
                     return true;
                 case nameof(RecalcIntermediateSum):
                     RecalcIntermediateSum();
@@ -2464,44 +2487,32 @@ namespace gip.bso.masterdata
                 case nameof(UnSetMaterialWF):
                     UnSetMaterialWF();
                     return true;
+                case nameof(UpdateFromMaterialWF):
+                    UpdateFromMaterialWF();
+                    return true;
+                case nameof(UpdateAllFromMaterialWF):
+                    UpdateAllFromMaterialWF();
+                    return true;
                 case nameof(IsEnabledSetMaterialWF):
                     result = IsEnabledSetMaterialWF();
                     return true;
                 case nameof(IsEnabledUnSetMaterialWF):
                     result = IsEnabledUnSetMaterialWF();
                     return true;
+                case nameof(IsEnabledUpdateFromMaterialWF):
+                    result = IsEnabledUpdateFromMaterialWF();
+                    return true;
+                case nameof(IsEnabledUpdateAllFromMaterialWF):
+                    result = IsEnabledUpdateAllFromMaterialWF();
+                    return true;
+                case nameof(SetSelectedMaterial):
+                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                    return true;
                 case nameof(ConfigurationTransferSetSource):
                     ConfigurationTransferSetSource();
                     return true;
                 case nameof(IsEnabledConfigurationTransferSetSource):
                     result = IsEnabledConfigurationTransferSetSource();
-                    return true;
-                case nameof(AddProcessWorkflow):
-                    AddProcessWorkflow();
-                    return true;
-                case nameof(IsEnabledAddProcessWorkflow):
-                    result = IsEnabledAddProcessWorkflow();
-                    return true;
-                case nameof(RemoveProcessWorkflow):
-                    RemoveProcessWorkflow();
-                    return true;
-                case nameof(IsEnabledRemoveProcessWorkflow):
-                    result = IsEnabledRemoveProcessWorkflow();
-                    return true;
-                case nameof(NewProcessWorkflowOk):
-                    NewProcessWorkflowOk();
-                    return true;
-                case nameof(IsEnabledNewProcessWorkflowOk):
-                    result = IsEnabledNewProcessWorkflowOk();
-                    return true;
-                case nameof(NewProcessWorkflowCancel):
-                    NewProcessWorkflowCancel();
-                    return true;
-                case nameof(ValidateRoutes):
-                    ValidateRoutes();
-                    return true;
-                case nameof(IsEnabledValidateRoutes):
-                    result = IsEnabledValidateRoutes();
                     return true;
                 case nameof(InitStandardPartslistConfigParams):
                     InitStandardPartslistConfigParams();
@@ -2521,23 +2532,11 @@ namespace gip.bso.masterdata
                 case nameof(IsEnabledInitAllStandardPartslistConfigParams):
                     result = IsEnabledInitAllStandardPartslistConfigParams();
                     return true;
-                case nameof(Restore):
-                    Restore();
+                case nameof(AddProcessWorkflow):
+                    AddProcessWorkflow();
                     return true;
-                case nameof(IsEnabledRestore):
-                    result = IsEnabledRestore();
-                    return true;
-                case nameof(UpdateFromMaterialWF):
-                    UpdateFromMaterialWF();
-                    return true;
-                case nameof(IsEnabledUpdateFromMaterialWF):
-                    result = IsEnabledUpdateFromMaterialWF();
-                    return true;
-                case nameof(UpdateAllFromMaterialWF):
-                    UpdateAllFromMaterialWF();
-                    return true;
-                case nameof(IsEnabledUpdateAllFromMaterialWF):
-                    result = IsEnabledUpdateAllFromMaterialWF();
+                case nameof(IsEnabledAddProcessWorkflow):
+                    result = IsEnabledAddProcessWorkflow();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

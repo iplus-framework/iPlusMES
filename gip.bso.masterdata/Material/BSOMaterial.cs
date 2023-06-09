@@ -18,8 +18,6 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Data.Objects;
-using gip.mes.autocomponent;
-using System.Windows.Input;
 using static gip.core.datamodel.Global;
 using gip.mes.facility;
 
@@ -780,7 +778,7 @@ namespace gip.bso.masterdata
         {
             if (SelectedMaterial == null)
                 return new List<FacilityMaterial>();
-            return 
+            return
                 SelectedMaterial
                 .FacilityMaterial_Material
                 .OrderBy(c => c.Facility.FacilityNo)
@@ -1533,7 +1531,7 @@ namespace gip.bso.masterdata
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
                 return;
-            using (DatabaseApp dbApp = new DatabaseApp()) 
+            using (DatabaseApp dbApp = new DatabaseApp())
             {
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
                 Msg msg = FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
@@ -2040,7 +2038,7 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        
+
 
         #endregion
 
@@ -2212,78 +2210,11 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case nameof(IsEnabledConvertTestToBase):
-                    result = IsEnabledConvertTestToBase();
-                    return true;
-                case nameof(ConvertTestFromBase):
-                    ConvertTestFromBase();
-                    return true;
-                case nameof(IsEnabledConvertTestFromBase):
-                    result = IsEnabledConvertTestFromBase();
-                    return true;
-                case nameof(ConvertTest):
-                    ConvertTest();
-                    return true;
-                case nameof(IsEnabledConvertTest):
-                    result = IsEnabledConvertTest();
-                    return true;
-                case nameof(TranslationNew):
-                    TranslationNew();
-                    return true;
-                case nameof(TranslationDelete):
-                    TranslationDelete();
-                    return true;
-                case nameof(IsEnabledTranslationNew):
-                    result = IsEnabledTranslationNew();
-                    return true;
-                case nameof(IsEnabledTranslationDelete):
-                    result = IsEnabledTranslationDelete();
-                    return true;
-                case nameof(ValidateInput):
-                    result = ValidateInput((String)acParameter[0], (Object)acParameter[1], (System.Globalization.CultureInfo)acParameter[2]);
-                    return true;
-                case nameof(ConvertAmbientVolToRefVol15):
-                    ConvertAmbientVolToRefVol15();
-                    return true;
-                case nameof(IsEnabledConvertAmbientVolToRefVol15):
-                    result = IsEnabledConvertAmbientVolToRefVol15();
-                    return true;
-                case nameof(ConvertRefVol15ToAmbientVol):
-                    ConvertRefVol15ToAmbientVol();
-                    return true;
-                case nameof(IsEnabledConvertRefVol15ToAmbientVol):
-                    result = IsEnabledConvertRefVol15ToAmbientVol();
-                    return true;
-                case nameof(ConvertAmbVolToMass):
-                    ConvertAmbVolToMass();
-                    return true;
-                case nameof(IsEnabledConvertAmbVolToMass):
-                    result = IsEnabledConvertAmbVolToMass();
-                    return true;
-                case nameof(ConvertMassToAmbVol):
-                    ConvertMassToAmbVol();
-                    return true;
-                case nameof(IsEnabledConvertMassToAmbVol):
-                    result = IsEnabledConvertMassToAmbVol();
-                    return true;
-                case nameof(CalcDensityAndTemp):
-                    CalcDensityAndTemp();
-                    return true;
-                case nameof(IsEnabledCalcDensityAndTemp):
-                    result = IsEnabledCalcDensityAndTemp();
-                    return true;
-                case nameof(CalcDensityAndVol):
-                    CalcDensityAndVol();
-                    return true;
-                case nameof(IsEnabledCalcDensityAndVol):
-                    result = IsEnabledCalcDensityAndVol();
-                    return true;
                 case nameof(Save):
                     Save();
                     return true;
@@ -2297,7 +2228,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledUndoSave();
                     return true;
                 case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
@@ -2377,17 +2308,20 @@ namespace gip.bso.masterdata
                 case nameof(ConvertTestToBase):
                     ConvertTestToBase();
                     return true;
-                case nameof(AddPWMethodNodeConfig):
-                    AddPWMethodNodeConfig();
+                case nameof(IsEnabledConvertTestToBase):
+                    result = IsEnabledConvertTestToBase();
                     return true;
-                case nameof(IsEnabledAddPWMethodNodeConfig):
-                    result = IsEnabledAddPWMethodNodeConfig();
+                case nameof(ConvertTestFromBase):
+                    ConvertTestFromBase();
                     return true;
-                case nameof(DeletePWMethodNodeConfig):
-                    DeletePWMethodNodeConfig();
+                case nameof(IsEnabledConvertTestFromBase):
+                    result = IsEnabledConvertTestFromBase();
                     return true;
-                case nameof(IsEnabledDeletePWMethodNodeConfig):
-                    result = IsEnabledDeletePWMethodNodeConfig();
+                case nameof(ConvertTest):
+                    ConvertTest();
+                    return true;
+                case nameof(IsEnabledConvertTest):
+                    result = IsEnabledConvertTest();
                     return true;
                 case nameof(AddFacility):
                     AddFacility();
@@ -2430,6 +2364,102 @@ namespace gip.bso.masterdata
                     return true;
                 case nameof(IsEnabledRecalcThroughputAndOEE):
                     result = IsEnabledRecalcThroughputAndOEE();
+                    return true;
+                case nameof(TranslationNew):
+                    TranslationNew();
+                    return true;
+                case nameof(TranslationDelete):
+                    TranslationDelete();
+                    return true;
+                case nameof(IsEnabledTranslationNew):
+                    result = IsEnabledTranslationNew();
+                    return true;
+                case nameof(IsEnabledTranslationDelete):
+                    result = IsEnabledTranslationDelete();
+                    return true;
+                case nameof(SearchAssociatedPos):
+                    SearchAssociatedPos();
+                    return true;
+                case nameof(IsEnabledSearchAssociatedPos):
+                    result = IsEnabledSearchAssociatedPos();
+                    return true;
+                case nameof(OpenQueryDialog):
+                    result = OpenQueryDialog();
+                    return true;
+                case nameof(AddPWMethodNodeConfig):
+                    AddPWMethodNodeConfig();
+                    return true;
+                case nameof(IsEnabledAddPWMethodNodeConfig):
+                    result = IsEnabledAddPWMethodNodeConfig();
+                    return true;
+                case nameof(DeletePWMethodNodeConfig):
+                    DeletePWMethodNodeConfig();
+                    return true;
+                case nameof(IsEnabledDeletePWMethodNodeConfig):
+                    result = IsEnabledDeletePWMethodNodeConfig();
+                    return true;
+                case nameof(ValidateInput):
+                    result = ValidateInput((System.String)acParameter[0], (System.Object)acParameter[1], (System.Globalization.CultureInfo)acParameter[2]);
+                    return true;
+                case nameof(ConvertAmbientVolToRefVol15):
+                    ConvertAmbientVolToRefVol15();
+                    return true;
+                case nameof(IsEnabledConvertAmbientVolToRefVol15):
+                    result = IsEnabledConvertAmbientVolToRefVol15();
+                    return true;
+                case nameof(ConvertRefVol15ToAmbientVol):
+                    ConvertRefVol15ToAmbientVol();
+                    return true;
+                case nameof(IsEnabledConvertRefVol15ToAmbientVol):
+                    result = IsEnabledConvertRefVol15ToAmbientVol();
+                    return true;
+                case nameof(ConvertAmbVolToMass):
+                    ConvertAmbVolToMass();
+                    return true;
+                case nameof(IsEnabledConvertAmbVolToMass):
+                    result = IsEnabledConvertAmbVolToMass();
+                    return true;
+                case nameof(ConvertMassToAmbVol):
+                    ConvertMassToAmbVol();
+                    return true;
+                case nameof(IsEnabledConvertMassToAmbVol):
+                    result = IsEnabledConvertMassToAmbVol();
+                    return true;
+                case nameof(CalcDensityAndTemp):
+                    CalcDensityAndTemp();
+                    return true;
+                case nameof(IsEnabledCalcDensityAndTemp):
+                    result = IsEnabledCalcDensityAndTemp();
+                    return true;
+                case nameof(CalcDensityAndVol):
+                    CalcDensityAndVol();
+                    return true;
+                case nameof(IsEnabledCalcDensityAndVol):
+                    result = IsEnabledCalcDensityAndVol();
+                    return true;
+                case nameof(ShowMaterialOptions):
+                    ShowMaterialOptions();
+                    return true;
+                case nameof(IsEnabledShowMaterialOptions):
+                    result = IsEnabledShowMaterialOptions();
+                    return true;
+                case nameof(MoveToAnotherIntermediate):
+                    MoveToAnotherIntermediate();
+                    return true;
+                case nameof(IsEnabledMoveToAnotherIntermediate):
+                    result = IsEnabledMoveToAnotherIntermediate();
+                    return true;
+                case nameof(MoveAndReplaceMaterial):
+                    MoveAndReplaceMaterial();
+                    return true;
+                case nameof(IsEnabledMoveAndReplaceMaterial):
+                    result = IsEnabledMoveAndReplaceMaterial();
+                    return true;
+                case nameof(ReplaceMaterial):
+                    ReplaceMaterial();
+                    return true;
+                case nameof(IsEnabledReplaceMaterial):
+                    result = IsEnabledReplaceMaterial();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

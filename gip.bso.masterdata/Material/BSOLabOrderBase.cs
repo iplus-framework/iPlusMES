@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
@@ -59,7 +59,7 @@ namespace gip.bso.masterdata
             if (_LabOrderManager == null)
                 throw new Exception("LabOrderManager not configured");
             bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
-            if(!skipSearchOnStart)
+            if (!skipSearchOnStart)
             {
                 Search();
             }
@@ -245,7 +245,7 @@ namespace gip.bso.masterdata
 
         public virtual bool SetCurrentSelected(LabOrder value)
         {
-            bool isChanged =false;
+            bool isChanged = false;
             if (AccessPrimary == null)
                 return false;
             if (value != CurrentLabOrder)
@@ -261,7 +261,7 @@ namespace gip.bso.masterdata
                 isChanged = true;
             }
 
-            if(isChanged)
+            if (isChanged)
                 LoadLabOrderPosList(value);
 
             return isChanged;
@@ -350,7 +350,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if(_LabOrderPosList == null)
+                if (_LabOrderPosList == null)
                     _LabOrderPosList = new List<LabOrderPos>();
                 return _LabOrderPosList;
             }
@@ -361,13 +361,13 @@ namespace gip.bso.masterdata
             _LabOrderPosList = null;
             if (labOrder != null)
             {
-                if(labOrder.EntityState != System.Data.EntityState.Added)
+                if (labOrder.EntityState != System.Data.EntityState.Added)
                 {
                     labOrder.LabOrderPos_LabOrder.AutoRefresh(this.DatabaseApp);
                 }
                 _LabOrderPosList = labOrder.LabOrderPos_LabOrder.OrderBy(c => c.Sequence).ToList();
             }
-            if(_LabOrderPosList == null)
+            if (_LabOrderPosList == null)
                 SelectedLabOrderPos = null;
             else
                 SelectedLabOrderPos = _LabOrderPosList.FirstOrDefault();
@@ -781,73 +781,72 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadLabOrderPos":
+                case nameof(LoadLabOrderPos):
                     LoadLabOrderPos();
                     return true;
-                case "IsEnabledLoadLabOrderPos":
+                case nameof(IsEnabledLoadLabOrderPos):
                     result = IsEnabledLoadLabOrderPos();
                     return true;
-                case "NewLabOrderPos":
+                case nameof(NewLabOrderPos):
                     NewLabOrderPos();
                     return true;
-                case "IsEnabledNewLabOrderPos":
+                case nameof(IsEnabledNewLabOrderPos):
                     result = IsEnabledNewLabOrderPos();
                     return true;
-                case "DeleteLabOrderPos":
+                case nameof(DeleteLabOrderPos):
                     DeleteLabOrderPos();
                     return true;
-                case "IsEnabledDeleteLabOrderPos":
+                case nameof(IsEnabledDeleteLabOrderPos):
                     result = IsEnabledDeleteLabOrderPos();
                     return true;
-                case "ApplyValueFilter":
+                case nameof(ApplyValueFilter):
                     ApplyValueFilter();
                     return true;
-                case "IsEnabledApplyValueFilter":
+                case nameof(IsEnabledApplyValueFilter):
                     result = IsEnabledApplyValueFilter();
                     return true;
-                case "ClearValueFilter":
+                case nameof(ClearValueFilter):
                     ClearValueFilter();
                     return true;
-                case "IsEnabledClearValueFilter":
+                case nameof(IsEnabledClearValueFilter):
                     result = IsEnabledClearValueFilter();
                     return true;
             }

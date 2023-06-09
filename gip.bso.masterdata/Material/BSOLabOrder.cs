@@ -1142,7 +1142,7 @@ namespace gip.bso.masterdata
                 AccessPrimary.NavACQueryDefinition.TakeCount = 500;
             else
                 AccessPrimary.NavACQueryDefinition.TakeCount = 50;
-                base.Search();
+            base.Search();
 
             _LabOrderPosAVGList = null;
             OnPropertyChanged(nameof(LabOrderPosAVGList));
@@ -1312,34 +1312,33 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "NewLabOrderDialog":
-                    result = NewLabOrderDialog((DeliveryNotePos)acParameter[0], (DeliveryNotePos)acParameter[1], (ProdOrderPartslistPos)acParameter[2], (FacilityLot)acParameter[3]);
+                case nameof(NewLabOrderDialog):
+                    result = NewLabOrderDialog((gip.mes.datamodel.DeliveryNotePos)acParameter[0], (gip.mes.datamodel.DeliveryNotePos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3]);
                     return true;
-                case "DialogCreatePos":
+                case nameof(DialogCreatePos):
                     DialogCreatePos();
                     return true;
-                case "DialogCancelPos":
+                case nameof(DialogCancelPos):
                     DialogCancelPos();
                     return true;
-                case "ShowLabOrderViewDialog":
-                    ShowLabOrderViewDialog(acParameter[0] as InOrderPos, acParameter[1] as OutOrderPos, acParameter[2] as ProdOrderPartslistPos, acParameter[3] as FacilityLot, acParameter[4] as LabOrder, (Boolean)acParameter[5], acParameter[6] as PAOrderInfo);
+                case nameof(ShowLabOrderViewDialog):
+                    ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.LabOrder)acParameter[4], (System.Boolean)acParameter[5], (gip.core.autocomponent.PAOrderInfo)acParameter[6]);
                     return true;
-                case "CloseLabOrderViewDialog":
+                case nameof(CloseLabOrderViewDialog):
                     CloseLabOrderViewDialog();
                     return true;
-                case "IsEnabledNewLabOrderPos":
+                case nameof(IsEnabledNewLabOrderPos):
                     result = IsEnabledNewLabOrderPos();
                     return true;
-                case "IsEnabledDeleteLabOrderPos":
+                case nameof(IsEnabledDeleteLabOrderPos):
                     result = IsEnabledDeleteLabOrderPos();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
             }
@@ -1347,7 +1346,6 @@ namespace gip.bso.masterdata
         }
 
         #endregion
-
 
     }
 }

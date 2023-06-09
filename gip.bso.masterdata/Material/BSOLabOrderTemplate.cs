@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -100,7 +100,6 @@ namespace gip.bso.masterdata
         #endregion
         #endregion
 
-
         #region Methods
 
         public override void New()
@@ -181,17 +180,18 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case "MassUpdateOnValues":
+                case nameof(MassUpdateOnValues):
                     MassUpdateOnValues();
                     return true;
-                case "IsEnabledMassUpdateOnValues":
+                case nameof(IsEnabledMassUpdateOnValues):
                     result = IsEnabledMassUpdateOnValues();
                     return true;
             }
-            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
+
         #endregion
     }
 }
