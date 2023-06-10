@@ -31,6 +31,18 @@ namespace gip.mes.processapplication
                         DosedQuantity = totalizingScale.TotalActualWeight.ValueT;
                 }
             }
+            else
+            {
+                // If Dosing is done without scale and no result from PLC,
+                // then calculate quantity from difference between last posted quantity
+                // and measured weight
+                if (silo.HasBoundFillLevel
+                    && (silo.HasBoundFillLevelRaw || silo.HasBoundFillLevelScale)
+                    && (!dosing.IsSimulationOn || Math.Abs(silo.FillLevelScale.ValueT) > Double.Epsilon))
+                {
+                    DosedQuantity = silo.DiffFillLevelScale;
+                }
+            }
 
             silo.RefreshFacility(false, null);
 

@@ -120,7 +120,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region LackOfMaterial State
-        private bool _LackOfMaterialForced = false;
+        protected bool _LackOfMaterialForced = false;
         public bool IsLackOfMaterialForced
         {
             get
@@ -1240,7 +1240,23 @@ namespace gip.mes.processapplication
                 return completeResult;
             }
 
+            // If Dosing is done without scale and no result from PLC,
+            // then calculate quantity from difference between last posted quantity
+            // and measured weight
             double actualQuantity = (double)acMethod.ResultValueList["ActualQuantity"];
+            if (   actualQuantity < 0.0000001 
+                && CurrentScaleForWeighing == null)
+            {
+                PAMSilo dosingSilo = CurrentDosingSilo;
+                if (    dosingSilo != null 
+                    && !dosingSilo.HasBoundFillLevel 
+                    && (dosingSilo.HasBoundFillLevelRaw || dosingSilo.HasBoundFillLevelScale)
+                    && (!this.IsSimulationOn || Math.Abs(dosingSilo.FillLevelScale.ValueT) > Double.Epsilon))
+                {
+                    actualQuantity = dosingSilo.DiffFillLevelScale;
+                }
+            }
+            
             if (this.IsSimulationOn)
             {
                 if (actualQuantity < 0.0000001)
@@ -1869,6 +1885,21 @@ namespace gip.mes.processapplication
         {
             if (!IsEnabledAcknowledgeAlarms())
                 return;
+            OnHandleAcknowlegdeDosingAlarms();
+            base.AcknowledgeAlarms();
+        }
+
+        public override bool IsEnabledAcknowledgeAlarms()
+        {
+            if (((StateTolerance.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckTolerance.ValueT))
+                || ((StateLackOfMaterial.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckLackOfMaterial.ValueT))
+                || ((StateDosingTime.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckDosingTime.ValueT)))
+                return true;
+            return base.IsEnabledAcknowledgeAlarms();
+        }
+
+        protected virtual void OnHandleAcknowlegdeDosingAlarms()
+        {
             if (StateTolerance.ValueT != PANotifyState.Off)
                 FaultAckTolerance.ValueT = true;
             if (StateLackOfMaterial.ValueT != PANotifyState.Off)
@@ -1883,16 +1914,6 @@ namespace gip.mes.processapplication
             }
             if (StateDosingTime.ValueT != PANotifyState.Off)
                 FaultAckDosingTime.ValueT = true;
-            base.AcknowledgeAlarms();
-        }
-
-        public override bool IsEnabledAcknowledgeAlarms()
-        {
-            if (((StateTolerance.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckTolerance.ValueT))
-                || ((StateLackOfMaterial.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckLackOfMaterial.ValueT))
-                || ((StateDosingTime.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckDosingTime.ValueT)))
-                return true;
-            return base.IsEnabledAcknowledgeAlarms();
         }
 
         [ACMethodInfo("Function", "en{'Default dosing paramters'}de{'Standard Dosierparameter'}", 9999)]

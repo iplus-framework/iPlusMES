@@ -792,150 +792,153 @@ namespace gip.mes.processapplication
                                 actualWeight = acValue.ParamAsDouble;
                             //short simulationWeight = (short)acMethod["Source"];
 
-                            using (var dbIPlus = new Database())
-                            using (var dbApp = new DatabaseApp(dbIPlus))
+                            if (OnTaskCallbackCanExecutePostings(sender, e, wrapObject, discharging, acMethod))
                             {
-                                ProdOrderPartslistPos currentBatchPos = null;
-                                if (IsProduction)
+                                using (var dbIPlus = new Database())
+                                using (var dbApp = new DatabaseApp(dbIPlus))
                                 {
-                                    currentBatchPos = ParentPWMethod<PWMethodProduction>().CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
-                                    // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
-                                    // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
-                                    OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualWeight);
-
-                                    bool exceptionHandled = false;
-                                    var routeItem = CurrentDischargingDest(dbIPlus);
-                                    PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
-                                    if (routeItem != null && targetModule != null)
+                                    ProdOrderPartslistPos currentBatchPos = null;
+                                    if (IsProduction)
                                     {
-                                        try
-                                        {
-                                            DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Messages.LogException(this.GetACUrl(), "TaskCallback(20)", ex);
-                                            ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                                            OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "TaskCallback", 1020), true);
-                                            discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
-                                            discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1020), true);
-                                            exceptionHandled = true;
-                                        }
-                                        finally
-                                        {
-                                            routeItem.Detach();
-                                        }
-                                    }
+                                        currentBatchPos = ParentPWMethod<PWMethodProduction>().CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
+                                        // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
+                                        // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
+                                        OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualWeight);
 
-                                    if (ParentPWGroup != null)
-                                    {
-                                        List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this);
-                                        if (previousDosings != null)
+                                        bool exceptionHandled = false;
+                                        var routeItem = CurrentDischargingDest(dbIPlus);
+                                        PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
+                                        if (routeItem != null && targetModule != null)
                                         {
-                                            foreach (var pwDosing in previousDosings)
+                                            try
                                             {
-                                                if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp))
-                                                    pwDosing.ResetDosingsAfterInterDischarging(dbApp);
-                                                else
-                                                    pwDosing.SetDosingsCompletedAfterDischarging(dbApp);
+                                                DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Messages.LogException(this.GetACUrl(), "TaskCallback(20)", ex);
+                                                ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                                                OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "TaskCallback", 1020), true);
+                                                discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
+                                                discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1020), true);
+                                                exceptionHandled = true;
+                                            }
+                                            finally
+                                            {
+                                                routeItem.Detach();
                                             }
                                         }
-                                    }
-                                    if (dbApp.IsChanged)
-                                    {
-                                        if (exceptionHandled)
-                                            dbApp.ACUndoChanges();
-                                        else
-                                            dbApp.ACSaveChanges();
-                                    }
-                                }
-                                else if (IsTransport)
-                                {
-                                    if (this.IsSimulationOn && actualWeight <= 0.000001)
-                                    {
-                                        ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
-                                        if (acValueTargetQ != null)
-                                            actualWeight = acValueTargetQ.ParamAsDouble;
-                                    }
 
-                                    var routeItem = CurrentDischargingDest(dbIPlus);
-                                    PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
-                                    if (routeItem != null && targetModule != null)
-                                    {
-                                        try
+                                        if (ParentPWGroup != null)
                                         {
-                                            if (IsIntake)
+                                            List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this);
+                                            if (previousDosings != null)
                                             {
-                                                var pwMethod = ParentPWMethod<PWMethodIntake>();
-                                                Picking picking = null;
-                                                DeliveryNotePos notePos = null;
-                                                FacilityBooking fBooking = null;
-                                                if (pwMethod.CurrentPicking != null)
+                                                foreach (var pwDosing in previousDosings)
                                                 {
-                                                    picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
-                                                    PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                    if (picking != null)
-                                                        DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
-                                                }
-                                                else if (pwMethod.CurrentDeliveryNotePos != null)
-                                                {
-                                                    notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
-                                                    if (notePos != null)
-                                                        DoInwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
-                                                }
-                                                else if (pwMethod.CurrentFacilityBooking != null)
-                                                {
-                                                    fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
-                                                    if (fBooking != null)
-                                                        DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
+                                                    if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp))
+                                                        pwDosing.ResetDosingsAfterInterDischarging(dbApp);
+                                                    else
+                                                        pwDosing.SetDosingsCompletedAfterDischarging(dbApp);
                                                 }
                                             }
-                                            else if (IsRelocation)
+                                        }
+                                        if (dbApp.IsChanged)
+                                        {
+                                            if (exceptionHandled)
+                                                dbApp.ACUndoChanges();
+                                            else
+                                                dbApp.ACSaveChanges();
+                                        }
+                                    }
+                                    else if (IsTransport)
+                                    {
+                                        if (this.IsSimulationOn && actualWeight <= 0.000001)
+                                        {
+                                            ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                                            if (acValueTargetQ != null)
+                                                actualWeight = acValueTargetQ.ParamAsDouble;
+                                        }
+
+                                        var routeItem = CurrentDischargingDest(dbIPlus);
+                                        PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
+                                        if (routeItem != null && targetModule != null)
+                                        {
+                                            try
                                             {
-                                                var pwMethod = ParentPWMethod<PWMethodRelocation>();
-                                                Picking picking = null;
-                                                FacilityBooking fBooking = null;
-                                                if (pwMethod.CurrentPicking != null)
+                                                if (IsIntake)
                                                 {
-                                                    picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
-                                                    PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                    if (picking != null)
+                                                    var pwMethod = ParentPWMethod<PWMethodIntake>();
+                                                    Picking picking = null;
+                                                    DeliveryNotePos notePos = null;
+                                                    FacilityBooking fBooking = null;
+                                                    if (pwMethod.CurrentPicking != null)
                                                     {
-                                                        if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
-                                                            actualWeight = pickingPos.TargetQuantityUOM;
-                                                        DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                        picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
+                                                        PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
+                                                        if (picking != null)
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                    }
+                                                    else if (pwMethod.CurrentDeliveryNotePos != null)
+                                                    {
+                                                        notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
+                                                        if (notePos != null)
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                    }
+                                                    else if (pwMethod.CurrentFacilityBooking != null)
+                                                    {
+                                                        fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
+                                                        if (fBooking != null)
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
                                                     }
                                                 }
-                                                else if (pwMethod.CurrentFacilityBooking != null)
+                                                else if (IsRelocation)
                                                 {
-                                                    fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
-                                                    if (fBooking != null)
-                                                        DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
+                                                    var pwMethod = ParentPWMethod<PWMethodRelocation>();
+                                                    Picking picking = null;
+                                                    FacilityBooking fBooking = null;
+                                                    if (pwMethod.CurrentPicking != null)
+                                                    {
+                                                        picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
+                                                        PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
+                                                        if (picking != null)
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
+                                                                actualWeight = pickingPos.TargetQuantityUOM;
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                        }
+                                                    }
+                                                    else if (pwMethod.CurrentFacilityBooking != null)
+                                                    {
+                                                        fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
+                                                        if (fBooking != null)
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
+                                                    }
+                                                }
+                                                else if (IsLoading)
+                                                {
+                                                    var pwMethod = ParentPWMethod<PWMethodLoading>();
+                                                    Picking picking = null;
+                                                    DeliveryNotePos notePos = null;
+                                                    if (pwMethod.CurrentPicking != null)
+                                                    {
+                                                        picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
+                                                        PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
+                                                        if (picking != null)
+                                                            DoOutwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                    }
+                                                    else if (pwMethod.CurrentDeliveryNotePos != null)
+                                                    {
+                                                        notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
+                                                        if (notePos != null)
+                                                            DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                    }
                                                 }
                                             }
-                                            else if (IsLoading)
+                                            finally
                                             {
-                                                var pwMethod = ParentPWMethod<PWMethodLoading>();
-                                                Picking picking = null;
-                                                DeliveryNotePos notePos = null;
-                                                if (pwMethod.CurrentPicking != null)
-                                                {
-                                                    picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
-                                                    PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                    if (picking != null)
-                                                        DoOutwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
-                                                }
-                                                else if (pwMethod.CurrentDeliveryNotePos != null)
-                                                {
-                                                    notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
-                                                    if (notePos != null)
-                                                        DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
-                                                }
+                                                routeItem.Detach();
                                             }
-                                        }
-                                        finally
-                                        {
-                                            routeItem.Detach();
                                         }
                                     }
                                 }
@@ -975,6 +978,11 @@ namespace gip.mes.processapplication
             {
                 _InCallback = false;
             }
+        }
+
+        protected virtual bool OnTaskCallbackCanExecutePostings(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject, PAProcessFunction discharging, ACMethod acMethod)
+        {
+            return true;
         }
         #endregion
 
