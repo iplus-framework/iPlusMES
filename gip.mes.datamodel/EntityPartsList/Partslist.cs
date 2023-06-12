@@ -495,6 +495,19 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(500, "", ConstApp.FinalIntermediate)]
+        public PartslistPos FinalIntermediate
+        {
+            get
+            {
+                return PartslistPos_Partslist
+                .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                .AsEnumerable()
+                .Where(x => x.IsFinalMixure)
+                .FirstOrDefault();
+            }
+        }
+
         #endregion
 
         #region partial methods

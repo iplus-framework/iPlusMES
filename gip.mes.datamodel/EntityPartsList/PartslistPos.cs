@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Transactions;
 
 namespace gip.mes.datamodel
 {
@@ -261,6 +259,18 @@ namespace gip.mes.datamodel
             get
             {
                 return this.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot;
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        public bool IsFinalMixure
+        {
+            get
+            {
+                return this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                    && !PartslistPosRelation_SourcePartslistPos.Any();
+                //&& Material != null
+                //&& !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
             }
         }
 

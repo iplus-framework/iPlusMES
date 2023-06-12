@@ -1856,14 +1856,16 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (CurrentPartslist == null || CurrentPartslist.Material == null)
+                if (CurrentPartslist == null || CurrentPartslist.Material == null || !CurrentPartslist.Material.MaterialUnit_Material.Any())
                 {
                     SelectedMaterialUnit = null;
                     return null;
                 }
-                if (!CurrentPartslist.Material.MaterialUnit_Material.Any())
-                    return null;
-                return CurrentPartslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToList();
+
+                List<MaterialUnit> mdUnits =  CurrentPartslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToList();
+                SelectedMaterialUnit = mdUnits.FirstOrDefault();
+
+                return mdUnits;
             }
         }
 
@@ -2339,6 +2341,8 @@ namespace gip.bso.masterdata
             BSOPartslist clone = base.Clone() as BSOPartslist;
             clone.SelectedPartslist = this.SelectedPartslist;
             clone.CurrentPartslist = this.CurrentPartslist;
+            clone.SelectedMaterialUnit = this.SelectedMaterialUnit;
+            clone.CurrentProdMDUnit = this.CurrentProdMDUnit;
             return clone;
         }
 

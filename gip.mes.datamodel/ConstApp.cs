@@ -208,6 +208,8 @@
 
         public const string BOM = "en{'Bill of Materials'}de{'Stückliste'}";
 
+        public const string FinalIntermediate = "en{'Final intermediate'}de{'Finales Zwischenprodukt'}";
+
         // Date
         public const string ExpirationDate = "en{'Expiration Date'}de{'Ablaufdatum'}";
         public const string FillingDate = "en{'Fill Date'}de{'Fülldatum'}";
