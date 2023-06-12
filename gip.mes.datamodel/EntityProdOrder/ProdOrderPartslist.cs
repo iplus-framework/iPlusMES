@@ -63,6 +63,7 @@ namespace gip.mes.datamodel
         {
             ProdOrderPartslist entity = new ProdOrderPartslist();
             entity.ProdOrderPartslistID = Guid.NewGuid();
+            entity.Context = dbApp;
             entity.DefaultValuesACObject();
             if (parentACObject is ProdOrder)
             {

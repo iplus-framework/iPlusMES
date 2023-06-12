@@ -1400,7 +1400,7 @@ namespace gip.mes.facility
                 {
                     FacilityReservation[] selectedModules = new FacilityReservation[] { };
                     if (
-                            batchPlan.EntityState != EntityState.Added
+                            batchPlan.EntityState != EntityState.Added && batchPlan.FacilityReservation_ProdOrderBatchPlan != null
                             && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != EntityState.Unchanged)
                         )
                     {
@@ -1415,7 +1415,10 @@ namespace gip.mes.facility
                     }
                     else
                     {
-                        selectedModules = batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray();
+                        if (batchPlan.FacilityReservation_ProdOrderBatchPlan != null)
+                        {
+                            selectedModules = batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray();
+                        }
                     }
 
 
