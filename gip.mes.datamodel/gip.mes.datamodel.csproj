@@ -9,11 +9,11 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <DefineConstants>TRACE;DEBUG;NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\bin\Release\</OutputPath>
+    <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
