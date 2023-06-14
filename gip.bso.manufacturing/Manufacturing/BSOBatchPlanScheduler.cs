@@ -3795,7 +3795,7 @@ namespace gip.bso.manufacturing
                     maintainOrderInfo.PO = prodOrderPartslist.ProdOrder;
                     maintainOrderInfos.Add(maintainOrderInfo);
                 }
-                
+
                 if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
                     || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
                 {
@@ -5429,8 +5429,15 @@ namespace gip.bso.manufacturing
             if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
             {
                 bool hasAnyPostings =
-                                    DatabaseApp.FacilityBooking.Where(c => (c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == partslist.ProdOrderPartslistID)
-                                                || (c.ProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID == partslist.ProdOrderPartslistID))
+                                    partslist
+                                    .ProdOrderPartslistPos_ProdOrderPartslist
+                                    .SelectMany(c => c.FacilityBooking_ProdOrderPartslistPos)
+                                    .Any()
+                                    ||
+                                    partslist
+                                    .ProdOrderPartslistPos_ProdOrderPartslist
+                                    .SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+                                    .SelectMany(c => c.FacilityBooking_ProdOrderPartslistPosRelation)
                                     .Any();
 
                 bool hasOrderLog =
