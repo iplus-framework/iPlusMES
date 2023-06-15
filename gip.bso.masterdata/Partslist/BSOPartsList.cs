@@ -2006,6 +2006,7 @@ namespace gip.bso.masterdata
                 {
                     SelectedPartslistPos.Material = value;
                     OnPropertyChanged(nameof(SelectedInputMaterial));
+                    OnPropertyChanged(nameof(SelectedPartslistPos));
                 }
             }
         }

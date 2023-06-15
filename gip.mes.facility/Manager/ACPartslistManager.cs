@@ -732,7 +732,7 @@ namespace gip.mes.facility
             {
                 isAddedElements =
                        partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added)
-                    || partslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Any(c => c.EntityState == EntityState.Added);
+                    || partslist.PartslistPos_Partslist.SelectMany(c => c?.PartslistPosRelation_TargetPartslistPos).Any(c => c != null && c.EntityState == EntityState.Added);
 
                 if (!isAddedElements)
                 {

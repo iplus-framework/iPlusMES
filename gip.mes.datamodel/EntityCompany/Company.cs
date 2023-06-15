@@ -80,6 +80,7 @@ namespace gip.mes.datamodel
             address.IsHouseCompanyAddress = true;
             address.IsBillingCompanyAddress = true;
             address.IsDeliveryCompanyAddress = true;
+            dbApp.Add(entity);
             entity.CompanyAddress_Company.Add(address);
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;

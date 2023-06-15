@@ -961,7 +961,6 @@ namespace gip.bso.masterdata
 
             ACState = Const.SMNew;
             PostExecute("New");
-
         }
 
         /// <summary>

@@ -374,7 +374,7 @@ namespace gip.bso.masterdata
                     CurrentMaterialUnit = null;
                     return null;
                 }
-                if (CurrentMaterial.MaterialUnit_Material.Count <= 0)
+                if (CurrentMaterial.MaterialUnit_Material == null || CurrentMaterial.MaterialUnit_Material.Count <= 0)
                     return null;
                 return CurrentMaterial.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToList();
             }
@@ -814,7 +814,7 @@ namespace gip.bso.masterdata
                 case "CurrentMaterial\\BaseMDUnitID":
                 case "CurrentMaterial\\BaseMDUnit":
                     {
-                        if (CurrentMaterial != null && CurrentMaterial.FacilityCharge_Material.Count > 0)
+                        if (CurrentMaterial.FacilityCharge_Material != null && CurrentMaterial != null && CurrentMaterial.FacilityCharge_Material.Count > 0)
                             return Global.ControlModes.Disabled;
                         return result;
                     }
@@ -881,7 +881,7 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Material.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            OnSave(); 
         }
 
         /// <summary>
@@ -967,6 +967,7 @@ namespace gip.bso.masterdata
             AccessPrimary.NavList.Add(CurrentMaterial);
             AccessPrimary.Selected = CurrentMaterial;
             OnPropertyChanged("SelectedMaterial");
+            OnPropertyChanged("MaterialList");
 
             ACState = Const.SMNew;
             PostExecute("New");
@@ -997,6 +998,7 @@ namespace gip.bso.masterdata
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMaterial);
             SelectedMaterial = AccessPrimary.NavList.FirstOrDefault();
             Load();
+            OnPropertyChanged("MaterialList");
             PostExecute("Delete");
         }
 
