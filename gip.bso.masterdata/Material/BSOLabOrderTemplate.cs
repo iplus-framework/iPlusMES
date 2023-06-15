@@ -104,7 +104,7 @@ namespace gip.bso.masterdata
 
         public override void New()
         {
-            if (!PreExecute("New"))
+            if (!PreExecute(nameof(New)))
                 return;
             if (AccessPrimary == null)
                 return;
@@ -116,9 +116,9 @@ namespace gip.bso.masterdata
             ACState = Const.SMNew;
             AccessPrimary.NavList.Add(newLabOrder);
             CurrentLabOrder = newLabOrder;
-            OnPropertyChanged("LabOrderList");
-            OnPropertyChanged("LabOrderPosList");
-            PostExecute("New");
+            OnPropertyChanged(nameof(LabOrderList));
+            OnPropertyChanged(nameof(LabOrderPosList));
+            PostExecute(nameof(New));
         }
 
         #region Filter

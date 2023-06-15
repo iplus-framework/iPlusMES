@@ -33,8 +33,8 @@ namespace gip.bso.manufacturing
             {
                 _ScaleAddAcutalWeight = value;
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value);
-                OnPropertyChanged("ScaleActualWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                OnPropertyChanged(nameof(ScaleActualWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 
@@ -45,8 +45,8 @@ namespace gip.bso.manufacturing
             {
                 _ScaleRealWeight = value;
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, ScaleAddAcutalWeight);
-                OnPropertyChanged("ScaleActualWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                OnPropertyChanged(nameof(ScaleActualWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 
