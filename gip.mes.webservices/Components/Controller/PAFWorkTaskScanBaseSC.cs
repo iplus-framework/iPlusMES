@@ -143,7 +143,7 @@ namespace gip.mes.webservices
                                                        .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos.Material")
                                                        .Include("Material.MaterialWFRelation_SourceMaterial")
                                                        .Where(c => (        c.ProdOrderBatch != null
-                                                                        && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                        && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Blocked
                                                                             || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
                                                                         && intermChildPoPLPosIDs.Contains(c.ProdOrderPartslistPosID)
                                                        )
