@@ -151,7 +151,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDTourplanPosState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>

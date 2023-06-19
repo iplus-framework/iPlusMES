@@ -239,7 +239,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (CurrentCurrency == null)
+                if (CurrentCurrency == null || CurrentCurrency.MDCurrencyExchange_MDCurrency == null)
                     return null;
                 //if (_MDCurrencyExchangeList == null)
                 //    _MDCurrencyExchangeList = Database.MDCurrencyExchange.ToList();

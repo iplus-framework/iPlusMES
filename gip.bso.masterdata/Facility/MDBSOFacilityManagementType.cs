@@ -161,7 +161,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand("MDFacilityManagementType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -258,6 +259,7 @@ namespace gip.bso.masterdata
             SelectedFacilityManagementType = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(FacilityManagementTypeList));
         }
 
         /// <summary>
@@ -278,7 +280,7 @@ namespace gip.bso.masterdata
             if (AccessPrimary == null)
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityManagementTypeList");
+            OnPropertyChanged(nameof(FacilityManagementTypeList));
         }
 
         #endregion

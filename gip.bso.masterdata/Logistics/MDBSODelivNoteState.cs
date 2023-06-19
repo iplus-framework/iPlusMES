@@ -151,7 +151,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDDelivNoteState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -245,6 +246,7 @@ namespace gip.bso.masterdata
             SelectedDelivNoteState = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(DelivNoteStateList));
         }
 
         /// <summary>

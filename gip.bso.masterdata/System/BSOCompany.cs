@@ -958,7 +958,6 @@ namespace gip.bso.masterdata
             DatabaseApp.Company.Add(CurrentCompany);
             DatabaseApp.CompanyAddress.Add(CurrentCompany.HouseCompanyAddress);
             CurrentHouseAdress = CurrentCompany.HouseCompanyAddress;
-
             ACState = Const.SMNew;
             PostExecute("New");
         }
@@ -998,6 +997,7 @@ namespace gip.bso.masterdata
             OnPropertyChanged("CompanyList");
             SelectedCompany = AccessPrimary.NavList.FirstOrDefault();
             Load();
+            Search();
         }
 
         /// <summary>

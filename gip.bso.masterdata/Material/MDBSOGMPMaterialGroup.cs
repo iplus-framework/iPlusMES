@@ -246,7 +246,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -340,6 +341,7 @@ namespace gip.bso.masterdata
             SelectedGMPMaterialGroup = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(GMPMaterialGroupList));
         }
 
         /// <summary>
@@ -358,7 +360,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("GMPMaterialGroupList");
+            OnPropertyChanged(nameof(GMPMaterialGroupList));
         }
 
         /// <summary>
@@ -370,7 +372,10 @@ namespace gip.bso.masterdata
             if (!IsEnabledLoadGMPMaterialGroupPos())
             {
                 if (!PreExecute("LoadGMPMaterialGroupPos")) return;
-                CurrentGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup.Where(c => c.MDGMPMaterialGroupPosID == SelectedGMPMaterialGroupPos.MDGMPMaterialGroupPosID).FirstOrDefault();
+                if (SelectedGMPMaterialGroupPos != null)
+                    CurrentGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup.Where(c => c.MDGMPMaterialGroupPosID == SelectedGMPMaterialGroupPos.MDGMPMaterialGroupPosID).FirstOrDefault();
+                else
+                    CurrentGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup.FirstOrDefault();
                 PostExecute("LoadGMPMaterialGroupPos");
 
             }
@@ -426,6 +431,7 @@ namespace gip.bso.masterdata
             CurrentGMPMaterialGroupPos.MDGMPMaterialGroup = CurrentGMPMaterialGroup;
             CurrentGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup.Add(CurrentGMPMaterialGroupPos);
             PostExecute("NewGMPMaterialGroupPos");
+            LoadGMPMaterialGroupPos();
         }
 
         /// <summary>

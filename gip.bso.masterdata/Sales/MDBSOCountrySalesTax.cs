@@ -202,7 +202,7 @@ namespace gip.bso.masterdata
 
         private List<MDCountrySalesTaxMaterial> LoadMDCountrySalesTaxMaterial()
         {
-            if (SelectedMDCountrySalesTax == null) return null;
+            if (SelectedMDCountrySalesTax == null || SelectedMDCountrySalesTax.MDCountrySalesTaxMaterial_MDCountrySalesTax == null) return null;
             return SelectedMDCountrySalesTax.MDCountrySalesTaxMaterial_MDCountrySalesTax.OrderBy(c => c.Material.MaterialNo).ToList();
         }
 
@@ -329,7 +329,7 @@ namespace gip.bso.masterdata
 
         private List<MDCountrySalesTaxMDMaterialGroup> LoadMDCountrySalesTaxMDMaterialGroup()
         {
-            if (SelectedMDCountrySalesTax == null) return null;
+            if (SelectedMDCountrySalesTax == null || SelectedMDCountrySalesTax.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax == null) return null;
             return SelectedMDCountrySalesTax.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.OrderBy(c => c.MDMaterialGroup.MDKey).ToList();
         }
 
@@ -684,6 +684,16 @@ namespace gip.bso.masterdata
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
+            foreach (var material in SelectedMDCountrySalesTax.MDCountrySalesTaxMaterial_MDCountrySalesTax)
+            {
+                SelectedMDCountrySalesTaxMaterial = material;
+                DeleteMDCountrySalesTaxMaterial();
+            }
+            foreach (var materialGroup in SelectedMDCountrySalesTax.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax)
+            {
+                SelectedMDCountrySalesTaxMDMaterialGroup = materialGroup;
+                DeleteMDCountrySalesTaxMDMaterialGroup();
+            }
             SelectedMDCountrySalesTax.MDCountrySalesTaxMaterial_MDCountrySalesTax.Clear();
             SelectedMDCountrySalesTax.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.Clear();
             Msg msg = SelectedMDCountrySalesTax.DeleteACObject(DatabaseApp, true);

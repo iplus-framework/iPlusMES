@@ -248,7 +248,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDCountry.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -341,6 +342,7 @@ namespace gip.bso.masterdata
             SelectedCountry = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(CountryList));
         }
 
         /// <summary>
@@ -359,7 +361,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("CountryList");
+            OnPropertyChanged(nameof(CountryList));
         }
         #endregion
 
@@ -373,6 +375,7 @@ namespace gip.bso.masterdata
             if (!PreExecute("NewCountryLand")) return;
             CurrentCountryLand = MDCountryLand.NewACObject(DatabaseApp, CurrentCountry);
             CurrentCountryLand.MDCountry = CurrentCountry;
+            DatabaseApp.Add(CurrentCountryLand);
             PostExecute("NewCountryLand");
             OnPropertyChanged("CountryLandList");
         }

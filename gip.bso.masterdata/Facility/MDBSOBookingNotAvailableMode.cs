@@ -162,7 +162,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -260,6 +261,7 @@ namespace gip.bso.masterdata
             Load();
 
             PostExecute("Delete");
+            OnPropertyChanged(nameof(BookingNotAvailableModeList));
         }
 
         /// <summary>
@@ -280,7 +282,7 @@ namespace gip.bso.masterdata
             if (AccessPrimary == null)
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("BookingNotAvailableModeList");
+            OnPropertyChanged(nameof(BookingNotAvailableModeList));
         }
         #endregion
 
