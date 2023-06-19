@@ -2747,10 +2747,13 @@ namespace gip.bso.manufacturing
                             posID = SelectedWeighingMaterial.PickingPosition.PickingPosID;
                     }
 
+                    if (posID == Guid.Empty)
+                        return _FacilityChargeList;
+
                     ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
                                                                             posID) as ACValueList;
 
-                    var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
+                    var facilityIDs = facilities?.Select(c => c.ParamAsGuid).ToArray();
                     if (facilityIDs == null)
                         return null;
 
@@ -2768,12 +2771,26 @@ namespace gip.bso.manufacturing
                             }
                         }
 
-                        if (SelectedWeighingMaterial.PosRelation != null)
-                            _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
-                        else if (SelectedWeighingMaterial.PickingPosition != null)
-                            _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PickingPosition.Material.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
 
-                        FacilityChargeListCount = _FacilityChargeList.Count();
+                        if (SelectedWeighingMaterial != null)
+                        {
+                            if (SelectedWeighingMaterial.PosRelation != null)
+                            {
+                                Guid? materialID = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.MaterialID;
+                                if (materialID.HasValue)
+                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
+                            }
+                            else if (SelectedWeighingMaterial.PickingPosition != null)
+                            {
+                                Guid? materialID = SelectedWeighingMaterial?.PickingPosition?.Material?.MaterialID;
+                                if (materialID.HasValue)
+                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
+                            }
+
+                        }
+
+                        if (_FacilityChargeList != null)
+                            FacilityChargeListCount = _FacilityChargeList.Count();
                     }
                 }
 
