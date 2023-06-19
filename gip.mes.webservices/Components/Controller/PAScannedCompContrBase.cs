@@ -54,14 +54,14 @@ namespace gip.mes.webservices
             }
         }
 
-        private int _ControllerLevel;
-        public int ControllerLevel
-        {
-            get
-            {
-                return _ControllerLevel;
-            }
-        }
+        //private int _ControllerLevel;
+        //public int ControllerLevel
+        //{
+        //    get
+        //    {
+        //        return _ControllerLevel;
+        //    }
+        //}
 
         Type _TypeOfPAProcessFunction;
         protected Type TypeOfPAProcessFunction

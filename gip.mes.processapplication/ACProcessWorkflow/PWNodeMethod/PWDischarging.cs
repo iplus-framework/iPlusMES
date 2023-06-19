@@ -688,7 +688,7 @@ namespace gip.mes.processapplication
             if (!IsProduction && !IsIntake && !IsRelocation && !IsLoading)
                 return StartDisResult.WaitForCallback;
 
-            if (discharging.StateDestinationFull.ValueT == PANotifyState.Off)
+            if (!IsConditionForDestinationChange(discharging))
             {
                 NoTargetWait = null;
                 return StartDisResult.WaitForCallback;
@@ -710,7 +710,7 @@ namespace gip.mes.processapplication
                 return StartDisResult.WaitForCallback;
             }
 
-            // If tragetSilo is null, then dicharging is to Procemodule and not to Silo
+            // If tragetSilo is null, then dicharging is to Processmodule and not to Silo
             PAProcessModule targetModule = TargetPAModule(null);
             if (targetModule == null)
             {
@@ -735,6 +735,11 @@ namespace gip.mes.processapplication
                 return OnHandleStateCheckFullSiloLoading(discharging, targetModule, ParentPWGroup.AccessedProcessModule);
             }
             return StartDisResult.WaitForCallback;
+        }
+
+        public virtual bool IsConditionForDestinationChange(PAFDischarging discharging)
+        {
+            return discharging.StateDestinationFull.ValueT != PANotifyState.Off;
         }
 
         protected virtual bool CanChangeDestOnStopping
@@ -1198,7 +1203,7 @@ namespace gip.mes.processapplication
         }
 
         private ACRef<PAMSilo> _CurrentCachedDestinationSilo = null;
-        public PAMSilo CurrentCachedDestinationSilo(Database db)
+        public PAMSilo CurrentCachedDestinationSilo(Database db = null)
         {
             if (CurrentDischargingRoute == null)
             {
@@ -1220,9 +1225,16 @@ namespace gip.mes.processapplication
             }
 
             RouteItem clone = lastItem.Clone() as RouteItem;
-            if (db != null)
+            IACComponent component = clone.TargetACComponent;
+            if (component == null)
+            {
+                if (db == null)
+                    db = gip.core.datamodel.Database.GlobalDatabase;
                 clone.AttachTo(db);
-            PAMSilo targetSilo = clone.TargetACComponent as PAMSilo;
+                component = clone.TargetACComponent;
+            }
+
+            PAMSilo targetSilo = component as PAMSilo;
             if (targetSilo == null)
                 return null;
             _CurrentCachedDestinationSilo = new ACRef<PAMSilo>(targetSilo, this);

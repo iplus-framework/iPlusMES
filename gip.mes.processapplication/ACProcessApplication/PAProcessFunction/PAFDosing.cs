@@ -564,8 +564,20 @@ namespace gip.mes.processapplication
             if (currentSource == null)
                 return null;
 
-            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null);
+            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null, IsSourceMarkedAsEmpty);
             return restInfo;
+        }
+
+        public bool IsSourceMarkedAsEmpty
+        {
+            get
+            {
+                return DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceNextSource
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceEndBatchplan
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EndDosingThenDisThenEnd
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EndDosingThenDisThenNextComp
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait;
+            }
         }
 
         #endregion
@@ -1248,12 +1260,14 @@ namespace gip.mes.processapplication
                 && CurrentScaleForWeighing == null)
             {
                 PAMSilo dosingSilo = CurrentDosingSilo;
-                if (    dosingSilo != null 
-                    && !dosingSilo.HasBoundFillLevel 
-                    && (dosingSilo.HasBoundFillLevelRaw || dosingSilo.HasBoundFillLevelScale)
-                    && (!this.IsSimulationOn || Math.Abs(dosingSilo.FillLevelScale.ValueT) > Double.Epsilon))
+                if (dosingSilo != null)
                 {
-                    actualQuantity = dosingSilo.DiffFillLevelScale;
+                    DosingRestInfo restInfo = new DosingRestInfo(dosingSilo, this, null, IsSourceMarkedAsEmpty);
+                    if (Math.Abs(restInfo.DosedQuantity) > Double.Epsilon)
+                    {
+                        actualQuantity = restInfo.DosedQuantity;
+                        acMethod.ResultValueList["ActualQuantity"] = actualQuantity;
+                    }
                 }
             }
             

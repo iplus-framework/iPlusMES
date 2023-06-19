@@ -17,9 +17,10 @@ namespace gip.mes.processapplication
         {
         }
 
-        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol)
+        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false)
         {
             DosedQuantity = 0;
+            IsSourceEmpty = isSourceEmpty;
             PAEScaleBase scale = dosing.CurrentScaleForWeighing;
             if (scale != null)
             {
@@ -36,7 +37,7 @@ namespace gip.mes.processapplication
                 // If Dosing is done without scale and no result from PLC,
                 // then calculate quantity from difference between last posted quantity
                 // and measured weight
-                if (silo.HasBoundFillLevel
+                if (   !silo.HasBoundFillLevel
                     && (silo.HasBoundFillLevelRaw || silo.HasBoundFillLevelScale)
                     && (!dosing.IsSimulationOn || Math.Abs(silo.FillLevelScale.ValueT) > Double.Epsilon))
                 {
@@ -111,6 +112,12 @@ namespace gip.mes.processapplication
             {
                 return RemainingStock < ZeroTol;
             }
+        }
+
+        [DataMember(Name = "SE")]
+        public bool IsSourceEmpty
+        {
+            get; set;
         }
     }
 }
