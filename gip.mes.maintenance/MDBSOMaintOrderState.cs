@@ -139,7 +139,8 @@ namespace gip.mes.maintenance
         [ACMethodCommand("MDMaintOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -233,6 +234,7 @@ namespace gip.mes.maintenance
             SelectedMaintOrderState = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(MaintOrderStateList));
         }
 
         /// <summary>
@@ -251,7 +253,7 @@ namespace gip.mes.maintenance
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("MaintOrderStateList");
+            OnPropertyChanged(nameof(MaintOrderStateList));
         }
 
         #endregion

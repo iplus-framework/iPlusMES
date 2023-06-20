@@ -156,7 +156,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDTermOfPayment.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -249,6 +250,7 @@ namespace gip.bso.masterdata
             SelectedTermOfPayment = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(TermOfPaymentList));
         }
 
         /// <summary>
@@ -267,7 +269,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("TermOfPaymentList");
+            OnPropertyChanged(nameof(TermOfPaymentList));
         }
 
         #endregion

@@ -151,7 +151,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDTransportMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -215,7 +216,6 @@ namespace gip.bso.masterdata
             DatabaseApp.MDTransportMode.Add(CurrentTransportMode);
             ACState = Const.SMNew;
             PostExecute("New");
-
         }
 
         /// <summary>
@@ -242,6 +242,7 @@ namespace gip.bso.masterdata
             }
 
             PostExecute("Delete");
+            OnPropertyChanged(nameof(TransportModeList));
         }
 
         /// <summary>
@@ -260,7 +261,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("TransportModeList");
+            OnPropertyChanged(nameof(TransportModeList));
         }
 
         #endregion

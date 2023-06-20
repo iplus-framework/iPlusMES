@@ -161,7 +161,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDReleaseState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -257,6 +258,7 @@ namespace gip.bso.masterdata
             SelectedReleaseState = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(ReleaseStateList));
         }
 
         /// <summary>
@@ -277,7 +279,7 @@ namespace gip.bso.masterdata
             if (AccessPrimary == null)
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("ReleaseStateList");
+            OnPropertyChanged(nameof(ReleaseStateList));
         }
 
         #endregion

@@ -151,7 +151,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDToleranceState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -245,6 +246,7 @@ namespace gip.bso.masterdata
             SelectedToleranceState = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(ToleranceStateList));
         }
 
         /// <summary>
@@ -263,7 +265,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("ToleranceStateList");
+            OnPropertyChanged(nameof(ToleranceStateList));
         }
 
         #endregion

@@ -231,7 +231,7 @@ namespace gip.bso.masterdata
 
         private void UpdateLocalConversionList()
         {
-            if (CurrentUnit != null)
+            if (CurrentUnit != null && CurrentUnit.MDUnitConversion_MDUnit != null)
                 _UnitConversionList = CurrentUnit.MDUnitConversion_MDUnit.ToList();
             else
                 _UnitConversionList = null;
@@ -358,7 +358,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (CurrentUnit == null)
+                if (CurrentUnit == null || CurrentUnit.ConvertableUnits == null)
                     return null;
                 return CurrentUnit.ConvertableUnits;
             }
@@ -378,7 +378,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDUnit.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -472,6 +473,7 @@ namespace gip.bso.masterdata
             SelectedUnit = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(UnitList));
         }
 
         /// <summary>
@@ -490,7 +492,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("UnitList");
+            OnPropertyChanged(nameof(UnitList));
         }
         #endregion
 

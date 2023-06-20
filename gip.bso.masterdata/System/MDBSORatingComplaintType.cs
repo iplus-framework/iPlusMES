@@ -130,7 +130,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand("MDRatingComplaintType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -224,6 +225,7 @@ namespace gip.bso.masterdata
             SelectedMDRatingComplaintType = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged("MDRatingComplaintTypeList");
         }
 
         /// <summary>

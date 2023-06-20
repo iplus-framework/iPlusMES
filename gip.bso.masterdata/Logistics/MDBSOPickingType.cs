@@ -140,7 +140,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDPickingType.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -234,6 +235,7 @@ namespace gip.bso.masterdata
             SelectedPickingType = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(PickingTypeList));
         }
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("PickingTypeList");
+            OnPropertyChanged(nameof(PickingTypeList));
         }
 
         #endregion

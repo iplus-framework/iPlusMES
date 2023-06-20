@@ -194,7 +194,7 @@ namespace gip.mes.datamodel
                 MDUnit fromUnit = this;
                 if (this.SIDimension != GlobalApp.SIDimensions.None)
                     fromUnit = SIUnit;
-                if (fromUnit == null)
+                if (fromUnit == null || fromUnit.MDUnitConversion_MDUnit == null)
                     return new List<MDUnit>();
                 else
                 {

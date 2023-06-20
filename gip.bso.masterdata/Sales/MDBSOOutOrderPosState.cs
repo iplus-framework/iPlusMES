@@ -18,6 +18,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using System.Windows.Forms;
 
 namespace gip.bso.masterdata
 {
@@ -151,7 +152,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MDOutOrderPosState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -245,6 +247,7 @@ namespace gip.bso.masterdata
             SelectedOutOrderPosState = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(OutOrderPosStateList));
         }
 
         /// <summary>
@@ -263,7 +266,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("OutOrderPosStateList");
+            OnPropertyChanged(nameof(OutOrderPosStateList));
         }
 
         #endregion
