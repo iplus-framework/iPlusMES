@@ -210,6 +210,8 @@
 
         public const string FinalIntermediate = "en{'Final intermediate'}de{'Finales Zwischenprodukt'}";
 
+        public const string OperationLog = "en{'Operation log'}de{'Betriebsprotokoll'}";
+
         // Date
         public const string ExpirationDate = "en{'Expiration Date'}de{'Ablaufdatum'}";
         public const string FillingDate = "en{'Fill Date'}de{'Fülldatum'}";

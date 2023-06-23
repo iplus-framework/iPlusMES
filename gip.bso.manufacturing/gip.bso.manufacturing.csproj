@@ -73,8 +73,11 @@
   <ItemGroup>
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
     <Compile Include="Manufacturing\BSOOperationLog.cs" />
+    <Compile Include="Manufacturing\BSOOperationView.cs" />
     <Compile Include="Manufacturing\BSOPropertyLogPresenterVB.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOPickingByMaterial.cs" />
+    <Compile Include="Model\OperationLogParam.cs" />
+    <Compile Include="Model\OperationLogView.cs" />
     <Compile Include="Model\TimeFilterTypeEnum.cs" />
     <Compile Include="Model\BatchPlanProdOrderSortFilterEnum.cs" />
     <Compile Include="Manufacturing\BSOLabOrderMES.cs" />
@@ -584,6 +587,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2023-04-27 17-06_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-06-23 12-46_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
