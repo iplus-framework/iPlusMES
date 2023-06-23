@@ -331,7 +331,7 @@ namespace gip.bso.manufacturing
             List<dbMes.OperationLog> operationLogs =
                 databaseApp
                 .OperationLog
-                .Where(c => c.InsertDate >= startTime && c.InsertDate < endTime && c.XMLValue != null)
+                .Where(c => c.InsertDate >= startTime && c.InsertDate < endTime)
                 .ToList();
 
 
@@ -345,7 +345,11 @@ namespace gip.bso.manufacturing
         private List<OperationLogView> GetOperationLogView(List<dbMes.OperationLog> operationLogs)
         {
             List<OperationLogView> operationLogViews = new List<OperationLogView>();
-            foreach (dbMes.OperationLog operationLog in operationLogs)
+            List<dbMes.OperationLog> filteredOperationLogs = 
+                operationLogs
+                .Where(c=>c.XMLValue != null && c.Operation == (short)dbMes.OperationLogEnum.UnregisterEntityOnScan)
+                .ToList();
+            foreach (dbMes.OperationLog operationLog in filteredOperationLogs)
             {
                 OperationLogView wp = new OperationLogView();
 
@@ -353,7 +357,7 @@ namespace gip.bso.manufacturing
                 wp.UserName = operationLog.UpdateName;
 
                 FillMaterialAndOrderData(operationLog, wp);
-                FillTimeData(operationLog, wp);
+                FillTimeData(operationLogs, operationLog, wp);
                 FillMachineData(operationLog, wp);
                 FillParamsData(operationLog, wp);
 
@@ -372,11 +376,10 @@ namespace gip.bso.manufacturing
             wp.SplitNo = operationLog.FacilityCharge?.SplitNo ?? 0;
         }
 
-        private void FillTimeData(dbMes.OperationLog operationLog, OperationLogView wp)
+        private void FillTimeData(List<dbMes.OperationLog> operationLogs, dbMes.OperationLog operationLog, OperationLogView wp)
         {
             dbMes.OperationLog initialOperationLog =
-                    DatabaseApp
-                    .OperationLog
+                    operationLogs
                     .Where(c =>
                                 c.ACProgramLogID == operationLog.ACProgramLogID
                                 && c.FacilityChargeID == operationLog.FacilityChargeID
