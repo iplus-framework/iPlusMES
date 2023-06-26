@@ -106,37 +106,37 @@ namespace gip.mes.maintenance
                 childBSO = _this.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ExecuteMethod(nameof(BSOMaintOrder.ShowMaintenance), _this);
+            childBSO.ExecuteMethod("ShowMaintenance", _this);
             childBSO.Stop();
             return;
         }
 
         public static bool IsEnabledShowMaintenanceOrder(IACComponent acComponent)
         {
-            ACComponent _this = acComponent as ACComponent;       
-            if (_this == null)
-                return false;
+            //ACComponent _this = acComponent as ACComponent;       
+            //if (_this == null)
+            //    return false;
 
-            ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
-            if (appManager == null)
-                return false;
+            //ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
+            //if (appManager == null)
+            //    return false;
 
-            var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
-            if (maintService == null)
-                return false;
+            //var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
+            //if (maintService == null)
+            //    return false;
 
-            if (_this.Database is mes.datamodel.DatabaseApp)
-            {
-                Guid componentClassID = _this.ComponentClass.ACClassID;
-                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+            //if (_this.Database is mes.datamodel.DatabaseApp)
+            //{
+            //    Guid componentClassID = _this.ComponentClass.ACClassID;
+            //    vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
 
-                using (ACMonitor.Lock(dbApp.QueryLock_1X000))
-                {
-                    if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
-                       && c.MDMaintOrderState.MDMaintOrderStateIndex != (short)mes.datamodel.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
-                        return true;
-                }
-            }
+            //    using (ACMonitor.Lock(dbApp.QueryLock_1X000))
+            //    {
+            //        if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
+            //           && c.MDMaintOrderState.MDMaintOrderStateIndex != (short)mes.datamodel.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+            //            return true;
+            //    }
+            //}
             return false;
         }
 
@@ -159,30 +159,30 @@ namespace gip.mes.maintenance
 
         public static bool IsEnabledShowMaintenanceOrderHistory(IACComponent acComponent)
         {
-            ACComponent _this = acComponent as ACComponent;
-            if (_this == null)
-                return false;
+            //ACComponent _this = acComponent as ACComponent;
+            //if (_this == null)
+            //    return false;
 
-            ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
-            if (appManager == null)
-                return false;
+            //ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
+            //if (appManager == null)
+            //    return false;
 
-            var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
-            if (maintService == null)
-                return false;
+            //var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
+            //if (maintService == null)
+            //    return false;
 
-            if (_this.Database is vd.DatabaseApp)
-            {
-                Guid componentClassID = _this.ComponentClass.ACClassID;
-                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+            //if (_this.Database is vd.DatabaseApp)
+            //{
+            //    Guid componentClassID = _this.ComponentClass.ACClassID;
+            //    vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
 
-                using (ACMonitor.Lock(dbApp.QueryLock_1X000))
-                {
-                    if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
-                   && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
-                        return true;
-                }
-            }
+            //    using (ACMonitor.Lock(dbApp.QueryLock_1X000))
+            //    {
+            //        if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
+            //       && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+            //            return true;
+            //    }
+            //}
             return false;
         }
 

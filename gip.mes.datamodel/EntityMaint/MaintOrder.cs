@@ -24,7 +24,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintOrder.ClassName, "en{'Maintenance Order'}de{'Wartungsauftrag'}", typeof(MaintOrder), MaintOrder.ClassName, "MaintOrderNo", "MaintOrderNo", new object[]
         {
-            new object[] {Const.QueryPrefix + MaintOrderProperty.ClassName, "en{'Maint Order Properties'}de{'Wartungsauftrag Eigenschaften'}", typeof(MaintOrderProperty), MaintOrderProperty.ClassName + "_" + MaintOrder.ClassName, MaintOrderProperty.ClassName + "\\ACIdentifier", MaintOrderProperty.ClassName + "\\ACIdentifier"}
+            new object[] {Const.QueryPrefix + mes.datamodel.MaintOrderProperty.ClassName, "en{'Maint Order Properties'}de{'Wartungsauftrag Eigenschaften'}", typeof(MaintOrderProperty), mes.datamodel.MaintOrderProperty.ClassName + "_" + MaintOrder.ClassName, mes.datamodel.MaintOrderProperty.ClassName + "\\ACIdentifier", mes.datamodel.MaintOrderProperty.ClassName + "\\ACIdentifier"}
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintOrder>) })]
@@ -73,8 +73,8 @@ namespace gip.mes.datamodel
         /// <returns>A Entity-Object as IACObject</returns>
         public override IACObject GetChildEntityObject(string className, params string[] filterValues)
         {
-            if (filterValues.Any() && className == MaintOrderProperty.ClassName)
-                return this.MaintOrderProperty_MaintOrder.Where(c => c.MaintACClassProperty.ACIdentifier == filterValues[0]).FirstOrDefault();
+            //if (filterValues.Any() && className == MaintOrderProperty.ClassName)
+            //    return this.MaintOrderProperty_MaintOrder.Where(c => c.MaintACClassProperty.ACIdentifier == filterValues[0]).FirstOrDefault();
             return null;
         }
 
@@ -136,34 +136,34 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
 
-        private TimeSpan _MaintActDurationTS;
-        [ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
-        public TimeSpan MaintActDurationTS
-        {
-            get
-            {
-                if (MaintActDuration > 0)
-                    _MaintActDurationTS = TimeSpan.FromMinutes(MaintActDuration);
-                else
-                    _MaintActDurationTS = new TimeSpan();
-                return _MaintActDurationTS;
-            }
-            set
-            {
-                _MaintActDurationTS = value;
-                MaintActDuration = (int)_MaintActDurationTS.TotalMinutes;
-                OnPropertyChanged("MaintActDurationTS");
-            }
-        }
+        //private TimeSpan _MaintActDurationTS;
+        //[ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
+        //public TimeSpan MaintActDurationTS
+        //{
+        //    get
+        //    {
+        //        if (MaintActDuration > 0)
+        //            _MaintActDurationTS = TimeSpan.FromMinutes(MaintActDuration);
+        //        else
+        //            _MaintActDurationTS = new TimeSpan();
+        //        return _MaintActDurationTS;
+        //    }
+        //    set
+        //    {
+        //        _MaintActDurationTS = value;
+        //        MaintActDuration = (int)_MaintActDurationTS.TotalMinutes;
+        //        OnPropertyChanged("MaintActDurationTS");
+        //    }
+        //}
 
-        [ACPropertyInfo(999, "", "en{'Url of the Objekt'}de{'Url des Objekts'}")]
-        public string ComponentACUrl
-        {
-            get
-            {
-                return VBiPAACClass.FromIPlusContext<core.datamodel.ACClass>().GetACUrlComponent();
-            }
-        }
+        //[ACPropertyInfo(999, "", "en{'Url of the Objekt'}de{'Url des Objekts'}")]
+        //public string ComponentACUrl
+        //{
+        //    get
+        //    {
+        //        return VBiPAACClass.FromIPlusContext<core.datamodel.ACClass>().GetACUrlComponent();
+        //    }
+        //}
 
         #endregion
     }

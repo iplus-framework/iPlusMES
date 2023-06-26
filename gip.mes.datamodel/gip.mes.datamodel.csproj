@@ -524,6 +524,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DbScripts\iPlusMES\dbsync_2023-06-26_09-26_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="DbScripts\iPlusMES\dbsync_2023-05-25_14-20_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

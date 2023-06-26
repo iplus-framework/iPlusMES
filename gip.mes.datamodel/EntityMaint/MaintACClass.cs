@@ -111,8 +111,8 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (LastMaintTerm.HasValue && MaintInterval.HasValue)
-                    return LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
+                //if (LastMaintTerm.HasValue && MaintInterval.HasValue)
+                //    return LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
                 return null;
             }
             set
@@ -147,7 +147,7 @@ namespace gip.mes.datamodel
 
         public void CopyMaintACClassPropertiesToLocalCache()
         {
-            _LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
+            //_LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
         }
 
         #region VBIplus-Context
