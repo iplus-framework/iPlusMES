@@ -1,10 +1,13 @@
-﻿using gip.core.autocomponent;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +24,12 @@ namespace gip.mes.processapplication
         {
             ACMethod method = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            method.ParameterValueList.Add(new ACValue("TolerancePlus", typeof(Double), (Double)0.0, Global.ParamOption.Required));
+            paramTranslation.Add("TolerancePlus", "en{'Tolerance + [+=kg/-=%]'}de{'Toleranz + [+=kg/-=%]'}");
+            method.ParameterValueList.Add(new ACValue("ToleranceMinus", typeof(Double), (Double)0.0, Global.ParamOption.Required));
+            paramTranslation.Add("ToleranceMinus", "en{'Tolerance - [+=kg/-=%]'}de{'Toleranz - [+=kg/-=%]'}");
+            method.ParameterValueList.Add(new ACValue("StorageFormat", typeof(ushort), (ushort) 0, Global.ParamOption.Required));
+            paramTranslation.Add("StorageFormat", "en{'0=(N)LabOrder;1=(N)LabOrderPos;2=(N)Items-(1)LabOrderPos'}de{'0=(N)LabOrder;1=(N)LabOrderPos;2=(N)Items-(1)LabOrderPos'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWSampleWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWSampleWeighing), ACStateConst.SMStarting, wrapper);
@@ -71,6 +80,66 @@ namespace gip.mes.processapplication
                 PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
                 return pwMethodProduction != null ? pwMethodProduction.LabOrderManager : null;
             }
+        }
+
+
+        public double TolerancePlus
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("TolerancePlus");
+                    if (acValue != null)
+                        return acValue.ParamAsDouble;
+                }
+                return -1.0;
+            }
+        }
+
+        public double ToleranceMinus
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    ACValue acValue = method.ParameterValueList.GetACValue("ToleranceMinus");
+                    if (acValue != null)
+                        return acValue.ParamAsDouble;
+                }
+                return -1.0;
+            }
+        }
+
+        public StorageFormatEnum StorageFormat
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    ACValue acValue = method.ParameterValueList.GetACValue("StorageFormat");
+                    if (acValue != null)
+                    {
+                        if (acValue.ParamAsUInt16 == (ushort)StorageFormatEnum.LabOrderForEachWeighing)
+                            return StorageFormatEnum.LabOrderForEachWeighing;
+                        else if (acValue.ParamAsUInt16 == (ushort)StorageFormatEnum.PositionForEachWeighing)
+                            return StorageFormatEnum.PositionForEachWeighing;
+                        else //if (acValue.ParamAsUInt16 == (ushort)StorageFormatEnum.AsSamplePiStatsInOnePos)
+                            return StorageFormatEnum.AsSamplePiStatsInOnePos;
+                    }
+                }
+                return StorageFormatEnum.LabOrderForEachWeighing;
+            }
+        }
+
+        public enum StorageFormatEnum : ushort
+        {
+             LabOrderForEachWeighing = 0,
+             PositionForEachWeighing = 1,
+             AsSamplePiStatsInOnePos = 2
         }
 
         #endregion
@@ -240,6 +309,32 @@ namespace gip.mes.processapplication
 
                         acMethod.ParameterValueList["PLPos"] = intermediateChildPos.ProdOrderPartslistPosID;
 
+                        Material material = null;
+                        if (endBatchPos != null)
+                            material = endBatchPos.BookingMaterial;
+                        if (material == null)
+                            material = intermediateChildPos.BookingMaterial;
+                        if (material != null)
+                        {
+                            double setPoint = material.ProductionWeight;
+                            if (setPoint <= Double.Epsilon)
+                            {
+                                MaterialUnit materialUnit = material.MaterialUnit_Material.Where(c => c.ToMDUnit.SIDimension == GlobalApp.SIDimensions.Mass).FirstOrDefault();
+                                if (materialUnit != null && materialUnit.ProductionWeight >= Double.Epsilon)
+                                    setPoint = materialUnit.ProductionWeight;
+                            }
+
+                            if (setPoint > Double.Epsilon)
+                            {
+                                acMethod.ParameterValueList["TargetQuantity"] = setPoint;
+                                double tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
+                                acMethod.ParameterValueList["TolerancePlus"] = tolPlus;
+                                double tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
+                                acMethod.ParameterValueList["ToleranceMinus"] = tolMinus;
+                            }
+                        }
+
+
                         if (!acMethod.IsValid())
                         {
                             // Error50317: Sample weighing task is not startable Order {0}, Bill of material {1}, line {2}
@@ -336,56 +431,100 @@ namespace gip.mes.processapplication
                                     return;
                                 }
 
-                                Guid plPosID = function.CurrentACMethod.ValueT.ParameterValueList.GetGuid("PLPos");
-                                if (plPosID != Guid.Empty)
+                                ACMethod acMethod = function?.CurrentACMethod?.ValueT;
+
+                                if (acMethod != null)
                                 {
-                                    ACValue actualWeightParam = function.CurrentACMethod.ValueT.ResultValueList.GetACValue("ActualWeight");
-                                    double actualWeight = 0;
-                                    if (actualWeightParam != null)
-                                        actualWeight = actualWeightParam.ParamAsDouble;
-
-                                    ACValue alibiNoParam = function.CurrentACMethod.ValueT.ResultValueList.GetACValue("AlibiNo");
-                                    string alibiNo = "";
-                                    if (alibiNoParam != null)
-                                        alibiNo = alibiNoParam.ParamAsString;
-
-                                    using (Database db = new core.datamodel.Database())
-                                    using (DatabaseApp dbApp = new DatabaseApp(db))
+                                    Guid plPosID = acMethod.ParameterValueList.GetGuid("PLPos");
+                                    if (plPosID != Guid.Empty)
                                     {
-                                        Msg msg;
-                                        ProdOrderPartslistPos plPos = dbApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == plPosID);
-                                        if (plPos == null)
-                                        {
-                                            //Error50318: Can not find the ProdOrderPartslistPos in the database with ProdOrderPartslistPosID: {0}
-                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(10)", 357, "Error50318", plPosID);
-                                            AddAlarm(msg, true);
-                                            _InCallback = false;
-                                            return;
-                                        }
+                                        ACValue acValue = acMethod.ResultValueList.GetACValue("ActualWeight");
+                                        double actualWeight = 0;
+                                        if (acValue != null)
+                                            actualWeight = acValue.ParamAsDouble;
 
-                                        LabOrderPos labOrderPos;
-                                        msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, C_LabOrderTemplateName, actualWeight, alibiNo, out labOrderPos);
-                                        if (msg == null && labOrderPos == null)
-                                        {
-                                            //Error50323: The LabOrder position Sample weight not exist.
-                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
-                                        }
-                                        if (msg != null)
-                                        {
-                                            AddAlarm(msg, true);
-                                            _InCallback = false;
-                                            return;
-                                        }
+                                        acValue = acMethod.ResultValueList.GetACValue("AlibiNo");
+                                        string alibiNo = "";
+                                        if (acValue != null)
+                                            alibiNo = acValue.ParamAsString;
 
-                                        if (CurrentACState == ACStateEnum.SMRunning)
-                                            CurrentACState = ACStateEnum.SMCompleted;
+                                        double setPoint = 0.0;
+                                        acValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                                        if (acValue != null)
+                                            setPoint = acValue.ParamAsDouble;
+
+                                        using (Database db = new core.datamodel.Database())
+                                        using (DatabaseApp dbApp = new DatabaseApp(db))
+                                        {
+                                            Msg msg;
+                                            ProdOrderPartslistPos plPos = dbApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == plPosID);
+                                            if (plPos == null)
+                                            {
+                                                //Error50318: Can not find the ProdOrderPartslistPos in the database with ProdOrderPartslistPosID: {0}
+                                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(10)", 357, "Error50318", plPosID);
+                                                AddAlarm(msg, true);
+                                                _InCallback = false;
+                                                return;
+                                            }
+
+                                            LabOrderPos labOrderPos;
+                                            msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, C_LabOrderTemplateName, actualWeight, alibiNo, StorageFormat, out labOrderPos);
+                                            if (msg == null && labOrderPos == null)
+                                            {
+                                                //Error50323: The LabOrder position Sample weight not exist.
+                                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
+                                            }
+                                            if (msg != null)
+                                            {
+                                                AddAlarm(msg, true);
+                                                _InCallback = false;
+                                                return;
+                                            }
+                                            if (StorageFormat == StorageFormatEnum.AsSamplePiStatsInOnePos)
+                                            {
+                                                // Hole Statistiken raus und erweitere um neuen Wert
+                                                SamplePiStats existingPiStats = null;
+                                                try
+                                                {
+                                                    existingPiStats = labOrderPos[PWSamplePiLightBox.C_LabOrderExtFieldStats] as SamplePiStats;
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Messages.LogException(this.GetACUrl(), "TaskCallback(46)", ex.Message);
+                                                }
+                                                if (existingPiStats == null)
+                                                    existingPiStats = new SamplePiStats(setPoint, ToleranceMinus, ToleranceMinus);
+                                                if (existingPiStats != null)
+                                                {
+                                                    existingPiStats.Values.Add(new SamplePiValue() { Value = actualWeight, DTStamp = DateTime.Now });
+                                                    existingPiStats.RecalcStatistics();
+                                                    labOrderPos.ReferenceValue = setPoint;
+                                                    labOrderPos.ValueMax = setPoint + ToleranceMinus;
+                                                    labOrderPos.ValueMin = setPoint - ToleranceMinus;
+                                                }
+                                                try
+                                                {
+                                                    labOrderPos[PWSamplePiLightBox.C_LabOrderExtFieldStats] = existingPiStats;
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Messages.LogException(this.GetACUrl(), "TaskCallback(47)", ex.Message);
+                                                }
+                                                msg = dbApp.ACSaveChanges();
+                                                if (msg != null)
+                                                    AddAlarm(msg, true);
+                                            }
+
+                                            if (CurrentACState == ACStateEnum.SMRunning)
+                                                CurrentACState = ACStateEnum.SMCompleted;
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    //Error50322: The ACValue PLPos is null from PAFSampleWeighing ACMethod parameters.
-                                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(50)", 443, "Error50322");
-                                    AddAlarm(msg, true);
+                                    else
+                                    {
+                                        //Error50322: The ACValue PLPos is null from PAFSampleWeighing ACMethod parameters.
+                                        Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(50)", 443, "Error50322");
+                                        AddAlarm(msg, true);
+                                    }
                                 }
                             }
                         }
@@ -399,7 +538,8 @@ namespace gip.mes.processapplication
             _InCallback = false;
         }
 
-        public static Msg CreateNewLabOrder(IRoot root, IACComponent requester, ACLabOrderManager labOrderManager, DatabaseApp dbApp, ProdOrderPartslistPos plPos, string templateName, double actualWeight, string alibiNo, out LabOrderPos labOrderPos)
+        public static Msg CreateNewLabOrder(IRoot root, IACComponent requester, ACLabOrderManager labOrderManager, DatabaseApp dbApp, ProdOrderPartslistPos plPos, 
+                                            string templateName, double actualWeight, string alibiNo, StorageFormatEnum storageFormat, out LabOrderPos labOrderPos)
         {
             labOrderPos = null;
             string secondaryKey = root.NoManager.GetNewNo(dbApp, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, requester);
@@ -426,7 +566,11 @@ namespace gip.mes.processapplication
             }
 
             LabOrder labOrder = null;
-            msg = labOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, out labOrder);
+            if (storageFormat >= StorageFormatEnum.PositionForEachWeighing)
+                labOrder = dbApp.LabOrder.Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPosID == plPos.ProdOrderPartslistPosID).FirstOrDefault();
+
+            if (labOrder == null)
+                msg = labOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, out labOrder);
             if (msg != null)
                 return msg;
 
@@ -434,6 +578,11 @@ namespace gip.mes.processapplication
                 labOrderPos = labOrder.LabOrderPos_LabOrder.Where(c => c.MDLabTag.MDKey == C_LabOrderPosTagKey).FirstOrDefault();
             if (labOrderPos == null)
                 return null;
+            if (storageFormat == StorageFormatEnum.PositionForEachWeighing && labOrderPos.EntityState != System.Data.EntityState.Added)
+            {
+                labOrderPos = LabOrderPos.NewACObject(dbApp, labOrder, labOrderPos);
+                labOrder.LabOrderPos_LabOrder.Add(labOrderPos);
+            }
 
             weighing.LabOrderPos = labOrderPos;
             labOrderPos.ActualValue = weighing.Weight;

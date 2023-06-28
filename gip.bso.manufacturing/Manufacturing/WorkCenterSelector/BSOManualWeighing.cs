@@ -140,16 +140,18 @@ namespace gip.bso.manufacturing
         private IACContainerT<ACMethod> _PAFCurrentACMethod;
 
         private ACRef<IACComponent> _CurrentPAFManualWeighing;
-
-        protected IACContainerT<double> _PAFManuallyAddedQuantity;
-
-        private IACContainerT<short> _TareScaleState;
-
         [ACPropertyInfo(602)]
         public IACComponent CurrentPAFManualWeighing
         {
             get => _CurrentPAFManualWeighing?.ValueT;
         }
+
+
+        protected IACContainerT<double> _PAFManuallyAddedQuantity;
+
+        private IACContainerT<short> _TareScaleState;
+
+
 
         protected IACContainerTNet<string> _ActiveScaleObjectACUrl;
 
@@ -208,24 +210,24 @@ namespace gip.bso.manufacturing
         }
 
         /// <summary>
-        /// Represents the sum of ScaleAddAcutalWeight and Scale RealWeight
+        /// Represents the sum of ScaleAddActualWeight and Scale RealWeight
         /// </summary>
         [ACPropertyInfo(605)]
         public virtual double ScaleActualWeight
         {
-            get => ScaleAddAcutalWeight + ScaleRealWeight;
+            get => ScaleAddActualWeight + ScaleRealWeight;
         }
 
-        protected double _ScaleAddAcutalWeight;
+        protected double _ScaleAddActualWeight;
         /// <summary>
         /// The weight which is manually added from sack or etc.
         /// </summary>
-        public virtual double ScaleAddAcutalWeight
+        public virtual double ScaleAddActualWeight
         {
-            get => _ScaleAddAcutalWeight;
+            get => _ScaleAddActualWeight;
             set
             {
-                _ScaleAddAcutalWeight = value;
+                _ScaleAddActualWeight = value;
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value + ScaleRealWeight);
                 OnPropertyChanged(nameof(ScaleActualWeight));
                 OnPropertyChanged(nameof(ScaleDifferenceWeight));
@@ -242,7 +244,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScaleRealWeight = value;
-                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value + ScaleAddAcutalWeight);
+                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value + ScaleAddActualWeight);
                 OnPropertyChanged(nameof(ScaleActualWeight));
                 OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
@@ -591,7 +593,7 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged();
                     FacilityChargeList = FillFacilityChargeList();
                     FacilityChargeNo = null;
-                    ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
+                    ScaleAddActualWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
 
                     if (_SelectedWeighingMaterial != null && WeighingMaterialsFSM)
                         ShowSelectFacilityLotInfo = true;
@@ -1487,7 +1489,7 @@ namespace gip.bso.manufacturing
 
             _PAFManuallyAddedQuantity = manuallyAddedQuantity as IACContainerTNet<double>;
             (_PAFManuallyAddedQuantity as IACPropertyNetBase).PropertyChanged += PAFManuallyAddedQuantityPropChanged;
-            ScaleAddAcutalWeight = _PAFManuallyAddedQuantity.ValueT;
+            ScaleAddActualWeight = _PAFManuallyAddedQuantity.ValueT;
 
             _TareScaleState = tareScaleState as IACContainerT<short>;
 
@@ -2207,7 +2209,7 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT && _PAFManuallyAddedQuantity != null)
             {
                 double tempValue = _PAFManuallyAddedQuantity.ValueT;
-                ParentBSOWCS?.ApplicationQueue.Add(() => ScaleAddAcutalWeight = tempValue);
+                ParentBSOWCS?.ApplicationQueue.Add(() => ScaleAddActualWeight = tempValue);
             }
         }
 

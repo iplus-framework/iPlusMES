@@ -386,7 +386,7 @@ namespace gip.mes.processapplication
                                     stats.SetToleranceAndRecalc(setPoint, tolPlus, tolMinus);
 
                                     LabOrderPos labOrderPos;
-                                    msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, out labOrderPos);
+                                    msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.AsSamplePiStatsInOnePos, out labOrderPos);
                                     if (msg == null && labOrderPos == null)
                                     {
                                         //Error50323: The LabOrder position Sample weight not exist.
@@ -403,7 +403,7 @@ namespace gip.mes.processapplication
                                     labOrderPos[C_LabOrderExtFieldStats] = stats;
 
                                     gip.core.datamodel.ACClass machine =  ParentPWGroup?.AccessedProcessModule?.ComponentClass;
-                                    if(machine != null)
+                                    if (machine != null)
                                     {
                                         labOrderPos.LabOrder.RefACClassID = machine.ACClassID;
                                     }

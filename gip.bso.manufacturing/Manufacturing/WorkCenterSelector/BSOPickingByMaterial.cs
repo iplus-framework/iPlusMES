@@ -231,7 +231,7 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged(nameof(SelectedWeighingMaterial));
                     FacilityChargeList = FillFacilityChargeList();
                     FacilityChargeNo = null;
-                    ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
+                    ScaleAddActualWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
                     SelectedFacilityCharge = null;
                     if (_SelectedWeighingMaterial != null)
                         ShowSelectFacilityLotInfo = true;
@@ -873,12 +873,12 @@ namespace gip.bso.manufacturing
 
         public override void AddKg()
         {
-            ScaleAddAcutalWeight = SelectedWeighingMaterial.AddKg(ScaleAddAcutalWeight);
+            ScaleAddActualWeight = SelectedWeighingMaterial.AddKg(ScaleAddActualWeight);
         }
 
         public override void RemoveKg()
         {
-            ScaleAddAcutalWeight = SelectedWeighingMaterial.RemoveKg(ScaleAddAcutalWeight);
+            ScaleAddActualWeight = SelectedWeighingMaterial.RemoveKg(ScaleAddActualWeight);
         }
 
         public override void Tare()

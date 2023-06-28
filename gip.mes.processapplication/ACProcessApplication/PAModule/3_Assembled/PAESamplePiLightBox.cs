@@ -39,7 +39,7 @@ namespace gip.mes.processapplication
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            InitializeExtPropInLabOrderPos();
+            InitializeExtPropInLabOrderPos(this);
             return true;
         }
 
@@ -413,7 +413,7 @@ namespace gip.mes.processapplication
         }
 
         private static bool _ExtPropInitialized = false;
-        private void InitializeExtPropInLabOrderPos()
+        internal static void InitializeExtPropInLabOrderPos(ACComponent invoker)
         {
             if (_ExtPropInitialized)
                 return;
@@ -450,7 +450,7 @@ namespace gip.mes.processapplication
                 }
                 catch (Exception e)
                 {
-                    this.Messages.LogException("PAESamplePiLightBox", "InitializeExtPropInLabOrderPos()", e);
+                    invoker.Messages.LogException("PAESamplePiLightBox", "InitializeExtPropInLabOrderPos()", e);
                 }
             }
         }

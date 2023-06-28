@@ -68,6 +68,8 @@ namespace gip.bso.manufacturing
         {
             DeActivate();
 
+            var pafManWeighingRef = new ACRef<IACComponent>(selectedProcessModule, this);
+
             ProcessModule = selectedProcessModule;
             ProcessFunction = ItemFunction?.ProcessFunction;
 
@@ -86,7 +88,7 @@ namespace gip.bso.manufacturing
             _ScaleRef = new ACRef<ACComponent>(scale, this);
 
             PAFACState = ProcessFunction.GetPropertyNet(nameof(PAProcessFunction.ACState)) as IACContainerTNet<ACStateEnum>;
-            if(PAFACState == null)
+            if (PAFACState == null)
             {
                 //Error50326: The property ACState can not be found on the current process function.
                 Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "Activate(20)", 114, "Error50326");
