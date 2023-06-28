@@ -121,6 +121,11 @@ namespace gip.mes.processapplication
             }
         }
 
+        /// <summary>
+        /// If null in configuration, then constant C_LabOrderTemplateName is used and therefore only one LabOrderTemplate is used.
+        /// If string is empty, then the MaterialNo will be used to find a Template. If a Template doesn't exist in the database, then a new one is created for each material.
+        /// Else Template with the configured name is used.
+        /// </summary>
         public string LabOrderTemplateName
         {
             get
@@ -130,7 +135,13 @@ namespace gip.mes.processapplication
                 {
                     ACValue acValue = method.ParameterValueList.GetACValue("LabOrderTemplateName");
                     if (acValue != null)
-                        return !String.IsNullOrEmpty(acValue.ParamAsString) ? acValue.ParamAsString : PWSampleWeighing.C_LabOrderTemplateName;
+                    {
+                        if (acValue.ParamAsString == null)
+                            return PWSampleWeighing.C_LabOrderTemplateName;
+                        if (!String.IsNullOrEmpty(acValue.ParamAsString))
+                            return acValue.ParamAsString.Trim();
+                        return acValue.ParamAsString;
+                    }
                 }
                 return PWSampleWeighing.C_LabOrderTemplateName;
             }

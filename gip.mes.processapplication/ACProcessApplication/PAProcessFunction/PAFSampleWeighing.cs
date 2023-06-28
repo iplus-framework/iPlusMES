@@ -118,7 +118,7 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 410)]
         public virtual Msg RegisterSampleWeight()
         {
-            if(CurrentScaleForWeighing == null)
+            if (CurrentScaleForWeighing == null)
             {
                 return new Msg("The scale for register sample weight can not be found!", this, eMsgLevel.Error, ClassName, "RegisterSampleWeight(10)", 124);
             }
@@ -136,6 +136,7 @@ namespace gip.mes.processapplication
             
 
             PAEScaleCalibratable calibScale = scale as PAEScaleCalibratable;
+            double actualWeight = 0.0;
             if (calibScale != null)
             {
                 Msg msg = calibScale.OnRegisterAlibiWeight(null);
@@ -146,22 +147,37 @@ namespace gip.mes.processapplication
                     return msg;
                 }
 
-                if (CurrentACMethod != null)
+                if (CurrentACMethod != null && CurrentACMethod.ValueT != null)
                 {
-                    CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = calibScale.AlibiWeight.ValueT;
+                    if (!IsSimulationOn)
+                        actualWeight = calibScale.AlibiWeight.ValueT;
                     CurrentACMethod.ValueT.ResultValueList["AlibiNo"] = calibScale.AlibiNo.ValueT;
                 }
             }
             else if (scale != null)
             {
                 if (CurrentACMethod != null)
-                    CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = scale.ActualWeight.ValueT;
+                    actualWeight = scale.ActualWeight.ValueT;
             }
-            else
+
+            if (Math.Abs(actualWeight) <= Double.Epsilon && IsSimulationOn && CurrentACMethod != null)
             {
-                if (CurrentACMethod != null)
-                    CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = 0;
+                ACMethod acMethod = CurrentACMethod.ValueT;
+                if (acMethod != null)
+                {
+                    actualWeight = (double) acMethod.ParameterValueList["TargetQuantity"];
+                    double tol = (double) acMethod.ParameterValueList["TolerancePlus"];
+                    if (Math.Abs(tol) > Double.Epsilon)
+                    {
+                        Random rnd = new Random();
+                        actualWeight -= (rnd.NextDouble() * tol);
+                    }
+                }
             }
+
+            if (CurrentACMethod != null && CurrentACMethod.ValueT != null)
+                CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = actualWeight;
+
 
             CurrentACState = ACStateEnum.SMCompleted;
             return null;
@@ -198,6 +214,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("TolerancePlus", "en{'Tolerance + [+=kg/-=%]'}de{'Toleranz + [+=kg/-=%]'}");
             method.ParameterValueList.Add(new ACValue("ToleranceMinus", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("ToleranceMinus", "en{'Tolerance - [+=kg/-=%]'}de{'Toleranz - [+=kg/-=%]'}");
+            method.ParameterValueList.Add(new ACValue("AckInTol", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AckInTol", "en{'Can Acknowledge if in Tolerance'}de{'Bestätigung nur innerhalb der Toleranz'}");
 
             method.ResultValueList.Add(new ACValue("ActualWeight", typeof(double), null, Global.ParamOption.Optional));
             resultTranslation.Add("ActualWeight", "en{'Actual weight'}de{'Ist-Gewicht'}");

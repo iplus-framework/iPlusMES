@@ -30,6 +30,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("ToleranceMinus", "en{'Tolerance - [+=kg/-=%]'}de{'Toleranz - [+=kg/-=%]'}");
             method.ParameterValueList.Add(new ACValue("StorageFormat", typeof(ushort), (ushort) 0, Global.ParamOption.Required));
             paramTranslation.Add("StorageFormat", "en{'0=(N)LabOrder;1=(N)LabOrderPos;2=(N)Items-(1)LabOrderPos'}de{'0=(N)LabOrder;1=(N)LabOrderPos;2=(N)Items-(1)LabOrderPos'}");
+            method.ParameterValueList.Add(new ACValue("LabOrderTemplateName", typeof(string), PWSampleWeighing.C_LabOrderTemplateName, Global.ParamOption.Required));
+            paramTranslation.Add("LabOrderTemplateName", "en{'LO template (Empty string -> material is used)'}de{'Laborauftragsvorlage (Leerer string -> material vird verwendet)'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWSampleWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWSampleWeighing), ACStateConst.SMStarting, wrapper);
@@ -140,6 +142,32 @@ namespace gip.mes.processapplication
              LabOrderForEachWeighing = 0,
              PositionForEachWeighing = 1,
              AsSamplePiStatsInOnePos = 2
+        }
+
+        /// <summary>
+        /// If null in configuration, then constant C_LabOrderTemplateName is used and therefore only one LabOrderTemplate is used.
+        /// If string is empty, then the MaterialNo will be used to find a Template. If a Template doesn't exist in the database, then a new one is created for each material.
+        /// Else Template with the configured name is used.
+        /// </summary>
+        public string LabOrderTemplateName
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    ACValue acValue = method.ParameterValueList.GetACValue("LabOrderTemplateName");
+                    if (acValue != null)
+                    {
+                        if (acValue.ParamAsString == null)
+                            return PWSampleWeighing.C_LabOrderTemplateName;
+                        if (!String.IsNullOrEmpty(acValue.ParamAsString))
+                            return acValue.ParamAsString.Trim();
+                        return acValue.ParamAsString;
+                    }
+                }
+                return PWSampleWeighing.C_LabOrderTemplateName;
+            }
         }
 
         #endregion
@@ -468,7 +496,7 @@ namespace gip.mes.processapplication
                                             }
 
                                             LabOrderPos labOrderPos;
-                                            msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, C_LabOrderTemplateName, actualWeight, alibiNo, StorageFormat, out labOrderPos);
+                                            msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, LabOrderTemplateName, actualWeight, alibiNo, StorageFormat, out labOrderPos);
                                             if (msg == null && labOrderPos == null)
                                             {
                                                 //Error50323: The LabOrder position Sample weight not exist.
@@ -555,22 +583,27 @@ namespace gip.mes.processapplication
                 return msg;
             }
 
-            LabOrder sampleWeighingTemplate = dbApp.LabOrder.FirstOrDefault(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template
-                                                                              && c.TemplateName == templateName);
-
-            if (sampleWeighingTemplate == null)
-            {
-                msg = CreateLabOrderTemplate(root, requester, dbApp, plPos.BookingMaterial, templateName, out sampleWeighingTemplate);
-                if (msg != null)
-                    return msg;
-            }
-
             LabOrder labOrder = null;
             if (storageFormat >= StorageFormatEnum.PositionForEachWeighing)
                 labOrder = dbApp.LabOrder.Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPosID == plPos.ProdOrderPartslistPosID).FirstOrDefault();
 
             if (labOrder == null)
+            {
+                LabOrder sampleWeighingTemplate = null;
+                Material material = plPos.BookingMaterial;
+                if (material != null)
+                    sampleWeighingTemplate = dbApp.LabOrder.Where(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template && c.MaterialID == material.MaterialID).FirstOrDefault();
+                if (sampleWeighingTemplate == null && !String.IsNullOrEmpty(templateName))
+                    sampleWeighingTemplate = dbApp.LabOrder.Where(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template && c.TemplateName == templateName).FirstOrDefault();
+                if (sampleWeighingTemplate == null)
+                {
+                    msg = CreateLabOrderTemplate(root, requester, dbApp, plPos.BookingMaterial, templateName, out sampleWeighingTemplate);
+                    if (msg != null)
+                        return msg;
+                }
+
                 msg = labOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, out labOrder);
+            }
             if (msg != null)
                 return msg;
 
@@ -599,7 +632,10 @@ namespace gip.mes.processapplication
             template.MDLabOrderState = dbApp.MDLabOrderState.FirstOrDefault(c => c.IsDefault);
             template.Material = material;
             template.SampleTakingDate = DateTime.Now;
-            template.TemplateName = templateName;
+            if (templateName != null)
+                template.TemplateName = material != null ? material.MaterialName1 + templateName : templateName;
+            else if (material != null)
+                template.TemplateName = material.MaterialName1;
             dbApp.LabOrder.AddObject(template);
 
             Msg msg = dbApp.ACSaveChanges();
