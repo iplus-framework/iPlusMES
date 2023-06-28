@@ -2303,19 +2303,17 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void HandlePAFCurrentACMethod(ACMethod currentACMethod)
+        protected virtual void HandlePAFCurrentACMethod(ACMethod currentACMethod)
         {
             if (currentACMethod != null)
             {
                 _TolerancePlus = currentACMethod.ParameterValueList.GetDouble("TolerancePlus");
                 _ToleranceMinus = currentACMethod.ParameterValueList.GetDouble("ToleranceMinus");
-            }
 
-            if (currentACMethod != null)
-            {
-                PAFCurrentMaterial = currentACMethod.ParameterValueList.GetString("Material");
+                ACValue paramMaterial = currentACMethod.ParameterValueList.GetACValue("Material");
+                if (paramMaterial != null)
+                    PAFCurrentMaterial = paramMaterial.ParamAsString;
                 TargetWeight = currentACMethod.ParameterValueList.GetDouble("TargetQuantity");
-                //Messages.LogError(this.GetACUrl(), "HandlePAFCurrentACMethod(10)", "PAFCurrentMaterial is setted: " + PAFCurrentMaterial);
             }
             else
             {
@@ -2537,7 +2535,7 @@ namespace gip.bso.manufacturing
             return SelectedFacilityCharge == null || _CallPWLotChange;
         }
 
-        protected ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
+        protected virtual ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
             if (!tolPlus.HasValue)
                 tolPlus = 0;

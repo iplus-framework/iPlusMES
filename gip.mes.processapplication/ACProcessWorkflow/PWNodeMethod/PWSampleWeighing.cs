@@ -335,6 +335,9 @@ namespace gip.mes.processapplication
                             return;
                         }
 
+                        if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true))
+                            return;
+
                         acMethod.ParameterValueList["PLPos"] = intermediateChildPos.ProdOrderPartslistPosID;
 
                         Material material = null;

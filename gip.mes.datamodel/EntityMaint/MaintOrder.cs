@@ -8,15 +8,17 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Order'}de{'Wartungsauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaintOrder")]
 
     [ACPropertyEntity(1, "MaintOrderNo", "en{'Maintorder-No.'}de{'Wartungauftrags-Nr.'}", "", "", true)]
-    [ACPropertyEntity(2, "MaintSetDate", "en{'Order Date'}de{'Auftragsdatum'}", "", "", true)]
-    [ACPropertyEntity(3, "MaintSetDuration", "en{'Maintenance Interval'}de{'Wartungsintervall'}", "", "", true)]
-    [ACPropertyEntity(4, "Comment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]
-    [ACPropertyEntity(5, "MaintActDuration", "en{'Duration'}de{'Dauer'}", "", "", true)]
-    [ACPropertyEntity(6, "MaintActStartDate", "en{'Start of Maintenance'}de{'Wartungsbeginn'}", "", "", true)]
-    [ACPropertyEntity(7, "MaintActEndDate", "en{'Completed at'}de{'Fertiggestellt am'}", "", "", true)]
+    [ACPropertyEntity(2, "BasedOnMaintOrder", "en{'BasedOnMaintOrder'}de{'BasedOnMaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName, "", true)]
+    [ACPropertyEntity(3, "Facility", "en{'Facility'}de{'Facility'}", Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
+    [ACPropertyEntity(4, "Picking", "en{'Picking'}de{'Picking'}", Const.ContextDatabase + "\\" + Picking.ClassName, "", true)]
+    [ACPropertyEntity(5, "IsActive", "en{'Active'}de{'Aktiv'}", "", "", true)]
+    [ACPropertyEntity(6, "MaintInterval", "en{'Maintenance interval'}de{'Wartungsintervall'}", "", "", true)]
+    [ACPropertyEntity(7, "LastMaintTerm", "en{'Last Maintenance on'}de{'Letzte Wartung am'}", "", "", true)]
+    [ACPropertyEntity(8, "WarningDiff", "en{'Advance Notice Days'}de{'Vorankündigung Tage'}", "", "", true)]
+    [ACPropertyEntity(9, "PlannedStartDate", "en{'Planned start date'}de{'Geplantes Startdatum'}", "", "", true)]
+    [ACPropertyEntity(10, "StartDate", "en{'Start date'}de{'Startdatum'}", "", "", true)]
+    [ACPropertyEntity(11, "EndDate", "en{'Completed at'}de{'Fertiggestellt am'}", "", "", true)]
     [ACPropertyEntity(8, "MDMaintOrderState", "en{'Status'}de{'Status'}", Const.ContextDatabase + "\\MDMaintOrderState", "", true)]
-    [ACPropertyEntity(9, "MDMaintMode", "en{'Maintenance Mode'}de{'Wartungsmodus'}", Const.ContextDatabase + "\\MDMaintMode", "", true)]
-    [ACPropertyEntity(10, "VBiPAACClass", "en{'Maintenance Objekt'}de{'Wartungsobjekt'}")]
     [ACPropertyEntity(13, "MaintACClass", "en{'Maintenance Objekt'}de{Wartungsobjekt'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
@@ -30,7 +32,7 @@ namespace gip.mes.datamodel
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintOrder>) })]
     public partial class MaintOrder
     {
-        public const string ClassName = "MaintOrder";
+        public const string ClassName = nameof(MaintOrder);
         public const string NoColumnName = "MaintOrderNo";
         public const string FormatNewNo = "MO{0}";
 

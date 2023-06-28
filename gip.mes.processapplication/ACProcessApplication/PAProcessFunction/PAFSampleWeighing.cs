@@ -99,7 +99,6 @@ namespace gip.mes.processapplication
             return base.Start(acMethod);
         }
 
-
         public override void SMStarting()
         {
             base.SMStarting();

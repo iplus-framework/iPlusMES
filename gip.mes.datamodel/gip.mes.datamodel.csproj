@@ -102,6 +102,7 @@
     <Compile Include="EntityFacility\FacilityMDSchedulingGroup.cs" />
     <Compile Include="EntityInvoice\Invoice.cs" />
     <Compile Include="EntityInvoice\InvoicePos.cs" />
+    <Compile Include="EntityMaint\MaintOrderPos.cs" />
     <Compile Include="EntityMD\FacilityInventoryPosStateEnum.cs" />
     <Compile Include="EntityMD\FacilityInventoryStateEnum.cs" />
     <Compile Include="EntityMD\MDBatchPlanGroup.cs" />
@@ -195,10 +196,10 @@
     <Compile Include="EntityLabel\LabelTranslation.cs" />
     <Compile Include="EntityMaint\MaintACClass.cs" />
     <Compile Include="EntityMaint\MaintACClassProperty.cs" />
-    <Compile Include="EntityMaint\MaintACClassVBGroup.cs" />
+    <Compile Include="EntityMaint\MaintOrderAssignment.cs" />
     <Compile Include="EntityMaint\MaintOrder.cs" />
     <Compile Include="EntityMaint\MaintOrderProperty.cs" />
-    <Compile Include="EntityMaint\MaintTask.cs" />
+    <Compile Include="EntityMaint\MaintOrderTask.cs" />
     <Compile Include="EntityMaterialWF\MaterialWFACClassMethodConfig.cs" />
     <Compile Include="EntityMaterialWF\MaterialWFACClassMethod.cs" />
     <Compile Include="EntityMaterialWF\MaterialWFConnection.cs" />
