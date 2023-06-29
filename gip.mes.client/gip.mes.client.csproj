@@ -81,6 +81,7 @@
     <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
     <ProjectReference Include="..\gip.mes.webservices\gip.mes.webservices.csproj" />
+    <ProjectReference Include="..\gip.mes.wpfservices\gip.mes.wpfservices.csproj" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

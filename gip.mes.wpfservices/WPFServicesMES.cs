@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace gip.mes.wpfservices
 {
-    public class WPFMESServices : IWPFMESServices
+    public class WPFServicesMES : WPFServices
     {
-        VBMESDesignerService _VBMESDesignerService = new VBMESDesignerService();
-        public IVBMESDesignerService DesignerMESService { get { return _VBMESDesignerService; } }
+        VBDesignerServiceMES _VBDesignerServiceMES  = new VBDesignerServiceMES();
+        public override IVBDesignerService DesignerService { get { return _VBDesignerServiceMES; } }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.wpfservices;
+using gip.mes.wpfservices;
 
 namespace gip.mes.cmdlet
 {
@@ -19,7 +20,7 @@ namespace gip.mes.cmdlet
             #endregion
 
             //TODO Linux implementation
-            ACStartUpRoot startupRoot = new ACStartUpRoot(new WPFServices());
+            ACStartUpRoot startupRoot = new ACStartUpRoot(new WPFServicesMES());
             startupRoot.LoginUser(userName, password, registerACObjects, PropPersistenceOff, ref errorMsg);
             return errorMsg;
         }

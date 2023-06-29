@@ -29,10 +29,4 @@ namespace gip.mes.datamodel
         new IEnumerable<IACObject> GetAvailableTools();
         void Refresh();
     }
-
-    public interface IVBMESDesignerService
-    {
-        IVBComponentDesignManagerProxy GetDesignMangerProxy(IACComponent component);
-        void RemoveDesignMangerProxy(IACComponent component);
-    }
 }
