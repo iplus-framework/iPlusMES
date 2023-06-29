@@ -265,9 +265,12 @@ namespace gip.mes.facility
             foreach (var pos in positions)
             {
                 int i = 0;
-                foreach (var sourceItem in pos.PartslistPosRelation_TargetPartslistPos)
+                if (pos.PartslistPosRelation_TargetPartslistPos != null)
                 {
-                    sourceItem.Sequence = ++i;
+                    foreach (var sourceItem in pos.PartslistPosRelation_TargetPartslistPos)
+                    {
+                        sourceItem.Sequence = ++i;
+                    }
                 }
             }
 
@@ -731,8 +734,8 @@ namespace gip.mes.facility
             if (!isChangedPartslist)
             {
                 isAddedElements =
-                       partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added)
-                    || partslist.PartslistPos_Partslist.SelectMany(c => c?.PartslistPosRelation_TargetPartslistPos).Any(c => c != null && c.EntityState == EntityState.Added);
+                       partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added);
+                    //|| partslist.PartslistPos_Partslist.SelectMany(c => c?.PartslistPosRelation_TargetPartslistPos).Any(c => c != null && c.EntityState == EntityState.Added);
 
                 if (!isAddedElements)
                 {

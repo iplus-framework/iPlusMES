@@ -198,7 +198,8 @@ namespace gip.bso.masterdata
         public void Save()
         {
             if (!PreExecute()) return;
-            OnSave();
+            if (OnSave())
+                OnPropertyChanged(nameof(PartslistList));
             PostExecute();
         }
 

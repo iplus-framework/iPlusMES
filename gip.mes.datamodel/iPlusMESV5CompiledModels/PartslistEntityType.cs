@@ -322,6 +322,9 @@ namespace gip.mes.datamodel
                 name: "PartslistVersion_PartslistNo",
                 unique: true);
 
+            var dboudfIsTimeSpanActualEnabledFromEnabledTo = runtimeEntityType.AddTrigger(
+                "([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))");
+
             return runtimeEntityType;
         }
 

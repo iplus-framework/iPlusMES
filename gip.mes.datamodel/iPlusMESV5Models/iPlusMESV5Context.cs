@@ -8002,6 +8002,8 @@ public partial class iPlusMESV5Context : DbContext
         {
             entity.ToTable("Partslist");
 
+            entity.ToTable(tbl => tbl.HasTrigger("([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))"));
+
             entity.HasIndex(e => e.MDUnitID, "NCI_FK_Partslist_MDUnitID");
 
             entity.HasIndex(e => e.MaterialID, "NCI_FK_Partslist_MaterialID");

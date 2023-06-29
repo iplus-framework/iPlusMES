@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.wpfservices
 {
-    public class VBMESDesignerService : VBDesignerService
+    public class VBMESDesignerService : VBDesignerService, IVBMESDesignerService
     {
         public VBMESDesignerService()
         {

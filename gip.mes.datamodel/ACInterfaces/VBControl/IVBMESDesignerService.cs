@@ -32,5 +32,7 @@ namespace gip.mes.datamodel
 
     public interface IVBMESDesignerService
     {
+        IVBComponentDesignManagerProxy GetDesignMangerProxy(IACComponent component);
+        void RemoveDesignMangerProxy(IACComponent component);
     }
 }
