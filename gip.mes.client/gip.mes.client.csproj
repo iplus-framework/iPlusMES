@@ -70,6 +70,7 @@
     <ProjectReference Include="..\..\iPlus\gip.core.dbsyncer\gip.core.dbsyncer.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.layoutengine\gip.core.layoutengine.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.scichart\gip.core.scichart.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.visualcontrols\gip.core.visualcontrols.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.ControlScriptSync\gip.core.ControlScriptSync.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
