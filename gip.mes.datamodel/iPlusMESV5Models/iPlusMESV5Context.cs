@@ -8002,8 +8002,6 @@ public partial class iPlusMESV5Context : DbContext
         {
             entity.ToTable("Partslist");
 
-            entity.ToTable(tbl => tbl.HasTrigger("([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))"));
-
             entity.HasIndex(e => e.MDUnitID, "NCI_FK_Partslist_MDUnitID");
 
             entity.HasIndex(e => e.MaterialID, "NCI_FK_Partslist_MaterialID");
@@ -8030,6 +8028,7 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.IsInEnabledPeriod).HasComputedColumnSql("([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))", false);
+            entity.ToTable(tbl => tbl.HasTrigger("([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))"));
             entity.Property(e => e.KeyOfExtSys)
                 .HasMaxLength(40)
                 .IsUnicode(false);

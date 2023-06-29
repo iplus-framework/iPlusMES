@@ -216,6 +216,12 @@ public partial class <#= Options.ContextName #> : DbContext
 <#
             anyEntityTypeConfiguration = true;
             firstProperty = false;
+            if (propertyFluentApiCalls.Method == "HasComputedColumnSql")
+            {
+            #>
+            entity.ToTable(tbl => tbl.HasTrigger("<#= propertyFluentApiCalls.Arguments[0] #>"));
+            <#
+            }
         }
 
         foreach (var foreignKey in entityType.GetForeignKeys())
