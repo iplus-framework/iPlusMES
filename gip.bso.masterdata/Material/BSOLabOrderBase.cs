@@ -215,7 +215,7 @@ namespace gip.bso.masterdata
             {
                 if (AccessPrimary == null)
                     return null;
-                if (AccessPrimary == null) return null; return AccessPrimary.Selected;
+                return AccessPrimary.Selected;
             }
             set
             {
@@ -234,7 +234,7 @@ namespace gip.bso.masterdata
             {
                 if (AccessPrimary == null)
                     return null;
-                if (AccessPrimary == null) return null; return AccessPrimary.Current;
+                return AccessPrimary.Current;
             }
             set
             {

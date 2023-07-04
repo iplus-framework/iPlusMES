@@ -1022,6 +1022,31 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(RunPickingByMaterial):
+                    RunPickingByMaterial();
+                    return true;
+                case nameof(IsEnabledRunPickingByMaterial):
+                    result = IsEnabledRunPickingByMaterial();
+                    return true;
+                case nameof(FinishPickingOrder):
+                    FinishPickingOrder();
+                    return true;
+                case nameof(CancelCurrentComponent):
+                    CancelCurrentComponent();
+                    return true;
+                case nameof(AbortPickingByMaterial):
+                    AbortPickingByMaterial();
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
     }
 }

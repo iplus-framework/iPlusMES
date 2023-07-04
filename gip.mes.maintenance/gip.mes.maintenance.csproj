@@ -77,6 +77,10 @@
       <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
       <Name>gip.core.processapplication</Name>
     </ProjectReference>
+    <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj">
+      <Project>{64342646-DAD9-441C-A270-2A7DD2228A42}</Project>
+      <Name>gip.bso.masterdata</Name>
+    </ProjectReference>
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
       <Project>{a1b3c017-ad96-4ae2-b6ff-9c8948393a39}</Project>
       <Name>gip.mes.autocomponent</Name>
