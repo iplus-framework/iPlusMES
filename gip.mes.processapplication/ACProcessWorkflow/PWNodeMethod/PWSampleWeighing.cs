@@ -31,7 +31,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("StorageFormat", typeof(ushort), (ushort) 0, Global.ParamOption.Required));
             paramTranslation.Add("StorageFormat", "en{'0=(N)LabOrder;1=(N)LabOrderPos;2=(N)Items-(1)LabOrderPos'}de{'0=(N)LabOrder;1=(N)LabOrderPos;2=(N)Items-(1)LabOrderPos'}");
             method.ParameterValueList.Add(new ACValue("LabOrderTemplateName", typeof(string), PWSampleWeighing.C_LabOrderTemplateName, Global.ParamOption.Required));
-            paramTranslation.Add("LabOrderTemplateName", "en{'LO template (Empty string -> material is used)'}de{'Laborauftragsvorlage (Leerer string -> material vird verwendet)'}");
+            paramTranslation.Add("LabOrderTemplateName", "en{'LO template (Empty string -> material is used)'}de{'Laborauftragsvorlage (Leerer string -> material wird verwendet)'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWSampleWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWSampleWeighing), ACStateConst.SMStarting, wrapper);
