@@ -508,6 +508,19 @@ namespace gip.mes.datamodel
             }
         }
 
+        public double? LossCorrectionFactor
+        {
+            get
+            {
+                PartslistPos finalIntermediate = FinalIntermediate;
+                if (finalIntermediate != null)
+                {
+                    return TargetQuantityUOM / finalIntermediate.TargetQuantityUOM;
+                }
+                return null;
+            }
+        }
+
         #endregion
 
         #region partial methods

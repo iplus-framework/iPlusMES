@@ -2690,7 +2690,7 @@ namespace gip.mes.facility
         #endregion
 
         #region CalcProducedBatchWeight
-        public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, out double sumWeight)
+        public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, double? lossCorrectionFactor, out double sumWeight)
         {
             sumWeight = 0;
             if (batchIntermediatePos == null)
@@ -2703,6 +2703,18 @@ namespace gip.mes.facility
                 return new Msg() { Message = "Mass-Unit KG not found" };
 
             CalcProducedBatchWeight(ref sumWeight, batchIntermediatePos, batchIntermediatePos.ProdOrderBatch, unitKG);
+
+            if (sumWeight > 0.000001 && lossCorrectionFactor.HasValue)
+            {
+                if (lossCorrectionFactor > 0.000001)
+                    sumWeight = sumWeight - (sumWeight * (lossCorrectionFactor.Value / 100));
+                else
+                {
+                    Partslist pl = batchIntermediatePos.ProdOrderPartslist?.Partslist;
+                    if (pl != null && pl.LossCorrectionFactor.HasValue)
+                        sumWeight = sumWeight * pl.LossCorrectionFactor.Value;
+                }
+            }
 
             return null;
         }

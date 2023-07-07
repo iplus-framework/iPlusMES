@@ -1170,7 +1170,7 @@ namespace gip.mes.processapplication
                     if (prodOrderManager != null)
                     {
                         double calculatedBatchWeight = 0;
-                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
+                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, LossCorrectionFactor, out calculatedBatchWeight) == null)
                         {
                             double diff = calculatedBatchWeight - currentBatchPos.ActualWeight;
                             if (diff > 0.00001)
