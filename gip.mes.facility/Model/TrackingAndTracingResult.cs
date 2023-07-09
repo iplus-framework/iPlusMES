@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'TrackAndTracingResult'}de{'TrackAndTracingResult'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'TrackAndTracingResult'}de{'TrackAndTracingResult'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, true)]
     public class TrackingAndTracingResult
     {
         #region Properties
