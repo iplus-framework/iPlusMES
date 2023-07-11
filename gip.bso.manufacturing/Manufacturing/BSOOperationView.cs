@@ -369,8 +369,8 @@ namespace gip.bso.manufacturing
 
         private void FillMaterialAndOrderData(dbMes.OperationLog operationLog, OperationLogView wp)
         {
-            wp.MaterialNo = operationLog.FacilityCharge?.Partslist.Material.MaterialNo;
-            wp.MaterialName = operationLog.FacilityCharge?.Partslist.Material.MaterialName1;
+            wp.MaterialNo = operationLog.FacilityCharge?.Partslist?.Material?.MaterialNo;
+            wp.MaterialName = operationLog.FacilityCharge?.Partslist?.Material?.MaterialName1;
             wp.ProgramNo = operationLog.FacilityCharge?.ProdOrderProgramNo;
             wp.FacilityLotNo = operationLog.FacilityCharge?.FacilityLot?.LotNo;
             wp.SplitNo = operationLog.FacilityCharge?.SplitNo ?? 0;
