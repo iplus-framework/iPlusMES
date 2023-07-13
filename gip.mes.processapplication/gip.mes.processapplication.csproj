@@ -130,6 +130,7 @@
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodVBBase.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSampleWeighing.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSampleWeighingLoop.cs" />
+    <Compile Include="BSO\ACClassTaskModel.cs" />
     <Compile Include="Manager\DischargingItemManager.cs" />
     <Compile Include="Manager\DischargingItemNoValidator.cs" />
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
@@ -178,7 +179,6 @@
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWMixing.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWScanning.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWUnload.cs" />
-    <Compile Include="BSO\ACClassTaskWrapperVB.cs" />
     <Compile Include="BSO\VBBSOControlPAVB.cs" />
     <Compile Include="Configuration\ProcessConfiguration.cs" />
     <Compile Include="Configuration\ConfigManagerIPlusMES.cs" />
