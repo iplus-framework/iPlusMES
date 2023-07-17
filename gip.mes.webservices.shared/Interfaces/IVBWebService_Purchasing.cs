@@ -1,6 +1,6 @@
 ﻿using System;
 #if NETFRAMEWORK
-using System.ServiceModel;
+using CoreWCF;
 #elif NETSTANDARD
 using System.Threading.Tasks;
 #endif

@@ -47,7 +47,7 @@ namespace gip.mes.webservices
             return new VBWebService();
         }
 
-        protected override void OnAddKnownTypesToOperationContract(ServiceEndpoint endpoint, OperationDescription opDescr)
+        public override void OnAddKnownTypesToOperationContract(ServiceEndpoint endpoint, OperationDescription opDescr)
         {
             if (   opDescr.Name == nameof(VBWebService.InvokeBarcodeSequence)
                 || opDescr.Name == nameof(VBWebService.FinishPickingOrdersByMaterial))
