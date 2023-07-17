@@ -375,21 +375,21 @@ namespace gip.bso.manufacturing
                 }
                 if (pickingPos != null)
                 {
-                    model.BatchNo = pickingPos.FromFacility.FacilityName;
+                    model.BatchNo = pickingPos.FromFacility?.FacilityName;
                 }
 
                 model.Material = "";
                 if (prodOrderPartslistPos != null)
                 {
-                    model.BatchNo = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                    model.Material = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
                 }
                 if (pickingPos != null)
                 {
-                    model.BatchNo = pickingPos.Material.MaterialName1;
+                    model.Material = pickingPos.Material.MaterialName1;
                 }
 
                 model.InsertDate = task.InsertDate;
-                model.ACProgramNo = task.ACProgram.ACIdentifier;
+                model.ACProgramNo = task.ACProgram?.ProgramNo;
                 model.ACIdentifier = task.ACIdentifier;
 
                 result.Add(model);
