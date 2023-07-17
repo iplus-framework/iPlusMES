@@ -375,7 +375,14 @@ namespace gip.bso.manufacturing
                 }
                 if (pickingPos != null)
                 {
-                    model.BatchNo = pickingPos.FromFacility?.FacilityName;
+                    if(pickingPos.FromFacility != null)
+                    {
+                        model.BatchNo = pickingPos.FromFacility?.FacilityName;
+                    }
+                    else if(pickingPos.ToFacility != null)
+                    {
+                        model.BatchNo = pickingPos.ToFacility?.FacilityName;
+                    }
                 }
 
                 model.Material = "";
@@ -434,6 +441,8 @@ namespace gip.bso.manufacturing
                     && (string.IsNullOrEmpty(orderNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.ProdOrder).Where(x => x.ProgramNo.Contains(orderNo)).Any())
                     && (string.IsNullOrEmpty(materialNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.Partslist.Material).Where(x => x.MaterialNo.Contains(materialNo) || x.MaterialName1.Contains(materialNo)).Any())
                 )
+                .OrderBy(c => c.ACProgram.ProgramNo)
+                .ThenByDescending(c => c.InsertDate)
                 .ToList();
 
         }
