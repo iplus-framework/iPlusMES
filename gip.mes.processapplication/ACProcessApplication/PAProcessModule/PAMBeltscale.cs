@@ -345,7 +345,8 @@ namespace gip.mes.processapplication
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            this.ApplicationManager.ProjectWorkCycleR10sec += CyclicCallback;
+            if (this.ApplicationManager != null)
+                this.ApplicationManager.ProjectWorkCycleR10sec += CyclicCallback;
             return true;
         }
 
@@ -356,7 +357,8 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            this.ApplicationManager.ProjectWorkCycleR10sec -= CyclicCallback;
+            if (this.ApplicationManager != null)
+                this.ApplicationManager.ProjectWorkCycleR10sec -= CyclicCallback;
             return base.ACDeInit(deleteACClassTask);
         }
         #endregion
