@@ -25,6 +25,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("CompletePWGroupsOnInpointLoop", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("CompletePWGroupsOnInpointLoop", "en{'Complete PWGroups(SMStarting) on inpoint loop'}de{'Complete PWGroups(SMStarting) on inpoint loop'}");
 
+            method.ParameterValueList.Add(new ACValue("Repeats", typeof(UInt32), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("Repeats", "en{'Repeats'}de{'Wiederholungen'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeLoop), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeLoop), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWNodeLoop), HandleExecuteACMethod_PWNodeLoop);

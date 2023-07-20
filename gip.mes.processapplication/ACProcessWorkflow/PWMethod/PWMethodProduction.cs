@@ -17,6 +17,7 @@ namespace gip.mes.processapplication
         { 
             new object[] {gip.core.datamodel.ACProgram.ClassName, Global.ParamOption.Required, typeof(Guid)},
             new object[] {gip.core.datamodel.ACProgramLog.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {PWProcessFunction.C_InvocationCount, Global.ParamOption.Optional, typeof(int)},
             new object[] {ProdOrderPartslistPos.ClassName, Global.ParamOption.Required, typeof(Guid)},
             new object[] {PWMethodVBBase.IsLastBatchParamName, Global.ParamOption.Optional, typeof(Int16) }
        }
