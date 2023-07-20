@@ -127,6 +127,7 @@ namespace gip.mes.manager
             MaterialWFRelation relation = MaterialWFRelation.NewACObject(DatabaseApp, null);
             relation.SourceMaterial = sourceMaterial;
             relation.TargetMaterial = targetMaterial;
+            DatabaseApp.Add(relation);
             materialWF.MaterialWFRelation_MaterialWF.Add(relation);
             if (materialWF.MaterialWFRelation_MaterialWF.Count == 1 && relation.SourceMaterial == null)
                 relation.SourceMaterial = relation.TargetMaterial;
