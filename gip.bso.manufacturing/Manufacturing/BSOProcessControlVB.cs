@@ -204,6 +204,10 @@ namespace gip.bso.manufacturing
 
         protected override bool LoadACTaskList(FilterMode filterMode, bool forceUpdateTaskList)
         {
+            // Temp set CommandTimeout for long lasting search by material
+            int? commandTimeout = DatabaseApp.CommandTimeout;
+            DatabaseApp.CommandTimeout = 60 * 2;
+
             _NeedSearch = false;
             bool taskListChanged = true;
             ACClassTaskModel[] newTaskList = null;
@@ -269,6 +273,9 @@ namespace gip.bso.manufacturing
                     SelectedACTaskVB = currentACTask;
                 }
             }
+
+            DatabaseApp.CommandTimeout = commandTimeout;
+            
             return taskListChanged;
         }
 
@@ -337,7 +344,13 @@ namespace gip.bso.manufacturing
 
             List<gip.mes.datamodel.ACClassTask> tasks = GetTasks(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
             Guid[] aCProgramIDs = tasks.Select(c => c.ACProgramID ?? Guid.Empty).ToArray();
-            List<OrderLog> orderLogs = GetOrderLogPg(databaseApp, aCProgramIDs);
+            
+            List<OrderLog> orderLogs =
+                tasks
+                .SelectMany(c => c.ACProgram.ACProgramLog_ACProgram)
+                .Select(c => c.OrderLog_VBiACProgramLog)
+                .Where(c=>c !=null)
+                .ToList();
 
             foreach (gip.mes.datamodel.ACClassTask task in tasks)
             {
@@ -479,62 +492,6 @@ namespace gip.bso.manufacturing
                 .ThenByDescending(c => c.InsertDate)
                 .ToList();
 
-        }
-
-        private List<OrderLog> GetOrderLogPg(DatabaseApp databaseApp, Guid[] aCProgramIDs)
-        {
-            List<OrderLog> result = new List<OrderLog>();
-            if (aCProgramIDs != null)
-            {
-                if (aCProgramIDs.Count() <= 50)
-                {
-                    result = GetOrderLog(databaseApp, aCProgramIDs);
-                }
-                else
-                {
-                    int page = 0;
-                    List<Guid> tempIDList = null;
-
-                    while (tempIDList == null || tempIDList.Any())
-                    {
-                        tempIDList = aCProgramIDs.Skip(50 * page).Take(50).ToList();
-                        List<OrderLog> tmpList = GetOrderLog(databaseApp, tempIDList.ToArray());
-                        result.AddRange(tmpList);
-                        Console.WriteLine(page);
-                        page++;
-                    }
-
-                }
-            }
-            return result;
-        }
-
-        private List<OrderLog> GetOrderLog(DatabaseApp databaseApp, Guid[] aCProgramIDs)
-        {
-            return
-                 databaseApp
-                 .OrderLog
-
-                 .Include(c => c.ProdOrderPartslistPos)
-                 .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslist)
-                 .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
-                 .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslist.Partslist)
-                 .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material)
-                 .Include(c => c.ProdOrderPartslistPos.ProdOrderBatch)
-
-                 .Include(c => c.PickingPos)
-                 .Include(c => c.PickingPos.Picking)
-                 .Include(c => c.PickingPos.FromFacility)
-                 .Include(c => c.PickingPos.PickingMaterial)
-
-                 .Where(c =>
-                        (
-                            (c.ProdOrderPartslistPosID != null && c.ProdOrderPartslistPos.ProdOrderBatchID != null)
-                            ||
-                            c.PickingPosID != null
-                        )
-                        && aCProgramIDs.Contains(c.VBiACProgramLog.ACProgramID))
-                 .ToList();
         }
 
         #endregion
