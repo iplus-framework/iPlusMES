@@ -209,6 +209,13 @@ namespace gip.mes.processapplication
                 PAFSampleWeighing sampleWeighing = CurrentExecutingFunction<PAFSampleWeighing>();
                 if (sampleWeighing != null)
                 {
+                    // This node was invoked inside a loop, because functions is not completed and is in the Callback-Stack
+                    // Break the stack and wait for next cycle
+                    if (sampleWeighing.CurrentACState >= ACStateEnum.SMCompleted)
+                    {
+                        SubscribeToProjectWorkCycle();
+                        return;
+                    }
                     if (CurrentACState == ACStateEnum.SMStarting)
                         CurrentACState = ACStateEnum.SMRunning;
                     return;
