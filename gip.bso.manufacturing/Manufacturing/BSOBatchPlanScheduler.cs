@@ -3922,6 +3922,10 @@ namespace gip.bso.manufacturing
                 {
                     List<Guid> groupsForRefresh = new List<Guid>();
                     List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+                    List<ProdOrderPartslistPos> positions =
+                        selectedBatches
+                        .Select(c => c.ProdOrderPartslistPos)
+                        .ToList();
 
 
                     bool isSetBatchStateCancelledForTreeDelete = IsSetBatchStateCancelledForTreeDelete();
@@ -3932,6 +3936,7 @@ namespace gip.bso.manufacturing
                         {
                             // Silent delete batch plans for current ProdOrder
                             DoSetBatchStateCancelled(true, selectedBatches, ref groupsForRefresh);
+                            OnSetBatchStateCancelled(positions);
                             DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                         }
                         else if (answer == Global.MsgResult.No)
@@ -3961,6 +3966,7 @@ namespace gip.bso.manufacturing
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
                         DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
+                        OnSetBatchStateCancelled(positions);
                         DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                     }
                 }
@@ -3979,6 +3985,11 @@ namespace gip.bso.manufacturing
                 }
 
             }
+        }
+
+        public virtual void OnSetBatchStateCancelled(List<ProdOrderPartslistPos> positions)
+        {
+
         }
 
         private bool IsSetBatchStateCancelledForTreeDelete()
@@ -4468,7 +4479,13 @@ namespace gip.bso.manufacturing
                 {
                     batchPlans = batchPlans.Where(c => c.IsSelected).ToList();
                 }
+
+                List<ProdOrderPartslistPos> positions =
+                        batchPlans
+                        .Select(c => c.ProdOrderPartslistPos)
+                        .ToList();
                 DoSetBatchStateCancelled(false, batchPlans, ref groupsForRefresh);
+                OnSetBatchStateCancelled(positions);
 
                 wizardSchedulerPartslist.IsSolved = true;
                 OnPropertyChanged(nameof(WizardSchedulerPartslistList));
