@@ -488,10 +488,7 @@ namespace gip.bso.masterdata
                     }
                     else
                     {
-                        if (ParentACComponent is ACBSO)
-                        {
-                            (ParentACComponent as ACBSO).ExecuteMethod("Save", null);
-                        }
+                        OnSave();
                     }
                 }
             }
