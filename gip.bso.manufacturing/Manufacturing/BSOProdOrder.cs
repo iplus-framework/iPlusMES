@@ -208,14 +208,28 @@ namespace gip.bso.manufacturing
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
         [ACPropertyInfo(600)]
-        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        [ACChildInfo(nameof(BSOFacilityExplorer_Child), typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
             get
             {
                 if (_BSOFacilityExplorer_Child == null)
-                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, nameof(BSOFacilityExplorer_Child));
                 return _BSOFacilityExplorer_Child;
+            }
+        }
+
+
+        ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOSourceSelectionRules_Child), typeof(BSOSourceSelectionRules))]
+        public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
+        {
+            get
+            {
+                if (_BSOSourceSelectionRules_Child == null)
+                    _BSOSourceSelectionRules_Child = new ACChildItem<BSOSourceSelectionRules>(this, nameof(BSOSourceSelectionRules_Child));
+                return _BSOSourceSelectionRules_Child;
             }
         }
 
@@ -5119,11 +5133,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledShowDialogSelectSources())
                 return;
 
-            ACComponent bso = this.Root.Businessobjects.ACUrlCommand("?" + nameof(BSOSourceSelectionRules)) as ACComponent;
-            if (bso == null)
-                bso = this.Root.Businessobjects.StartComponent(nameof(BSOSourceSelectionRules), null, new object[] { }) as ACComponent;
-
-            (bso as BSOSourceSelectionRules).ShowDialogSelectSources(
+            BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(
                 ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
                 SelectedProdOrderPartslist.Partslist.PartslistID,
                 SelectedProdOrderPartslist.ProdOrderPartslistID);
@@ -5142,7 +5152,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledShowDialogSelectSources()
         {
-            if (SelectedProdOrderPartslist == null || CurrentProcessWorkflow == null)
+            if (SelectedProdOrderPartslist == null || CurrentProcessWorkflow == null || BSOSourceSelectionRules_Child == null || BSOSourceSelectionRules_Child.Value == null)
                 return false;
             Type typeOfSelectedNode = ProcessWorkflowPresenter?.SelectedWFNode?.ContentACClassWF?.PWACClass?.ObjectType;
             if (typeOfSelectedNode == null)

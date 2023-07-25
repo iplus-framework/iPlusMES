@@ -301,14 +301,14 @@ namespace gip.bso.masterdata
             SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
             LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, configStores, partslist, invokerPWNode);
             sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(partslist, prodOrderPartslist);
-            
+
             // Load Subs (level 1)
             List<ACClassWF> allSubWf = invokerPWNode.RefPAACClassMethod.ACClassWF_ACClassMethod.ToList();
             List<ACClassWF> filteredSubs = new List<ACClassWF>();
-            foreach(ACClassWF subWf in allSubWf)
+            foreach (ACClassWF subWf in allSubWf)
             {
-                Type nodeType =  subWf.PWACClass?.ObjectType;
-                if (nodeType != null && TypeOfPWNodeProcessWorkflow.IsAssignableFrom(nodeType) )
+                Type nodeType = subWf.PWACClass?.ObjectType;
+                if (nodeType != null && TypeOfPWNodeProcessWorkflow.IsAssignableFrom(nodeType))
                     filteredSubs.Add(subWf);
             }
 
@@ -319,7 +319,7 @@ namespace gip.bso.masterdata
                 {
                     preConfigACUrl = preConfigACUrl + "\\";
                 }
-                foreach(ACClassWF subWf in filteredSubs)
+                foreach (ACClassWF subWf in filteredSubs)
                 {
                     List<IACConfigStore> subConfigStores = GetConfigStores(new ACClassMethod[] { method, subWf.RefPAACClassMethod }, partslist, prodOrderPartslist);
                     LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, subConfigStores, partslist, subWf, preConfigACUrl);
@@ -477,6 +477,7 @@ namespace gip.bso.masterdata
                     }
                 }
 
+
                 if (change)
                 {
                     MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
@@ -484,6 +485,13 @@ namespace gip.bso.masterdata
                     {
                         Messages.Msg(msgWithDetails);
                         databaseApp.ACUndoChanges();
+                    }
+                    else
+                    {
+                        if (ParentACComponent is ACBSO)
+                        {
+                            (ParentACComponent as ACBSO).ExecuteMethod("Save", null);
+                        }
                     }
                 }
             }
@@ -521,8 +529,7 @@ namespace gip.bso.masterdata
                         excludedModules.RemoveAll(c => c.ACClassID == machineItem.Machine.ACClassID);
                         if (excludedModules.Any())
                         {
-                            RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
-                            RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
+                            change = true;
                         }
                     }
 
@@ -531,11 +538,9 @@ namespace gip.bso.masterdata
                         machineItem.SourceSelectionRulesResult.CurrentConfigStore.RemoveACConfig(currentStoreConfigItem);
                         change = true;
                     }
-
                 }
                 else
                 {
-
                     if (currentStoreConfigItem == null)
                     {
                         currentStoreConfigItem = machineItem.SourceSelectionRulesResult.CurrentConfigStore.NewACConfig(aCClassWF);
@@ -549,13 +554,12 @@ namespace gip.bso.masterdata
                         excludedModules.Add(machineItem.Machine);
                         change = true;
                     }
+                }
 
-                    if (change)
-                    {
-                        RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
-                        RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
-                    }
-
+                if (change && excludedModules.Any())
+                {
+                    RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
+                    RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
                 }
             }
 
@@ -593,7 +597,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledDlgSelectSourcesOk();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
