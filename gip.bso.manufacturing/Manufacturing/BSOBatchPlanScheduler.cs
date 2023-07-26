@@ -1254,7 +1254,7 @@ namespace gip.bso.manufacturing
                 if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount > 0)
                 {
                     if (
-                            SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.IsEnabled
+                            (SelectedProdOrderBatchPlan.ProdOrderPartslist != null && SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.IsEnabled)
                             && (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
                             || SelectedProdOrderBatchPlan.PlanState >= GlobalApp.BatchPlanState.Paused)
                         )
@@ -3566,9 +3566,9 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSetBatchStateReadyToStart()
         {
             return ProdOrderBatchPlanList != null
-                && ProdOrderBatchPlanList.Any(c => 
+                && ProdOrderBatchPlanList.Any(c =>
                         c.IsSelected
-                        && c.ProdOrderPartslist.Partslist.IsEnabled
+                        && (c.ProdOrderPartslist != null && c.ProdOrderPartslist.Partslist.IsEnabled)
                         && (
                                 c.PlanState <= GlobalApp.BatchPlanState.Created
                                 || c.PlanState >= GlobalApp.BatchPlanState.Paused
@@ -3581,7 +3581,7 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
-                bool isBatchReadyToStart = batchPlan.FacilityReservation_ProdOrderBatchPlan.Any() && batchPlan.ProdOrderPartslist.Partslist.IsEnabled;
+                bool isBatchReadyToStart = batchPlan.FacilityReservation_ProdOrderBatchPlan.Any() && (batchPlan.ProdOrderPartslist != null && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
                 if (!isBatchReadyToStart)
                 {
                     // Error50559
