@@ -3942,8 +3942,8 @@ namespace gip.bso.manufacturing
                         if (answer == Global.MsgResult.Yes)
                         {
                             // Silent delete batch plans for current ProdOrder
+                            OnSetBatchStateCanceling(positions);
                             DoSetBatchStateCancelled(true, selectedBatches, ref groupsForRefresh);
-                            OnSetBatchStateCancelled(positions);
                             DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                         }
                         else if (answer == Global.MsgResult.No)
@@ -3973,7 +3973,7 @@ namespace gip.bso.manufacturing
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
                         DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
-                        OnSetBatchStateCancelled(positions);
+                        OnSetBatchStateCanceling(positions);
                         DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                     }
                 }
@@ -4000,7 +4000,7 @@ namespace gip.bso.manufacturing
         /// <param name="positions">
         /// Dictionary with pos canceled batch plans + batch plan quantity
         /// </param>
-        public virtual void OnSetBatchStateCancelled(Dictionary<ProdOrderPartslistPos, double> positions)
+        public virtual void OnSetBatchStateCanceling(Dictionary<ProdOrderPartslistPos, double> positions)
         {
 
         }
@@ -4498,8 +4498,8 @@ namespace gip.bso.manufacturing
                         batchPlans
                         .ToDictionary(key => key.ProdOrderPartslistPos, val => val.BatchTargetCount * val.BatchSize);
 
+                OnSetBatchStateCanceling(positions);
                 DoSetBatchStateCancelled(false, batchPlans, ref groupsForRefresh);
-                OnSetBatchStateCancelled(positions);
 
                 wizardSchedulerPartslist.IsSolved = true;
                 OnPropertyChanged(nameof(WizardSchedulerPartslistList));
