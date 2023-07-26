@@ -3929,12 +3929,11 @@ namespace gip.bso.manufacturing
                 try
                 {
                     List<Guid> groupsForRefresh = new List<Guid>();
-                    List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-                    List<ProdOrderPartslistPos> positions =
-                        selectedBatches
-                        .Select(c => c.ProdOrderPartslistPos)
-                        .ToList();
 
+                    List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+                    Dictionary<ProdOrderPartslistPos, double> positions =
+                        selectedBatches
+                        .ToDictionary(key => key.ProdOrderPartslistPos, val => val.BatchTargetCount * val.BatchSize);
 
                     bool isSetBatchStateCancelledForTreeDelete = IsSetBatchStateCancelledForTreeDelete();
                     if (isSetBatchStateCancelledForTreeDelete)
@@ -3995,7 +3994,13 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public virtual void OnSetBatchStateCancelled(List<ProdOrderPartslistPos> positions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="positions">
+        /// Dictionary with pos canceled batch plans + batch plan quantity
+        /// </param>
+        public virtual void OnSetBatchStateCancelled(Dictionary<ProdOrderPartslistPos, double> positions)
         {
 
         }
@@ -4483,15 +4488,16 @@ namespace gip.bso.manufacturing
             {
                 List<Guid> groupsForRefresh = new List<Guid>();
                 List<ProdOrderBatchPlan> batchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+                
                 if (batchPlans.Any(c => c.IsSelected))
                 {
                     batchPlans = batchPlans.Where(c => c.IsSelected).ToList();
                 }
 
-                List<ProdOrderPartslistPos> positions =
+                Dictionary<ProdOrderPartslistPos, double> positions =
                         batchPlans
-                        .Select(c => c.ProdOrderPartslistPos)
-                        .ToList();
+                        .ToDictionary(key => key.ProdOrderPartslistPos, val => val.BatchTargetCount * val.BatchSize);
+
                 DoSetBatchStateCancelled(false, batchPlans, ref groupsForRefresh);
                 OnSetBatchStateCancelled(positions);
 
