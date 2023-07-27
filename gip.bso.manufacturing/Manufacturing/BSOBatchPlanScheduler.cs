@@ -3972,8 +3972,8 @@ namespace gip.bso.manufacturing
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup != null
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
-                        DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
                         OnSetBatchStateCanceling(positions);
+                        DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
                         DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                     }
                 }
