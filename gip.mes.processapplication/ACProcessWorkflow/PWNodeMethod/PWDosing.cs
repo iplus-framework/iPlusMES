@@ -1163,11 +1163,15 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
+                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c=>c.PickingPosID ==  dosingPosId);
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             if (IsProduction)
                                 orderLog.ProdOrderPartslistPosRelationID = dosingPosId;
                             if (IsTransport)
+                            {
+                                dosingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
                                 orderLog.PickingPosID = dosingPosId;
+                            }
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();
                         }

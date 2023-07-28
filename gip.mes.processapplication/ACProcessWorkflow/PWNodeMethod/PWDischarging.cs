@@ -1345,8 +1345,12 @@ namespace gip.mes.processapplication
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
+                            PickingPos currentDisEntity = dbApp.PickingPos.FirstOrDefault(c=>c.PickingPosID == currentDisEntityID);
                             if (propertyToSet == 1)
+                            {
+                                currentDisEntity.ACClassTaskID = this.ContentTask.ACClassTaskID;
                                 orderLog.PickingPosID = currentDisEntityID;
+                            }
                             else if (propertyToSet == 2)
                                 orderLog.DeliveryNotePosID = currentDisEntityID;
                             else if (propertyToSet == 3)

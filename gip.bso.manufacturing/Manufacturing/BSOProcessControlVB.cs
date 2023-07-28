@@ -275,7 +275,7 @@ namespace gip.bso.manufacturing
             }
 
             DatabaseApp.CommandTimeout = commandTimeout;
-            
+
             return taskListChanged;
         }
 
@@ -344,13 +344,7 @@ namespace gip.bso.manufacturing
 
             List<gip.mes.datamodel.ACClassTask> tasks = GetTasks(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
             Guid[] aCProgramIDs = tasks.Select(c => c.ACProgramID ?? Guid.Empty).ToArray();
-            
-            List<OrderLog> orderLogs =
-                tasks
-                .SelectMany(c => c.ACProgram.ACProgramLog_ACProgram)
-                .Select(c => c.OrderLog_VBiACProgramLog)
-                .Where(c=>c !=null)
-                .ToList();
+
 
             foreach (gip.mes.datamodel.ACClassTask task in tasks)
             {
@@ -359,16 +353,18 @@ namespace gip.bso.manufacturing
                 model.ACClassTaskID = task.ACClassTaskID;
 
                 ProdOrderPartslistPos prodOrderPartslistPos =
-                        orderLogs
-                        .Where(c => c.VBiACProgramLog.ACProgramID == task.ACProgramID && c.ProdOrderPartslistPosID != null)
-                        .Select(c => c.ProdOrderPartslistPos)
-                        .Where(c => c.ProdOrderBatchID != null)
-                        .FirstOrDefault();
+                    task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                    .Where(c => c.ParentProdOrderPartslistPosID != null)
+                    .FirstOrDefault();
 
                 PickingPos pickingPos =
-                    orderLogs
-                    .Where(c => c.VBiACProgramLog.ACProgramID == task.ACProgramID && c.PickingPosID != null)
-                    .Select(c => c.PickingPos)
+                     task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.PickingPos_ACClassTask)
                     .FirstOrDefault();
 
                 model.ProgramNo = "";
@@ -416,6 +412,7 @@ namespace gip.bso.manufacturing
             }
 
 
+
             return result.ToArray();
         }
 
@@ -430,14 +427,14 @@ namespace gip.bso.manufacturing
                 .Include(c => c.ContentACClassWF.PWACClass)
 
                 .Include(c => c.ACProgram)
-                .Include("ACProgram.ACProgramLog_ACProgram.OrderLog_VBiACProgramLog")
-                .Include("ACProgram.ACProgramLog_ACProgram.OrderLog_VBiACProgramLog.PickingPos")
-                .Include("ACProgram.ACProgramLog_ACProgram.OrderLog_VBiACProgramLog.PickingPos.Picking")
-                .Include("ACProgram.ACProgramLog_ACProgram.OrderLog_VBiACProgramLog.PickingPos.PickingMaterial")
 
                 .Include(c => c.ProdOrderPartslistPos_ACClassTask)
                 .Include("ProdOrderPartslistPos_ACClassTask.ProdOrderPartslist.ProdOrder")
                 .Include("ProdOrderPartslistPos_ACClassTask.ProdOrderPartslist.Partslist.Material")
+
+                .Include(c => c.PickingPos_ACClassTask)
+                .Include("PickingPos_ACClassTask.Picking")
+                .Include("PickingPos_ACClassTask.PickingMaterial")
 
                 .Where(c =>
 
