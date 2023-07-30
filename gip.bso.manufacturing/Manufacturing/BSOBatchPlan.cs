@@ -877,7 +877,7 @@ namespace gip.bso.manufacturing
                 }
 
                 ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
-                poManager.SetProdOrderItemsToInProduction(DatabaseApp, SelectedBatchPlanForIntermediate, CurrentProdOrderPartslist, SelectedIntermediate);
+                poManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, SelectedBatchPlanForIntermediate, CurrentProdOrderPartslist, SelectedIntermediate, true);
 
                 OnPropertyChanged("CurrentProdOrderPartslist");
                 OnPropertyChanged("SelectedIntermediate");

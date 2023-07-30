@@ -535,6 +535,9 @@ namespace gip.mes.processapplication
                     if (batchPlanEntry.DiffPartialCount.HasValue)
                         batchPlanEntry.PartialActualCount = batchPlanEntry.PartialActualCount.HasValue ? batchPlanEntry.PartialActualCount + 1 : 1;
                     batchPlanEntry.PlanState = GlobalApp.BatchPlanState.InProcess;
+
+                    ProdOrderManager.ActivateProdOrderStatesIntoProduction(dbApp, batchPlanEntry, currentProdOrderPartslist, intermediatePosition, false);
+
                     if (intermediatePosition.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart)
                         intermediatePosition.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess).FirstOrDefault();
                     newChildPosForBatch = resultNewEntities.Where(c => c is ProdOrderPartslistPos).FirstOrDefault() as ProdOrderPartslistPos;

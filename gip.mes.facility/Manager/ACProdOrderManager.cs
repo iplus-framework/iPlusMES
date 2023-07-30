@@ -1625,17 +1625,26 @@ namespace gip.mes.facility
         #region ProdOrder -> Batch -> Start
 
 
-        public virtual void SetProdOrderItemsToInProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate)
+        public virtual void ActivateProdOrderStatesIntoProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate, bool setAutoStartOnBatchplan)
         {
-            MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
-            prodOrderPartslist.ProdOrder.MDProdOrderState = mDProdOrderStateInProduction;
-            prodOrderPartslist.MDProdOrderState = prodOrderPartslist.ProdOrder.MDProdOrderState;
+            if (   (prodOrderPartslist.ProdOrder.MDProdOrderState == null || prodOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+                || (prodOrderPartslist.MDProdOrderState == null || prodOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction))
+            {
+                MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
+                if (prodOrderPartslist.ProdOrder.MDProdOrderState == null || prodOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+                    prodOrderPartslist.ProdOrder.MDProdOrderState = mDProdOrderStateInProduction;
+                if (prodOrderPartslist.MDProdOrderState == null || prodOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+                    prodOrderPartslist.MDProdOrderState = mDProdOrderStateInProduction;
+            }
             if (prodOrderPartslist.StartDate == null)
                 prodOrderPartslist.StartDate = DateTime.Now;
-            intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
-            if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
-                prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
-            prodOrderBatchPlan.PlannedStartDate = DateTimeUtils.NowDST;
+            if (setAutoStartOnBatchplan)
+            {
+                intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
+                if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
+                    prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
+                prodOrderBatchPlan.PlannedStartDate = DateTimeUtils.NowDST;
+            }
         }
 
         public ProdOrderPartslistPos GetIntermediate(ProdOrderPartslist prodOrderPartslist, MaterialWFConnection matWFConnection)
