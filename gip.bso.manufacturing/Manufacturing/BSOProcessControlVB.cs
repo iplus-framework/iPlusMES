@@ -562,56 +562,50 @@ namespace gip.bso.manufacturing
                 model.ACClassTaskID = task.ACClassTaskID;
 
                 ProdOrderPartslistPos prodOrderPartslistPos =
-                task
-                .ACProgram
-                .ACClassTask_ACProgram
-                .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
-                .Where(c => c.ParentProdOrderPartslistPosID != null)
-                .FirstOrDefault();
+                    task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                    .Where(c => c.ParentProdOrderPartslistPosID != null && c.ACClassTaskID == task.ACClassTaskID)
+                    .FirstOrDefault();
+                // prodOrderPartslistPos is null at planning nodes
+                if (prodOrderPartslistPos == null)
+                {
+                    prodOrderPartslistPos =
+                    task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                    .Where(c => c.ParentProdOrderPartslistPosID != null)
+                    .FirstOrDefault();
+                }
 
-                PickingPos pickingPos =
-                 task
-                .ACProgram
-                .ACClassTask_ACProgram
-                .SelectMany(c => c.PickingPos_ACClassTask)
-                .FirstOrDefault();
-
+                model.Material = "";
+                model.BatchNo = "";
                 model.ProgramNo = "";
                 if (prodOrderPartslistPos != null)
                 {
                     model.ProgramNo = prodOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                }
-                if (pickingPos != null)
-                {
-                    model.ProgramNo = pickingPos.Picking.PickingNo;
-                }
-
-                model.BatchNo = "";
-                if (prodOrderPartslistPos != null)
-                {
                     model.BatchNo = prodOrderPartslistPos.ProdOrderBatch?.BatchSeqNo.ToString();
-                }
-
-                if (pickingPos != null)
-                {
-                    if (pickingPos.FromFacility != null)
-                    {
-                        model.BatchNo = pickingPos.FromFacility?.FacilityName;
-                    }
-                    else if (pickingPos.ToFacility != null)
-                    {
-                        model.BatchNo = pickingPos.ToFacility?.FacilityName;
-                    }
-                }
-
-                model.Material = "";
-                if (prodOrderPartslistPos != null)
-                {
                     model.Material = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
                 }
-                if (pickingPos != null)
+                else
                 {
-                    model.Material = pickingPos.Material.MaterialName1;
+                    PickingPos pickingPos =
+                     task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.PickingPos_ACClassTask)
+                    .FirstOrDefault();
+                    if (pickingPos != null)
+                    {
+                        model.ProgramNo = pickingPos.Picking.PickingNo;
+                        model.Material = pickingPos.Material?.MaterialName1;
+                        if (pickingPos.FromFacility != null)
+                            model.BatchNo = pickingPos.FromFacility.FacilityName;
+                        else if (pickingPos.ToFacility != null)
+                            model.BatchNo = pickingPos.ToFacility.FacilityName;
+                    }
                 }
 
                 model.InsertDate = task.InsertDate;
