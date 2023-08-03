@@ -17,6 +17,7 @@ using gip.mes.datamodel;
 using System.Threading;
 using gip.mes.processapplication;
 using System.Windows.Threading;
+using gip.bso.iplus;
 
 namespace gip.bso.manufacturing
 {
@@ -29,6 +30,7 @@ namespace gip.bso.manufacturing
         public BSOWorkCenterSelector(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _CN_BSOWCSNavigation = new ACPropertyConfigValue<string>(this, "CN_BSOWCSNavigation", "");
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -808,6 +810,68 @@ namespace gip.bso.manufacturing
             {
                 _ReceivedAlarmsList = value;
                 OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Properties => Navigate
+
+        private static List<string> _WorkCenterModules;
+        private static List<string> WorkCenterModules
+        {
+            get
+            {
+                if (_WorkCenterModules == null)
+                {
+                    using (Database db = new core.datamodel.Database())
+                    {
+                        _WorkCenterModules = s_cQry_GetRelevantPAProcessFunctions(db, nameof(PAProcessFunction), Const.KeyACUrl_BusinessobjectList).ToArray().Select(c => c.ACClass1_ParentACClass.ACUrlComponent).ToList();
+                    }
+                }
+
+                return _WorkCenterModules;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _CN_BSOWCSNavigation;
+        [ACPropertyConfig("en{'Classname BSOWorkCenterSelector for navigate'}de{'Klassenname BSOWorkCenterSelector for navigate'}")]
+        public string CN_BSOWCSNavigation
+        {
+            get
+            {
+                return _CN_BSOWCSNavigation.ValueT;
+            }
+            set 
+            { 
+                _CN_BSOWCSNavigation.ValueT = value; 
+            }
+        }
+
+        private static string _BSOWCSNavigation;
+        public static string BSOWCSNavigation
+        {
+            get
+            {
+                if (_BSOWCSNavigation == null)
+                {
+                    using (Database db = new core.datamodel.Database())
+                    {
+                        gip.core.datamodel.ACClass classOfBso = typeof(BSOWorkCenterSelector).GetACType() as gip.core.datamodel.ACClass;
+                        if (classOfBso != null)
+                        {
+                            core.datamodel.ACClassConfig config = db.ACClassConfig.Where(c => c.ACClassID == classOfBso.ACClassID && c.LocalConfigACUrl == nameof(CN_BSOWCSNavigation)).FirstOrDefault();
+                            if (config != null)
+                            {
+                                _BSOWCSNavigation = config.Value as string;
+                            }
+                        }
+                    }
+
+                    if (_BSOWCSNavigation == null)
+                        _BSOWCSNavigation = nameof(BSOWorkCenterSelector);
+                }
+                return _BSOWCSNavigation;
             }
         }
 
@@ -1809,6 +1873,58 @@ namespace gip.bso.manufacturing
         {
             CurrentTime = DateTime.Now;
         }
+
+        #region Methods => Navigation
+
+        [ACMethodAttached("", "en{'Navigate to work center'}de{'Navigiere zur Arbeitsplatz'}", 550, typeof(PAProcessModule), true, "", false, Global.ContextMenuCategory.ProdPlanLog)]
+        public static void NavigateToWorkCenter(IACComponent acComponent)
+        {
+            if (acComponent == null)
+                return;
+
+            string acUrl = acComponent.ACUrl;
+            IRoot root = acComponent.Root;
+
+            if (root == null)
+                return;
+
+            BSOWorkCenterSelector selector = root.Businessobjects.FindChildComponents<BSOWorkCenterSelector>(c => c is BSOWorkCenterSelector, null, 1).FirstOrDefault();
+            bool startNewBSO = selector == null;
+            if (startNewBSO)
+            {
+                string bsoNav = BSOWCSNavigation;
+                if (string.IsNullOrEmpty(bsoNav))
+                    bsoNav = nameof(BSOWorkCenterSelector);
+
+                root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + bsoNav, null);
+                selector = root.Businessobjects.FindChildComponents<BSOWorkCenterSelector>(c => c is BSOWorkCenterSelector, null, 1).FirstOrDefault();
+            }
+
+            if (selector == null)
+                return;
+
+            selector.SelectWorkCenterItem(acUrl);
+
+            if (!startNewBSO)
+                selector.Root.RootPageWPF.FocusBSO(selector);
+        }
+
+        internal void SelectWorkCenterItem(string acUrl)
+        {
+            var selectedItem = WorkCenterItems.FirstOrDefault(c => c.ProcessModule.ACUrl == acUrl);
+            if (selectedItem != null)
+                SelectedWorkCenterItem = selectedItem;
+        }
+
+        public static bool IsEnabledNavigateToWorkCenter(IACComponent acComponent)
+        {
+            if (acComponent == null)
+                return false;
+
+            return WorkCenterModules.Contains(acComponent.ACUrl);
+        }
+
+        #endregion
 
         #endregion
 
