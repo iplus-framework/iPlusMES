@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Vml.Office;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Vml.Office;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
@@ -3125,6 +3126,11 @@ namespace gip.mes.processapplication
             {
                 if (dosingWeight == null)
                     dosingWeight = weighingComponent.TargetWeight;
+
+                if (dosingWeight.HasValue && dosingWeight.Value == double.NaN)
+                {
+                    Messages.LogDebug(this.GetACUrl(), "ManWeighing(double.Nan)", string.Format("Target weight:{0}", weighingComponent.TargetWeight));
+                }
 
                 acMethod["TargetQuantity"] = dosingWeight.Value;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
