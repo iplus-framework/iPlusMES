@@ -203,6 +203,7 @@ namespace gip.mes.datamodel
         {
             OnPropertyChanged("FacilityACClass");
         }
+
         public gip.core.datamodel.ACClass GetACClass(Database db)
         {
             if (this.VBiACClassID == null || this.VBiACClassID == Guid.Empty)

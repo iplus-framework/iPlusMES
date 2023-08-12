@@ -2,6 +2,7 @@
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -618,7 +619,7 @@ namespace gip.mes.processapplication
                 labOrderPos = labOrder.LabOrderPos_LabOrder.Where(c => c.MDLabTag.MDKey == C_LabOrderPosTagKey).FirstOrDefault();
             if (labOrderPos == null)
                 return null;
-            if (storageFormat == StorageFormatEnum.PositionForEachWeighing && labOrderPos.EntityState != System.Data.EntityState.Added)
+            if (storageFormat == StorageFormatEnum.PositionForEachWeighing && labOrderPos.EntityState != EntityState.Added)
             {
                 labOrderPos = LabOrderPos.NewACObject(dbApp, labOrder, labOrderPos);
                 labOrder.LabOrderPos_LabOrder.Add(labOrderPos);
