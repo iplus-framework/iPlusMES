@@ -19,7 +19,10 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.bso.iplus;
 using gip.mes.processapplication;
-using Microsoft.EntityFrameworkCore;
+using gip.mes.facility;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using static gip.bso.iplus.BSOProcessControl;
 
 namespace gip.bso.manufacturing
 {
@@ -29,6 +32,9 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Processcontrol'}de{'Prozesssteuerung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + gip.core.datamodel.ACProgram.ClassName)]
     public class BSOProcessControlVB : BSOProcessControl
     {
+        #region const
+        public const string BGWorkerMehtod_DoSearchWorkflows = @"DoSearchWorkflows";
+        #endregion
         #region c´tors
         /// <summary>
         /// Initializes a new instance of the <see cref="BSOProcessControl"/> class.
@@ -41,6 +47,7 @@ namespace gip.bso.manufacturing
         public BSOProcessControlVB(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _UseBackGroundWorker = new ACPropertyConfigValue<bool>(this, nameof(UseBackGroundWorker), true);
         }
 
         /// <summary>
@@ -52,6 +59,7 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _ = UseBackGroundWorker;
             return true;
         }
 
@@ -59,6 +67,24 @@ namespace gip.bso.manufacturing
         {
             return base.ACDeInit(deleteACClassTask);
         }
+        #endregion
+
+        #region Configuration
+
+        private ACPropertyConfigValue<bool> _UseBackGroundWorker;
+        [ACPropertyConfig("en{'Use Background Worker'}de{'Use Background Worker'}")]
+        public bool UseBackGroundWorker
+        {
+            get
+            {
+                return _UseBackGroundWorker.ValueT;
+            }
+            set
+            {
+                _UseBackGroundWorker.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region BSO->ACProperty
@@ -141,13 +167,13 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// The _ selected AC task
         /// </summary>
-        ACClassTaskWrapperVB _SelectedACTaskVB;
+        ACClassTaskModel _SelectedACTaskVB;
         /// <summary>
         /// Gets or sets the selected AC task.
         /// </summary>
         /// <value>The selected AC task.</value>
         [ACPropertySelected(500, "Workflow-Live-VB")]
-        public ACClassTaskWrapperVB SelectedACTaskVB
+        public ACClassTaskModel SelectedACTaskVB
         {
             get
             {
@@ -165,30 +191,34 @@ namespace gip.bso.manufacturing
                     }
                     else
                     {
-                        CurrentACTask = _SelectedACTaskVB.ACClassTask.FromIPlusContext<gip.core.datamodel.ACClassTask>(DatabaseApp.ContextIPlus);
+                        //CurrentACTask = _SelectedACTaskVB.ACClassTask.FromIPlusContext<gip.core.datamodel.ACClassTask>(DatabaseApp.ContextIPlus);
+                        CurrentACTask =
+                            DatabaseApp
+                            .ContextIPlus
+                            .ACClassTask
+                            .FirstOrDefault(c => c.ACClassTaskID == value.ACClassTaskID);
                         SelectedACTask = CurrentACTask;
                     }
 
-                    OnPropertyChanged("SelectedACTaskVB");
+                    OnPropertyChanged();
                 }
             }
         }
 
 
-        protected IEnumerable<ACClassTaskWrapperVB> _ACTaskVBList;
+        protected IEnumerable<ACClassTaskModel> _ACTaskVBList;
         /// <summary>
         /// Gets the AC task list.
         /// </summary>
         /// <value>The AC task list.</value>
         [ACPropertyList(501, "Workflow-Live-VB")]
-        public IEnumerable<ACClassTaskWrapperVB> ACTaskVBList
+        public IEnumerable<ACClassTaskModel> ACTaskVBList
         {
             get
             {
                 return _ACTaskVBList;
             }
         }
-
 
         #endregion
 
@@ -197,180 +227,31 @@ namespace gip.bso.manufacturing
         #region Methods
 
         #region Refresh Tasklist
-        static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByTaskID =
-            EF.CompileQuery<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>>(
-                (db, rootACClassTaskID, orderNo, materialNo) =>
-                    db.ACClassTask
-                    .Include("TaskTypeACClass")
-                    .Include("ContentACClassWF")
-                    .Include("ACProgram")
-                    .Include("ACClassTask_ParentACClassTask")
-                    .Include("ProdOrderPartslistPos_ACClassTask")
-                    .Include("ACProgram.ProdOrderPartslist_VBiACProgram")
-                    .Include("ACProgram.ProdOrderPartslist_VBiACProgram.ProdOrder")
-                    .Include("ACProgram.ProdOrderPartslist_VBiACProgram.Partslist.Material")
-                    .Where(c => c.ParentACClassTaskID.HasValue && c.ParentACClassTaskID == rootACClassTaskID
-                        && c.IsDynamic
-                        && c.ACTaskTypeIndex == (short)Global.ACTaskTypes.WorkflowTask
-                        && (string.IsNullOrEmpty(orderNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.ProdOrder).Where(x => x.ProgramNo.Contains(orderNo)).Any())
-                        && (string.IsNullOrEmpty(materialNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.Partslist.Material).Where(x => x.MaterialNo.Contains(materialNo) || x.MaterialName1.Contains(materialNo)).Any())
-                    )
-                    .OrderBy(c => c.ACProgram.ProgramNo)
-                    .ThenByDescending(c => c.InsertDate)
-                    .Select(c => new ACClassTaskWrapperVB()
-                    {
-                        ACClassTask = c,
-                        ProdOrderPartslist = c.ACProgram.ACProgramLog_ACProgram
-                                                    .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPosID.HasValue && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist != null)
-                                                    .Select(f => f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist)
-                                                    .FirstOrDefault(),
-                        ProdOrderPartslistPos = c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault(),
-                        ProdOrderBatch = c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault() != null ? c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault().ProdOrderBatch : null,
-                        PickingPos = c.ACProgram.ACProgramLog_ACProgram
-                                                        .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.PickingPosID != null)
-                                                        .Select(f => f.OrderLog_VBiACProgramLog.PickingPos)
-                                                        .FirstOrDefault()
-
-                    })
-            );
-
-        static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByPWClassID =
-            EF.CompileQuery<DatabaseApp, Guid, string,string, IEnumerable<ACClassTaskWrapperVB>>(
-                (db, pwACClassID, orderNo, materialNo) =>
-                    db.ACClassTask
-                        .Include("TaskTypeACClass")
-                        .Include("ContentACClassWF")
-                        .Include("ACProgram")
-                        .Include("ACClassTask_ParentACClassTask")
-                        .Include("ProdOrderPartslistPos_ACClassTask")
-                        .Include("ACProgram.ProdOrderPartslist_VBiACProgram")
-                        .Include("ACProgram.ProdOrderPartslist_VBiACProgram.ProdOrder")
-                        .Include("ACProgram.ProdOrderPartslist_VBiACProgram.Partslist.Material")
-                        .Where(c => c.IsDynamic
-                                && c.ACProgramID.HasValue
-                                && c.ACTaskTypeIndex == (short)Global.ACTaskTypes.WorkflowTask
-                                && c.ParentACClassTaskID.HasValue && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACKindIndex == (short)Global.ACKinds.TACApplicationManager
-                                && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACProject.IsWorkflowEnabled
-                                && c.ContentACClassWFID.HasValue && c.ContentACClassWF.PWACClass.ACClassID == pwACClassID
-                                && (string.IsNullOrEmpty(orderNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.ProdOrder).Where(x => x.ProgramNo.Contains(orderNo)).Any())
-                                && (string.IsNullOrEmpty(materialNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.Partslist.Material).Where(x => x.MaterialNo.Contains(materialNo) || x.MaterialName1.Contains(materialNo)).Any())
-                        )
-                        .OrderBy(c => c.ACProgram.ProgramNo)
-                        .ThenByDescending(c => c.InsertDate)
-                        .Select(c => new ACClassTaskWrapperVB()
-                        {
-                            ACClassTask = c,
-                            ProdOrderPartslist = c.ACProgram.ACProgramLog_ACProgram
-                                                    .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPosID.HasValue && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist != null)
-                                                    .Select(f => f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist)
-                                                    .FirstOrDefault(),
-                            ProdOrderPartslistPos = c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault(),
-                            ProdOrderBatch = c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault() != null ? c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault().ProdOrderBatch : null,
-                            PickingPos = c.ACProgram.ACProgramLog_ACProgram
-                                                            .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.PickingPosID != null)
-                                                            .Select(f => f.OrderLog_VBiACProgramLog.PickingPos)
-                                                            .FirstOrDefault()
-                        })
-            );
-
-        static readonly Func<DatabaseApp, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistAll =
-            EF.CompileQuery<DatabaseApp, IEnumerable<ACClassTaskWrapperVB>>(
-                (db) =>
-                    db.ACClassTask
-                        .Include("TaskTypeACClass")
-                        .Include("ContentACClassWF")
-                        .Include("ACProgram")
-                        .Include("ProdOrderPartslistPos_ACClassTask")
-                        .Include("ACClassTask_ParentACClassTask")
-                        .Include("ACProgram.ProdOrderPartslist_VBiACProgram")
-                        .Include("ACProgram.ProdOrderPartslist_VBiACProgram.ProdOrder")
-                        .Include("ACProgram.ProdOrderPartslist_VBiACProgram.Partslist.Material")
-                        .Where(c => c.IsDynamic
-                                && c.ACProgramID.HasValue
-                                && c.ACTaskTypeIndex == (short)Global.ACTaskTypes.WorkflowTask
-                                && c.ParentACClassTaskID.HasValue && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACKindIndex == (short)Global.ACKinds.TACApplicationManager
-                                && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACProject.IsWorkflowEnabled)
-                        .OrderBy(c => c.ACProgram.ProgramNo)
-                        .ThenByDescending(c => c.InsertDate)
-                        .Select(c => new ACClassTaskWrapperVB()
-                        {
-                            ACClassTask = c,
-                            ProdOrderPartslist = c.ACProgram.ACProgramLog_ACProgram
-                                                    .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPosID.HasValue && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist != null)
-                                                    .Select(f => f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist)
-                                                    .FirstOrDefault(),
-                            ProdOrderPartslistPos = c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault(),
-                            ProdOrderBatch = c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault() != null ? c.ProdOrderPartslistPos_ACClassTask.FirstOrDefault().ProdOrderBatch : null,
-                            PickingPos = c.ACProgram.ACProgramLog_ACProgram
-                                                            .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.PickingPosID != null)
-                                                            .Select(f => f.OrderLog_VBiACProgramLog.PickingPos)
-                                                            .FirstOrDefault()
-                        })
-            );
+        FilterMode _filterMode;
+        bool _forceUpdateTaskList;
 
         protected override bool LoadACTaskList(FilterMode filterMode, bool forceUpdateTaskList)
         {
-            _NeedSearch = false;
-            bool taskListChanged = true;
-            ACClassTaskWrapperVB[] newTaskList = null;
-            if (filterMode == FilterMode.ByApplication)
+            if(UseBackGroundWorker)
             {
-                if (CurrentApplicationManager == null)
-                {
-                    taskListChanged = _ACTaskVBList != null;
-                    EmptyACTaskList();
-                    return taskListChanged;
-                }
-
-                gip.mes.datamodel.ACClassTask rootTaskAppManger = this.DatabaseApp.ACClassTask.Where(c => c.TaskTypeACClassID == CurrentApplicationManager.ACClassID && !c.IsTestmode).FirstOrDefault();
-                if (rootTaskAppManger == null)
-                {
-                    taskListChanged = _ACTaskVBList != null;
-                    EmptyACTaskList();
-                    return taskListChanged;
-                }
-
-                newTaskList = s_cQry_TasklistByTaskID(this.DatabaseApp, rootTaskAppManger.ACClassTaskID, FilterOrderNo, FilterMaterialNo).ToArray();
+                _filterMode = filterMode;
+                _forceUpdateTaskList = forceUpdateTaskList;
+                EmptyACTaskList();
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchWorkflows);
+                ShowDialog(this, DesignNameProgressBar);
             }
             else
             {
-                if (CurrentProgramType == null)
+                _ACTaskVBList = DoSearchWorkflows(filterMode, forceUpdateTaskList);
+                OnPropertyChanged(nameof(ACTaskList));
+                if (_ACTaskList != null)
                 {
-                    taskListChanged = _ACTaskVBList != null;
-                    EmptyACTaskList();
-                    return taskListChanged;
-                }
-
-                if (CurrentProgramType.ACObject is gip.core.datamodel.ACClass)
-                {
-                    gip.core.datamodel.ACClass pwACClass = CurrentProgramType.ACObject as gip.core.datamodel.ACClass;
-                    newTaskList = s_cQry_TasklistByPWClassID(this.DatabaseApp, pwACClass.ACClassID, FilterOrderNo, FilterMaterialNo).ToArray();
-                }
-                else
-                {
-                    newTaskList = s_cQry_TasklistAll(this.DatabaseApp).ToArray();
+                    CurrentACTask = _ACTaskList.FirstOrDefault();
+                    SelectedACTask = CurrentACTask;
                 }
             }
-
-            if (!forceUpdateTaskList && _ACTaskVBList != null)
-            {
-                taskListChanged = newTaskList.Except(_ACTaskVBList, new ACClassTaskWrapperVBComparer()).Any();
-                if (taskListChanged)
-                    _ACTaskVBList = newTaskList;
-            }
-            else
-                _ACTaskVBList = newTaskList;
-
-            if (taskListChanged)
-            {
-                OnPropertyChanged("ACTaskVBList");
-                if (_ACTaskVBList != null)
-                {
-                    var currentACTask = _ACTaskVBList.FirstOrDefault();
-                    SelectedACTaskVB = currentACTask;
-                }
-            }
-            return taskListChanged;
+            
+            return true;
         }
 
         protected override void EmptyACTaskList()
@@ -380,8 +261,8 @@ namespace gip.bso.manufacturing
             CurrentACTask = null;
             SelectedACTaskVB = null;
             SelectedACTask = null;
-            OnPropertyChanged("ACTaskList");
-            OnPropertyChanged("ACTaskVBList");
+            OnPropertyChanged(nameof(ACTaskList));
+            OnPropertyChanged(nameof(ACTaskVBList));
         }
 
         protected override bool SelectACTaskAndShowWF(string taskACIdentifier)
@@ -424,10 +305,16 @@ namespace gip.bso.manufacturing
         public override void PreviewTask(core.datamodel.ACClass applicationManager, core.datamodel.ACClassTask task)
         {
             CurrentApplicationManager = applicationManager;
-            SelectedACTaskVB = _ACTaskVBList.FirstOrDefault(x => x.ACClassTask.ACClassTaskID == task.ACClassTaskID);
+            SelectedACTaskVB = _ACTaskVBList.FirstOrDefault(x => x.ACClassTaskID == task.ACClassTaskID);
             ShowWorkflow();
         }
         #endregion  
+
+
+        #region provide ACClassTaskModel list
+
+    
+        #endregion
 
         #region Execute-Helper-Handlers
 
@@ -436,10 +323,10 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case "DeleteWorkflowVB":
+                case nameof(DeleteWorkflowVB):
                     DeleteWorkflowVB();
                     return true;
-                case "IsEnabledDeleteWorkflowVB":
+                case nameof(IsEnabledDeleteWorkflowVB):
                     result = IsEnabledDeleteWorkflowVB();
                     return true;
             }
@@ -448,6 +335,373 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties -> Messages
+
+        public void SendMessage(object result)
+        {
+            Msg msg = result as Msg;
+            if (msg != null)
+            {
+                SendMessage(msg);
+            }
+        }
+
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged(nameof(CurrentMsg));
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        #endregion
+
+        #region BackgroundWorker
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            string updateName = Root.Environment.User.Initials;
+
+            switch (command)
+            {
+                case BGWorkerMehtod_DoSearchWorkflows:
+                    using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
+                    {
+                        e.Result = DoSearchWorkflows(_filterMode, _forceUpdateTaskList);
+                    }
+                    break;
+
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ClearMessages();
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+            ClearMessages();
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                if (command == BGWorkerMehtod_DoSearchWorkflows)
+                {
+                    _ACTaskVBList = e.Result as IEnumerable<ACClassTaskModel>;
+                    OnPropertyChanged(nameof(ACTaskList));
+                    if (_ACTaskList != null)
+                    {
+                        CurrentACTask = _ACTaskList.FirstOrDefault();
+                        SelectedACTask = CurrentACTask;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region BackgroundWorker -> DoMehtods
+
+        private List<ACClassTaskModel> DoSearchWorkflows(FilterMode filterMode, bool forceUpdateTaskList)
+        {
+            using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
+            {
+                // Temp set CommandTimeout for long lasting search by material
+                int? commandTimeout = DatabaseApp.CommandTimeout;
+                DatabaseApp.CommandTimeout = 60 * 2;
+
+                _NeedSearch = false;
+                bool taskListChanged = true;
+                ACClassTaskModel[] newTaskList = null;
+                if (filterMode == FilterMode.ByApplication)
+                {
+                    if (CurrentApplicationManager == null)
+                    {
+                        taskListChanged = _ACTaskVBList != null;
+                        
+                    }
+
+                    gip.mes.datamodel.ACClassTask rootTaskAppManger = this.DatabaseApp.ACClassTask.Where(c => c.TaskTypeACClassID == CurrentApplicationManager.ACClassID && !c.IsTestmode).FirstOrDefault();
+                    if (rootTaskAppManger == null)
+                    {
+                        taskListChanged = _ACTaskVBList != null;
+                        
+                    }
+
+                    // newTaskList = s_cQry_TasklistByTaskID(this.DatabaseApp, rootTaskAppManger.ACClassTaskID, FilterOrderNo, FilterMaterialNo).ToArray();
+                    newTaskList = GetACClassTaskModels(DatabaseApp, rootTaskAppManger.ACClassTaskID, null, FilterMaterialNo, FilterOrderNo);
+                }
+                else
+                {
+                    if (CurrentProgramType == null)
+                    {
+                        taskListChanged = _ACTaskVBList != null;
+                        
+                    }
+
+                    if (CurrentProgramType.ACObject is gip.core.datamodel.ACClass)
+                    {
+                        gip.core.datamodel.ACClass pwACClass = CurrentProgramType.ACObject as gip.core.datamodel.ACClass;
+                        //newTaskList = s_cQry_TasklistByPWClassID(this.DatabaseApp, pwACClass.ACClassID, FilterOrderNo, FilterMaterialNo).ToArray();
+                        newTaskList = GetACClassTaskModels(DatabaseApp, null, pwACClass.ACClassID, FilterOrderNo, FilterMaterialNo);
+                    }
+                    else
+                    {
+                        //newTaskList = s_cQry_TasklistAll(this.DatabaseApp).ToArray();
+                        newTaskList = GetACClassTaskModels(DatabaseApp, null, null, FilterOrderNo, FilterMaterialNo);
+                    }
+                }
+
+                if (!forceUpdateTaskList && _ACTaskVBList != null)
+                {
+                    Guid[] fetched = newTaskList.Select(c => c.ACClassTaskID).ToArray();
+                    Guid[] existing = _ACTaskVBList.Select(c => c.ACClassTaskID).ToArray();
+                    taskListChanged = fetched.SequenceEqual(existing);
+                    if (taskListChanged)
+                        _ACTaskVBList = newTaskList;
+                }
+                else
+                    _ACTaskVBList = newTaskList;
+
+                if (taskListChanged)
+                {
+                    OnPropertyChanged(nameof(ACTaskVBList));
+                    if (_ACTaskVBList != null)
+                    {
+                        var currentACTask = _ACTaskVBList.FirstOrDefault();
+                        SelectedACTaskVB = currentACTask;
+                    }
+                }
+
+                DatabaseApp.CommandTimeout = commandTimeout;
+
+                return newTaskList.ToList();
+            }
+        }
+
+       
+        private ACClassTaskModel[] GetACClassTaskModels(DatabaseApp databaseApp, Guid? rootACClassTaskID, Guid? pwACClassID, string materialNo, string orderNo)
+        {
+            List<ACClassTaskModel> result = new List<ACClassTaskModel>();
+
+            // GetTasks(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
+            List<gip.mes.datamodel.ACClassTask> tasks =
+            s_cQry_ACClassTask(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo)
+            .ToList();
+
+
+            Guid[] aCProgramIDs = tasks.Select(c => c.ACProgramID ?? Guid.Empty).ToArray();
+
+
+            foreach (gip.mes.datamodel.ACClassTask task in tasks)
+            {
+                ACClassTaskModel model = new ACClassTaskModel();
+
+                model.ACClassTaskID = task.ACClassTaskID;
+
+                ProdOrderPartslistPos prodOrderPartslistPos =
+                    task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                    .Where(c => c.ParentProdOrderPartslistPosID != null && c.ACClassTaskID == task.ACClassTaskID)
+                    .FirstOrDefault();
+                // prodOrderPartslistPos is null at planning nodes
+                if (prodOrderPartslistPos == null)
+                {
+                    prodOrderPartslistPos =
+                    task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                    .Where(c => c.ParentProdOrderPartslistPosID != null)
+                    .FirstOrDefault();
+                }
+
+                model.Material = "";
+                model.BatchNo = "";
+                model.ProgramNo = "";
+                if (prodOrderPartslistPos != null)
+                {
+                    model.ProgramNo = prodOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    model.BatchNo = prodOrderPartslistPos.ProdOrderBatch?.BatchSeqNo.ToString();
+                    model.Material = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                }
+                else
+                {
+                    PickingPos pickingPos =
+                     task
+                    .ACProgram
+                    .ACClassTask_ACProgram
+                    .SelectMany(c => c.PickingPos_ACClassTask)
+                    .FirstOrDefault();
+                    if (pickingPos != null)
+                    {
+                        model.ProgramNo = pickingPos.Picking.PickingNo;
+                        model.Material = pickingPos.Material?.MaterialName1;
+                        if (pickingPos.FromFacility != null)
+                            model.BatchNo = pickingPos.FromFacility.FacilityName;
+                        else if (pickingPos.ToFacility != null)
+                            model.BatchNo = pickingPos.ToFacility.FacilityName;
+                    }
+                }
+
+                model.InsertDate = task.InsertDate;
+                model.ACProgramNo = task.ACProgram?.ProgramNo;
+                model.ACIdentifier = task.ACIdentifier;
+
+                result.Add(model);
+            }
+
+
+
+            return result.ToArray();
+        }
+
+        #region precompiled query
+
+        public static readonly Func<DatabaseApp, Guid?, Guid?,string, string, IQueryable<gip.mes.datamodel.ACClassTask>> s_cQry_ACClassTask =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, string, string, IQueryable<gip.mes.datamodel.ACClassTask>>(
+            (databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo) =>
+                databaseApp
+                .ACClassTask
+
+                .Include("TaskTypeACClass")
+                .Include("ContentACClassWF")
+                .Include("ContentACClassWF.PWACClass")
+
+            #region Include ACProgram Task list
+
+                .Include("ACProgram")
+                .Include("ACProgram.ACClassTask_ACProgram")
+
+                .Include("ACProgram.ACClassTask_ACProgram.ProdOrderPartslistPos_ACClassTask")
+                .Include("ACProgram.ACClassTask_ACProgram.ProdOrderPartslistPos_ACClassTask.ProdOrderPartslist")
+                .Include("ACProgram.ACClassTask_ACProgram.ProdOrderPartslistPos_ACClassTask.ProdOrderPartslist.Partslist")
+                .Include("ACProgram.ACClassTask_ACProgram.ProdOrderPartslistPos_ACClassTask.ProdOrderPartslist.Partslist.Material")
+                .Include("ACProgram.ACClassTask_ACProgram.ProdOrderPartslistPos_ACClassTask.ProdOrderPartslist.ProdOrder")
+
+                .Include("ACProgram.ACClassTask_ACProgram.PickingPos_ACClassTask")
+                .Include("ACProgram.ACClassTask_ACProgram.PickingPos_ACClassTask.Picking")
+                .Include("ACProgram.ACClassTask_ACProgram.PickingPos_ACClassTask.PickingMaterial")
+
+            #endregion
+
+                .Where(c =>
+
+                    // common
+                    c.IsDynamic
+                    && c.ACProgramID != null
+                    && c.ACTaskTypeIndex == (short)gip.core.datamodel.Global.ACTaskTypes.WorkflowTask
+
+                    // rootACClassTaskID
+                    && (rootACClassTaskID == null || (c.ParentACClassTaskID.HasValue && c.ParentACClassTaskID == rootACClassTaskID))
+
+                    // pwACClassID
+                    && (pwACClassID == null ||
+                        (
+                            c.ParentACClassTaskID.HasValue && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACKindIndex == (short)Global.ACKinds.TACApplicationManager
+                            && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACProject.IsWorkflowEnabled
+                            && c.ContentACClassWFID.HasValue && c.ContentACClassWF.PWACClass.ACClassID == pwACClassID
+                        )
+                    )
+
+                    // orderNo && materialNo
+                    && (
+                            (string.IsNullOrEmpty(orderNo) && string.IsNullOrEmpty(materialNo))
+                            ||
+                                c
+                               .ACProgram
+                                .ACClassTask_ACProgram
+                                .SelectMany(x => x.ProdOrderPartslistPos_ACClassTask)
+                                .Where(x =>
+                                            (string.IsNullOrEmpty(orderNo) || x.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(orderNo))
+                                            &&
+                                            (string.IsNullOrEmpty(materialNo) || (x.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo) || x.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo)))
+                                )
+                                .Any()
+                            ||
+                                c
+                                 .ACProgram
+                                .ACClassTask_ACProgram
+                                .SelectMany(x => x.PickingPos_ACClassTask)
+                                .Where(x =>
+                                            (string.IsNullOrEmpty(orderNo) || x.Picking.PickingNo.Contains(orderNo))
+                                            &&
+                                            (string.IsNullOrEmpty(materialNo) || (x.PickingMaterial.MaterialNo.Contains(materialNo) || x.PickingMaterial.MaterialName1.Contains(materialNo)))
+                                 )
+                                .Any()
+                    )
+                )
+                .OrderBy(c => c.ACProgram.ProgramNo)
+                .ThenByDescending(c => c.InsertDate)
+        );
+
+        #endregion
+
+        #endregion
 
     }
 

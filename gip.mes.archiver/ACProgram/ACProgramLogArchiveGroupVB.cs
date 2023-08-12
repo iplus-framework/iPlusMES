@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.datamodel;
 using VD = gip.mes.datamodel;
 using System.IO;
@@ -11,7 +9,6 @@ using System.Runtime.Serialization;
 using gip.core.autocomponent;
 using gip.core.archiver;
 using gip.core.communication;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -48,7 +45,7 @@ namespace gip.mes.archiver
             switch (acMethodName)
             {
                 case nameof(RestoreArchivedProgramLogVB):
-                    result = RestoreArchivedProgramLogVB(acParameter[0] as String, (DateTime) acParameter[1]);
+                    result = RestoreArchivedProgramLogVB(acParameter[0] as String, (DateTime)acParameter[1]);
                     return true;
                 case nameof(ArchiveProgramLogVBManual):
                     result = ArchiveProgramLogVBManual(acParameter[0] as String, (DateTime)acParameter[1], acParameter[2] as String);
@@ -60,24 +57,36 @@ namespace gip.mes.archiver
 
 
         #region Methods
-        
+
         #region overrides
 
         protected override string OnProgramLogArchive(ACProgram acProgram, string exportPath)
         {
-            IEnumerable<VD.OrderLog> orderLogList;
-            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
+            IEnumerable<vd.OrderLog> orderLogList;
+            IEnumerable<vd.OperationLog> operationLogList;
+            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
             {
-                VD.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
+                vd.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
 
-                DeleteOperationLog(dbApp, acProgram);
+                //DeleteOperationLog(dbApp, acProgram);
 
                 orderLogList = dbApp.OrderLog.Where(c => c.VBiACProgramLog.ACProgramID == acProgram.ACProgramID).ToArray();
+                operationLogList = dbApp.OperationLog.Where(c => c.ACProgramLog.ACProgramID == acProgram.ACProgramID).ToArray();
 
-                if (orderLogList.Any())
+                if (orderLogList.Any() || operationLogList.Any())
                 {
                     string acProgramFolderName = CreateACProgramDirectory(acProgramVB, exportPath);
-                    ArchiveOrderLog(orderLogList, acProgram, acProgramFolderName, dbApp);
+
+                    if (orderLogList.Any())
+                    {
+                        ArchiveOrderLog(orderLogList, acProgram, acProgramFolderName, dbApp);
+                    }
+
+                    if (operationLogList.Any())
+                    {
+                        ArchiveOperationLog(operationLogList, acProgram, acProgramFolderName, dbApp);
+                    }
+
                     MsgWithDetails msg = dbApp.ACSaveChanges();
                     if (msg != null)
                     {
@@ -92,7 +101,6 @@ namespace gip.mes.archiver
                     return base.OnProgramLogArchive(acProgram, exportPath);
             }
         }
-
         protected override string CreateACProgramDirectory(IACObject acProgram, string exportPath)
         {
             string exportPathWithDate = exportPath;
@@ -119,7 +127,7 @@ namespace gip.mes.archiver
             if (!Directory.Exists(exportPathWithDate))
                 Directory.CreateDirectory(exportPathWithDate);
 
-            string acProgramDirPath = string.Format("{0}\\ProdOrderProgramNo({1})ACProgram({2})", exportPathWithDate, prodOrder.Item1, acProgramVB.ProgramNo);  
+            string acProgramDirPath = string.Format("{0}\\ProdOrderProgramNo({1})ACProgram({2})", exportPathWithDate, prodOrder.Item1, acProgramVB.ProgramNo);
             if (File.Exists(acProgramDirPath + ".zip"))
             {
                 File.Delete(acProgramDirPath + ".zip");
@@ -167,7 +175,7 @@ namespace gip.mes.archiver
                 foreach (var item in orderLogList)
                     item.GetObjectContext().Detach(item);
             }
-            catch(Exception ec)
+            catch (Exception ec)
             {
                 //Error50219: Detaching OrderLog from database context is fail!!! Error message: {0}
                 Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOrderLog), 164, "Error50219", ec.Message);
@@ -225,29 +233,79 @@ namespace gip.mes.archiver
             }
         }
 
-        private void DeleteOperationLog(VD.DatabaseApp dbApp, ACProgram acProgram)
+        private void ArchiveOperationLog(IEnumerable<vd.OperationLog> operationLoglist, ACProgram acProgram, string exportPath, vd.DatabaseApp dbApp)
         {
-            if (acProgram == null)
+            if (exportPath == null)
                 return;
+
+            string filePath = string.Format("{0}\\OperationLog.xml", exportPath);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
 
             try
             {
-                dbApp.Database.ExecuteSql(FormattableStringFactory.Create("delete OperationLog from OperationLog ol inner join ACProgramLog pl on ol.ACProgramLogID = pl.ACProgramLogID where pl.ACProgramID = @p0", acProgram.ACProgramID));
-
-                DateTime dateTime = DateTime.Now.AddDays(-ArchiveAfterDays);
-                dbApp.Database.ExecuteSql(FormattableStringFactory.Create("delete OperationLog where OperationTime < @p0", dateTime));
+                foreach (var item in operationLoglist)
+                    item.GetObjectContext().Detach(item);
             }
             catch (Exception ec)
             {
-                //Error50217: Order log archive is fail! Error message: {0}
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DeleteOperationLog), 241, "Error50217", ec.Message);
+                // Error50599
+                // Detaching the OperationLog from the database context is fail!!! Error message: { 0}
+                // Das Trennen des OperationLog aus dem Datenbank - Kontext ist fehlgeschlagen. Fehlermeldung: { 0}
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOperationLog), 164, "Error50599", ec.Message);
                 AddAlarm(PropNameExportAlarm, msg);
 
                 string msgEc = ec.Message;
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msgEc += " Inner:" + ec.InnerException.Message;
 
-                Messages.LogException(ClassName, nameof(DeleteOperationLog)+"(10)", msgEc);
+                Messages.LogException(ClassName, nameof(ArchiveOperationLog) + "(0)", msgEc);
+
+                return;
+            }
+
+            DataContractSerializer serializer = new DataContractSerializer(typeof(List<vd.OperationLog>));
+            try
+            {
+                using (FileStream fs = File.Open(filePath, FileMode.Create))
+                {
+                    serializer.WriteObject(fs, operationLoglist);
+                }
+            }
+            catch (Exception ec)
+            {
+                // Error50600
+                // Operation log serialization is fail! Error message: {0}
+                // Die Serialisierung des OperationLog ist fehlgeschlagen!Fehlermeldung: { 0}
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOperationLog), 187, "Error50600", ec.Message);
+                AddAlarm(PropNameExportAlarm, msg);
+
+                string msgEc = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msgEc += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException(ClassName, nameof(ArchiveOperationLog) + "(10)", msgEc);
+
+                return;
+            }
+
+            try
+            {
+                dbApp.ExecuteStoreCommand("delete OperationLog from OperationLog ol inner join ACProgramLog pl on pl.ACProgramLogID = ol.ACProgramLogID inner join ACProgram p on p.ACProgramID = pl.ACProgramID where pl.ACProgramID = {0}", acProgram.ACProgramID);
+            }
+            catch (Exception ec)
+            {
+                //Error50217: Order log archive is fail! Error message: {0}
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ArchiveOperationLog), 213, "Error50217", ec.Message);
+                AddAlarm(PropNameExportAlarm, msg);
+
+                string msgEc = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msgEc += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException(ClassName, nameof(ArchiveOperationLog) + "(20)", msgEc);
 
                 return;
             }
@@ -291,7 +349,7 @@ namespace gip.mes.archiver
 
             //string[] archives = Directory.GetFiles(pathWithDate);
             string[] targetFilePaths = Directory.GetFiles(pathWithDate, string.Format("ProdOrderProgramNo({0})*.zip", prodOrderProgramNo));
-            foreach(var targetFilePath in targetFilePaths)
+            foreach (var targetFilePath in targetFilePaths)
             {
                 ProcessArchiveFile(targetFilePath, paFileCyclicExport.Path);
             }
@@ -307,7 +365,8 @@ namespace gip.mes.archiver
             }
 
             string[] archive = Directory.GetFiles(targetDirPath);
-            string orderLogPath = archive.FirstOrDefault(c => c.Contains("OrderLog"));
+            string orderLogPath = archive.FirstOrDefault(c => c.Contains(nameof(gip.mes.datamodel.OrderLog)));
+            string operationLogPath = archive.FirstOrDefault(c => c.Contains(nameof(gip.mes.datamodel.OperationLog)));
 
             if (string.IsNullOrEmpty(orderLogPath))
             {
@@ -321,30 +380,10 @@ namespace gip.mes.archiver
 
             try
             {
-                DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<VD.OrderLog>));
-                using (FileStream fs = File.Open(orderLogPath, FileMode.Open))
+                DeserializeOrderLog(orderLogPath);
+                if (!string.IsNullOrEmpty(operationLogPath))
                 {
-                    List<VD.OrderLog> orders = serializerOrder.ReadObject(fs) as List<VD.OrderLog>;
-                    using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
-                    {
-                        foreach (VD.OrderLog log in orders)
-                        {
-                            if (!dbApp.OrderLog.Any(c => c.VBiACProgramLogID == log.VBiACProgramLogID))
-                            {
-                                if (String.IsNullOrEmpty(log.XMLConfig))
-                                    log.ACProperties.Serialize();
-                                dbApp.Add(log);
-                            }
-                        }
-                        MsgWithDetails msg = dbApp.ACSaveChanges();
-                        if (msg != null)
-                        {
-                            AddAlarm(PropNameExportAlarm, msg);
-                            Messages.LogError(GetACUrl(), nameof(ProcessArchiveFile) + "(9)", msg.Message);
-                            Messages.LogError(GetACUrl(), nameof(ProcessArchiveFile) + "(9)", msg.InnerMessage);
-                            return;
-                        }
-                    }
+                    DeserializeOperationLog(operationLogPath);
                 }
                 CleanUpAfterRestore(targetFilePath, defaultArchivePath);
             }
@@ -361,6 +400,68 @@ namespace gip.mes.archiver
                 Messages.LogException(ClassName, nameof(ProcessArchiveFile) + "(10)", msgEc);
 
                 return;
+            }
+        }
+
+        public void DeserializeOrderLog(string orderLogPath)
+        {
+            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<vd.OrderLog>));
+            using (FileStream fs = File.Open(orderLogPath, FileMode.Open))
+            {
+                List<vd.OrderLog> orders = serializerOrder.ReadObject(fs) as List<vd.OrderLog>;
+                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                {
+                    foreach (vd.OrderLog log in orders)
+                    {
+                        if (!dbApp.OrderLog.Any(c => c.VBiACProgramLogID == log.VBiACProgramLogID))
+                        {
+                            if (String.IsNullOrEmpty(log.XMLConfig))
+                                log.ACProperties.Serialize();
+                            dbApp.AddToOrderLog(log);
+                        }
+                    }
+                    MsgWithDetails msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        AddAlarm(PropNameExportAlarm, msg);
+                        Messages.LogError(GetACUrl(), nameof(DeserializeOrderLog) + "(10)", msg.Message);
+                        Messages.LogError(GetACUrl(), nameof(DeserializeOrderLog) + "(10)", msg.InnerMessage);
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void DeserializeOperationLog(string operationLogPath)
+        {
+            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<vd.OperationLog>));
+            using (FileStream fs = File.Open(operationLogPath, FileMode.Open))
+            {
+                List<vd.OperationLog> operationLogs = serializerOrder.ReadObject(fs) as List<vd.OperationLog>;
+                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                {
+                    foreach (vd.OperationLog log in operationLogs)
+                    {
+                        if (!dbApp.OperationLog.Any(c => c.ACProgramLogID == log.ACProgramLogID))
+                        {
+                            bool existRefClass = log.RefACClassID == null || dbApp.ContextIPlus.ACClass.Any(c => c.ACClassID == (log.RefACClassID ?? Guid.Empty));
+                            if(existRefClass)
+                            {
+                                if (String.IsNullOrEmpty(log.XMLConfig))
+                                    log.ACProperties.Serialize();
+                                dbApp.AddToOperationLog(log);
+                            }
+                        }
+                    }
+                    MsgWithDetails msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        AddAlarm(PropNameExportAlarm, msg);
+                        Messages.LogError(GetACUrl(), nameof(DeserializeOperationLog) + "(10)", msg.Message);
+                        Messages.LogError(GetACUrl(), nameof(DeserializeOperationLog) + "(10)", msg.InnerMessage);
+                        return;
+                    }
+                }
             }
         }
 
@@ -382,7 +483,7 @@ namespace gip.mes.archiver
                 isArchiveable = db.ACProgram.Where(c => c.ProgramNo == acProgramNo && !c.ACClassTask_ACProgram.Any()).Any();
             }
             if (!isArchiveable)
-                 return "Warning50019";
+                return "Warning50019";
 
             DelegateQueue.Add(() => ArchiveProgramLogVB(prodOrderProgramNo, prodOrderInsertDate, acProgramNo));
             return null;

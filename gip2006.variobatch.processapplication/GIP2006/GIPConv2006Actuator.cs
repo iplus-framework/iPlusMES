@@ -19,7 +19,7 @@ namespace gip2006.variobatch.processapplication
     [ACPropertyEntity(102, "Bit02", "en{'Open, Position 2 (Bit02/3.2)'}de{'Offen, Position 2 Offen(Bit02/3.2)'}")]
     [ACPropertyEntity(103, "Bit03", "en{'Mid (Bit03/3.3)'}de{'Mitte (Bit03/3.3)'}")]
     [ACPropertyEntity(104, "Bit04", "en{'Half open (Bit04/3.4)'}de{'Halb Offen (Bit04/3.4)'}")]
-    [ACPropertyEntity(108, "Bit08", "en{'Allocated, Posistion 2 (Bit08/2.0)'}de{'Belegt, Position 2 (Bit08/2.0)'}")]
+    [ACPropertyEntity(108, "Bit08", "en{'Allocated, Position 2 (Bit08/2.0)'}de{'Belegt, Position 2 (Bit08/2.0)'}")]
     [ACPropertyEntity(109, "Bit09", "en{'Allocated, Position 1 (Bit09/2.1)'}de{'Belegt, Position 1 (Bit09/2.1)'}")]
     [ACPropertyEntity(112, "Bit12", "en{'Endposition 1 (Bit12/2.4)'}de{'Endlage 1 (Bit12/2.4)'}")]
     [ACPropertyEntity(113, "Bit13", "en{'Endposition 2 (Bit13/2.5)'}de{'Endlage 2 (Bit13/2.5)'}")]

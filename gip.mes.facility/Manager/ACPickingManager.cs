@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioLogistics, "", Global.ACKinds.TPARole, Global.ACStorableTypes.NotStorable, false, false)]
-    public partial class ACPickingManager : PARole
+    public class ACPickingManager : PARole
     {
         #region c´tors
         public ACPickingManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

@@ -300,10 +300,20 @@ namespace gip.mes.webservices
             if (resolvedComponent == null)
                 return false;
 
-            controller = FindChildComponents<PAScannedCompContrBase>
+            var controllers = FindChildComponents<PAScannedCompContrBase>
                                                 (c => c is PAScannedCompContrBase
-                                                  && (c as PAScannedCompContrBase).IsControllerFor(acComponent))
-                                                .FirstOrDefault();
+                                                  && (c as PAScannedCompContrBase).IsControllerFor(acComponent));
+
+            if (controllers.Count > 1)
+            {
+                controller = controllers.FirstOrDefault();//todo: controllers.OrderByDescending(c => c.ComponentClass.ClassHierarchy.Count()).FirstOrDefault();
+            }
+            else
+            {
+                controller = controllers.FirstOrDefault();
+            }
+            
+
             if (controller == null)
             {
                 sequence.Message = new Msg("Keine Scanunterstützung für Maschine oder Funktion", this, eMsgLevel.Error, ClassName, "ResolveACComponentAndValidateState", 10);
@@ -347,9 +357,9 @@ namespace gip.mes.webservices
 
         public virtual void GetFacilityEntitiesFromSequence(BarcodeSequence sequence, out BarcodeEntity entityFacility, out BarcodeEntity entityCharge)
         {
-            entityCharge = sequence.Sequence.Where(c => c.ValidEntity.GetType() == typeof(FacilityCharge)).FirstOrDefault();
-            entityFacility = sequence.Sequence.Where(c => c.ValidEntity.GetType() == typeof(Facility)).FirstOrDefault();
-            BarcodeEntity entityLot = sequence.Sequence.Where(c => c.ValidEntity.GetType() == typeof(FacilityLot)).FirstOrDefault();
+            entityCharge = sequence.Sequence.Where(c => c.ValidEntity != null && c.ValidEntity.GetType() == typeof(FacilityCharge)).FirstOrDefault();
+            entityFacility = sequence.Sequence.Where(c => c.ValidEntity != null && c.ValidEntity.GetType() == typeof(Facility)).FirstOrDefault();
+            BarcodeEntity entityLot = sequence.Sequence.Where(c => c.ValidEntity != null && c.ValidEntity.GetType() == typeof(FacilityLot)).FirstOrDefault();
             // More Quants with same Lot
             if (entityLot != null && entityCharge == null)
                 entityCharge = OnResolveFacilityChargeFromLot(sequence, entityLot);

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
 using gip.core.datamodel;
@@ -59,7 +59,7 @@ namespace gip.bso.masterdata
                 if (dummyMaterial != null)
                     MediaSettings.LoadTypeFolder(dummyMaterial);
             }
-           
+
             return true;
         }
 
@@ -393,6 +393,25 @@ namespace gip.bso.masterdata
             }
         }
 
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(ClearSearch):
+                    ClearSearch();
+                    return true;
+                case nameof(OnKeyEvent):
+                    OnKeyEvent((System.Windows.Input.KeyEventArgs)acParameter[0]);
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
+
     }
 }

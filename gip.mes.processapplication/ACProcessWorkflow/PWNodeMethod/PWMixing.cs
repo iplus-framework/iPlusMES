@@ -20,7 +20,7 @@ namespace gip.mes.processapplication
             method = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
             method.ParameterValueList.Add(new ACValue("SkipIfCountComp", typeof(int), 0, Global.ParamOption.Required));
-            paramTranslation.Add("SkipIfCountComp", "en{'Skip if count components lower than'}de{'Überspringe wenn Komponentenanzahl kleiner als'}");
+            paramTranslation.Add("SkipIfCountComp", "en{'Skip if count components lower than or negative'}de{'Überspringe wenn Komponentenanzahl kleiner als oder negativ'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWMixing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWMixing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWMixing), HandleExecuteACMethod_PWMixing);
@@ -103,14 +103,17 @@ namespace gip.mes.processapplication
             if (!CheckParentGroupAndHandleSkipMode())
                 return;
 
-            if (SkipIfCountComp > 0)
+            if (SkipIfCountComp != 0)
             {
                 int countDosings = 0;
-                List<PWDosing> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<PWDosing>(this);
-                if (previousDosings != null)
-                    countDosings = previousDosings.Sum(c => c.CountRunDosings);
+                if (SkipIfCountComp > 0)
+                {
+                    List<PWDosing> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<PWDosing>(this);
+                    if (previousDosings != null)
+                        countDosings = previousDosings.Sum(c => c.CountRunDosings);
+                }
 
-                if (countDosings < SkipIfCountComp)
+                if (SkipIfCountComp < 0 || countDosings < SkipIfCountComp)
                 {
                     // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
                     if (CurrentACState == ACStateEnum.SMStarting)

@@ -20,9 +20,10 @@ namespace gip2006.variobatch.processapplication
     [ACSerializeableInfo]
     [ACClassInfo(ConstGIP2006.PackName_VarioGIP2006, "en{'BitAccess GIPConv2006BaseMaskRes'}de{'Bitzugriff GIPConv2006BaseMaskRes'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     [ACPropertyEntity(106, "Bit23", "en{'On site maintenance (Bit23/1.7)'}de{'Wartungsschalter (Bit23/1.7)'}")]
+    [ACPropertyEntity(107, "Bit07", "en{'On site switch auto (Bit07/3.7)'}de{'Vorortschalter Auto (Bit07/3.7)'}")]
     [ACPropertyEntity(108, "Bit08", "en{'Allocated by way (Bit08/2.0)'}de{'Belegt durch Wegesteuerung (Bit08/2.0)'}")]
     [ACPropertyEntity(110, "Bit10", "en{'Turn on interlock (Bit10/2.2'}de{'Einschaltverriegelung (Bit10/2.2)'}")]
-    [ACPropertyEntity(111, "Bit11", "en{'On site turned on (Bit11/2.3)'}de{'Vorortschalter (Bit11/2.3)'}")]
+    [ACPropertyEntity(111, "Bit11", "en{'On site switch on (Bit11/2.3)'}de{'Vorortschalter (Bit11/2.3)'}")]
     [ACPropertyEntity(114, "Bit14", "en{'Manual mode (Bit14/2.6)'}de{'Handbetrieb (Bit14/2.6)'}")]
     [ACPropertyEntity(115, "Bit15", "en{'Common fault (Bit15/2.7)'}de{'Störung allgemein (Bit15/2.7)'}")]
     [ACPropertyEntity(120, "Bit20", "en{'Error extern (Bit20/1.4)'}de{'Störung Extern (Bit20/1.4)'}")]
@@ -45,6 +46,12 @@ namespace gip2006.variobatch.processapplication
         {
             get { return Bit23; }
             set { Bit23 = value; }
+        }
+
+        public bool Bit07_OnSiteTurnedAuto
+        {
+            get { return Bit07; }
+            set { Bit07 = value; }
         }
 
         public bool Bit08_AllocatedByWay
@@ -283,7 +290,7 @@ namespace gip2006.variobatch.processapplication
         #region Read-Values from PLC
         public IACContainerTNet<PANotifyState> FaultState { get; set; }
         public IACContainerTNet<BitAccessForAllocatedByWay> AllocatedByWay { get; set; }
-        public IACContainerTNet<Boolean> OnSiteTurnedOn { get; set; }
+        public IACContainerTNet<ushort> OnSiteTurnedOn { get; set; }
         public IACContainerTNet<Boolean> TurnOnInterlock { get; set; }
         public IACContainerTNet<Global.OperatingMode> OperatingMode { get; set; }
         public IACContainerTNet<Boolean> IsTriggered { get; set; }
@@ -342,7 +349,17 @@ namespace gip2006.variobatch.processapplication
             {
                 if (AllocatedByWay != null) AllocatedByWay.ValueT.Bit01_Allocated = _ResponseValue.Bit08_AllocatedByWay;
                 if (TurnOnInterlock != null) TurnOnInterlock.ValueT = _ResponseValue.Bit10_TurnOnInterlock;
-                if (OnSiteTurnedOn != null) OnSiteTurnedOn.ValueT = _ResponseValue.Bit11_OnSiteTurnedOn;
+                if (OnSiteTurnedOn != null)
+                {
+                    if (!_ResponseValue.Bit07_OnSiteTurnedAuto && !_ResponseValue.Bit11_OnSiteTurnedOn)
+                        OnSiteTurnedOn.ValueT = 0;
+                    else if (_ResponseValue.Bit07_OnSiteTurnedAuto && !_ResponseValue.Bit11_OnSiteTurnedOn)
+                        OnSiteTurnedOn.ValueT = 1;
+                    else if (!_ResponseValue.Bit07_OnSiteTurnedAuto && _ResponseValue.Bit11_OnSiteTurnedOn)
+                        OnSiteTurnedOn.ValueT = 2;
+                    else //if (_ResponseValue.Bit07_OnSiteTurnedAuto && _ResponseValue.Bit11_OnSiteTurnedOn)
+                        OnSiteTurnedOn.ValueT = 3;
+                }
                 if (OperatingMode != null)
                 {
                     if (!_ResponseValue.IsAnyBitSetted && !IsSimulationOn && HasConnectedSession)
@@ -399,7 +416,7 @@ namespace gip2006.variobatch.processapplication
                     AllocatedByWay = parentProperty as IACContainerTNet<BitAccessForAllocatedByWay>;
                     return true;
                 case "OnSiteTurnedOn":
-                    OnSiteTurnedOn = parentProperty as IACContainerTNet<Boolean>;
+                    OnSiteTurnedOn = parentProperty as IACContainerTNet<ushort>;
                     return true;
                 case "TurnOnInterlock":
                     TurnOnInterlock = parentProperty as IACContainerTNet<Boolean>;

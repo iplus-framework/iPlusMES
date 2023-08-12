@@ -57,7 +57,8 @@ namespace gip.mes.webservices
             if (result != null)
             {
                 if (result.Result.State == BarcodeSequenceBase.ActionState.Selection
-                    || result.Result.State == BarcodeSequenceBase.ActionState.FastSelection)
+                    || result.Result.State == BarcodeSequenceBase.ActionState.FastSelection
+                    || result.Result.State == BarcodeSequenceBase.ActionState.SelectionScanAgain)
                 {
                     BarcodeEntity barcodeEntity = new BarcodeEntity();
                     List<ProdOrderPartslistWFInfo> orderInfoList = new List<ProdOrderPartslistWFInfo>();
@@ -67,8 +68,11 @@ namespace gip.mes.webservices
                     sequence.State = result.Result.State;
                     sequence.Sequence.Add(barcodeEntity);
                 }
-                else if (result.Result.Message.MessageLevel == eMsgLevel.Question)
+                else if (result.Result.Message != null && result.Result.Message.MessageLevel == eMsgLevel.Question)
+                {
                     sequence.AddQuestion(result.Result.Message);
+                    sequence.QuestionSequence = result.Result.QuestionSequence;
+                }
                 else
                 {
                     sequence.State = result.Result.State;
@@ -140,7 +144,7 @@ namespace gip.mes.webservices
                                                        .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos.Material")
                                                        .Include("Material.MaterialWFRelation_SourceMaterial")
                                                        .Where(c => (        c.ProdOrderBatch != null
-                                                                        && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                        && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Blocked
                                                                             || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
                                                                         && intermChildPoPLPosIDs.Contains(c.ProdOrderPartslistPosID)
                                                        )

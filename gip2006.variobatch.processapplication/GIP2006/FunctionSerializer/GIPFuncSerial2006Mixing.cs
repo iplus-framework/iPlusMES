@@ -109,9 +109,14 @@ namespace gip2006.variobatch.processapplication
             }
             else if (MethodNameEquals(request.ACIdentifier, "MixingTime"))
             {
+                ACValue acValueLeaveOn = request.ParameterValueList.GetACValue("LeaveOn");
+
                 totalSec = request.ParameterValueList.GetTimeSpan("Duration").TotalSeconds;
                 if (totalSec > Int16.MaxValue)
                     totalSec = Int16.MaxValue;
+                if (acValueLeaveOn != null && acValueLeaveOn.ParamAsBoolean)
+                    totalSec = totalSec * -1;
+
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
@@ -162,6 +167,8 @@ namespace gip2006.variobatch.processapplication
             }
             else if (MethodNameEquals(request.ACIdentifier, "MixingTemperature"))
             {
+                ACValue acValueLeaveOn = request.ParameterValueList.GetACValue("LeaveOn");
+
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(0),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
@@ -170,7 +177,11 @@ namespace gip2006.variobatch.processapplication
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("Temperature")),
+                double temperature = request.ParameterValueList.GetDouble("Temperature");
+                if (acValueLeaveOn != null && acValueLeaveOn.ParamAsBoolean)
+                    temperature = temperature * -1;
+
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(temperature),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
@@ -303,7 +314,10 @@ namespace gip2006.variobatch.processapplication
                 }
                 else if (MethodNameEquals(response.ACIdentifier, "MixingTime"))
                 {
-                    response.ParameterValueList.GetACValue("Duration").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    short duration = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
+                    if (duration < 0)
+                        duration = (short) (duration * -1);
+                    response.ParameterValueList.GetACValue("Duration").Value = TimeSpan.FromSeconds(duration);
                     iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                     response.ParameterValueList.GetACValue("Speed").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
@@ -338,7 +352,11 @@ namespace gip2006.variobatch.processapplication
                     response.ParameterValueList.GetACValue("Speed").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
                     iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                    response.ParameterValueList.GetACValue("Temperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                    double temperature = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                    ACValue acValueLeaveOn = response.ParameterValueList.GetACValue("LeaveOn");
+                    if (acValueLeaveOn != null && acValueLeaveOn.ParamAsBoolean)
+                        temperature = temperature * -1;
+                    response.ParameterValueList.GetACValue("Temperature").Value = temperature;
                     iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                     response.ParameterValueList.GetACValue("MinWeight").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);

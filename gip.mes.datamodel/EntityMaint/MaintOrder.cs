@@ -10,15 +10,16 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Order'}de{'Wartungsauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaintOrder")]
 
     [ACPropertyEntity(1, "MaintOrderNo", "en{'Maintorder-No.'}de{'Wartungauftrags-Nr.'}", "", "", true)]
-    [ACPropertyEntity(2, "MaintSetDate", "en{'Order Date'}de{'Auftragsdatum'}", "", "", true)]
-    [ACPropertyEntity(3, "MaintSetDuration", "en{'Maintenance Interval'}de{'Wartungsintervall'}", "", "", true)]
-    [ACPropertyEntity(4, "Comment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]
-    [ACPropertyEntity(5, "MaintActDuration", "en{'Duration'}de{'Dauer'}", "", "", true)]
-    [ACPropertyEntity(6, "MaintActStartDate", "en{'Start of Maintenance'}de{'Wartungsbeginn'}", "", "", true)]
-    [ACPropertyEntity(7, "MaintActEndDate", "en{'Completed at'}de{'Fertiggestellt am'}", "", "", true)]
-    [ACPropertyEntity(8, "MDMaintOrderState", "en{'Status'}de{'Status'}", Const.ContextDatabase + "\\MDMaintOrderState" + Const.DBSetAsEnumerablePostfix, "", true)]
-    [ACPropertyEntity(9, "MDMaintMode", "en{'Maintenance Mode'}de{'Wartungsmodus'}", Const.ContextDatabase + "\\MDMaintMode" + Const.DBSetAsEnumerablePostfix, "", true)]
-    [ACPropertyEntity(10, "VBiPAACClass", "en{'Maintenance Objekt'}de{'Wartungsobjekt'}")]
+    [ACPropertyEntity(2, "BasedOnMaintOrder", "en{'BasedOnMaintOrder'}de{'BasedOnMaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName, "", true)]
+    [ACPropertyEntity(3, "Facility", "en{'Facility'}de{'Facility'}", Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
+    [ACPropertyEntity(4, "Picking", "en{'Picking'}de{'Picking'}", Const.ContextDatabase + "\\" + Picking.ClassName, "", true)]
+    [ACPropertyEntity(5, "IsActive", "en{'Active'}de{'Aktiv'}", "", "", true)]
+    [ACPropertyEntity(6, "MaintInterval", "en{'Maintenance interval'}de{'Wartungsintervall'}", "", "", true)]
+    [ACPropertyEntity(7, "LastMaintTerm", "en{'Last Maintenance on'}de{'Letzte Wartung am'}", "", "", true)]
+    [ACPropertyEntity(8, "WarningDiff", "en{'Advance Notice Days'}de{'Vorankündigung Tage'}", "", "", true)]
+    [ACPropertyEntity(9, "PlannedStartDate", "en{'Planned start date'}de{'Geplantes Startdatum'}", "", "", true)]
+    [ACPropertyEntity(10, "StartDate", "en{'Start date'}de{'Startdatum'}", "", "", true)]
+    [ACPropertyEntity(11, "EndDate", "en{'Completed at'}de{'Fertiggestellt am'}", "", "", true)]
     [ACPropertyEntity(13, "MaintACClass", "en{'Maintenance Objekt'}de{Wartungsobjekt'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
@@ -26,7 +27,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintOrder.ClassName, "en{'Maintenance Order'}de{'Wartungsauftrag'}", typeof(MaintOrder), MaintOrder.ClassName, "MaintOrderNo", "MaintOrderNo", new object[]
         {
-            new object[] {Const.QueryPrefix + MaintOrderProperty.ClassName, "en{'Maint Order Properties'}de{'Wartungsauftrag Eigenschaften'}", typeof(MaintOrderProperty), MaintOrderProperty.ClassName + "_" + MaintOrder.ClassName, MaintOrderProperty.ClassName + "\\ACIdentifier", MaintOrderProperty.ClassName + "\\ACIdentifier"}
+            new object[] {Const.QueryPrefix + mes.datamodel.MaintOrderProperty.ClassName, "en{'Maint Order Properties'}de{'Wartungsauftrag Eigenschaften'}", typeof(MaintOrderProperty), mes.datamodel.MaintOrderProperty.ClassName + "_" + MaintOrder.ClassName, mes.datamodel.MaintOrderProperty.ClassName + "\\ACIdentifier", mes.datamodel.MaintOrderProperty.ClassName + "\\ACIdentifier"}
         }
     )]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintOrder>) })]
@@ -34,7 +35,7 @@ namespace gip.mes.datamodel
     public partial class MaintOrder
     {
         [NotMapped]
-        public const string ClassName = "MaintOrder";
+        public const string ClassName = nameof(MaintOrder);
         [NotMapped]
         public const string NoColumnName = "MaintOrderNo";
         [NotMapped]
@@ -80,8 +81,8 @@ namespace gip.mes.datamodel
         /// <returns>A Entity-Object as IACObject</returns>
         public override IACObject GetChildEntityObject(string className, params string[] filterValues)
         {
-            if (filterValues.Any() && className == MaintOrderProperty.ClassName)
-                return this.MaintOrderProperty_MaintOrder.Where(c => c.MaintACClassProperty.ACIdentifier == filterValues[0]).FirstOrDefault();
+            //if (filterValues.Any() && className == MaintOrderProperty.ClassName)
+            //    return this.MaintOrderProperty_MaintOrder.Where(c => c.MaintACClassProperty.ACIdentifier == filterValues[0]).FirstOrDefault();
             return null;
         }
 
@@ -152,37 +153,34 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
 
-        [NotMapped]
-        private TimeSpan _MaintActDurationTS;
-        [ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
-        [NotMapped]
-        public TimeSpan MaintActDurationTS
-        {
-            get
-            {
-                if (MaintActDuration > 0)
-                    _MaintActDurationTS = TimeSpan.FromMinutes(MaintActDuration);
-                else
-                    _MaintActDurationTS = new TimeSpan();
-                return _MaintActDurationTS;
-            }
-            set
-            {
-                _MaintActDurationTS = value;
-                MaintActDuration = (int)_MaintActDurationTS.TotalMinutes;
-                OnPropertyChanged("MaintActDurationTS");
-            }
-        }
+        //private TimeSpan _MaintActDurationTS;
+        //[ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
+        //public TimeSpan MaintActDurationTS
+        //{
+        //    get
+        //    {
+        //        if (MaintActDuration > 0)
+        //            _MaintActDurationTS = TimeSpan.FromMinutes(MaintActDuration);
+        //        else
+        //            _MaintActDurationTS = new TimeSpan();
+        //        return _MaintActDurationTS;
+        //    }
+        //    set
+        //    {
+        //        _MaintActDurationTS = value;
+        //        MaintActDuration = (int)_MaintActDurationTS.TotalMinutes;
+        //        OnPropertyChanged("MaintActDurationTS");
+        //    }
+        //}
 
-        [ACPropertyInfo(999, "", "en{'Url of the Objekt'}de{'Url des Objekts'}")]
-        [NotMapped]
-        public string ComponentACUrl
-        {
-            get
-            {
-                return VBiPAACClass.FromIPlusContext<core.datamodel.ACClass>().GetACUrlComponent();
-            }
-        }
+        //[ACPropertyInfo(999, "", "en{'Url of the Objekt'}de{'Url des Objekts'}")]
+        //public string ComponentACUrl
+        //{
+        //    get
+        //    {
+        //        return VBiPAACClass.FromIPlusContext<core.datamodel.ACClass>().GetACUrlComponent();
+        //    }
+        //}
 
         #endregion
     }

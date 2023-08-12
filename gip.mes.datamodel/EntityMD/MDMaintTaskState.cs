@@ -7,7 +7,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioAutomation, ConstApp.ESMaintTaskState, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
-    [ACPropertyEntity(3, "MDMaintTaskStateIndex", ConstApp.ESMaintTaskState, typeof(MaintTaskState), "", "", true)]
+    //[ACPropertyEntity(3, "MDMaintTaskStateIndex", ConstApp.ESMaintTaskState, typeof(MaintTaskState), "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

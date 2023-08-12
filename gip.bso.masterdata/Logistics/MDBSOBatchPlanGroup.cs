@@ -1,8 +1,7 @@
-﻿using gip.core.autocomponent;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +12,7 @@ namespace gip.bso.masterdata
     /// Allgemeine Stammdatenmaske für MDBatchPlanGroup
     /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix +nameof(MDBatchPlanGroup))]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + nameof(MDBatchPlanGroup))]
     public class MDBSOBatchPlanGroup : ACBSOvbNav
     {
         #region c´tors
@@ -220,7 +219,7 @@ namespace gip.bso.masterdata
         [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if(!IsEnabledDelete())
+            if (!IsEnabledDelete())
                 return;
             Msg msg = CurrentMDBatchPlanGroup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
@@ -249,10 +248,52 @@ namespace gip.bso.masterdata
         [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged(nameof(MDBatchPlanGroupList));
+        }
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(Search):
+                    Search();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

@@ -11,13 +11,10 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using gip.core.autocomponent;
-//using gip.core.manager;
-using gip.mes.datamodel; using gip.core.datamodel;
+using gip.mes.datamodel;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 
 namespace gip.bso.masterdata
@@ -31,7 +28,7 @@ namespace gip.bso.masterdata
     /// TODO: Betroffene Tabellen: InDeliveryNotePosInWeighing
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Receiptweighing'}de{'Eingangsverwiegung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Weighing")]
-    public class BSOVehicleWeighing : ACBSOvbNav 
+    public class BSOVehicleWeighing : ACBSOvbNav
     {
         #region c´tors
 
@@ -43,7 +40,7 @@ namespace gip.bso.masterdata
         /// <param name="parentACObject">The parent AC object.</param>
         /// <param name="parameter">The parameter.</param>
         /// <param name="acIdentifier">The ac identifier.</param>
-        public BSOVehicleWeighing(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public BSOVehicleWeighing(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             //DatabaseMode = DatabaseModes.OwnDB;
@@ -204,7 +201,7 @@ namespace gip.bso.masterdata
             //Database.InDeliveryNotePosInWeighing.AddObject(CurrentInDeliveryNotePosInWeighing);
             ACState = Const.SMNew;
             PostExecute("New");
-           
+
         }
 
         /// <summary>
@@ -265,54 +262,52 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case"ResetWheigingMachine":
+                case nameof(ResetWheigingMachine):
                     ResetWheigingMachine();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
-
 
     }
 }

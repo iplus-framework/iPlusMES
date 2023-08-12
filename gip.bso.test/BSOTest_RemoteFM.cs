@@ -122,24 +122,6 @@ namespace gip.bso.test
         /// <summary>
         /// Source Property: ReciveRemotePicking
         /// </summary>
-        [ACMethodInfo("RecieveRemotePicking", "en{'Recive remote Picking'}de{'Recive remote Picking'}", 999)]
-        public void RecieveRemotePicking()
-        {
-            if (!IsEnabledRecieveRemotePicking())
-                return;
-            CallRemoteFacilityManagerForPicking(SelectedRemoteFacilityManagerInfo.RemoteFacilityManager, RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
-        }
-
-        public bool IsEnabledRecieveRemotePicking()
-        {
-            return 
-                !string.IsNullOrEmpty(RemotePickingNo) 
-                && SelectedRemoteFacilityManagerInfo != null;
-        }
-
-        /// <summary>
-        /// Source Property: ReciveRemotePicking
-        /// </summary>
         [ACMethodInfo("ReciveRemotePickingLocal", "en{'Recive remote Picking local'}de{'Recive remote Picking local'}", 999)]
         public void ReciveRemotePickingLocal()
         {
@@ -147,7 +129,7 @@ namespace gip.bso.test
                 return;
             RemoteFMHelper fm = new RemoteFMHelper();
             RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
-            fm.SynchronizeFacility(this, Messages, PickingManager, SelectedRemoteFacilityManagerInfo.RemoteConnString, remoteStorePostingData);
+            fm.SynchronizeFacility(this, Messages,ACFacilityManager, PickingManager, SelectedRemoteFacilityManagerInfo.RemoteConnString, remoteStorePostingData);
         }
 
         public bool IsEnabledReciveRemotePickingLocal()

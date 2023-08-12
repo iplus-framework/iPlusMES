@@ -1,4 +1,6 @@
-﻿using gip.core.autocomponent;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Vml.Office;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -3125,6 +3127,11 @@ namespace gip.mes.processapplication
                 if (dosingWeight == null)
                     dosingWeight = weighingComponent.TargetWeight;
 
+                if (dosingWeight.HasValue && dosingWeight.Value == double.NaN)
+                {
+                    Messages.LogDebug(this.GetACUrl(), "ManWeighing(double.Nan)", string.Format("Target weight:{0}", weighingComponent.TargetWeight));
+                }
+
                 acMethod["TargetQuantity"] = dosingWeight.Value;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
                 if (IsProduction)
@@ -3174,7 +3181,7 @@ namespace gip.mes.processapplication
                 acMethod["Route"] = new Route();
             }
 
-            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))
                 return StartNextCompResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -3219,7 +3226,7 @@ namespace gip.mes.processapplication
             UpdateCurrentACMethod();
 
             _LastOpenMaterial = CurrentOpenMaterial;
-
+            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, responsibleFunc);
             return StartNextCompResult.NextCompStarted;
         }
 

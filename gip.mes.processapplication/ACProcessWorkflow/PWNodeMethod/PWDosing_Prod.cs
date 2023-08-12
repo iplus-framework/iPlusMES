@@ -450,10 +450,12 @@ namespace gip.mes.processapplication
 
                             MDProdOrderPartslistPosState posState;
                             IList<Facility> possibleSilos;
+                            IEnumerable<IPWNodeReceiveMaterial> parallelDosingWFs = GetParallelDosingWFs(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
+                            IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos = GetAllExcludedSilos(parallelDosingWFs);
 
                             RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                 OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                null, null, ExcludedSilos);
+                                null, null, allExcludedSilos);
                             IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
 
                             if (routes != null && routes.Any())
@@ -496,57 +498,64 @@ namespace gip.mes.processapplication
                                 bool hasOtherStartableDosingNodes = false;
                                 // Falls Komponente überspringbar und es weitere Dosierschritte gibt, die diese Komponente dosieren könnten, und vom gleichen Dosierschritttyp sind,
                                 // dann gehe zur nächsten Komponente 
-                                Guid[] otherDosingNodes = null;
-                                Guid thisACClassID = ComponentClass.ACClassID;
-                                core.datamodel.ACClassWF thisContentACClassWF = ContentACClassWF;
-                                if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
-                                {
-                                    otherDosingNodes = intermediatePosition.Material.MaterialWFConnection_Material
-                                    .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
-                                                && c.ACClassWFID != thisContentACClassWF.ACClassWFID
-                                                && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
-                                    .Select(c => c.ACClassWFID)
-                                    .ToArray();
-                                }
-                                else
-                                {
-                                    PartslistACClassMethod plMethod = intermediatePosition.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                                    if (plMethod != null)
-                                    {
-                                        otherDosingNodes = intermediatePosition.Material.MaterialWFConnection_Material
-                                                                .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
-                                                                && c.ACClassWFID != thisContentACClassWF.ACClassWFID
-                                                                && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                                && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
-                                                .Select(c => c.ACClassWFID)
-                                                .ToArray();
-                                    }
-                                    else
-                                    {
-                                        otherDosingNodes = intermediatePosition.Material.MaterialWFConnection_Material
-                                            .Where(c => c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod
-                                                            .Where(d => d.PartslistID == endBatchPos.ProdOrderPartslist.PartslistID).Any()
-                                                        && c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
-                                                        && c.ACClassWFID != thisContentACClassWF.ACClassWFID
-                                                        && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                        && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
-                                            .Select(c => c.ACClassWFID)
-                                            .ToArray();
-                                    }
-                                }
+                                //Guid[] otherDosingNodes = null;
+                                //Guid thisACClassID = ComponentClass.ACClassID;
+                                //core.datamodel.ACClassWF thisContentACClassWF = ContentACClassWF;
+                                //if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
+                                //{
+                                //    otherDosingNodes = intermediatePosition.Material.MaterialWFConnection_Material
+                                //    .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
+                                //                && c.ACClassWFID != thisContentACClassWF.ACClassWFID
+                                //                && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
+                                //                && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
+                                //    .Select(c => c.ACClassWFID)
+                                //    .ToArray();
+                                //}
+                                //else
+                                //{
+                                //    PartslistACClassMethod plMethod = intermediatePosition.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                                //    if (plMethod != null)
+                                //    {
+                                //        otherDosingNodes = intermediatePosition.Material.MaterialWFConnection_Material
+                                //                                .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
+                                //                                && c.ACClassWFID != thisContentACClassWF.ACClassWFID
+                                //                                && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
+                                //                                && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
+                                //                .Select(c => c.ACClassWFID)
+                                //                .ToArray();
+                                //    }
+                                //    else
+                                //    {
+                                //        otherDosingNodes = intermediatePosition.Material.MaterialWFConnection_Material
+                                //            .Where(c => c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod
+                                //                            .Where(d => d.PartslistID == endBatchPos.ProdOrderPartslist.PartslistID).Any()
+                                //                        && c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
+                                //                        && c.ACClassWFID != thisContentACClassWF.ACClassWFID
+                                //                        && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
+                                //                        && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
+                                //            .Select(c => c.ACClassWFID)
+                                //            .ToArray();
+                                //    }
+                                //}
 
-                                if (   otherDosingNodes != null 
-                                    && otherDosingNodes.Any() 
+                                //if (   otherDosingNodes != null 
+                                //    && otherDosingNodes.Any() 
+                                //    && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.Any())))
+                                if (   parallelDosingWFs != null 
+                                    && parallelDosingWFs.Any()
                                     && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.Any())))
                                 {
-                                    List<IPWNodeReceiveMaterial> otherDosingWFs = this.RootPW.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial
-                                                                                                && (c as IPWNodeReceiveMaterial).ContentACClassWF != null
-                                                                                                && otherDosingNodes.Contains((c as IPWNodeReceiveMaterial).ContentACClassWF.ACClassWFID)
-                                                                                                && (   (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0 
-                                                                                                    || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null 
-                                                                                                        && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
-                                                                                                /*&& (c.CurrentACState == PABaseState.SMIdle || c.CurrentACState == PABaseState.SMBreakPoint)*/);
+                                    //List<IPWNodeReceiveMaterial> otherDosingWFs = this.RootPW.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial
+                                    //                                                            && (c as IPWNodeReceiveMaterial).ContentACClassWF != null
+                                    //                                                            && otherDosingNodes.Contains((c as IPWNodeReceiveMaterial).ContentACClassWF.ACClassWFID)
+                                    //                                                            && (   (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0 
+                                    //                                                                || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null 
+                                    //                                                                    && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
+                                    //                                                            /*&& (c.CurrentACState == PABaseState.SMIdle || c.CurrentACState == PABaseState.SMBreakPoint)*/);
+                                    List<IPWNodeReceiveMaterial> otherDosingWFs = parallelDosingWFs.Where(c => (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0
+                                                                                                            || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null
+                                                                                                                && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
+                                                                                                   .ToList();
                                     // Remove potential WFNodes which are out of the SequenceRange
                                     if (otherDosingWFs.Any())
                                     {
@@ -771,7 +780,7 @@ namespace gip.mes.processapplication
                             if (dosingRoute != null)
                                 dosingRoute.Detach(true);
 
-                            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
                                 return StartNextCompResult.CycleWait;
 
                             if (!acMethod.IsValid())
@@ -829,6 +838,7 @@ namespace gip.mes.processapplication
                                 return StartNextCompResult.CycleWait;
                             }
                             AcknowledgeAlarms();
+                            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo, responsibleFunc);
                             return StartNextCompResult.NextCompStarted;
                             #endregion
                         }
@@ -1475,8 +1485,9 @@ namespace gip.mes.processapplication
 
                         // Positionstate must be set at last because of conccurrency-Problems if another Scale(PWGroup) is waiting for starting this dosing in the Applicationthread
                         if (changePosState)
-                        {
                             dosingPosRelation.MDProdOrderPartslistPosState = posState;
+                        if (changePosState || dbApp.IsChanged)
+                        { 
                             msg = dbApp.ACSaveChanges();
                             if (msg != null)
                             {
@@ -1583,8 +1594,8 @@ namespace gip.mes.processapplication
                     if (needKompScaling && !ScaleOtherComp && dosingPosRelation.ProdOrderBatch != null)
                     {
                         var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                            .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                            && c.MDProdOrderPartslistPosState != null
+                            .Where(c => //c.RemainingDosingWeight < -0.1 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                c.MDProdOrderPartslistPosState != null
                             && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                 || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
 
@@ -1762,8 +1773,8 @@ namespace gip.mes.processapplication
                             //dosingPosRelation.MDProdOrderPartslistPosState = posState;
 
                             var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                                .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                                && c.MDProdOrderPartslistPosState != null
+                                .Where(c => //c.RemainingDosingWeight < -0.1 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                   c.MDProdOrderPartslistPosState != null
                                 && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                     || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
 

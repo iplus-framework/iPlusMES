@@ -1628,17 +1628,26 @@ namespace gip.mes.facility
         #region ProdOrder -> Batch -> Start
 
 
-        public virtual void SetProdOrderItemsToInProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate)
+        public virtual void ActivateProdOrderStatesIntoProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate, bool setAutoStartOnBatchplan)
         {
-            MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
-            prodOrderPartslist.ProdOrder.MDProdOrderState = mDProdOrderStateInProduction;
-            prodOrderPartslist.MDProdOrderState = prodOrderPartslist.ProdOrder.MDProdOrderState;
+            if (   (prodOrderPartslist.ProdOrder.MDProdOrderState == null || prodOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+                || (prodOrderPartslist.MDProdOrderState == null || prodOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction))
+            {
+                MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
+                if (prodOrderPartslist.ProdOrder.MDProdOrderState == null || prodOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+                    prodOrderPartslist.ProdOrder.MDProdOrderState = mDProdOrderStateInProduction;
+                if (prodOrderPartslist.MDProdOrderState == null || prodOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+                    prodOrderPartslist.MDProdOrderState = mDProdOrderStateInProduction;
+            }
             if (prodOrderPartslist.StartDate == null)
                 prodOrderPartslist.StartDate = DateTime.Now;
-            intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
-            if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
-                prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
-            prodOrderBatchPlan.PlannedStartDate = DateTimeUtils.NowDST;
+            if (setAutoStartOnBatchplan)
+            {
+                intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
+                if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
+                    prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
+                prodOrderBatchPlan.PlannedStartDate = DateTimeUtils.NowDST;
+            }
         }
 
         public ProdOrderPartslistPos GetIntermediate(ProdOrderPartslist prodOrderPartslist, MaterialWFConnection matWFConnection)
@@ -1789,7 +1798,9 @@ namespace gip.mes.facility
                                     .Include("ProdOrderPartslist.Partslist.Material")
                                     .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
                                     .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
-                                    .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
+                                    .Where(c =>
+                                            c.ProdOrderPartslist.Partslist.IsEnabled
+                                            && (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
                                             && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
@@ -2693,7 +2704,7 @@ namespace gip.mes.facility
         #endregion
 
         #region CalcProducedBatchWeight
-        public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, out double sumWeight)
+        public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, double? lossCorrectionFactor, out double sumWeight)
         {
             sumWeight = 0;
             if (batchIntermediatePos == null)
@@ -2706,6 +2717,18 @@ namespace gip.mes.facility
                 return new Msg() { Message = "Mass-Unit KG not found" };
 
             CalcProducedBatchWeight(ref sumWeight, batchIntermediatePos, batchIntermediatePos.ProdOrderBatch, unitKG);
+
+            if (sumWeight > 0.000001 && lossCorrectionFactor.HasValue)
+            {
+                if (lossCorrectionFactor > 0.000001)
+                    sumWeight = sumWeight - (sumWeight * (lossCorrectionFactor.Value / 100));
+                else
+                {
+                    Partslist pl = batchIntermediatePos.ProdOrderPartslist?.Partslist;
+                    if (pl != null && pl.LossCorrectionFactor.HasValue)
+                        sumWeight = sumWeight * pl.LossCorrectionFactor.Value;
+                }
+            }
 
             return null;
         }
@@ -3286,7 +3309,7 @@ namespace gip.mes.facility
 
             if (calcMsg != null && calcMsg.MsgDetailsCount > 0)
                 msg.AddDetailMessage(calcMsg);
-            
+
             if (saveMsg != null && saveMsg.MsgDetailsCount > 0)
                 msg.AddDetailMessage(saveMsg);
             else
@@ -3294,7 +3317,7 @@ namespace gip.mes.facility
                 if (CalculateOEEs && FacilityOEEManager != null)
                     FacilityOEEManager.OnPostProcessingOEE(databaseApp, prodOrder, itemsForPostProcessing);
             }
-            
+
             if (msg == null || msg.MsgDetailsCount <= 0)
                 return null;
             return msg;

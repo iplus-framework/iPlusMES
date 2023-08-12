@@ -8,12 +8,6 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Rule'}de{'Wartungsregel'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaintConfig")]
     [ACPropertyEntity(1, "VBiACClass", "en{'Object'}de{'Objekt'}", "", "", true)]
-    [ACPropertyEntity(2, "MDMaintMode", "en{'Maintenance Mode'}de{'Wartungsmodus'}", Const.ContextDatabase + "\\MDMaintMode" + Const.DBSetAsEnumerablePostfix, "", true)]
-    [ACPropertyEntity(3, "IsActive", ConstApp.IsActive, "", "", true)]
-    [ACPropertyEntity(4, "MaintInterval", "en{'Maintenance Interval [days]'}de{'Wartungsintervall [Tage]'}", "", "", true)]
-    [ACPropertyEntity(5, "LastMaintTerm", "en{'Last Maintenance on'}de{'Letzte Wartung am'}", "", "", true)]
-    [ACPropertyEntity(6, "IsWarningActive", "en{'Maintenance Notification'}de{'Wartungsvorankündigung'}", "", "", true)]
-    [ACPropertyEntity(7, "WarningDiff", "en{'Advance Notice Days'}de{'Vorankündigung Tage'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -44,10 +38,6 @@ namespace gip.mes.datamodel
                 //else
                 //    NextMaintTerm = null;
                 OnPropertyChanged("NextMaintTerm");
-            }
-            else if (property == nameof(VBiACClassID))
-            {
-                OnPropertyChanged("FacilityACClass");
             }
             //else if (property == "MDMaintModeID")
             //{
@@ -119,8 +109,8 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (LastMaintTerm.HasValue && MaintInterval.HasValue)
-                    return LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
+                //if (LastMaintTerm.HasValue && MaintInterval.HasValue)
+                //    return LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
                 return null;
             }
             set
@@ -159,7 +149,7 @@ namespace gip.mes.datamodel
 
         public void CopyMaintACClassPropertiesToLocalCache()
         {
-            _LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
+            //_LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
         }
 
         #region VBIplus-Context
@@ -209,9 +199,13 @@ namespace gip.mes.datamodel
             }
         }
 
+        partial void OnVBiACClassIDChanged()
+        {
+            OnPropertyChanged("FacilityACClass");
+        }
         public gip.core.datamodel.ACClass GetACClass(Database db)
         {
-            if (this.VBiACClassID == Guid.Empty)
+            if (this.VBiACClassID == null || this.VBiACClassID == Guid.Empty)
                 return null;
             if (this.VBiACClass == null)
             {

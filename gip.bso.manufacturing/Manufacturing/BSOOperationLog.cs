@@ -109,7 +109,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Close operation'}de{'Close operation'}", 9999, true)]
         public void CloseSelectedOperationLog()
         {
-            MsgWithDetails msg = OperationLog.CloseOperationLog(DatabaseApp, SelectedOperationLog);
+            MsgWithDetails msg = OperationLog.CloseOperationLog(DatabaseApp, SelectedOperationLog, null);
             if (msg != null)
             {
                 Messages.Msg(msg);

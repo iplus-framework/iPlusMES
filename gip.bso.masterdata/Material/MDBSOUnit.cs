@@ -634,78 +634,76 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case"NewUnitConversion":
+                case nameof(NewUnitConversion):
                     NewUnitConversion();
                     return true;
-                case"IsEnabledNewUnitConversion":
+                case nameof(IsEnabledNewUnitConversion):
                     result = IsEnabledNewUnitConversion();
                     return true;
-                case"DeleteUnitConversion":
+                case nameof(DeleteUnitConversion):
                     DeleteUnitConversion();
                     return true;
-                case"IsEnabledDeleteUnitConversion":
+                case nameof(IsEnabledDeleteUnitConversion):
                     result = IsEnabledDeleteUnitConversion();
                     return true;
-                case"NewUnitConversionOK":
+                case nameof(NewUnitConversionOK):
                     NewUnitConversionOK();
                     return true;
-                case"IsEnabledNewUnitConversionOK":
+                case nameof(IsEnabledNewUnitConversionOK):
                     result = IsEnabledNewUnitConversionOK();
                     return true;
-                case"NewUnitConversionCancel":
+                case nameof(NewUnitConversionCancel):
                     NewUnitConversionCancel();
                     return true;
-                case"ConvertTest":
+                case nameof(ConvertTest):
                     ConvertTest();
                     return true;
-                case"IsEnabledConvertTest":
+                case nameof(IsEnabledConvertTest):
                     result = IsEnabledConvertTest();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
-
 
     }
 }

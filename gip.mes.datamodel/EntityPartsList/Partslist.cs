@@ -523,6 +523,32 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(500, "", ConstApp.FinalIntermediate)]
+        public PartslistPos FinalIntermediate
+        {
+            get
+            {
+                return PartslistPos_Partslist
+                .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                .AsEnumerable()
+                .Where(x => x.IsFinalMixure)
+                .FirstOrDefault();
+            }
+        }
+
+        public double? LossCorrectionFactor
+        {
+            get
+            {
+                PartslistPos finalIntermediate = FinalIntermediate;
+                if (finalIntermediate != null)
+                {
+                    return TargetQuantityUOM / finalIntermediate.TargetQuantityUOM;
+                }
+                return null;
+            }
+        }
+
         #endregion
 
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")

@@ -48,7 +48,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(18, "MaxVolumeCapacity", "en{'Max. Volume Capacity'}de{'Max. Volumenkapazität'}", "", "", true)]
     [ACPropertyEntity(19, "Drivername", "en{'Driver Name'}de{'Fahrername'}", "", "", true)]
     [ACPropertyEntity(20, "Tolerance", "en{'Empty Tolerance'}de{'Leer-Toleranz'}", "", "", true)]
-    [ACPropertyEntity(21, "HighLidNo", "en{'HighLidNo'}de{'HighLidNo'}", "", "", true)]
+    [ACPropertyEntity(21, "HighLidNo", "en{'Fill level validation flags'}de{'Füllstandsvalidierung-flags'}", "", "", true)]
     [ACPropertyEntity(22, "FittingsDistanceFront", "en{'Fittings Distance Front'}de{'Anbauten Abstand vorne'}", "", "", true)]
     [ACPropertyEntity(23, "FittingsDistanceBehind", "en{'Fittings Distance Back'}de{'Anbauten Abstand hinten'}", "", "", true)]
     [ACPropertyEntity(24, "DistanceFront", "en{'Distance Front'}de{'Abstand vorne'}", "", "", true)]

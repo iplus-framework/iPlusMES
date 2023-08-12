@@ -14,12 +14,18 @@ namespace gip.mes.webservices
     public abstract class PAScannedCompContrBase : PAClassAlarmingBase
     {
         #region c'tors
-        public const string ClassName = "PAScannedCompContrBase";
+        public const string ClassName = nameof(PAScannedCompContrBase);
 
         public PAScannedCompContrBase(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
+
+        public override bool ACPostInit()
+        {
+            return base.ACPostInit();
+        }
+
         #endregion
 
 
@@ -47,6 +53,15 @@ namespace gip.mes.webservices
                 return ParentACComponent as PAEScannerDecoderWS;
             }
         }
+
+        //private int _ControllerLevel;
+        //public int ControllerLevel
+        //{
+        //    get
+        //    {
+        //        return _ControllerLevel;
+        //    }
+        //}
 
         Type _TypeOfPAProcessFunction;
         protected Type TypeOfPAProcessFunction
@@ -101,6 +116,22 @@ namespace gip.mes.webservices
             }
             return acState.ValueT;
         }
+
+        private void GetHierarchyLevel()
+        {
+            //var chain = new List<Type>();
+            //Type controllerBaseType = typeof(PAScannedCompContrBase);
+
+
+            //while (firstType != typeof(object))
+            //{
+            //    chain.Add(firstType);
+            //    firstType = firstType.BaseType;
+            //}
+
+            //return chain.IndexOf(secondType);
+        }
+
         #endregion
     }
 

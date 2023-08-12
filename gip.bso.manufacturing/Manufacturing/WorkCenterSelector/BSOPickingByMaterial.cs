@@ -232,7 +232,7 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged(nameof(SelectedWeighingMaterial));
                     FacilityChargeList = FillFacilityChargeList();
                     FacilityChargeNo = null;
-                    ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
+                    ScaleAddActualWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
                     SelectedFacilityCharge = null;
                     if (_SelectedWeighingMaterial != null)
                         ShowSelectFacilityLotInfo = true;
@@ -874,12 +874,12 @@ namespace gip.bso.manufacturing
 
         public override void AddKg()
         {
-            ScaleAddAcutalWeight = SelectedWeighingMaterial.AddKg(ScaleAddAcutalWeight);
+            ScaleAddActualWeight = SelectedWeighingMaterial.AddKg(ScaleAddActualWeight);
         }
 
         public override void RemoveKg()
         {
-            ScaleAddAcutalWeight = SelectedWeighingMaterial.RemoveKg(ScaleAddAcutalWeight);
+            ScaleAddActualWeight = SelectedWeighingMaterial.RemoveKg(ScaleAddActualWeight);
         }
 
         public override void Tare()
@@ -1021,6 +1021,31 @@ namespace gip.bso.manufacturing
         {
             base.BgWorkerCompleted(sender, e);
             CloseTopDialog();
+        }
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(RunPickingByMaterial):
+                    RunPickingByMaterial();
+                    return true;
+                case nameof(IsEnabledRunPickingByMaterial):
+                    result = IsEnabledRunPickingByMaterial();
+                    return true;
+                case nameof(FinishPickingOrder):
+                    FinishPickingOrder();
+                    return true;
+                case nameof(CancelCurrentComponent):
+                    CancelCurrentComponent();
+                    return true;
+                case nameof(AbortPickingByMaterial):
+                    AbortPickingByMaterial();
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

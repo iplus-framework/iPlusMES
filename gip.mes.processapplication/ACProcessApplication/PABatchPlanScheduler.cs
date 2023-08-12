@@ -438,13 +438,18 @@ namespace gip.mes.processapplication
                 OnNewAlarmOccurred(SchedulesForPWNodes, msg);
                 return msg;
             }
-            if (item.StartMode != changedScheduleNode.StartMode
+            if (   item.StartMode != changedScheduleNode.StartMode
                 || item.RefreshCounter != changedScheduleNode.RefreshCounter)
             {
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     item.UpdateAndMaintainRefreshCounter(changedScheduleNode);
-                    item.StartMode = changedScheduleNode.StartMode;
+                    if (item.StartMode != changedScheduleNode.StartMode)
+                    {
+                        Messages.LogDebug(this.GetACUrl(), "UpdateScheduleFromClient(10)", String.Format("Startmode changed from {0} to {1} at {2}", 
+                                                                item.StartMode, changedScheduleNode.StartMode, item.MDSchedulingGroup != null ? item.MDSchedulingGroup.MDSchedulingGroupName : item.MDSchedulingGroupID.ToString()));
+                        item.StartMode = changedScheduleNode.StartMode;
+                    }
                     item.UpdateName = changedScheduleNode.UpdateName;
                     item.UpdateTime = DateTime.Now;
                 }

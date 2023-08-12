@@ -1869,7 +1869,7 @@ namespace gip.mes.facility
                 if (stackItem.CloneOnDest)
                 {
                     if (BP.IsAutoResetNotAvailable)
-                        facilityChargeToBook = TryReactivateFacilityCharge(BP, stackItem.FacilityCharge.Material, BP.ParamsAdjusted.InwardFacility, stackItem.FacilityCharge.FacilityLot, stackItem.FacilityCharge.Partslist);
+                        facilityChargeToBook = TryReactivateFacilityCharge(BP, stackItem.FacilityCharge.Material, BP.ParamsAdjusted.InwardFacility, stackItem.FacilityCharge.FacilityLot, stackItem.FacilityCharge.Partslist, BP.ParamsAdjusted.InwardSplitNo);
                     if (facilityChargeToBook == null)
                         facilityChargeToBook = FacilityCharge.NewACObject(BP.DatabaseApp, null);
                     facilityChargeToBook.CloneFrom(stackItem.FacilityCharge, false);
@@ -1936,7 +1936,7 @@ namespace gip.mes.facility
                 if (stackItem.CloneOnDest)
                 {
                     if (BP.IsAutoResetNotAvailable)
-                        facilityChargeToBook = TryReactivateFacilityCharge(BP, stackItem.FacilityCharge.Material, stackItem.FacilityCharge.Facility, stackItem.FacilityCharge.FacilityLot, stackItem.FacilityCharge.Partslist);
+                        facilityChargeToBook = TryReactivateFacilityCharge(BP, stackItem.FacilityCharge.Material, stackItem.FacilityCharge.Facility, stackItem.FacilityCharge.FacilityLot, stackItem.FacilityCharge.Partslist, BP.ParamsAdjusted.OutwardSplitNo);
                     if (facilityChargeToBook == null)
                         facilityChargeToBook = FacilityCharge.NewACObject(BP.DatabaseApp, null);
                     facilityChargeToBook.CloneFrom(stackItem.FacilityCharge, false);

@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
+using System.Reflection.Emit;
 
 namespace gip.mes.processapplication
 {
@@ -85,10 +86,9 @@ namespace gip.mes.processapplication
                     // Falls dies der letzte Entleerschritt ist, dann erfolgt Entleerung ins ein Silo
                     if (connectionToDischarging != null)
                     {
+                        FacilityReservation nextDestination = null;
                         if (CurrentDischargingDest(null) == null)
                         {
-                            FacilityReservation nextDestination = null;
-
                             PWGroupVB pwGroup = ParentPWGroup as PWGroupVB;
                             // Prüfe zuerst ob in Leerfahrmodus und prüfe ob es sich um ein endgültiges Ziel handelt
                             if (pwGroup != null && pwGroup.IsInEmptyingMode && !KeepPlannedDestOnEmptying)
@@ -308,7 +308,7 @@ namespace gip.mes.processapplication
                             OnSetLastBatchParam(acValue, acMethod, targetModule, dbApp, batchPlan, currentBatchPos);
 
                         NoTargetWait = null;
-                        if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
+                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
 
                         if (!acMethod.IsValid())
@@ -361,6 +361,8 @@ namespace gip.mes.processapplication
                             return StartDisResult.CycleWait;
                         }
                         AcknowledgeAlarms();
+                        ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule, responsibleFunc);
+                        OnSwitchedToNextSilo(dbApp, currentBatchPos, responsibleFunc as PAFDischarging, targetModule, null, targetSiloACComp as PAMSilo, null, nextDestination);
                         return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
                         //return StartDisResult.WaitForCallback;
                     }
@@ -502,7 +504,7 @@ namespace gip.mes.processapplication
                                     if (acValue != null)
                                         acValue.Value = (double)targetWeight;
                                 }
-                                if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
+                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
 
@@ -549,6 +551,7 @@ namespace gip.mes.processapplication
                                 UpdateCurrentACMethod();
 
                                 AcknowledgeAlarms();
+                                ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule, responsibleFunc);
                                 return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
                                 //return StartDisResult.WaitForCallback;
                             }
@@ -1051,10 +1054,11 @@ namespace gip.mes.processapplication
 
                     if (isNewACMethod)
                     {
-                        if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
+                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
                             return StartDisResult.CycleWait;
                     }
 
+                    OnSwitchingToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, plannedSilo);
                     // Sende neues Ziel an dies SPS
                     msg = OnReSendACMethod(discharging, acMethod, dbApp);
                     if (msg != null)
@@ -1080,6 +1084,7 @@ namespace gip.mes.processapplication
 
                         NoTargetWait = null;
                         this.TaskSubscriptionPoint.Persist(false);
+                        ExecuteMethod(nameof(OnACMethodSended), acMethod, false, dbApp, batchPlan, currentBatchPos, targetContainer, discharging);
                         OnSwitchedToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, plannedSilo);
                     }
                 }
@@ -1122,9 +1127,18 @@ namespace gip.mes.processapplication
                                                     FacilityReservation fullSiloReservation, FacilityReservation nextSiloReservation)
         {
             // Quittiere Alarm und setze fort falls pausiert
-            discharging.AcknowledgeAlarms();
-            if (discharging.CurrentACState == ACStateEnum.SMPaused)
-                discharging.Resume();
+            if (discharging != null)
+            {
+                discharging.AcknowledgeAlarms();
+                if (discharging.CurrentACState == ACStateEnum.SMPaused)
+                    discharging.Resume();
+            }
+        }
+
+        protected virtual void OnSwitchingToNextSilo(DatabaseApp dbApp, ProdOrderPartslistPos currentBatchPos, PAFDischarging discharging, PAProcessModule targetContainer,
+                                            PAMSilo fullSilo, PAMSilo nextSilo,
+                                            FacilityReservation fullSiloReservation, FacilityReservation nextSiloReservation)
+        {
         }
 
         #endregion
@@ -1150,16 +1164,28 @@ namespace gip.mes.processapplication
                 && (   eM == null
                     || eM.ResultState < Global.ACMethodResultState.Failed))
             {
-                ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
-                if (prodOrderManager != null)
+                try
                 {
-                    double calculatedBatchWeight = 0;
-                    if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
+                    ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                    if (prodOrderManager != null)
                     {
-                        double diff = calculatedBatchWeight - currentBatchPos.ActualWeight;
-                        if (diff > 0.00001)
-                            actualWeight = diff;
+                        double calculatedBatchWeight = 0;
+                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, LossCorrectionFactor, out calculatedBatchWeight) == null)
+                        {
+                            double diff = calculatedBatchWeight - currentBatchPos.ActualWeight;
+                            if (diff > 0.00001)
+                                actualWeight = diff;
+                        }
                     }
+                }
+                catch(Exception ex) 
+                {
+                    Messages.LogException(this.GetACUrl(), "OnTaskCallbackCheckQuantity(20)", ex);
+                    //ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                    //OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "OnTaskCallbackCheckQuantity", 1030), true);
+                    //discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
+                    //discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1020), true);
+                    //exceptionHandled = true;
                 }
             }
 
@@ -1272,7 +1298,7 @@ namespace gip.mes.processapplication
                         bookingParam.PostingBehaviour = PostingBehaviour;
                     else if (isFinalMixture && currentBatchPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
                         bookingParam.PostingBehaviour = PostingBehaviourEnum.DoNothing;
-
+                    OnPrepareInwardBooking(actualWeight, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
                     msg = dbApp.ACSaveChangesWithRetry();
 
                     // 2. Führe Buchung durch
@@ -1345,6 +1371,12 @@ namespace gip.mes.processapplication
                 }
             }
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
+        }
+
+        protected virtual void OnPrepareInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest,
+            ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant,
+            FacilityPreBooking facilityPreBooking, ACMethodBooking bookingParam)
+        {
         }
 
         protected virtual void OnDoInwardBookingSucceeded(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, 

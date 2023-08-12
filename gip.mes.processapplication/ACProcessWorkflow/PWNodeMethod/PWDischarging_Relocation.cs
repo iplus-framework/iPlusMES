@@ -173,7 +173,7 @@ namespace gip.mes.processapplication
                 CurrentDischargingRoute.Detach(true);
 
             NoTargetWait = null;
-            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, facilityBooking, targetModule))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, facilityBooking, targetModule))
                 return StartDisResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -222,6 +222,7 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
             AcknowledgeAlarms();
+            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, facilityBooking, targetModule, responsibleFunc);
             return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
             //return StartDisResult.WaitForCallback;
         }

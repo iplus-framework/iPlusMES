@@ -146,8 +146,8 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.Current = value;
                 OnPropertyChanged("CurrentCompany");
                 OnPropertyChanged("FactoryList");
@@ -1473,149 +1473,148 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadCompanyAddress":
+                case nameof(LoadCompanyAddress):
                     LoadCompanyAddress();
                     return true;
-                case "IsEnabledLoadCompanyAddress":
+                case nameof(IsEnabledLoadCompanyAddress):
                     result = IsEnabledLoadCompanyAddress();
                     return true;
-                case "NewCompanyAddress":
+                case nameof(NewCompanyAddress):
                     NewCompanyAddress();
                     return true;
-                case "IsEnabledNewCompanyAddress":
+                case nameof(IsEnabledNewCompanyAddress):
                     result = IsEnabledNewCompanyAddress();
                     return true;
-                case "DeleteCompanyAddress":
+                case nameof(DeleteCompanyAddress):
                     DeleteCompanyAddress();
                     return true;
-                case "IsEnabledDeleteCompanyAddress":
+                case nameof(IsEnabledDeleteCompanyAddress):
                     result = IsEnabledDeleteCompanyAddress();
                     return true;
-                case "NewCompanyAddressDepartment":
+                case nameof(NewCompanyAddressDepartment):
                     NewCompanyAddressDepartment();
                     return true;
-                case "IsEnabledNewCompanyAddressDepartment":
+                case nameof(IsEnabledNewCompanyAddressDepartment):
                     result = IsEnabledNewCompanyAddressDepartment();
                     return true;
-                case "DeleteCompanyAddressDepartment":
+                case nameof(DeleteCompanyAddressDepartment):
                     DeleteCompanyAddressDepartment();
                     return true;
-                case "IsEnabledDeleteCompanyAddressDepartment":
+                case nameof(IsEnabledDeleteCompanyAddressDepartment):
                     result = IsEnabledDeleteCompanyAddressDepartment();
                     return true;
-                case "LoadCompanyPerson":
+                case nameof(LoadCompanyPerson):
                     LoadCompanyPerson();
                     return true;
-                case "IsEnabledLoadCompanyPerson":
+                case nameof(IsEnabledLoadCompanyPerson):
                     result = IsEnabledLoadCompanyPerson();
                     return true;
-                case "NewCompanyPerson":
+                case nameof(NewCompanyPerson):
                     NewCompanyPerson();
                     return true;
-                case "IsEnabledNewCompanyPerson":
+                case nameof(IsEnabledNewCompanyPerson):
                     result = IsEnabledNewCompanyPerson();
                     return true;
-                case "DeleteCompanyPerson":
+                case nameof(DeleteCompanyPerson):
                     DeleteCompanyPerson();
                     return true;
-                case "IsEnabledDeleteCompanyPerson":
+                case nameof(IsEnabledDeleteCompanyPerson):
                     result = IsEnabledDeleteCompanyPerson();
                     return true;
-                case "NewFactory":
+                case nameof(NewFactory):
                     NewFactory();
                     return true;
-                case "IsEnabledNewFactory":
+                case nameof(IsEnabledNewFactory):
                     result = IsEnabledNewFactory();
                     return true;
-                case "LoadFactory":
+                case nameof(LoadFactory):
                     LoadFactory();
                     return true;
-                case "IsEnabledLoadFactory":
+                case nameof(IsEnabledLoadFactory):
                     result = IsEnabledLoadFactory();
                     return true;
-                case "DeleteFactory":
+                case nameof(DeleteFactory):
                     DeleteFactory();
                     return true;
-                case "IsEnabledDeleteFactory":
+                case nameof(IsEnabledDeleteFactory):
                     result = IsEnabledDeleteFactory();
                     return true;
-                case "LoadCompanyMaterial":
+                case nameof(LoadCompanyMaterial):
                     LoadCompanyMaterial();
                     return true;
-                case "IsEnabledLoadCompanyMaterial":
+                case nameof(IsEnabledLoadCompanyMaterial):
                     result = IsEnabledLoadCompanyMaterial();
                     return true;
-                case "NewCompanyMaterial":
+                case nameof(NewCompanyMaterial):
                     NewCompanyMaterial();
                     return true;
-                case "IsEnabledNewCompanyMaterial":
+                case nameof(IsEnabledNewCompanyMaterial):
                     result = IsEnabledNewCompanyMaterial();
                     return true;
-                case "DeleteCompanyMaterial":
+                case nameof(DeleteCompanyMaterial):
                     DeleteCompanyMaterial();
                     return true;
-                case "IsEnabledDeleteCompanyMaterial":
+                case nameof(IsEnabledDeleteCompanyMaterial):
                     result = IsEnabledDeleteCompanyMaterial();
                     return true;
-                case "LoadCompanyMaterialPickup":
+                case nameof(LoadCompanyMaterialPickup):
                     LoadCompanyMaterialPickup();
                     return true;
-                case "IsEnabledLoadCompanyMaterialPickup":
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
                     result = IsEnabledLoadCompanyMaterialPickup();
                     return true;
-                case "NewCompanyMaterialPickup":
+                case nameof(NewCompanyMaterialPickup):
                     NewCompanyMaterialPickup();
                     return true;
-                case "IsEnabledNewCompanyMaterialPickup":
+                case nameof(IsEnabledNewCompanyMaterialPickup):
                     result = IsEnabledNewCompanyMaterialPickup();
                     return true;
-                case "DeleteCompanyMaterialPickup":
+                case nameof(DeleteCompanyMaterialPickup):
                     DeleteCompanyMaterialPickup();
                     return true;
-                case "IsEnabledDeleteCompanyMaterialPickup":
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
                     result = IsEnabledDeleteCompanyMaterialPickup();
                     return true;
             }
-            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

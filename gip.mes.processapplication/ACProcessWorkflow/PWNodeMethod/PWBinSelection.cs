@@ -289,7 +289,7 @@ namespace gip.mes.processapplication
                     }
                     UpdateCurrentACMethod();
                 }
-                else if(result == StartNextCompResult.Done)
+                else if (result == StartNextCompResult.Done)
                 {
                     UnSubscribeToProjectWorkCycle();
                     CurrentACState = ACStateEnum.SMCompleted;

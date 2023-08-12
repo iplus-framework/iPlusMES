@@ -2007,21 +2007,26 @@ namespace gip.mes.facility
 
         private FacilityCharge TryReactivateOutwardFacilityCharge(ACMethodBooking BP)
         {
-            return TryReactivateFacilityCharge(BP, BP.ParamsAdjusted.OutwardMaterial, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardFacilityLot, BP.ParamsAdjusted.OutwardPartslist);
+            return TryReactivateFacilityCharge(BP, BP.ParamsAdjusted.OutwardMaterial, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardFacilityLot, BP.ParamsAdjusted.OutwardPartslist, BP.ParamsAdjusted.OutwardSplitNo);
         }
 
         private FacilityCharge TryReactivateInwardFacilityCharge(ACMethodBooking BP)
         {
-            return TryReactivateFacilityCharge(BP, BP.ParamsAdjusted.InwardMaterial, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardFacilityLot, BP.ParamsAdjusted.InwardPartslist);
+            return TryReactivateFacilityCharge(BP, BP.ParamsAdjusted.InwardMaterial, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardFacilityLot, BP.ParamsAdjusted.InwardPartslist, BP.ParamsAdjusted.InwardSplitNo);
         }
 
-        private FacilityCharge TryReactivateFacilityCharge(ACMethodBooking BP, Material material, Facility facility, FacilityLot lot, Partslist partsList)
+        private FacilityCharge TryReactivateFacilityCharge(ACMethodBooking BP, Material material, Facility facility, FacilityLot lot, Partslist partsList, int? splitNo)
         {
             FacilityCharge InwardFacilityCharge = null;
             IEnumerable<FacilityCharge> queryExistOld = null;
             if (lot != null && partsList != null)
             {
-                queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp, facility.FacilityID, lot.FacilityLotID, material.MaterialID, null, partsList.PartslistID, true);
+                if (splitNo.HasValue)
+                {
+                    queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable_SplitNo(BP.DatabaseApp, facility.FacilityID, lot.FacilityLotID, material.MaterialID, null, partsList.PartslistID, true, splitNo.Value);
+                }
+                else
+                    queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp, facility.FacilityID, lot.FacilityLotID, material.MaterialID, null, partsList.PartslistID, true);
             }
             else if (lot != null && partsList == null)
             {

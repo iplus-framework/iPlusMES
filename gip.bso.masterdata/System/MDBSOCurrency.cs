@@ -1,5 +1,3 @@
-using System;
-using gip.core.autocomponent;
 // ***********************************************************************
 // Assembly         : gip.bso.masterdata
 // Author           : DLisak
@@ -13,6 +11,8 @@ using gip.core.autocomponent;
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using System;
+using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
@@ -493,8 +493,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand("GetCurrencyFromWebApi", "en{'Read Online-Exchangerate'}de{'Lese Online-Wechselkurs'}", 500)]
         public async void GetExchangeRateFromWebApi()
         {
-            if (CurrentCurrencyExchange == null 
-                || CurrentCurrency == null 
+            if (CurrentCurrencyExchange == null
+                || CurrentCurrency == null
                 || CurrentCurrencyExchange.ToMDCurrency == null)
                 return;
             try
@@ -529,67 +529,66 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "NewCurrencyExchange":
+                case nameof(NewCurrencyExchange):
                     NewCurrencyExchange();
                     return true;
-                case "IsEnabledNewCurrencyExchange":
+                case nameof(IsEnabledNewCurrencyExchange):
                     result = IsEnabledNewCurrencyExchange();
                     return true;
-                case "DeleteCurrencyExchange":
+                case nameof(DeleteCurrencyExchange):
                     DeleteCurrencyExchange();
                     return true;
-                case "IsEnabledDeleteCurrencyExchange":
+                case nameof(IsEnabledDeleteCurrencyExchange):
                     result = IsEnabledDeleteCurrencyExchange();
                     return true;
-                case "NewCurrencyExchangeOK":
+                case nameof(NewCurrencyExchangeOK):
                     NewCurrencyExchangeOK();
                     return true;
-                case "IsEnabledNewCurrencyExchangeOK":
+                case nameof(IsEnabledNewCurrencyExchangeOK):
                     result = IsEnabledNewCurrencyExchangeOK();
                     return true;
-                case "NewCurrencyExchangeCancel":
+                case nameof(NewCurrencyExchangeCancel):
                     NewCurrencyExchangeCancel();
                     return true;
-                case "GetExchangeRateFromWebApi":
+                case nameof(GetExchangeRateFromWebApi):
                     GetExchangeRateFromWebApi();
                     return true;
             }

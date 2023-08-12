@@ -13,6 +13,7 @@ namespace gip.mes.processapplication
         {
             new object[] {gip.core.datamodel.ACProgram.ClassName, Global.ParamOption.Required, typeof(Guid)},
             new object[] {gip.core.datamodel.ACProgramLog.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {PWProcessFunction.C_InvocationCount, Global.ParamOption.Optional, typeof(int)},
             new object[] {Picking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
@@ -313,6 +314,7 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
+                            currentPickingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             orderLog.PickingPosID = currentPickingPos.PickingPosID;
                             dbApp.OrderLog.Add(orderLog);
@@ -378,13 +380,14 @@ namespace gip.mes.processapplication
                 return;
             if (CurrentPicking != null)
             {
-                using (var dbApp = new DatabaseApp())
+                using (var dbApp = new DatabaseApp())   
                 {
                     Picking picking = CurrentPicking.FromAppContext<Picking>(dbApp);
                     if (picking != null)
                     {
                         foreach (PickingPos pickingPos in picking.PickingPos_Picking)
                         {
+                            //pickingPos.ACClassTaskID = null;
                             if (pickingPos.MDDelivPosLoadState != null && pickingPos.MDDelivPosLoadState.DelivPosLoadState != MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
                                 pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                         }

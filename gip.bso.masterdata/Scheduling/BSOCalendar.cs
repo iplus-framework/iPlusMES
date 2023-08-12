@@ -11,12 +11,10 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using gip.mes.datamodel; using gip.core.datamodel;
-//using gip.core.manager;
+using gip.mes.datamodel;
+using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 
@@ -26,7 +24,7 @@ namespace gip.bso.masterdata
     /// Allgemeine Stammdatenmaske für Calendar
     /// </summary>
     [ACClassInfo(Const.PackName_VarioScheduling, "en{'Calendar'}de{'Kalender'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Calendar.ClassName)]
-    public class BSOCalendar : ACBSOvbNav 
+    public class BSOCalendar : ACBSOvbNav
     {
         #region c´tors
 
@@ -38,7 +36,7 @@ namespace gip.bso.masterdata
         /// <param name="parentACObject">The parent AC object.</param>
         /// <param name="parameter">The parameter.</param>
         /// <param name="acIdentifier">The ac identifier.</param>
-        public BSOCalendar(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public BSOCalendar(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             //DatabaseMode = DatabaseModes.OwnDB;
@@ -215,7 +213,7 @@ namespace gip.bso.masterdata
             DatabaseApp.Calendar.Add(CurrentCalendar);
             ACState = Const.SMNew;
             PostExecute("Neu");
-           
+
         }
 
         /// <summary>
@@ -270,51 +268,49 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabled":
+                case nameof(IsEnabled):
                     result = IsEnabled();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
-
 
     }
 }

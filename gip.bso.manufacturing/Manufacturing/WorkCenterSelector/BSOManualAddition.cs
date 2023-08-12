@@ -24,17 +24,17 @@ namespace gip.bso.manufacturing
         }
 
 
-        public override double ScaleActualWeight => ScaleAddAcutalWeight;
+        public override double ScaleActualWeight => ScaleAddActualWeight;
 
-        public override double ScaleAddAcutalWeight
+        public override double ScaleAddActualWeight
         {
-            get => base.ScaleAddAcutalWeight;
+            get => base.ScaleAddActualWeight;
             set
             {
-                _ScaleAddAcutalWeight = value;
+                _ScaleAddActualWeight = value;
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value);
-                OnPropertyChanged("ScaleActualWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                OnPropertyChanged(nameof(ScaleActualWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 
@@ -44,9 +44,9 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScaleRealWeight = value;
-                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, ScaleAddAcutalWeight);
-                OnPropertyChanged("ScaleActualWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, ScaleAddActualWeight);
+                OnPropertyChanged(nameof(ScaleActualWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 

@@ -403,7 +403,7 @@ namespace gip.mes.processapplication
                     if (prodOrderManager != null)
                     {
                         double calculatedBatchWeight = 0;
-                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, intermediateChildPos, out calculatedBatchWeight) == null)
+                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, intermediateChildPos, null, out calculatedBatchWeight) == null)
                         {
                             actualBatchWeight = calculatedBatchWeight;
                         }
@@ -575,7 +575,7 @@ namespace gip.mes.processapplication
                     if (prodOrderManager != null)
                     {
                         double calculatedBatchWeight = 0;
-                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, intermediateChildPos, out calculatedBatchWeight) == null)
+                        if (prodOrderManager.CalcProducedBatchWeight(dbApp, intermediateChildPos, null, out calculatedBatchWeight) == null)
                         {
                             actualBatchWeight = calculatedBatchWeight;
                         }

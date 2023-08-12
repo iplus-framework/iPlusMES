@@ -1,4 +1,4 @@
-﻿using gip.core.autocomponent;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.facility;
@@ -301,14 +301,14 @@ namespace gip.bso.masterdata
             SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
             LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, configStores, partslist, invokerPWNode);
             sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(partslist, prodOrderPartslist);
-            
+
             // Load Subs (level 1)
             List<ACClassWF> allSubWf = invokerPWNode.RefPAACClassMethod.ACClassWF_ACClassMethod.ToList();
             List<ACClassWF> filteredSubs = new List<ACClassWF>();
-            foreach(ACClassWF subWf in allSubWf)
+            foreach (ACClassWF subWf in allSubWf)
             {
-                Type nodeType =  subWf.PWACClass?.ObjectType;
-                if (nodeType != null && TypeOfPWNodeProcessWorkflow.IsAssignableFrom(nodeType) )
+                Type nodeType = subWf.PWACClass?.ObjectType;
+                if (nodeType != null && TypeOfPWNodeProcessWorkflow.IsAssignableFrom(nodeType))
                     filteredSubs.Add(subWf);
             }
 
@@ -319,7 +319,7 @@ namespace gip.bso.masterdata
                 {
                     preConfigACUrl = preConfigACUrl + "\\";
                 }
-                foreach(ACClassWF subWf in filteredSubs)
+                foreach (ACClassWF subWf in filteredSubs)
                 {
                     List<IACConfigStore> subConfigStores = GetConfigStores(new ACClassMethod[] { method, subWf.RefPAACClassMethod }, partslist, prodOrderPartslist);
                     LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, subConfigStores, partslist, subWf, preConfigACUrl);
@@ -477,6 +477,7 @@ namespace gip.bso.masterdata
                     }
                 }
 
+
                 if (change)
                 {
                     MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
@@ -484,6 +485,10 @@ namespace gip.bso.masterdata
                     {
                         Messages.Msg(msgWithDetails);
                         databaseApp.ACUndoChanges();
+                    }
+                    else
+                    {
+                        OnSave();
                     }
                 }
             }
@@ -521,8 +526,7 @@ namespace gip.bso.masterdata
                         excludedModules.RemoveAll(c => c.ACClassID == machineItem.Machine.ACClassID);
                         if (excludedModules.Any())
                         {
-                            RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
-                            RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
+                            change = true;
                         }
                     }
 
@@ -531,11 +535,9 @@ namespace gip.bso.masterdata
                         machineItem.SourceSelectionRulesResult.CurrentConfigStore.RemoveACConfig(currentStoreConfigItem);
                         change = true;
                     }
-
                 }
                 else
                 {
-
                     if (currentStoreConfigItem == null)
                     {
                         currentStoreConfigItem = machineItem.SourceSelectionRulesResult.CurrentConfigStore.NewACConfig(aCClassWF);
@@ -549,13 +551,12 @@ namespace gip.bso.masterdata
                         excludedModules.Add(machineItem.Machine);
                         change = true;
                     }
+                }
 
-                    if (change)
-                    {
-                        RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
-                        RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
-                    }
-
+                if (change && excludedModules.Any())
+                {
+                    RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
+                    RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
                 }
             }
 
@@ -578,14 +579,13 @@ namespace gip.bso.masterdata
             }
             return result ?? new List<ACClass>();
         }
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
                 case nameof(ShowDialogSelectSources):
-                    //ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Nullable<System.Guid>)acParameter[3]);
+                    ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Nullable<System.Guid>)acParameter[2]);
                     return true;
                 case nameof(DlgSelectSourcesOk):
                     DlgSelectSourcesOk();

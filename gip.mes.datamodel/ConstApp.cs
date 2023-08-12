@@ -208,6 +208,10 @@
 
         public const string BOM = "en{'Bill of Materials'}de{'Stückliste'}";
 
+        public const string FinalIntermediate = "en{'Final intermediate'}de{'Finales Zwischenprodukt'}";
+
+        public const string OperationLog = "en{'Operation log'}de{'Betriebsprotokoll'}";
+
         // Date
         public const string ExpirationDate = "en{'Expiration Date'}de{'Ablaufdatum'}";
         public const string FillingDate = "en{'Fill Date'}de{'Fülldatum'}";
@@ -333,6 +337,8 @@
         #region OrderLotItem
 
         public const string TimeEntered = "en{'Time Entered'}de{'Eingabezeit'}";
+        public const string MinDuration = "en{'Minimum duration'}de{'Minimum duration'}";
+        public const string MaxDuration = "en{'Maximum duration'}de{'Maximum duration'}";
         public const string Duration = "en{'Duration'}de{'Dauer'}";
         public const string HintDuration = "en{'Hint Duration'}de{'Hinweisdauer'}";
         public const string ElapsedTime = "en{'Elapsed Time'}de{'Verstrichene Zeit'}";

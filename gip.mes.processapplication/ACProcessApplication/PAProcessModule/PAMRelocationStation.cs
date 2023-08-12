@@ -26,6 +26,7 @@ namespace gip.mes.processapplication
             _DestFacilityNo = new ACPropertyConfigValue<string>(this, nameof(DestFacilityNo), "");
             _MethodNameWF = new ACPropertyConfigValue<string>(this, nameof(MethodNameWF), "");
             _ConfigACUrlOfNode = new ACPropertyConfigValue<string>(this, nameof(ConfigACUrlOfNode), "");
+            _SourceFacilityNos = new ACPropertyConfigValue<string>(this, nameof(SourceFacilityNos), "");
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -35,6 +36,7 @@ namespace gip.mes.processapplication
             _ = DestFacilityNo;
             _ = MethodNameWF;
             _ = ConfigACUrlOfNode;
+            _ = SourceFacilityNos;
             return true;
         }
         #endregion
@@ -51,6 +53,20 @@ namespace gip.mes.processapplication
             set
             {
                 _DestFacilityNo.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _SourceFacilityNos;
+        [ACPropertyConfig("en{'Sources (semicolonsep)'}de{'Quellen (semicolonsep)'}")]
+        public string SourceFacilityNos
+        {
+            get
+            {
+                return _SourceFacilityNos.ValueT;
+            }
+            set
+            {
+                _SourceFacilityNos.ValueT = value;
             }
         }
 
@@ -140,7 +156,27 @@ namespace gip.mes.processapplication
                 Material material = inwardFacility.Material;
                 if (material == null)
                 {
-                    acComponent.Messages.Error(acComponent, String.Format("No material assigned to Facility {0}",configACUrlOfNode.ValueT), true);
+                    var sourceFacilityNos = new ACPropertyConfigValue<string>(acComponent as ACComponent, nameof(SourceFacilityNos), "");
+                    if (!String.IsNullOrEmpty(sourceFacilityNos.ValueT))
+                    {
+                        string[] arrSourceFacilityNos = sourceFacilityNos.ValueT.Split(';');
+                        foreach (string sourceFacilityNo in arrSourceFacilityNos)
+                        {
+                            if (String.IsNullOrEmpty(sourceFacilityNo))
+                                continue;
+                            Facility sourceFacility = dbApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo);
+                            if (sourceFacility != null)
+                            {
+                                material = sourceFacility.Material;
+                                if (material != null)
+                                    break;
+                            }
+                        }
+                    }
+                }
+                if (material == null)
+                { 
+                    acComponent.Messages.Error(acComponent, String.Format("No material assigned to Facility {0}", destFacilityNo.ValueT), true);
                     return;
                 }
 
@@ -154,6 +190,8 @@ namespace gip.mes.processapplication
 
 
                 currentBookParamRelocation.InwardFacility = inwardFacility;
+                if (inwardFacility.Material == null)
+                    inwardFacility.Material = material;
                 currentBookParamRelocation.InwardMaterial = material;
                 currentBookParamRelocation.OutwardMaterial = material;
                 currentBookParamRelocation.InwardQuantity = 10000000;

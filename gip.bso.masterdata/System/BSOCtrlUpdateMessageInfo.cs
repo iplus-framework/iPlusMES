@@ -1,15 +1,10 @@
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Xml.Serialization;
 
 namespace gip.bso.masterdata
 {
@@ -292,22 +287,21 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case"CopyAllToClipboard":
+                case nameof(CopyAllToClipboard):
                     CopyAllToClipboard();
                     return true;
-                case"SaveAllToTxtFile":
+                case nameof(SaveAllToTxtFile):
                     SaveAllToTxtFile();
                     return true;
-                case"IsEnabledCopyAllToClipboard":
+                case nameof(IsEnabledCopyAllToClipboard):
                     result = IsEnabledCopyAllToClipboard();
                     return true;
-                case"IsEnabledSaveAllToTxtFile":
+                case nameof(IsEnabledSaveAllToTxtFile):
                     result = IsEnabledSaveAllToTxtFile();
                     return true;
             }
@@ -315,7 +309,6 @@ namespace gip.bso.masterdata
         }
 
         #endregion
-
 
     }
 }

@@ -623,7 +623,10 @@ namespace gip.mes.facility
                                         if (!collectingData && dosableRelations.Contains(mat4Dosing))
                                             continue;
                                         if (!IsRouteValidationNeededForPos(mat4Dosing, dbApp, dbIPlus, pList, configStores, mapPosToWFConn, validationBehaviour, detailMessages))
+                                        {
+                                            dosableRelations.Add(mat4Dosing);
                                             continue;
+                                        }
 
                                         MapPosToWFConnSubItem subItem = mapPosWF.MapPosToWFConnSubItems.Where(c => c.PWNode.ACClassWFID == node2Check.PWNode.ACClassWFID).FirstOrDefault();
                                         if (subItem == null)

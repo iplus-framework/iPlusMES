@@ -121,7 +121,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region LackOfMaterial State
-        private bool _LackOfMaterialForced = false;
+        protected bool _LackOfMaterialForced = false;
         public bool IsLackOfMaterialForced
         {
             get
@@ -565,8 +565,20 @@ namespace gip.mes.processapplication
             if (currentSource == null)
                 return null;
 
-            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null);
+            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null, IsSourceMarkedAsEmpty);
             return restInfo;
+        }
+
+        public bool IsSourceMarkedAsEmpty
+        {
+            get
+            {
+                return DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceNextSource
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceEndBatchplan
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EndDosingThenDisThenEnd
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EndDosingThenDisThenNextComp
+                    || DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait;
+            }
         }
 
         #endregion
@@ -1241,7 +1253,25 @@ namespace gip.mes.processapplication
                 return completeResult;
             }
 
+            // If Dosing is done without scale and no result from PLC,
+            // then calculate quantity from difference between last posted quantity
+            // and measured weight
             double actualQuantity = (double)acMethod.ResultValueList["ActualQuantity"];
+            if (   actualQuantity < 0.0000001 
+                && CurrentScaleForWeighing == null)
+            {
+                PAMSilo dosingSilo = CurrentDosingSilo;
+                if (dosingSilo != null)
+                {
+                    DosingRestInfo restInfo = new DosingRestInfo(dosingSilo, this, null, IsSourceMarkedAsEmpty);
+                    if (Math.Abs(restInfo.DosedQuantity) > Double.Epsilon)
+                    {
+                        actualQuantity = restInfo.DosedQuantity;
+                        acMethod.ResultValueList["ActualQuantity"] = actualQuantity;
+                    }
+                }
+            }
+            
             if (this.IsSimulationOn)
             {
                 if (actualQuantity < 0.0000001)
@@ -1870,6 +1900,21 @@ namespace gip.mes.processapplication
         {
             if (!IsEnabledAcknowledgeAlarms())
                 return;
+            OnHandleAcknowlegdeDosingAlarms();
+            base.AcknowledgeAlarms();
+        }
+
+        public override bool IsEnabledAcknowledgeAlarms()
+        {
+            if (((StateTolerance.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckTolerance.ValueT))
+                || ((StateLackOfMaterial.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckLackOfMaterial.ValueT))
+                || ((StateDosingTime.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckDosingTime.ValueT)))
+                return true;
+            return base.IsEnabledAcknowledgeAlarms();
+        }
+
+        protected virtual void OnHandleAcknowlegdeDosingAlarms()
+        {
             if (StateTolerance.ValueT != PANotifyState.Off)
                 FaultAckTolerance.ValueT = true;
             if (StateLackOfMaterial.ValueT != PANotifyState.Off)
@@ -1884,16 +1929,6 @@ namespace gip.mes.processapplication
             }
             if (StateDosingTime.ValueT != PANotifyState.Off)
                 FaultAckDosingTime.ValueT = true;
-            base.AcknowledgeAlarms();
-        }
-
-        public override bool IsEnabledAcknowledgeAlarms()
-        {
-            if (((StateTolerance.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckTolerance.ValueT))
-                || ((StateLackOfMaterial.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckLackOfMaterial.ValueT))
-                || ((StateDosingTime.ValueT == PANotifyState.AlarmOrFault) && (!FaultAckDosingTime.ValueT)))
-                return true;
-            return base.IsEnabledAcknowledgeAlarms();
         }
 
         [ACMethodInfo("Function", "en{'Default dosing paramters'}de{'Standard Dosierparameter'}", 9999)]

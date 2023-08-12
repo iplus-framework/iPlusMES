@@ -1,20 +1,16 @@
 ﻿using gip.core.datamodel;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioSystem, ConstApp.Material, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOOperationLog")]
-    [ACPropertyEntity(1, "FacilityCharge", "en{'Quant'}de{'Quant'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACClassInfo(Const.PackName_VarioSystem, ConstApp.OperationLog, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOOperationLog")]
+    [ACPropertyEntity(1, "FacilityCharge", "en{'Quant'}de{'Quant'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName, "", true)]
     [ACPropertyEntity(2, "OperationTime", "en{'Time'}de{'Zeit'}", "", "", true)]
     [ACPropertyEntity(31, "Operation", "en{'Operation'}de{'Operation'}", "", "", true)]
     [ACPropertyEntity(31, "OperationState", "en{'State'}de{'Status'}", "", "", true)]
-    [NotMapped]
-    public partial class OperationLog
+    [ACPropertyEntity(9999, "XMLValue", "en{'Value'}de{'Wert'}")]
+    public partial class OperationLog 
+
     {
         public static OperationLog NewACObject(DatabaseApp dbApp, IACObject parentACObject)
         {
@@ -26,7 +22,7 @@ namespace gip.mes.datamodel
                 entity.RefACClassID = refACClass.ACClassID;
 
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
-
+            
             return entity;
         }
 
@@ -65,7 +61,7 @@ namespace gip.mes.datamodel
 
         #region Methods
 
-        public static MsgWithDetails CloseOperationLog(DatabaseApp dbApp, OperationLog inOperationLog)
+        public static MsgWithDetails CloseOperationLog(DatabaseApp dbApp, OperationLog inOperationLog, ACMethod method)
         {
             inOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
 
@@ -77,7 +73,13 @@ namespace gip.mes.datamodel
             outOperationLog.OperationTime = DateTime.Now;
             outOperationLog.ACProgramLogID = inOperationLog.ACProgramLogID;
 
-            dbApp.OperationLog.Add(outOperationLog);
+            if(method != null)
+            {
+                string xml = gip.core.datamodel.ACClassMethod.SerializeACMethod(method);
+                outOperationLog.XMLValue = xml;
+            }
+
+            dbApp.OperationLog.AddObject(outOperationLog);
 
             return dbApp.ACSaveChanges();
         }

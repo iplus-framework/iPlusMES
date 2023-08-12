@@ -38,6 +38,10 @@ namespace gip.bso.test
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
             _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
             if (_PickingManager == null)
                 throw new Exception("PickingManager not configured");
@@ -49,8 +53,17 @@ namespace gip.bso.test
         {
             bool baseReturn = base.ACDeInit(deleteACClassTask);
 
+            if(_ACFacilityManager != null)
+            {
+                FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            }
+
+            _ACFacilityManager = null;
+
             if (_PickingManager != null)
+            {
                 ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+            }
             _PickingManager = null;
 
             return baseReturn;
@@ -68,6 +81,17 @@ namespace gip.bso.test
                 if (_PickingManager == null)
                     return null;
                 return _PickingManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
             }
         }
 

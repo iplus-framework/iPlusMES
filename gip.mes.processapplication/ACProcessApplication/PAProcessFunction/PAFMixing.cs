@@ -53,7 +53,7 @@ namespace gip.mes.processapplication
         {
             ACMethod method = new ACMethod(acIdentifier);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
-            method.ParameterValueList.Add(new ACValue("SwitchOff", typeof(bool), 0, Global.ParamOption.Optional));
+            method.ParameterValueList.Add(new ACValue("SwitchOff", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("SwitchOff", "en{'Switch off'}de{'Ausschalten'}");
             method.ParameterValueList.Add(new ACValue("Speed", typeof(Int16), 0, Global.ParamOption.Optional));
             paramTranslation.Add("Speed", "en{'Speed'}de{'Geschwindigkeit'}");
@@ -78,6 +78,8 @@ namespace gip.mes.processapplication
             ACMethod method = new ACMethod(acIdentifier);
 
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            method.ParameterValueList.Add(new ACValue("LeaveOn", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("LeaveOn", "en{'Leave motor switched on'}de{'Motor eingeschaltet lassen'}");
             method.ParameterValueList.Add(new ACValue("Duration", typeof(TimeSpan), 0, Global.ParamOption.Required));
             paramTranslation.Add("Duration", "en{'Duration'}de{'Dauer'}");
             method.ParameterValueList.Add(new ACValue("Speed", typeof(Int16), 0, Global.ParamOption.Optional));
@@ -109,6 +111,8 @@ namespace gip.mes.processapplication
             ACMethod method = new ACMethod(acIdentifier);
 
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            method.ParameterValueList.Add(new ACValue("LeaveOn", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("LeaveOn", "en{'Leave motor switched on'}de{'Motor eingeschaltet lassen'}");
             method.ParameterValueList.Add(new ACValue("Temperature", typeof(Double), 0.0, Global.ParamOption.Required));
             paramTranslation.Add("Temperature", "en{'Temperature'}de{'Temperatur'}");
             method.ParameterValueList.Add(new ACValue("Speed", typeof(Int16), 0, Global.ParamOption.Optional));

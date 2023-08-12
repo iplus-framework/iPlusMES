@@ -511,6 +511,14 @@ namespace gip.mes.processapplication
                 return propTarget.Source != null;
             }
         }
+
+        public double DiffFillLevelScale
+        {
+            get
+            {
+                return FillLevel.ValueT - FillLevelScale.ValueT;
+            }
+        }
         
         [ACPropertyBindingSource(450, "Error", "en{'Validation error'}de{'Validierungsfehler'}", "", false, false)]
         public IACContainerTNet<PANotifyState> ValidationError { get; set; }

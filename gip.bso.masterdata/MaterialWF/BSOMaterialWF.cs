@@ -1310,308 +1310,106 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "New":
-                    New();
-                    return true;
-                case "IsEnabledNew":
-                    result = IsEnabledNew();
-                    return true;
-                case "Delete":
-                    Delete();
-                    return true;
-                case "IsEnabledSave":
-                    result = IsEnabledSave();
-                    return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "SetSelectedMaterial":
-                    SetSelectedMaterial((Material)acParameter[0], acParameter.Count() == 2 ? (Boolean)acParameter[1] : false);
+                case nameof(SetSelectedMaterial):
+                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
                     return true;
-                case "AddMaterialDlg":
+                case nameof(AddMaterialDlg):
                     AddMaterialDlg();
                     return true;
-                case "AddMaterialDlgCancel":
+                case nameof(AddMaterialDlgCancel):
                     AddMaterialDlgCancel();
                     return true;
-                case "AddMaterialOK":
+                case nameof(AddMaterialOK):
                     AddMaterialOK();
                     return true;
-                case "IsEnabledAddMaterialDlg":
+                case nameof(IsEnabledAddMaterialDlg):
                     result = IsEnabledAddMaterialDlg();
                     return true;
-                case "IsEnabledAddMaterialOK":
+                case nameof(IsEnabledAddMaterialOK):
                     result = IsEnabledAddMaterialOK();
                     return true;
-                case "NewMaterialWFRelation":
+                case nameof(NewMaterialWFRelation):
                     NewMaterialWFRelation();
                     return true;
-                case "DeleteMaterialWFRelation":
+                case nameof(DeleteMaterialWFRelation):
                     DeleteMaterialWFRelation();
                     return true;
-                case "IsEnabledNewMaterialWFRelation":
+                case nameof(IsEnabledNewMaterialWFRelation):
                     result = IsEnabledNewMaterialWFRelation();
                     return true;
-                case "IsEnabledDeleteMaterialWFRelation":
+                case nameof(IsEnabledDeleteMaterialWFRelation):
                     result = IsEnabledDeleteMaterialWFRelation();
                     return true;
-                case "AddProcessWorkflow":
+                case nameof(AddProcessWorkflow):
                     AddProcessWorkflow();
                     return true;
-                case "IsEnabledAddProcessWorkflow":
+                case nameof(IsEnabledAddProcessWorkflow):
                     result = IsEnabledAddProcessWorkflow();
                     return true;
-                case "RemoveProcessWorkflow":
+                case nameof(RemoveProcessWorkflow):
                     RemoveProcessWorkflow();
                     return true;
-                case "IsEnabledRemoveProcessWorkflow":
+                case nameof(IsEnabledRemoveProcessWorkflow):
                     result = IsEnabledRemoveProcessWorkflow();
                     return true;
-                case "NewProcessWorkflowOk":
+                case nameof(NewProcessWorkflowOk):
                     NewProcessWorkflowOk();
                     return true;
-                case "IsEnabledNewProcessWorkflowOk":
+                case nameof(IsEnabledNewProcessWorkflowOk):
                     result = IsEnabledNewProcessWorkflowOk();
                     return true;
-                case "NewProcessWorkflowCancel":
+                case nameof(NewProcessWorkflowCancel):
                     NewProcessWorkflowCancel();
                     return true;
-                case "IsEnabledACActionToTarget":
-                    result = IsEnabledACActionToTarget((IACInteractiveObject)acParameter[0], (ACActionArgs)acParameter[1]);
+                case nameof(IsEnabledACActionToTarget):
+                    result = IsEnabledACActionToTarget((gip.core.datamodel.IACInteractiveObject)acParameter[0], (gip.core.datamodel.ACActionArgs)acParameter[1]);
                     return true;
-                case "RemoveMaterialConnection":
+                case nameof(RemoveMaterialConnection):
                     RemoveMaterialConnection();
                     return true;
-                case "IsEnabledRemoveMaterialConnection":
+                case nameof(IsEnabledRemoveMaterialConnection):
                     result = IsEnabledRemoveMaterialConnection();
                     return true;
+                
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
-        #endregion
-
-        #region Clone
-
-        #region Clone MaterialWF
-
-
-
-        #endregion
-
-        #region Clone WF Relations
-
-        // SourceProcWF
-        // MaterialWFACClassMethod
-
-        #region SourceProcWF
-
-        private MaterialWFACClassMethod _SelectedSourceProcWF;
-        /// <summary>
-        /// Selected property for MaterialWFACClassMethod
-        /// </summary>
-        /// <value>The selected SourceProcWF</value>
-        [ACPropertySelected(9999, "SourceProcWF", "en{'TODO: SourceProcWF'}de{'TODO: SourceProcWF'}")]
-        public MaterialWFACClassMethod SelectedSourceProcWF
-        {
-            get
-            {
-                return _SelectedSourceProcWF;
-            }
-            set
-            {
-                if (_SelectedSourceProcWF != value)
-                {
-                    _SelectedSourceProcWF = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// List property for MaterialWFACClassMethod
-        /// </summary>
-        /// <value>The SourceProcWF list</value>
-        [ACPropertyList(9999, "SourceProcWF")]
-        public IEnumerable<MaterialWFACClassMethod> SourceProcWFList
-        {
-            get
-            {
-                return CurrentMaterialWF?.MaterialWFACClassMethod_MaterialWF;
-            }
-        }
-
-
-        #endregion
-
-        #region TargetProcWF
-
-        private MaterialWFACClassMethod _SelectedTargetProcWF;
-        /// <summary>
-        /// Selected property for MaterialWFACClassMethod
-        /// </summary>
-        /// <value>The selected SourceProcWF</value>
-        [ACPropertySelected(9999, "TargetProcWF", "en{'TODO: SourceProcWF'}de{'TODO: SourceProcWF'}")]
-        public MaterialWFACClassMethod SelectedTargetProcWF
-        {
-            get
-            {
-                return _SelectedTargetProcWF;
-            }
-            set
-            {
-                if (_SelectedTargetProcWF != value)
-                {
-                    _SelectedTargetProcWF = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        /// <summary>
-        /// List property for MaterialWFACClassMethod
-        /// </summary>
-        /// <value>The SourceProcWF list</value>
-        [ACPropertyList(9999, "TargetProcWF")]
-        public IEnumerable<MaterialWFACClassMethod> TargetProcWFList
-        {
-            get
-            {
-                return CurrentMaterialWF?.MaterialWFACClassMethod_MaterialWF;
-            }
-        }
-
-
-        #endregion
-
-        #region CompareConnections
-
-        private ApplyMatConnectionToOtherWF _SelectedApplyToOtherWF;
-        /// <summary>
-        /// Selected property for CompareConnections
-        /// </summary>
-        /// <value>The selected CompareConnections</value>
-        [ACPropertySelected(9999, "ApplyToOtherWF", "en{'TODO: CompareConnections'}de{'TODO: CompareConnections'}")]
-        public ApplyMatConnectionToOtherWF SelectedApplyToOtherWF
-        {
-            get
-            {
-                return _SelectedApplyToOtherWF;
-            }
-            set
-            {
-                if (_SelectedApplyToOtherWF != value)
-                {
-                    _SelectedApplyToOtherWF = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
-        private List<ApplyMatConnectionToOtherWF> _ApplyToOtherWFList;
-        /// <summary>
-        /// List property for CompareConnections
-        /// </summary>
-        /// <value>The CompareConnections list</value>
-        [ACPropertyList(9999, "ApplyToOtherWF")]
-        public List<ApplyMatConnectionToOtherWF> ApplyToOtherWFList
-        {
-            get
-            {
-                return _ApplyToOtherWFList;
-            }
-        }
-
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Source Property: GetConnectionCloneSuggestion
-        /// </summary>
-        [ACMethodInfo("GetApplyToOtherWFList", "en{'Get connections'}de{'Get connections'}", 999)]
-        public void GetApplyToOtherWFList()
-        {
-            if (!IsEnabledGetApplyToOtherWFList())
-                return;
-            _ApplyToOtherWFList = PartslistManager.GetMaterialWFConnections(CurrentMaterialWF, SelectedSourceProcWF.ACClassMethodID, SelectedTargetProcWF.ACClassMethodID);
-            OnPropertyChanged(nameof(ApplyToOtherWFList));
-        }
-
-        public bool IsEnabledGetApplyToOtherWFList()
-        {
-            return
-                SelectedSourceProcWF != null
-                && SelectedTargetProcWF != null
-                && SelectedSourceProcWF.ACClassMethodID != SelectedTargetProcWF.ACClassMethodID;
-        }
-
-        /// <summary>
-        /// Source Property: GetConnectionCloneSuggestion
-        /// </summary>
-        [ACMethodInfo("ApplyConnectionCloneSuggestion", "en{'Apply to target'}de{'Apply to target'}", 999)]
-        public void ApplyToOtherWF()
-        {
-            if (!IsEnabledApplyToOtherWF())
-                return;
-            PartslistManager.ApplyMaterialWFConnections(DatabaseApp, CurrentMaterialWF, _ApplyToOtherWFList, SelectedTargetProcWF.ACClassMethodID);
-            _ApplyToOtherWFList = null;
-            OnPropertyChanged(nameof(ApplyToOtherWFList));
-        }
-
-        public bool IsEnabledApplyToOtherWF()
-        {
-            return
-                _ApplyToOtherWFList != null
-                && _ApplyToOtherWFList.Any();
-        }
-
-
-        /// <summary>
-        /// Source Property: MethodName
-        /// </summary>
-        [ACMethodInfo("ShowApplyToOtherWFDlg", "en{'Copy mat.conn'}de{'Copy mat.conn'}", 999)]
-        public void ShowApplyToOtherWFDlg()
-        {
-            if (!IsEnabledShowApplyToOtherWFDlg())
-                return;
-            ShowDialog(this, "ApplyToOtherWFDlg");
-        }
-
-        public bool IsEnabledShowApplyToOtherWFDlg()
-        {
-            return CurrentMaterialWF != null;
-        }
-
-
-        #endregion
-
-
-        #endregion
 
         #endregion
 

@@ -53,7 +53,7 @@ namespace gip.mes.webservices
             {
                 sequence.Sequence = new List<BarcodeEntity>();
             }
-            if (sequence.State < BarcodeSequence.ActionState.Question)
+            if (sequence.State < BarcodeSequence.ActionState.Question || sequence.State == BarcodeSequenceBase.ActionState.SelectionScanAgain)
             {
                 WSResponse<BarcodeEntity> nextEntity = GetBarcodeEntity(sequence.CurrentBarcode);
 
@@ -62,6 +62,14 @@ namespace gip.mes.webservices
                     sequence.State = BarcodeSequence.ActionState.Cancelled;
                     sequence.Message = nextEntity.Message;
                     return new WSResponse<BarcodeSequence>(sequence, nextEntity.Message);
+                }
+
+                if (sequence.State == BarcodeSequenceBase.ActionState.SelectionScanAgain && nextEntity != null && nextEntity.Data.ACClass != null)
+                {
+                    if (sequence.Sequence.Any(c => c.ACClass != null))
+                    {
+                        sequence.Sequence.Clear();
+                    }
                 }
 
                 sequence.AddSequence(nextEntity.Data);

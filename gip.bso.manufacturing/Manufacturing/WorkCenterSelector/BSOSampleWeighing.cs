@@ -8,11 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using gip.core.processapplication;
+using System.Collections.ObjectModel;
 
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Sample weighing'}de{'Gewichtsprüfung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 400)]
-    public class BSOSampleWeighing : BSOWorkCenterChild
+    public class BSOSampleWeighing : BSOManualWeighing
     {
         public BSOSampleWeighing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
@@ -25,7 +26,7 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
-        public const string ClassName = "BSOSampleWeighing";
+        public new const string ClassName = "BSOSampleWeighing";
 
         #region Properties
 
@@ -48,45 +49,91 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        private ACRef<ACComponent> _ScaleRef;
         [ACPropertyInfo(602)]
-        public ACComponent Scale
+        public double TolerancePlus
         {
-            get
-            {
-                if (_ScaleRef != null)
-                    return _ScaleRef.ValueT;
-                return null;
-            }
+            get => _TolerancePlus;
+        }
+
+        [ACPropertyInfo(603)]
+        public double ToleranceMinus
+        {
+            get => _ToleranceMinus;
+        }
+
+        public bool AckInTol
+        {
+            get;
+            set;
         }
 
         #endregion
 
         #region Methods
 
+
         public override void Activate(ACComponent selectedProcessModule)
         {
-            DeActivate();
+            CurrentProcessModule = selectedProcessModule;
+            ParentBSOWCS?.ApplicationQueue.Add(() => ActivateModule(selectedProcessModule));
+        }
 
-            ProcessModule = selectedProcessModule;
-            ProcessFunction = ItemFunction?.ProcessFunction;
+        public override void DeActivate()
+        {
+            if (PAFACState != null)
+                PAFACState.PropertyChanged -= _PAFACStateProp_PropertyChanged;
 
-            var processModuleChildComps = ProcessModule.ACComponentChildsOnServer;
+            ProcessFunction = null;
+            ProcessModule = null;
+            PAFACState = null;
+            CurrentProcessModule = null;
+        }
 
-            var scale = processModuleChildComps.FirstOrDefault(c => typeof(PAEScaleGravimetric).IsAssignableFrom(c.ComponentClass.ObjectType)) as ACComponent;
-            if (scale == null)
+        private void ActivateModule(ACComponent selectedProcessModule)
+        {
+            ACComponent currentProcessModule = selectedProcessModule;
+            if (currentProcessModule == null)
             {
-                //Error50325: The child component Scale can not be found on the current process module.
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "Activate(10)", 114, "Error50325");
-                Messages.LogMessageMsg(msg);
-                Messages.Msg(msg);
+                //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
+                // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
+                Messages.Error(this, "Error50283");
                 return;
             }
 
-            _ScaleRef = new ACRef<ACComponent>(scale, this);
+            //PAProcessModuleACUrl = currentProcessModule.ACUrl;
+            //PAProcessModuleACCaption = currentProcessModule.ACCaption;
 
-            PAFACState = ProcessFunction.GetPropertyNet(nameof(PAProcessFunction.ACState)) as IACContainerTNet<ACStateEnum>;
-            if(PAFACState == null)
+            if (currentProcessModule.ConnectionState == ACObjectConnectionState.DisConnected)
+            {
+                //Info50040: The server is unreachable.Reopen the program once the connection to the server has been established.
+                //     Der Server ist nicht erreichbar.Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
+                Messages.Info(this, "Info50040");
+                return;
+            }
+
+            ProcessFunction = ItemFunction?.ProcessFunction;
+
+            var processModuleChildComps = currentProcessModule.ACComponentChildsOnServer;
+            IEnumerable<IACComponent> scaleObjects = processModuleChildComps.Where(c => typeof(PAEScaleBase).IsAssignableFrom(c.ComponentClass.ObjectType)).ToArray();
+            if (scaleObjects != null && scaleObjects.Any())
+            {
+                _ProcessModuleScales = scaleObjects.Select(c => new ACRef<IACComponent>(c, this)).ToArray();
+                ActivateScale(scaleObjects.FirstOrDefault());
+
+                var scaleObjectInfoList = new ObservableCollection<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
+                ScaleObjectsList = scaleObjectInfoList;
+                CurrentScaleObject = ScaleObjectsList.FirstOrDefault();
+            }
+
+            var pafACState = ProcessFunction.GetPropertyNet(nameof(ACState));
+            if (pafACState == null)
+            {
+                Messages.Error(this, "50285", false, nameof(ACState));
+                return;
+            }
+
+            PAFACState = pafACState as IACContainerTNet<ACStateEnum>;
+            if (PAFACState == null)
             {
                 //Error50326: The property ACState can not be found on the current process function.
                 Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "Activate(20)", 114, "Error50326");
@@ -94,16 +141,19 @@ namespace gip.bso.manufacturing
                 Messages.Msg(msg);
                 return;
             }
-        }
 
-        public override void DeActivate()
-        {
-            if (_ScaleRef != null)
-                _ScaleRef.Detach();
-            _ScaleRef = null;
-            ProcessFunction = null;
-            ProcessModule = null;
-            PAFACState = null;
+            PAFACState.PropertyChanged += _PAFACStateProp_PropertyChanged;
+
+            var currentACMethod = ProcessFunction.GetPropertyNet(nameof(PAProcessFunction.CurrentACMethod)) as IACContainerTNet<ACMethod>;
+            if (currentACMethod == null)
+            {
+                //Error50287: Initialization error: The weighing function doesn't have the property {0}.
+                // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
+                Messages.Info(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
+                return;
+            }
+
+            HandlePAFCurrentACMethod(currentACMethod.ValueT);
         }
 
         [ACMethodInfo("", "en{'Register sample weight'}de{'Stichprobengewicht registrieren'}", 601, true)]
@@ -125,7 +175,23 @@ namespace gip.bso.manufacturing
             if (PAFACState.ValueT != ACStateEnum.SMRunning)
                 return false;
 
+            if (AckInTol && ScaleBckgrState != ScaleBackgroundState.InTolerance)
+                return false;
+
             return true;
+        }
+
+        private void _PAFACStateProp_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                var tempSender = sender as IACContainerTNet<ACStateEnum>;
+                if (tempSender != null)
+                {
+                    ACStateEnum tempState = tempSender.ValueT;
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandlePAFACState(tempState));
+                }
+            }
         }
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, ACClassMethod acClassMethod, params object[] acParameter)
@@ -143,6 +209,80 @@ namespace gip.bso.manufacturing
             }
 
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        protected override ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
+        {
+            if (!tolPlus.HasValue)
+                tolPlus = 0;
+
+            if (!tolMinus.HasValue)
+                tolMinus = 0;
+
+            if (tolPlus.HasValue && tolMinus.HasValue && target > 0)
+            {
+                double act = Math.Round(ScaleGrossWeight, 5);
+
+                if (act > target)
+                {
+                    if (act <= Math.Round(target + tolPlus.Value, 5))
+                        return ScaleBackgroundState.InTolerance;
+                    else
+                        return ScaleBackgroundState.Weighing;
+                }
+                else
+                {
+                    if (act >= Math.Round(target - tolMinus.Value, 5))
+                        return ScaleBackgroundState.InTolerance;
+                }
+            }
+            return ScaleBackgroundState.OutTolerance;
+        }
+
+        private void HandlePAFACState(ACStateEnum acState)
+        {
+            if (acState == ACStateEnum.SMRunning)
+            {
+                var currentACMethod = ProcessFunction.GetPropertyNet(nameof(PAProcessFunction.CurrentACMethod)) as IACContainerTNet<ACMethod>;
+                if (currentACMethod == null)
+                {
+                    //Error50287: Initialization error: The weighing function doesn't have the property {0}.
+                    // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
+                    Messages.Info(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
+                    return;
+                }
+
+                HandlePAFCurrentACMethod(currentACMethod.ValueT);
+            }
+            else if (acState == ACStateEnum.SMResetting)
+            {
+                TargetWeight = 0;
+            }
+        }
+
+        protected override void HandlePAFCurrentACMethod(ACMethod currentACMethod)
+        {
+            ACStateEnum? acState = PAFACState?.ValueT;
+
+            if (acState.HasValue && acState == ACStateEnum.SMRunning)
+            {
+                base.HandlePAFCurrentACMethod(currentACMethod);
+
+                if (currentACMethod != null)
+                {
+                    ACValue paramAck = currentACMethod.ParameterValueList.GetACValue("AckInTol");
+                    if (paramAck != null)
+                        AckInTol = paramAck.ParamAsBoolean;
+                    else
+                        AckInTol = false;
+                }
+            }
+            else
+            {
+                TargetWeight = 0;
+                _TolerancePlus = 0;
+                _ToleranceMinus = 0;
+            }
         }
 
         #endregion

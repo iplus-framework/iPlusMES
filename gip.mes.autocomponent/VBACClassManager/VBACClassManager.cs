@@ -234,12 +234,12 @@ namespace gip.mes.autocomponent
                 inRequestConfig.DeleteACObject(databaseApp, withCheck);
 
             //  MaintOrder/VBiPAACClassID  |NotNull 
-            List<MaintOrder> maintOrders = databaseApp.MaintOrder.Where(c => c.VBiPAACClassID == aCClass.ACClassID).ToList();
-            List<MaintTask> maintTasks = maintOrders.SelectMany(c => c.MaintTask_MaintOrder).ToList();
-            foreach (MaintTask maintTask in maintTasks)
-                maintTask.DeleteACObject(databaseApp, withCheck);
-            foreach (MaintOrder maintOrder in maintOrders)
-                maintOrder.DeleteACObject(databaseApp, withCheck);
+            //List<MaintOrder> maintOrders = databaseApp.MaintOrder.Where(c => c.VBiPAACClassID == aCClass.ACClassID).ToList();
+            //List<MaintTask> maintTasks = maintOrders.SelectMany(c => c.MaintTask_MaintOrder).ToList();
+            //foreach (MaintTask maintTask in maintTasks)
+            //    maintTask.DeleteACObject(databaseApp, withCheck);
+            //foreach (MaintOrder maintOrder in maintOrders)
+            //    maintOrder.DeleteACObject(databaseApp, withCheck);
 
 
 

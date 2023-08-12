@@ -256,6 +256,7 @@ namespace gip.mes.datamodel
         }
 
         [NotMapped]
+        [ACPropertyInfo(500, "", ConstApp.FinalIntermediate)]
         public ProdOrderPartslistPos FinalIntermediate
         {
             get

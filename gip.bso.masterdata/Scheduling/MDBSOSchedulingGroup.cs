@@ -1,4 +1,4 @@
-﻿using gip.core.autocomponent;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -72,7 +72,6 @@ namespace gip.bso.masterdata.Scheduling
         }
 
         #endregion
-
 
         #region BSO->ACProperty
 
@@ -277,7 +276,20 @@ namespace gip.bso.masterdata.Scheduling
                      && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
                      && c.RefPAACClassMethod.PWACClass != null
                      && (c.RefPAACClassMethod.PWACClass.ACIdentifier == ProcessWFClassName
-                         || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName)
+                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                    && (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName // 2. Ableitungsstufe
+                                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                    && (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName // 3. Ableitungsstufe
+                                                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                            && c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName) // 4. Ableitungsstufe
+                                                                || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                    && c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName) // 5. Ableitungsstufe
+                                                                        || (c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                        && c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName)
+                                                        )
+                                            )
+                                        )
+                                ))
                      && !string.IsNullOrEmpty(c.Comment)
                      && !assignedWorkflowNodeIds.Contains(c.ACClassWFID));
                 }
@@ -650,56 +662,73 @@ namespace gip.bso.masterdata.Scheduling
         #endregion
 
         #region Execute-Helper-Handlers
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabled":
+                case nameof(IsEnabled):
                     result = IsEnabled();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "AddMDSchedulingGroupWF":
+                case nameof(AddMDSchedulingGroupWF):
                     AddMDSchedulingGroupWF();
                     return true;
-                case "IsEnabledAddMDSchedulingGroupWF":
+                case nameof(IsEnabledAddMDSchedulingGroupWF):
                     result = IsEnabledAddMDSchedulingGroupWF();
                     return true;
-                case "DeleteMDSchedulingGroupWF":
+                case nameof(DeleteMDSchedulingGroupWF):
                     DeleteMDSchedulingGroupWF();
                     return true;
-                case "IsEnabledDeleteMDSchedulingGroupWF":
+                case nameof(IsEnabledDeleteMDSchedulingGroupWF):
                     result = IsEnabledDeleteMDSchedulingGroupWF();
+                    return true;
+                case nameof(AddFacility):
+                    AddFacility();
+                    return true;
+                case nameof(IsEnabledAddFacility):
+                    result = IsEnabledAddFacility();
+                    return true;
+                case nameof(DeleteFacility):
+                    DeleteFacility();
+                    return true;
+                case nameof(IsEnabledDeleteFacility):
+                    result = IsEnabledDeleteFacility();
+                    return true;
+                case nameof(ShowFacility):
+                    ShowFacility();
+                    return true;
+                case nameof(IsEnabledShowFacility):
+                    result = IsEnabledShowFacility();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
