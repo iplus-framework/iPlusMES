@@ -1,13 +1,10 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using gip.core.autocomponent;
+﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
