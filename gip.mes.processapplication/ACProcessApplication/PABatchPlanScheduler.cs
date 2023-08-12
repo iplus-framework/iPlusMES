@@ -1,6 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using VD = gip.mes.datamodel;
+using vd = gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
@@ -178,7 +178,7 @@ namespace gip.mes.processapplication
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
-                activatedSchedules = activatedSchedules.Where(c => c.StartMode != VD.BatchPlanStartModeEnum.Off).ToArray();
+                activatedSchedules = activatedSchedules.Where(c => c.StartMode != vd.BatchPlanStartModeEnum.Off).ToArray();
             }
             if (!activatedSchedules.Any())
                 return;
@@ -496,7 +496,7 @@ namespace gip.mes.processapplication
             {
                 MDSchedulingGroupID = c.MDSchedulingGroupID,
                 MDSchedulingGroup = c,
-                StartMode = VD.BatchPlanStartModeEnum.Off,
+                StartMode = vd.BatchPlanStartModeEnum.Off,
                 UpdateName = invoker.Root.Environment.User.Initials,
                 UpdateTime = DateTime.Now
             }));

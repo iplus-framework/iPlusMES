@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using gip.core.datamodel;
-using VD = gip.mes.datamodel;
+using vd = gip.mes.datamodel;
 using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -63,9 +63,9 @@ namespace gip.mes.processapplication
             }
         }
 
-        private VD.BatchPlanStartModeEnum _StartMode;
+        private vd.BatchPlanStartModeEnum _StartMode;
         [DataMember]
-        public VD.BatchPlanStartModeEnum StartMode
+        public vd.BatchPlanStartModeEnum StartMode
         {
             get
             {
@@ -108,7 +108,7 @@ namespace gip.mes.processapplication
         {
             get
             {
-                ACValueItem item = DatabaseApp.BatchPlanStartModeEnumList.Where(c => (VD.BatchPlanStartModeEnum)c.Value == StartMode).FirstOrDefault();
+                ACValueItem item = DatabaseApp.BatchPlanStartModeEnumList.Where(c => (vd.BatchPlanStartModeEnum)c.Value == StartMode).FirstOrDefault();
                 if (item != null)
                     return item.ACCaption;
                 return StartMode.ToString();
@@ -127,11 +127,8 @@ namespace gip.mes.processapplication
             }
             set
             {
-                if (_UpdateTime != null)
-                {
-                    _UpdateTime = value;
-                    OnPropertyChanged("UpdateTime");
-                }
+                _UpdateTime = value;
+                OnPropertyChanged("UpdateTime");
             }
         }
 
@@ -146,11 +143,8 @@ namespace gip.mes.processapplication
             }
             set
             {
-                if (_UpdateName != value)
-                {
-                    _UpdateName = value;
-                    OnPropertyChanged("UpdateName");
-                }
+                _UpdateName = value;
+                OnPropertyChanged("UpdateName");
             }
         }
 
