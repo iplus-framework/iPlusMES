@@ -127,11 +127,8 @@ namespace gip.mes.processapplication
             }
             set
             {
-                if (_UpdateTime != null)
-                {
-                    _UpdateTime = value;
-                    OnPropertyChanged("UpdateTime");
-                }
+                _UpdateTime = value;
+                OnPropertyChanged("UpdateTime");
             }
         }
 
@@ -146,11 +143,8 @@ namespace gip.mes.processapplication
             }
             set
             {
-                if (_UpdateName != value)
-                {
-                    _UpdateName = value;
-                    OnPropertyChanged("UpdateName");
-                }
+                _UpdateName = value;
+                OnPropertyChanged("UpdateName");
             }
         }
 
