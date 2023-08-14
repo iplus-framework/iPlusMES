@@ -34,48 +34,6 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid>(ref _VBiACClassID, value); }
     }
 
-    Guid _MDMaintModeID;
-    public Guid MDMaintModeID 
-    {
-        get { return _MDMaintModeID; }
-        set { SetProperty<Guid>(ref _MDMaintModeID, value); }
-    }
-
-    bool _IsActive;
-    public bool IsActive 
-    {
-        get { return _IsActive; }
-        set { SetProperty<bool>(ref _IsActive, value); }
-    }
-
-    int? _MaintInterval;
-    public int? MaintInterval 
-    {
-        get { return _MaintInterval; }
-        set { SetProperty<int?>(ref _MaintInterval, value); }
-    }
-
-    DateTime? _LastMaintTerm;
-    public DateTime? LastMaintTerm 
-    {
-        get { return _LastMaintTerm; }
-        set { SetProperty<DateTime?>(ref _LastMaintTerm, value); }
-    }
-
-    bool _IsWarningActive;
-    public bool IsWarningActive 
-    {
-        get { return _IsWarningActive; }
-        set { SetProperty<bool>(ref _IsWarningActive, value); }
-    }
-
-    int? _WarningDiff;
-    public int? WarningDiff 
-    {
-        get { return _WarningDiff; }
-        set { SetProperty<int?>(ref _WarningDiff, value); }
-    }
-
     string _InsertName;
     public string InsertName 
     {
@@ -104,26 +62,6 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private MDMaintMode _MDMaintMode;
-    public virtual MDMaintMode MDMaintMode
-    { 
-        get => LazyLoader.Load(this, ref _MDMaintMode);
-        set => _MDMaintMode = value;
-    }
-
-    public bool MDMaintMode_IsLoaded
-    {
-        get
-        {
-            return MDMaintMode != null;
-        }
-    }
-
-    public virtual ReferenceEntry MDMaintModeReference 
-    {
-        get { return Context.Entry(this).Reference("MDMaintMode"); }
-    }
-    
     private ICollection<MaintACClassProperty> _MaintACClassProperty_MaintACClass;
     public virtual ICollection<MaintACClassProperty> MaintACClassProperty_MaintACClass
     {
@@ -142,26 +80,6 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual CollectionEntry MaintACClassProperty_MaintACClassReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintACClassProperty_MaintACClass); }
-    }
-
-    private ICollection<MaintACClassVBGroup> _MaintACClassVBGroup_MaintACClass;
-    public virtual ICollection<MaintACClassVBGroup> MaintACClassVBGroup_MaintACClass
-    {
-        get => LazyLoader.Load(this, ref _MaintACClassVBGroup_MaintACClass);
-        set => _MaintACClassVBGroup_MaintACClass = value;
-    }
-
-    public bool MaintACClassVBGroup_MaintACClass_IsLoaded
-    {
-        get
-        {
-            return MaintACClassVBGroup_MaintACClass != null;
-        }
-    }
-
-    public virtual CollectionEntry MaintACClassVBGroup_MaintACClassReference
-    {
-        get { return Context.Entry(this).Collection(c => c.MaintACClassVBGroup_MaintACClass); }
     }
 
     private ICollection<MaintOrder> _MaintOrder_MaintACClass;

@@ -4,6 +4,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using static gip.core.autocomponent.PAProcessFunction;
 
 namespace gip.mes.processapplication
@@ -329,7 +330,7 @@ namespace gip.mes.processapplication
                 inOperationLog.ACProgramLogID = moduleVB.CurrentProgramLog.ACProgramLogID;
             }
 
-            dbApp.OperationLog.AddObject(inOperationLog);
+            dbApp.OperationLog.Add(inOperationLog);
 
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)
@@ -524,8 +525,8 @@ namespace gip.mes.processapplication
                                 using (var dbApp = new DatabaseApp())
                                 {
                                     // 1. Hole Material-Konfiguration spezielle für diesen Weg
-                                    materialConfigList = dbApp.MaterialConfig.Where(c => c.VBiACClassPropertyRelationID == logicalRelation.ACClassPropertyRelationID && c.MaterialID == materialID.Value).SetMergeOption(System.Data.Objects.MergeOption.NoTracking).ToList();
-                                    var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID.Value && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
+                                    materialConfigList = dbApp.MaterialConfig.Where(c => c.VBiACClassPropertyRelationID == logicalRelation.ACClassPropertyRelationID && c.MaterialID == materialID.Value).AsNoTracking().ToList();
+                                    var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID.Value && c.VBiACClassID == acClassIdOfParent).AsNoTracking();
                                     foreach (var matConfigIndepedent in wayIndependent)
                                     {
                                         if (!materialConfigList.Where(c => c.LocalConfigACUrl == matConfigIndepedent.LocalConfigACUrl).Any())
@@ -568,7 +569,7 @@ namespace gip.mes.processapplication
             }
             // Überschreibe Parameter mit materialabhängigen Einstellungen
             if (!isConfigInitialization
-                && config.EntityState != System.Data.EntityState.Added
+                && config.EntityState != EntityState.Added
                 && materialConfigList != null
                 && materialConfigList.Any())
             {
@@ -587,7 +588,7 @@ namespace gip.mes.processapplication
             }
             if (!isNewDefaultedMethod)
                 ACUrlCommand("!InheritParamsFromConfig", acMethod, storedACMethod, isConfigInitialization);
-            if (config.EntityState == System.Data.EntityState.Added || isNewDefaultedMethod)
+            if (config.EntityState == EntityState.Added || isNewDefaultedMethod)
                 config.Value = storedACMethod;
             else if (isConfigInitialization)
             {
@@ -596,7 +597,7 @@ namespace gip.mes.processapplication
                 else
                     config.Value = acMethod;
             }
-            if (config.EntityState == System.Data.EntityState.Added || logicalRelation.EntityState == System.Data.EntityState.Added || isNewDefaultedMethod || isConfigInitialization || differentVirtualMethod)
+            if (config.EntityState == EntityState.Added || logicalRelation.EntityState == EntityState.Added || isNewDefaultedMethod || isConfigInitialization || differentVirtualMethod)
             {
                 MsgWithDetails msg = db.ACSaveChanges();
                 if (msg != null)
@@ -613,7 +614,7 @@ namespace gip.mes.processapplication
             Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
 
             var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID
-                                                              && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
+                                                              && c.VBiACClassID == acClassIdOfParent).AsNoTracking();
 
             foreach (var matConfig in wayIndependent)
             {

@@ -76,23 +76,23 @@ public partial class MDMaintTaskState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<MaintTask> _MaintTask_MDMaintTaskState;
-    public virtual ICollection<MaintTask> MaintTask_MDMaintTaskState
+    private ICollection<MaintOrderTask> _MaintOrderTask_MDMaintTaskState;
+    public virtual ICollection<MaintOrderTask> MaintOrderTask_MDMaintTaskState
     {
-        get => LazyLoader.Load(this, ref _MaintTask_MDMaintTaskState);
-        set => _MaintTask_MDMaintTaskState = value;
+        get => LazyLoader.Load(this, ref _MaintOrderTask_MDMaintTaskState);
+        set => _MaintOrderTask_MDMaintTaskState = value;
     }
 
-    public bool MaintTask_MDMaintTaskState_IsLoaded
+    public bool MaintOrderTask_MDMaintTaskState_IsLoaded
     {
         get
         {
-            return MaintTask_MDMaintTaskState != null;
+            return MaintOrderTask_MDMaintTaskState != null;
         }
     }
 
-    public virtual CollectionEntry MaintTask_MDMaintTaskStateReference
+    public virtual CollectionEntry MaintOrderTask_MDMaintTaskStateReference
     {
-        get { return Context.Entry(this).Collection(c => c.MaintTask_MDMaintTaskState); }
+        get { return Context.Entry(this).Collection(c => c.MaintOrderTask_MDMaintTaskState); }
     }
 }

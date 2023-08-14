@@ -243,11 +243,6 @@ namespace gip.mes.datamodel
                 new[] { partslistID },
                 name: "NCI_FK_PartslistPos_PartslistID");
 
-            var uIXPartslistPos = runtimeEntityType.AddIndex(
-                new[] { partslistPosID, sequence },
-                name: "UIX_PartslistPos",
-                unique: true);
-
             return runtimeEntityType;
         }
 

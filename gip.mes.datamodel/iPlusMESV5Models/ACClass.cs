@@ -1198,26 +1198,6 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintACClass_VBiACClass); }
     }
 
-    private ICollection<MaintOrder> _MaintOrder_VBiPAACClass;
-    public virtual ICollection<MaintOrder> MaintOrder_VBiPAACClass
-    {
-        get => LazyLoader.Load(this, ref _MaintOrder_VBiPAACClass);
-        set => _MaintOrder_VBiPAACClass = value;
-    }
-
-    public bool MaintOrder_VBiPAACClass_IsLoaded
-    {
-        get
-        {
-            return MaintOrder_VBiPAACClass != null;
-        }
-    }
-
-    public virtual CollectionEntry MaintOrder_VBiPAACClassReference
-    {
-        get { return Context.Entry(this).Collection(c => c.MaintOrder_VBiPAACClass); }
-    }
-
     private ICollection<MaterialConfig> _MaterialConfig_VBiACClass;
     public virtual ICollection<MaterialConfig> MaterialConfig_VBiACClass
     {

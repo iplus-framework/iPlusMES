@@ -213,6 +213,26 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDPickingType"); }
     }
     
+    private ICollection<MaintOrder> _MaintOrder_Picking;
+    public virtual ICollection<MaintOrder> MaintOrder_Picking
+    {
+        get => LazyLoader.Load(this, ref _MaintOrder_Picking);
+        set => _MaintOrder_Picking = value;
+    }
+
+    public bool MaintOrder_Picking_IsLoaded
+    {
+        get
+        {
+            return MaintOrder_Picking != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrder_PickingReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrder_Picking); }
+    }
+
     private ICollection<PickingConfig> _PickingConfig_Picking;
     public virtual ICollection<PickingConfig> PickingConfig_Picking
     {

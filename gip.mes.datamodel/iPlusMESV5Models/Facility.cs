@@ -869,6 +869,26 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDUnit"); }
     }
     
+    private ICollection<MaintOrder> _MaintOrder_Facility;
+    public virtual ICollection<MaintOrder> MaintOrder_Facility
+    {
+        get => LazyLoader.Load(this, ref _MaintOrder_Facility);
+        set => _MaintOrder_Facility = value;
+    }
+
+    public bool MaintOrder_Facility_IsLoaded
+    {
+        get
+        {
+            return MaintOrder_Facility != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrder_FacilityReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrder_Facility); }
+    }
+
     private Material _Material;
     public virtual Material Material
     { 

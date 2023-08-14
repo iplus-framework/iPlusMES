@@ -178,6 +178,26 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Company_VBUser); }
     }
 
+    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_VBUser;
+    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBUser
+    {
+        get => LazyLoader.Load(this, ref _MaintOrderAssignment_VBUser);
+        set => _MaintOrderAssignment_VBUser = value;
+    }
+
+    public bool MaintOrderAssignment_VBUser_IsLoaded
+    {
+        get
+        {
+            return MaintOrderAssignment_VBUser != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrderAssignment_VBUserReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_VBUser); }
+    }
+
     private ACClassDesign _MenuACClassDesign;
     public virtual ACClassDesign MenuACClassDesign
     { 

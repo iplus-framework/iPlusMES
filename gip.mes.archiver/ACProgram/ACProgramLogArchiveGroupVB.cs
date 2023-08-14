@@ -62,11 +62,11 @@ namespace gip.mes.archiver
 
         protected override string OnProgramLogArchive(ACProgram acProgram, string exportPath)
         {
-            IEnumerable<vd.OrderLog> orderLogList;
-            IEnumerable<vd.OperationLog> operationLogList;
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            IEnumerable<VD.OrderLog> orderLogList;
+            IEnumerable<VD.OperationLog> operationLogList;
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
-                vd.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
+                VD.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
 
                 //DeleteOperationLog(dbApp, acProgram);
 
@@ -233,7 +233,7 @@ namespace gip.mes.archiver
             }
         }
 
-        private void ArchiveOperationLog(IEnumerable<vd.OperationLog> operationLoglist, ACProgram acProgram, string exportPath, vd.DatabaseApp dbApp)
+        private void ArchiveOperationLog(IEnumerable<VD.OperationLog> operationLoglist, ACProgram acProgram, string exportPath, VD.DatabaseApp dbApp)
         {
             if (exportPath == null)
                 return;
@@ -266,7 +266,7 @@ namespace gip.mes.archiver
                 return;
             }
 
-            DataContractSerializer serializer = new DataContractSerializer(typeof(List<vd.OperationLog>));
+            DataContractSerializer serializer = new DataContractSerializer(typeof(List<VD.OperationLog>));
             try
             {
                 using (FileStream fs = File.Open(filePath, FileMode.Create))
@@ -293,7 +293,7 @@ namespace gip.mes.archiver
 
             try
             {
-                dbApp.ExecuteStoreCommand("delete OperationLog from OperationLog ol inner join ACProgramLog pl on pl.ACProgramLogID = ol.ACProgramLogID inner join ACProgram p on p.ACProgramID = pl.ACProgramID where pl.ACProgramID = {0}", acProgram.ACProgramID);
+                dbApp.Database.ExecuteSql(FormattableStringFactory.Create("delete OperationLog from OperationLog ol inner join ACProgramLog pl on pl.ACProgramLogID = ol.ACProgramLogID inner join ACProgram p on p.ACProgramID = pl.ACProgramID where pl.ACProgramID = {0}", acProgram.ACProgramID));
             }
             catch (Exception ec)
             {
@@ -405,19 +405,19 @@ namespace gip.mes.archiver
 
         public void DeserializeOrderLog(string orderLogPath)
         {
-            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<vd.OrderLog>));
+            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<VD.OrderLog>));
             using (FileStream fs = File.Open(orderLogPath, FileMode.Open))
             {
-                List<vd.OrderLog> orders = serializerOrder.ReadObject(fs) as List<vd.OrderLog>;
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                List<VD.OrderLog> orders = serializerOrder.ReadObject(fs) as List<VD.OrderLog>;
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
-                    foreach (vd.OrderLog log in orders)
+                    foreach (VD.OrderLog log in orders)
                     {
                         if (!dbApp.OrderLog.Any(c => c.VBiACProgramLogID == log.VBiACProgramLogID))
                         {
                             if (String.IsNullOrEmpty(log.XMLConfig))
                                 log.ACProperties.Serialize();
-                            dbApp.AddToOrderLog(log);
+                            dbApp.Add(log);
                         }
                     }
                     MsgWithDetails msg = dbApp.ACSaveChanges();
@@ -434,13 +434,13 @@ namespace gip.mes.archiver
 
         public void DeserializeOperationLog(string operationLogPath)
         {
-            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<vd.OperationLog>));
+            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<VD.OperationLog>));
             using (FileStream fs = File.Open(operationLogPath, FileMode.Open))
             {
-                List<vd.OperationLog> operationLogs = serializerOrder.ReadObject(fs) as List<vd.OperationLog>;
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                List<VD.OperationLog> operationLogs = serializerOrder.ReadObject(fs) as List<VD.OperationLog>;
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
-                    foreach (vd.OperationLog log in operationLogs)
+                    foreach (VD.OperationLog log in operationLogs)
                     {
                         if (!dbApp.OperationLog.Any(c => c.ACProgramLogID == log.ACProgramLogID))
                         {
@@ -449,7 +449,7 @@ namespace gip.mes.archiver
                             {
                                 if (String.IsNullOrEmpty(log.XMLConfig))
                                     log.ACProperties.Serialize();
-                                dbApp.AddToOperationLog(log);
+                                dbApp.Add(log);
                             }
                         }
                     }

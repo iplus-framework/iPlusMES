@@ -69,24 +69,24 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<MaintACClassVBGroup> _MaintACClassVBGroup_VBGroup;
-    public virtual ICollection<MaintACClassVBGroup> MaintACClassVBGroup_VBGroup
+    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_VBGroup;
+    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBGroup
     {
-        get => LazyLoader.Load(this, ref _MaintACClassVBGroup_VBGroup);
-        set => _MaintACClassVBGroup_VBGroup = value;
+        get => LazyLoader.Load(this, ref _MaintOrderAssignment_VBGroup);
+        set => _MaintOrderAssignment_VBGroup = value;
     }
 
-    public bool MaintACClassVBGroup_VBGroup_IsLoaded
+    public bool MaintOrderAssignment_VBGroup_IsLoaded
     {
         get
         {
-            return MaintACClassVBGroup_VBGroup != null;
+            return MaintOrderAssignment_VBGroup != null;
         }
     }
 
-    public virtual CollectionEntry MaintACClassVBGroup_VBGroupReference
+    public virtual CollectionEntry MaintOrderAssignment_VBGroupReference
     {
-        get { return Context.Entry(this).Collection(c => c.MaintACClassVBGroup_VBGroup); }
+        get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_VBGroup); }
     }
 
     private ICollection<VBGroupRight> _VBGroupRight_VBGroup;

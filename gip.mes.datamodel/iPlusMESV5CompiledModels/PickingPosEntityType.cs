@@ -29,6 +29,14 @@ namespace gip.mes.datamodel
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             pickingPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var aCClassTaskID = runtimeEntityType.AddProperty(
+                "ACClassTaskID",
+                typeof(Guid?),
+                propertyInfo: typeof(PickingPos).GetProperty("ACClassTaskID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PickingPos).GetField("_ACClassTaskID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            aCClassTaskID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var comment = runtimeEntityType.AddProperty(
                 "Comment",
                 typeof(string),
@@ -187,9 +195,12 @@ namespace gip.mes.datamodel
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { mDDelivPosLoadStateID });
+                new[] { aCClassTaskID });
 
             var index0 = runtimeEntityType.AddIndex(
+                new[] { mDDelivPosLoadStateID });
+
+            var index1 = runtimeEntityType.AddIndex(
                 new[] { pickingMaterialID });
 
             var nCIFKPickingPosFromFacilityID = runtimeEntityType.AddIndex(
@@ -217,6 +228,33 @@ namespace gip.mes.datamodel
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ACClassTaskID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassTaskID") }),
+                principalEntityType,
+                deleteBehavior: DeleteBehavior.SetNull);
+
+            var aCClassTask = declaringEntityType.AddNavigation("ACClassTask",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(ACClassTask),
+                propertyInfo: typeof(PickingPos).GetProperty("ACClassTask", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PickingPos).GetField("_ACClassTask", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var pickingPosACClassTask = principalEntityType.AddNavigation("PickingPos_ACClassTask",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<PickingPos>),
+                propertyInfo: typeof(ACClassTask).GetProperty("PickingPos_ACClassTask", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClassTask).GetField("_PickingPos_ACClassTask", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_PickingPos_ACClassTaskID");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("FromFacilityID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),
                 principalEntityType);
@@ -241,7 +279,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("InOrderPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("InOrderPosID") }),
@@ -267,7 +305,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MDDelivPosLoadStateID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MDDelivPosLoadStateID") }),
@@ -293,7 +331,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("OutOrderPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOrderPosID") }),
@@ -319,7 +357,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PickingID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PickingID") }),
@@ -347,7 +385,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey7(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PickingMaterialID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaterialID") }),
@@ -373,7 +411,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey7(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey8(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ToFacilityID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),

@@ -617,37 +617,37 @@ namespace gip.bso.manufacturing
                         IXLCell cell = workSheet.Cell(rowNr, i + 1);
                         if (col.DataType == stringType)
                         {
-                            cell.SetValue<string>(value);
+                            cell.SetValue(value);
                             continue;
                         }
 
                         else if (col.DataType == shortType && short.TryParse(value, out shortValue))
                         {
-                            cell.SetValue<short>(shortValue);
+                            cell.SetValue(shortValue);
                             continue;
                         }
 
                         else if (col.DataType == intType && int.TryParse(value, out intValue))
                         {
-                            cell.SetValue<int>(intValue);
+                            cell.SetValue(intValue);
                             continue;
                         }
 
                         else if (col.DataType == floatType && float.TryParse(value, out floatValue))
                         {
-                            cell.SetValue<float>(floatValue);
+                            cell.SetValue(floatValue);
                             continue;
                         }
 
                         else if (col.DataType == doubleType && double.TryParse(value, out doubleValue))
                         {
-                            cell.SetValue<double>(doubleValue);
+                            cell.SetValue(doubleValue);
                             continue;
                         }
 
                         else if (col.DataType == decimalType && decimal.TryParse(value, out decimalValue))
                         {
-                            cell.SetValue<decimal>(decimalValue);
+                            cell.SetValue(decimalValue);
                             continue;
                         }
 
@@ -655,7 +655,7 @@ namespace gip.bso.manufacturing
                         {
                             try
                             {
-                                cell.SetValue<string>(Enum.Parse(col.DataType, value).ToString());
+                                cell.SetValue(Enum.Parse(col.DataType, value).ToString());
                                 continue;
                             }
                             catch (Exception e)
@@ -664,7 +664,7 @@ namespace gip.bso.manufacturing
                             }
                         }
 
-                        cell.SetValue<string>(value);
+                        cell.SetValue(value);
                     }
                 }
 
