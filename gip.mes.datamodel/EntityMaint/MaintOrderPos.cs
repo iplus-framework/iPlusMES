@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'MaintOrderPos'}de{'MaintOrderPos'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "")]
-    [ACPropertyEntity(1, "MaintOrder", "en{'MaintOrder'}de{'MaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName, "", true)]
-    [ACPropertyEntity(2, "ParentMaintOrderPos", "en{'MaintOrderPos parent'}de{'MaintOrderPos parent'}", Const.ContextDatabase + "\\" + MaintOrderPos.ClassName, "", true)]
-    [ACPropertyEntity(3, "Material", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
+    [ACPropertyEntity(1, "MaintOrder", "en{'MaintOrder'}de{'MaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(2, "ParentMaintOrderPos", "en{'MaintOrderPos parent'}de{'MaintOrderPos parent'}", Const.ContextDatabase + "\\" + MaintOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, "Material", "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "Quantity", "en{'Quantity'}de{'Menge'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

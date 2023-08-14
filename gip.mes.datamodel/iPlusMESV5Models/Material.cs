@@ -909,6 +909,26 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDMaterialType"); }
     }
     
+    private ICollection<MaintOrderPos> _MaintOrderPos_Material;
+    public virtual ICollection<MaintOrderPos> MaintOrderPos_Material
+    {
+        get => LazyLoader.Load(this, ref _MaintOrderPos_Material);
+        set => _MaintOrderPos_Material = value;
+    }
+
+    public bool MaintOrderPos_Material_IsLoaded
+    {
+        get
+        {
+            return MaintOrderPos_Material != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrderPos_MaterialReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrderPos_Material); }
+    }
+
     private ICollection<MaterialCalculation> _MaterialCalculation_Material;
     public virtual ICollection<MaterialCalculation> MaterialCalculation_Material
     {

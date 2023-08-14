@@ -80,7 +80,7 @@ namespace gip.mes.datamodel
                 outOperationLog.XMLValue = xml;
             }
 
-            dbApp.OperationLog.AddObject(outOperationLog);
+            dbApp.OperationLog.Add(outOperationLog);
 
             return dbApp.ACSaveChanges();
         }

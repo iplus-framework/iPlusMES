@@ -27,18 +27,11 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid>(ref _MaintOrderID, value); }
     }
 
-    Guid _VBiPAACClassID;
-    public Guid VBiPAACClassID 
+    Guid? _BasedOnMaintOrderID;
+    public Guid? BasedOnMaintOrderID 
     {
-        get { return _VBiPAACClassID; }
-        set { SetProperty<Guid>(ref _VBiPAACClassID, value); }
-    }
-
-    Guid _MaintACClassID;
-    public Guid MaintACClassID 
-    {
-        get { return _MaintACClassID; }
-        set { SetProperty<Guid>(ref _MaintACClassID, value); }
+        get { return _BasedOnMaintOrderID; }
+        set { SetProperty<Guid?>(ref _BasedOnMaintOrderID, value); }
     }
 
     string _MaintOrderNo;
@@ -55,60 +48,88 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _MDMaintOrderStateID, value); }
     }
 
-    Guid? _MDMaintModeID;
-    public Guid? MDMaintModeID 
+    Guid? _MaintACClassID;
+    public Guid? MaintACClassID 
     {
-        get { return _MDMaintModeID; }
-        set { SetProperty<Guid?>(ref _MDMaintModeID, value); }
+        get { return _MaintACClassID; }
+        set { SetProperty<Guid?>(ref _MaintACClassID, value); }
     }
 
-    DateTime? _MaintSetDate;
-    public DateTime? MaintSetDate 
+    Guid? _FacilityID;
+    public Guid? FacilityID 
     {
-        get { return _MaintSetDate; }
-        set { SetProperty<DateTime?>(ref _MaintSetDate, value); }
+        get { return _FacilityID; }
+        set { SetProperty<Guid?>(ref _FacilityID, value); }
     }
 
-    int _MaintSetDuration;
-    public int MaintSetDuration 
+    Guid? _PickingID;
+    public Guid? PickingID 
     {
-        get { return _MaintSetDuration; }
-        set { SetProperty<int>(ref _MaintSetDuration, value); }
+        get { return _PickingID; }
+        set { SetProperty<Guid?>(ref _PickingID, value); }
     }
 
-    DateTime? _MaintActStartDate;
-    public DateTime? MaintActStartDate 
+    int _MaintModeIndex;
+    public int MaintModeIndex 
     {
-        get { return _MaintActStartDate; }
-        set { SetProperty<DateTime?>(ref _MaintActStartDate, value); }
+        get { return _MaintModeIndex; }
+        set { SetProperty<int>(ref _MaintModeIndex, value); }
     }
 
-    int _MaintActDuration;
-    public int MaintActDuration 
+    bool _IsActive;
+    public bool IsActive 
     {
-        get { return _MaintActDuration; }
-        set { SetProperty<int>(ref _MaintActDuration, value); }
+        get { return _IsActive; }
+        set { SetProperty<bool>(ref _IsActive, value); }
     }
 
-    DateTime? _MaintActEndDate;
-    public DateTime? MaintActEndDate 
+    int? _MaintInterval;
+    public int? MaintInterval 
     {
-        get { return _MaintActEndDate; }
-        set { SetProperty<DateTime?>(ref _MaintActEndDate, value); }
+        get { return _MaintInterval; }
+        set { SetProperty<int?>(ref _MaintInterval, value); }
     }
 
-    string _DirText;
-    public string DirText 
+    DateTime? _LastMaintTerm;
+    public DateTime? LastMaintTerm 
     {
-        get { return _DirText; }
-        set { SetProperty<string>(ref _DirText, value); }
+        get { return _LastMaintTerm; }
+        set { SetProperty<DateTime?>(ref _LastMaintTerm, value); }
     }
 
-    string _DirPicture;
-    public string DirPicture 
+    int? _WarningDiff;
+    public int? WarningDiff 
     {
-        get { return _DirPicture; }
-        set { SetProperty<string>(ref _DirPicture, value); }
+        get { return _WarningDiff; }
+        set { SetProperty<int?>(ref _WarningDiff, value); }
+    }
+
+    DateTime? _PlannedStartDate;
+    public DateTime? PlannedStartDate 
+    {
+        get { return _PlannedStartDate; }
+        set { SetProperty<DateTime?>(ref _PlannedStartDate, value); }
+    }
+
+    int? _PlannedDuration;
+    public int? PlannedDuration 
+    {
+        get { return _PlannedDuration; }
+        set { SetProperty<int?>(ref _PlannedDuration, value); }
+    }
+
+    DateTime? _StartDate;
+    public DateTime? StartDate 
+    {
+        get { return _StartDate; }
+        set { SetProperty<DateTime?>(ref _StartDate, value); }
+    }
+
+    DateTime? _EndDate;
+    public DateTime? EndDate 
+    {
+        get { return _EndDate; }
+        set { SetProperty<DateTime?>(ref _EndDate, value); }
     }
 
     string _Comment;
@@ -153,26 +174,66 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private MDMaintMode _MDMaintMode;
-    public virtual MDMaintMode MDMaintMode
+    private MaintOrder _MaintOrder1_BasedOnMaintOrder;
+    public virtual MaintOrder MaintOrder1_BasedOnMaintOrder
     { 
-        get => LazyLoader.Load(this, ref _MDMaintMode);
-        set => _MDMaintMode = value;
+        get => LazyLoader.Load(this, ref _MaintOrder1_BasedOnMaintOrder);
+        set => _MaintOrder1_BasedOnMaintOrder = value;
     }
 
-    public bool MDMaintMode_IsLoaded
+    public bool MaintOrder1_BasedOnMaintOrder_IsLoaded
     {
         get
         {
-            return MDMaintMode != null;
+            return MaintOrder1_BasedOnMaintOrder != null;
         }
     }
 
-    public virtual ReferenceEntry MDMaintModeReference 
+    public virtual ReferenceEntry MaintOrder1_BasedOnMaintOrderReference 
     {
-        get { return Context.Entry(this).Reference("MDMaintMode"); }
+        get { return Context.Entry(this).Reference("MaintOrder1_BasedOnMaintOrder"); }
     }
     
+    private Facility _Facility;
+    public virtual Facility Facility
+    { 
+        get => LazyLoader.Load(this, ref _Facility);
+        set => _Facility = value;
+    }
+
+    public bool Facility_IsLoaded
+    {
+        get
+        {
+            return Facility != null;
+        }
+    }
+
+    public virtual ReferenceEntry FacilityReference 
+    {
+        get { return Context.Entry(this).Reference("Facility"); }
+    }
+    
+    private ICollection<MaintOrder> _MaintOrder_BasedOnMaintOrder;
+    public virtual ICollection<MaintOrder> MaintOrder_BasedOnMaintOrder
+    {
+        get => LazyLoader.Load(this, ref _MaintOrder_BasedOnMaintOrder);
+        set => _MaintOrder_BasedOnMaintOrder = value;
+    }
+
+    public bool MaintOrder_BasedOnMaintOrder_IsLoaded
+    {
+        get
+        {
+            return MaintOrder_BasedOnMaintOrder != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrder_BasedOnMaintOrderReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrder_BasedOnMaintOrder); }
+    }
+
     private MDMaintOrderState _MDMaintOrderState;
     public virtual MDMaintOrderState MDMaintOrderState
     { 
@@ -213,6 +274,46 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MaintACClass"); }
     }
     
+    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_MaintOrder;
+    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_MaintOrder
+    {
+        get => LazyLoader.Load(this, ref _MaintOrderAssignment_MaintOrder);
+        set => _MaintOrderAssignment_MaintOrder = value;
+    }
+
+    public bool MaintOrderAssignment_MaintOrder_IsLoaded
+    {
+        get
+        {
+            return MaintOrderAssignment_MaintOrder != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrderAssignment_MaintOrderReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_MaintOrder); }
+    }
+
+    private ICollection<MaintOrderPos> _MaintOrderPos_MaintOrder;
+    public virtual ICollection<MaintOrderPos> MaintOrderPos_MaintOrder
+    {
+        get => LazyLoader.Load(this, ref _MaintOrderPos_MaintOrder);
+        set => _MaintOrderPos_MaintOrder = value;
+    }
+
+    public bool MaintOrderPos_MaintOrder_IsLoaded
+    {
+        get
+        {
+            return MaintOrderPos_MaintOrder != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrderPos_MaintOrderReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrderPos_MaintOrder); }
+    }
+
     private ICollection<MaintOrderProperty> _MaintOrderProperty_MaintOrder;
     public virtual ICollection<MaintOrderProperty> MaintOrderProperty_MaintOrder
     {
@@ -233,43 +334,43 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderProperty_MaintOrder); }
     }
 
-    private ICollection<MaintTask> _MaintTask_MaintOrder;
-    public virtual ICollection<MaintTask> MaintTask_MaintOrder
+    private ICollection<MaintOrderTask> _MaintOrderTask_MaintOrder;
+    public virtual ICollection<MaintOrderTask> MaintOrderTask_MaintOrder
     {
-        get => LazyLoader.Load(this, ref _MaintTask_MaintOrder);
-        set => _MaintTask_MaintOrder = value;
+        get => LazyLoader.Load(this, ref _MaintOrderTask_MaintOrder);
+        set => _MaintOrderTask_MaintOrder = value;
     }
 
-    public bool MaintTask_MaintOrder_IsLoaded
+    public bool MaintOrderTask_MaintOrder_IsLoaded
     {
         get
         {
-            return MaintTask_MaintOrder != null;
+            return MaintOrderTask_MaintOrder != null;
         }
     }
 
-    public virtual CollectionEntry MaintTask_MaintOrderReference
+    public virtual CollectionEntry MaintOrderTask_MaintOrderReference
     {
-        get { return Context.Entry(this).Collection(c => c.MaintTask_MaintOrder); }
+        get { return Context.Entry(this).Collection(c => c.MaintOrderTask_MaintOrder); }
     }
 
-    private ACClass _VBiPAACClass;
-    public virtual ACClass VBiPAACClass
+    private Picking _Picking;
+    public virtual Picking Picking
     { 
-        get => LazyLoader.Load(this, ref _VBiPAACClass);
-        set => _VBiPAACClass = value;
+        get => LazyLoader.Load(this, ref _Picking);
+        set => _Picking = value;
     }
 
-    public bool VBiPAACClass_IsLoaded
+    public bool Picking_IsLoaded
     {
         get
         {
-            return VBiPAACClass != null;
+            return Picking != null;
         }
     }
 
-    public virtual ReferenceEntry VBiPAACClassReference 
+    public virtual ReferenceEntry PickingReference 
     {
-        get { return Context.Entry(this).Reference("VBiPAACClass"); }
+        get { return Context.Entry(this).Reference("Picking"); }
     }
     }

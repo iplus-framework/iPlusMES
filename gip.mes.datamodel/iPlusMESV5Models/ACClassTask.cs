@@ -225,6 +225,26 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassTask1_ParentACClassTask"); }
     }
     
+    private ICollection<PickingPos> _PickingPos_ACClassTask;
+    public virtual ICollection<PickingPos> PickingPos_ACClassTask
+    {
+        get => LazyLoader.Load(this, ref _PickingPos_ACClassTask);
+        set => _PickingPos_ACClassTask = value;
+    }
+
+    public bool PickingPos_ACClassTask_IsLoaded
+    {
+        get
+        {
+            return PickingPos_ACClassTask != null;
+        }
+    }
+
+    public virtual CollectionEntry PickingPos_ACClassTaskReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PickingPos_ACClassTask); }
+    }
+
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ACClassTask;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ACClassTask
     {

@@ -96,44 +96,4 @@ public partial class MDMaintMode : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return _IsDefault; }
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
-
-    private ICollection<MaintACClass> _MaintACClass_MDMaintMode;
-    public virtual ICollection<MaintACClass> MaintACClass_MDMaintMode
-    {
-        get => LazyLoader.Load(this, ref _MaintACClass_MDMaintMode);
-        set => _MaintACClass_MDMaintMode = value;
-    }
-
-    public bool MaintACClass_MDMaintMode_IsLoaded
-    {
-        get
-        {
-            return MaintACClass_MDMaintMode != null;
-        }
-    }
-
-    public virtual CollectionEntry MaintACClass_MDMaintModeReference
-    {
-        get { return Context.Entry(this).Collection(c => c.MaintACClass_MDMaintMode); }
-    }
-
-    private ICollection<MaintOrder> _MaintOrder_MDMaintMode;
-    public virtual ICollection<MaintOrder> MaintOrder_MDMaintMode
-    {
-        get => LazyLoader.Load(this, ref _MaintOrder_MDMaintMode);
-        set => _MaintOrder_MDMaintMode = value;
-    }
-
-    public bool MaintOrder_MDMaintMode_IsLoaded
-    {
-        get
-        {
-            return MaintOrder_MDMaintMode != null;
-        }
-    }
-
-    public virtual CollectionEntry MaintOrder_MDMaintModeReference
-    {
-        get { return Context.Entry(this).Collection(c => c.MaintOrder_MDMaintMode); }
-    }
 }

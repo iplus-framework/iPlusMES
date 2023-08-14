@@ -208,7 +208,7 @@ namespace gip.mes.maintenance
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaintOrder), nameof(MaintOrder.MaintOrderNo), MaintOrder.FormatNewNo, this);
             var newMaintOrder = MaintOrder.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.MaintOrder.AddObject(newMaintOrder);
+            DatabaseApp.MaintOrder.Add(newMaintOrder);
             ACState = Const.SMNew;
             AccessPrimary.NavList.Add(newMaintOrder);
             //CurrentLabOrder = newMaintOrder;

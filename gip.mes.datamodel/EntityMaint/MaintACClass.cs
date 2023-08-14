@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -28,21 +29,19 @@ namespace gip.mes.datamodel
             return entity;
         }
 
-        protected override void OnPropertyChanged(string property)
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            base.OnPropertyChanged(property);
-            if (property == "MaintInterval" || property == "LastMaintTerm")
+            switch (propertyName)
             {
-                //if (MaintInterval != null)
-                //    NextMaintTerm = LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
-                //else
-                //    NextMaintTerm = null;
-                OnPropertyChanged("NextMaintTerm");
+                case nameof(VBiACClassID):
+                    base.OnPropertyChanged("FacilityACClass");
+                    break;
+                case "MaintInterval":
+                case "LastMaintTerm":
+                    base.OnPropertyChanged("NextMaintTerm");
+                    break;
             }
-            //else if (property == "MDMaintModeID")
-            //{
-            //    //SetConfigCM();
-            //}
+            base.OnPropertyChanged(propertyName);
         }
 
         //public void SetConfigCM()
@@ -199,10 +198,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        partial void OnVBiACClassIDChanged()
-        {
-            OnPropertyChanged("FacilityACClass");
-        }
 
         public gip.core.datamodel.ACClass GetACClass(Database db)
         {

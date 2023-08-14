@@ -1467,16 +1467,6 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999)]
         [NotMapped]
-        public IEnumerable<MaintACClassVBGroup> MaintACClassVBGroupList
-        {
-            get
-            {
-                return MaintACClassVBGroup.ToArray();
-            }
-        }
-
-        [ACPropertyInfo(9999)]
-        [NotMapped]
         public IEnumerable<MaintOrder> MaintOrderList
         {
             get
@@ -1492,16 +1482,6 @@ namespace gip.mes.datamodel
             get
             {
                 return MaintOrderProperty.ToArray();
-            }
-        }
-
-        [ACPropertyInfo(9999)]
-        [NotMapped]
-        public IEnumerable<MaintTask> MaintTaskList
-        {
-            get
-            {
-                return MaintTask.ToArray();
             }
         }
 

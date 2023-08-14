@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using gip.core.datamodel;
-using System.Configuration;
 
 namespace gip.mes.datamodel;
 
@@ -316,13 +316,15 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<MaintACClassProperty> MaintACClassProperty { get; set; }
 
-    public virtual DbSet<MaintACClassVBGroup> MaintACClassVBGroup { get; set; }
-
     public virtual DbSet<MaintOrder> MaintOrder { get; set; }
+
+    public virtual DbSet<MaintOrderAssignment> MaintOrderAssignment { get; set; }
+
+    public virtual DbSet<MaintOrderPos> MaintOrderPos { get; set; }
 
     public virtual DbSet<MaintOrderProperty> MaintOrderProperty { get; set; }
 
-    public virtual DbSet<MaintTask> MaintTask { get; set; }
+    public virtual DbSet<MaintOrderTask> MaintOrderTask { get; set; }
 
     public virtual DbSet<Material> Material { get; set; }
 
@@ -6466,17 +6468,11 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.LastMaintTerm).HasColumnType("datetime");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateName)
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-
-           entity.HasOne(d => d.MDMaintMode).WithMany(p => p.MaintACClass_MDMaintMode)
-                .HasForeignKey(d => d.MDMaintModeID)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_MaintACClass_MDMaintModeID");
 
            entity.HasOne(d => d.VBiACClass).WithMany(p => p.MaintACClass_VBiACClass)
                 .HasForeignKey(d => d.VBiACClassID)
@@ -6513,69 +6509,25 @@ public partial class iPlusMESV5Context : DbContext
                 .HasConstraintName("FK_MaintACClassProperty_ACClassPropertyID");
         });
 
-        modelBuilder.Entity<MaintACClassVBGroup>(entity =>
-        {
-            entity.HasKey(e => e.MaintACClassVBGroupID).HasName("PK_MaintACClassRole");
-
-            entity.ToTable("MaintACClassVBGroup");
-
-            entity.Property(e => e.MaintACClassVBGroupID).ValueGeneratedNever();
-            entity.Property(e => e.Comment).IsUnicode(false);
-            entity.Property(e => e.InsertDate).HasColumnType("datetime");
-            entity.Property(e => e.InsertName)
-                .IsRequired()
-                .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-            entity.Property(e => e.UpdateName)
-                .IsRequired()
-                .HasMaxLength(20)
-                .IsUnicode(false);
-
-           entity.HasOne(d => d.MaintACClass).WithMany(p => p.MaintACClassVBGroup_MaintACClass)
-                .HasForeignKey(d => d.MaintACClassID)
-                .HasConstraintName("FK_MaintACClassVBGroup_MaintACClassID");
-
-           entity.HasOne(d => d.MaintACClassProperty).WithMany(p => p.MaintACClassVBGroup_MaintACClassProperty)
-                .HasForeignKey(d => d.MaintACClassPropertyID)
-                .HasConstraintName("FK_MaintACClassPropertyVBGroup_VBGroupID");
-
-           entity.HasOne(d => d.VBGroup).WithMany(p => p.MaintACClassVBGroup_VBGroup)
-                .HasForeignKey(d => d.VBGroupID)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_MaintACClassVBGroup_VBGroupID");
-        });
-
         modelBuilder.Entity<MaintOrder>(entity =>
         {
             entity.ToTable("MaintOrder");
 
-            entity.HasIndex(e => e.MDMaintOrderStateID, "NCI_FK_MaintOrder_MDMaintOrderStateID");
-
-            entity.HasIndex(e => e.VBiPAACClassID, "NCI_FK_MaintOrder_VBiPAACClassID");
-
-            entity.HasIndex(e => e.MaintOrderNo, "UIX_MaintOrder_MaintOrderNo").IsUnique();
-
             entity.Property(e => e.MaintOrderID).ValueGeneratedNever();
             entity.Property(e => e.Comment).IsUnicode(false);
-            entity.Property(e => e.DirPicture)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-            entity.Property(e => e.DirText)
-                .HasMaxLength(200)
-                .IsUnicode(false);
+            entity.Property(e => e.EndDate).HasColumnType("datetime");
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.MaintActEndDate).HasColumnType("datetime");
-            entity.Property(e => e.MaintActStartDate).HasColumnType("datetime");
+            entity.Property(e => e.LastMaintTerm).HasColumnType("datetime");
             entity.Property(e => e.MaintOrderNo)
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.MaintSetDate).HasColumnType("datetime");
+            entity.Property(e => e.PlannedStartDate).HasColumnType("datetime");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateName)
                 .IsRequired()
@@ -6583,9 +6535,13 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
 
-           entity.HasOne(d => d.MDMaintMode).WithMany(p => p.MaintOrder_MDMaintMode)
-                .HasForeignKey(d => d.MDMaintModeID)
-                .HasConstraintName("FK_MaintOrder_MDMaintModeID");
+           entity.HasOne(d => d.MaintOrder1_BasedOnMaintOrder).WithMany(p => p.MaintOrder_BasedOnMaintOrder)
+                .HasForeignKey(d => d.BasedOnMaintOrderID)
+                .HasConstraintName("FK_MaintOrder_BasedOnMaintOrderID");
+
+           entity.HasOne(d => d.Facility).WithMany(p => p.MaintOrder_Facility)
+                .HasForeignKey(d => d.FacilityID)
+                .HasConstraintName("FK_MaintOrder_FacilityID");
 
            entity.HasOne(d => d.MDMaintOrderState).WithMany(p => p.MaintOrder_MDMaintOrderState)
                 .HasForeignKey(d => d.MDMaintOrderStateID)
@@ -6593,21 +6549,76 @@ public partial class iPlusMESV5Context : DbContext
 
            entity.HasOne(d => d.MaintACClass).WithMany(p => p.MaintOrder_MaintACClass)
                 .HasForeignKey(d => d.MaintACClassID)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaintOrder_MaintACClassID");
 
-           entity.HasOne(d => d.VBiPAACClass).WithMany(p => p.MaintOrder_VBiPAACClass)
-                .HasForeignKey(d => d.VBiPAACClassID)
-                .HasConstraintName("FK_MaintOrder_PAACClassID");
+           entity.HasOne(d => d.Picking).WithMany(p => p.MaintOrder_Picking)
+                .HasForeignKey(d => d.PickingID)
+                .HasConstraintName("FK_MaintOrder_PickingID");
+        });
+
+        modelBuilder.Entity<MaintOrderAssignment>(entity =>
+        {
+            entity.ToTable("MaintOrderAssignment");
+
+            entity.Property(e => e.MaintOrderAssignmentID).ValueGeneratedNever();
+            entity.Property(e => e.Comment).IsUnicode(false);
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+
+           entity.HasOne(d => d.Company).WithMany(p => p.MaintOrderAssignment_Company)
+                .HasForeignKey(d => d.CompanyID)
+                .HasConstraintName("FK_MaintOrderAssignment_Company");
+
+           entity.HasOne(d => d.MaintOrder).WithMany(p => p.MaintOrderAssignment_MaintOrder)
+                .HasForeignKey(d => d.MaintOrderID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MaintOrderAssignment_MaintOrder");
+
+           entity.HasOne(d => d.VBGroup).WithMany(p => p.MaintOrderAssignment_VBGroup)
+                .HasForeignKey(d => d.VBGroupID)
+                .HasConstraintName("FK_MaintOrderAssignment_VBGroup");
+
+           entity.HasOne(d => d.VBUser).WithMany(p => p.MaintOrderAssignment_VBUser)
+                .HasForeignKey(d => d.VBUserID)
+                .HasConstraintName("FK_MaintOrderAssignment_VBUserID");
+        });
+
+        modelBuilder.Entity<MaintOrderPos>(entity =>
+        {
+            entity.Property(e => e.MaintOrderPosID).ValueGeneratedNever();
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+
+           entity.HasOne(d => d.MaintOrder).WithMany(p => p.MaintOrderPos_MaintOrder)
+                .HasForeignKey(d => d.MaintOrderID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MaintOrderPos_MaintOrderID");
+
+           entity.HasOne(d => d.Material).WithMany(p => p.MaintOrderPos_Material)
+                .HasForeignKey(d => d.MaterialID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MaintOrderPos_ParentMaintOrderPosID");
         });
 
         modelBuilder.Entity<MaintOrderProperty>(entity =>
         {
             entity.ToTable("MaintOrderProperty");
-
-            entity.HasIndex(e => e.MaintOrderID, "NCI_FK_MaintOrderProperty_MaintOrderID");
-
-            entity.HasIndex(e => e.MaintACClassPropertyID, "NCI_FK_MaintOrderProperty_VBiACClassPropertyID");
 
             entity.Property(e => e.MaintOrderPropertyID).ValueGeneratedNever();
             entity.Property(e => e.ActValue)
@@ -6634,42 +6645,40 @@ public partial class iPlusMESV5Context : DbContext
 
            entity.HasOne(d => d.MaintOrder).WithMany(p => p.MaintOrderProperty_MaintOrder)
                 .HasForeignKey(d => d.MaintOrderID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaintOrderProperty_MaintOrderID");
         });
 
-        modelBuilder.Entity<MaintTask>(entity =>
+        modelBuilder.Entity<MaintOrderTask>(entity =>
         {
-            entity.ToTable("MaintTask");
+            entity.ToTable("MaintOrderTask");
 
-            entity.Property(e => e.MaintTaskID).ValueGeneratedNever();
+            entity.Property(e => e.MaintOrderTaskID).ValueGeneratedNever();
             entity.Property(e => e.Comment).IsUnicode(false);
-            entity.Property(e => e.EndTaskDate).HasColumnType("datetime");
+            entity.Property(e => e.EndDate).HasColumnType("datetime");
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.StartTaskDate).HasColumnType("datetime");
+            entity.Property(e => e.PlannedStartDate).HasColumnType("datetime");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.TaskDescription).IsUnicode(false);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateName)
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
-           entity.HasOne(d => d.MDMaintTaskState).WithMany(p => p.MaintTask_MDMaintTaskState)
+           entity.HasOne(d => d.MDMaintTaskState).WithMany(p => p.MaintOrderTask_MDMaintTaskState)
                 .HasForeignKey(d => d.MDMaintTaskStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_MaintTask_MDMaintTaskStateID");
+                .HasConstraintName("FK_MaintOrderTask_MDMaintTaskStateID");
 
-           entity.HasOne(d => d.MaintACClassVBGroup).WithMany(p => p.MaintTask_MaintACClassVBGroup)
-                .HasForeignKey(d => d.MaintACClassVBGroupID)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_MaintTask_MaintACClassVBGroupID");
-
-           entity.HasOne(d => d.MaintOrder).WithMany(p => p.MaintTask_MaintOrder)
+           entity.HasOne(d => d.MaintOrder).WithMany(p => p.MaintOrderTask_MaintOrder)
                 .HasForeignKey(d => d.MaintOrderID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_MaintTask_MaintOrderID");
+                .HasConstraintName("FK_MaintOrderTask_MaintOrderID");
         });
 
         modelBuilder.Entity<Material>(entity =>
@@ -7251,6 +7260,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
+            entity.Property(e => e.XMLValue).IsUnicode(false);
 
            entity.HasOne(d => d.ACProgramLog).WithMany(p => p.OperationLog_ACProgramLog)
                 .HasForeignKey(d => d.ACProgramLogID)
@@ -8029,7 +8039,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.IsInEnabledPeriod).HasComputedColumnSql("([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))", false);
             entity.ToTable(tbl => tbl.HasTrigger("([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))"));
-            entity.Property(e => e.KeyOfExtSys)
+                        entity.Property(e => e.KeyOfExtSys)
                 .HasMaxLength(40)
                 .IsUnicode(false);
             entity.Property(e => e.LastFormulaChange).HasColumnType("datetime");
@@ -8167,8 +8177,6 @@ public partial class iPlusMESV5Context : DbContext
             entity.HasIndex(e => e.ParentPartslistPosID, "NCI_FK_PartslistPos_ParentPartslistPosID");
 
             entity.HasIndex(e => e.PartslistID, "NCI_FK_PartslistPos_PartslistID");
-
-            entity.HasIndex(e => new { e.PartslistPosID, e.Sequence }, "UIX_PartslistPos").IsUnique();
 
             entity.Property(e => e.PartslistPosID).ValueGeneratedNever();
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
@@ -8447,6 +8455,11 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
+
+           entity.HasOne(d => d.ACClassTask).WithMany(p => p.PickingPos_ACClassTask)
+                .HasForeignKey(d => d.ACClassTaskID)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_PickingPos_ACClassTaskID");
 
            entity.HasOne(d => d.FromFacility).WithMany(p => p.PickingPos_FromFacility)
                 .HasForeignKey(d => d.FromFacilityID)

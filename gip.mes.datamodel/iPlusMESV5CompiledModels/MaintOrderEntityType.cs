@@ -29,6 +29,14 @@ namespace gip.mes.datamodel
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             maintOrderID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var basedOnMaintOrderID = runtimeEntityType.AddProperty(
+                "BasedOnMaintOrderID",
+                typeof(Guid?),
+                propertyInfo: typeof(MaintOrder).GetProperty("BasedOnMaintOrderID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_BasedOnMaintOrderID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            basedOnMaintOrderID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var comment = runtimeEntityType.AddProperty(
                 "Comment",
                 typeof(string),
@@ -38,25 +46,22 @@ namespace gip.mes.datamodel
                 unicode: false);
             comment.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var dirPicture = runtimeEntityType.AddProperty(
-                "DirPicture",
-                typeof(string),
-                propertyInfo: typeof(MaintOrder).GetProperty("DirPicture", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_DirPicture", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true,
-                maxLength: 200,
-                unicode: false);
-            dirPicture.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            var endDate = runtimeEntityType.AddProperty(
+                "EndDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(MaintOrder).GetProperty("EndDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_EndDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            endDate.AddAnnotation("Relational:ColumnType", "datetime");
+            endDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var dirText = runtimeEntityType.AddProperty(
-                "DirText",
-                typeof(string),
-                propertyInfo: typeof(MaintOrder).GetProperty("DirText", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_DirText", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true,
-                maxLength: 200,
-                unicode: false);
-            dirText.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            var facilityID = runtimeEntityType.AddProperty(
+                "FacilityID",
+                typeof(Guid?),
+                propertyInfo: typeof(MaintOrder).GetProperty("FacilityID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_FacilityID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            facilityID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
                 "InsertDate",
@@ -75,13 +80,21 @@ namespace gip.mes.datamodel
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var mDMaintModeID = runtimeEntityType.AddProperty(
-                "MDMaintModeID",
-                typeof(Guid?),
-                propertyInfo: typeof(MaintOrder).GetProperty("MDMaintModeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MDMaintModeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+            var isActive = runtimeEntityType.AddProperty(
+                "IsActive",
+                typeof(bool),
+                propertyInfo: typeof(MaintOrder).GetProperty("IsActive", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_IsActive", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            isActive.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var lastMaintTerm = runtimeEntityType.AddProperty(
+                "LastMaintTerm",
+                typeof(DateTime?),
+                propertyInfo: typeof(MaintOrder).GetProperty("LastMaintTerm", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_LastMaintTerm", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            mDMaintModeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            lastMaintTerm.AddAnnotation("Relational:ColumnType", "datetime");
+            lastMaintTerm.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDMaintOrderStateID = runtimeEntityType.AddProperty(
                 "MDMaintOrderStateID",
@@ -93,35 +106,26 @@ namespace gip.mes.datamodel
 
             var maintACClassID = runtimeEntityType.AddProperty(
                 "MaintACClassID",
-                typeof(Guid),
+                typeof(Guid?),
                 propertyInfo: typeof(MaintOrder).GetProperty("MaintACClassID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MaintACClassID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(MaintOrder).GetField("_MaintACClassID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
             maintACClassID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var maintActDuration = runtimeEntityType.AddProperty(
-                "MaintActDuration",
+            var maintInterval = runtimeEntityType.AddProperty(
+                "MaintInterval",
+                typeof(int?),
+                propertyInfo: typeof(MaintOrder).GetProperty("MaintInterval", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_MaintInterval", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            maintInterval.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var maintModeIndex = runtimeEntityType.AddProperty(
+                "MaintModeIndex",
                 typeof(int),
-                propertyInfo: typeof(MaintOrder).GetProperty("MaintActDuration", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MaintActDuration", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            maintActDuration.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var maintActEndDate = runtimeEntityType.AddProperty(
-                "MaintActEndDate",
-                typeof(DateTime?),
-                propertyInfo: typeof(MaintOrder).GetProperty("MaintActEndDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MaintActEndDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
-            maintActEndDate.AddAnnotation("Relational:ColumnType", "datetime");
-            maintActEndDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var maintActStartDate = runtimeEntityType.AddProperty(
-                "MaintActStartDate",
-                typeof(DateTime?),
-                propertyInfo: typeof(MaintOrder).GetProperty("MaintActStartDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MaintActStartDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
-            maintActStartDate.AddAnnotation("Relational:ColumnType", "datetime");
-            maintActStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+                propertyInfo: typeof(MaintOrder).GetProperty("MaintModeIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_MaintModeIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            maintModeIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var maintOrderNo = runtimeEntityType.AddProperty(
                 "MaintOrderNo",
@@ -132,21 +136,39 @@ namespace gip.mes.datamodel
                 unicode: false);
             maintOrderNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var maintSetDate = runtimeEntityType.AddProperty(
-                "MaintSetDate",
-                typeof(DateTime?),
-                propertyInfo: typeof(MaintOrder).GetProperty("MaintSetDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MaintSetDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+            var pickingID = runtimeEntityType.AddProperty(
+                "PickingID",
+                typeof(Guid?),
+                propertyInfo: typeof(MaintOrder).GetProperty("PickingID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_PickingID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            maintSetDate.AddAnnotation("Relational:ColumnType", "datetime");
-            maintSetDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            pickingID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var maintSetDuration = runtimeEntityType.AddProperty(
-                "MaintSetDuration",
-                typeof(int),
-                propertyInfo: typeof(MaintOrder).GetProperty("MaintSetDuration", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MaintSetDuration", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            maintSetDuration.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            var plannedDuration = runtimeEntityType.AddProperty(
+                "PlannedDuration",
+                typeof(int?),
+                propertyInfo: typeof(MaintOrder).GetProperty("PlannedDuration", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_PlannedDuration", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            plannedDuration.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var plannedStartDate = runtimeEntityType.AddProperty(
+                "PlannedStartDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(MaintOrder).GetProperty("PlannedStartDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_PlannedStartDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            plannedStartDate.AddAnnotation("Relational:ColumnType", "datetime");
+            plannedStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var startDate = runtimeEntityType.AddProperty(
+                "StartDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(MaintOrder).GetProperty("StartDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_StartDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            startDate.AddAnnotation("Relational:ColumnType", "datetime");
+            startDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateDate = runtimeEntityType.AddProperty(
                 "UpdateDate",
@@ -165,12 +187,13 @@ namespace gip.mes.datamodel
                 unicode: false);
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var vBiPAACClassID = runtimeEntityType.AddProperty(
-                "VBiPAACClassID",
-                typeof(Guid),
-                propertyInfo: typeof(MaintOrder).GetProperty("VBiPAACClassID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_VBiPAACClassID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            vBiPAACClassID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            var warningDiff = runtimeEntityType.AddProperty(
+                "WarningDiff",
+                typeof(int?),
+                propertyInfo: typeof(MaintOrder).GetProperty("WarningDiff", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_WarningDiff", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            warningDiff.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var xMLConfig = runtimeEntityType.AddProperty(
                 "XMLConfig",
@@ -190,54 +213,76 @@ namespace gip.mes.datamodel
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { mDMaintModeID });
+                new[] { basedOnMaintOrderID });
 
             var index0 = runtimeEntityType.AddIndex(
+                new[] { facilityID });
+
+            var index1 = runtimeEntityType.AddIndex(
+                new[] { mDMaintOrderStateID });
+
+            var index2 = runtimeEntityType.AddIndex(
                 new[] { maintACClassID });
 
-            var nCIFKMaintOrderMDMaintOrderStateID = runtimeEntityType.AddIndex(
-                new[] { mDMaintOrderStateID },
-                name: "NCI_FK_MaintOrder_MDMaintOrderStateID");
-
-            var nCIFKMaintOrderVBiPAACClassID = runtimeEntityType.AddIndex(
-                new[] { vBiPAACClassID },
-                name: "NCI_FK_MaintOrder_VBiPAACClassID");
-
-            var uIXMaintOrderMaintOrderNo = runtimeEntityType.AddIndex(
-                new[] { maintOrderNo },
-                name: "UIX_MaintOrder_MaintOrderNo",
-                unique: true);
+            var index3 = runtimeEntityType.AddIndex(
+                new[] { pickingID });
 
             return runtimeEntityType;
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MDMaintModeID") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MDMaintModeID") }),
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("BasedOnMaintOrderID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaintOrderID") }),
                 principalEntityType);
 
-            var mDMaintMode = declaringEntityType.AddNavigation("MDMaintMode",
+            var maintOrder1BasedOnMaintOrder = declaringEntityType.AddNavigation("MaintOrder1_BasedOnMaintOrder",
                 runtimeForeignKey,
                 onDependent: true,
-                typeof(MDMaintMode),
-                propertyInfo: typeof(MaintOrder).GetProperty("MDMaintMode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_MDMaintMode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                typeof(MaintOrder),
+                propertyInfo: typeof(MaintOrder).GetProperty("MaintOrder1_BasedOnMaintOrder", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_MaintOrder1_BasedOnMaintOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderMDMaintMode = principalEntityType.AddNavigation("MaintOrder_MDMaintMode",
+            var maintOrderBasedOnMaintOrder = principalEntityType.AddNavigation("MaintOrder_BasedOnMaintOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrder>),
-                propertyInfo: typeof(MDMaintMode).GetProperty("MaintOrder_MDMaintMode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MDMaintMode).GetField("_MaintOrder_MDMaintMode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(MaintOrder).GetProperty("MaintOrder_BasedOnMaintOrder", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_MaintOrder_BasedOnMaintOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MaintOrder_MDMaintModeID");
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MaintOrder_BasedOnMaintOrderID");
             return runtimeForeignKey;
         }
 
         public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("FacilityID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),
+                principalEntityType);
+
+            var facility = declaringEntityType.AddNavigation("Facility",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(Facility),
+                propertyInfo: typeof(MaintOrder).GetProperty("Facility", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var maintOrderFacility = principalEntityType.AddNavigation("MaintOrder_Facility",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<MaintOrder>),
+                propertyInfo: typeof(Facility).GetProperty("MaintOrder_Facility", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Facility).GetField("_MaintOrder_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MaintOrder_FacilityID");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MDMaintOrderStateID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MDMaintOrderStateID") }),
@@ -263,12 +308,11 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MaintACClassID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaintACClassID") }),
-                principalEntityType,
-                required: true);
+                principalEntityType);
 
             var maintACClass = declaringEntityType.AddNavigation("MaintACClass",
                 runtimeForeignKey,
@@ -290,31 +334,29 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiPAACClassID") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassID") }),
-                principalEntityType,
-                deleteBehavior: DeleteBehavior.Cascade,
-                required: true);
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PickingID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PickingID") }),
+                principalEntityType);
 
-            var vBiPAACClass = declaringEntityType.AddNavigation("VBiPAACClass",
+            var picking = declaringEntityType.AddNavigation("Picking",
                 runtimeForeignKey,
                 onDependent: true,
-                typeof(ACClass),
-                propertyInfo: typeof(MaintOrder).GetProperty("VBiPAACClass", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(MaintOrder).GetField("_VBiPAACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                typeof(Picking),
+                propertyInfo: typeof(MaintOrder).GetProperty("Picking", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrder).GetField("_Picking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderVBiPAACClass = principalEntityType.AddNavigation("MaintOrder_VBiPAACClass",
+            var maintOrderPicking = principalEntityType.AddNavigation("MaintOrder_Picking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrder>),
-                propertyInfo: typeof(ACClass).GetProperty("MaintOrder_VBiPAACClass", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(ACClass).GetField("_MaintOrder_VBiPAACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(Picking).GetProperty("MaintOrder_Picking", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_MaintOrder_Picking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MaintOrder_PAACClassID");
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MaintOrder_PickingID");
             return runtimeForeignKey;
         }
 

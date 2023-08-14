@@ -23,6 +23,7 @@ using gip.mes.facility;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using static gip.bso.iplus.BSOProcessControl;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -469,8 +470,8 @@ namespace gip.bso.manufacturing
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
             {
                 // Temp set CommandTimeout for long lasting search by material
-                int? commandTimeout = DatabaseApp.CommandTimeout;
-                DatabaseApp.CommandTimeout = 60 * 2;
+                int? commandTimeout = DatabaseApp.Database.GetCommandTimeout();
+                DatabaseApp.Database.SetCommandTimeout(60*2);
 
                 _NeedSearch = false;
                 bool taskListChanged = true;
@@ -535,7 +536,7 @@ namespace gip.bso.manufacturing
                     }
                 }
 
-                DatabaseApp.CommandTimeout = commandTimeout;
+                DatabaseApp.Database.SetCommandTimeout(commandTimeout);
 
                 return newTaskList.ToList();
             }

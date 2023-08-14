@@ -108,6 +108,15 @@ namespace gip.mes.datamodel
                 unicode: false);
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var xMLValue = runtimeEntityType.AddProperty(
+                "XMLValue",
+                typeof(string),
+                propertyInfo: typeof(OperationLog).GetProperty("XMLValue", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(OperationLog).GetField("_XMLValue", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                unicode: false);
+            xMLValue.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var lazyLoader = runtimeEntityType.AddServiceProperty(
                 "LazyLoader",
                 propertyInfo: typeof(OperationLog).GetProperty("LazyLoader", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));

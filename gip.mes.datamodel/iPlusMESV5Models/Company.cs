@@ -463,6 +463,26 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDCurrency"); }
     }
     
+    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_Company;
+    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_Company
+    {
+        get => LazyLoader.Load(this, ref _MaintOrderAssignment_Company);
+        set => _MaintOrderAssignment_Company = value;
+    }
+
+    public bool MaintOrderAssignment_Company_IsLoaded
+    {
+        get
+        {
+            return MaintOrderAssignment_Company != null;
+        }
+    }
+
+    public virtual CollectionEntry MaintOrderAssignment_CompanyReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_Company); }
+    }
+
     private ICollection<OutOffer> _OutOffer_CustomerCompany;
     public virtual ICollection<OutOffer> OutOffer_CustomerCompany
     {

@@ -6,25 +6,25 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaintTask : VBEntityObject, IInsertInfo, IUpdateInfo
+public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
-    public MaintTask()
+    public MaintOrderTask()
     {
     }
 
-    private MaintTask(ILazyLoader lazyLoader)
+    private MaintOrderTask(ILazyLoader lazyLoader)
     {
         LazyLoader = lazyLoader;
     }
 
     private ILazyLoader LazyLoader { get; set; }
     
-    Guid _MaintTaskID;
-    public Guid MaintTaskID 
+    Guid _MaintOrderTaskID;
+    public Guid MaintOrderTaskID 
     {
-        get { return _MaintTaskID; }
-        set { SetProperty<Guid>(ref _MaintTaskID, value); }
+        get { return _MaintOrderTaskID; }
+        set { SetProperty<Guid>(ref _MaintOrderTaskID, value); }
     }
 
     Guid _MaintOrderID;
@@ -34,13 +34,6 @@ public partial class MaintTask : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid>(ref _MaintOrderID, value); }
     }
 
-    Guid _MaintACClassVBGroupID;
-    public Guid MaintACClassVBGroupID 
-    {
-        get { return _MaintACClassVBGroupID; }
-        set { SetProperty<Guid>(ref _MaintACClassVBGroupID, value); }
-    }
-
     Guid _MDMaintTaskStateID;
     public Guid MDMaintTaskStateID 
     {
@@ -48,25 +41,11 @@ public partial class MaintTask : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid>(ref _MDMaintTaskStateID, value); }
     }
 
-    bool _IsRepair;
-    public bool IsRepair 
+    string _TaskDescription;
+    public string TaskDescription 
     {
-        get { return _IsRepair; }
-        set { SetProperty<bool>(ref _IsRepair, value); }
-    }
-
-    DateTime? _StartTaskDate;
-    public DateTime? StartTaskDate 
-    {
-        get { return _StartTaskDate; }
-        set { SetProperty<DateTime?>(ref _StartTaskDate, value); }
-    }
-
-    DateTime? _EndTaskDate;
-    public DateTime? EndTaskDate 
-    {
-        get { return _EndTaskDate; }
-        set { SetProperty<DateTime?>(ref _EndTaskDate, value); }
+        get { return _TaskDescription; }
+        set { SetProperty<string>(ref _TaskDescription, value); }
     }
 
     string _Comment;
@@ -74,6 +53,34 @@ public partial class MaintTask : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return _Comment; }
         set { SetProperty<string>(ref _Comment, value); }
+    }
+
+    DateTime? _PlannedStartDate;
+    public DateTime? PlannedStartDate 
+    {
+        get { return _PlannedStartDate; }
+        set { SetProperty<DateTime?>(ref _PlannedStartDate, value); }
+    }
+
+    int? _PlannedDuration;
+    public int? PlannedDuration 
+    {
+        get { return _PlannedDuration; }
+        set { SetProperty<int?>(ref _PlannedDuration, value); }
+    }
+
+    DateTime? _StartDate;
+    public DateTime? StartDate 
+    {
+        get { return _StartDate; }
+        set { SetProperty<DateTime?>(ref _StartDate, value); }
+    }
+
+    DateTime? _EndDate;
+    public DateTime? EndDate 
+    {
+        get { return _EndDate; }
+        set { SetProperty<DateTime?>(ref _EndDate, value); }
     }
 
     string _InsertName;
@@ -122,26 +129,6 @@ public partial class MaintTask : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ReferenceEntry MDMaintTaskStateReference 
     {
         get { return Context.Entry(this).Reference("MDMaintTaskState"); }
-    }
-    
-    private MaintACClassVBGroup _MaintACClassVBGroup;
-    public virtual MaintACClassVBGroup MaintACClassVBGroup
-    { 
-        get => LazyLoader.Load(this, ref _MaintACClassVBGroup);
-        set => _MaintACClassVBGroup = value;
-    }
-
-    public bool MaintACClassVBGroup_IsLoaded
-    {
-        get
-        {
-            return MaintACClassVBGroup != null;
-        }
-    }
-
-    public virtual ReferenceEntry MaintACClassVBGroupReference 
-    {
-        get { return Context.Entry(this).Reference("MaintACClassVBGroup"); }
     }
     
     private MaintOrder _MaintOrder;

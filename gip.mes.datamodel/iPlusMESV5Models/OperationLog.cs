@@ -97,6 +97,13 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    string _XMLValue;
+    public string XMLValue 
+    {
+        get { return _XMLValue; }
+        set { SetProperty<string>(ref _XMLValue, value); }
+    }
+
     private ACProgramLog _ACProgramLog;
     public virtual ACProgramLog ACProgramLog
     { 

@@ -153,6 +153,33 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         set { SetProperty<string>(ref _KeyOfExtSys, value); }
     }
 
+    Guid? _ACClassTaskID;
+    public Guid? ACClassTaskID 
+    {
+        get { return _ACClassTaskID; }
+        set { SetProperty<Guid?>(ref _ACClassTaskID, value); }
+    }
+
+    private ACClassTask _ACClassTask;
+    public virtual ACClassTask ACClassTask
+    { 
+        get => LazyLoader.Load(this, ref _ACClassTask);
+        set => _ACClassTask = value;
+    }
+
+    public bool ACClassTask_IsLoaded
+    {
+        get
+        {
+            return ACClassTask != null;
+        }
+    }
+
+    public virtual ReferenceEntry ACClassTaskReference 
+    {
+        get { return Context.Entry(this).Reference("ACClassTask"); }
+    }
+    
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_PickingPos;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_PickingPos
     {

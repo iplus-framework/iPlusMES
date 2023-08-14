@@ -100,13 +100,11 @@ namespace gip.mes.datamodel
                 new[] { maintOrderPropertyID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaintOrderPropertyMaintOrderID = runtimeEntityType.AddIndex(
-                new[] { maintOrderID },
-                name: "NCI_FK_MaintOrderProperty_MaintOrderID");
+            var index = runtimeEntityType.AddIndex(
+                new[] { maintACClassPropertyID });
 
-            var nCIFKMaintOrderPropertyVBiACClassPropertyID = runtimeEntityType.AddIndex(
-                new[] { maintACClassPropertyID },
-                name: "NCI_FK_MaintOrderProperty_VBiACClassPropertyID");
+            var index0 = runtimeEntityType.AddIndex(
+                new[] { maintOrderID });
 
             return runtimeEntityType;
         }
@@ -143,7 +141,6 @@ namespace gip.mes.datamodel
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MaintOrderID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaintOrderID") }),
                 principalEntityType,
-                deleteBehavior: DeleteBehavior.Cascade,
                 required: true);
 
             var maintOrder = declaringEntityType.AddNavigation("MaintOrder",
