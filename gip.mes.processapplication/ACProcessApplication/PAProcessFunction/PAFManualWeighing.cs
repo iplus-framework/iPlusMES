@@ -1076,7 +1076,17 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 400)]
         public void TareActiveScale()
         {
-            TareScale(ActiveScaleObject);
+            PAEScaleGravimetric scale = ActiveScaleObject;
+            if (scale == null)
+            {
+                string activeScaleObject = ActiveScaleObjectUrl.ValueT;
+                if (!string.IsNullOrEmpty(activeScaleObject))
+                {
+                    scale = ParentACComponent.ACUrlCommand(activeScaleObject) as PAEScaleGravimetric;
+                }
+            }
+
+            TareScale(scale);
         }
 
         private void TareScale(PAEScaleGravimetric scale)
