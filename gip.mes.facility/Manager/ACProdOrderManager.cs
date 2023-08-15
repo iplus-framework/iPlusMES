@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using gip.core.processapplication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace gip.mes.facility
 {

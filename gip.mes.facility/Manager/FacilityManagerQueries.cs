@@ -705,8 +705,8 @@ namespace gip.mes.facility
                                                     .FirstOrDefault().FacilityBookingCharge_FacilityBooking.Select(x => x.InwardFacilityCharge).AsQueryable()
         );
 
-        public static readonly Func<DatabaseApp, Guid, Guid, bool, IEnumerable<FacilityCharge>> s_cQry_FCList_Fac_Mat_LotNotNull_NotAvailable =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, bool, IEnumerable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Mat_LotNotNull_NotAvailable =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, bool, IQueryable<FacilityCharge>>(
             (ctx, facilityID, materialID, notAvailable) => ctx.FacilityCharge
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
@@ -721,8 +721,8 @@ namespace gip.mes.facility
                         .ThenByDescending(c => c.FacilityChargeSortNo)
         );
 
-        public static readonly Func<DatabaseApp, Guid, Guid, bool, IEnumerable<FacilityCharge>> s_cQry_FCList_Fac_Mat_NotAvailable =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, bool, IEnumerable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Mat_NotAvailable =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, bool, IQueryable<FacilityCharge>>(
             (ctx, facilityID, materialID, notAvailable) => ctx.FacilityCharge
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
