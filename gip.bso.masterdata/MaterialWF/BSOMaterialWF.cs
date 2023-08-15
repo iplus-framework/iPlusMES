@@ -769,7 +769,7 @@ namespace gip.bso.masterdata
                 if (this.SelectedMaterialWF == null)
                     return new MaterialWFACClassMethod[0];
                 else
-                    return this.SelectedMaterialWF.MaterialWFACClassMethod_MaterialWF;
+                    return this.SelectedMaterialWF.MaterialWFACClassMethod_MaterialWF.ToList();
             }
         }
 
@@ -836,6 +836,7 @@ namespace gip.bso.masterdata
             {
                 this.RemoveProcessWorkflowConnections(this.CurrentProcessWorkflow);
                 _ProcessWorkflow.DeleteACObject(this.DatabaseApp, false);
+                this.SelectedMaterialWF.MaterialWFACClassMethod_MaterialWF.Remove(_ProcessWorkflow);
                 this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
             }
 

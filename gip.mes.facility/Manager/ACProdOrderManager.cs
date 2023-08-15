@@ -315,6 +315,10 @@ namespace gip.mes.facility
             prodOrderPartsList.LastFormulaChange = partsList.LastFormulaChange;
 
             List<ProdOrderPartslistPos> prodOrderPartsListPosItems = new List<ProdOrderPartslistPos>();
+            if (prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist == null)
+            {
+                prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist = new List<ProdOrderPartslistPos>();
+            }
             foreach (var pos in partsListPosItems)
             {
                 ProdOrderPartslistPos prodPos = GetProdOrderPartslistPos(dbApp, prodOrderPartsList, pos);
@@ -338,6 +342,10 @@ namespace gip.mes.facility
                 ProdOrderPartslistPosRelation prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
                 if (prodRelationItem != null)
                 {
+                    if (prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos == null)
+                    {
+                        prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos = new List<ProdOrderPartslistPosRelation>();
+                    }
                     prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
                     prodOrderPartsListPosRelationItems.Add(prodRelationItem);
                 }
