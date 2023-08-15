@@ -109,17 +109,17 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Precompiled Queries
-        protected static readonly Func<DatabaseApp, Guid, Guid, Guid?, Guid?, IEnumerable<MaterialWFConnection>> s_cQry_IsSubBatchCreation =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, Guid?, IEnumerable<MaterialWFConnection>>(
-            (ctx, materialID, materialWFACClassMethodID, contentACClassWFRefPAACClassMethodID, contentACClassWFID) => ctx.MaterialWFConnection
+        protected static readonly Func<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IEnumerable<MaterialWFConnection>> s_cQry_IsSubBatchCreation =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, mes.datamodel.ACClassWF, IEnumerable<MaterialWFConnection>>(
+            (ctx, materialID, materialWFACClassMethodID, contentACClassWFVB) => ctx.MaterialWFConnection
                                                                     .Where(c => c.MaterialID == materialID
                                                                            && c.MaterialWFACClassMethodID == materialWFACClassMethodID
-                                                                           && c.ACClassWF.ACClassMethodID == contentACClassWFRefPAACClassMethodID
-                                                                           && c.ACClassWFID != contentACClassWFID
-                                                                            && (c.ACClassWF.PWACClass.ACIdentifier == "PWNodeProcessWorkflow"
+                                                                           && c.ACClassWF.ACClassMethodID == contentACClassWFVB.RefPAACClassMethodID
+                                                                           && c.ACClassWFID != contentACClassWFVB.ACClassWFID
+                                                                            && (c.ACClassWF.PWACClass.ACIdentifier == PWNodeProcessWorkflow.PWClassName
                                                                                 || c.ACClassWF.PWACClass.BasedOnACClassID.HasValue
-                                                                                    && (c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == "PWNodeProcessWorkflow"
-                                                                                        || c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == "PWNodeProcessWorkflow")))
+                                                                                    && (c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflow.PWClassName
+                                                                                        || c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflow.PWClassName)))
         );
         #endregion
 
@@ -579,7 +579,7 @@ namespace gip.mes.processapplication
                         {
                             // Finde heraus ob diese Zwischenmaterial mit einem anderen PWNodeProcessWorkflow verbunden ist als dieser
                             // Falls ja, dann erzeugt dieser selbst weitere unterbatche. Dann darf dieser PWNodeProcessWorkflow keinen Batch für dieses Zwischenmaterial erzeugen
-                            var queryBatchCreation = s_cQry_IsSubBatchCreation(dbApp, intermediatePosOfSubWF.MaterialID.Value, matWFConnection.MaterialWFACClassMethodID, contentACClassWFVB.RefPAACClassMethodID, contentACClassWFVB.ACClassWFID);
+                            var queryBatchCreation = s_cQry_IsSubBatchCreation(dbApp, intermediatePosOfSubWF.MaterialID.Value, matWFConnection.MaterialWFACClassMethodID, contentACClassWFVB);
                             if (!queryBatchCreation.Any())
                             {
                                 resultNewEntities = new List<object>();
