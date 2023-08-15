@@ -104,8 +104,8 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<PlanningMRProposal> _PlanningMRProposal_PlanningMR;
-    public virtual ICollection<PlanningMRProposal> PlanningMRProposal_PlanningMR
+    private ObservableHashSet<PlanningMRProposal> _PlanningMRProposal_PlanningMR;
+    public virtual ObservableHashSet<PlanningMRProposal> PlanningMRProposal_PlanningMR
     {
         get => LazyLoader.Load(this, ref _PlanningMRProposal_PlanningMR);
         set => _PlanningMRProposal_PlanningMR = value;

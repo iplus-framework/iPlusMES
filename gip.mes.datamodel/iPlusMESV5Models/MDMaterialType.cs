@@ -97,8 +97,8 @@ public partial class MDMaterialType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         set { SetProperty<short>(ref _MDMaterialTypeIndex, value); }
     }
 
-    private ICollection<Material> _Material_MDMaterialType;
-    public virtual ICollection<Material> Material_MDMaterialType
+    private ObservableHashSet<Material> _Material_MDMaterialType;
+    public virtual ObservableHashSet<Material> Material_MDMaterialType
     {
         get => LazyLoader.Load(this, ref _Material_MDMaterialType);
         set => _Material_MDMaterialType = value;

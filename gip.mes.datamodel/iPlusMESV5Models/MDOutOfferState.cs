@@ -97,8 +97,8 @@ public partial class MDOutOfferState : VBEntityObject, IInsertInfo, IUpdateInfo,
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<OutOffer> _OutOffer_MDOutOfferState;
-    public virtual ICollection<OutOffer> OutOffer_MDOutOfferState
+    private ObservableHashSet<OutOffer> _OutOffer_MDOutOfferState;
+    public virtual ObservableHashSet<OutOffer> OutOffer_MDOutOfferState
     {
         get => LazyLoader.Load(this, ref _OutOffer_MDOutOfferState);
         set => _OutOffer_MDOutOfferState = value;

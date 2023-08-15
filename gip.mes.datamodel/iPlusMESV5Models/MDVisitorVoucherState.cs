@@ -97,8 +97,8 @@ public partial class MDVisitorVoucherState : VBEntityObject, IInsertInfo, IUpdat
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ICollection<VisitorVoucher> _VisitorVoucher_MDVisitorVoucherState;
-    public virtual ICollection<VisitorVoucher> VisitorVoucher_MDVisitorVoucherState
+    private ObservableHashSet<VisitorVoucher> _VisitorVoucher_MDVisitorVoucherState;
+    public virtual ObservableHashSet<VisitorVoucher> VisitorVoucher_MDVisitorVoucherState
     {
         get => LazyLoader.Load(this, ref _VisitorVoucher_MDVisitorVoucherState);
         set => _VisitorVoucher_MDVisitorVoucherState = value;

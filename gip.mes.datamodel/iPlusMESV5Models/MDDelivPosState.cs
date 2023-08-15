@@ -97,8 +97,8 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPos_MDDelivPosState;
-    public virtual ICollection<InOrderPos> InOrderPos_MDDelivPosState
+    private ObservableHashSet<InOrderPos> _InOrderPos_MDDelivPosState;
+    public virtual ObservableHashSet<InOrderPos> InOrderPos_MDDelivPosState
     {
         get => LazyLoader.Load(this, ref _InOrderPos_MDDelivPosState);
         set => _InOrderPos_MDDelivPosState = value;
@@ -117,8 +117,8 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDDelivPosState); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_MDDelivPosState;
-    public virtual ICollection<OutOrderPos> OutOrderPos_MDDelivPosState
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDDelivPosState;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDDelivPosState
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDDelivPosState);
         set => _OutOrderPos_MDDelivPosState = value;

@@ -236,8 +236,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClass"); }
     }
     
-    private ICollection<VBGroupRight> _VBGroupRight_ACClassDesign;
-    public virtual ICollection<VBGroupRight> VBGroupRight_ACClassDesign
+    private ObservableHashSet<VBGroupRight> _VBGroupRight_ACClassDesign;
+    public virtual ObservableHashSet<VBGroupRight> VBGroupRight_ACClassDesign
     {
         get => LazyLoader.Load(this, ref _VBGroupRight_ACClassDesign);
         set => _VBGroupRight_ACClassDesign = value;
@@ -256,8 +256,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VBGroupRight_ACClassDesign); }
     }
 
-    private ICollection<VBUserACClassDesign> _VBUserACClassDesign_ACClassDesign;
-    public virtual ICollection<VBUserACClassDesign> VBUserACClassDesign_ACClassDesign
+    private ObservableHashSet<VBUserACClassDesign> _VBUserACClassDesign_ACClassDesign;
+    public virtual ObservableHashSet<VBUserACClassDesign> VBUserACClassDesign_ACClassDesign
     {
         get => LazyLoader.Load(this, ref _VBUserACClassDesign_ACClassDesign);
         set => _VBUserACClassDesign_ACClassDesign = value;
@@ -276,8 +276,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VBUserACClassDesign_ACClassDesign); }
     }
 
-    private ICollection<VBUser> _VBUser_MenuACClassDesign;
-    public virtual ICollection<VBUser> VBUser_MenuACClassDesign
+    private ObservableHashSet<VBUser> _VBUser_MenuACClassDesign;
+    public virtual ObservableHashSet<VBUser> VBUser_MenuACClassDesign
     {
         get => LazyLoader.Load(this, ref _VBUser_MenuACClassDesign);
         set => _VBUser_MenuACClassDesign = value;

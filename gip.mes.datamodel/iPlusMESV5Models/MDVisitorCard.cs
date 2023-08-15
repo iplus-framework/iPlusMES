@@ -103,8 +103,8 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDVisitorCardState"); }
     }
     
-    private ICollection<VisitorVoucher> _VisitorVoucher_MDVisitorCard;
-    public virtual ICollection<VisitorVoucher> VisitorVoucher_MDVisitorCard
+    private ObservableHashSet<VisitorVoucher> _VisitorVoucher_MDVisitorCard;
+    public virtual ObservableHashSet<VisitorVoucher> VisitorVoucher_MDVisitorCard
     {
         get => LazyLoader.Load(this, ref _VisitorVoucher_MDVisitorCard);
         set => _VisitorVoucher_MDVisitorCard = value;
@@ -123,8 +123,8 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_MDVisitorCard); }
     }
 
-    private ICollection<Visitor> _Visitor_MDVisitorCard;
-    public virtual ICollection<Visitor> Visitor_MDVisitorCard
+    private ObservableHashSet<Visitor> _Visitor_MDVisitorCard;
+    public virtual ObservableHashSet<Visitor> Visitor_MDVisitorCard
     {
         get => LazyLoader.Load(this, ref _Visitor_MDVisitorCard);
         set => _Visitor_MDVisitorCard = value;

@@ -244,8 +244,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         set { SetProperty<string>(ref _KeyOfExtSys, value); }
     }
 
-    private ICollection<DemandOrderPos> _DemandOrderPos_Partslist;
-    public virtual ICollection<DemandOrderPos> DemandOrderPos_Partslist
+    private ObservableHashSet<DemandOrderPos> _DemandOrderPos_Partslist;
+    public virtual ObservableHashSet<DemandOrderPos> DemandOrderPos_Partslist
     {
         get => LazyLoader.Load(this, ref _DemandOrderPos_Partslist);
         set => _DemandOrderPos_Partslist = value;
@@ -264,8 +264,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_Partslist); }
     }
 
-    private ICollection<Facility> _Facility_Partslist;
-    public virtual ICollection<Facility> Facility_Partslist
+    private ObservableHashSet<Facility> _Facility_Partslist;
+    public virtual ObservableHashSet<Facility> Facility_Partslist
     {
         get => LazyLoader.Load(this, ref _Facility_Partslist);
         set => _Facility_Partslist = value;
@@ -284,8 +284,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.Facility_Partslist); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardPartslist;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardPartslist
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_InwardPartslist;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_InwardPartslist
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardPartslist);
         set => _FacilityBookingCharge_InwardPartslist = value;
@@ -304,8 +304,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardPartslist); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardPartslist;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardPartslist
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutwardPartslist;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutwardPartslist
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardPartslist);
         set => _FacilityBookingCharge_OutwardPartslist = value;
@@ -324,8 +324,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardPartslist); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_InwardPartslist;
-    public virtual ICollection<FacilityBooking> FacilityBooking_InwardPartslist
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_InwardPartslist;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_InwardPartslist
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_InwardPartslist);
         set => _FacilityBooking_InwardPartslist = value;
@@ -344,8 +344,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardPartslist); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_OutwardPartslist;
-    public virtual ICollection<FacilityBooking> FacilityBooking_OutwardPartslist
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_OutwardPartslist;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_OutwardPartslist
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_OutwardPartslist);
         set => _FacilityBooking_OutwardPartslist = value;
@@ -364,8 +364,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardPartslist); }
     }
 
-    private ICollection<FacilityCharge> _FacilityCharge_Partslist;
-    public virtual ICollection<FacilityCharge> FacilityCharge_Partslist
+    private ObservableHashSet<FacilityCharge> _FacilityCharge_Partslist;
+    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_Partslist
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_Partslist);
         set => _FacilityCharge_Partslist = value;
@@ -384,8 +384,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_Partslist); }
     }
 
-    private ICollection<Partslist> _Partslist_PreviousPartslist;
-    public virtual ICollection<Partslist> Partslist_PreviousPartslist
+    private ObservableHashSet<Partslist> _Partslist_PreviousPartslist;
+    public virtual ObservableHashSet<Partslist> Partslist_PreviousPartslist
     {
         get => LazyLoader.Load(this, ref _Partslist_PreviousPartslist);
         set => _Partslist_PreviousPartslist = value;
@@ -464,8 +464,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Reference("MaterialWF"); }
     }
     
-    private ICollection<PartslistACClassMethod> _PartslistACClassMethod_Partslist;
-    public virtual ICollection<PartslistACClassMethod> PartslistACClassMethod_Partslist
+    private ObservableHashSet<PartslistACClassMethod> _PartslistACClassMethod_Partslist;
+    public virtual ObservableHashSet<PartslistACClassMethod> PartslistACClassMethod_Partslist
     {
         get => LazyLoader.Load(this, ref _PartslistACClassMethod_Partslist);
         set => _PartslistACClassMethod_Partslist = value;
@@ -484,8 +484,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.PartslistACClassMethod_Partslist); }
     }
 
-    private ICollection<PartslistConfig> _PartslistConfig_Partslist;
-    public virtual ICollection<PartslistConfig> PartslistConfig_Partslist
+    private ObservableHashSet<PartslistConfig> _PartslistConfig_Partslist;
+    public virtual ObservableHashSet<PartslistConfig> PartslistConfig_Partslist
     {
         get => LazyLoader.Load(this, ref _PartslistConfig_Partslist);
         set => _PartslistConfig_Partslist = value;
@@ -504,8 +504,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_Partslist); }
     }
 
-    private ICollection<PartslistPos> _PartslistPos_ParentPartslist;
-    public virtual ICollection<PartslistPos> PartslistPos_ParentPartslist
+    private ObservableHashSet<PartslistPos> _PartslistPos_ParentPartslist;
+    public virtual ObservableHashSet<PartslistPos> PartslistPos_ParentPartslist
     {
         get => LazyLoader.Load(this, ref _PartslistPos_ParentPartslist);
         set => _PartslistPos_ParentPartslist = value;
@@ -524,8 +524,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.PartslistPos_ParentPartslist); }
     }
 
-    private ICollection<PartslistPos> _PartslistPos_Partslist;
-    public virtual ICollection<PartslistPos> PartslistPos_Partslist
+    private ObservableHashSet<PartslistPos> _PartslistPos_Partslist;
+    public virtual ObservableHashSet<PartslistPos> PartslistPos_Partslist
     {
         get => LazyLoader.Load(this, ref _PartslistPos_Partslist);
         set => _PartslistPos_Partslist = value;
@@ -544,8 +544,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.PartslistPos_Partslist); }
     }
 
-    private ICollection<PartslistStock> _PartslistStock_Partslist;
-    public virtual ICollection<PartslistStock> PartslistStock_Partslist
+    private ObservableHashSet<PartslistStock> _PartslistStock_Partslist;
+    public virtual ObservableHashSet<PartslistStock> PartslistStock_Partslist
     {
         get => LazyLoader.Load(this, ref _PartslistStock_Partslist);
         set => _PartslistStock_Partslist = value;
@@ -584,8 +584,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Reference("Partslist1_PreviousPartslist"); }
     }
     
-    private ICollection<ProdOrderPartslist> _ProdOrderPartslist_Partslist;
-    public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_Partslist
+    private ObservableHashSet<ProdOrderPartslist> _ProdOrderPartslist_Partslist;
+    public virtual ObservableHashSet<ProdOrderPartslist> ProdOrderPartslist_Partslist
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslist_Partslist);
         set => _ProdOrderPartslist_Partslist = value;

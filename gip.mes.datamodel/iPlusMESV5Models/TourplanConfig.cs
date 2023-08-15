@@ -139,8 +139,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<TourplanConfig> _TourplanConfig_ParentTourplanConfig;
-    public virtual ICollection<TourplanConfig> TourplanConfig_ParentTourplanConfig
+    private ObservableHashSet<TourplanConfig> _TourplanConfig_ParentTourplanConfig;
+    public virtual ObservableHashSet<TourplanConfig> TourplanConfig_ParentTourplanConfig
     {
         get => LazyLoader.Load(this, ref _TourplanConfig_ParentTourplanConfig);
         set => _TourplanConfig_ParentTourplanConfig = value;

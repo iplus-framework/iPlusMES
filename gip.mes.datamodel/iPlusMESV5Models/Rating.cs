@@ -143,8 +143,8 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryNote"); }
     }
     
-    private ICollection<RatingComplaint> _RatingComplaint_Rating;
-    public virtual ICollection<RatingComplaint> RatingComplaint_Rating
+    private ObservableHashSet<RatingComplaint> _RatingComplaint_Rating;
+    public virtual ObservableHashSet<RatingComplaint> RatingComplaint_Rating
     {
         get => LazyLoader.Load(this, ref _RatingComplaint_Rating);
         set => _RatingComplaint_Rating = value;

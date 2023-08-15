@@ -117,8 +117,8 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Calendar"); }
     }
     
-    private ICollection<CalendarShiftPerson> _CalendarShiftPerson_CalendarShift;
-    public virtual ICollection<CalendarShiftPerson> CalendarShiftPerson_CalendarShift
+    private ObservableHashSet<CalendarShiftPerson> _CalendarShiftPerson_CalendarShift;
+    public virtual ObservableHashSet<CalendarShiftPerson> CalendarShiftPerson_CalendarShift
     {
         get => LazyLoader.Load(this, ref _CalendarShiftPerson_CalendarShift);
         set => _CalendarShiftPerson_CalendarShift = value;

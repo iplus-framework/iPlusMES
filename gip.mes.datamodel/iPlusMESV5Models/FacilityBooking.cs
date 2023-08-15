@@ -502,8 +502,8 @@ public partial class FacilityBooking : VBEntityObject
         get { return Context.Entry(this).Reference("CPartnerCompany"); }
     }
     
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_FacilityBooking;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_FacilityBooking
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_FacilityBooking;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_FacilityBooking
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_FacilityBooking);
         set => _FacilityBookingCharge_FacilityBooking = value;
@@ -862,8 +862,8 @@ public partial class FacilityBooking : VBEntityObject
         get { return Context.Entry(this).Reference("MDZeroStockState"); }
     }
     
-    private ICollection<OrderLog> _OrderLog_FacilityBooking;
-    public virtual ICollection<OrderLog> OrderLog_FacilityBooking
+    private ObservableHashSet<OrderLog> _OrderLog_FacilityBooking;
+    public virtual ObservableHashSet<OrderLog> OrderLog_FacilityBooking
     {
         get => LazyLoader.Load(this, ref _OrderLog_FacilityBooking);
         set => _OrderLog_FacilityBooking = value;

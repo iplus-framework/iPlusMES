@@ -369,8 +369,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("BaseMDUnit"); }
     }
     
-    private ICollection<CompanyMaterial> _CompanyMaterial_Material;
-    public virtual ICollection<CompanyMaterial> CompanyMaterial_Material
+    private ObservableHashSet<CompanyMaterial> _CompanyMaterial_Material;
+    public virtual ObservableHashSet<CompanyMaterial> CompanyMaterial_Material
     {
         get => LazyLoader.Load(this, ref _CompanyMaterial_Material);
         set => _CompanyMaterial_Material = value;
@@ -389,8 +389,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_Material); }
     }
 
-    private ICollection<DemandOrderPos> _DemandOrderPos_Material;
-    public virtual ICollection<DemandOrderPos> DemandOrderPos_Material
+    private ObservableHashSet<DemandOrderPos> _DemandOrderPos_Material;
+    public virtual ObservableHashSet<DemandOrderPos> DemandOrderPos_Material
     {
         get => LazyLoader.Load(this, ref _DemandOrderPos_Material);
         set => _DemandOrderPos_Material = value;
@@ -409,8 +409,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_Material); }
     }
 
-    private ICollection<DemandPrimary> _DemandPrimary_Material;
-    public virtual ICollection<DemandPrimary> DemandPrimary_Material
+    private ObservableHashSet<DemandPrimary> _DemandPrimary_Material;
+    public virtual ObservableHashSet<DemandPrimary> DemandPrimary_Material
     {
         get => LazyLoader.Load(this, ref _DemandPrimary_Material);
         set => _DemandPrimary_Material = value;
@@ -429,8 +429,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DemandPrimary_Material); }
     }
 
-    private ICollection<Facility> _Facility_Material;
-    public virtual ICollection<Facility> Facility_Material
+    private ObservableHashSet<Facility> _Facility_Material;
+    public virtual ObservableHashSet<Facility> Facility_Material
     {
         get => LazyLoader.Load(this, ref _Facility_Material);
         set => _Facility_Material = value;
@@ -449,8 +449,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Facility_Material); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardMaterial;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardMaterial
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_InwardMaterial;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_InwardMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardMaterial);
         set => _FacilityBookingCharge_InwardMaterial = value;
@@ -469,8 +469,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardMaterial); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardMaterial;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardMaterial
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutwardMaterial;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutwardMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardMaterial);
         set => _FacilityBookingCharge_OutwardMaterial = value;
@@ -489,8 +489,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardMaterial); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_InwardMaterial;
-    public virtual ICollection<FacilityBooking> FacilityBooking_InwardMaterial
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_InwardMaterial;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_InwardMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_InwardMaterial);
         set => _FacilityBooking_InwardMaterial = value;
@@ -509,8 +509,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardMaterial); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_OutwardMaterial;
-    public virtual ICollection<FacilityBooking> FacilityBooking_OutwardMaterial
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_OutwardMaterial;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_OutwardMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_OutwardMaterial);
         set => _FacilityBooking_OutwardMaterial = value;
@@ -529,8 +529,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardMaterial); }
     }
 
-    private ICollection<FacilityCharge> _FacilityCharge_Material;
-    public virtual ICollection<FacilityCharge> FacilityCharge_Material
+    private ObservableHashSet<FacilityCharge> _FacilityCharge_Material;
+    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_Material
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_Material);
         set => _FacilityCharge_Material = value;
@@ -549,8 +549,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_Material); }
     }
 
-    private ICollection<FacilityLot> _FacilityLot_Material;
-    public virtual ICollection<FacilityLot> FacilityLot_Material
+    private ObservableHashSet<FacilityLot> _FacilityLot_Material;
+    public virtual ObservableHashSet<FacilityLot> FacilityLot_Material
     {
         get => LazyLoader.Load(this, ref _FacilityLot_Material);
         set => _FacilityLot_Material = value;
@@ -569,8 +569,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityLot_Material); }
     }
 
-    private ICollection<FacilityMaterial> _FacilityMaterial_Material;
-    public virtual ICollection<FacilityMaterial> FacilityMaterial_Material
+    private ObservableHashSet<FacilityMaterial> _FacilityMaterial_Material;
+    public virtual ObservableHashSet<FacilityMaterial> FacilityMaterial_Material
     {
         get => LazyLoader.Load(this, ref _FacilityMaterial_Material);
         set => _FacilityMaterial_Material = value;
@@ -589,8 +589,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityMaterial_Material); }
     }
 
-    private ICollection<FacilityReservation> _FacilityReservation_Material;
-    public virtual ICollection<FacilityReservation> FacilityReservation_Material
+    private ObservableHashSet<FacilityReservation> _FacilityReservation_Material;
+    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_Material
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_Material);
         set => _FacilityReservation_Material = value;
@@ -629,8 +629,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("InFacility"); }
     }
     
-    private ICollection<InOrderConfig> _InOrderConfig_Material;
-    public virtual ICollection<InOrderConfig> InOrderConfig_Material
+    private ObservableHashSet<InOrderConfig> _InOrderConfig_Material;
+    public virtual ObservableHashSet<InOrderConfig> InOrderConfig_Material
     {
         get => LazyLoader.Load(this, ref _InOrderConfig_Material);
         set => _InOrderConfig_Material = value;
@@ -649,8 +649,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_Material); }
     }
 
-    private ICollection<InOrderPos> _InOrderPos_Material;
-    public virtual ICollection<InOrderPos> InOrderPos_Material
+    private ObservableHashSet<InOrderPos> _InOrderPos_Material;
+    public virtual ObservableHashSet<InOrderPos> InOrderPos_Material
     {
         get => LazyLoader.Load(this, ref _InOrderPos_Material);
         set => _InOrderPos_Material = value;
@@ -669,8 +669,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderPos_Material); }
     }
 
-    private ICollection<InRequestConfig> _InRequestConfig_Material;
-    public virtual ICollection<InRequestConfig> InRequestConfig_Material
+    private ObservableHashSet<InRequestConfig> _InRequestConfig_Material;
+    public virtual ObservableHashSet<InRequestConfig> InRequestConfig_Material
     {
         get => LazyLoader.Load(this, ref _InRequestConfig_Material);
         set => _InRequestConfig_Material = value;
@@ -689,8 +689,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_Material); }
     }
 
-    private ICollection<InRequestPos> _InRequestPos_Material;
-    public virtual ICollection<InRequestPos> InRequestPos_Material
+    private ObservableHashSet<InRequestPos> _InRequestPos_Material;
+    public virtual ObservableHashSet<InRequestPos> InRequestPos_Material
     {
         get => LazyLoader.Load(this, ref _InRequestPos_Material);
         set => _InRequestPos_Material = value;
@@ -709,8 +709,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequestPos_Material); }
     }
 
-    private ICollection<Material> _Material_ProductionMaterial;
-    public virtual ICollection<Material> Material_ProductionMaterial
+    private ObservableHashSet<Material> _Material_ProductionMaterial;
+    public virtual ObservableHashSet<Material> Material_ProductionMaterial
     {
         get => LazyLoader.Load(this, ref _Material_ProductionMaterial);
         set => _Material_ProductionMaterial = value;
@@ -729,8 +729,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Material_ProductionMaterial); }
     }
 
-    private ICollection<InvoicePos> _InvoicePos_Material;
-    public virtual ICollection<InvoicePos> InvoicePos_Material
+    private ObservableHashSet<InvoicePos> _InvoicePos_Material;
+    public virtual ObservableHashSet<InvoicePos> InvoicePos_Material
     {
         get => LazyLoader.Load(this, ref _InvoicePos_Material);
         set => _InvoicePos_Material = value;
@@ -749,8 +749,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InvoicePos_Material); }
     }
 
-    private ICollection<LabOrder> _LabOrder_Material;
-    public virtual ICollection<LabOrder> LabOrder_Material
+    private ObservableHashSet<LabOrder> _LabOrder_Material;
+    public virtual ObservableHashSet<LabOrder> LabOrder_Material
     {
         get => LazyLoader.Load(this, ref _LabOrder_Material);
         set => _LabOrder_Material = value;
@@ -789,8 +789,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Label"); }
     }
     
-    private ICollection<MDCountrySalesTaxMaterial> _MDCountrySalesTaxMaterial_Material;
-    public virtual ICollection<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_Material
+    private ObservableHashSet<MDCountrySalesTaxMaterial> _MDCountrySalesTaxMaterial_Material;
+    public virtual ObservableHashSet<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_Material
     {
         get => LazyLoader.Load(this, ref _MDCountrySalesTaxMaterial_Material);
         set => _MDCountrySalesTaxMaterial_Material = value;
@@ -909,8 +909,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDMaterialType"); }
     }
     
-    private ICollection<MaintOrderPos> _MaintOrderPos_Material;
-    public virtual ICollection<MaintOrderPos> MaintOrderPos_Material
+    private ObservableHashSet<MaintOrderPos> _MaintOrderPos_Material;
+    public virtual ObservableHashSet<MaintOrderPos> MaintOrderPos_Material
     {
         get => LazyLoader.Load(this, ref _MaintOrderPos_Material);
         set => _MaintOrderPos_Material = value;
@@ -929,8 +929,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderPos_Material); }
     }
 
-    private ICollection<MaterialCalculation> _MaterialCalculation_Material;
-    public virtual ICollection<MaterialCalculation> MaterialCalculation_Material
+    private ObservableHashSet<MaterialCalculation> _MaterialCalculation_Material;
+    public virtual ObservableHashSet<MaterialCalculation> MaterialCalculation_Material
     {
         get => LazyLoader.Load(this, ref _MaterialCalculation_Material);
         set => _MaterialCalculation_Material = value;
@@ -949,8 +949,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialCalculation_Material); }
     }
 
-    private ICollection<MaterialConfig> _MaterialConfig_Material;
-    public virtual ICollection<MaterialConfig> MaterialConfig_Material
+    private ObservableHashSet<MaterialConfig> _MaterialConfig_Material;
+    public virtual ObservableHashSet<MaterialConfig> MaterialConfig_Material
     {
         get => LazyLoader.Load(this, ref _MaterialConfig_Material);
         set => _MaterialConfig_Material = value;
@@ -969,8 +969,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialConfig_Material); }
     }
 
-    private ICollection<MaterialGMPAdditive> _MaterialGMPAdditive_Material;
-    public virtual ICollection<MaterialGMPAdditive> MaterialGMPAdditive_Material
+    private ObservableHashSet<MaterialGMPAdditive> _MaterialGMPAdditive_Material;
+    public virtual ObservableHashSet<MaterialGMPAdditive> MaterialGMPAdditive_Material
     {
         get => LazyLoader.Load(this, ref _MaterialGMPAdditive_Material);
         set => _MaterialGMPAdditive_Material = value;
@@ -989,8 +989,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialGMPAdditive_Material); }
     }
 
-    private ICollection<MaterialHistory> _MaterialHistory_Material;
-    public virtual ICollection<MaterialHistory> MaterialHistory_Material
+    private ObservableHashSet<MaterialHistory> _MaterialHistory_Material;
+    public virtual ObservableHashSet<MaterialHistory> MaterialHistory_Material
     {
         get => LazyLoader.Load(this, ref _MaterialHistory_Material);
         set => _MaterialHistory_Material = value;
@@ -1009,8 +1009,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialHistory_Material); }
     }
 
-    private ICollection<MaterialStock> _MaterialStock_Material;
-    public virtual ICollection<MaterialStock> MaterialStock_Material
+    private ObservableHashSet<MaterialStock> _MaterialStock_Material;
+    public virtual ObservableHashSet<MaterialStock> MaterialStock_Material
     {
         get => LazyLoader.Load(this, ref _MaterialStock_Material);
         set => _MaterialStock_Material = value;
@@ -1029,8 +1029,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialStock_Material); }
     }
 
-    private ICollection<MaterialUnit> _MaterialUnit_Material;
-    public virtual ICollection<MaterialUnit> MaterialUnit_Material
+    private ObservableHashSet<MaterialUnit> _MaterialUnit_Material;
+    public virtual ObservableHashSet<MaterialUnit> MaterialUnit_Material
     {
         get => LazyLoader.Load(this, ref _MaterialUnit_Material);
         set => _MaterialUnit_Material = value;
@@ -1049,8 +1049,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialUnit_Material); }
     }
 
-    private ICollection<MaterialWFConnection> _MaterialWFConnection_Material;
-    public virtual ICollection<MaterialWFConnection> MaterialWFConnection_Material
+    private ObservableHashSet<MaterialWFConnection> _MaterialWFConnection_Material;
+    public virtual ObservableHashSet<MaterialWFConnection> MaterialWFConnection_Material
     {
         get => LazyLoader.Load(this, ref _MaterialWFConnection_Material);
         set => _MaterialWFConnection_Material = value;
@@ -1069,8 +1069,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFConnection_Material); }
     }
 
-    private ICollection<MaterialWFRelation> _MaterialWFRelation_SourceMaterial;
-    public virtual ICollection<MaterialWFRelation> MaterialWFRelation_SourceMaterial
+    private ObservableHashSet<MaterialWFRelation> _MaterialWFRelation_SourceMaterial;
+    public virtual ObservableHashSet<MaterialWFRelation> MaterialWFRelation_SourceMaterial
     {
         get => LazyLoader.Load(this, ref _MaterialWFRelation_SourceMaterial);
         set => _MaterialWFRelation_SourceMaterial = value;
@@ -1089,8 +1089,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFRelation_SourceMaterial); }
     }
 
-    private ICollection<MaterialWFRelation> _MaterialWFRelation_TargetMaterial;
-    public virtual ICollection<MaterialWFRelation> MaterialWFRelation_TargetMaterial
+    private ObservableHashSet<MaterialWFRelation> _MaterialWFRelation_TargetMaterial;
+    public virtual ObservableHashSet<MaterialWFRelation> MaterialWFRelation_TargetMaterial
     {
         get => LazyLoader.Load(this, ref _MaterialWFRelation_TargetMaterial);
         set => _MaterialWFRelation_TargetMaterial = value;
@@ -1129,8 +1129,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("OutFacility"); }
     }
     
-    private ICollection<OutOfferConfig> _OutOfferConfig_Material;
-    public virtual ICollection<OutOfferConfig> OutOfferConfig_Material
+    private ObservableHashSet<OutOfferConfig> _OutOfferConfig_Material;
+    public virtual ObservableHashSet<OutOfferConfig> OutOfferConfig_Material
     {
         get => LazyLoader.Load(this, ref _OutOfferConfig_Material);
         set => _OutOfferConfig_Material = value;
@@ -1149,8 +1149,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_Material); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPos_Material;
-    public virtual ICollection<OutOfferPos> OutOfferPos_Material
+    private ObservableHashSet<OutOfferPos> _OutOfferPos_Material;
+    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_Material
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_Material);
         set => _OutOfferPos_Material = value;
@@ -1169,8 +1169,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_Material); }
     }
 
-    private ICollection<OutOrderConfig> _OutOrderConfig_Material;
-    public virtual ICollection<OutOrderConfig> OutOrderConfig_Material
+    private ObservableHashSet<OutOrderConfig> _OutOrderConfig_Material;
+    public virtual ObservableHashSet<OutOrderConfig> OutOrderConfig_Material
     {
         get => LazyLoader.Load(this, ref _OutOrderConfig_Material);
         set => _OutOrderConfig_Material = value;
@@ -1189,8 +1189,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_Material); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_Material;
-    public virtual ICollection<OutOrderPos> OutOrderPos_Material
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_Material;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_Material
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_Material);
         set => _OutOrderPos_Material = value;
@@ -1209,8 +1209,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_Material); }
     }
 
-    private ICollection<OutOrderPosUtilization> _OutOrderPosUtilization_Material;
-    public virtual ICollection<OutOrderPosUtilization> OutOrderPosUtilization_Material
+    private ObservableHashSet<OutOrderPosUtilization> _OutOrderPosUtilization_Material;
+    public virtual ObservableHashSet<OutOrderPosUtilization> OutOrderPosUtilization_Material
     {
         get => LazyLoader.Load(this, ref _OutOrderPosUtilization_Material);
         set => _OutOrderPosUtilization_Material = value;
@@ -1229,8 +1229,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderPosUtilization_Material); }
     }
 
-    private ICollection<PartslistConfig> _PartslistConfig_Material;
-    public virtual ICollection<PartslistConfig> PartslistConfig_Material
+    private ObservableHashSet<PartslistConfig> _PartslistConfig_Material;
+    public virtual ObservableHashSet<PartslistConfig> PartslistConfig_Material
     {
         get => LazyLoader.Load(this, ref _PartslistConfig_Material);
         set => _PartslistConfig_Material = value;
@@ -1249,8 +1249,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_Material); }
     }
 
-    private ICollection<PartslistPos> _PartslistPos_Material;
-    public virtual ICollection<PartslistPos> PartslistPos_Material
+    private ObservableHashSet<PartslistPos> _PartslistPos_Material;
+    public virtual ObservableHashSet<PartslistPos> PartslistPos_Material
     {
         get => LazyLoader.Load(this, ref _PartslistPos_Material);
         set => _PartslistPos_Material = value;
@@ -1269,8 +1269,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PartslistPos_Material); }
     }
 
-    private ICollection<Partslist> _Partslist_Material;
-    public virtual ICollection<Partslist> Partslist_Material
+    private ObservableHashSet<Partslist> _Partslist_Material;
+    public virtual ObservableHashSet<Partslist> Partslist_Material
     {
         get => LazyLoader.Load(this, ref _Partslist_Material);
         set => _Partslist_Material = value;
@@ -1289,8 +1289,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Partslist_Material); }
     }
 
-    private ICollection<PickingConfig> _PickingConfig_Material;
-    public virtual ICollection<PickingConfig> PickingConfig_Material
+    private ObservableHashSet<PickingConfig> _PickingConfig_Material;
+    public virtual ObservableHashSet<PickingConfig> PickingConfig_Material
     {
         get => LazyLoader.Load(this, ref _PickingConfig_Material);
         set => _PickingConfig_Material = value;
@@ -1309,8 +1309,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingConfig_Material); }
     }
 
-    private ICollection<PickingPos> _PickingPos_PickingMaterial;
-    public virtual ICollection<PickingPos> PickingPos_PickingMaterial
+    private ObservableHashSet<PickingPos> _PickingPos_PickingMaterial;
+    public virtual ObservableHashSet<PickingPos> PickingPos_PickingMaterial
     {
         get => LazyLoader.Load(this, ref _PickingPos_PickingMaterial);
         set => _PickingPos_PickingMaterial = value;
@@ -1329,8 +1329,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingPos_PickingMaterial); }
     }
 
-    private ICollection<PriceListMaterial> _PriceListMaterial_Material;
-    public virtual ICollection<PriceListMaterial> PriceListMaterial_Material
+    private ObservableHashSet<PriceListMaterial> _PriceListMaterial_Material;
+    public virtual ObservableHashSet<PriceListMaterial> PriceListMaterial_Material
     {
         get => LazyLoader.Load(this, ref _PriceListMaterial_Material);
         set => _PriceListMaterial_Material = value;
@@ -1349,8 +1349,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PriceListMaterial_Material); }
     }
 
-    private ICollection<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_Material;
-    public virtual ICollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_Material
+    private ObservableHashSet<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_Material;
+    public virtual ObservableHashSet<ProdOrderPartslistConfig> ProdOrderPartslistConfig_Material
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistConfig_Material);
         set => _ProdOrderPartslistConfig_Material = value;
@@ -1369,8 +1369,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_Material); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_Material;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_Material
+    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_Material;
+    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_Material
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_Material);
         set => _ProdOrderPartslistPos_Material = value;
@@ -1409,8 +1409,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material1_ProductionMaterial"); }
     }
     
-    private ICollection<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_Material;
-    public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_Material
+    private ObservableHashSet<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_Material;
+    public virtual ObservableHashSet<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_Material
     {
         get => LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_Material);
         set => _TandTv3FilterTrackingMaterial_Material = value;
@@ -1429,8 +1429,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TandTv3FilterTrackingMaterial_Material); }
     }
 
-    private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardMaterial;
-    public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardMaterial
+    private ObservableHashSet<TandTv3MixPoint> _TandTv3MixPoint_InwardMaterial;
+    public virtual ObservableHashSet<TandTv3MixPoint> TandTv3MixPoint_InwardMaterial
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPoint_InwardMaterial);
         set => _TandTv3MixPoint_InwardMaterial = value;
@@ -1449,8 +1449,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_InwardMaterial); }
     }
 
-    private ICollection<TourplanConfig> _TourplanConfig_Material;
-    public virtual ICollection<TourplanConfig> TourplanConfig_Material
+    private ObservableHashSet<TourplanConfig> _TourplanConfig_Material;
+    public virtual ObservableHashSet<TourplanConfig> TourplanConfig_Material
     {
         get => LazyLoader.Load(this, ref _TourplanConfig_Material);
         set => _TourplanConfig_Material = value;
@@ -1509,8 +1509,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("VBiStackCalculatorACClass"); }
     }
     
-    private ICollection<Visitor> _Visitor_Material;
-    public virtual ICollection<Visitor> Visitor_Material
+    private ObservableHashSet<Visitor> _Visitor_Material;
+    public virtual ObservableHashSet<Visitor> Visitor_Material
     {
         get => LazyLoader.Load(this, ref _Visitor_Material);
         set => _Visitor_Material = value;

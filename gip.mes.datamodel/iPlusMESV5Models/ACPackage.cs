@@ -76,8 +76,8 @@ public partial class ACPackage : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<ACClass> _ACClass_ACPackage;
-    public virtual ICollection<ACClass> ACClass_ACPackage
+    private ObservableHashSet<ACClass> _ACClass_ACPackage;
+    public virtual ObservableHashSet<ACClass> ACClass_ACPackage
     {
         get => LazyLoader.Load(this, ref _ACClass_ACPackage);
         set => _ACClass_ACPackage = value;

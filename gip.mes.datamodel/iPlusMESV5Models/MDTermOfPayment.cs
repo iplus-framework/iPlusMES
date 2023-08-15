@@ -97,8 +97,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ICollection<Company> _Company_BillingMDTermOfPayment;
-    public virtual ICollection<Company> Company_BillingMDTermOfPayment
+    private ObservableHashSet<Company> _Company_BillingMDTermOfPayment;
+    public virtual ObservableHashSet<Company> Company_BillingMDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _Company_BillingMDTermOfPayment);
         set => _Company_BillingMDTermOfPayment = value;
@@ -117,8 +117,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.Company_BillingMDTermOfPayment); }
     }
 
-    private ICollection<Company> _Company_ShippingMDTermOfPayment;
-    public virtual ICollection<Company> Company_ShippingMDTermOfPayment
+    private ObservableHashSet<Company> _Company_ShippingMDTermOfPayment;
+    public virtual ObservableHashSet<Company> Company_ShippingMDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _Company_ShippingMDTermOfPayment);
         set => _Company_ShippingMDTermOfPayment = value;
@@ -137,8 +137,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.Company_ShippingMDTermOfPayment); }
     }
 
-    private ICollection<InOrder> _InOrder_MDTermOfPayment;
-    public virtual ICollection<InOrder> InOrder_MDTermOfPayment
+    private ObservableHashSet<InOrder> _InOrder_MDTermOfPayment;
+    public virtual ObservableHashSet<InOrder> InOrder_MDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _InOrder_MDTermOfPayment);
         set => _InOrder_MDTermOfPayment = value;
@@ -157,8 +157,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.InOrder_MDTermOfPayment); }
     }
 
-    private ICollection<InRequest> _InRequest_MDTermOfPayment;
-    public virtual ICollection<InRequest> InRequest_MDTermOfPayment
+    private ObservableHashSet<InRequest> _InRequest_MDTermOfPayment;
+    public virtual ObservableHashSet<InRequest> InRequest_MDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _InRequest_MDTermOfPayment);
         set => _InRequest_MDTermOfPayment = value;
@@ -177,8 +177,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.InRequest_MDTermOfPayment); }
     }
 
-    private ICollection<Invoice> _Invoice_MDTermOfPayment;
-    public virtual ICollection<Invoice> Invoice_MDTermOfPayment
+    private ObservableHashSet<Invoice> _Invoice_MDTermOfPayment;
+    public virtual ObservableHashSet<Invoice> Invoice_MDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _Invoice_MDTermOfPayment);
         set => _Invoice_MDTermOfPayment = value;
@@ -197,8 +197,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.Invoice_MDTermOfPayment); }
     }
 
-    private ICollection<OutOffer> _OutOffer_MDTermOfPayment;
-    public virtual ICollection<OutOffer> OutOffer_MDTermOfPayment
+    private ObservableHashSet<OutOffer> _OutOffer_MDTermOfPayment;
+    public virtual ObservableHashSet<OutOffer> OutOffer_MDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _OutOffer_MDTermOfPayment);
         set => _OutOffer_MDTermOfPayment = value;
@@ -217,8 +217,8 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDTermOfPayment); }
     }
 
-    private ICollection<OutOrder> _OutOrder_MDTermOfPayment;
-    public virtual ICollection<OutOrder> OutOrder_MDTermOfPayment
+    private ObservableHashSet<OutOrder> _OutOrder_MDTermOfPayment;
+    public virtual ObservableHashSet<OutOrder> OutOrder_MDTermOfPayment
     {
         get => LazyLoader.Load(this, ref _OutOrder_MDTermOfPayment);
         set => _OutOrder_MDTermOfPayment = value;

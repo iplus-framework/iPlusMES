@@ -48,8 +48,8 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
         set { SetProperty<decimal>(ref _SalesTax, value); }
     }
 
-    private ICollection<InvoicePos> _InvoicePos_MDCountrySalesTaxMDMaterialGroup;
-    public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTaxMDMaterialGroup
+    private ObservableHashSet<InvoicePos> _InvoicePos_MDCountrySalesTaxMDMaterialGroup;
+    public virtual ObservableHashSet<InvoicePos> InvoicePos_MDCountrySalesTaxMDMaterialGroup
     {
         get => LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTaxMDMaterialGroup);
         set => _InvoicePos_MDCountrySalesTaxMDMaterialGroup = value;
@@ -108,8 +108,8 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
         get { return Context.Entry(this).Reference("MDMaterialGroup"); }
     }
     
-    private ICollection<OutOfferPos> _OutOfferPos_MDCountrySalesTaxMDMaterialGroup;
-    public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTaxMDMaterialGroup
+    private ObservableHashSet<OutOfferPos> _OutOfferPos_MDCountrySalesTaxMDMaterialGroup;
+    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_MDCountrySalesTaxMDMaterialGroup
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTaxMDMaterialGroup);
         set => _OutOfferPos_MDCountrySalesTaxMDMaterialGroup = value;
@@ -128,8 +128,8 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTaxMDMaterialGroup); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_MDCountrySalesTaxMDMaterialGroup;
-    public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTaxMDMaterialGroup
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDCountrySalesTaxMDMaterialGroup;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDCountrySalesTaxMDMaterialGroup
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTaxMDMaterialGroup);
         set => _OutOrderPos_MDCountrySalesTaxMDMaterialGroup = value;

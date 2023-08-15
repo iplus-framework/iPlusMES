@@ -130,8 +130,8 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassTask"); }
     }
     
-    private ICollection<ACClassTaskValuePos> _ACClassTaskValuePos_ACClassTaskValue;
-    public virtual ICollection<ACClassTaskValuePos> ACClassTaskValuePos_ACClassTaskValue
+    private ObservableHashSet<ACClassTaskValuePos> _ACClassTaskValuePos_ACClassTaskValue;
+    public virtual ObservableHashSet<ACClassTaskValuePos> ACClassTaskValuePos_ACClassTaskValue
     {
         get => LazyLoader.Load(this, ref _ACClassTaskValuePos_ACClassTaskValue);
         set => _ACClassTaskValuePos_ACClassTaskValue = value;

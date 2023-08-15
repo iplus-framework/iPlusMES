@@ -76,8 +76,8 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosFacilityLot
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosFacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot);
         set => _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot = value;
@@ -96,8 +96,8 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPosFacilityLot); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_ProdOrderPartslistPosFacilityLot;
-    public virtual ICollection<FacilityBooking> FacilityBooking_ProdOrderPartslistPosFacilityLot
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_ProdOrderPartslistPosFacilityLot;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_ProdOrderPartslistPosFacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPosFacilityLot);
         set => _FacilityBooking_ProdOrderPartslistPosFacilityLot = value;

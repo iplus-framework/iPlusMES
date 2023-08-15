@@ -216,8 +216,8 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
                 relName = targetType+"_"+pkIdName;
             }
 #>
-    private ICollection<<#= targetType #>> _<#= relName #>;
-    public virtual ICollection<<#= targetType #>> <#= relName #>
+    private ObservableHashSet<<#= targetType #>> _<#= relName #>;
+    public virtual ObservableHashSet<<#= targetType #>> <#= relName #>
     {
         get => LazyLoader.Load(this, ref _<#= relName #>);
         set => _<#= relName #> = value;
@@ -296,8 +296,8 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
             }
         }
 #>
-    private ICollection<<#= skipNavigation.TargetEntityType.Name #>> _<#= skipNavigation.Name #>;
-    public virtual ICollection<<#= skipNavigation.TargetEntityType.Name #>> <#= skipNavigation.Name #>
+    private ObservableHashSet<<#= skipNavigation.TargetEntityType.Name #>> _<#= skipNavigation.Name #>;
+    public virtual ObservableHashSet<<#= skipNavigation.TargetEntityType.Name #>> <#= skipNavigation.Name #>
     {
         get => LazyLoader.Load(this, ref _<#= skipNavigation.Name #>);
         set => _<#= skipNavigation.Name #> = value;

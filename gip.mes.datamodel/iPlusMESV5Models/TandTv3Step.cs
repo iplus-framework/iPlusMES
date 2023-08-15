@@ -68,8 +68,8 @@ public partial class TandTv3Step : VBEntityObject
         get { return Context.Entry(this).Reference("TandTv3FilterTracking"); }
     }
     
-    private ICollection<TandTv3MixPoint> _TandTv3MixPoint_TandTv3Step;
-    public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_TandTv3Step
+    private ObservableHashSet<TandTv3MixPoint> _TandTv3MixPoint_TandTv3Step;
+    public virtual ObservableHashSet<TandTv3MixPoint> TandTv3MixPoint_TandTv3Step
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPoint_TandTv3Step);
         set => _TandTv3MixPoint_TandTv3Step = value;

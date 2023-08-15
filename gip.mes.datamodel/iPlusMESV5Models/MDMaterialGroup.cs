@@ -104,8 +104,8 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<MDCountrySalesTaxMDMaterialGroup> _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup;
-    public virtual ICollection<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
+    private ObservableHashSet<MDCountrySalesTaxMDMaterialGroup> _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup;
+    public virtual ObservableHashSet<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
     {
         get => LazyLoader.Load(this, ref _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup);
         set => _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup = value;
@@ -124,8 +124,8 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup); }
     }
 
-    private ICollection<Material> _Material_MDMaterialGroup;
-    public virtual ICollection<Material> Material_MDMaterialGroup
+    private ObservableHashSet<Material> _Material_MDMaterialGroup;
+    public virtual ObservableHashSet<Material> Material_MDMaterialGroup
     {
         get => LazyLoader.Load(this, ref _Material_MDMaterialGroup);
         set => _Material_MDMaterialGroup = value;

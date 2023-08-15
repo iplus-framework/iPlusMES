@@ -167,8 +167,8 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _TrailerFacilityID, value); }
     }
 
-    private ICollection<DeliveryNote> _DeliveryNote_VisitorVoucher;
-    public virtual ICollection<DeliveryNote> DeliveryNote_VisitorVoucher
+    private ObservableHashSet<DeliveryNote> _DeliveryNote_VisitorVoucher;
+    public virtual ObservableHashSet<DeliveryNote> DeliveryNote_VisitorVoucher
     {
         get => LazyLoader.Load(this, ref _DeliveryNote_VisitorVoucher);
         set => _DeliveryNote_VisitorVoucher = value;
@@ -227,8 +227,8 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDVisitorVoucherState"); }
     }
     
-    private ICollection<Picking> _Picking_VisitorVoucher;
-    public virtual ICollection<Picking> Picking_VisitorVoucher
+    private ObservableHashSet<Picking> _Picking_VisitorVoucher;
+    public virtual ObservableHashSet<Picking> Picking_VisitorVoucher
     {
         get => LazyLoader.Load(this, ref _Picking_VisitorVoucher);
         set => _Picking_VisitorVoucher = value;
@@ -247,8 +247,8 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Picking_VisitorVoucher); }
     }
 
-    private ICollection<Tourplan> _Tourplan_VisitorVoucher;
-    public virtual ICollection<Tourplan> Tourplan_VisitorVoucher
+    private ObservableHashSet<Tourplan> _Tourplan_VisitorVoucher;
+    public virtual ObservableHashSet<Tourplan> Tourplan_VisitorVoucher
     {
         get => LazyLoader.Load(this, ref _Tourplan_VisitorVoucher);
         set => _Tourplan_VisitorVoucher = value;

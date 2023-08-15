@@ -97,8 +97,8 @@ public partial class MDInvoiceType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<Invoice> _Invoice_MDInvoiceType;
-    public virtual ICollection<Invoice> Invoice_MDInvoiceType
+    private ObservableHashSet<Invoice> _Invoice_MDInvoiceType;
+    public virtual ObservableHashSet<Invoice> Invoice_MDInvoiceType
     {
         get => LazyLoader.Load(this, ref _Invoice_MDInvoiceType);
         set => _Invoice_MDInvoiceType = value;

@@ -97,8 +97,8 @@ public partial class MDDelivNoteState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<DeliveryNote> _DeliveryNote_MDDelivNoteState;
-    public virtual ICollection<DeliveryNote> DeliveryNote_MDDelivNoteState
+    private ObservableHashSet<DeliveryNote> _DeliveryNote_MDDelivNoteState;
+    public virtual ObservableHashSet<DeliveryNote> DeliveryNote_MDDelivNoteState
     {
         get => LazyLoader.Load(this, ref _DeliveryNote_MDDelivNoteState);
         set => _DeliveryNote_MDDelivNoteState = value;

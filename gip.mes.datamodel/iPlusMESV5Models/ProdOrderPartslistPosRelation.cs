@@ -125,8 +125,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         set { SetProperty<bool?>(ref _Anterograde, value); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_ProdOrderPartslistPosRelation;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosRelation
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_ProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPosRelation);
         set => _FacilityBookingCharge_ProdOrderPartslistPosRelation = value;
@@ -145,8 +145,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_ProdOrderPartslistPosRelation;
-    public virtual ICollection<FacilityBooking> FacilityBooking_ProdOrderPartslistPosRelation
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_ProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_ProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPosRelation);
         set => _FacilityBooking_ProdOrderPartslistPosRelation = value;
@@ -165,8 +165,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_ProdOrderPartslistPosRelation); }
     }
 
-    private ICollection<FacilityPreBooking> _FacilityPreBooking_ProdOrderPartslistPosRelation;
-    public virtual ICollection<FacilityPreBooking> FacilityPreBooking_ProdOrderPartslistPosRelation
+    private ObservableHashSet<FacilityPreBooking> _FacilityPreBooking_ProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<FacilityPreBooking> FacilityPreBooking_ProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _FacilityPreBooking_ProdOrderPartslistPosRelation);
         set => _FacilityPreBooking_ProdOrderPartslistPosRelation = value;
@@ -185,8 +185,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_ProdOrderPartslistPosRelation); }
     }
 
-    private ICollection<FacilityReservation> _FacilityReservation_ProdOrderPartslistPosRelation;
-    public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderPartslistPosRelation
+    private ObservableHashSet<FacilityReservation> _FacilityReservation_ProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_ProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_ProdOrderPartslistPosRelation);
         set => _FacilityReservation_ProdOrderPartslistPosRelation = value;
@@ -205,8 +205,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_ProdOrderPartslistPosRelation); }
     }
 
-    private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation;
-    public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation
+    private ObservableHashSet<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation);
         set => _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation = value;
@@ -265,8 +265,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         get { return Context.Entry(this).Reference("MDToleranceState"); }
     }
     
-    private ICollection<OrderLog> _OrderLog_ProdOrderPartslistPosRelation;
-    public virtual ICollection<OrderLog> OrderLog_ProdOrderPartslistPosRelation
+    private ObservableHashSet<OrderLog> _OrderLog_ProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<OrderLog> OrderLog_ProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _OrderLog_ProdOrderPartslistPosRelation);
         set => _OrderLog_ProdOrderPartslistPosRelation = value;
@@ -345,8 +345,8 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         get { return Context.Entry(this).Reference("SourceProdOrderPartslistPos"); }
     }
     
-    private ICollection<TandTv3MixPointProdOrderPartslistPosRelation> _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation;
-    public virtual ICollection<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation
+    private ObservableHashSet<TandTv3MixPointProdOrderPartslistPosRelation> _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation;
+    public virtual ObservableHashSet<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation);
         set => _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation = value;

@@ -97,8 +97,8 @@ public partial class MDOutOrderPosState : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_MDOutOrderPosState;
-    public virtual ICollection<OutOrderPos> OutOrderPos_MDOutOrderPosState
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDOutOrderPosState;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDOutOrderPosState
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDOutOrderPosState);
         set => _OutOrderPos_MDOutOrderPosState = value;

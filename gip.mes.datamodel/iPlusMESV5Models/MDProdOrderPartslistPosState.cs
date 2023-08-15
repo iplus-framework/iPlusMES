@@ -97,8 +97,8 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDProdOrderPartslistPosState;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDProdOrderPartslistPosState
+    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDProdOrderPartslistPosState;
+    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_MDProdOrderPartslistPosState
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDProdOrderPartslistPosState);
         set => _ProdOrderPartslistPos_MDProdOrderPartslistPosState = value;
@@ -117,8 +117,8 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDProdOrderPartslistPosState); }
     }
 
-    private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState;
-    public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState
+    private ObservableHashSet<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState;
+    public virtual ObservableHashSet<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState);
         set => _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState = value;

@@ -130,8 +130,8 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDProdOrderState"); }
     }
     
-    private ICollection<PlanningMRProposal> _PlanningMRProposal_ProdOrder;
-    public virtual ICollection<PlanningMRProposal> PlanningMRProposal_ProdOrder
+    private ObservableHashSet<PlanningMRProposal> _PlanningMRProposal_ProdOrder;
+    public virtual ObservableHashSet<PlanningMRProposal> PlanningMRProposal_ProdOrder
     {
         get => LazyLoader.Load(this, ref _PlanningMRProposal_ProdOrder);
         set => _PlanningMRProposal_ProdOrder = value;
@@ -150,8 +150,8 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PlanningMRProposal_ProdOrder); }
     }
 
-    private ICollection<ProdOrderPartslist> _ProdOrderPartslist_ProdOrder;
-    public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_ProdOrder
+    private ObservableHashSet<ProdOrderPartslist> _ProdOrderPartslist_ProdOrder;
+    public virtual ObservableHashSet<ProdOrderPartslist> ProdOrderPartslist_ProdOrder
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslist_ProdOrder);
         set => _ProdOrderPartslist_ProdOrder = value;

@@ -118,8 +118,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<ACChangeLog> _ACChangeLog_VBUser;
-    public virtual ICollection<ACChangeLog> ACChangeLog_VBUser
+    private ObservableHashSet<ACChangeLog> _ACChangeLog_VBUser;
+    public virtual ObservableHashSet<ACChangeLog> ACChangeLog_VBUser
     {
         get => LazyLoader.Load(this, ref _ACChangeLog_VBUser);
         set => _ACChangeLog_VBUser = value;
@@ -138,8 +138,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACChangeLog_VBUser); }
     }
 
-    private ICollection<ACClassTaskValue> _ACClassTaskValue_VBUser;
-    public virtual ICollection<ACClassTaskValue> ACClassTaskValue_VBUser
+    private ObservableHashSet<ACClassTaskValue> _ACClassTaskValue_VBUser;
+    public virtual ObservableHashSet<ACClassTaskValue> ACClassTaskValue_VBUser
     {
         get => LazyLoader.Load(this, ref _ACClassTaskValue_VBUser);
         set => _ACClassTaskValue_VBUser = value;
@@ -158,8 +158,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassTaskValue_VBUser); }
     }
 
-    private ICollection<Company> _Company_VBUser;
-    public virtual ICollection<Company> Company_VBUser
+    private ObservableHashSet<Company> _Company_VBUser;
+    public virtual ObservableHashSet<Company> Company_VBUser
     {
         get => LazyLoader.Load(this, ref _Company_VBUser);
         set => _Company_VBUser = value;
@@ -178,8 +178,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Company_VBUser); }
     }
 
-    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_VBUser;
-    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBUser
+    private ObservableHashSet<MaintOrderAssignment> _MaintOrderAssignment_VBUser;
+    public virtual ObservableHashSet<MaintOrderAssignment> MaintOrderAssignment_VBUser
     {
         get => LazyLoader.Load(this, ref _MaintOrderAssignment_VBUser);
         set => _MaintOrderAssignment_VBUser = value;
@@ -218,8 +218,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MenuACClassDesign"); }
     }
     
-    private ICollection<UserSettings> _UserSettings_VBUser;
-    public virtual ICollection<UserSettings> UserSettings_VBUser
+    private ObservableHashSet<UserSettings> _UserSettings_VBUser;
+    public virtual ObservableHashSet<UserSettings> UserSettings_VBUser
     {
         get => LazyLoader.Load(this, ref _UserSettings_VBUser);
         set => _UserSettings_VBUser = value;
@@ -258,8 +258,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("VBLanguage"); }
     }
     
-    private ICollection<VBUserACClassDesign> _VBUserACClassDesign_VBUser;
-    public virtual ICollection<VBUserACClassDesign> VBUserACClassDesign_VBUser
+    private ObservableHashSet<VBUserACClassDesign> _VBUserACClassDesign_VBUser;
+    public virtual ObservableHashSet<VBUserACClassDesign> VBUserACClassDesign_VBUser
     {
         get => LazyLoader.Load(this, ref _VBUserACClassDesign_VBUser);
         set => _VBUserACClassDesign_VBUser = value;
@@ -278,8 +278,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VBUserACClassDesign_VBUser); }
     }
 
-    private ICollection<VBUserACProject> _VBUserACProject_VBUser;
-    public virtual ICollection<VBUserACProject> VBUserACProject_VBUser
+    private ObservableHashSet<VBUserACProject> _VBUserACProject_VBUser;
+    public virtual ObservableHashSet<VBUserACProject> VBUserACProject_VBUser
     {
         get => LazyLoader.Load(this, ref _VBUserACProject_VBUser);
         set => _VBUserACProject_VBUser = value;
@@ -298,8 +298,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VBUserACProject_VBUser); }
     }
 
-    private ICollection<VBUserGroup> _VBUserGroup_VBUser;
-    public virtual ICollection<VBUserGroup> VBUserGroup_VBUser
+    private ObservableHashSet<VBUserGroup> _VBUserGroup_VBUser;
+    public virtual ObservableHashSet<VBUserGroup> VBUserGroup_VBUser
     {
         get => LazyLoader.Load(this, ref _VBUserGroup_VBUser);
         set => _VBUserGroup_VBUser = value;
@@ -318,8 +318,8 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VBUserGroup_VBUser); }
     }
 
-    private ICollection<VBUserInstance> _VBUserInstance_VBUser;
-    public virtual ICollection<VBUserInstance> VBUserInstance_VBUser
+    private ObservableHashSet<VBUserInstance> _VBUserInstance_VBUser;
+    public virtual ObservableHashSet<VBUserInstance> VBUserInstance_VBUser
     {
         get => LazyLoader.Load(this, ref _VBUserInstance_VBUser);
         set => _VBUserInstance_VBUser = value;

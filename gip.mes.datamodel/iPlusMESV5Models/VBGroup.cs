@@ -69,8 +69,8 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_VBGroup;
-    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBGroup
+    private ObservableHashSet<MaintOrderAssignment> _MaintOrderAssignment_VBGroup;
+    public virtual ObservableHashSet<MaintOrderAssignment> MaintOrderAssignment_VBGroup
     {
         get => LazyLoader.Load(this, ref _MaintOrderAssignment_VBGroup);
         set => _MaintOrderAssignment_VBGroup = value;
@@ -89,8 +89,8 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_VBGroup); }
     }
 
-    private ICollection<VBGroupRight> _VBGroupRight_VBGroup;
-    public virtual ICollection<VBGroupRight> VBGroupRight_VBGroup
+    private ObservableHashSet<VBGroupRight> _VBGroupRight_VBGroup;
+    public virtual ObservableHashSet<VBGroupRight> VBGroupRight_VBGroup
     {
         get => LazyLoader.Load(this, ref _VBGroupRight_VBGroup);
         set => _VBGroupRight_VBGroup = value;
@@ -109,8 +109,8 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.VBGroupRight_VBGroup); }
     }
 
-    private ICollection<VBUserGroup> _VBUserGroup_VBGroup;
-    public virtual ICollection<VBUserGroup> VBUserGroup_VBGroup
+    private ObservableHashSet<VBUserGroup> _VBUserGroup_VBGroup;
+    public virtual ObservableHashSet<VBUserGroup> VBUserGroup_VBGroup
     {
         get => LazyLoader.Load(this, ref _VBUserGroup_VBGroup);
         set => _VBUserGroup_VBGroup = value;

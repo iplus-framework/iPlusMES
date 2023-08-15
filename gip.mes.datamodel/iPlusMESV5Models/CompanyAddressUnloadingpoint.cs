@@ -110,8 +110,8 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
         get { return Context.Entry(this).Reference("CompanyAddress"); }
     }
     
-    private ICollection<OutOrderPos> _OutOrderPos_CompanyAddressUnloadingpoint;
-    public virtual ICollection<OutOrderPos> OutOrderPos_CompanyAddressUnloadingpoint
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_CompanyAddressUnloadingpoint;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_CompanyAddressUnloadingpoint
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_CompanyAddressUnloadingpoint);
         set => _OutOrderPos_CompanyAddressUnloadingpoint = value;
@@ -130,8 +130,8 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_CompanyAddressUnloadingpoint); }
     }
 
-    private ICollection<TourplanPos> _TourplanPos_CompanyAddressUnloadingpoint;
-    public virtual ICollection<TourplanPos> TourplanPos_CompanyAddressUnloadingpoint
+    private ObservableHashSet<TourplanPos> _TourplanPos_CompanyAddressUnloadingpoint;
+    public virtual ObservableHashSet<TourplanPos> TourplanPos_CompanyAddressUnloadingpoint
     {
         get => LazyLoader.Load(this, ref _TourplanPos_CompanyAddressUnloadingpoint);
         set => _TourplanPos_CompanyAddressUnloadingpoint = value;

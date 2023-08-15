@@ -97,8 +97,8 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDBookingNotAvailableMode;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDBookingNotAvailableMode
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_MDBookingNotAvailableMode;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_MDBookingNotAvailableMode
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDBookingNotAvailableMode);
         set => _FacilityBookingCharge_MDBookingNotAvailableMode = value;
@@ -117,8 +117,8 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDBookingNotAvailableMode); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_MDBookingNotAvailableMode;
-    public virtual ICollection<FacilityBooking> FacilityBooking_MDBookingNotAvailableMode
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_MDBookingNotAvailableMode;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_MDBookingNotAvailableMode
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_MDBookingNotAvailableMode);
         set => _FacilityBooking_MDBookingNotAvailableMode = value;

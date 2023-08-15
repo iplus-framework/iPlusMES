@@ -180,8 +180,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("ACClassTask"); }
     }
     
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_PickingPos;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_PickingPos
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_PickingPos;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_PickingPos
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_PickingPos);
         set => _FacilityBookingCharge_PickingPos = value;
@@ -200,8 +200,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_PickingPos); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_PickingPos;
-    public virtual ICollection<FacilityBooking> FacilityBooking_PickingPos
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_PickingPos;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_PickingPos
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_PickingPos);
         set => _FacilityBooking_PickingPos = value;
@@ -220,8 +220,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_PickingPos); }
     }
 
-    private ICollection<FacilityPreBooking> _FacilityPreBooking_PickingPos;
-    public virtual ICollection<FacilityPreBooking> FacilityPreBooking_PickingPos
+    private ObservableHashSet<FacilityPreBooking> _FacilityPreBooking_PickingPos;
+    public virtual ObservableHashSet<FacilityPreBooking> FacilityPreBooking_PickingPos
     {
         get => LazyLoader.Load(this, ref _FacilityPreBooking_PickingPos);
         set => _FacilityPreBooking_PickingPos = value;
@@ -300,8 +300,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("MDDelivPosLoadState"); }
     }
     
-    private ICollection<OrderLog> _OrderLog_PickingPos;
-    public virtual ICollection<OrderLog> OrderLog_PickingPos
+    private ObservableHashSet<OrderLog> _OrderLog_PickingPos;
+    public virtual ObservableHashSet<OrderLog> OrderLog_PickingPos
     {
         get => LazyLoader.Load(this, ref _OrderLog_PickingPos);
         set => _OrderLog_PickingPos = value;
@@ -380,8 +380,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("PickingMaterial"); }
     }
     
-    private ICollection<PickingPosProdOrderPartslistPos> _PickingPosProdOrderPartslistPos_PickingPos;
-    public virtual ICollection<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos_PickingPos
+    private ObservableHashSet<PickingPosProdOrderPartslistPos> _PickingPosProdOrderPartslistPos_PickingPos;
+    public virtual ObservableHashSet<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos_PickingPos
     {
         get => LazyLoader.Load(this, ref _PickingPosProdOrderPartslistPos_PickingPos);
         set => _PickingPosProdOrderPartslistPos_PickingPos = value;
@@ -400,8 +400,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Collection(c => c.PickingPosProdOrderPartslistPos_PickingPos); }
     }
 
-    private ICollection<TandTv3MixPointPickingPos> _TandTv3MixPointPickingPos_PickingPos;
-    public virtual ICollection<TandTv3MixPointPickingPos> TandTv3MixPointPickingPos_PickingPos
+    private ObservableHashSet<TandTv3MixPointPickingPos> _TandTv3MixPointPickingPos_PickingPos;
+    public virtual ObservableHashSet<TandTv3MixPointPickingPos> TandTv3MixPointPickingPos_PickingPos
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointPickingPos_PickingPos);
         set => _TandTv3MixPointPickingPos_PickingPos = value;
@@ -440,8 +440,8 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("ToFacility"); }
     }
     
-    private ICollection<Weighing> _Weighing_PickingPos;
-    public virtual ICollection<Weighing> Weighing_PickingPos
+    private ObservableHashSet<Weighing> _Weighing_PickingPos;
+    public virtual ObservableHashSet<Weighing> Weighing_PickingPos
     {
         get => LazyLoader.Load(this, ref _Weighing_PickingPos);
         set => _Weighing_PickingPos = value;

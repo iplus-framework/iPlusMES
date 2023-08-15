@@ -1095,8 +1095,8 @@ public partial class FacilityBookingCharge : VBEntityObject
         get { return Context.Entry(this).Reference("ProdOrderPartslistPosRelation"); }
     }
     
-    private ICollection<TandTv3MixPointFacilityBookingCharge> _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge;
-    public virtual ICollection<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge
+    private ObservableHashSet<TandTv3MixPointFacilityBookingCharge> _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge;
+    public virtual ObservableHashSet<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge);
         set => _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge = value;

@@ -144,8 +144,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Reference("InOrderPos"); }
     }
     
-    private ICollection<OrderLog> _OrderLog_DeliveryNotePos;
-    public virtual ICollection<OrderLog> OrderLog_DeliveryNotePos
+    private ObservableHashSet<OrderLog> _OrderLog_DeliveryNotePos;
+    public virtual ObservableHashSet<OrderLog> OrderLog_DeliveryNotePos
     {
         get => LazyLoader.Load(this, ref _OrderLog_DeliveryNotePos);
         set => _OrderLog_DeliveryNotePos = value;
@@ -184,8 +184,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Reference("OutOrderPos"); }
     }
     
-    private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_DeliveryNotePos;
-    public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos
+    private ObservableHashSet<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_DeliveryNotePos;
+    public virtual ObservableHashSet<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePos_DeliveryNotePos);
         set => _TandTv3MixPointDeliveryNotePos_DeliveryNotePos = value;

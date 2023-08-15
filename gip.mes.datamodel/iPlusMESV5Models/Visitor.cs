@@ -286,8 +286,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("VisitorCompanyPerson"); }
     }
     
-    private ICollection<VisitorVoucher> _VisitorVoucher_Visitor;
-    public virtual ICollection<VisitorVoucher> VisitorVoucher_Visitor
+    private ObservableHashSet<VisitorVoucher> _VisitorVoucher_Visitor;
+    public virtual ObservableHashSet<VisitorVoucher> VisitorVoucher_Visitor
     {
         get => LazyLoader.Load(this, ref _VisitorVoucher_Visitor);
         set => _VisitorVoucher_Visitor = value;

@@ -139,8 +139,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<OutOfferConfig> _OutOfferConfig_ParentOutOfferConfig;
-    public virtual ICollection<OutOfferConfig> OutOfferConfig_ParentOutOfferConfig
+    private ObservableHashSet<OutOfferConfig> _OutOfferConfig_ParentOutOfferConfig;
+    public virtual ObservableHashSet<OutOfferConfig> OutOfferConfig_ParentOutOfferConfig
     {
         get => LazyLoader.Load(this, ref _OutOfferConfig_ParentOutOfferConfig);
         set => _OutOfferConfig_ParentOutOfferConfig = value;

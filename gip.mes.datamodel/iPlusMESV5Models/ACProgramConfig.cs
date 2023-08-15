@@ -192,8 +192,8 @@ public partial class ACProgramConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACProgram"); }
     }
     
-    private ICollection<ACProgramConfig> _ACProgramConfig_ParentACProgramConfig;
-    public virtual ICollection<ACProgramConfig> ACProgramConfig_ParentACProgramConfig
+    private ObservableHashSet<ACProgramConfig> _ACProgramConfig_ParentACProgramConfig;
+    public virtual ObservableHashSet<ACProgramConfig> ACProgramConfig_ParentACProgramConfig
     {
         get => LazyLoader.Load(this, ref _ACProgramConfig_ParentACProgramConfig);
         set => _ACProgramConfig_ParentACProgramConfig = value;

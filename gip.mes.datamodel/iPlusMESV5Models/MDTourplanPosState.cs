@@ -97,8 +97,8 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_MDTourplanPosState;
-    public virtual ICollection<OutOrderPos> OutOrderPos_MDTourplanPosState
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDTourplanPosState;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDTourplanPosState
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDTourplanPosState);
         set => _OutOrderPos_MDTourplanPosState = value;
@@ -117,8 +117,8 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTourplanPosState); }
     }
 
-    private ICollection<TourplanPos> _TourplanPos_MDTourplanPosState;
-    public virtual ICollection<TourplanPos> TourplanPos_MDTourplanPosState
+    private ObservableHashSet<TourplanPos> _TourplanPos_MDTourplanPosState;
+    public virtual ObservableHashSet<TourplanPos> TourplanPos_MDTourplanPosState
     {
         get => LazyLoader.Load(this, ref _TourplanPos_MDTourplanPosState);
         set => _TourplanPos_MDTourplanPosState = value;

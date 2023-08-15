@@ -97,8 +97,8 @@ public partial class MDInOrderPosState : VBEntityObject, IInsertInfo, IUpdateInf
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<InOrderPos> _InOrderPos_MDInOrderPosState;
-    public virtual ICollection<InOrderPos> InOrderPos_MDInOrderPosState
+    private ObservableHashSet<InOrderPos> _InOrderPos_MDInOrderPosState;
+    public virtual ObservableHashSet<InOrderPos> InOrderPos_MDInOrderPosState
     {
         get => LazyLoader.Load(this, ref _InOrderPos_MDInOrderPosState);
         set => _InOrderPos_MDInOrderPosState = value;

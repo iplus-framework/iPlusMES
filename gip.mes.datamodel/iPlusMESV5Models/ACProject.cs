@@ -153,8 +153,8 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<ACClass> _ACClass_ACProject;
-    public virtual ICollection<ACClass> ACClass_ACProject
+    private ObservableHashSet<ACClass> _ACClass_ACProject;
+    public virtual ObservableHashSet<ACClass> ACClass_ACProject
     {
         get => LazyLoader.Load(this, ref _ACClass_ACProject);
         set => _ACClass_ACProject = value;
@@ -193,8 +193,8 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACProject1_BasedOnACProject"); }
     }
     
-    private ICollection<CalendarShift> _CalendarShift_VBiACProject;
-    public virtual ICollection<CalendarShift> CalendarShift_VBiACProject
+    private ObservableHashSet<CalendarShift> _CalendarShift_VBiACProject;
+    public virtual ObservableHashSet<CalendarShift> CalendarShift_VBiACProject
     {
         get => LazyLoader.Load(this, ref _CalendarShift_VBiACProject);
         set => _CalendarShift_VBiACProject = value;
@@ -213,8 +213,8 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CalendarShift_VBiACProject); }
     }
 
-    private ICollection<ACProject> _ACProject_BasedOnACProject;
-    public virtual ICollection<ACProject> ACProject_BasedOnACProject
+    private ObservableHashSet<ACProject> _ACProject_BasedOnACProject;
+    public virtual ObservableHashSet<ACProject> ACProject_BasedOnACProject
     {
         get => LazyLoader.Load(this, ref _ACProject_BasedOnACProject);
         set => _ACProject_BasedOnACProject = value;
@@ -253,8 +253,8 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("PAAppClassAssignmentACClass"); }
     }
     
-    private ICollection<VBUserACProject> _VBUserACProject_ACProject;
-    public virtual ICollection<VBUserACProject> VBUserACProject_ACProject
+    private ObservableHashSet<VBUserACProject> _VBUserACProject_ACProject;
+    public virtual ObservableHashSet<VBUserACProject> VBUserACProject_ACProject
     {
         get => LazyLoader.Load(this, ref _VBUserACProject_ACProject);
         set => _VBUserACProject_ACProject = value;

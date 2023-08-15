@@ -97,8 +97,8 @@ public partial class MDVisitorCardState : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<MDVisitorCard> _MDVisitorCard_MDVisitorCardState;
-    public virtual ICollection<MDVisitorCard> MDVisitorCard_MDVisitorCardState
+    private ObservableHashSet<MDVisitorCard> _MDVisitorCard_MDVisitorCardState;
+    public virtual ObservableHashSet<MDVisitorCard> MDVisitorCard_MDVisitorCardState
     {
         get => LazyLoader.Load(this, ref _MDVisitorCard_MDVisitorCardState);
         set => _MDVisitorCard_MDVisitorCardState = value;

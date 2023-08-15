@@ -146,8 +146,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
         set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
     }
 
-    private ICollection<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig;
-    public virtual ICollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_ParentProdOrderPartslistConfig
+    private ObservableHashSet<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig;
+    public virtual ObservableHashSet<ProdOrderPartslistConfig> ProdOrderPartslistConfig_ParentProdOrderPartslistConfig
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig);
         set => _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig = value;

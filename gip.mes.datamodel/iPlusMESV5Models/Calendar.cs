@@ -69,8 +69,8 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _InsertName, value); }
     }
 
-    private ICollection<CalendarHoliday> _CalendarHoliday_Calendar;
-    public virtual ICollection<CalendarHoliday> CalendarHoliday_Calendar
+    private ObservableHashSet<CalendarHoliday> _CalendarHoliday_Calendar;
+    public virtual ObservableHashSet<CalendarHoliday> CalendarHoliday_Calendar
     {
         get => LazyLoader.Load(this, ref _CalendarHoliday_Calendar);
         set => _CalendarHoliday_Calendar = value;
@@ -89,8 +89,8 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CalendarHoliday_Calendar); }
     }
 
-    private ICollection<CalendarShift> _CalendarShift_Calendar;
-    public virtual ICollection<CalendarShift> CalendarShift_Calendar
+    private ObservableHashSet<CalendarShift> _CalendarShift_Calendar;
+    public virtual ObservableHashSet<CalendarShift> CalendarShift_Calendar
     {
         get => LazyLoader.Load(this, ref _CalendarShift_Calendar);
         set => _CalendarShift_Calendar = value;
@@ -109,8 +109,8 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CalendarShift_Calendar); }
     }
 
-    private ICollection<DemandPrimary> _DemandPrimary_Calendar;
-    public virtual ICollection<DemandPrimary> DemandPrimary_Calendar
+    private ObservableHashSet<DemandPrimary> _DemandPrimary_Calendar;
+    public virtual ObservableHashSet<DemandPrimary> DemandPrimary_Calendar
     {
         get => LazyLoader.Load(this, ref _DemandPrimary_Calendar);
         set => _DemandPrimary_Calendar = value;

@@ -97,8 +97,8 @@ public partial class MDInventoryManagementType : VBEntityObject, IInsertInfo, IU
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<Material> _Material_MDInventoryManagementType;
-    public virtual ICollection<Material> Material_MDInventoryManagementType
+    private ObservableHashSet<Material> _Material_MDInventoryManagementType;
+    public virtual ObservableHashSet<Material> Material_MDInventoryManagementType
     {
         get => LazyLoader.Load(this, ref _Material_MDInventoryManagementType);
         set => _Material_MDInventoryManagementType = value;

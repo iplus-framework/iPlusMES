@@ -159,8 +159,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("InRequest"); }
     }
     
-    private ICollection<InRequestConfig> _InRequestConfig_ParentInRequestConfig;
-    public virtual ICollection<InRequestConfig> InRequestConfig_ParentInRequestConfig
+    private ObservableHashSet<InRequestConfig> _InRequestConfig_ParentInRequestConfig;
+    public virtual ObservableHashSet<InRequestConfig> InRequestConfig_ParentInRequestConfig
     {
         get => LazyLoader.Load(this, ref _InRequestConfig_ParentInRequestConfig);
         set => _InRequestConfig_ParentInRequestConfig = value;

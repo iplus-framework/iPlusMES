@@ -111,8 +111,8 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<CalendarHoliday> _CalendarHoliday_MDCountry;
-    public virtual ICollection<CalendarHoliday> CalendarHoliday_MDCountry
+    private ObservableHashSet<CalendarHoliday> _CalendarHoliday_MDCountry;
+    public virtual ObservableHashSet<CalendarHoliday> CalendarHoliday_MDCountry
     {
         get => LazyLoader.Load(this, ref _CalendarHoliday_MDCountry);
         set => _CalendarHoliday_MDCountry = value;
@@ -131,8 +131,8 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         get { return Context.Entry(this).Collection(c => c.CalendarHoliday_MDCountry); }
     }
 
-    private ICollection<CompanyAddress> _CompanyAddress_MDCountry;
-    public virtual ICollection<CompanyAddress> CompanyAddress_MDCountry
+    private ObservableHashSet<CompanyAddress> _CompanyAddress_MDCountry;
+    public virtual ObservableHashSet<CompanyAddress> CompanyAddress_MDCountry
     {
         get => LazyLoader.Load(this, ref _CompanyAddress_MDCountry);
         set => _CompanyAddress_MDCountry = value;
@@ -151,8 +151,8 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_MDCountry); }
     }
 
-    private ICollection<CompanyPerson> _CompanyPerson_MDCountry;
-    public virtual ICollection<CompanyPerson> CompanyPerson_MDCountry
+    private ObservableHashSet<CompanyPerson> _CompanyPerson_MDCountry;
+    public virtual ObservableHashSet<CompanyPerson> CompanyPerson_MDCountry
     {
         get => LazyLoader.Load(this, ref _CompanyPerson_MDCountry);
         set => _CompanyPerson_MDCountry = value;
@@ -171,8 +171,8 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_MDCountry); }
     }
 
-    private ICollection<MDCountryLand> _MDCountryLand_MDCountry;
-    public virtual ICollection<MDCountryLand> MDCountryLand_MDCountry
+    private ObservableHashSet<MDCountryLand> _MDCountryLand_MDCountry;
+    public virtual ObservableHashSet<MDCountryLand> MDCountryLand_MDCountry
     {
         get => LazyLoader.Load(this, ref _MDCountryLand_MDCountry);
         set => _MDCountryLand_MDCountry = value;
@@ -191,8 +191,8 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         get { return Context.Entry(this).Collection(c => c.MDCountryLand_MDCountry); }
     }
 
-    private ICollection<MDCountrySalesTax> _MDCountrySalesTax_MDCountry;
-    public virtual ICollection<MDCountrySalesTax> MDCountrySalesTax_MDCountry
+    private ObservableHashSet<MDCountrySalesTax> _MDCountrySalesTax_MDCountry;
+    public virtual ObservableHashSet<MDCountrySalesTax> MDCountrySalesTax_MDCountry
     {
         get => LazyLoader.Load(this, ref _MDCountrySalesTax_MDCountry);
         set => _MDCountrySalesTax_MDCountry = value;

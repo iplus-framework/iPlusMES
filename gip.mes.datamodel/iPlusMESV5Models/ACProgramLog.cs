@@ -166,8 +166,8 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACProgram"); }
     }
     
-    private ICollection<ACProgramLogTask> _ACProgramLogTask_ACProgramLog;
-    public virtual ICollection<ACProgramLogTask> ACProgramLogTask_ACProgramLog
+    private ObservableHashSet<ACProgramLogTask> _ACProgramLogTask_ACProgramLog;
+    public virtual ObservableHashSet<ACProgramLogTask> ACProgramLogTask_ACProgramLog
     {
         get => LazyLoader.Load(this, ref _ACProgramLogTask_ACProgramLog);
         set => _ACProgramLogTask_ACProgramLog = value;
@@ -186,8 +186,8 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACProgramLogTask_ACProgramLog); }
     }
 
-    private ICollection<ACProgramLog> _ACProgramLog_ParentACProgramLog;
-    public virtual ICollection<ACProgramLog> ACProgramLog_ParentACProgramLog
+    private ObservableHashSet<ACProgramLog> _ACProgramLog_ParentACProgramLog;
+    public virtual ObservableHashSet<ACProgramLog> ACProgramLog_ParentACProgramLog
     {
         get => LazyLoader.Load(this, ref _ACProgramLog_ParentACProgramLog);
         set => _ACProgramLog_ParentACProgramLog = value;
@@ -206,8 +206,8 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACProgramLog_ParentACProgramLog); }
     }
 
-    private ICollection<MsgAlarmLog> _MsgAlarmLog_ACProgramLog;
-    public virtual ICollection<MsgAlarmLog> MsgAlarmLog_ACProgramLog
+    private ObservableHashSet<MsgAlarmLog> _MsgAlarmLog_ACProgramLog;
+    public virtual ObservableHashSet<MsgAlarmLog> MsgAlarmLog_ACProgramLog
     {
         get => LazyLoader.Load(this, ref _MsgAlarmLog_ACProgramLog);
         set => _MsgAlarmLog_ACProgramLog = value;
@@ -226,8 +226,8 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MsgAlarmLog_ACProgramLog); }
     }
 
-    private ICollection<OperationLog> _OperationLog_ACProgramLog;
-    public virtual ICollection<OperationLog> OperationLog_ACProgramLog
+    private ObservableHashSet<OperationLog> _OperationLog_ACProgramLog;
+    public virtual ObservableHashSet<OperationLog> OperationLog_ACProgramLog
     {
         get => LazyLoader.Load(this, ref _OperationLog_ACProgramLog);
         set => _OperationLog_ACProgramLog = value;

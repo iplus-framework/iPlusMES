@@ -179,8 +179,8 @@ public partial class ACClassMethodConfig : VBEntityObject, IInsertInfo, IUpdateI
         get { return Context.Entry(this).Reference("ACClassWF"); }
     }
     
-    private ICollection<ACClassMethodConfig> _ACClassMethodConfig_ParentACClassMethodConfig;
-    public virtual ICollection<ACClassMethodConfig> ACClassMethodConfig_ParentACClassMethodConfig
+    private ObservableHashSet<ACClassMethodConfig> _ACClassMethodConfig_ParentACClassMethodConfig;
+    public virtual ObservableHashSet<ACClassMethodConfig> ACClassMethodConfig_ParentACClassMethodConfig
     {
         get => LazyLoader.Load(this, ref _ACClassMethodConfig_ParentACClassMethodConfig);
         set => _ACClassMethodConfig_ParentACClassMethodConfig = value;

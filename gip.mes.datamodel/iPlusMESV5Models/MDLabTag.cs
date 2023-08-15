@@ -97,8 +97,8 @@ public partial class MDLabTag : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTra
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<LabOrderPos> _LabOrderPos_MDLabTag;
-    public virtual ICollection<LabOrderPos> LabOrderPos_MDLabTag
+    private ObservableHashSet<LabOrderPos> _LabOrderPos_MDLabTag;
+    public virtual ObservableHashSet<LabOrderPos> LabOrderPos_MDLabTag
     {
         get => LazyLoader.Load(this, ref _LabOrderPos_MDLabTag);
         set => _LabOrderPos_MDLabTag = value;

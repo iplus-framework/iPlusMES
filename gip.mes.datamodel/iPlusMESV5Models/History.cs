@@ -90,8 +90,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _Comment, value); }
     }
 
-    private ICollection<CompanyMaterialHistory> _CompanyMaterialHistory_History;
-    public virtual ICollection<CompanyMaterialHistory> CompanyMaterialHistory_History
+    private ObservableHashSet<CompanyMaterialHistory> _CompanyMaterialHistory_History;
+    public virtual ObservableHashSet<CompanyMaterialHistory> CompanyMaterialHistory_History
     {
         get => LazyLoader.Load(this, ref _CompanyMaterialHistory_History);
         set => _CompanyMaterialHistory_History = value;
@@ -110,8 +110,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialHistory_History); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_History;
-    public virtual ICollection<FacilityBooking> FacilityBooking_History
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_History;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_History
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_History);
         set => _FacilityBooking_History = value;
@@ -130,8 +130,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_History); }
     }
 
-    private ICollection<FacilityHistory> _FacilityHistory_History;
-    public virtual ICollection<FacilityHistory> FacilityHistory_History
+    private ObservableHashSet<FacilityHistory> _FacilityHistory_History;
+    public virtual ObservableHashSet<FacilityHistory> FacilityHistory_History
     {
         get => LazyLoader.Load(this, ref _FacilityHistory_History);
         set => _FacilityHistory_History = value;
@@ -150,8 +150,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityHistory_History); }
     }
 
-    private ICollection<HistoryConfig> _HistoryConfig_History;
-    public virtual ICollection<HistoryConfig> HistoryConfig_History
+    private ObservableHashSet<HistoryConfig> _HistoryConfig_History;
+    public virtual ObservableHashSet<HistoryConfig> HistoryConfig_History
     {
         get => LazyLoader.Load(this, ref _HistoryConfig_History);
         set => _HistoryConfig_History = value;
@@ -170,8 +170,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.HistoryConfig_History); }
     }
 
-    private ICollection<MaterialHistory> _MaterialHistory_History;
-    public virtual ICollection<MaterialHistory> MaterialHistory_History
+    private ObservableHashSet<MaterialHistory> _MaterialHistory_History;
+    public virtual ObservableHashSet<MaterialHistory> MaterialHistory_History
     {
         get => LazyLoader.Load(this, ref _MaterialHistory_History);
         set => _MaterialHistory_History = value;

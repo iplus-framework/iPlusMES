@@ -97,8 +97,8 @@ public partial class MDInvoiceState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<Invoice> _Invoice_MDInvoiceState;
-    public virtual ICollection<Invoice> Invoice_MDInvoiceState
+    private ObservableHashSet<Invoice> _Invoice_MDInvoiceState;
+    public virtual ObservableHashSet<Invoice> Invoice_MDInvoiceState
     {
         get => LazyLoader.Load(this, ref _Invoice_MDInvoiceState);
         set => _Invoice_MDInvoiceState = value;

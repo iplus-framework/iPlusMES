@@ -139,8 +139,8 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
     }
 
-    private ICollection<MaterialConfig> _MaterialConfig_ParentMaterialConfig;
-    public virtual ICollection<MaterialConfig> MaterialConfig_ParentMaterialConfig
+    private ObservableHashSet<MaterialConfig> _MaterialConfig_ParentMaterialConfig;
+    public virtual ObservableHashSet<MaterialConfig> MaterialConfig_ParentMaterialConfig
     {
         get => LazyLoader.Load(this, ref _MaterialConfig_ParentMaterialConfig);
         set => _MaterialConfig_ParentMaterialConfig = value;

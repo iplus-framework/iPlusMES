@@ -132,8 +132,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _KeyOfExtSys, value); }
     }
 
-    private ICollection<CompanyMaterial> _CompanyMaterial_MDUnit;
-    public virtual ICollection<CompanyMaterial> CompanyMaterial_MDUnit
+    private ObservableHashSet<CompanyMaterial> _CompanyMaterial_MDUnit;
+    public virtual ObservableHashSet<CompanyMaterial> CompanyMaterial_MDUnit
     {
         get => LazyLoader.Load(this, ref _CompanyMaterial_MDUnit);
         set => _CompanyMaterial_MDUnit = value;
@@ -152,8 +152,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_MDUnit); }
     }
 
-    private ICollection<Facility> _Facility_MDUnit;
-    public virtual ICollection<Facility> Facility_MDUnit
+    private ObservableHashSet<Facility> _Facility_MDUnit;
+    public virtual ObservableHashSet<Facility> Facility_MDUnit
     {
         get => LazyLoader.Load(this, ref _Facility_MDUnit);
         set => _Facility_MDUnit = value;
@@ -172,8 +172,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Facility_MDUnit); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDUnit;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDUnit
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_MDUnit;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_MDUnit
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDUnit);
         set => _FacilityBookingCharge_MDUnit = value;
@@ -192,8 +192,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDUnit); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_MDUnit;
-    public virtual ICollection<FacilityBooking> FacilityBooking_MDUnit
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_MDUnit;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_MDUnit
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_MDUnit);
         set => _FacilityBooking_MDUnit = value;
@@ -212,8 +212,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDUnit); }
     }
 
-    private ICollection<FacilityCharge> _FacilityCharge_MDUnit;
-    public virtual ICollection<FacilityCharge> FacilityCharge_MDUnit
+    private ObservableHashSet<FacilityCharge> _FacilityCharge_MDUnit;
+    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_MDUnit
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_MDUnit);
         set => _FacilityCharge_MDUnit = value;
@@ -232,8 +232,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_MDUnit); }
     }
 
-    private ICollection<InOrderPos> _InOrderPos_MDUnit;
-    public virtual ICollection<InOrderPos> InOrderPos_MDUnit
+    private ObservableHashSet<InOrderPos> _InOrderPos_MDUnit;
+    public virtual ObservableHashSet<InOrderPos> InOrderPos_MDUnit
     {
         get => LazyLoader.Load(this, ref _InOrderPos_MDUnit);
         set => _InOrderPos_MDUnit = value;
@@ -252,8 +252,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDUnit); }
     }
 
-    private ICollection<InRequestPos> _InRequestPos_MDUnit;
-    public virtual ICollection<InRequestPos> InRequestPos_MDUnit
+    private ObservableHashSet<InRequestPos> _InRequestPos_MDUnit;
+    public virtual ObservableHashSet<InRequestPos> InRequestPos_MDUnit
     {
         get => LazyLoader.Load(this, ref _InRequestPos_MDUnit);
         set => _InRequestPos_MDUnit = value;
@@ -272,8 +272,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequestPos_MDUnit); }
     }
 
-    private ICollection<InvoicePos> _InvoicePos_MDUnit;
-    public virtual ICollection<InvoicePos> InvoicePos_MDUnit
+    private ObservableHashSet<InvoicePos> _InvoicePos_MDUnit;
+    public virtual ObservableHashSet<InvoicePos> InvoicePos_MDUnit
     {
         get => LazyLoader.Load(this, ref _InvoicePos_MDUnit);
         set => _InvoicePos_MDUnit = value;
@@ -292,8 +292,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InvoicePos_MDUnit); }
     }
 
-    private ICollection<MDGMPAdditive> _MDGMPAdditive_MDQuantityUnit;
-    public virtual ICollection<MDGMPAdditive> MDGMPAdditive_MDQuantityUnit
+    private ObservableHashSet<MDGMPAdditive> _MDGMPAdditive_MDQuantityUnit;
+    public virtual ObservableHashSet<MDGMPAdditive> MDGMPAdditive_MDQuantityUnit
     {
         get => LazyLoader.Load(this, ref _MDGMPAdditive_MDQuantityUnit);
         set => _MDGMPAdditive_MDQuantityUnit = value;
@@ -312,8 +312,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MDGMPAdditive_MDQuantityUnit); }
     }
 
-    private ICollection<MDUnitConversion> _MDUnitConversion_MDUnit;
-    public virtual ICollection<MDUnitConversion> MDUnitConversion_MDUnit
+    private ObservableHashSet<MDUnitConversion> _MDUnitConversion_MDUnit;
+    public virtual ObservableHashSet<MDUnitConversion> MDUnitConversion_MDUnit
     {
         get => LazyLoader.Load(this, ref _MDUnitConversion_MDUnit);
         set => _MDUnitConversion_MDUnit = value;
@@ -332,8 +332,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MDUnitConversion_MDUnit); }
     }
 
-    private ICollection<MDUnitConversion> _MDUnitConversion_ToMDUnit;
-    public virtual ICollection<MDUnitConversion> MDUnitConversion_ToMDUnit
+    private ObservableHashSet<MDUnitConversion> _MDUnitConversion_ToMDUnit;
+    public virtual ObservableHashSet<MDUnitConversion> MDUnitConversion_ToMDUnit
     {
         get => LazyLoader.Load(this, ref _MDUnitConversion_ToMDUnit);
         set => _MDUnitConversion_ToMDUnit = value;
@@ -352,8 +352,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MDUnitConversion_ToMDUnit); }
     }
 
-    private ICollection<MaterialUnit> _MaterialUnit_ToMDUnit;
-    public virtual ICollection<MaterialUnit> MaterialUnit_ToMDUnit
+    private ObservableHashSet<MaterialUnit> _MaterialUnit_ToMDUnit;
+    public virtual ObservableHashSet<MaterialUnit> MaterialUnit_ToMDUnit
     {
         get => LazyLoader.Load(this, ref _MaterialUnit_ToMDUnit);
         set => _MaterialUnit_ToMDUnit = value;
@@ -372,8 +372,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialUnit_ToMDUnit); }
     }
 
-    private ICollection<Material> _Material_BaseMDUnit;
-    public virtual ICollection<Material> Material_BaseMDUnit
+    private ObservableHashSet<Material> _Material_BaseMDUnit;
+    public virtual ObservableHashSet<Material> Material_BaseMDUnit
     {
         get => LazyLoader.Load(this, ref _Material_BaseMDUnit);
         set => _Material_BaseMDUnit = value;
@@ -392,8 +392,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Material_BaseMDUnit); }
     }
 
-    private ICollection<OutOfferPos> _OutOfferPos_MDUnit;
-    public virtual ICollection<OutOfferPos> OutOfferPos_MDUnit
+    private ObservableHashSet<OutOfferPos> _OutOfferPos_MDUnit;
+    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_MDUnit
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_MDUnit);
         set => _OutOfferPos_MDUnit = value;
@@ -412,8 +412,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDUnit); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_MDUnit;
-    public virtual ICollection<OutOrderPos> OutOrderPos_MDUnit
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDUnit;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDUnit
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDUnit);
         set => _OutOrderPos_MDUnit = value;
@@ -432,8 +432,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDUnit); }
     }
 
-    private ICollection<PartslistPos> _PartslistPos_MDUnit;
-    public virtual ICollection<PartslistPos> PartslistPos_MDUnit
+    private ObservableHashSet<PartslistPos> _PartslistPos_MDUnit;
+    public virtual ObservableHashSet<PartslistPos> PartslistPos_MDUnit
     {
         get => LazyLoader.Load(this, ref _PartslistPos_MDUnit);
         set => _PartslistPos_MDUnit = value;
@@ -452,8 +452,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PartslistPos_MDUnit); }
     }
 
-    private ICollection<Partslist> _Partslist_MDUnit;
-    public virtual ICollection<Partslist> Partslist_MDUnit
+    private ObservableHashSet<Partslist> _Partslist_MDUnit;
+    public virtual ObservableHashSet<Partslist> Partslist_MDUnit
     {
         get => LazyLoader.Load(this, ref _Partslist_MDUnit);
         set => _Partslist_MDUnit = value;
@@ -472,8 +472,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Partslist_MDUnit); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDUnit;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDUnit
+    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDUnit;
+    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_MDUnit
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDUnit);
         set => _ProdOrderPartslistPos_MDUnit = value;

@@ -146,8 +146,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardFacilityLot;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityLot
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_InwardFacilityLot;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityLot);
         set => _FacilityBookingCharge_InwardFacilityLot = value;
@@ -166,8 +166,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardFacilityLot); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardFacilityLot;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityLot
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutwardFacilityLot;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityLot);
         set => _FacilityBookingCharge_OutwardFacilityLot = value;
@@ -186,8 +186,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardFacilityLot); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_InwardFacilityLot;
-    public virtual ICollection<FacilityBooking> FacilityBooking_InwardFacilityLot
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_InwardFacilityLot;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_InwardFacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityLot);
         set => _FacilityBooking_InwardFacilityLot = value;
@@ -206,8 +206,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardFacilityLot); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_OutwardFacilityLot;
-    public virtual ICollection<FacilityBooking> FacilityBooking_OutwardFacilityLot
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_OutwardFacilityLot;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_OutwardFacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityLot);
         set => _FacilityBooking_OutwardFacilityLot = value;
@@ -226,8 +226,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacilityLot); }
     }
 
-    private ICollection<FacilityCharge> _FacilityCharge_FacilityLot;
-    public virtual ICollection<FacilityCharge> FacilityCharge_FacilityLot
+    private ObservableHashSet<FacilityCharge> _FacilityCharge_FacilityLot;
+    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_FacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_FacilityLot);
         set => _FacilityCharge_FacilityLot = value;
@@ -246,8 +246,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_FacilityLot); }
     }
 
-    private ICollection<FacilityLotStock> _FacilityLotStock_FacilityLot;
-    public virtual ICollection<FacilityLotStock> FacilityLotStock_FacilityLot
+    private ObservableHashSet<FacilityLotStock> _FacilityLotStock_FacilityLot;
+    public virtual ObservableHashSet<FacilityLotStock> FacilityLotStock_FacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityLotStock_FacilityLot);
         set => _FacilityLotStock_FacilityLot = value;
@@ -266,8 +266,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityLotStock_FacilityLot); }
     }
 
-    private ICollection<FacilityReservation> _FacilityReservation_FacilityLot;
-    public virtual ICollection<FacilityReservation> FacilityReservation_FacilityLot
+    private ObservableHashSet<FacilityReservation> _FacilityReservation_FacilityLot;
+    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_FacilityLot
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_FacilityLot);
         set => _FacilityReservation_FacilityLot = value;
@@ -286,8 +286,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_FacilityLot); }
     }
 
-    private ICollection<LabOrder> _LabOrder_FacilityLot;
-    public virtual ICollection<LabOrder> LabOrder_FacilityLot
+    private ObservableHashSet<LabOrder> _LabOrder_FacilityLot;
+    public virtual ObservableHashSet<LabOrder> LabOrder_FacilityLot
     {
         get => LazyLoader.Load(this, ref _LabOrder_FacilityLot);
         set => _LabOrder_FacilityLot = value;
@@ -346,8 +346,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_FacilityLot;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_FacilityLot
+    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_FacilityLot;
+    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_FacilityLot
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_FacilityLot);
         set => _ProdOrderPartslistPos_FacilityLot = value;
@@ -366,8 +366,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_FacilityLot); }
     }
 
-    private ICollection<ProdOrderPartslistPosFacilityLot> _ProdOrderPartslistPosFacilityLot_FacilityLot;
-    public virtual ICollection<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot_FacilityLot
+    private ObservableHashSet<ProdOrderPartslistPosFacilityLot> _ProdOrderPartslistPosFacilityLot_FacilityLot;
+    public virtual ObservableHashSet<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot_FacilityLot
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPosFacilityLot_FacilityLot);
         set => _ProdOrderPartslistPosFacilityLot_FacilityLot = value;
@@ -386,8 +386,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosFacilityLot_FacilityLot); }
     }
 
-    private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardLot;
-    public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardLot
+    private ObservableHashSet<TandTv3MixPoint> _TandTv3MixPoint_InwardLot;
+    public virtual ObservableHashSet<TandTv3MixPoint> TandTv3MixPoint_InwardLot
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPoint_InwardLot);
         set => _TandTv3MixPoint_InwardLot = value;
@@ -406,8 +406,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_InwardLot); }
     }
 
-    private ICollection<TandTv3MixPointFacilityLot> _TandTv3MixPointFacilityLot_FacilityLot;
-    public virtual ICollection<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_FacilityLot
+    private ObservableHashSet<TandTv3MixPointFacilityLot> _TandTv3MixPointFacilityLot_FacilityLot;
+    public virtual ObservableHashSet<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_FacilityLot
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointFacilityLot_FacilityLot);
         set => _TandTv3MixPointFacilityLot_FacilityLot = value;

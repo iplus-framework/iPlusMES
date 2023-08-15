@@ -110,8 +110,8 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Reference("Facility"); }
     }
     
-    private ICollection<FacilityInventoryPos> _FacilityInventoryPos_FacilityInventory;
-    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityInventory
+    private ObservableHashSet<FacilityInventoryPos> _FacilityInventoryPos_FacilityInventory;
+    public virtual ObservableHashSet<FacilityInventoryPos> FacilityInventoryPos_FacilityInventory
     {
         get => LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityInventory);
         set => _FacilityInventoryPos_FacilityInventory = value;

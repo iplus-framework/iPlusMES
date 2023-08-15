@@ -263,8 +263,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryCompanyAddress"); }
     }
     
-    private ICollection<DeliveryNotePos> _DeliveryNotePos_DeliveryNote;
-    public virtual ICollection<DeliveryNotePos> DeliveryNotePos_DeliveryNote
+    private ObservableHashSet<DeliveryNotePos> _DeliveryNotePos_DeliveryNote;
+    public virtual ObservableHashSet<DeliveryNotePos> DeliveryNotePos_DeliveryNote
     {
         get => LazyLoader.Load(this, ref _DeliveryNotePos_DeliveryNote);
         set => _DeliveryNotePos_DeliveryNote = value;
@@ -303,8 +303,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDDelivNoteState"); }
     }
     
-    private ICollection<Rating> _Rating_DeliveryNote;
-    public virtual ICollection<Rating> Rating_DeliveryNote
+    private ObservableHashSet<Rating> _Rating_DeliveryNote;
+    public virtual ObservableHashSet<Rating> Rating_DeliveryNote
     {
         get => LazyLoader.Load(this, ref _Rating_DeliveryNote);
         set => _Rating_DeliveryNote = value;

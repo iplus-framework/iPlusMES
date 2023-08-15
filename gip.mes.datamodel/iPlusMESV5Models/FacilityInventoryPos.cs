@@ -118,8 +118,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_FacilityInventoryPos;
-    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_FacilityInventoryPos
+    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_FacilityInventoryPos;
+    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_FacilityInventoryPos
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_FacilityInventoryPos);
         set => _FacilityBookingCharge_FacilityInventoryPos = value;
@@ -138,8 +138,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_FacilityInventoryPos); }
     }
 
-    private ICollection<FacilityBooking> _FacilityBooking_FacilityInventoryPos;
-    public virtual ICollection<FacilityBooking> FacilityBooking_FacilityInventoryPos
+    private ObservableHashSet<FacilityBooking> _FacilityBooking_FacilityInventoryPos;
+    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_FacilityInventoryPos
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_FacilityInventoryPos);
         set => _FacilityBooking_FacilityInventoryPos = value;

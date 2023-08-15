@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using gip.core.processapplication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace gip.mes.facility
 {
@@ -317,7 +318,7 @@ namespace gip.mes.facility
             List<ProdOrderPartslistPos> prodOrderPartsListPosItems = new List<ProdOrderPartslistPos>();
             if (prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist == null)
             {
-                prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist = new List<ProdOrderPartslistPos>();
+                prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist = new ObservableHashSet<ProdOrderPartslistPos>();
             }
             foreach (var pos in partsListPosItems)
             {
@@ -344,7 +345,7 @@ namespace gip.mes.facility
                 {
                     if (prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos == null)
                     {
-                        prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos = new List<ProdOrderPartslistPosRelation>();
+                        prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos = new ObservableHashSet<ProdOrderPartslistPosRelation>();
                     }
                     prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
                     prodOrderPartsListPosRelationItems.Add(prodRelationItem);

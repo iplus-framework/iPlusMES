@@ -146,8 +146,8 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
     }
 
-    private ICollection<OutOrderConfig> _OutOrderConfig_ParentOutOrderConfig;
-    public virtual ICollection<OutOrderConfig> OutOrderConfig_ParentOutOrderConfig
+    private ObservableHashSet<OutOrderConfig> _OutOrderConfig_ParentOutOrderConfig;
+    public virtual ObservableHashSet<OutOrderConfig> OutOrderConfig_ParentOutOrderConfig
     {
         get => LazyLoader.Load(this, ref _OutOrderConfig_ParentOutOrderConfig);
         set => _OutOrderConfig_ParentOutOrderConfig = value;

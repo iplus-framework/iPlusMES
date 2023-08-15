@@ -178,8 +178,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("CompanyAddressUnloadingpoint"); }
     }
     
-    private ICollection<DeliveryNote> _DeliveryNote_TourplanPos;
-    public virtual ICollection<DeliveryNote> DeliveryNote_TourplanPos
+    private ObservableHashSet<DeliveryNote> _DeliveryNote_TourplanPos;
+    public virtual ObservableHashSet<DeliveryNote> DeliveryNote_TourplanPos
     {
         get => LazyLoader.Load(this, ref _DeliveryNote_TourplanPos);
         set => _DeliveryNote_TourplanPos = value;

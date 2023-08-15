@@ -48,8 +48,8 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         set { SetProperty<decimal>(ref _SalesTax, value); }
     }
 
-    private ICollection<InvoicePos> _InvoicePos_MDCountrySalesTaxMaterial;
-    public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTaxMaterial
+    private ObservableHashSet<InvoicePos> _InvoicePos_MDCountrySalesTaxMaterial;
+    public virtual ObservableHashSet<InvoicePos> InvoicePos_MDCountrySalesTaxMaterial
     {
         get => LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTaxMaterial);
         set => _InvoicePos_MDCountrySalesTaxMaterial = value;
@@ -108,8 +108,8 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ICollection<OutOfferPos> _OutOfferPos_MDCountrySalesTaxMaterial;
-    public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTaxMaterial
+    private ObservableHashSet<OutOfferPos> _OutOfferPos_MDCountrySalesTaxMaterial;
+    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_MDCountrySalesTaxMaterial
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTaxMaterial);
         set => _OutOfferPos_MDCountrySalesTaxMaterial = value;
@@ -128,8 +128,8 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTaxMaterial); }
     }
 
-    private ICollection<OutOrderPos> _OutOrderPos_MDCountrySalesTaxMaterial;
-    public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTaxMaterial
+    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDCountrySalesTaxMaterial;
+    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDCountrySalesTaxMaterial
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTaxMaterial);
         set => _OutOrderPos_MDCountrySalesTaxMaterial = value;

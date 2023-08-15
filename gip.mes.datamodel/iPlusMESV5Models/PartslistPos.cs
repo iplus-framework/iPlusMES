@@ -211,8 +211,8 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Reference("PartslistPos1_AlternativePartslistPos"); }
     }
     
-    private ICollection<PartslistPos> _PartslistPos_AlternativePartslistPos;
-    public virtual ICollection<PartslistPos> PartslistPos_AlternativePartslistPos
+    private ObservableHashSet<PartslistPos> _PartslistPos_AlternativePartslistPos;
+    public virtual ObservableHashSet<PartslistPos> PartslistPos_AlternativePartslistPos
     {
         get => LazyLoader.Load(this, ref _PartslistPos_AlternativePartslistPos);
         set => _PartslistPos_AlternativePartslistPos = value;
@@ -231,8 +231,8 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Collection(c => c.PartslistPos_AlternativePartslistPos); }
     }
 
-    private ICollection<PartslistPos> _PartslistPos_ParentPartslistPos;
-    public virtual ICollection<PartslistPos> PartslistPos_ParentPartslistPos
+    private ObservableHashSet<PartslistPos> _PartslistPos_ParentPartslistPos;
+    public virtual ObservableHashSet<PartslistPos> PartslistPos_ParentPartslistPos
     {
         get => LazyLoader.Load(this, ref _PartslistPos_ParentPartslistPos);
         set => _PartslistPos_ParentPartslistPos = value;
@@ -351,8 +351,8 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Reference("Partslist"); }
     }
     
-    private ICollection<PartslistPosRelation> _PartslistPosRelation_SourcePartslistPos;
-    public virtual ICollection<PartslistPosRelation> PartslistPosRelation_SourcePartslistPos
+    private ObservableHashSet<PartslistPosRelation> _PartslistPosRelation_SourcePartslistPos;
+    public virtual ObservableHashSet<PartslistPosRelation> PartslistPosRelation_SourcePartslistPos
     {
         get => LazyLoader.Load(this, ref _PartslistPosRelation_SourcePartslistPos);
         set => _PartslistPosRelation_SourcePartslistPos = value;
@@ -371,8 +371,8 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Collection(c => c.PartslistPosRelation_SourcePartslistPos); }
     }
 
-    private ICollection<PartslistPosRelation> _PartslistPosRelation_TargetPartslistPos;
-    public virtual ICollection<PartslistPosRelation> PartslistPosRelation_TargetPartslistPos
+    private ObservableHashSet<PartslistPosRelation> _PartslistPosRelation_TargetPartslistPos;
+    public virtual ObservableHashSet<PartslistPosRelation> PartslistPosRelation_TargetPartslistPos
     {
         get => LazyLoader.Load(this, ref _PartslistPosRelation_TargetPartslistPos);
         set => _PartslistPosRelation_TargetPartslistPos = value;
@@ -391,8 +391,8 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Collection(c => c.PartslistPosRelation_TargetPartslistPos); }
     }
 
-    private ICollection<PartslistPosSplit> _PartslistPosSplit_PartslistPos;
-    public virtual ICollection<PartslistPosSplit> PartslistPosSplit_PartslistPos
+    private ObservableHashSet<PartslistPosSplit> _PartslistPosSplit_PartslistPos;
+    public virtual ObservableHashSet<PartslistPosSplit> PartslistPosSplit_PartslistPos
     {
         get => LazyLoader.Load(this, ref _PartslistPosSplit_PartslistPos);
         set => _PartslistPosSplit_PartslistPos = value;
@@ -411,8 +411,8 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         get { return Context.Entry(this).Collection(c => c.PartslistPosSplit_PartslistPos); }
     }
 
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_BasedOnPartslistPos;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_BasedOnPartslistPos
+    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_BasedOnPartslistPos;
+    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_BasedOnPartslistPos
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_BasedOnPartslistPos);
         set => _ProdOrderPartslistPos_BasedOnPartslistPos = value;

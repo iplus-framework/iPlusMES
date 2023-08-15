@@ -157,8 +157,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ProdOrderPartslist"); }
     }
     
-    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ProdOrderBatch;
-    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ProdOrderBatch
+    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_ProdOrderBatch;
+    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_ProdOrderBatch
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_ProdOrderBatch);
         set => _ProdOrderPartslistPos_ProdOrderBatch = value;
@@ -177,8 +177,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_ProdOrderBatch); }
     }
 
-    private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_ProdOrderBatch;
-    public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ProdOrderBatch
+    private ObservableHashSet<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_ProdOrderBatch;
+    public virtual ObservableHashSet<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ProdOrderBatch
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_ProdOrderBatch);
         set => _ProdOrderPartslistPosRelation_ProdOrderBatch = value;

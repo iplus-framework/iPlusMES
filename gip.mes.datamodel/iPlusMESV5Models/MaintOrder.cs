@@ -214,8 +214,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Facility"); }
     }
     
-    private ICollection<MaintOrder> _MaintOrder_BasedOnMaintOrder;
-    public virtual ICollection<MaintOrder> MaintOrder_BasedOnMaintOrder
+    private ObservableHashSet<MaintOrder> _MaintOrder_BasedOnMaintOrder;
+    public virtual ObservableHashSet<MaintOrder> MaintOrder_BasedOnMaintOrder
     {
         get => LazyLoader.Load(this, ref _MaintOrder_BasedOnMaintOrder);
         set => _MaintOrder_BasedOnMaintOrder = value;
@@ -274,8 +274,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MaintACClass"); }
     }
     
-    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_MaintOrder;
-    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_MaintOrder
+    private ObservableHashSet<MaintOrderAssignment> _MaintOrderAssignment_MaintOrder;
+    public virtual ObservableHashSet<MaintOrderAssignment> MaintOrderAssignment_MaintOrder
     {
         get => LazyLoader.Load(this, ref _MaintOrderAssignment_MaintOrder);
         set => _MaintOrderAssignment_MaintOrder = value;
@@ -294,8 +294,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_MaintOrder); }
     }
 
-    private ICollection<MaintOrderPos> _MaintOrderPos_MaintOrder;
-    public virtual ICollection<MaintOrderPos> MaintOrderPos_MaintOrder
+    private ObservableHashSet<MaintOrderPos> _MaintOrderPos_MaintOrder;
+    public virtual ObservableHashSet<MaintOrderPos> MaintOrderPos_MaintOrder
     {
         get => LazyLoader.Load(this, ref _MaintOrderPos_MaintOrder);
         set => _MaintOrderPos_MaintOrder = value;
@@ -314,8 +314,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderPos_MaintOrder); }
     }
 
-    private ICollection<MaintOrderProperty> _MaintOrderProperty_MaintOrder;
-    public virtual ICollection<MaintOrderProperty> MaintOrderProperty_MaintOrder
+    private ObservableHashSet<MaintOrderProperty> _MaintOrderProperty_MaintOrder;
+    public virtual ObservableHashSet<MaintOrderProperty> MaintOrderProperty_MaintOrder
     {
         get => LazyLoader.Load(this, ref _MaintOrderProperty_MaintOrder);
         set => _MaintOrderProperty_MaintOrder = value;
@@ -334,8 +334,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderProperty_MaintOrder); }
     }
 
-    private ICollection<MaintOrderTask> _MaintOrderTask_MaintOrder;
-    public virtual ICollection<MaintOrderTask> MaintOrderTask_MaintOrder
+    private ObservableHashSet<MaintOrderTask> _MaintOrderTask_MaintOrder;
+    public virtual ObservableHashSet<MaintOrderTask> MaintOrderTask_MaintOrder
     {
         get => LazyLoader.Load(this, ref _MaintOrderTask_MaintOrder);
         set => _MaintOrderTask_MaintOrder = value;

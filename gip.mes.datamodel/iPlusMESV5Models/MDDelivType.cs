@@ -97,8 +97,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ICollection<CompanyAddress> _CompanyAddress_MDDelivType;
-    public virtual ICollection<CompanyAddress> CompanyAddress_MDDelivType
+    private ObservableHashSet<CompanyAddress> _CompanyAddress_MDDelivType;
+    public virtual ObservableHashSet<CompanyAddress> CompanyAddress_MDDelivType
     {
         get => LazyLoader.Load(this, ref _CompanyAddress_MDDelivType);
         set => _CompanyAddress_MDDelivType = value;
@@ -117,8 +117,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_MDDelivType); }
     }
 
-    private ICollection<InOrder> _InOrder_MDDelivType;
-    public virtual ICollection<InOrder> InOrder_MDDelivType
+    private ObservableHashSet<InOrder> _InOrder_MDDelivType;
+    public virtual ObservableHashSet<InOrder> InOrder_MDDelivType
     {
         get => LazyLoader.Load(this, ref _InOrder_MDDelivType);
         set => _InOrder_MDDelivType = value;
@@ -137,8 +137,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.InOrder_MDDelivType); }
     }
 
-    private ICollection<InRequest> _InRequest_MDDelivType;
-    public virtual ICollection<InRequest> InRequest_MDDelivType
+    private ObservableHashSet<InRequest> _InRequest_MDDelivType;
+    public virtual ObservableHashSet<InRequest> InRequest_MDDelivType
     {
         get => LazyLoader.Load(this, ref _InRequest_MDDelivType);
         set => _InRequest_MDDelivType = value;
@@ -157,8 +157,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.InRequest_MDDelivType); }
     }
 
-    private ICollection<OutOffer> _OutOffer_MDDelivType;
-    public virtual ICollection<OutOffer> OutOffer_MDDelivType
+    private ObservableHashSet<OutOffer> _OutOffer_MDDelivType;
+    public virtual ObservableHashSet<OutOffer> OutOffer_MDDelivType
     {
         get => LazyLoader.Load(this, ref _OutOffer_MDDelivType);
         set => _OutOffer_MDDelivType = value;
@@ -177,8 +177,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDDelivType); }
     }
 
-    private ICollection<OutOrder> _OutOrder_MDDelivType;
-    public virtual ICollection<OutOrder> OutOrder_MDDelivType
+    private ObservableHashSet<OutOrder> _OutOrder_MDDelivType;
+    public virtual ObservableHashSet<OutOrder> OutOrder_MDDelivType
     {
         get => LazyLoader.Load(this, ref _OutOrder_MDDelivType);
         set => _OutOrder_MDDelivType = value;

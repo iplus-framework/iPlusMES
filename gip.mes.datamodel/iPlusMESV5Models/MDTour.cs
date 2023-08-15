@@ -139,8 +139,8 @@ public partial class MDTour : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ICollection<Tourplan> _Tourplan_MDTour;
-    public virtual ICollection<Tourplan> Tourplan_MDTour
+    private ObservableHashSet<Tourplan> _Tourplan_MDTour;
+    public virtual ObservableHashSet<Tourplan> Tourplan_MDTour
     {
         get => LazyLoader.Load(this, ref _Tourplan_MDTour);
         set => _Tourplan_MDTour = value;

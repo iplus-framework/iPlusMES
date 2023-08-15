@@ -213,8 +213,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDPickingType"); }
     }
     
-    private ICollection<MaintOrder> _MaintOrder_Picking;
-    public virtual ICollection<MaintOrder> MaintOrder_Picking
+    private ObservableHashSet<MaintOrder> _MaintOrder_Picking;
+    public virtual ObservableHashSet<MaintOrder> MaintOrder_Picking
     {
         get => LazyLoader.Load(this, ref _MaintOrder_Picking);
         set => _MaintOrder_Picking = value;
@@ -233,8 +233,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrder_Picking); }
     }
 
-    private ICollection<PickingConfig> _PickingConfig_Picking;
-    public virtual ICollection<PickingConfig> PickingConfig_Picking
+    private ObservableHashSet<PickingConfig> _PickingConfig_Picking;
+    public virtual ObservableHashSet<PickingConfig> PickingConfig_Picking
     {
         get => LazyLoader.Load(this, ref _PickingConfig_Picking);
         set => _PickingConfig_Picking = value;
@@ -253,8 +253,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingConfig_Picking); }
     }
 
-    private ICollection<PickingPos> _PickingPos_Picking;
-    public virtual ICollection<PickingPos> PickingPos_Picking
+    private ObservableHashSet<PickingPos> _PickingPos_Picking;
+    public virtual ObservableHashSet<PickingPos> PickingPos_Picking
     {
         get => LazyLoader.Load(this, ref _PickingPos_Picking);
         set => _PickingPos_Picking = value;
