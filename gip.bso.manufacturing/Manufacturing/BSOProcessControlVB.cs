@@ -623,8 +623,8 @@ namespace gip.bso.manufacturing
 
         #region precompiled query
 
-        public static readonly Func<DatabaseApp, Guid?, Guid?,string, string, IQueryable<gip.mes.datamodel.ACClassTask>> s_cQry_ACClassTask =
-        EF.CompileQuery<DatabaseApp, Guid?, Guid?, string, string, IQueryable<gip.mes.datamodel.ACClassTask>>(
+        public static readonly Func<DatabaseApp, Guid?, Guid?,string, string, IEnumerable<gip.mes.datamodel.ACClassTask>> s_cQry_ACClassTask =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, string, string, IEnumerable<gip.mes.datamodel.ACClassTask>>(
             (databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo) =>
                 databaseApp
                 .ACClassTask
