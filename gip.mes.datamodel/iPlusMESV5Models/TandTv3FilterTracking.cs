@@ -97,8 +97,8 @@ public partial class TandTv3FilterTracking : VBEntityObject
         set { SetProperty<string>(ref _InsertName, value); }
     }
 
-    private ObservableHashSet<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_TandTv3FilterTracking;
-    public virtual ObservableHashSet<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_TandTv3FilterTracking
+    private ICollection<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_TandTv3FilterTracking;
+    public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_TandTv3FilterTracking
     {
         get => LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_TandTv3FilterTracking);
         set => _TandTv3FilterTrackingMaterial_TandTv3FilterTracking = value;
@@ -157,8 +157,8 @@ public partial class TandTv3FilterTracking : VBEntityObject
         get { return Context.Entry(this).Reference("TandTv3MDTrackingStartItemType"); }
     }
     
-    private ObservableHashSet<TandTv3Step> _TandTv3Step_TandTv3FilterTracking;
-    public virtual ObservableHashSet<TandTv3Step> TandTv3Step_TandTv3FilterTracking
+    private ICollection<TandTv3Step> _TandTv3Step_TandTv3FilterTracking;
+    public virtual ICollection<TandTv3Step> TandTv3Step_TandTv3FilterTracking
     {
         get => LazyLoader.Load(this, ref _TandTv3Step_TandTv3FilterTracking);
         set => _TandTv3Step_TandTv3FilterTracking = value;

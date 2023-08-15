@@ -76,8 +76,8 @@ public partial class MDMaintTaskState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<MaintOrderTask> _MaintOrderTask_MDMaintTaskState;
-    public virtual ObservableHashSet<MaintOrderTask> MaintOrderTask_MDMaintTaskState
+    private ICollection<MaintOrderTask> _MaintOrderTask_MDMaintTaskState;
+    public virtual ICollection<MaintOrderTask> MaintOrderTask_MDMaintTaskState
     {
         get => LazyLoader.Load(this, ref _MaintOrderTask_MDMaintTaskState);
         set => _MaintOrderTask_MDMaintTaskState = value;

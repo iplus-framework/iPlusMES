@@ -97,8 +97,8 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_MDZeroStockState;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_MDZeroStockState
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDZeroStockState;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDZeroStockState
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDZeroStockState);
         set => _FacilityBookingCharge_MDZeroStockState = value;
@@ -117,8 +117,8 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDZeroStockState); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_MDZeroStockState;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_MDZeroStockState
+    private ICollection<FacilityBooking> _FacilityBooking_MDZeroStockState;
+    public virtual ICollection<FacilityBooking> FacilityBooking_MDZeroStockState
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_MDZeroStockState);
         set => _FacilityBooking_MDZeroStockState = value;

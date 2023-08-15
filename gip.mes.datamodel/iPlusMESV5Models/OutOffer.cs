@@ -443,8 +443,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDTimeRange"); }
     }
     
-    private ObservableHashSet<OutOfferConfig> _OutOfferConfig_OutOffer;
-    public virtual ObservableHashSet<OutOfferConfig> OutOfferConfig_OutOffer
+    private ICollection<OutOfferConfig> _OutOfferConfig_OutOffer;
+    public virtual ICollection<OutOfferConfig> OutOfferConfig_OutOffer
     {
         get => LazyLoader.Load(this, ref _OutOfferConfig_OutOffer);
         set => _OutOfferConfig_OutOffer = value;
@@ -463,8 +463,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_OutOffer); }
     }
 
-    private ObservableHashSet<OutOfferPos> _OutOfferPos_OutOffer;
-    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_OutOffer
+    private ICollection<OutOfferPos> _OutOfferPos_OutOffer;
+    public virtual ICollection<OutOfferPos> OutOfferPos_OutOffer
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_OutOffer);
         set => _OutOfferPos_OutOffer = value;
@@ -483,8 +483,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_OutOffer); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_BasedOnOutOffer;
-    public virtual ObservableHashSet<OutOrder> OutOrder_BasedOnOutOffer
+    private ICollection<OutOrder> _OutOrder_BasedOnOutOffer;
+    public virtual ICollection<OutOrder> OutOrder_BasedOnOutOffer
     {
         get => LazyLoader.Load(this, ref _OutOrder_BasedOnOutOffer);
         set => _OutOrder_BasedOnOutOffer = value;

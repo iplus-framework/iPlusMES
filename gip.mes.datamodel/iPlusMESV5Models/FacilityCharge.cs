@@ -360,8 +360,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Facility"); }
     }
     
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_InwardFacilityCharge;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityCharge
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardFacilityCharge;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityCharge
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityCharge);
         set => _FacilityBookingCharge_InwardFacilityCharge = value;
@@ -380,8 +380,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardFacilityCharge); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutwardFacilityCharge;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityCharge
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardFacilityCharge;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityCharge
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityCharge);
         set => _FacilityBookingCharge_OutwardFacilityCharge = value;
@@ -400,8 +400,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardFacilityCharge); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_InwardFacilityCharge;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_InwardFacilityCharge
+    private ICollection<FacilityBooking> _FacilityBooking_InwardFacilityCharge;
+    public virtual ICollection<FacilityBooking> FacilityBooking_InwardFacilityCharge
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityCharge);
         set => _FacilityBooking_InwardFacilityCharge = value;
@@ -420,8 +420,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardFacilityCharge); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_OutwardFacilityCharge;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_OutwardFacilityCharge
+    private ICollection<FacilityBooking> _FacilityBooking_OutwardFacilityCharge;
+    public virtual ICollection<FacilityBooking> FacilityBooking_OutwardFacilityCharge
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityCharge);
         set => _FacilityBooking_OutwardFacilityCharge = value;
@@ -440,8 +440,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacilityCharge); }
     }
 
-    private ObservableHashSet<FacilityInventoryPos> _FacilityInventoryPos_FacilityCharge;
-    public virtual ObservableHashSet<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
+    private ICollection<FacilityInventoryPos> _FacilityInventoryPos_FacilityCharge;
+    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
     {
         get => LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityCharge);
         set => _FacilityInventoryPos_FacilityCharge = value;
@@ -480,8 +480,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("FacilityLot"); }
     }
     
-    private ObservableHashSet<FacilityReservation> _FacilityReservation_FacilityCharge;
-    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_FacilityCharge
+    private ICollection<FacilityReservation> _FacilityReservation_FacilityCharge;
+    public virtual ICollection<FacilityReservation> FacilityReservation_FacilityCharge
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_FacilityCharge);
         set => _FacilityReservation_FacilityCharge = value;
@@ -560,8 +560,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ObservableHashSet<OperationLog> _OperationLog_FacilityCharge;
-    public virtual ObservableHashSet<OperationLog> OperationLog_FacilityCharge
+    private ICollection<OperationLog> _OperationLog_FacilityCharge;
+    public virtual ICollection<OperationLog> OperationLog_FacilityCharge
     {
         get => LazyLoader.Load(this, ref _OperationLog_FacilityCharge);
         set => _OperationLog_FacilityCharge = value;

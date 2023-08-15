@@ -111,8 +111,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<ACClassTask> _ACClassTask_ACProgram;
-    public virtual ObservableHashSet<ACClassTask> ACClassTask_ACProgram
+    private ICollection<ACClassTask> _ACClassTask_ACProgram;
+    public virtual ICollection<ACClassTask> ACClassTask_ACProgram
     {
         get => LazyLoader.Load(this, ref _ACClassTask_ACProgram);
         set => _ACClassTask_ACProgram = value;
@@ -131,8 +131,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassTask_ACProgram); }
     }
 
-    private ObservableHashSet<ACProgramConfig> _ACProgramConfig_ACProgram;
-    public virtual ObservableHashSet<ACProgramConfig> ACProgramConfig_ACProgram
+    private ICollection<ACProgramConfig> _ACProgramConfig_ACProgram;
+    public virtual ICollection<ACProgramConfig> ACProgramConfig_ACProgram
     {
         get => LazyLoader.Load(this, ref _ACProgramConfig_ACProgram);
         set => _ACProgramConfig_ACProgram = value;
@@ -151,8 +151,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACProgramConfig_ACProgram); }
     }
 
-    private ObservableHashSet<ACProgramLog> _ACProgramLog_ACProgram;
-    public virtual ObservableHashSet<ACProgramLog> ACProgramLog_ACProgram
+    private ICollection<ACProgramLog> _ACProgramLog_ACProgram;
+    public virtual ICollection<ACProgramLog> ACProgramLog_ACProgram
     {
         get => LazyLoader.Load(this, ref _ACProgramLog_ACProgram);
         set => _ACProgramLog_ACProgram = value;
@@ -171,8 +171,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACProgramLog_ACProgram); }
     }
 
-    private ObservableHashSet<DemandOrderPos> _DemandOrderPos_ACProgram;
-    public virtual ObservableHashSet<DemandOrderPos> DemandOrderPos_ACProgram
+    private ICollection<DemandOrderPos> _DemandOrderPos_ACProgram;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_ACProgram
     {
         get => LazyLoader.Load(this, ref _DemandOrderPos_ACProgram);
         set => _DemandOrderPos_ACProgram = value;
@@ -191,8 +191,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_ACProgram); }
     }
 
-    private ObservableHashSet<ProdOrderPartslist> _ProdOrderPartslist_VBiACProgram;
-    public virtual ObservableHashSet<ProdOrderPartslist> ProdOrderPartslist_VBiACProgram
+    private ICollection<ProdOrderPartslist> _ProdOrderPartslist_VBiACProgram;
+    public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_VBiACProgram
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslist_VBiACProgram);
         set => _ProdOrderPartslist_VBiACProgram = value;

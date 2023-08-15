@@ -96,8 +96,8 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
         get { return Context.Entry(this).Reference("CompanyAddress"); }
     }
     
-    private ObservableHashSet<CompanyPersonRole> _CompanyPersonRole_CompanyAddressDepartment;
-    public virtual ObservableHashSet<CompanyPersonRole> CompanyPersonRole_CompanyAddressDepartment
+    private ICollection<CompanyPersonRole> _CompanyPersonRole_CompanyAddressDepartment;
+    public virtual ICollection<CompanyPersonRole> CompanyPersonRole_CompanyAddressDepartment
     {
         get => LazyLoader.Load(this, ref _CompanyPersonRole_CompanyAddressDepartment);
         set => _CompanyPersonRole_CompanyAddressDepartment = value;

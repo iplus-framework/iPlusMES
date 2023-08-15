@@ -243,8 +243,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("BillingMDTermOfPayment"); }
     }
     
-    private ObservableHashSet<CompanyAddress> _CompanyAddress_Company;
-    public virtual ObservableHashSet<CompanyAddress> CompanyAddress_Company
+    private ICollection<CompanyAddress> _CompanyAddress_Company;
+    public virtual ICollection<CompanyAddress> CompanyAddress_Company
     {
         get => LazyLoader.Load(this, ref _CompanyAddress_Company);
         set => _CompanyAddress_Company = value;
@@ -263,8 +263,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_Company); }
     }
 
-    private ObservableHashSet<CompanyMaterial> _CompanyMaterial_Company;
-    public virtual ObservableHashSet<CompanyMaterial> CompanyMaterial_Company
+    private ICollection<CompanyMaterial> _CompanyMaterial_Company;
+    public virtual ICollection<CompanyMaterial> CompanyMaterial_Company
     {
         get => LazyLoader.Load(this, ref _CompanyMaterial_Company);
         set => _CompanyMaterial_Company = value;
@@ -283,8 +283,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_Company); }
     }
 
-    private ObservableHashSet<CompanyPerson> _CompanyPerson_Company;
-    public virtual ObservableHashSet<CompanyPerson> CompanyPerson_Company
+    private ICollection<CompanyPerson> _CompanyPerson_Company;
+    public virtual ICollection<CompanyPerson> CompanyPerson_Company
     {
         get => LazyLoader.Load(this, ref _CompanyPerson_Company);
         set => _CompanyPerson_Company = value;
@@ -303,8 +303,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_Company); }
     }
 
-    private ObservableHashSet<Facility> _Facility_Company;
-    public virtual ObservableHashSet<Facility> Facility_Company
+    private ICollection<Facility> _Facility_Company;
+    public virtual ICollection<Facility> Facility_Company
     {
         get => LazyLoader.Load(this, ref _Facility_Company);
         set => _Facility_Company = value;
@@ -323,8 +323,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Facility_Company); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_CPartnerCompany;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_CPartnerCompany
+    private ICollection<FacilityBooking> _FacilityBooking_CPartnerCompany;
+    public virtual ICollection<FacilityBooking> FacilityBooking_CPartnerCompany
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_CPartnerCompany);
         set => _FacilityBooking_CPartnerCompany = value;
@@ -343,8 +343,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_CPartnerCompany); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_CPartnerCompany;
-    public virtual ObservableHashSet<InOrder> InOrder_CPartnerCompany
+    private ICollection<InOrder> _InOrder_CPartnerCompany;
+    public virtual ICollection<InOrder> InOrder_CPartnerCompany
     {
         get => LazyLoader.Load(this, ref _InOrder_CPartnerCompany);
         set => _InOrder_CPartnerCompany = value;
@@ -363,8 +363,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrder_CPartnerCompany); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_DistributorCompany;
-    public virtual ObservableHashSet<InOrder> InOrder_DistributorCompany
+    private ICollection<InOrder> _InOrder_DistributorCompany;
+    public virtual ICollection<InOrder> InOrder_DistributorCompany
     {
         get => LazyLoader.Load(this, ref _InOrder_DistributorCompany);
         set => _InOrder_DistributorCompany = value;
@@ -383,8 +383,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrder_DistributorCompany); }
     }
 
-    private ObservableHashSet<InRequest> _InRequest_DistributorCompany;
-    public virtual ObservableHashSet<InRequest> InRequest_DistributorCompany
+    private ICollection<InRequest> _InRequest_DistributorCompany;
+    public virtual ICollection<InRequest> InRequest_DistributorCompany
     {
         get => LazyLoader.Load(this, ref _InRequest_DistributorCompany);
         set => _InRequest_DistributorCompany = value;
@@ -403,8 +403,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequest_DistributorCompany); }
     }
 
-    private ObservableHashSet<Company> _Company_ParentCompany;
-    public virtual ObservableHashSet<Company> Company_ParentCompany
+    private ICollection<Company> _Company_ParentCompany;
+    public virtual ICollection<Company> Company_ParentCompany
     {
         get => LazyLoader.Load(this, ref _Company_ParentCompany);
         set => _Company_ParentCompany = value;
@@ -423,8 +423,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Company_ParentCompany); }
     }
 
-    private ObservableHashSet<Invoice> _Invoice_CustomerCompany;
-    public virtual ObservableHashSet<Invoice> Invoice_CustomerCompany
+    private ICollection<Invoice> _Invoice_CustomerCompany;
+    public virtual ICollection<Invoice> Invoice_CustomerCompany
     {
         get => LazyLoader.Load(this, ref _Invoice_CustomerCompany);
         set => _Invoice_CustomerCompany = value;
@@ -463,8 +463,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDCurrency"); }
     }
     
-    private ObservableHashSet<MaintOrderAssignment> _MaintOrderAssignment_Company;
-    public virtual ObservableHashSet<MaintOrderAssignment> MaintOrderAssignment_Company
+    private ICollection<MaintOrderAssignment> _MaintOrderAssignment_Company;
+    public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_Company
     {
         get => LazyLoader.Load(this, ref _MaintOrderAssignment_Company);
         set => _MaintOrderAssignment_Company = value;
@@ -483,8 +483,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_Company); }
     }
 
-    private ObservableHashSet<OutOffer> _OutOffer_CustomerCompany;
-    public virtual ObservableHashSet<OutOffer> OutOffer_CustomerCompany
+    private ICollection<OutOffer> _OutOffer_CustomerCompany;
+    public virtual ICollection<OutOffer> OutOffer_CustomerCompany
     {
         get => LazyLoader.Load(this, ref _OutOffer_CustomerCompany);
         set => _OutOffer_CustomerCompany = value;
@@ -503,8 +503,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOffer_CustomerCompany); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_CPartnerCompany;
-    public virtual ObservableHashSet<OutOrder> OutOrder_CPartnerCompany
+    private ICollection<OutOrder> _OutOrder_CPartnerCompany;
+    public virtual ICollection<OutOrder> OutOrder_CPartnerCompany
     {
         get => LazyLoader.Load(this, ref _OutOrder_CPartnerCompany);
         set => _OutOrder_CPartnerCompany = value;
@@ -523,8 +523,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrder_CPartnerCompany); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_CustomerCompany;
-    public virtual ObservableHashSet<OutOrder> OutOrder_CustomerCompany
+    private ICollection<OutOrder> _OutOrder_CustomerCompany;
+    public virtual ICollection<OutOrder> OutOrder_CustomerCompany
     {
         get => LazyLoader.Load(this, ref _OutOrder_CustomerCompany);
         set => _OutOrder_CustomerCompany = value;
@@ -563,8 +563,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Company1_ParentCompany"); }
     }
     
-    private ObservableHashSet<ProdOrder> _ProdOrder_CPartnerCompany;
-    public virtual ObservableHashSet<ProdOrder> ProdOrder_CPartnerCompany
+    private ICollection<ProdOrder> _ProdOrder_CPartnerCompany;
+    public virtual ICollection<ProdOrder> ProdOrder_CPartnerCompany
     {
         get => LazyLoader.Load(this, ref _ProdOrder_CPartnerCompany);
         set => _ProdOrder_CPartnerCompany = value;
@@ -583,8 +583,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrder_CPartnerCompany); }
     }
 
-    private ObservableHashSet<Rating> _Rating_Company;
-    public virtual ObservableHashSet<Rating> Rating_Company
+    private ICollection<Rating> _Rating_Company;
+    public virtual ICollection<Rating> Rating_Company
     {
         get => LazyLoader.Load(this, ref _Rating_Company);
         set => _Rating_Company = value;
@@ -623,8 +623,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ShippingMDTermOfPayment"); }
     }
     
-    private ObservableHashSet<TourplanPos> _TourplanPos_Company;
-    public virtual ObservableHashSet<TourplanPos> TourplanPos_Company
+    private ICollection<TourplanPos> _TourplanPos_Company;
+    public virtual ICollection<TourplanPos> TourplanPos_Company
     {
         get => LazyLoader.Load(this, ref _TourplanPos_Company);
         set => _TourplanPos_Company = value;
@@ -643,8 +643,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TourplanPos_Company); }
     }
 
-    private ObservableHashSet<Tourplan> _Tourplan_Company;
-    public virtual ObservableHashSet<Tourplan> Tourplan_Company
+    private ICollection<Tourplan> _Tourplan_Company;
+    public virtual ICollection<Tourplan> Tourplan_Company
     {
         get => LazyLoader.Load(this, ref _Tourplan_Company);
         set => _Tourplan_Company = value;
@@ -663,8 +663,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Tourplan_Company); }
     }
 
-    private ObservableHashSet<UserSettings> _UserSettings_TenantCompany;
-    public virtual ObservableHashSet<UserSettings> UserSettings_TenantCompany
+    private ICollection<UserSettings> _UserSettings_TenantCompany;
+    public virtual ICollection<UserSettings> UserSettings_TenantCompany
     {
         get => LazyLoader.Load(this, ref _UserSettings_TenantCompany);
         set => _UserSettings_TenantCompany = value;
@@ -703,8 +703,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("VBUser"); }
     }
     
-    private ObservableHashSet<Visitor> _Visitor_VisitedCompany;
-    public virtual ObservableHashSet<Visitor> Visitor_VisitedCompany
+    private ICollection<Visitor> _Visitor_VisitedCompany;
+    public virtual ICollection<Visitor> Visitor_VisitedCompany
     {
         get => LazyLoader.Load(this, ref _Visitor_VisitedCompany);
         set => _Visitor_VisitedCompany = value;
@@ -723,8 +723,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Visitor_VisitedCompany); }
     }
 
-    private ObservableHashSet<Visitor> _Visitor_VisitorCompany;
-    public virtual ObservableHashSet<Visitor> Visitor_VisitorCompany
+    private ICollection<Visitor> _Visitor_VisitorCompany;
+    public virtual ICollection<Visitor> Visitor_VisitorCompany
     {
         get => LazyLoader.Load(this, ref _Visitor_VisitorCompany);
         set => _Visitor_VisitorCompany = value;
@@ -743,8 +743,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Visitor_VisitorCompany); }
     }
 
-    private ObservableHashSet<VisitorVoucher> _VisitorVoucher_VisitorCompany;
-    public virtual ObservableHashSet<VisitorVoucher> VisitorVoucher_VisitorCompany
+    private ICollection<VisitorVoucher> _VisitorVoucher_VisitorCompany;
+    public virtual ICollection<VisitorVoucher> VisitorVoucher_VisitorCompany
     {
         get => LazyLoader.Load(this, ref _VisitorVoucher_VisitorCompany);
         set => _VisitorVoucher_VisitorCompany = value;

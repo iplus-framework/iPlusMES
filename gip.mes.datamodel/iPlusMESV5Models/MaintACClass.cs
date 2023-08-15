@@ -62,8 +62,8 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<MaintACClassProperty> _MaintACClassProperty_MaintACClass;
-    public virtual ObservableHashSet<MaintACClassProperty> MaintACClassProperty_MaintACClass
+    private ICollection<MaintACClassProperty> _MaintACClassProperty_MaintACClass;
+    public virtual ICollection<MaintACClassProperty> MaintACClassProperty_MaintACClass
     {
         get => LazyLoader.Load(this, ref _MaintACClassProperty_MaintACClass);
         set => _MaintACClassProperty_MaintACClass = value;
@@ -82,8 +82,8 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaintACClassProperty_MaintACClass); }
     }
 
-    private ObservableHashSet<MaintOrder> _MaintOrder_MaintACClass;
-    public virtual ObservableHashSet<MaintOrder> MaintOrder_MaintACClass
+    private ICollection<MaintOrder> _MaintOrder_MaintACClass;
+    public virtual ICollection<MaintOrder> MaintOrder_MaintACClass
     {
         get => LazyLoader.Load(this, ref _MaintOrder_MaintACClass);
         set => _MaintOrder_MaintACClass = value;

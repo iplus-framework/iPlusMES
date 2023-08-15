@@ -262,8 +262,8 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryCompanyAddress"); }
     }
     
-    private ObservableHashSet<InvoicePos> _InvoicePos_Invoice;
-    public virtual ObservableHashSet<InvoicePos> InvoicePos_Invoice
+    private ICollection<InvoicePos> _InvoicePos_Invoice;
+    public virtual ICollection<InvoicePos> InvoicePos_Invoice
     {
         get => LazyLoader.Load(this, ref _InvoicePos_Invoice);
         set => _InvoicePos_Invoice = value;

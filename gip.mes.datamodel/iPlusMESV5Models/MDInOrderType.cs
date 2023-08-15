@@ -97,8 +97,8 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_MDInOrderType;
-    public virtual ObservableHashSet<InOrder> InOrder_MDInOrderType
+    private ICollection<InOrder> _InOrder_MDInOrderType;
+    public virtual ICollection<InOrder> InOrder_MDInOrderType
     {
         get => LazyLoader.Load(this, ref _InOrder_MDInOrderType);
         set => _InOrder_MDInOrderType = value;
@@ -117,8 +117,8 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         get { return Context.Entry(this).Collection(c => c.InOrder_MDInOrderType); }
     }
 
-    private ObservableHashSet<InRequest> _InRequest_MDInOrderType;
-    public virtual ObservableHashSet<InRequest> InRequest_MDInOrderType
+    private ICollection<InRequest> _InRequest_MDInOrderType;
+    public virtual ICollection<InRequest> InRequest_MDInOrderType
     {
         get => LazyLoader.Load(this, ref _InRequest_MDInOrderType);
         set => _InRequest_MDInOrderType = value;

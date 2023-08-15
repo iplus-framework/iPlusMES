@@ -117,8 +117,8 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
         get { return Context.Entry(this).Reference("MaintACClass"); }
     }
     
-    private ObservableHashSet<MaintOrderProperty> _MaintOrderProperty_MaintACClassProperty;
-    public virtual ObservableHashSet<MaintOrderProperty> MaintOrderProperty_MaintACClassProperty
+    private ICollection<MaintOrderProperty> _MaintOrderProperty_MaintACClassProperty;
+    public virtual ICollection<MaintOrderProperty> MaintOrderProperty_MaintACClassProperty
     {
         get => LazyLoader.Load(this, ref _MaintOrderProperty_MaintACClassProperty);
         set => _MaintOrderProperty_MaintACClassProperty = value;

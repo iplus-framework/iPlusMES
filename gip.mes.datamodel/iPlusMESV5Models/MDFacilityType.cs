@@ -97,8 +97,8 @@ public partial class MDFacilityType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ObservableHashSet<Facility> _Facility_MDFacilityType;
-    public virtual ObservableHashSet<Facility> Facility_MDFacilityType
+    private ICollection<Facility> _Facility_MDFacilityType;
+    public virtual ICollection<Facility> Facility_MDFacilityType
     {
         get => LazyLoader.Load(this, ref _Facility_MDFacilityType);
         set => _Facility_MDFacilityType = value;

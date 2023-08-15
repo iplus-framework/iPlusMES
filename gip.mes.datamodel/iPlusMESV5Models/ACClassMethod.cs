@@ -306,8 +306,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClass"); }
     }
     
-    private ObservableHashSet<ACClassMethodConfig> _ACClassMethodConfig_ACClassMethod;
-    public virtual ObservableHashSet<ACClassMethodConfig> ACClassMethodConfig_ACClassMethod
+    private ICollection<ACClassMethodConfig> _ACClassMethodConfig_ACClassMethod;
+    public virtual ICollection<ACClassMethodConfig> ACClassMethodConfig_ACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassMethodConfig_ACClassMethod);
         set => _ACClassMethodConfig_ACClassMethod = value;
@@ -326,8 +326,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassMethodConfig_ACClassMethod); }
     }
 
-    private ObservableHashSet<ACClassWF> _ACClassWF_ACClassMethod;
-    public virtual ObservableHashSet<ACClassWF> ACClassWF_ACClassMethod
+    private ICollection<ACClassWF> _ACClassWF_ACClassMethod;
+    public virtual ICollection<ACClassWF> ACClassWF_ACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassWF_ACClassMethod);
         set => _ACClassWF_ACClassMethod = value;
@@ -346,8 +346,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWF_ACClassMethod); }
     }
 
-    private ObservableHashSet<ACClassWFEdge> _ACClassWFEdge_ACClassMethod;
-    public virtual ObservableHashSet<ACClassWFEdge> ACClassWFEdge_ACClassMethod
+    private ICollection<ACClassWFEdge> _ACClassWFEdge_ACClassMethod;
+    public virtual ICollection<ACClassWFEdge> ACClassWFEdge_ACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassWFEdge_ACClassMethod);
         set => _ACClassWFEdge_ACClassMethod = value;
@@ -366,8 +366,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_ACClassMethod); }
     }
 
-    private ObservableHashSet<ACClassWFEdge> _ACClassWFEdge_SourceACClassMethod;
-    public virtual ObservableHashSet<ACClassWFEdge> ACClassWFEdge_SourceACClassMethod
+    private ICollection<ACClassWFEdge> _ACClassWFEdge_SourceACClassMethod;
+    public virtual ICollection<ACClassWFEdge> ACClassWFEdge_SourceACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassWFEdge_SourceACClassMethod);
         set => _ACClassWFEdge_SourceACClassMethod = value;
@@ -386,8 +386,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_SourceACClassMethod); }
     }
 
-    private ObservableHashSet<ACClassWFEdge> _ACClassWFEdge_TargetACClassMethod;
-    public virtual ObservableHashSet<ACClassWFEdge> ACClassWFEdge_TargetACClassMethod
+    private ICollection<ACClassWFEdge> _ACClassWFEdge_TargetACClassMethod;
+    public virtual ICollection<ACClassWFEdge> ACClassWFEdge_TargetACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassWFEdge_TargetACClassMethod);
         set => _ACClassWFEdge_TargetACClassMethod = value;
@@ -406,8 +406,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_TargetACClassMethod); }
     }
 
-    private ObservableHashSet<ACClassWF> _ACClassWF_RefPAACClassMethod;
-    public virtual ObservableHashSet<ACClassWF> ACClassWF_RefPAACClassMethod
+    private ICollection<ACClassWF> _ACClassWF_RefPAACClassMethod;
+    public virtual ICollection<ACClassWF> ACClassWF_RefPAACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassWF_RefPAACClassMethod);
         set => _ACClassWF_RefPAACClassMethod = value;
@@ -426,8 +426,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWF_RefPAACClassMethod); }
     }
 
-    private ObservableHashSet<ACProgram> _ACProgram_ProgramACClassMethod;
-    public virtual ObservableHashSet<ACProgram> ACProgram_ProgramACClassMethod
+    private ICollection<ACProgram> _ACProgram_ProgramACClassMethod;
+    public virtual ICollection<ACProgram> ACProgram_ProgramACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACProgram_ProgramACClassMethod);
         set => _ACProgram_ProgramACClassMethod = value;
@@ -466,8 +466,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("AttachedFromACClass"); }
     }
     
-    private ObservableHashSet<DemandOrderPos> _DemandOrderPos_VBiProgramACClassMethod;
-    public virtual ObservableHashSet<DemandOrderPos> DemandOrderPos_VBiProgramACClassMethod
+    private ICollection<DemandOrderPos> _DemandOrderPos_VBiProgramACClassMethod;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_VBiProgramACClassMethod
     {
         get => LazyLoader.Load(this, ref _DemandOrderPos_VBiProgramACClassMethod);
         set => _DemandOrderPos_VBiProgramACClassMethod = value;
@@ -486,8 +486,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_VBiProgramACClassMethod); }
     }
 
-    private ObservableHashSet<ACClassMethod> _ACClassMethod_ParentACClassMethod;
-    public virtual ObservableHashSet<ACClassMethod> ACClassMethod_ParentACClassMethod
+    private ICollection<ACClassMethod> _ACClassMethod_ParentACClassMethod;
+    public virtual ICollection<ACClassMethod> ACClassMethod_ParentACClassMethod
     {
         get => LazyLoader.Load(this, ref _ACClassMethod_ParentACClassMethod);
         set => _ACClassMethod_ParentACClassMethod = value;
@@ -506,8 +506,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassMethod_ParentACClassMethod); }
     }
 
-    private ObservableHashSet<MaterialWFACClassMethod> _MaterialWFACClassMethod_ACClassMethod;
-    public virtual ObservableHashSet<MaterialWFACClassMethod> MaterialWFACClassMethod_ACClassMethod
+    private ICollection<MaterialWFACClassMethod> _MaterialWFACClassMethod_ACClassMethod;
+    public virtual ICollection<MaterialWFACClassMethod> MaterialWFACClassMethod_ACClassMethod
     {
         get => LazyLoader.Load(this, ref _MaterialWFACClassMethod_ACClassMethod);
         set => _MaterialWFACClassMethod_ACClassMethod = value;
@@ -526,8 +526,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethod_ACClassMethod); }
     }
 
-    private ObservableHashSet<Material> _Material_VBiProgramACClassMethod;
-    public virtual ObservableHashSet<Material> Material_VBiProgramACClassMethod
+    private ICollection<Material> _Material_VBiProgramACClassMethod;
+    public virtual ICollection<Material> Material_VBiProgramACClassMethod
     {
         get => LazyLoader.Load(this, ref _Material_VBiProgramACClassMethod);
         set => _Material_VBiProgramACClassMethod = value;
@@ -586,8 +586,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassMethod1_ParentACClassMethod"); }
     }
     
-    private ObservableHashSet<Picking> _Picking_ACClassMethod;
-    public virtual ObservableHashSet<Picking> Picking_ACClassMethod
+    private ICollection<Picking> _Picking_ACClassMethod;
+    public virtual ICollection<Picking> Picking_ACClassMethod
     {
         get => LazyLoader.Load(this, ref _Picking_ACClassMethod);
         set => _Picking_ACClassMethod = value;
@@ -606,8 +606,8 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Picking_ACClassMethod); }
     }
 
-    private ObservableHashSet<VBGroupRight> _VBGroupRight_ACClassMethod;
-    public virtual ObservableHashSet<VBGroupRight> VBGroupRight_ACClassMethod
+    private ICollection<VBGroupRight> _VBGroupRight_ACClassMethod;
+    public virtual ICollection<VBGroupRight> VBGroupRight_ACClassMethod
     {
         get => LazyLoader.Load(this, ref _VBGroupRight_ACClassMethod);
         set => _VBGroupRight_ACClassMethod = value;

@@ -90,8 +90,8 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<string>(ref _ExchangeNo, value); }
     }
 
-    private ObservableHashSet<Invoice> _Invoice_MDCurrencyExchange;
-    public virtual ObservableHashSet<Invoice> Invoice_MDCurrencyExchange
+    private ICollection<Invoice> _Invoice_MDCurrencyExchange;
+    public virtual ICollection<Invoice> Invoice_MDCurrencyExchange
     {
         get => LazyLoader.Load(this, ref _Invoice_MDCurrencyExchange);
         set => _Invoice_MDCurrencyExchange = value;

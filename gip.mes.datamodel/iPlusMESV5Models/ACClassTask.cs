@@ -125,8 +125,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<ACClassTaskValue> _ACClassTaskValue_ACClassTask;
-    public virtual ObservableHashSet<ACClassTaskValue> ACClassTaskValue_ACClassTask
+    private ICollection<ACClassTaskValue> _ACClassTaskValue_ACClassTask;
+    public virtual ICollection<ACClassTaskValue> ACClassTaskValue_ACClassTask
     {
         get => LazyLoader.Load(this, ref _ACClassTaskValue_ACClassTask);
         set => _ACClassTaskValue_ACClassTask = value;
@@ -185,8 +185,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ContentACClassWF"); }
     }
     
-    private ObservableHashSet<ACClassTask> _ACClassTask_ParentACClassTask;
-    public virtual ObservableHashSet<ACClassTask> ACClassTask_ParentACClassTask
+    private ICollection<ACClassTask> _ACClassTask_ParentACClassTask;
+    public virtual ICollection<ACClassTask> ACClassTask_ParentACClassTask
     {
         get => LazyLoader.Load(this, ref _ACClassTask_ParentACClassTask);
         set => _ACClassTask_ParentACClassTask = value;
@@ -225,8 +225,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassTask1_ParentACClassTask"); }
     }
     
-    private ObservableHashSet<PickingPos> _PickingPos_ACClassTask;
-    public virtual ObservableHashSet<PickingPos> PickingPos_ACClassTask
+    private ICollection<PickingPos> _PickingPos_ACClassTask;
+    public virtual ICollection<PickingPos> PickingPos_ACClassTask
     {
         get => LazyLoader.Load(this, ref _PickingPos_ACClassTask);
         set => _PickingPos_ACClassTask = value;
@@ -245,8 +245,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingPos_ACClassTask); }
     }
 
-    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_ACClassTask;
-    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_ACClassTask
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ACClassTask;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ACClassTask
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_ACClassTask);
         set => _ProdOrderPartslistPos_ACClassTask = value;

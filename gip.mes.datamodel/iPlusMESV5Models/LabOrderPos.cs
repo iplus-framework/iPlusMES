@@ -206,8 +206,8 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("MDLabTag"); }
     }
     
-    private ObservableHashSet<Weighing> _Weighing_LabOrderPos;
-    public virtual ObservableHashSet<Weighing> Weighing_LabOrderPos
+    private ICollection<Weighing> _Weighing_LabOrderPos;
+    public virtual ICollection<Weighing> Weighing_LabOrderPos
     {
         get => LazyLoader.Load(this, ref _Weighing_LabOrderPos);
         set => _Weighing_LabOrderPos = value;

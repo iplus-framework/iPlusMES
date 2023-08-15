@@ -104,8 +104,8 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<LabelTranslation> _LabelTranslation_VBLanguage;
-    public virtual ObservableHashSet<LabelTranslation> LabelTranslation_VBLanguage
+    private ICollection<LabelTranslation> _LabelTranslation_VBLanguage;
+    public virtual ICollection<LabelTranslation> LabelTranslation_VBLanguage
     {
         get => LazyLoader.Load(this, ref _LabelTranslation_VBLanguage);
         set => _LabelTranslation_VBLanguage = value;
@@ -124,8 +124,8 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.LabelTranslation_VBLanguage); }
     }
 
-    private ObservableHashSet<VBUser> _VBUser_VBLanguage;
-    public virtual ObservableHashSet<VBUser> VBUser_VBLanguage
+    private ICollection<VBUser> _VBUser_VBLanguage;
+    public virtual ICollection<VBUser> VBUser_VBLanguage
     {
         get => LazyLoader.Load(this, ref _VBUser_VBLanguage);
         set => _VBUser_VBLanguage = value;

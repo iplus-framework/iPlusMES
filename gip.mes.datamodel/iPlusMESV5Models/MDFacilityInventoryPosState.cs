@@ -97,8 +97,8 @@ public partial class MDFacilityInventoryPosState : VBEntityObject, IInsertInfo, 
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<FacilityInventoryPos> _FacilityInventoryPos_MDFacilityInventoryPosState;
-    public virtual ObservableHashSet<FacilityInventoryPos> FacilityInventoryPos_MDFacilityInventoryPosState
+    private ICollection<FacilityInventoryPos> _FacilityInventoryPos_MDFacilityInventoryPosState;
+    public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_MDFacilityInventoryPosState
     {
         get => LazyLoader.Load(this, ref _FacilityInventoryPos_MDFacilityInventoryPosState);
         set => _FacilityInventoryPos_MDFacilityInventoryPosState = value;

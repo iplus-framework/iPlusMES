@@ -241,8 +241,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DistributorCompany"); }
     }
     
-    private ObservableHashSet<InOrder> _InOrder_BasedOnInRequest;
-    public virtual ObservableHashSet<InOrder> InOrder_BasedOnInRequest
+    private ICollection<InOrder> _InOrder_BasedOnInRequest;
+    public virtual ICollection<InOrder> InOrder_BasedOnInRequest
     {
         get => LazyLoader.Load(this, ref _InOrder_BasedOnInRequest);
         set => _InOrder_BasedOnInRequest = value;
@@ -261,8 +261,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrder_BasedOnInRequest); }
     }
 
-    private ObservableHashSet<InRequestConfig> _InRequestConfig_InRequest;
-    public virtual ObservableHashSet<InRequestConfig> InRequestConfig_InRequest
+    private ICollection<InRequestConfig> _InRequestConfig_InRequest;
+    public virtual ICollection<InRequestConfig> InRequestConfig_InRequest
     {
         get => LazyLoader.Load(this, ref _InRequestConfig_InRequest);
         set => _InRequestConfig_InRequest = value;
@@ -281,8 +281,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_InRequest); }
     }
 
-    private ObservableHashSet<InRequestPos> _InRequestPos_InRequest;
-    public virtual ObservableHashSet<InRequestPos> InRequestPos_InRequest
+    private ICollection<InRequestPos> _InRequestPos_InRequest;
+    public virtual ICollection<InRequestPos> InRequestPos_InRequest
     {
         get => LazyLoader.Load(this, ref _InRequestPos_InRequest);
         set => _InRequestPos_InRequest = value;

@@ -165,8 +165,8 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassPropertyRelation"); }
     }
     
-    private ObservableHashSet<VBConfig> _VBConfig_ParentVBConfig;
-    public virtual ObservableHashSet<VBConfig> VBConfig_ParentVBConfig
+    private ICollection<VBConfig> _VBConfig_ParentVBConfig;
+    public virtual ICollection<VBConfig> VBConfig_ParentVBConfig
     {
         get => LazyLoader.Load(this, ref _VBConfig_ParentVBConfig);
         set => _VBConfig_ParentVBConfig = value;

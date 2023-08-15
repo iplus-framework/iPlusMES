@@ -152,8 +152,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassMethod"); }
     }
     
-    private ObservableHashSet<ACClassMethodConfig> _ACClassMethodConfig_ACClassWF;
-    public virtual ObservableHashSet<ACClassMethodConfig> ACClassMethodConfig_ACClassWF
+    private ICollection<ACClassMethodConfig> _ACClassMethodConfig_ACClassWF;
+    public virtual ICollection<ACClassMethodConfig> ACClassMethodConfig_ACClassWF
     {
         get => LazyLoader.Load(this, ref _ACClassMethodConfig_ACClassWF);
         set => _ACClassMethodConfig_ACClassWF = value;
@@ -172,8 +172,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassMethodConfig_ACClassWF); }
     }
 
-    private ObservableHashSet<ACClassTask> _ACClassTask_ContentACClassWF;
-    public virtual ObservableHashSet<ACClassTask> ACClassTask_ContentACClassWF
+    private ICollection<ACClassTask> _ACClassTask_ContentACClassWF;
+    public virtual ICollection<ACClassTask> ACClassTask_ContentACClassWF
     {
         get => LazyLoader.Load(this, ref _ACClassTask_ContentACClassWF);
         set => _ACClassTask_ContentACClassWF = value;
@@ -192,8 +192,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassTask_ContentACClassWF); }
     }
 
-    private ObservableHashSet<ACClassWFEdge> _ACClassWFEdge_SourceACClassWF;
-    public virtual ObservableHashSet<ACClassWFEdge> ACClassWFEdge_SourceACClassWF
+    private ICollection<ACClassWFEdge> _ACClassWFEdge_SourceACClassWF;
+    public virtual ICollection<ACClassWFEdge> ACClassWFEdge_SourceACClassWF
     {
         get => LazyLoader.Load(this, ref _ACClassWFEdge_SourceACClassWF);
         set => _ACClassWFEdge_SourceACClassWF = value;
@@ -212,8 +212,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_SourceACClassWF); }
     }
 
-    private ObservableHashSet<ACClassWFEdge> _ACClassWFEdge_TargetACClassWF;
-    public virtual ObservableHashSet<ACClassWFEdge> ACClassWFEdge_TargetACClassWF
+    private ICollection<ACClassWFEdge> _ACClassWFEdge_TargetACClassWF;
+    public virtual ICollection<ACClassWFEdge> ACClassWFEdge_TargetACClassWF
     {
         get => LazyLoader.Load(this, ref _ACClassWFEdge_TargetACClassWF);
         set => _ACClassWFEdge_TargetACClassWF = value;
@@ -232,8 +232,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_TargetACClassWF); }
     }
 
-    private ObservableHashSet<HistoryConfig> _HistoryConfig_VBiACClassWF;
-    public virtual ObservableHashSet<HistoryConfig> HistoryConfig_VBiACClassWF
+    private ICollection<HistoryConfig> _HistoryConfig_VBiACClassWF;
+    public virtual ICollection<HistoryConfig> HistoryConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _HistoryConfig_VBiACClassWF);
         set => _HistoryConfig_VBiACClassWF = value;
@@ -252,8 +252,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.HistoryConfig_VBiACClassWF); }
     }
 
-    private ObservableHashSet<InOrderConfig> _InOrderConfig_VBiACClassWF;
-    public virtual ObservableHashSet<InOrderConfig> InOrderConfig_VBiACClassWF
+    private ICollection<InOrderConfig> _InOrderConfig_VBiACClassWF;
+    public virtual ICollection<InOrderConfig> InOrderConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _InOrderConfig_VBiACClassWF);
         set => _InOrderConfig_VBiACClassWF = value;
@@ -272,8 +272,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_VBiACClassWF); }
     }
 
-    private ObservableHashSet<ACClassWF> _ACClassWF_ParentACClassWF;
-    public virtual ObservableHashSet<ACClassWF> ACClassWF_ParentACClassWF
+    private ICollection<ACClassWF> _ACClassWF_ParentACClassWF;
+    public virtual ICollection<ACClassWF> ACClassWF_ParentACClassWF
     {
         get => LazyLoader.Load(this, ref _ACClassWF_ParentACClassWF);
         set => _ACClassWF_ParentACClassWF = value;
@@ -292,8 +292,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ACClassWF_ParentACClassWF); }
     }
 
-    private ObservableHashSet<MDSchedulingGroupWF> _MDSchedulingGroupWF_VBiACClassWF;
-    public virtual ObservableHashSet<MDSchedulingGroupWF> MDSchedulingGroupWF_VBiACClassWF
+    private ICollection<MDSchedulingGroupWF> _MDSchedulingGroupWF_VBiACClassWF;
+    public virtual ICollection<MDSchedulingGroupWF> MDSchedulingGroupWF_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _MDSchedulingGroupWF_VBiACClassWF);
         set => _MDSchedulingGroupWF_VBiACClassWF = value;
@@ -312,8 +312,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MDSchedulingGroupWF_VBiACClassWF); }
     }
 
-    private ObservableHashSet<MaterialConfig> _MaterialConfig_VBiACClassWF;
-    public virtual ObservableHashSet<MaterialConfig> MaterialConfig_VBiACClassWF
+    private ICollection<MaterialConfig> _MaterialConfig_VBiACClassWF;
+    public virtual ICollection<MaterialConfig> MaterialConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _MaterialConfig_VBiACClassWF);
         set => _MaterialConfig_VBiACClassWF = value;
@@ -332,8 +332,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialConfig_VBiACClassWF); }
     }
 
-    private ObservableHashSet<MaterialWFACClassMethodConfig> _MaterialWFACClassMethodConfig_VBiACClassWF;
-    public virtual ObservableHashSet<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_VBiACClassWF
+    private ICollection<MaterialWFACClassMethodConfig> _MaterialWFACClassMethodConfig_VBiACClassWF;
+    public virtual ICollection<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_VBiACClassWF);
         set => _MaterialWFACClassMethodConfig_VBiACClassWF = value;
@@ -352,8 +352,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethodConfig_VBiACClassWF); }
     }
 
-    private ObservableHashSet<MaterialWFConnection> _MaterialWFConnection_ACClassWF;
-    public virtual ObservableHashSet<MaterialWFConnection> MaterialWFConnection_ACClassWF
+    private ICollection<MaterialWFConnection> _MaterialWFConnection_ACClassWF;
+    public virtual ICollection<MaterialWFConnection> MaterialWFConnection_ACClassWF
     {
         get => LazyLoader.Load(this, ref _MaterialWFConnection_ACClassWF);
         set => _MaterialWFConnection_ACClassWF = value;
@@ -372,8 +372,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFConnection_ACClassWF); }
     }
 
-    private ObservableHashSet<OutOrderConfig> _OutOrderConfig_VBiACClassWF;
-    public virtual ObservableHashSet<OutOrderConfig> OutOrderConfig_VBiACClassWF
+    private ICollection<OutOrderConfig> _OutOrderConfig_VBiACClassWF;
+    public virtual ICollection<OutOrderConfig> OutOrderConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _OutOrderConfig_VBiACClassWF);
         set => _OutOrderConfig_VBiACClassWF = value;
@@ -432,8 +432,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassWF1_ParentACClassWF"); }
     }
     
-    private ObservableHashSet<PartslistConfig> _PartslistConfig_VBiACClassWF;
-    public virtual ObservableHashSet<PartslistConfig> PartslistConfig_VBiACClassWF
+    private ICollection<PartslistConfig> _PartslistConfig_VBiACClassWF;
+    public virtual ICollection<PartslistConfig> PartslistConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _PartslistConfig_VBiACClassWF);
         set => _PartslistConfig_VBiACClassWF = value;
@@ -452,8 +452,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_VBiACClassWF); }
     }
 
-    private ObservableHashSet<PickingConfig> _PickingConfig_VBiACClassWF;
-    public virtual ObservableHashSet<PickingConfig> PickingConfig_VBiACClassWF
+    private ICollection<PickingConfig> _PickingConfig_VBiACClassWF;
+    public virtual ICollection<PickingConfig> PickingConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _PickingConfig_VBiACClassWF);
         set => _PickingConfig_VBiACClassWF = value;
@@ -472,8 +472,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingConfig_VBiACClassWF); }
     }
 
-    private ObservableHashSet<ProdOrderBatchPlan> _ProdOrderBatchPlan_VBiACClassWF;
-    public virtual ObservableHashSet<ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWF
+    private ICollection<ProdOrderBatchPlan> _ProdOrderBatchPlan_VBiACClassWF;
+    public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _ProdOrderBatchPlan_VBiACClassWF);
         set => _ProdOrderBatchPlan_VBiACClassWF = value;
@@ -492,8 +492,8 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatchPlan_VBiACClassWF); }
     }
 
-    private ObservableHashSet<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_VBiACClassWF;
-    public virtual ObservableHashSet<ProdOrderPartslistConfig> ProdOrderPartslistConfig_VBiACClassWF
+    private ICollection<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_VBiACClassWF;
+    public virtual ICollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_VBiACClassWF
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistConfig_VBiACClassWF);
         set => _ProdOrderPartslistConfig_VBiACClassWF = value;

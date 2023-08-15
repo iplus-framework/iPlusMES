@@ -90,8 +90,8 @@ public partial class MDRatingComplaintType : VBEntityObject, IInsertInfo, IUpdat
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<RatingComplaint> _RatingComplaint_MDRatingComplaintType;
-    public virtual ObservableHashSet<RatingComplaint> RatingComplaint_MDRatingComplaintType
+    private ICollection<RatingComplaint> _RatingComplaint_MDRatingComplaintType;
+    public virtual ICollection<RatingComplaint> RatingComplaint_MDRatingComplaintType
     {
         get => LazyLoader.Load(this, ref _RatingComplaint_MDRatingComplaintType);
         set => _RatingComplaint_MDRatingComplaintType = value;

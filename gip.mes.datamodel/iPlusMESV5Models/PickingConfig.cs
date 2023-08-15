@@ -146,8 +146,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<PickingConfig> _PickingConfig_ParentPickingConfig;
-    public virtual ObservableHashSet<PickingConfig> PickingConfig_ParentPickingConfig
+    private ICollection<PickingConfig> _PickingConfig_ParentPickingConfig;
+    public virtual ICollection<PickingConfig> PickingConfig_ParentPickingConfig
     {
         get => LazyLoader.Load(this, ref _PickingConfig_ParentPickingConfig);
         set => _PickingConfig_ParentPickingConfig = value;

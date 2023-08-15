@@ -243,8 +243,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Company"); }
     }
     
-    private ObservableHashSet<CompanyAddressDepartment> _CompanyAddressDepartment_CompanyAddress;
-    public virtual ObservableHashSet<CompanyAddressDepartment> CompanyAddressDepartment_CompanyAddress
+    private ICollection<CompanyAddressDepartment> _CompanyAddressDepartment_CompanyAddress;
+    public virtual ICollection<CompanyAddressDepartment> CompanyAddressDepartment_CompanyAddress
     {
         get => LazyLoader.Load(this, ref _CompanyAddressDepartment_CompanyAddress);
         set => _CompanyAddressDepartment_CompanyAddress = value;
@@ -263,8 +263,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyAddressDepartment_CompanyAddress); }
     }
 
-    private ObservableHashSet<CompanyAddressUnloadingpoint> _CompanyAddressUnloadingpoint_CompanyAddress;
-    public virtual ObservableHashSet<CompanyAddressUnloadingpoint> CompanyAddressUnloadingpoint_CompanyAddress
+    private ICollection<CompanyAddressUnloadingpoint> _CompanyAddressUnloadingpoint_CompanyAddress;
+    public virtual ICollection<CompanyAddressUnloadingpoint> CompanyAddressUnloadingpoint_CompanyAddress
     {
         get => LazyLoader.Load(this, ref _CompanyAddressUnloadingpoint_CompanyAddress);
         set => _CompanyAddressUnloadingpoint_CompanyAddress = value;
@@ -283,8 +283,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyAddressUnloadingpoint_CompanyAddress); }
     }
 
-    private ObservableHashSet<DeliveryNote> _DeliveryNote_Delivery2CompanyAddress;
-    public virtual ObservableHashSet<DeliveryNote> DeliveryNote_Delivery2CompanyAddress
+    private ICollection<DeliveryNote> _DeliveryNote_Delivery2CompanyAddress;
+    public virtual ICollection<DeliveryNote> DeliveryNote_Delivery2CompanyAddress
     {
         get => LazyLoader.Load(this, ref _DeliveryNote_Delivery2CompanyAddress);
         set => _DeliveryNote_Delivery2CompanyAddress = value;
@@ -303,8 +303,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_Delivery2CompanyAddress); }
     }
 
-    private ObservableHashSet<DeliveryNote> _DeliveryNote_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<DeliveryNote> DeliveryNote_DeliveryCompanyAddress
+    private ICollection<DeliveryNote> _DeliveryNote_DeliveryCompanyAddress;
+    public virtual ICollection<DeliveryNote> DeliveryNote_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _DeliveryNote_DeliveryCompanyAddress);
         set => _DeliveryNote_DeliveryCompanyAddress = value;
@@ -323,8 +323,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<DeliveryNote> _DeliveryNote_ShipperCompanyAddress;
-    public virtual ObservableHashSet<DeliveryNote> DeliveryNote_ShipperCompanyAddress
+    private ICollection<DeliveryNote> _DeliveryNote_ShipperCompanyAddress;
+    public virtual ICollection<DeliveryNote> DeliveryNote_ShipperCompanyAddress
     {
         get => LazyLoader.Load(this, ref _DeliveryNote_ShipperCompanyAddress);
         set => _DeliveryNote_ShipperCompanyAddress = value;
@@ -343,8 +343,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_ShipperCompanyAddress); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_BillingCompanyAddress;
-    public virtual ObservableHashSet<InOrder> InOrder_BillingCompanyAddress
+    private ICollection<InOrder> _InOrder_BillingCompanyAddress;
+    public virtual ICollection<InOrder> InOrder_BillingCompanyAddress
     {
         get => LazyLoader.Load(this, ref _InOrder_BillingCompanyAddress);
         set => _InOrder_BillingCompanyAddress = value;
@@ -363,8 +363,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrder_BillingCompanyAddress); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<InOrder> InOrder_DeliveryCompanyAddress
+    private ICollection<InOrder> _InOrder_DeliveryCompanyAddress;
+    public virtual ICollection<InOrder> InOrder_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _InOrder_DeliveryCompanyAddress);
         set => _InOrder_DeliveryCompanyAddress = value;
@@ -383,8 +383,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrder_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<InRequest> _InRequest_BillingCompanyAddress;
-    public virtual ObservableHashSet<InRequest> InRequest_BillingCompanyAddress
+    private ICollection<InRequest> _InRequest_BillingCompanyAddress;
+    public virtual ICollection<InRequest> InRequest_BillingCompanyAddress
     {
         get => LazyLoader.Load(this, ref _InRequest_BillingCompanyAddress);
         set => _InRequest_BillingCompanyAddress = value;
@@ -403,8 +403,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequest_BillingCompanyAddress); }
     }
 
-    private ObservableHashSet<InRequest> _InRequest_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<InRequest> InRequest_DeliveryCompanyAddress
+    private ICollection<InRequest> _InRequest_DeliveryCompanyAddress;
+    public virtual ICollection<InRequest> InRequest_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _InRequest_DeliveryCompanyAddress);
         set => _InRequest_DeliveryCompanyAddress = value;
@@ -423,8 +423,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InRequest_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<Invoice> _Invoice_BillingCompanyAddress;
-    public virtual ObservableHashSet<Invoice> Invoice_BillingCompanyAddress
+    private ICollection<Invoice> _Invoice_BillingCompanyAddress;
+    public virtual ICollection<Invoice> Invoice_BillingCompanyAddress
     {
         get => LazyLoader.Load(this, ref _Invoice_BillingCompanyAddress);
         set => _Invoice_BillingCompanyAddress = value;
@@ -443,8 +443,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Invoice_BillingCompanyAddress); }
     }
 
-    private ObservableHashSet<Invoice> _Invoice_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<Invoice> Invoice_DeliveryCompanyAddress
+    private ICollection<Invoice> _Invoice_DeliveryCompanyAddress;
+    public virtual ICollection<Invoice> Invoice_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _Invoice_DeliveryCompanyAddress);
         set => _Invoice_DeliveryCompanyAddress = value;
@@ -463,8 +463,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Invoice_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<Invoice> _Invoice_IssuerCompanyAddress;
-    public virtual ObservableHashSet<Invoice> Invoice_IssuerCompanyAddress
+    private ICollection<Invoice> _Invoice_IssuerCompanyAddress;
+    public virtual ICollection<Invoice> Invoice_IssuerCompanyAddress
     {
         get => LazyLoader.Load(this, ref _Invoice_IssuerCompanyAddress);
         set => _Invoice_IssuerCompanyAddress = value;
@@ -543,8 +543,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDDelivType"); }
     }
     
-    private ObservableHashSet<OutOffer> _OutOffer_BillingCompanyAddress;
-    public virtual ObservableHashSet<OutOffer> OutOffer_BillingCompanyAddress
+    private ICollection<OutOffer> _OutOffer_BillingCompanyAddress;
+    public virtual ICollection<OutOffer> OutOffer_BillingCompanyAddress
     {
         get => LazyLoader.Load(this, ref _OutOffer_BillingCompanyAddress);
         set => _OutOffer_BillingCompanyAddress = value;
@@ -563,8 +563,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOffer_BillingCompanyAddress); }
     }
 
-    private ObservableHashSet<OutOffer> _OutOffer_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<OutOffer> OutOffer_DeliveryCompanyAddress
+    private ICollection<OutOffer> _OutOffer_DeliveryCompanyAddress;
+    public virtual ICollection<OutOffer> OutOffer_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _OutOffer_DeliveryCompanyAddress);
         set => _OutOffer_DeliveryCompanyAddress = value;
@@ -583,8 +583,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOffer_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<OutOffer> _OutOffer_IssuerCompanyAddress;
-    public virtual ObservableHashSet<OutOffer> OutOffer_IssuerCompanyAddress
+    private ICollection<OutOffer> _OutOffer_IssuerCompanyAddress;
+    public virtual ICollection<OutOffer> OutOffer_IssuerCompanyAddress
     {
         get => LazyLoader.Load(this, ref _OutOffer_IssuerCompanyAddress);
         set => _OutOffer_IssuerCompanyAddress = value;
@@ -603,8 +603,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOffer_IssuerCompanyAddress); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_BillingCompanyAddress;
-    public virtual ObservableHashSet<OutOrder> OutOrder_BillingCompanyAddress
+    private ICollection<OutOrder> _OutOrder_BillingCompanyAddress;
+    public virtual ICollection<OutOrder> OutOrder_BillingCompanyAddress
     {
         get => LazyLoader.Load(this, ref _OutOrder_BillingCompanyAddress);
         set => _OutOrder_BillingCompanyAddress = value;
@@ -623,8 +623,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrder_BillingCompanyAddress); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<OutOrder> OutOrder_DeliveryCompanyAddress
+    private ICollection<OutOrder> _OutOrder_DeliveryCompanyAddress;
+    public virtual ICollection<OutOrder> OutOrder_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _OutOrder_DeliveryCompanyAddress);
         set => _OutOrder_DeliveryCompanyAddress = value;
@@ -643,8 +643,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrder_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_IssuerCompanyAddress;
-    public virtual ObservableHashSet<OutOrder> OutOrder_IssuerCompanyAddress
+    private ICollection<OutOrder> _OutOrder_IssuerCompanyAddress;
+    public virtual ICollection<OutOrder> OutOrder_IssuerCompanyAddress
     {
         get => LazyLoader.Load(this, ref _OutOrder_IssuerCompanyAddress);
         set => _OutOrder_IssuerCompanyAddress = value;
@@ -663,8 +663,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrder_IssuerCompanyAddress); }
     }
 
-    private ObservableHashSet<Picking> _Picking_DeliveryCompanyAddress;
-    public virtual ObservableHashSet<Picking> Picking_DeliveryCompanyAddress
+    private ICollection<Picking> _Picking_DeliveryCompanyAddress;
+    public virtual ICollection<Picking> Picking_DeliveryCompanyAddress
     {
         get => LazyLoader.Load(this, ref _Picking_DeliveryCompanyAddress);
         set => _Picking_DeliveryCompanyAddress = value;
@@ -683,8 +683,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Picking_DeliveryCompanyAddress); }
     }
 
-    private ObservableHashSet<TourplanPos> _TourplanPos_CompanyAddress;
-    public virtual ObservableHashSet<TourplanPos> TourplanPos_CompanyAddress
+    private ICollection<TourplanPos> _TourplanPos_CompanyAddress;
+    public virtual ICollection<TourplanPos> TourplanPos_CompanyAddress
     {
         get => LazyLoader.Load(this, ref _TourplanPos_CompanyAddress);
         set => _TourplanPos_CompanyAddress = value;
@@ -703,8 +703,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TourplanPos_CompanyAddress); }
     }
 
-    private ObservableHashSet<UserSettings> _UserSettings_InvoiceCompanyAddress;
-    public virtual ObservableHashSet<UserSettings> UserSettings_InvoiceCompanyAddress
+    private ICollection<UserSettings> _UserSettings_InvoiceCompanyAddress;
+    public virtual ICollection<UserSettings> UserSettings_InvoiceCompanyAddress
     {
         get => LazyLoader.Load(this, ref _UserSettings_InvoiceCompanyAddress);
         set => _UserSettings_InvoiceCompanyAddress = value;

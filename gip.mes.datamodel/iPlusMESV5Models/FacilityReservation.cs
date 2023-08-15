@@ -240,8 +240,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
         get { return Context.Entry(this).Reference("InOrderPos"); }
     }
     
-    private ObservableHashSet<FacilityReservation> _FacilityReservation_ParentFacilityReservation;
-    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_ParentFacilityReservation
+    private ICollection<FacilityReservation> _FacilityReservation_ParentFacilityReservation;
+    public virtual ICollection<FacilityReservation> FacilityReservation_ParentFacilityReservation
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_ParentFacilityReservation);
         set => _FacilityReservation_ParentFacilityReservation = value;

@@ -90,8 +90,8 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<DemandOrderPos> _DemandOrderPos_DemandOrder;
-    public virtual ObservableHashSet<DemandOrderPos> DemandOrderPos_DemandOrder
+    private ICollection<DemandOrderPos> _DemandOrderPos_DemandOrder;
+    public virtual ICollection<DemandOrderPos> DemandOrderPos_DemandOrder
     {
         get => LazyLoader.Load(this, ref _DemandOrderPos_DemandOrder);
         set => _DemandOrderPos_DemandOrder = value;
@@ -110,8 +110,8 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_DemandOrder); }
     }
 
-    private ObservableHashSet<DemandProdOrder> _DemandProdOrder_DemandOrder;
-    public virtual ObservableHashSet<DemandProdOrder> DemandProdOrder_DemandOrder
+    private ICollection<DemandProdOrder> _DemandProdOrder_DemandOrder;
+    public virtual ICollection<DemandProdOrder> DemandProdOrder_DemandOrder
     {
         get => LazyLoader.Load(this, ref _DemandProdOrder_DemandOrder);
         set => _DemandProdOrder_DemandOrder = value;

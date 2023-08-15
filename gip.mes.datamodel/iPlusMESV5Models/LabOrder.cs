@@ -213,8 +213,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("InOrderPos"); }
     }
     
-    private ObservableHashSet<LabOrder> _LabOrder_BasedOnTemplate;
-    public virtual ObservableHashSet<LabOrder> LabOrder_BasedOnTemplate
+    private ICollection<LabOrder> _LabOrder_BasedOnTemplate;
+    public virtual ICollection<LabOrder> LabOrder_BasedOnTemplate
     {
         get => LazyLoader.Load(this, ref _LabOrder_BasedOnTemplate);
         set => _LabOrder_BasedOnTemplate = value;
@@ -233,8 +233,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.LabOrder_BasedOnTemplate); }
     }
 
-    private ObservableHashSet<LabOrderPos> _LabOrderPos_LabOrder;
-    public virtual ObservableHashSet<LabOrderPos> LabOrderPos_LabOrder
+    private ICollection<LabOrderPos> _LabOrderPos_LabOrder;
+    public virtual ICollection<LabOrderPos> LabOrderPos_LabOrder
     {
         get => LazyLoader.Load(this, ref _LabOrderPos_LabOrder);
         set => _LabOrderPos_LabOrder = value;

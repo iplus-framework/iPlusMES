@@ -250,8 +250,8 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("OutOfferPos1_GroupOutOfferPos"); }
     }
     
-    private ObservableHashSet<OutOfferPos> _OutOfferPos_GroupOutOfferPos;
-    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_GroupOutOfferPos
+    private ICollection<OutOfferPos> _OutOfferPos_GroupOutOfferPos;
+    public virtual ICollection<OutOfferPos> OutOfferPos_GroupOutOfferPos
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_GroupOutOfferPos);
         set => _OutOfferPos_GroupOutOfferPos = value;
@@ -270,8 +270,8 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_GroupOutOfferPos); }
     }
 
-    private ObservableHashSet<OutOfferPos> _OutOfferPos_ParentOutOfferPos;
-    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_ParentOutOfferPos
+    private ICollection<OutOfferPos> _OutOfferPos_ParentOutOfferPos;
+    public virtual ICollection<OutOfferPos> OutOfferPos_ParentOutOfferPos
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_ParentOutOfferPos);
         set => _OutOfferPos_ParentOutOfferPos = value;

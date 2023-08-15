@@ -90,8 +90,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<Company> _Company_MDCurrency;
-    public virtual ObservableHashSet<Company> Company_MDCurrency
+    private ICollection<Company> _Company_MDCurrency;
+    public virtual ICollection<Company> Company_MDCurrency
     {
         get => LazyLoader.Load(this, ref _Company_MDCurrency);
         set => _Company_MDCurrency = value;
@@ -110,8 +110,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.Company_MDCurrency); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_MDCurrency;
-    public virtual ObservableHashSet<InOrder> InOrder_MDCurrency
+    private ICollection<InOrder> _InOrder_MDCurrency;
+    public virtual ICollection<InOrder> InOrder_MDCurrency
     {
         get => LazyLoader.Load(this, ref _InOrder_MDCurrency);
         set => _InOrder_MDCurrency = value;
@@ -130,8 +130,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.InOrder_MDCurrency); }
     }
 
-    private ObservableHashSet<Invoice> _Invoice_MDCurrency;
-    public virtual ObservableHashSet<Invoice> Invoice_MDCurrency
+    private ICollection<Invoice> _Invoice_MDCurrency;
+    public virtual ICollection<Invoice> Invoice_MDCurrency
     {
         get => LazyLoader.Load(this, ref _Invoice_MDCurrency);
         set => _Invoice_MDCurrency = value;
@@ -150,8 +150,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.Invoice_MDCurrency); }
     }
 
-    private ObservableHashSet<MDCountry> _MDCountry_MDCurrency;
-    public virtual ObservableHashSet<MDCountry> MDCountry_MDCurrency
+    private ICollection<MDCountry> _MDCountry_MDCurrency;
+    public virtual ICollection<MDCountry> MDCountry_MDCurrency
     {
         get => LazyLoader.Load(this, ref _MDCountry_MDCurrency);
         set => _MDCountry_MDCurrency = value;
@@ -170,8 +170,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.MDCountry_MDCurrency); }
     }
 
-    private ObservableHashSet<MDCurrencyExchange> _MDCurrencyExchange_MDCurrency;
-    public virtual ObservableHashSet<MDCurrencyExchange> MDCurrencyExchange_MDCurrency
+    private ICollection<MDCurrencyExchange> _MDCurrencyExchange_MDCurrency;
+    public virtual ICollection<MDCurrencyExchange> MDCurrencyExchange_MDCurrency
     {
         get => LazyLoader.Load(this, ref _MDCurrencyExchange_MDCurrency);
         set => _MDCurrencyExchange_MDCurrency = value;
@@ -190,8 +190,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.MDCurrencyExchange_MDCurrency); }
     }
 
-    private ObservableHashSet<MDCurrencyExchange> _MDCurrencyExchange_ToMDCurrency;
-    public virtual ObservableHashSet<MDCurrencyExchange> MDCurrencyExchange_ToMDCurrency
+    private ICollection<MDCurrencyExchange> _MDCurrencyExchange_ToMDCurrency;
+    public virtual ICollection<MDCurrencyExchange> MDCurrencyExchange_ToMDCurrency
     {
         get => LazyLoader.Load(this, ref _MDCurrencyExchange_ToMDCurrency);
         set => _MDCurrencyExchange_ToMDCurrency = value;
@@ -210,8 +210,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.MDCurrencyExchange_ToMDCurrency); }
     }
 
-    private ObservableHashSet<OutOffer> _OutOffer_MDCurrency;
-    public virtual ObservableHashSet<OutOffer> OutOffer_MDCurrency
+    private ICollection<OutOffer> _OutOffer_MDCurrency;
+    public virtual ICollection<OutOffer> OutOffer_MDCurrency
     {
         get => LazyLoader.Load(this, ref _OutOffer_MDCurrency);
         set => _OutOffer_MDCurrency = value;
@@ -230,8 +230,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDCurrency); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_MDCurrency;
-    public virtual ObservableHashSet<OutOrder> OutOrder_MDCurrency
+    private ICollection<OutOrder> _OutOrder_MDCurrency;
+    public virtual ICollection<OutOrder> OutOrder_MDCurrency
     {
         get => LazyLoader.Load(this, ref _OutOrder_MDCurrency);
         set => _OutOrder_MDCurrency = value;
@@ -250,8 +250,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         get { return Context.Entry(this).Collection(c => c.OutOrder_MDCurrency); }
     }
 
-    private ObservableHashSet<PriceList> _PriceList_MDCurrency;
-    public virtual ObservableHashSet<PriceList> PriceList_MDCurrency
+    private ICollection<PriceList> _PriceList_MDCurrency;
+    public virtual ICollection<PriceList> PriceList_MDCurrency
     {
         get => LazyLoader.Load(this, ref _PriceList_MDCurrency);
         set => _PriceList_MDCurrency = value;

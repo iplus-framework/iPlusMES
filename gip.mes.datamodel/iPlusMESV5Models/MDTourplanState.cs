@@ -97,8 +97,8 @@ public partial class MDTourplanState : VBEntityObject, IInsertInfo, IUpdateInfo,
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ObservableHashSet<Tourplan> _Tourplan_MDTourplanState;
-    public virtual ObservableHashSet<Tourplan> Tourplan_MDTourplanState
+    private ICollection<Tourplan> _Tourplan_MDTourplanState;
+    public virtual ICollection<Tourplan> Tourplan_MDTourplanState
     {
         get => LazyLoader.Load(this, ref _Tourplan_MDTourplanState);
         set => _Tourplan_MDTourplanState = value;

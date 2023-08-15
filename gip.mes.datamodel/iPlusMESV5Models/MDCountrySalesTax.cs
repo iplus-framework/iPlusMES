@@ -111,8 +111,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         set { SetProperty<DateTime?>(ref _DateTo, value); }
     }
 
-    private ObservableHashSet<InOrderPos> _InOrderPos_MDCountrySalesTax;
-    public virtual ObservableHashSet<InOrderPos> InOrderPos_MDCountrySalesTax
+    private ICollection<InOrderPos> _InOrderPos_MDCountrySalesTax;
+    public virtual ICollection<InOrderPos> InOrderPos_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _InOrderPos_MDCountrySalesTax);
         set => _InOrderPos_MDCountrySalesTax = value;
@@ -131,8 +131,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDCountrySalesTax); }
     }
 
-    private ObservableHashSet<InRequestPos> _InRequestPos_MDCountrySalesTax;
-    public virtual ObservableHashSet<InRequestPos> InRequestPos_MDCountrySalesTax
+    private ICollection<InRequestPos> _InRequestPos_MDCountrySalesTax;
+    public virtual ICollection<InRequestPos> InRequestPos_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _InRequestPos_MDCountrySalesTax);
         set => _InRequestPos_MDCountrySalesTax = value;
@@ -151,8 +151,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Collection(c => c.InRequestPos_MDCountrySalesTax); }
     }
 
-    private ObservableHashSet<InvoicePos> _InvoicePos_MDCountrySalesTax;
-    public virtual ObservableHashSet<InvoicePos> InvoicePos_MDCountrySalesTax
+    private ICollection<InvoicePos> _InvoicePos_MDCountrySalesTax;
+    public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTax);
         set => _InvoicePos_MDCountrySalesTax = value;
@@ -191,8 +191,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Reference("MDCountry"); }
     }
     
-    private ObservableHashSet<MDCountrySalesTaxMDMaterialGroup> _MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax;
-    public virtual ObservableHashSet<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax
+    private ICollection<MDCountrySalesTaxMDMaterialGroup> _MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax;
+    public virtual ICollection<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax);
         set => _MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax = value;
@@ -211,8 +211,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax); }
     }
 
-    private ObservableHashSet<MDCountrySalesTaxMaterial> _MDCountrySalesTaxMaterial_MDCountrySalesTax;
-    public virtual ObservableHashSet<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_MDCountrySalesTax
+    private ICollection<MDCountrySalesTaxMaterial> _MDCountrySalesTaxMaterial_MDCountrySalesTax;
+    public virtual ICollection<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _MDCountrySalesTaxMaterial_MDCountrySalesTax);
         set => _MDCountrySalesTaxMaterial_MDCountrySalesTax = value;
@@ -231,8 +231,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMaterial_MDCountrySalesTax); }
     }
 
-    private ObservableHashSet<OutOfferPos> _OutOfferPos_MDCountrySalesTax;
-    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_MDCountrySalesTax
+    private ICollection<OutOfferPos> _OutOfferPos_MDCountrySalesTax;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTax);
         set => _OutOfferPos_MDCountrySalesTax = value;
@@ -251,8 +251,8 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTax); }
     }
 
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDCountrySalesTax;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDCountrySalesTax
+    private ICollection<OutOrderPos> _OutOrderPos_MDCountrySalesTax;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTax
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTax);
         set => _OutOrderPos_MDCountrySalesTax = value;

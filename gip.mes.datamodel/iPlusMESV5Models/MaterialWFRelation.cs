@@ -75,8 +75,8 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
         get { return Context.Entry(this).Reference("MaterialWF"); }
     }
     
-    private ObservableHashSet<PartslistPosRelation> _PartslistPosRelation_MaterialWFRelation;
-    public virtual ObservableHashSet<PartslistPosRelation> PartslistPosRelation_MaterialWFRelation
+    private ICollection<PartslistPosRelation> _PartslistPosRelation_MaterialWFRelation;
+    public virtual ICollection<PartslistPosRelation> PartslistPosRelation_MaterialWFRelation
     {
         get => LazyLoader.Load(this, ref _PartslistPosRelation_MaterialWFRelation);
         set => _PartslistPosRelation_MaterialWFRelation = value;

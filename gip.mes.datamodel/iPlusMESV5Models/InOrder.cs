@@ -309,8 +309,8 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DistributorCompany"); }
     }
     
-    private ObservableHashSet<InOrderConfig> _InOrderConfig_InOrder;
-    public virtual ObservableHashSet<InOrderConfig> InOrderConfig_InOrder
+    private ICollection<InOrderConfig> _InOrderConfig_InOrder;
+    public virtual ICollection<InOrderConfig> InOrderConfig_InOrder
     {
         get => LazyLoader.Load(this, ref _InOrderConfig_InOrder);
         set => _InOrderConfig_InOrder = value;
@@ -329,8 +329,8 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_InOrder); }
     }
 
-    private ObservableHashSet<InOrderPos> _InOrderPos_InOrder;
-    public virtual ObservableHashSet<InOrderPos> InOrderPos_InOrder
+    private ICollection<InOrderPos> _InOrderPos_InOrder;
+    public virtual ICollection<InOrderPos> InOrderPos_InOrder
     {
         get => LazyLoader.Load(this, ref _InOrderPos_InOrder);
         set => _InOrderPos_InOrder = value;
@@ -489,8 +489,8 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDTimeRange"); }
     }
     
-    private ObservableHashSet<PlanningMRProposal> _PlanningMRProposal_InOrder;
-    public virtual ObservableHashSet<PlanningMRProposal> PlanningMRProposal_InOrder
+    private ICollection<PlanningMRProposal> _PlanningMRProposal_InOrder;
+    public virtual ICollection<PlanningMRProposal> PlanningMRProposal_InOrder
     {
         get => LazyLoader.Load(this, ref _PlanningMRProposal_InOrder);
         set => _PlanningMRProposal_InOrder = value;

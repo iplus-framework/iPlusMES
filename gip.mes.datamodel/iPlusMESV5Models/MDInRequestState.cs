@@ -97,8 +97,8 @@ public partial class MDInRequestState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<InRequest> _InRequest_MDInRequestState;
-    public virtual ObservableHashSet<InRequest> InRequest_MDInRequestState
+    private ICollection<InRequest> _InRequest_MDInRequestState;
+    public virtual ICollection<InRequest> InRequest_MDInRequestState
     {
         get => LazyLoader.Load(this, ref _InRequest_MDInRequestState);
         set => _InRequest_MDInRequestState = value;

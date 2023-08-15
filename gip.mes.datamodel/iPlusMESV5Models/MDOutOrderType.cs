@@ -97,8 +97,8 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<OutOffer> _OutOffer_MDOutOrderType;
-    public virtual ObservableHashSet<OutOffer> OutOffer_MDOutOrderType
+    private ICollection<OutOffer> _OutOffer_MDOutOrderType;
+    public virtual ICollection<OutOffer> OutOffer_MDOutOrderType
     {
         get => LazyLoader.Load(this, ref _OutOffer_MDOutOrderType);
         set => _OutOffer_MDOutOrderType = value;
@@ -117,8 +117,8 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDOutOrderType); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_MDOutOrderType;
-    public virtual ObservableHashSet<OutOrder> OutOrder_MDOutOrderType
+    private ICollection<OutOrder> _OutOrder_MDOutOrderType;
+    public virtual ICollection<OutOrder> OutOrder_MDOutOrderType
     {
         get => LazyLoader.Load(this, ref _OutOrder_MDOutOrderType);
         set => _OutOrder_MDOutOrderType = value;

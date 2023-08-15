@@ -369,8 +369,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("CompanyAddressUnloadingpoint"); }
     }
     
-    private ObservableHashSet<CompanyMaterialPickup> _CompanyMaterialPickup_OutOrderPos;
-    public virtual ObservableHashSet<CompanyMaterialPickup> CompanyMaterialPickup_OutOrderPos
+    private ICollection<CompanyMaterialPickup> _CompanyMaterialPickup_OutOrderPos;
+    public virtual ICollection<CompanyMaterialPickup> CompanyMaterialPickup_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _CompanyMaterialPickup_OutOrderPos);
         set => _CompanyMaterialPickup_OutOrderPos = value;
@@ -389,8 +389,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_OutOrderPos); }
     }
 
-    private ObservableHashSet<DeliveryNotePos> _DeliveryNotePos_OutOrderPos;
-    public virtual ObservableHashSet<DeliveryNotePos> DeliveryNotePos_OutOrderPos
+    private ICollection<DeliveryNotePos> _DeliveryNotePos_OutOrderPos;
+    public virtual ICollection<DeliveryNotePos> DeliveryNotePos_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _DeliveryNotePos_OutOrderPos);
         set => _DeliveryNotePos_OutOrderPos = value;
@@ -409,8 +409,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_OutOrderPos); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutOrderPos;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutOrderPos
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutOrderPos;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutOrderPos);
         set => _FacilityBookingCharge_OutOrderPos = value;
@@ -429,8 +429,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutOrderPos); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_OutOrderPos;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_OutOrderPos
+    private ICollection<FacilityBooking> _FacilityBooking_OutOrderPos;
+    public virtual ICollection<FacilityBooking> FacilityBooking_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_OutOrderPos);
         set => _FacilityBooking_OutOrderPos = value;
@@ -449,8 +449,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutOrderPos); }
     }
 
-    private ObservableHashSet<FacilityPreBooking> _FacilityPreBooking_OutOrderPos;
-    public virtual ObservableHashSet<FacilityPreBooking> FacilityPreBooking_OutOrderPos
+    private ICollection<FacilityPreBooking> _FacilityPreBooking_OutOrderPos;
+    public virtual ICollection<FacilityPreBooking> FacilityPreBooking_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _FacilityPreBooking_OutOrderPos);
         set => _FacilityPreBooking_OutOrderPos = value;
@@ -469,8 +469,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_OutOrderPos); }
     }
 
-    private ObservableHashSet<FacilityReservation> _FacilityReservation_OutOrderPos;
-    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_OutOrderPos
+    private ICollection<FacilityReservation> _FacilityReservation_OutOrderPos;
+    public virtual ICollection<FacilityReservation> FacilityReservation_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_OutOrderPos);
         set => _FacilityReservation_OutOrderPos = value;
@@ -509,8 +509,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("OutOrderPos1_GroupOutOrderPos"); }
     }
     
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_GroupOutOrderPos;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_GroupOutOrderPos
+    private ICollection<OutOrderPos> _OutOrderPos_GroupOutOrderPos;
+    public virtual ICollection<OutOrderPos> OutOrderPos_GroupOutOrderPos
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_GroupOutOrderPos);
         set => _OutOrderPos_GroupOutOrderPos = value;
@@ -529,8 +529,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_GroupOutOrderPos); }
     }
 
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_ParentOutOrderPos;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_ParentOutOrderPos
+    private ICollection<OutOrderPos> _OutOrderPos_ParentOutOrderPos;
+    public virtual ICollection<OutOrderPos> OutOrderPos_ParentOutOrderPos
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_ParentOutOrderPos);
         set => _OutOrderPos_ParentOutOrderPos = value;
@@ -549,8 +549,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_ParentOutOrderPos); }
     }
 
-    private ObservableHashSet<InvoicePos> _InvoicePos_OutOrderPos;
-    public virtual ObservableHashSet<InvoicePos> InvoicePos_OutOrderPos
+    private ICollection<InvoicePos> _InvoicePos_OutOrderPos;
+    public virtual ICollection<InvoicePos> InvoicePos_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _InvoicePos_OutOrderPos);
         set => _InvoicePos_OutOrderPos = value;
@@ -569,8 +569,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.InvoicePos_OutOrderPos); }
     }
 
-    private ObservableHashSet<LabOrder> _LabOrder_OutOrderPos;
-    public virtual ObservableHashSet<LabOrder> LabOrder_OutOrderPos
+    private ICollection<LabOrder> _LabOrder_OutOrderPos;
+    public virtual ICollection<LabOrder> LabOrder_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _LabOrder_OutOrderPos);
         set => _LabOrder_OutOrderPos = value;
@@ -869,8 +869,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("OutOrder"); }
     }
     
-    private ObservableHashSet<OutOrderPosSplit> _OutOrderPosSplit_OutOrderPos;
-    public virtual ObservableHashSet<OutOrderPosSplit> OutOrderPosSplit_OutOrderPos
+    private ICollection<OutOrderPosSplit> _OutOrderPosSplit_OutOrderPos;
+    public virtual ICollection<OutOrderPosSplit> OutOrderPosSplit_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _OutOrderPosSplit_OutOrderPos);
         set => _OutOrderPosSplit_OutOrderPos = value;
@@ -889,8 +889,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.OutOrderPosSplit_OutOrderPos); }
     }
 
-    private ObservableHashSet<OutOrderPosUtilization> _OutOrderPosUtilization_OutOrderPos;
-    public virtual ObservableHashSet<OutOrderPosUtilization> OutOrderPosUtilization_OutOrderPos
+    private ICollection<OutOrderPosUtilization> _OutOrderPosUtilization_OutOrderPos;
+    public virtual ICollection<OutOrderPosUtilization> OutOrderPosUtilization_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _OutOrderPosUtilization_OutOrderPos);
         set => _OutOrderPosUtilization_OutOrderPos = value;
@@ -929,8 +929,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("OutOrderPos1_ParentOutOrderPos"); }
     }
     
-    private ObservableHashSet<PickingPos> _PickingPos_OutOrderPos;
-    public virtual ObservableHashSet<PickingPos> PickingPos_OutOrderPos
+    private ICollection<PickingPos> _PickingPos_OutOrderPos;
+    public virtual ICollection<PickingPos> PickingPos_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _PickingPos_OutOrderPos);
         set => _PickingPos_OutOrderPos = value;
@@ -969,8 +969,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("PickupCompanyMaterial"); }
     }
     
-    private ObservableHashSet<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
-    public virtual ObservableHashSet<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
+    private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
+    public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointOutOrderPos_OutOrderPos);
         set => _TandTv3MixPointOutOrderPos_OutOrderPos = value;
@@ -989,8 +989,8 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPos_OutOrderPos); }
     }
 
-    private ObservableHashSet<Weighing> _Weighing_OutOrderPos;
-    public virtual ObservableHashSet<Weighing> Weighing_OutOrderPos
+    private ICollection<Weighing> _Weighing_OutOrderPos;
+    public virtual ICollection<Weighing> Weighing_OutOrderPos
     {
         get => LazyLoader.Load(this, ref _Weighing_OutOrderPos);
         set => _Weighing_OutOrderPos = value;

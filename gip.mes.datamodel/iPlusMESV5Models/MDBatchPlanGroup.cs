@@ -97,8 +97,8 @@ public partial class MDBatchPlanGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<ProdOrderBatchPlan> _ProdOrderBatchPlan_MDBatchPlanGroup;
-    public virtual ObservableHashSet<ProdOrderBatchPlan> ProdOrderBatchPlan_MDBatchPlanGroup
+    private ICollection<ProdOrderBatchPlan> _ProdOrderBatchPlan_MDBatchPlanGroup;
+    public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_MDBatchPlanGroup
     {
         get => LazyLoader.Load(this, ref _ProdOrderBatchPlan_MDBatchPlanGroup);
         set => _ProdOrderBatchPlan_MDBatchPlanGroup = value;

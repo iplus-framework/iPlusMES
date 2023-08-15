@@ -159,8 +159,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("History"); }
     }
     
-    private ObservableHashSet<HistoryConfig> _HistoryConfig_ParentHistoryConfig;
-    public virtual ObservableHashSet<HistoryConfig> HistoryConfig_ParentHistoryConfig
+    private ICollection<HistoryConfig> _HistoryConfig_ParentHistoryConfig;
+    public virtual ICollection<HistoryConfig> HistoryConfig_ParentHistoryConfig
     {
         get => LazyLoader.Load(this, ref _HistoryConfig_ParentHistoryConfig);
         set => _HistoryConfig_ParentHistoryConfig = value;

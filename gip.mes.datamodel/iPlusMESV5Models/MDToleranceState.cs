@@ -97,8 +97,8 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDToleranceState;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDToleranceState
+    private ICollection<OutOrderPos> _OutOrderPos_MDToleranceState;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDToleranceState
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDToleranceState);
         set => _OutOrderPos_MDToleranceState = value;
@@ -117,8 +117,8 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDToleranceState); }
     }
 
-    private ObservableHashSet<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDToleranceState;
-    public virtual ObservableHashSet<ProdOrderPartslistPos> ProdOrderPartslistPos_MDToleranceState
+    private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDToleranceState;
+    public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDToleranceState
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDToleranceState);
         set => _ProdOrderPartslistPos_MDToleranceState = value;
@@ -137,8 +137,8 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDToleranceState); }
     }
 
-    private ObservableHashSet<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDToleranceState;
-    public virtual ObservableHashSet<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDToleranceState
+    private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDToleranceState;
+    public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDToleranceState
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_MDToleranceState);
         set => _ProdOrderPartslistPosRelation_MDToleranceState = value;

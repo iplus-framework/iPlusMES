@@ -97,8 +97,8 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ObservableHashSet<InOrderPos> _InOrderPos_MDTransportMode;
-    public virtual ObservableHashSet<InOrderPos> InOrderPos_MDTransportMode
+    private ICollection<InOrderPos> _InOrderPos_MDTransportMode;
+    public virtual ICollection<InOrderPos> InOrderPos_MDTransportMode
     {
         get => LazyLoader.Load(this, ref _InOrderPos_MDTransportMode);
         set => _InOrderPos_MDTransportMode = value;
@@ -117,8 +117,8 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDTransportMode); }
     }
 
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDTransportMode;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDTransportMode
+    private ICollection<OutOrderPos> _OutOrderPos_MDTransportMode;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDTransportMode
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDTransportMode);
         set => _OutOrderPos_MDTransportMode = value;

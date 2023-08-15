@@ -27,8 +27,8 @@ public partial class TandTv3MDBookingDirection : VBEntityObject
         set { SetProperty<string>(ref _TandTv3MDBookingDirectionID, value); }
     }
 
-    private ObservableHashSet<TandTv3MixPointFacility> _TandTv3MixPointFacility_TandTv3MDBookingDirection;
-    public virtual ObservableHashSet<TandTv3MixPointFacility> TandTv3MixPointFacility_TandTv3MDBookingDirection
+    private ICollection<TandTv3MixPointFacility> _TandTv3MixPointFacility_TandTv3MDBookingDirection;
+    public virtual ICollection<TandTv3MixPointFacility> TandTv3MixPointFacility_TandTv3MDBookingDirection
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointFacility_TandTv3MDBookingDirection);
         set => _TandTv3MixPointFacility_TandTv3MDBookingDirection = value;
@@ -47,8 +47,8 @@ public partial class TandTv3MDBookingDirection : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacility_TandTv3MDBookingDirection); }
     }
 
-    private ObservableHashSet<TandTv3MixPointFacilityLot> _TandTv3MixPointFacilityLot_TandTv3MDBookingDirection;
-    public virtual ObservableHashSet<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_TandTv3MDBookingDirection
+    private ICollection<TandTv3MixPointFacilityLot> _TandTv3MixPointFacilityLot_TandTv3MDBookingDirection;
+    public virtual ICollection<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_TandTv3MDBookingDirection
     {
         get => LazyLoader.Load(this, ref _TandTv3MixPointFacilityLot_TandTv3MDBookingDirection);
         set => _TandTv3MixPointFacilityLot_TandTv3MDBookingDirection = value;

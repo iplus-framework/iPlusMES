@@ -83,8 +83,8 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<FacilityMDSchedulingGroup> _FacilityMDSchedulingGroup_MDSchedulingGroup;
-    public virtual ObservableHashSet<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDSchedulingGroup
+    private ICollection<FacilityMDSchedulingGroup> _FacilityMDSchedulingGroup_MDSchedulingGroup;
+    public virtual ICollection<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDSchedulingGroup
     {
         get => LazyLoader.Load(this, ref _FacilityMDSchedulingGroup_MDSchedulingGroup);
         set => _FacilityMDSchedulingGroup_MDSchedulingGroup = value;
@@ -103,8 +103,8 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
         get { return Context.Entry(this).Collection(c => c.FacilityMDSchedulingGroup_MDSchedulingGroup); }
     }
 
-    private ObservableHashSet<MDSchedulingGroupWF> _MDSchedulingGroupWF_MDSchedulingGroup;
-    public virtual ObservableHashSet<MDSchedulingGroupWF> MDSchedulingGroupWF_MDSchedulingGroup
+    private ICollection<MDSchedulingGroupWF> _MDSchedulingGroupWF_MDSchedulingGroup;
+    public virtual ICollection<MDSchedulingGroupWF> MDSchedulingGroupWF_MDSchedulingGroup
     {
         get => LazyLoader.Load(this, ref _MDSchedulingGroupWF_MDSchedulingGroup);
         set => _MDSchedulingGroupWF_MDSchedulingGroup = value;

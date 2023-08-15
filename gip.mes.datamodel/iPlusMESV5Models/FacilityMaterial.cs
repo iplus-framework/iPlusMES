@@ -138,8 +138,8 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Facility"); }
     }
     
-    private ObservableHashSet<FacilityMaterialOEE> _FacilityMaterialOEE_FacilityMaterial;
-    public virtual ObservableHashSet<FacilityMaterialOEE> FacilityMaterialOEE_FacilityMaterial
+    private ICollection<FacilityMaterialOEE> _FacilityMaterialOEE_FacilityMaterial;
+    public virtual ICollection<FacilityMaterialOEE> FacilityMaterialOEE_FacilityMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityMaterialOEE_FacilityMaterial);
         set => _FacilityMaterialOEE_FacilityMaterial = value;

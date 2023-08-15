@@ -146,8 +146,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<PartslistConfig> _PartslistConfig_ParentPartslistConfig;
-    public virtual ObservableHashSet<PartslistConfig> PartslistConfig_ParentPartslistConfig
+    private ICollection<PartslistConfig> _PartslistConfig_ParentPartslistConfig;
+    public virtual ICollection<PartslistConfig> PartslistConfig_ParentPartslistConfig
     {
         get => LazyLoader.Load(this, ref _PartslistConfig_ParentPartslistConfig);
         set => _PartslistConfig_ParentPartslistConfig = value;

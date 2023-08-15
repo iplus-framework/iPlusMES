@@ -34,8 +34,8 @@ public partial class TandTv3MDTrackingStartItemType : VBEntityObject
         set { SetProperty<string>(ref _ACCaptionTranslation, value); }
     }
 
-    private ObservableHashSet<TandTv3FilterTracking> _TandTv3FilterTracking_TandTv3MDTrackingStartItemType;
-    public virtual ObservableHashSet<TandTv3FilterTracking> TandTv3FilterTracking_TandTv3MDTrackingStartItemType
+    private ICollection<TandTv3FilterTracking> _TandTv3FilterTracking_TandTv3MDTrackingStartItemType;
+    public virtual ICollection<TandTv3FilterTracking> TandTv3FilterTracking_TandTv3MDTrackingStartItemType
     {
         get => LazyLoader.Load(this, ref _TandTv3FilterTracking_TandTv3MDTrackingStartItemType);
         set => _TandTv3FilterTracking_TandTv3MDTrackingStartItemType = value;

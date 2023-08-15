@@ -237,8 +237,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<Guid?>(ref _MDBatchPlanGroupID, value); }
     }
 
-    private ObservableHashSet<FacilityReservation> _FacilityReservation_ProdOrderBatchPlan;
-    public virtual ObservableHashSet<FacilityReservation> FacilityReservation_ProdOrderBatchPlan
+    private ICollection<FacilityReservation> _FacilityReservation_ProdOrderBatchPlan;
+    public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderBatchPlan
     {
         get => LazyLoader.Load(this, ref _FacilityReservation_ProdOrderBatchPlan);
         set => _FacilityReservation_ProdOrderBatchPlan = value;
@@ -297,8 +297,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
         get { return Context.Entry(this).Reference("MaterialWFACClassMethod"); }
     }
     
-    private ObservableHashSet<ProdOrderBatch> _ProdOrderBatch_ProdOrderBatchPlan;
-    public virtual ObservableHashSet<ProdOrderBatch> ProdOrderBatch_ProdOrderBatchPlan
+    private ICollection<ProdOrderBatch> _ProdOrderBatch_ProdOrderBatchPlan;
+    public virtual ICollection<ProdOrderBatch> ProdOrderBatch_ProdOrderBatchPlan
     {
         get => LazyLoader.Load(this, ref _ProdOrderBatch_ProdOrderBatchPlan);
         set => _ProdOrderBatch_ProdOrderBatchPlan = value;

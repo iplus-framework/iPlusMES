@@ -102,8 +102,8 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         get { return Context.Entry(this).Reference("MaterialWF"); }
     }
     
-    private ObservableHashSet<MaterialWFACClassMethodConfig> _MaterialWFACClassMethodConfig_MaterialWFACClassMethod;
-    public virtual ObservableHashSet<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_MaterialWFACClassMethod
+    private ICollection<MaterialWFACClassMethodConfig> _MaterialWFACClassMethodConfig_MaterialWFACClassMethod;
+    public virtual ICollection<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_MaterialWFACClassMethod
     {
         get => LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_MaterialWFACClassMethod);
         set => _MaterialWFACClassMethodConfig_MaterialWFACClassMethod = value;
@@ -122,8 +122,8 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethodConfig_MaterialWFACClassMethod); }
     }
 
-    private ObservableHashSet<MaterialWFConnection> _MaterialWFConnection_MaterialWFACClassMethod;
-    public virtual ObservableHashSet<MaterialWFConnection> MaterialWFConnection_MaterialWFACClassMethod
+    private ICollection<MaterialWFConnection> _MaterialWFConnection_MaterialWFACClassMethod;
+    public virtual ICollection<MaterialWFConnection> MaterialWFConnection_MaterialWFACClassMethod
     {
         get => LazyLoader.Load(this, ref _MaterialWFConnection_MaterialWFACClassMethod);
         set => _MaterialWFConnection_MaterialWFACClassMethod = value;
@@ -142,8 +142,8 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.MaterialWFConnection_MaterialWFACClassMethod); }
     }
 
-    private ObservableHashSet<PartslistACClassMethod> _PartslistACClassMethod_MaterialWFACClassMethod;
-    public virtual ObservableHashSet<PartslistACClassMethod> PartslistACClassMethod_MaterialWFACClassMethod
+    private ICollection<PartslistACClassMethod> _PartslistACClassMethod_MaterialWFACClassMethod;
+    public virtual ICollection<PartslistACClassMethod> PartslistACClassMethod_MaterialWFACClassMethod
     {
         get => LazyLoader.Load(this, ref _PartslistACClassMethod_MaterialWFACClassMethod);
         set => _PartslistACClassMethod_MaterialWFACClassMethod = value;
@@ -162,8 +162,8 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.PartslistACClassMethod_MaterialWFACClassMethod); }
     }
 
-    private ObservableHashSet<ProdOrderBatchPlan> _ProdOrderBatchPlan_MaterialWFACClassMethod;
-    public virtual ObservableHashSet<ProdOrderBatchPlan> ProdOrderBatchPlan_MaterialWFACClassMethod
+    private ICollection<ProdOrderBatchPlan> _ProdOrderBatchPlan_MaterialWFACClassMethod;
+    public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_MaterialWFACClassMethod
     {
         get => LazyLoader.Load(this, ref _ProdOrderBatchPlan_MaterialWFACClassMethod);
         set => _ProdOrderBatchPlan_MaterialWFACClassMethod = value;

@@ -97,8 +97,8 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_MDMovementReason;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_MDMovementReason
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDMovementReason;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDMovementReason
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDMovementReason);
         set => _FacilityBookingCharge_MDMovementReason = value;
@@ -117,8 +117,8 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDMovementReason); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_MDMovementReason;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_MDMovementReason
+    private ICollection<FacilityBooking> _FacilityBooking_MDMovementReason;
+    public virtual ICollection<FacilityBooking> FacilityBooking_MDMovementReason
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_MDMovementReason);
         set => _FacilityBooking_MDMovementReason = value;

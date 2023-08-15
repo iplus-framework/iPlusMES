@@ -97,8 +97,8 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<FacilityMDSchedulingGroup> _FacilityMDSchedulingGroup_MDPickingType;
-    public virtual ObservableHashSet<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDPickingType
+    private ICollection<FacilityMDSchedulingGroup> _FacilityMDSchedulingGroup_MDPickingType;
+    public virtual ICollection<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDPickingType
     {
         get => LazyLoader.Load(this, ref _FacilityMDSchedulingGroup_MDPickingType);
         set => _FacilityMDSchedulingGroup_MDPickingType = value;
@@ -117,8 +117,8 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         get { return Context.Entry(this).Collection(c => c.FacilityMDSchedulingGroup_MDPickingType); }
     }
 
-    private ObservableHashSet<Picking> _Picking_MDPickingType;
-    public virtual ObservableHashSet<Picking> Picking_MDPickingType
+    private ICollection<Picking> _Picking_MDPickingType;
+    public virtual ICollection<Picking> Picking_MDPickingType
     {
         get => LazyLoader.Load(this, ref _Picking_MDPickingType);
         set => _Picking_MDPickingType = value;

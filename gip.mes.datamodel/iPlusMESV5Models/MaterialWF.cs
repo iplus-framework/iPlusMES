@@ -83,8 +83,8 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
-    private ObservableHashSet<MaterialWFACClassMethod> _MaterialWFACClassMethod_MaterialWF;
-    public virtual ObservableHashSet<MaterialWFACClassMethod> MaterialWFACClassMethod_MaterialWF
+    private ICollection<MaterialWFACClassMethod> _MaterialWFACClassMethod_MaterialWF;
+    public virtual ICollection<MaterialWFACClassMethod> MaterialWFACClassMethod_MaterialWF
     {
         get => LazyLoader.Load(this, ref _MaterialWFACClassMethod_MaterialWF);
         set => _MaterialWFACClassMethod_MaterialWF = value;
@@ -103,8 +103,8 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethod_MaterialWF); }
     }
 
-    private ObservableHashSet<MaterialWFRelation> _MaterialWFRelation_MaterialWF;
-    public virtual ObservableHashSet<MaterialWFRelation> MaterialWFRelation_MaterialWF
+    private ICollection<MaterialWFRelation> _MaterialWFRelation_MaterialWF;
+    public virtual ICollection<MaterialWFRelation> MaterialWFRelation_MaterialWF
     {
         get => LazyLoader.Load(this, ref _MaterialWFRelation_MaterialWF);
         set => _MaterialWFRelation_MaterialWF = value;
@@ -123,8 +123,8 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.MaterialWFRelation_MaterialWF); }
     }
 
-    private ObservableHashSet<Partslist> _Partslist_MaterialWF;
-    public virtual ObservableHashSet<Partslist> Partslist_MaterialWF
+    private ICollection<Partslist> _Partslist_MaterialWF;
+    public virtual ICollection<Partslist> Partslist_MaterialWF
     {
         get => LazyLoader.Load(this, ref _Partslist_MaterialWF);
         set => _Partslist_MaterialWF = value;

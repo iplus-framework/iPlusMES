@@ -166,8 +166,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("InOrder"); }
     }
     
-    private ObservableHashSet<InOrderConfig> _InOrderConfig_ParentInOrderConfig;
-    public virtual ObservableHashSet<InOrderConfig> InOrderConfig_ParentInOrderConfig
+    private ICollection<InOrderConfig> _InOrderConfig_ParentInOrderConfig;
+    public virtual ICollection<InOrderConfig> InOrderConfig_ParentInOrderConfig
     {
         get => LazyLoader.Load(this, ref _InOrderConfig_ParentInOrderConfig);
         set => _InOrderConfig_ParentInOrderConfig = value;

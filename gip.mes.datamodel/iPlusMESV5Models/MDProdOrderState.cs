@@ -97,8 +97,8 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<ProdOrderBatch> _ProdOrderBatch_MDProdOrderState;
-    public virtual ObservableHashSet<ProdOrderBatch> ProdOrderBatch_MDProdOrderState
+    private ICollection<ProdOrderBatch> _ProdOrderBatch_MDProdOrderState;
+    public virtual ICollection<ProdOrderBatch> ProdOrderBatch_MDProdOrderState
     {
         get => LazyLoader.Load(this, ref _ProdOrderBatch_MDProdOrderState);
         set => _ProdOrderBatch_MDProdOrderState = value;
@@ -117,8 +117,8 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatch_MDProdOrderState); }
     }
 
-    private ObservableHashSet<ProdOrderPartslist> _ProdOrderPartslist_MDProdOrderState;
-    public virtual ObservableHashSet<ProdOrderPartslist> ProdOrderPartslist_MDProdOrderState
+    private ICollection<ProdOrderPartslist> _ProdOrderPartslist_MDProdOrderState;
+    public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_MDProdOrderState
     {
         get => LazyLoader.Load(this, ref _ProdOrderPartslist_MDProdOrderState);
         set => _ProdOrderPartslist_MDProdOrderState = value;
@@ -137,8 +137,8 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslist_MDProdOrderState); }
     }
 
-    private ObservableHashSet<ProdOrder> _ProdOrder_MDProdOrderState;
-    public virtual ObservableHashSet<ProdOrder> ProdOrder_MDProdOrderState
+    private ICollection<ProdOrder> _ProdOrder_MDProdOrderState;
+    public virtual ICollection<ProdOrder> ProdOrder_MDProdOrderState
     {
         get => LazyLoader.Load(this, ref _ProdOrder_MDProdOrderState);
         set => _ProdOrder_MDProdOrderState = value;

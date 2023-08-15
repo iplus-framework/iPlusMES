@@ -97,8 +97,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<CompanyMaterialStock> _CompanyMaterialStock_MDReleaseState;
-    public virtual ObservableHashSet<CompanyMaterialStock> CompanyMaterialStock_MDReleaseState
+    private ICollection<CompanyMaterialStock> _CompanyMaterialStock_MDReleaseState;
+    public virtual ICollection<CompanyMaterialStock> CompanyMaterialStock_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _CompanyMaterialStock_MDReleaseState);
         set => _CompanyMaterialStock_MDReleaseState = value;
@@ -117,8 +117,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialStock_MDReleaseState); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_MDReleaseState;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_MDReleaseState
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDReleaseState;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDReleaseState);
         set => _FacilityBookingCharge_MDReleaseState = value;
@@ -137,8 +137,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDReleaseState); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_MDReleaseState;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_MDReleaseState
+    private ICollection<FacilityBooking> _FacilityBooking_MDReleaseState;
+    public virtual ICollection<FacilityBooking> FacilityBooking_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_MDReleaseState);
         set => _FacilityBooking_MDReleaseState = value;
@@ -157,8 +157,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDReleaseState); }
     }
 
-    private ObservableHashSet<FacilityCharge> _FacilityCharge_MDReleaseState;
-    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_MDReleaseState
+    private ICollection<FacilityCharge> _FacilityCharge_MDReleaseState;
+    public virtual ICollection<FacilityCharge> FacilityCharge_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_MDReleaseState);
         set => _FacilityCharge_MDReleaseState = value;
@@ -177,8 +177,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_MDReleaseState); }
     }
 
-    private ObservableHashSet<FacilityLotStock> _FacilityLotStock_MDReleaseState;
-    public virtual ObservableHashSet<FacilityLotStock> FacilityLotStock_MDReleaseState
+    private ICollection<FacilityLotStock> _FacilityLotStock_MDReleaseState;
+    public virtual ICollection<FacilityLotStock> FacilityLotStock_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _FacilityLotStock_MDReleaseState);
         set => _FacilityLotStock_MDReleaseState = value;
@@ -197,8 +197,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.FacilityLotStock_MDReleaseState); }
     }
 
-    private ObservableHashSet<FacilityLot> _FacilityLot_MDReleaseState;
-    public virtual ObservableHashSet<FacilityLot> FacilityLot_MDReleaseState
+    private ICollection<FacilityLot> _FacilityLot_MDReleaseState;
+    public virtual ICollection<FacilityLot> FacilityLot_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _FacilityLot_MDReleaseState);
         set => _FacilityLot_MDReleaseState = value;
@@ -217,8 +217,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.FacilityLot_MDReleaseState); }
     }
 
-    private ObservableHashSet<FacilityStock> _FacilityStock_MDReleaseState;
-    public virtual ObservableHashSet<FacilityStock> FacilityStock_MDReleaseState
+    private ICollection<FacilityStock> _FacilityStock_MDReleaseState;
+    public virtual ICollection<FacilityStock> FacilityStock_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _FacilityStock_MDReleaseState);
         set => _FacilityStock_MDReleaseState = value;
@@ -237,8 +237,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.FacilityStock_MDReleaseState); }
     }
 
-    private ObservableHashSet<MaterialStock> _MaterialStock_MDReleaseState;
-    public virtual ObservableHashSet<MaterialStock> MaterialStock_MDReleaseState
+    private ICollection<MaterialStock> _MaterialStock_MDReleaseState;
+    public virtual ICollection<MaterialStock> MaterialStock_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _MaterialStock_MDReleaseState);
         set => _MaterialStock_MDReleaseState = value;
@@ -257,8 +257,8 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         get { return Context.Entry(this).Collection(c => c.MaterialStock_MDReleaseState); }
     }
 
-    private ObservableHashSet<PartslistStock> _PartslistStock_MDReleaseState;
-    public virtual ObservableHashSet<PartslistStock> PartslistStock_MDReleaseState
+    private ICollection<PartslistStock> _PartslistStock_MDReleaseState;
+    public virtual ICollection<PartslistStock> PartslistStock_MDReleaseState
     {
         get => LazyLoader.Load(this, ref _PartslistStock_MDReleaseState);
         set => _PartslistStock_MDReleaseState = value;

@@ -172,8 +172,8 @@ public partial class ACClassConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("ACClassPropertyRelation"); }
     }
     
-    private ObservableHashSet<ACClassConfig> _ACClassConfig_ParentACClassConfig;
-    public virtual ObservableHashSet<ACClassConfig> ACClassConfig_ParentACClassConfig
+    private ICollection<ACClassConfig> _ACClassConfig_ParentACClassConfig;
+    public virtual ICollection<ACClassConfig> ACClassConfig_ParentACClassConfig
     {
         get => LazyLoader.Load(this, ref _ACClassConfig_ParentACClassConfig);
         set => _ACClassConfig_ParentACClassConfig = value;

@@ -41,8 +41,8 @@ public partial class Label : VBEntityObject
         set { SetProperty<string>(ref _Desc, value); }
     }
 
-    private ObservableHashSet<LabelTranslation> _LabelTranslation_Label;
-    public virtual ObservableHashSet<LabelTranslation> LabelTranslation_Label
+    private ICollection<LabelTranslation> _LabelTranslation_Label;
+    public virtual ICollection<LabelTranslation> LabelTranslation_Label
     {
         get => LazyLoader.Load(this, ref _LabelTranslation_Label);
         set => _LabelTranslation_Label = value;
@@ -61,8 +61,8 @@ public partial class Label : VBEntityObject
         get { return Context.Entry(this).Collection(c => c.LabelTranslation_Label); }
     }
 
-    private ObservableHashSet<Material> _Material_Label;
-    public virtual ObservableHashSet<Material> Material_Label
+    private ICollection<Material> _Material_Label;
+    public virtual ICollection<Material> Material_Label
     {
         get => LazyLoader.Load(this, ref _Material_Label);
         set => _Material_Label = value;

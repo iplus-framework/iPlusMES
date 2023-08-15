@@ -290,8 +290,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDTourplanState"); }
     }
     
-    private ObservableHashSet<Picking> _Picking_Tourplan;
-    public virtual ObservableHashSet<Picking> Picking_Tourplan
+    private ICollection<Picking> _Picking_Tourplan;
+    public virtual ICollection<Picking> Picking_Tourplan
     {
         get => LazyLoader.Load(this, ref _Picking_Tourplan);
         set => _Picking_Tourplan = value;
@@ -310,8 +310,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Picking_Tourplan); }
     }
 
-    private ObservableHashSet<TourplanConfig> _TourplanConfig_Tourplan;
-    public virtual ObservableHashSet<TourplanConfig> TourplanConfig_Tourplan
+    private ICollection<TourplanConfig> _TourplanConfig_Tourplan;
+    public virtual ICollection<TourplanConfig> TourplanConfig_Tourplan
     {
         get => LazyLoader.Load(this, ref _TourplanConfig_Tourplan);
         set => _TourplanConfig_Tourplan = value;
@@ -330,8 +330,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.TourplanConfig_Tourplan); }
     }
 
-    private ObservableHashSet<TourplanPos> _TourplanPos_Tourplan;
-    public virtual ObservableHashSet<TourplanPos> TourplanPos_Tourplan
+    private ICollection<TourplanPos> _TourplanPos_Tourplan;
+    public virtual ICollection<TourplanPos> TourplanPos_Tourplan
     {
         get => LazyLoader.Load(this, ref _TourplanPos_Tourplan);
         set => _TourplanPos_Tourplan = value;

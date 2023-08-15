@@ -337,8 +337,8 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryCompanyAddress"); }
     }
     
-    private ObservableHashSet<Invoice> _Invoice_OutOrder;
-    public virtual ObservableHashSet<Invoice> Invoice_OutOrder
+    private ICollection<Invoice> _Invoice_OutOrder;
+    public virtual ICollection<Invoice> Invoice_OutOrder
     {
         get => LazyLoader.Load(this, ref _Invoice_OutOrder);
         set => _Invoice_OutOrder = value;
@@ -517,8 +517,8 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDTimeRange"); }
     }
     
-    private ObservableHashSet<OutOrderConfig> _OutOrderConfig_OutOrder;
-    public virtual ObservableHashSet<OutOrderConfig> OutOrderConfig_OutOrder
+    private ICollection<OutOrderConfig> _OutOrderConfig_OutOrder;
+    public virtual ICollection<OutOrderConfig> OutOrderConfig_OutOrder
     {
         get => LazyLoader.Load(this, ref _OutOrderConfig_OutOrder);
         set => _OutOrderConfig_OutOrder = value;
@@ -537,8 +537,8 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_OutOrder); }
     }
 
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_OutOrder;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_OutOrder
+    private ICollection<OutOrderPos> _OutOrderPos_OutOrder;
+    public virtual ICollection<OutOrderPos> OutOrderPos_OutOrder
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_OutOrder);
         set => _OutOrderPos_OutOrder = value;

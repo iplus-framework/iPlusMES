@@ -117,8 +117,8 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("MDCurrency"); }
     }
     
-    private ObservableHashSet<PriceListMaterial> _PriceListMaterial_PriceList;
-    public virtual ObservableHashSet<PriceListMaterial> PriceListMaterial_PriceList
+    private ICollection<PriceListMaterial> _PriceListMaterial_PriceList;
+    public virtual ICollection<PriceListMaterial> PriceListMaterial_PriceList
     {
         get => LazyLoader.Load(this, ref _PriceListMaterial_PriceList);
         set => _PriceListMaterial_PriceList = value;

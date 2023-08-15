@@ -173,8 +173,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Company"); }
     }
     
-    private ObservableHashSet<CompanyMaterialHistory> _CompanyMaterialHistory_CompanyMaterial;
-    public virtual ObservableHashSet<CompanyMaterialHistory> CompanyMaterialHistory_CompanyMaterial
+    private ICollection<CompanyMaterialHistory> _CompanyMaterialHistory_CompanyMaterial;
+    public virtual ICollection<CompanyMaterialHistory> CompanyMaterialHistory_CompanyMaterial
     {
         get => LazyLoader.Load(this, ref _CompanyMaterialHistory_CompanyMaterial);
         set => _CompanyMaterialHistory_CompanyMaterial = value;
@@ -193,8 +193,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialHistory_CompanyMaterial); }
     }
 
-    private ObservableHashSet<CompanyMaterialPickup> _CompanyMaterialPickup_CompanyMaterial;
-    public virtual ObservableHashSet<CompanyMaterialPickup> CompanyMaterialPickup_CompanyMaterial
+    private ICollection<CompanyMaterialPickup> _CompanyMaterialPickup_CompanyMaterial;
+    public virtual ICollection<CompanyMaterialPickup> CompanyMaterialPickup_CompanyMaterial
     {
         get => LazyLoader.Load(this, ref _CompanyMaterialPickup_CompanyMaterial);
         set => _CompanyMaterialPickup_CompanyMaterial = value;
@@ -213,8 +213,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_CompanyMaterial); }
     }
 
-    private ObservableHashSet<CompanyMaterialStock> _CompanyMaterialStock_CompanyMaterial;
-    public virtual ObservableHashSet<CompanyMaterialStock> CompanyMaterialStock_CompanyMaterial
+    private ICollection<CompanyMaterialStock> _CompanyMaterialStock_CompanyMaterial;
+    public virtual ICollection<CompanyMaterialStock> CompanyMaterialStock_CompanyMaterial
     {
         get => LazyLoader.Load(this, ref _CompanyMaterialStock_CompanyMaterial);
         set => _CompanyMaterialStock_CompanyMaterial = value;
@@ -233,8 +233,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialStock_CompanyMaterial); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_InwardCPartnerCompMat;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_InwardCPartnerCompMat
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardCPartnerCompMat;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardCPartnerCompMat
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardCPartnerCompMat);
         set => _FacilityBookingCharge_InwardCPartnerCompMat = value;
@@ -253,8 +253,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardCPartnerCompMat); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_InwardCompanyMaterial;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_InwardCompanyMaterial
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardCompanyMaterial;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardCompanyMaterial);
         set => _FacilityBookingCharge_InwardCompanyMaterial = value;
@@ -273,8 +273,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardCompanyMaterial); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutwardCPartnerCompMat;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutwardCPartnerCompMat
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardCPartnerCompMat;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardCPartnerCompMat
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardCPartnerCompMat);
         set => _FacilityBookingCharge_OutwardCPartnerCompMat = value;
@@ -293,8 +293,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardCPartnerCompMat); }
     }
 
-    private ObservableHashSet<FacilityBookingCharge> _FacilityBookingCharge_OutwardCompanyMaterial;
-    public virtual ObservableHashSet<FacilityBookingCharge> FacilityBookingCharge_OutwardCompanyMaterial
+    private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardCompanyMaterial;
+    public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardCompanyMaterial);
         set => _FacilityBookingCharge_OutwardCompanyMaterial = value;
@@ -313,8 +313,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardCompanyMaterial); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_InwardCompanyMaterial;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_InwardCompanyMaterial
+    private ICollection<FacilityBooking> _FacilityBooking_InwardCompanyMaterial;
+    public virtual ICollection<FacilityBooking> FacilityBooking_InwardCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_InwardCompanyMaterial);
         set => _FacilityBooking_InwardCompanyMaterial = value;
@@ -333,8 +333,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardCompanyMaterial); }
     }
 
-    private ObservableHashSet<FacilityBooking> _FacilityBooking_OutwardCompanyMaterial;
-    public virtual ObservableHashSet<FacilityBooking> FacilityBooking_OutwardCompanyMaterial
+    private ICollection<FacilityBooking> _FacilityBooking_OutwardCompanyMaterial;
+    public virtual ICollection<FacilityBooking> FacilityBooking_OutwardCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityBooking_OutwardCompanyMaterial);
         set => _FacilityBooking_OutwardCompanyMaterial = value;
@@ -353,8 +353,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardCompanyMaterial); }
     }
 
-    private ObservableHashSet<FacilityCharge> _FacilityCharge_CPartnerCompanyMaterial;
-    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_CPartnerCompanyMaterial
+    private ICollection<FacilityCharge> _FacilityCharge_CPartnerCompanyMaterial;
+    public virtual ICollection<FacilityCharge> FacilityCharge_CPartnerCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_CPartnerCompanyMaterial);
         set => _FacilityCharge_CPartnerCompanyMaterial = value;
@@ -373,8 +373,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_CPartnerCompanyMaterial); }
     }
 
-    private ObservableHashSet<FacilityCharge> _FacilityCharge_CompanyMaterial;
-    public virtual ObservableHashSet<FacilityCharge> FacilityCharge_CompanyMaterial
+    private ICollection<FacilityCharge> _FacilityCharge_CompanyMaterial;
+    public virtual ICollection<FacilityCharge> FacilityCharge_CompanyMaterial
     {
         get => LazyLoader.Load(this, ref _FacilityCharge_CompanyMaterial);
         set => _FacilityCharge_CompanyMaterial = value;
@@ -393,8 +393,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_CompanyMaterial); }
     }
 
-    private ObservableHashSet<InOrderPos> _InOrderPos_PickupCompanyMaterial;
-    public virtual ObservableHashSet<InOrderPos> InOrderPos_PickupCompanyMaterial
+    private ICollection<InOrderPos> _InOrderPos_PickupCompanyMaterial;
+    public virtual ICollection<InOrderPos> InOrderPos_PickupCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _InOrderPos_PickupCompanyMaterial);
         set => _InOrderPos_PickupCompanyMaterial = value;
@@ -453,8 +453,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("Material"); }
     }
     
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_PickupCompanyMaterial;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_PickupCompanyMaterial
+    private ICollection<OutOrderPos> _OutOrderPos_PickupCompanyMaterial;
+    public virtual ICollection<OutOrderPos> OutOrderPos_PickupCompanyMaterial
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_PickupCompanyMaterial);
         set => _OutOrderPos_PickupCompanyMaterial = value;

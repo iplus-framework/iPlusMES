@@ -118,8 +118,8 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ObservableHashSet<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPos_MDGMPAdditive;
-    public virtual ObservableHashSet<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPAdditive
+    private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPos_MDGMPAdditive;
+    public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPAdditive
     {
         get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPAdditive);
         set => _MDGMPMaterialGroupPos_MDGMPAdditive = value;
@@ -178,8 +178,8 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
         get { return Context.Entry(this).Reference("MDQuantityUnit"); }
     }
     
-    private ObservableHashSet<MaterialGMPAdditive> _MaterialGMPAdditive_MDGMPAdditive;
-    public virtual ObservableHashSet<MaterialGMPAdditive> MaterialGMPAdditive_MDGMPAdditive
+    private ICollection<MaterialGMPAdditive> _MaterialGMPAdditive_MDGMPAdditive;
+    public virtual ICollection<MaterialGMPAdditive> MaterialGMPAdditive_MDGMPAdditive
     {
         get => LazyLoader.Load(this, ref _MaterialGMPAdditive_MDGMPAdditive);
         set => _MaterialGMPAdditive_MDGMPAdditive = value;

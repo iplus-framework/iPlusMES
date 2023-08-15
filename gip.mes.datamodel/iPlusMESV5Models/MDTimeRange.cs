@@ -118,8 +118,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         set { SetProperty<bool>(ref _IsDefault, value); }
     }
 
-    private ObservableHashSet<CalendarShift> _CalendarShift_MDTimeRange;
-    public virtual ObservableHashSet<CalendarShift> CalendarShift_MDTimeRange
+    private ICollection<CalendarShift> _CalendarShift_MDTimeRange;
+    public virtual ICollection<CalendarShift> CalendarShift_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _CalendarShift_MDTimeRange);
         set => _CalendarShift_MDTimeRange = value;
@@ -138,8 +138,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.CalendarShift_MDTimeRange); }
     }
 
-    private ObservableHashSet<CompanyPerson> _CompanyPerson_MDTimeRange;
-    public virtual ObservableHashSet<CompanyPerson> CompanyPerson_MDTimeRange
+    private ICollection<CompanyPerson> _CompanyPerson_MDTimeRange;
+    public virtual ICollection<CompanyPerson> CompanyPerson_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _CompanyPerson_MDTimeRange);
         set => _CompanyPerson_MDTimeRange = value;
@@ -158,8 +158,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_MDTimeRange); }
     }
 
-    private ObservableHashSet<InOrderPos> _InOrderPos_MDTimeRange;
-    public virtual ObservableHashSet<InOrderPos> InOrderPos_MDTimeRange
+    private ICollection<InOrderPos> _InOrderPos_MDTimeRange;
+    public virtual ICollection<InOrderPos> InOrderPos_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _InOrderPos_MDTimeRange);
         set => _InOrderPos_MDTimeRange = value;
@@ -178,8 +178,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDTimeRange); }
     }
 
-    private ObservableHashSet<InOrder> _InOrder_MDTimeRange;
-    public virtual ObservableHashSet<InOrder> InOrder_MDTimeRange
+    private ICollection<InOrder> _InOrder_MDTimeRange;
+    public virtual ICollection<InOrder> InOrder_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _InOrder_MDTimeRange);
         set => _InOrder_MDTimeRange = value;
@@ -198,8 +198,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.InOrder_MDTimeRange); }
     }
 
-    private ObservableHashSet<InRequestPos> _InRequestPos_MDTimeRange;
-    public virtual ObservableHashSet<InRequestPos> InRequestPos_MDTimeRange
+    private ICollection<InRequestPos> _InRequestPos_MDTimeRange;
+    public virtual ICollection<InRequestPos> InRequestPos_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _InRequestPos_MDTimeRange);
         set => _InRequestPos_MDTimeRange = value;
@@ -218,8 +218,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.InRequestPos_MDTimeRange); }
     }
 
-    private ObservableHashSet<InRequest> _InRequest_MDTimeRange;
-    public virtual ObservableHashSet<InRequest> InRequest_MDTimeRange
+    private ICollection<InRequest> _InRequest_MDTimeRange;
+    public virtual ICollection<InRequest> InRequest_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _InRequest_MDTimeRange);
         set => _InRequest_MDTimeRange = value;
@@ -238,8 +238,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.InRequest_MDTimeRange); }
     }
 
-    private ObservableHashSet<MDTimeRange> _MDTimeRange_ParentMDTimeRange;
-    public virtual ObservableHashSet<MDTimeRange> MDTimeRange_ParentMDTimeRange
+    private ICollection<MDTimeRange> _MDTimeRange_ParentMDTimeRange;
+    public virtual ICollection<MDTimeRange> MDTimeRange_ParentMDTimeRange
     {
         get => LazyLoader.Load(this, ref _MDTimeRange_ParentMDTimeRange);
         set => _MDTimeRange_ParentMDTimeRange = value;
@@ -258,8 +258,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.MDTimeRange_ParentMDTimeRange); }
     }
 
-    private ObservableHashSet<OutOfferPos> _OutOfferPos_MDTimeRange;
-    public virtual ObservableHashSet<OutOfferPos> OutOfferPos_MDTimeRange
+    private ICollection<OutOfferPos> _OutOfferPos_MDTimeRange;
+    public virtual ICollection<OutOfferPos> OutOfferPos_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _OutOfferPos_MDTimeRange);
         set => _OutOfferPos_MDTimeRange = value;
@@ -278,8 +278,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDTimeRange); }
     }
 
-    private ObservableHashSet<OutOffer> _OutOffer_MDTimeRange;
-    public virtual ObservableHashSet<OutOffer> OutOffer_MDTimeRange
+    private ICollection<OutOffer> _OutOffer_MDTimeRange;
+    public virtual ICollection<OutOffer> OutOffer_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _OutOffer_MDTimeRange);
         set => _OutOffer_MDTimeRange = value;
@@ -298,8 +298,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDTimeRange); }
     }
 
-    private ObservableHashSet<OutOrderPos> _OutOrderPos_MDTimeRange;
-    public virtual ObservableHashSet<OutOrderPos> OutOrderPos_MDTimeRange
+    private ICollection<OutOrderPos> _OutOrderPos_MDTimeRange;
+    public virtual ICollection<OutOrderPos> OutOrderPos_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _OutOrderPos_MDTimeRange);
         set => _OutOrderPos_MDTimeRange = value;
@@ -318,8 +318,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTimeRange); }
     }
 
-    private ObservableHashSet<OutOrder> _OutOrder_MDTimeRange;
-    public virtual ObservableHashSet<OutOrder> OutOrder_MDTimeRange
+    private ICollection<OutOrder> _OutOrder_MDTimeRange;
+    public virtual ICollection<OutOrder> OutOrder_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _OutOrder_MDTimeRange);
         set => _OutOrder_MDTimeRange = value;
@@ -358,8 +358,8 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         get { return Context.Entry(this).Reference("MDTimeRange1_ParentMDTimeRange"); }
     }
     
-    private ObservableHashSet<TourplanPos> _TourplanPos_MDTimeRange;
-    public virtual ObservableHashSet<TourplanPos> TourplanPos_MDTimeRange
+    private ICollection<TourplanPos> _TourplanPos_MDTimeRange;
+    public virtual ICollection<TourplanPos> TourplanPos_MDTimeRange
     {
         get => LazyLoader.Load(this, ref _TourplanPos_MDTimeRange);
         set => _TourplanPos_MDTimeRange = value;

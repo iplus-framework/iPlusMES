@@ -97,8 +97,8 @@ public partial class MDLabOrderPosState : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<string>(ref _MDKey, value); }
     }
 
-    private ObservableHashSet<LabOrderPos> _LabOrderPos_MDLabOrderPosState;
-    public virtual ObservableHashSet<LabOrderPos> LabOrderPos_MDLabOrderPosState
+    private ICollection<LabOrderPos> _LabOrderPos_MDLabOrderPosState;
+    public virtual ICollection<LabOrderPos> LabOrderPos_MDLabOrderPosState
     {
         get => LazyLoader.Load(this, ref _LabOrderPos_MDLabOrderPosState);
         set => _LabOrderPos_MDLabOrderPosState = value;
