@@ -1061,6 +1061,7 @@ namespace gip.bso.masterdata
             List<ProdOrderBatchPlan> batchPlans = item.ProdOrderBatchPlan_MaterialWFACClassMethod.ToList();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
                 batchPlan.MaterialWFACClassMethod = null;
+
             var methodsToDelete = item.MaterialWFConnection_MaterialWFACClassMethod.ToList();
             foreach(var method in methodsToDelete)
             {
