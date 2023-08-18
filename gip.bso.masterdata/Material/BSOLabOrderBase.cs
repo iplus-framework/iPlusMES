@@ -537,7 +537,8 @@ namespace gip.bso.masterdata
         [ACMethodCommand("LabOrder", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public virtual void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>

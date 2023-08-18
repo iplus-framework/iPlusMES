@@ -804,7 +804,8 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         protected override Msg OnPreSave()
@@ -1908,7 +1909,7 @@ namespace gip.bso.facility
         {
             get
             {
-                if (CurrentFacilityCharge == null) return false;
+                if (CurrentFacilityCharge == null || CurrentFacilityCharge.ACCaption == "0") return false;
                 return
                     CurrentFacilityCharge.FacilityBooking_InwardFacilityCharge.Any() ||
                     CurrentFacilityCharge.FacilityBooking_OutwardFacilityCharge.Any() ||

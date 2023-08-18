@@ -78,7 +78,7 @@ namespace gip.mes.datamodel
         [IgnoreDataMember]
         [NotMapped]
         private gip.core.datamodel.ACProgramLog _ACProgramLog;
-        [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
         [IgnoreDataMember]
         [NotMapped]
         public gip.core.datamodel.ACProgramLog ACProgramLog

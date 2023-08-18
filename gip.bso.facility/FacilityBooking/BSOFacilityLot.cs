@@ -282,7 +282,8 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            OnSave();
+            if (OnSave())
+                Search();
         }
 
         /// <summary>
@@ -364,6 +365,7 @@ namespace gip.bso.facility
             SelectedFacilityLot = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
+            OnPropertyChanged(nameof(FacilityLotList));
         }
 
         /// <summary>
@@ -386,7 +388,7 @@ namespace gip.bso.facility
                 return;
             if (AccessPrimary != null)
                 AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityLotList");
+            OnPropertyChanged(nameof(FacilityLotList));
         }
 
 

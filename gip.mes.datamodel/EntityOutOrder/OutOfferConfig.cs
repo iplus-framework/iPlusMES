@@ -297,7 +297,7 @@ namespace gip.mes.datamodel
         #region VBIplus-Context
         [NotMapped]
         private gip.core.datamodel.ACClass _ACClass;
-        [ACPropertyInfo(9999, "", "en{'Class'}de{'Klasse'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Class'}de{'Klasse'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACClass ACClass
         {
@@ -347,7 +347,7 @@ namespace gip.mes.datamodel
         /// Metadata (iPlus-Type) of the Value-Property. ATTENTION: ACClass is a EF-Object. Therefore the access to Navigation-Properties must be secured using the QueryLock_1X000 of the Global Database-Context!
         /// </summary>
         /// <value>Metadata (iPlus-Type) of the Value-Property as ACClass</value>
-        [ACPropertyInfo(9999, "", "en{'Datatype'}de{'Datentyp'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Datatype'}de{'Datentyp'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACClass ValueTypeACClass
         {
@@ -393,7 +393,7 @@ namespace gip.mes.datamodel
 
         [NotMapped]
         private gip.core.datamodel.ACClassPropertyRelation _ACClassPropertyRelation;
-        [ACPropertyInfo(9999, "", "en{'Relation'}de{'Beziehung'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassPropertyRelation.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Relation'}de{'Beziehung'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassPropertyRelation.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACClassPropertyRelation ACClassPropertyRelation
         {

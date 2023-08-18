@@ -251,24 +251,26 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithMaterial =
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, bool, bool, IEnumerable<Facility>> s_cQry_PlSilosWithMaterial =
+            EF.CompileQuery<DatabaseApp, Guid?, Guid?, bool, bool, IEnumerable<Facility>>(
+            (ctx, posProdMaterialID, posMaterialID, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
                                                       && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && ((!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID != null && pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (pos.Material.ProductionMaterialID == null && c.MaterialID == pos.MaterialID)))
+                                                                && ((posProdMaterialID != null && posProdMaterialID.HasValue && c.MaterialID == posProdMaterialID)
+                                                                    || (posProdMaterialID == null && c.MaterialID == posMaterialID)))
                                                           || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                && ((pos.Material.ProductionMaterialID != null && pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (pos.Material.ProductionMaterialID == null && c.Facility.MaterialID == pos.MaterialID)))
+                                                                && ((posProdMaterialID != null && posProdMaterialID.HasValue && c.Facility.MaterialID == posProdMaterialID)
+                                                                    || (posProdMaterialID == null && c.Facility.MaterialID == posMaterialID)))
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .Select(c => c.Facility).ToList();
+                                               .Select(c => c.Facility).ToList()
+            );
         /// <summary>
         /// Queries Silos 
         /// which contains this material 
@@ -285,13 +287,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithMaterial(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray().Distinct().ToList());
+                    return new QrySilosResult(s_cQry_PlSilosWithMaterial(ctx, pos.Material.ProductionMaterialID, pos.MaterialID, checkOutwardEnabled, onlyContainer).ToArray().Distinct().ToList());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithMaterial(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray().Distinct().ToList();
+                        var result = s_cQry_PlSilosWithMaterial(ctx, altPos.Material.ProductionMaterialID, altPos.MaterialID, checkOutwardEnabled, onlyContainer).ToArray().Distinct().ToList();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);

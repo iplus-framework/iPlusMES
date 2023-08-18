@@ -17,7 +17,6 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
-using System.Windows.Forms;
 
 namespace gip.bso.masterdata
 {

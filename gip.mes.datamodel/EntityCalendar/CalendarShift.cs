@@ -166,7 +166,7 @@ namespace gip.mes.datamodel
         #region VBIplus-Context
         [NotMapped]
         private gip.core.datamodel.ACProject _ACProject;
-        [ACPropertyInfo(9999, "", "en{'Project'}de{'Projekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACProject.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Project'}de{'Projekt'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACProject.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACProject ACProject
         {

@@ -66,6 +66,7 @@ namespace gip.mes.datamodel
             entity.ProdOrderBatchPlanID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.PlanMode = BatchPlanMode.UseBatchCount;
+            entity.PlanModeIndex = 1;
             entity.PlanState = GlobalApp.BatchPlanState.Created;
             entity.IsValidated = false;
             entity.PlannedStartDate = DateTimeUtils.NowDST;
@@ -74,6 +75,7 @@ namespace gip.mes.datamodel
             {
                 ProdOrderPartslist prodOrderPartslist = parentACObject as ProdOrderPartslist;
                 prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(entity);
+                prodOrderPartslist.Context.Add(entity);
                 entity.ProdOrderPartslist = prodOrderPartslist;
             }
             else if (parentACObject is ProdOrderPartslistPos)
@@ -83,6 +85,7 @@ namespace gip.mes.datamodel
                 entity.ProdOrderPartslist = parentProdOrderPos.ProdOrderPartslist;
                 parentProdOrderPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(entity);
                 parentProdOrderPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Add(entity);
+                parentProdOrderPos.Context.Add(entity);
             }
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;

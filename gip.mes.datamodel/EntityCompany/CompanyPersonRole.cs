@@ -13,7 +13,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioCompany, "en{'Role'}de{'Rolle'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
     [ACPropertyEntity(2, "UnloadingPointName", "en{'Unloadingpoint'}de{'Verladestelle'}", "", "", true)]
-    [ACPropertyEntity(3, "CompanyDepartment", "en{'Department'}de{'Abteilung'}", Const.ContextDatabase + "\\CompanyDepartment", "", true)]
+    [ACPropertyEntity(3, "CompanyDepartment", "en{'Department'}de{'Abteilung'}", Const.ContextDatabase + "\\CompanyDepartment" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -169,7 +169,7 @@ namespace gip.mes.datamodel
         #region VBIplus-Context
         [NotMapped]
         private gip.core.datamodel.ACClass _RoleACClass;
-        [ACPropertyInfo(9999, "", "en{'Role'}de{'Rolle'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        [ACPropertyInfo(9999, "", "en{'Role'}de{'Rolle'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
         [NotMapped]
         public gip.core.datamodel.ACClass RoleACClass
         {

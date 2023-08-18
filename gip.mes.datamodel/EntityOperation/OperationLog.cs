@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, ConstApp.OperationLog, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOOperationLog")]
-    [ACPropertyEntity(1, "FacilityCharge", "en{'Quant'}de{'Quant'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName, "", true)]
+    [ACPropertyEntity(1, "FacilityCharge", "en{'Quant'}de{'Quant'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, "OperationTime", "en{'Time'}de{'Zeit'}", "", "", true)]
     [ACPropertyEntity(31, "Operation", "en{'Operation'}de{'Operation'}", "", "", true)]
     [ACPropertyEntity(31, "OperationState", "en{'State'}de{'Status'}", "", "", true)]

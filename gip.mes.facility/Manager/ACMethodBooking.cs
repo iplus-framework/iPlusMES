@@ -1460,7 +1460,7 @@ namespace gip.mes.facility
         #endregion
 
         #region Auftrags-/Bestellungsbeziehung
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabaseIPlus + "\\ACProgram")]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabaseIPlus + "\\ACProgram" + Const.DBSetAsEnumerablePostfix)]
         public gip.core.datamodel.ACProgram ACProgram
         {
             get;
