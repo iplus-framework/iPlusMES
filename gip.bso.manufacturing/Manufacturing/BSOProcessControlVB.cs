@@ -36,6 +36,7 @@ namespace gip.bso.manufacturing
         #region const
         public const string BGWorkerMehtod_DoSearchWorkflows = @"DoSearchWorkflows";
         #endregion
+
         #region c´tors
         /// <summary>
         /// Initializes a new instance of the <see cref="BSOProcessControl"/> class.
@@ -48,7 +49,7 @@ namespace gip.bso.manufacturing
         public BSOProcessControlVB(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _UseBackGroundWorker = new ACPropertyConfigValue<bool>(this, nameof(UseBackGroundWorker), true);
+            _UseBackGroundWorker = new ACPropertyConfigValue<bool>(this, nameof(UseBackGroundWorker), false);
         }
 
         /// <summary>
