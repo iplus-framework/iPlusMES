@@ -1153,14 +1153,23 @@ namespace gip.mes.facility
                 }
             }
 
-            // 3.0 generate batches
+            ProdOrderPartslist[] prodOrderPartslists =
+            prodOrder
+            .ProdOrderPartslist_ProdOrder
+            .OrderBy(c => c.Sequence)
+            .ToArray();
+
+            // 2.1 Fit quantities ProdOrderPartslist.TargetQuantity => FinalMix.TargetQuantity
+            foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
+            {
+                ProdOrderPartslistPos finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c=>c.IsFinalMixure).FirstOrDefault();
+                finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
+            }
+
+            // 3.0 Generate batch plans
             List<PartslistMDSchedulerGroupConnection> schedulerConnections = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName, null);
 
-            ProdOrderPartslist[] prodOrderPartslists =
-                prodOrder
-                .ProdOrderPartslist_ProdOrder
-                .OrderBy(c => c.Sequence)
-                .ToArray();
+        
             List<WizardSchedulerPartslist> wPls = new List<WizardSchedulerPartslist>();
 
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
@@ -1627,7 +1636,7 @@ namespace gip.mes.facility
 
         public virtual void ActivateProdOrderStatesIntoProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate, bool setAutoStartOnBatchplan)
         {
-            if (   (prodOrderPartslist.ProdOrder.MDProdOrderState == null || prodOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
+            if ((prodOrderPartslist.ProdOrder.MDProdOrderState == null || prodOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
                 || (prodOrderPartslist.MDProdOrderState == null || prodOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction))
             {
                 MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
