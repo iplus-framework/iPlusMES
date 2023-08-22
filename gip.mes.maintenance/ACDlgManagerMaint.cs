@@ -128,7 +128,7 @@ namespace gip.mes.maintenance
             //if (_this.Database is mes.datamodel.DatabaseApp)
             //{
             //    Guid componentClassID = _this.ComponentClass.ACClassID;
-            //    vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+            //    VD.DatabaseApp dbApp = _this.Database as VD.DatabaseApp;
 
             //    using (ACMonitor.Lock(dbApp.QueryLock_1X000))
             //    {
@@ -171,15 +171,15 @@ namespace gip.mes.maintenance
             //if (maintService == null)
             //    return false;
 
-            //if (_this.Database is vd.DatabaseApp)
+            //if (_this.Database is VD.DatabaseApp)
             //{
             //    Guid componentClassID = _this.ComponentClass.ACClassID;
-            //    vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+            //    VD.DatabaseApp dbApp = _this.Database as VD.DatabaseApp;
 
             //    using (ACMonitor.Lock(dbApp.QueryLock_1X000))
             //    {
             //        if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
-            //       && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+            //       && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
             //            return true;
             //    }
             //}
@@ -192,7 +192,7 @@ namespace gip.mes.maintenance
             ACComponent _this = acComponent as ACComponent;
             if (_this == null)
                 return;
-            //if (_this.Database is vd.DatabaseApp)
+            //if (_this.Database is VD.DatabaseApp)
             //{
                 ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
                 if (appManager == null)
@@ -210,8 +210,8 @@ namespace gip.mes.maintenance
             //if (acMaintService == null)
             //    return;
 
-            //vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
-            //vd.MaintACClass maintConfig = FindMaintConfiguration(_this.ACType as ACClass, dbApp.MaintACClass.ToList());
+            //VD.DatabaseApp dbApp = _this.Database as VD.DatabaseApp;
+            //VD.MaintACClass maintConfig = FindMaintConfiguration(_this.ACType as ACClass, dbApp.MaintACClass.ToList());
             //if (maintConfig == null)
             //    return;
 

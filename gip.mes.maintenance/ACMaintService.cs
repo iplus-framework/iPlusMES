@@ -7,7 +7,7 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using System.Threading;
 using System.Globalization;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.maintenance
@@ -38,9 +38,9 @@ namespace gip.mes.maintenance
             if (!base.ACInit(startChildMode))
                 return false;
             CompWarningList = new List<ACMaintWarning>();
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
-                if (dbApp.MaintOrder.Any(c => c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceNeeded))
+                if (dbApp.MaintOrder.Any(c => c.MDMaintOrderState.MDMaintOrderStateIndex == (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceNeeded))
                     IsMaintenanceWarning.ValueT = true;
             }
             return true;
@@ -77,13 +77,13 @@ namespace gip.mes.maintenance
         /// </summary>
         private class MaintTypeInfo
         {
-            public MaintTypeInfo(vd.MaintACClass maintACClass, ACClass acType)
+            public MaintTypeInfo(VD.MaintACClass maintACClass, ACClass acType)
             {
                 _MaintACClass = maintACClass;
                 _ACType = acType;
             }
 
-            private vd.MaintACClass _MaintACClass;
+            private VD.MaintACClass _MaintACClass;
             private ACClass _ACType;
 
             private Type _NETType = null;
@@ -105,7 +105,7 @@ namespace gip.mes.maintenance
                 }
             }
 
-            public vd.MaintACClass MaintACClass
+            public VD.MaintACClass MaintACClass
             {
                 get
                 {
@@ -225,7 +225,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Dictionary with Property-ACUrl of each Instance which has to be maintainted event-driven
         /// </summary>
-        Dictionary<string, vd.MaintACClassProperty> _MaintConfigForPropertyInstance = null;
+        Dictionary<string, VD.MaintACClassProperty> _MaintConfigForPropertyInstance = null;
         private object _LockMaintConfigForPropertyInstance = new object();
 
         private DateTime? _RebuildCacheAt = null;
@@ -284,7 +284,7 @@ namespace gip.mes.maintenance
             MaintTypeInfo maintTypeInfo = FindMaintTypeInfo(acComponent);
             if (maintTypeInfo != null)
             {
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
                     SetNewMaintOrder(maintTypeInfo.MaintACClass.MaintACClassID, acComponent, dbApp);
                 }
@@ -327,7 +327,7 @@ namespace gip.mes.maintenance
                 //    else
                 //    {
                 //        _AllMaintainableTypes = new Dictionary<Guid, MaintTypeInfo>();
-                //        using (var dbApp = new vd.DatabaseApp())
+                //        using (var dbApp = new VD.DatabaseApp())
                 //        {
                 //            var configuredClassesForMaint = dbApp.MaintACClass
                 //                                                .Include("MaintACClassProperty_MaintACClass");
@@ -352,7 +352,7 @@ namespace gip.mes.maintenance
                 //lock (_LockMaintConfigForPropertyInstance)
                 //{
                 //    _MaintainableInstancesTime = new Dictionary<int, MaintainableInstance>();
-                //    _MaintConfigForPropertyInstance = new Dictionary<string, vd.MaintACClassProperty>();
+                //    _MaintConfigForPropertyInstance = new Dictionary<string, VD.MaintACClassProperty>();
                 //}
 
                 //// 2.1 Determine Instances which has to be periodically maintained in this Application and build the cache
@@ -368,7 +368,7 @@ namespace gip.mes.maintenance
                 //}
 
                 //// 2.2 Determine instances which has to be maintained event driven when it's property is relevant von maintenance
-                //using (var dbApp = new vd.DatabaseApp())
+                //using (var dbApp = new VD.DatabaseApp())
                 //{
                 //    var queryEventBasedProps = dbApp.MaintACClassProperty
                 //                            .Include(c => c.MaintACClass)
@@ -376,9 +376,9 @@ namespace gip.mes.maintenance
                 //                            .Include(c => c.VBiACClassProperty)
                 //                            .Where(x => x.IsActive
                 //                                        && x.MaintACClass.IsActive
-                //                                        && x.MaintACClass.MDMaintMode.MDMaintModeIndex >= (short)vd.MDMaintMode.MaintModes.EventOnly);
+                //                                        && x.MaintACClass.MDMaintMode.MDMaintModeIndex >= (short)VD.MDMaintMode.MaintModes.EventOnly);
 
-                //    foreach (vd.MaintACClassProperty maintACClassProperty in queryEventBasedProps)
+                //    foreach (VD.MaintACClassProperty maintACClassProperty in queryEventBasedProps)
                 //    {
                 //        ApplyEventBasedRuleToInstances(maintACClassProperty, appManager);
                 //    }
@@ -400,7 +400,7 @@ namespace gip.mes.maintenance
             }
         }
 
-        private MaintTypeInfo AddMaintRuleToCache(vd.MaintACClass maintACClass)
+        private MaintTypeInfo AddMaintRuleToCache(VD.MaintACClass maintACClass)
         {
             MaintTypeInfo typeInfo = null;
             lock (_LockAllMaintainableTypes)
@@ -422,7 +422,7 @@ namespace gip.mes.maintenance
 
         private void ApplyTimeBasedRuleToInstances(MaintTypeInfo maintRule, ApplicationManager appManager)
         {
-            //if (!(maintRule.MaintACClass.MDMaintMode.MaintMode == vd.MDMaintMode.MaintModes.TimeOnly || maintRule.MaintACClass.MDMaintMode.MaintMode == vd.MDMaintMode.MaintModes.TimeAndEvent))
+            //if (!(maintRule.MaintACClass.MDMaintMode.MaintMode == VD.MDMaintMode.MaintModes.TimeOnly || maintRule.MaintACClass.MDMaintMode.MaintMode == VD.MDMaintMode.MaintModes.TimeAndEvent))
             //    return;
             //IEnumerable<ACComponent> affectedComponents = GetAffectedInstances(maintRule.MaintACClass.VBiACClassID, appManager);
             //if (affectedComponents == null || !affectedComponents.Any())
@@ -450,7 +450,7 @@ namespace gip.mes.maintenance
             //}
         }
 
-        private void ApplyEventBasedRuleToInstances(vd.MaintACClassProperty maintACClassProperty, ApplicationManager appManager)
+        private void ApplyEventBasedRuleToInstances(VD.MaintACClassProperty maintACClassProperty, ApplicationManager appManager)
         {
             IEnumerable<ACComponent> affectedComponents = GetAffectedInstances(maintACClassProperty.MaintACClass.VBiACClassID, appManager);
             if (affectedComponents == null || !affectedComponents.Any())
@@ -551,18 +551,18 @@ namespace gip.mes.maintenance
             //        return;
             //}
 
-            //using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            //using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             //{
             //    lock (_LockAllMaintainableTypes)
             //    {
             //        var openMaintenanceOrders = dbApp.MaintOrder
-            //                                        .Where(c => c.MDMaintOrderState.MDMaintOrderStateIndex < (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted)
+            //                                        .Where(c => c.MDMaintOrderState.MDMaintOrderStateIndex < (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted)
             //                                        .ToDictionary(c => c.VBiPAACClassID);
             //        foreach (MaintainableInstance maintInstance in _MaintainableInstancesTime.Values)
             //        {
             //            if (maintInstance.Instance == null)
             //                continue;
-            //            vd.MaintOrder maintOrder = null;
+            //            VD.MaintOrder maintOrder = null;
             //            if (openMaintenanceOrders.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
             //                continue;
 
@@ -664,7 +664,7 @@ namespace gip.mes.maintenance
             if (this.ApplicationManager != ((PAClassAlarmingBase)e.ForACComponent).ApplicationManager)
                 return;
             string propertyUrl = e.NetValueEventArgs.ACUrl + "\\" + e.NetValueEventArgs.ACIdentifier;
-            vd.MaintACClassProperty configProp = null;
+            VD.MaintACClassProperty configProp = null;
             lock (_LockMaintConfigForPropertyInstance)
             {
                 if (!_MaintConfigForPropertyInstance.TryGetValue(propertyUrl, out configProp))
@@ -677,7 +677,7 @@ namespace gip.mes.maintenance
             });
         }
 
-        private void CheckPropertyValue(ACPropertyNetSendEventArgs eventArgs, vd.MaintACClassProperty configProp)
+        private void CheckPropertyValue(ACPropertyNetSendEventArgs eventArgs, VD.MaintACClassProperty configProp)
         {
             try
             {
@@ -690,7 +690,7 @@ namespace gip.mes.maintenance
                     return;
                 if (changedValue.CompareTo(maxValue) >= 0)
                 {
-                    using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                    using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                     {
                         SetNewMaintOrder(configProp.MaintACClass.MaintACClassID, eventArgs.ForACComponent as ACComponent, dbApp);
                     }
@@ -726,7 +726,7 @@ namespace gip.mes.maintenance
 
         #region Maintenance Order
 
-        protected void SetNewMaintOrder(Guid maintACClassID, ACComponent acComponent, vd.DatabaseApp dbApp)
+        protected void SetNewMaintOrder(Guid maintACClassID, ACComponent acComponent, VD.DatabaseApp dbApp)
         {
             GenerateMaintOrder(maintACClassID, acComponent, dbApp);
 
@@ -750,11 +750,11 @@ namespace gip.mes.maintenance
             //    IsMaintenanceWarning.ValueT = false;
         }
 
-        private void GenerateMaintOrder(Guid maintACClassID, ACComponent acComponent, vd.DatabaseApp dbApp)
+        private void GenerateMaintOrder(Guid maintACClassID, ACComponent acComponent, VD.DatabaseApp dbApp)
         {
 
             //if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == acComponent.ComponentClass.ACClassID
-            //               && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+            //               && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
             //    return;
 
             //var maintACClass = dbApp.MaintACClass.Include("MaintACClassProperty_MaintACClass")
@@ -762,35 +762,35 @@ namespace gip.mes.maintenance
             //                                    .Where(c => c.MaintACClassID == maintACClassID)
             //                                    .FirstOrDefault();
 
-            //string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(vd.MaintOrder), vd.MaintOrder.NoColumnName, vd.MaintOrder.FormatNewNo, this);
-            //vd.MaintOrder maintOrder = vd.MaintOrder.NewACObject(dbApp, null, secondaryKey);
+            //string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(VD.MaintOrder), VD.MaintOrder.NoColumnName, VD.MaintOrder.FormatNewNo, this);
+            //VD.MaintOrder maintOrder = VD.MaintOrder.NewACObject(dbApp, null, secondaryKey);
             //maintOrder.MaintACClass = maintACClass;
-            //maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
+            //maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
             //maintOrder.VBiPAACClassID = acComponent.ComponentClass.ACClassID;
             //maintOrder.MDMaintMode = maintACClass.MDMaintMode;
             //maintOrder.MaintSetDate = DateTime.Now;
 
-            //foreach (vd.MaintACClassVBGroup maintVBGroup in maintACClass.MaintACClassVBGroup_MaintACClass.Where(c => c.IsActive))
+            //foreach (VD.MaintACClassVBGroup maintVBGroup in maintACClass.MaintACClassVBGroup_MaintACClass.Where(c => c.IsActive))
             //{
-            //    vd.MaintTask maintTask = vd.MaintTask.NewACObject(dbApp, maintOrder);
+            //    VD.MaintTask maintTask = VD.MaintTask.NewACObject(dbApp, maintOrder);
             //    maintTask.MaintACClassVBGroup = maintVBGroup;
-            //    maintTask.MDMaintTaskState = dbApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)vd.MaintTaskState.UnfinishedTask);
+            //    maintTask.MDMaintTaskState = dbApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)VD.MaintTaskState.UnfinishedTask);
             //}
 
-            //if ((maintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.TimeOnly ||
-            //    maintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.TimeAndEvent)
+            //if ((maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeOnly ||
+            //    maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeAndEvent)
             //    && maintACClass.MaintInterval.HasValue)
             //    maintOrder.MaintSetDuration = maintACClass.MaintInterval.Value;
 
-            //if (maintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.EventOnly
-            //    || maintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.TimeAndEvent)
+            //if (maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.EventOnly
+            //    || maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeAndEvent)
             //{
-            //    foreach (vd.MaintACClassProperty maintACClassProperty in maintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive))
+            //    foreach (VD.MaintACClassProperty maintACClassProperty in maintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive))
             //    {
             //        var property = acComponent.GetProperty(maintACClassProperty.VBiACClassProperty.ACIdentifier);
             //        if (property != null)
             //        {
-            //            vd.MaintOrderProperty maintOrderProperty = vd.MaintOrderProperty.NewACObject(dbApp, maintOrder);
+            //            VD.MaintOrderProperty maintOrderProperty = VD.MaintOrderProperty.NewACObject(dbApp, maintOrder);
             //            maintOrderProperty.SetValue = maintACClassProperty.MaxValue;
             //            if (property.Value != null)
             //                maintOrderProperty.ActValue = property.Value.ToString();

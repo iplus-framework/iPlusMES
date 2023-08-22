@@ -1,5 +1,5 @@
 using gip.mes.datamodel;
-using faciltiy = gip.mes.facility;
+using Facility = gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;

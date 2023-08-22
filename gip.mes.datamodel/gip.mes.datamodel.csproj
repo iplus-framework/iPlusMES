@@ -26,26 +26,6 @@
     <None Include="..\..\GIP-SNKey.snk">
       <Link>GIP-SNKey.snk</Link>
     </None>
-    <Compile Update="iPlusMESV4.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>iPlusMESV4.tt</DependentUpon>
-    </Compile>
-    <Compile Update="iPlusMESV4.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>iPlusMESV4.edmx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EntityDeploy Include="iPlusMESV4.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>iPlusMESV4.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Update="iPlusMESV4.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>iPlusMESV4.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />

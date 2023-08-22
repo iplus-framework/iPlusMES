@@ -4,7 +4,7 @@ using gip.mes.autocomponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 
 namespace gip.mes.maintenance
 {
@@ -88,8 +88,8 @@ namespace gip.mes.maintenance
 
         //private bool _SelectedFromHierarchy = false;
 
-        //private List<vd.VBGroup> _VBGroups;
-        //private List<vd.VBGroup> VBGroups
+        //private List<VD.VBGroup> _VBGroups;
+        //private List<VD.VBGroup> VBGroups
         //{
         //    get
         //    {
@@ -99,13 +99,13 @@ namespace gip.mes.maintenance
         //    }
         //}
 
-        //private List<vd.MaintACClassVBGroup> _TempMaintACClassVBGroup = new List<vd.MaintACClassVBGroup>();
+        //private List<VD.MaintACClassVBGroup> _TempMaintACClassVBGroup = new List<VD.MaintACClassVBGroup>();
 
-        //private List<vd.MaintACClassVBGroup> _TempMaintACClassPropertyVBGroup = new List<vd.MaintACClassVBGroup>();
+        //private List<VD.MaintACClassVBGroup> _TempMaintACClassPropertyVBGroup = new List<VD.MaintACClassVBGroup>();
 
-        //private List<vd.MaintACClass> _MaintRules;
+        //private List<VD.MaintACClass> _MaintRules;
 
-        //private List<vd.MaintACClass> MaintRules
+        //private List<VD.MaintACClass> MaintRules
         //{
         //    get
         //    {
@@ -311,7 +311,7 @@ namespace gip.mes.maintenance
         //    SearchProperties();
         //}
 
-        //private vd.MaintACClass _CurrentMaintACClass;
+        //private VD.MaintACClass _CurrentMaintACClass;
         ///// <summary>
         ///// Gets or sets the current maintenance ACClass.
         ///// </summary>
@@ -319,7 +319,7 @@ namespace gip.mes.maintenance
         ///// Ruft die CurrentMaintACClass ab oder setzt sie.
         ///// </summary>
         //[ACPropertyInfo(999, "", "en{'Maintenance-Class'}de{'Wartungsklasse'}")]
-        //public vd.MaintACClass CurrentMaintACClass
+        //public VD.MaintACClass CurrentMaintACClass
         //{
         //    get
         //    {
@@ -343,7 +343,7 @@ namespace gip.mes.maintenance
         //        CurrentMaintACClass = null;
         //        return;
         //    }
-        //    vd.MaintACClass maintACClass = DatabaseApp.MaintACClass.FirstOrDefault(c => c.VBiACClassID == acClass.ACClassID);
+        //    VD.MaintACClass maintACClass = DatabaseApp.MaintACClass.FirstOrDefault(c => c.VBiACClassID == acClass.ACClassID);
         //    if (maintACClass != null)
         //    {
         //        if (CurrentMaintACClass != maintACClass)
@@ -374,7 +374,7 @@ namespace gip.mes.maintenance
         //[ACMethodInfo("", "en{'Create new Maintenance Rule'}de{'Neue Wartungsregel anlegen'}", 999)]
         //public void GenerateNewMaintenanceConfiguration()
         //{
-        //    vd.MaintACClass maintACClass = vd.MaintACClass.NewACObject(DatabaseApp, null);
+        //    VD.MaintACClass maintACClass = VD.MaintACClass.NewACObject(DatabaseApp, null);
         //    maintACClass.VBiACClass = DatabaseApp.ACClass.FirstOrDefault(c => c.ACClassID == SelectedACClassHierarchy.ACClass.ACClassID);
         //    CurrentMaintACClass = maintACClass;
         //    ACClassWrapper hierarchyClass = ACClassHierarchyList.FirstOrDefault(c => c.ACClass.ACClassID == maintACClass.VBiACClassID);
@@ -441,11 +441,11 @@ namespace gip.mes.maintenance
         //    }
         //}
 
-        //public void SetMaintACClassProperty(vd.MaintACClass maintACClass)
+        //public void SetMaintACClassProperty(VD.MaintACClass maintACClass)
         //{
-        //    IEnumerable<vd.MaintACClassProperty> tempProperties = maintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive);
+        //    IEnumerable<VD.MaintACClassProperty> tempProperties = maintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive);
         //    List<MaintACClassPropertyWrapper> wrappers = new List<MaintACClassPropertyWrapper>();
-        //    foreach (vd.MaintACClassProperty prop in tempProperties)
+        //    foreach (VD.MaintACClassProperty prop in tempProperties)
         //    {
         //        MaintACClassPropertyWrapper wrapper = new MaintACClassPropertyWrapper() { MaintACClassProperty = prop };
         //        wrapper.ACClassProperty = DatabaseApp.ContextIPlus.ACClassProperty.FirstOrDefault(c => c.ACClassPropertyID == prop.VBiACClassPropertyID);
@@ -605,10 +605,10 @@ namespace gip.mes.maintenance
         //[ACMethodInfo("", "", 999)]
         //public void AddPropertyToMaintACClass()
         //{
-        //    vd.MaintACClassProperty maintACClassProperty = CurrentMaintACClass.MaintACClassProperty_MaintACClass.FirstOrDefault(c => c.VBiACClassProperty.ACIdentifier == SelectedACClassProperty.ACIdentifier);
+        //    VD.MaintACClassProperty maintACClassProperty = CurrentMaintACClass.MaintACClassProperty_MaintACClass.FirstOrDefault(c => c.VBiACClassProperty.ACIdentifier == SelectedACClassProperty.ACIdentifier);
         //    if (maintACClassProperty == null)
         //    {
-        //        maintACClassProperty = vd.MaintACClassProperty.NewACObject(DatabaseApp, CurrentMaintACClass);
+        //        maintACClassProperty = VD.MaintACClassProperty.NewACObject(DatabaseApp, CurrentMaintACClass);
         //        maintACClassProperty.VBiACClassProperty = DatabaseApp.ACClassProperty.FirstOrDefault(c => c.ACClassPropertyID == SelectedACClassProperty.ACClassPropertyID);
         //        CurrentMaintACClass.MaintACClassProperty_MaintACClass.Add(maintACClassProperty);
         //    }
@@ -698,7 +698,7 @@ namespace gip.mes.maintenance
         //    }
         //}
 
-        //private vd.MaintACClassVBGroup _CurrentMaintACClassGroup;
+        //private VD.MaintACClassVBGroup _CurrentMaintACClassGroup;
         ///// <summary>
         ///// Gets or sets the current MaintACClassGroup (VBGroup for the maintenance roles).
         ///// </summary>
@@ -706,7 +706,7 @@ namespace gip.mes.maintenance
         ///// Ruft die aktuelle MaintACClassGroup (VBGroup für die Pflegerollen) ab oder setzt sie.
         ///// </summary>
         //[ACPropertyInfo(999)]
-        //public vd.MaintACClassVBGroup CurrentMaintACClassGroup
+        //public VD.MaintACClassVBGroup CurrentMaintACClassGroup
         //{
         //    get
         //    {
@@ -734,7 +734,7 @@ namespace gip.mes.maintenance
 
         //    List<VBGroupWrapper> tempRoles = new List<VBGroupWrapper>();
         //    VBGroups.ForEach(c => tempRoles.Add(new VBGroupWrapper() { VBGroup = c }));
-        //    //IEnumerable<vd.MaintACClassVBGroup> assignedRoles = DatabaseApp.MaintACClassVBGroup.Where(c => c.MaintACClassID == CurrentMaintACClass.MaintACClassID && c.IsActive);
+        //    //IEnumerable<VD.MaintACClassVBGroup> assignedRoles = DatabaseApp.MaintACClassVBGroup.Where(c => c.MaintACClassID == CurrentMaintACClass.MaintACClassID && c.IsActive);
         //    //foreach (var roleACClass in tempRoles)
         //    //{
         //    //    roleACClass.PropertyChanged += roleACClass_PropertyChanged;
@@ -754,7 +754,7 @@ namespace gip.mes.maintenance
         //        return;
         //    }
 
-        //    vd.MaintACClassVBGroup classGroup = _TempMaintACClassVBGroup.FirstOrDefault(c => c.VBGroupID == _CurrentMaintACClassRole.VBGroup.VBGroupID
+        //    VD.MaintACClassVBGroup classGroup = _TempMaintACClassVBGroup.FirstOrDefault(c => c.VBGroupID == _CurrentMaintACClassRole.VBGroup.VBGroupID
         //                                                                                  && c.MaintACClassID == CurrentMaintACClass.MaintACClassID);
         //    if (classGroup != null)
         //        CurrentMaintACClassGroup = classGroup;
@@ -775,15 +775,15 @@ namespace gip.mes.maintenance
         //    if (e.PropertyName == "IsChecked" && maintRole != null)
         //    {
         //        CurrentMaintACClassRole = maintRole;
-        //        vd.MaintACClassVBGroup acClassRole = DatabaseApp.MaintACClassVBGroup.FirstOrDefault(c => c.MaintACClassID == CurrentMaintACClass.MaintACClassID
+        //        VD.MaintACClassVBGroup acClassRole = DatabaseApp.MaintACClassVBGroup.FirstOrDefault(c => c.MaintACClassID == CurrentMaintACClass.MaintACClassID
         //                                                                                        && c.VBGroupID == maintRole.VBGroup.VBGroupID);
 
-        //        vd.MaintACClassVBGroup acClassRoleTemp = _TempMaintACClassVBGroup.FirstOrDefault(c => c.MaintACClassID == CurrentMaintACClass.MaintACClassID
+        //        VD.MaintACClassVBGroup acClassRoleTemp = _TempMaintACClassVBGroup.FirstOrDefault(c => c.MaintACClassID == CurrentMaintACClass.MaintACClassID
         //                                                                                        && c.VBGroupID == maintRole.VBGroup.VBGroupID);
 
         //        if (maintRole.IsChecked && acClassRole == null && acClassRoleTemp == null)
         //        {
-        //            acClassRole = vd.MaintACClassVBGroup.NewACObject(DatabaseApp, null);
+        //            acClassRole = VD.MaintACClassVBGroup.NewACObject(DatabaseApp, null);
         //            acClassRole.MaintACClass = CurrentMaintACClass;
         //            acClassRole.VBGroup = maintRole.VBGroup;
         //            acClassRole.IsActive = true;
@@ -809,7 +809,7 @@ namespace gip.mes.maintenance
 
         //private void ClearClassNonSavedRoles()
         //{
-        //    foreach (vd.MaintACClassVBGroup role in _TempMaintACClassVBGroup)
+        //    foreach (VD.MaintACClassVBGroup role in _TempMaintACClassVBGroup)
         //        DatabaseApp.Detach(role);
         //    _TempMaintACClassVBGroup.Clear();
         //}
@@ -904,7 +904,7 @@ namespace gip.mes.maintenance
 
         //private bool? IsConfigured(ACClass acClass)
         //{
-        //    vd.MaintACClass maintClass = DatabaseApp.MaintACClass.FirstOrDefault(c => c.VBiACClassID == acClass.ACClassID);
+        //    VD.MaintACClass maintClass = DatabaseApp.MaintACClass.FirstOrDefault(c => c.VBiACClassID == acClass.ACClassID);
         //    if (maintClass == null)
         //        return null;
         //    return maintClass.IsActive;
@@ -1095,7 +1095,7 @@ namespace gip.mes.maintenance
         //    if (!PreExecute("Delete"))
         //        return;
 
-        //    foreach (vd.MaintACClassProperty maintProp in CurrentMaintACClass.MaintACClassProperty_MaintACClass.ToArray())
+        //    foreach (VD.MaintACClassProperty maintProp in CurrentMaintACClass.MaintACClassProperty_MaintACClass.ToArray())
         //    {
         //        Msg msg = maintProp.DeleteACObject(DatabaseApp, true);
         //        if(msg != null)
@@ -1105,7 +1105,7 @@ namespace gip.mes.maintenance
         //        }
         //    }
 
-        //    foreach(vd.MaintACClassVBGroup maintGroup in CurrentMaintACClass.MaintACClassVBGroup_MaintACClass.ToArray())
+        //    foreach(VD.MaintACClassVBGroup maintGroup in CurrentMaintACClass.MaintACClassVBGroup_MaintACClass.ToArray())
         //    {
         //        Msg msg = maintGroup.DeleteACObject(DatabaseApp, true);
         //        if (msg != null)
@@ -1177,17 +1177,17 @@ namespace gip.mes.maintenance
         //            case "CurrentMaintACClass\\MDMaintMode":
         //                if (CurrentMaintACClass != null && CurrentMaintACClass.MDMaintMode != null)
         //                {
-        //                    if (CurrentMaintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.TimeOnly)
+        //                    if (CurrentMaintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeOnly)
         //                    {
         //                        IsTimeVisible = true;
         //                        IsEventVisible = false;
         //                    }
-        //                    else if (CurrentMaintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.EventOnly)
+        //                    else if (CurrentMaintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.EventOnly)
         //                    {
         //                        IsTimeVisible = false;
         //                        IsEventVisible = true;
         //                    }
-        //                    else if (CurrentMaintACClass.MDMaintMode.MDMaintModeIndex == (short)vd.MDMaintMode.MaintModes.TimeAndEvent)
+        //                    else if (CurrentMaintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeAndEvent)
         //                    {
         //                        IsTimeVisible = true;
         //                        IsEventVisible = true;
@@ -1382,11 +1382,11 @@ namespace gip.mes.maintenance
         //    }
         //}
 
-        //private Global.ConfigIconState CheckConfigRuleMarks(ACClassInfoWithItems items, IEnumerable<vd.MaintACClass> maintconfigs, bool recursive = true)
+        //private Global.ConfigIconState CheckConfigRuleMarks(ACClassInfoWithItems items, IEnumerable<VD.MaintACClass> maintconfigs, bool recursive = true)
         //{
         //    Global.ConfigIconState iconState = Global.ConfigIconState.NoConfig;
         //    items.IconState = iconState;
-        //    IEnumerable<vd.MaintACClass> maintConfigsFilter = null;
+        //    IEnumerable<VD.MaintACClass> maintConfigsFilter = null;
 
         //    if (ActivatedRules && !DeactivatedRules)
         //        maintConfigsFilter = maintconfigs.Where(c => c.IsActive);
