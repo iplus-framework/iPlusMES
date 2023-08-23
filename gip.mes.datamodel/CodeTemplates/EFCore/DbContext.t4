@@ -91,7 +91,7 @@ public partial class <#= Options.ContextName #> : DbContext
             .UseModel(iPlusMESV5ContextModel.Instance)
             .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
             //Uncomment connection string when generating new CompiledModels
-            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV4_Entities"].ConnectionString);
+            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
 <#
     if (!Options.SuppressConnectionStringWarning)
     {

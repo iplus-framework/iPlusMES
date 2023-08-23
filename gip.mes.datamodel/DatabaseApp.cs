@@ -152,7 +152,7 @@ namespace gip.mes.datamodel
                 {
                     try
                     {
-                        ConnectionStringSettings setting = CommandLineHelper.ConfigCurrentDir.ConnectionStrings.ConnectionStrings["iPlusMESV4_Entities"];
+                        ConnectionStringSettings setting = CommandLineHelper.ConfigCurrentDir.ConnectionStrings.ConnectionStrings["iPlusMESV5_Entities"];
                         return setting.ConnectionString;
                     }
                     catch (Exception ec)
@@ -165,7 +165,7 @@ namespace gip.mes.datamodel
                             gip.core.datamodel.Database.Root.Messages.LogException("DatabaseApp", "ConnectionString", msg);
                     }
                 }
-                return ConfigurationManager.ConnectionStrings["iPlusMESV4_Entities"].ConnectionString;
+                return ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString;
             }
         }
 

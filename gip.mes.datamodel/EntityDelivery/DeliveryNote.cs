@@ -58,6 +58,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.DeliveryNoteTypeIndex = (short)GlobalApp.DeliveryNoteType.Receipt;
             entity.MDDelivNoteState = MDDelivNoteState.DefaultMDDelivNoteState(dbApp);
+            dbApp.Add(entity);
             entity.DeliveryNoteNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;

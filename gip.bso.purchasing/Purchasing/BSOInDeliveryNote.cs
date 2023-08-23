@@ -701,7 +701,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (CurrentDeliveryNote == null || CurrentDeliveryNote.DeliveryNotePos_DeliveryNote == null)
+                if (CurrentDeliveryNote == null)
                     return null;
 
                 return CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.ToList();
@@ -1903,7 +1903,7 @@ namespace gip.bso.purchasing
             _UnSavedUnAssignedInOrderPos = new List<InOrderPos>();
             _UnSavedAssignedPickingInOrderPos = new List<InOrderPos>();
             RefreshInOrderPosList();
-            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState != EntityState.Added)
+            if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState != EntityState.Added && CurrentDeliveryNote.EntityState != EntityState.Detached)
                 CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.AutoLoad(CurrentDeliveryNote.DeliveryNotePos_DeliveryNoteReference, CurrentDeliveryNote);
             OnPropertyChanged("DeliveryNotePosList");
             base.OnPostUndoSave();

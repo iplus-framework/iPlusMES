@@ -1544,7 +1544,7 @@ namespace gip.bso.purchasing
         {
             _UnSavedUnAssignedContractPos = new List<InOrderPos>();
             RefreshOpenContractPosList();
-            if (CurrentInOrder != null && CurrentInOrder.EntityState != EntityState.Added)
+            if (CurrentInOrder != null && CurrentInOrder.EntityState != EntityState.Added && CurrentInOrder.EntityState != EntityState.Detached)
                 CurrentInOrder.InOrderPos_InOrder.AutoLoad(CurrentInOrder.InOrderPos_InOrderReference, CurrentInOrder);
             OnPropertyChanged("InOrderPosList");
             base.OnPostUndoSave();
