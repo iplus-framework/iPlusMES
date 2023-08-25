@@ -35,6 +35,7 @@ namespace gip.mes.datamodel
         public const string ClassName = nameof(MaintOrder);
         public const string NoColumnName = "MaintOrderNo";
         public const string FormatNewNo = "MO{0}";
+        public const string FormatNewNoTemplate = "MOT{0}";
 
         #region New/Delete
         public static MaintOrder NewACObject(DatabaseApp dbApp, IACObject parentACObject, string secondaryKey)
@@ -137,6 +138,47 @@ namespace gip.mes.datamodel
         #endregion
 
         #region AdditionalProperties
+
+        [ACPropertyInfo(9999)]
+        public core.datamodel.ACClass TempACClass
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(999, "", "en{'Next Maintenance on'}de{'Nächste Wartung am'}")]
+        public DateTime? NextMaintTerm
+        {
+            get
+            {
+                if (LastMaintTerm.HasValue && MaintInterval.HasValue)
+                    return LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
+                return null;
+            }
+            set
+            {
+                //_NextMaintTerm = value;
+                OnPropertyChanged(nameof(NextMaintTerm));
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        public string ComponentACCaption
+        {
+            get
+            {
+                if (Facility != null)
+                {
+                    return Facility.FacilityNo + Environment.NewLine + Facility.FacilityName;
+                }
+                else if (MaintACClass != null)
+                {
+                    return MaintACClass.ACClass.ACCaption + Environment.NewLine + MaintACClass.ACClassACUrl;
+                }
+
+                return null;
+            }
+        }
 
         //private TimeSpan _MaintActDurationTS;
         //[ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]

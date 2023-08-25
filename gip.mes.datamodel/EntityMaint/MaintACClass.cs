@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -19,6 +20,12 @@ namespace gip.mes.datamodel
         {
             var entity = new MaintACClass();
             entity.MaintACClassID = Guid.NewGuid();
+
+            if (parentACObject is ACClass)
+            {
+                entity.VBiACClass = parentACObject as ACClass;
+            }
+
             entity.DefaultValuesACObject();
             dbApp.MaintACClass.AddObject(entity);
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
