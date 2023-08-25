@@ -24,6 +24,7 @@ using gip.mes.facility;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using static gip.bso.iplus.BSOProcessControl;
+using gip.core.layoutengine;
 
 namespace gip.bso.manufacturing
 {
@@ -233,7 +234,7 @@ namespace gip.bso.manufacturing
         bool _forceUpdateTaskList;
         protected override bool LoadACTaskList(FilterMode filterMode, bool forceUpdateTaskList)
         {
-            if(UseBackGroundWorker)
+            if (UseBackGroundWorker)
             {
                 _filterMode = filterMode;
                 _forceUpdateTaskList = forceUpdateTaskList;
@@ -251,7 +252,7 @@ namespace gip.bso.manufacturing
                     SelectedACTask = CurrentACTask;
                 }
             }
-            
+
             return true;
         }
 
@@ -309,12 +310,12 @@ namespace gip.bso.manufacturing
             SelectedACTaskVB = _ACTaskVBList.FirstOrDefault(x => x.ACClassTaskID == task.ACClassTaskID);
             ShowWorkflow();
         }
-        #endregion  
+        #endregion
 
 
         #region provide ACClassTaskModel list
 
-    
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -481,14 +482,14 @@ namespace gip.bso.manufacturing
                     if (CurrentApplicationManager == null)
                     {
                         taskListChanged = _ACTaskVBList != null;
-                        
+
                     }
 
                     gip.mes.datamodel.ACClassTask rootTaskAppManger = this.DatabaseApp.ACClassTask.Where(c => c.TaskTypeACClassID == CurrentApplicationManager.ACClassID && !c.IsTestmode).FirstOrDefault();
                     if (rootTaskAppManger == null)
                     {
                         taskListChanged = _ACTaskVBList != null;
-                        
+
                     }
 
                     // newTaskList = s_cQry_TasklistByTaskID(this.DatabaseApp, rootTaskAppManger.ACClassTaskID, FilterOrderNo, FilterMaterialNo).ToArray();
@@ -499,7 +500,7 @@ namespace gip.bso.manufacturing
                     if (CurrentProgramType == null)
                     {
                         taskListChanged = _ACTaskVBList != null;
-                        
+
                     }
 
                     if (CurrentProgramType.ACObject is gip.core.datamodel.ACClass)
@@ -542,19 +543,46 @@ namespace gip.bso.manufacturing
             }
         }
 
-       
+        public mes.datamodel.ACClassTask[] GetTasks_Classic(DatabaseApp databaseApp, Guid? rootACClassTaskID, Guid? pwACClassID, string materialNo, string orderNo)
+        {
+            var query = s_cQry_ACClassTask(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
+            return query.ToArray();
+        }
+
+        public mes.datamodel.ACClassTask[] GetTasksSimplified(DatabaseApp databaseApp, Guid? rootACClassTaskID, Guid? pwACClassID, string materialNo, string orderNo)
+        {
+
+            return
+                databaseApp
+                .ACClassTask
+                .Where(c =>
+
+                    // common
+                    c.IsDynamic
+                    && c.ACProgramID != null
+                    && c.ACTaskTypeIndex == (short)gip.core.datamodel.Global.ACTaskTypes.WorkflowTask
+
+                    // rootACClassTaskID
+                    && (rootACClassTaskID == null || (c.ParentACClassTaskID.HasValue && c.ParentACClassTaskID == rootACClassTaskID))
+
+                    // pwACClassID
+                    && (pwACClassID == null ||
+                        (
+                            c.ParentACClassTaskID.HasValue && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACKindIndex == (short)Global.ACKinds.TACApplicationManager
+                            && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACProject.IsWorkflowEnabled
+                            && c.ContentACClassWFID.HasValue && c.ContentACClassWF.PWACClass.ACClassID == pwACClassID
+                        )
+                    )
+                )
+                .ToArray();
+        }
+
+
         private ACClassTaskModel[] GetACClassTaskModels(DatabaseApp databaseApp, Guid? rootACClassTaskID, Guid? pwACClassID, string materialNo, string orderNo)
         {
             List<ACClassTaskModel> result = new List<ACClassTaskModel>();
 
-            // GetTasks(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
-            List<gip.mes.datamodel.ACClassTask> tasks =
-            s_cQry_ACClassTask(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo)
-            .ToList();
-
-
-            Guid[] aCProgramIDs = tasks.Select(c => c.ACProgramID ?? Guid.Empty).ToArray();
-
+            mes.datamodel.ACClassTask[] tasks = GetTasksSimplified(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
 
             foreach (gip.mes.datamodel.ACClassTask task in tasks)
             {
@@ -616,14 +644,22 @@ namespace gip.bso.manufacturing
                 result.Add(model);
             }
 
+            if (!string.IsNullOrEmpty(FilterMaterialNo))
+            {
+                result = result.Where(c => c.Material.ToLower().Contains(FilterMaterialNo.ToLower())).ToList();
+            }
 
+            if (!string.IsNullOrEmpty(FilterOrderNo))
+            {
+                result = result.Where(c => c.ProgramNo.ToLower().Contains(FilterOrderNo.ToLower())).ToList();
+            }
 
             return result.ToArray();
         }
 
         #region precompiled query
 
-        public static readonly Func<DatabaseApp, Guid?, Guid?,string, string, IQueryable<gip.mes.datamodel.ACClassTask>> s_cQry_ACClassTask =
+        public static readonly Func<DatabaseApp, Guid?, Guid?, string, string, IQueryable<gip.mes.datamodel.ACClassTask>> s_cQry_ACClassTask =
         CompiledQuery.Compile<DatabaseApp, Guid?, Guid?, string, string, IQueryable<gip.mes.datamodel.ACClassTask>>(
             (databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo) =>
                 databaseApp
@@ -635,6 +671,8 @@ namespace gip.bso.manufacturing
 
             #region Include ACProgram Task list
 
+                .Include("ACClassTask1_ParentACClassTask")
+                .Include("ACClassTask1_ParentACClassTask.TaskTypeACClass")
                 .Include("ACProgram")
                 .Include("ACProgram.ACClassTask_ACProgram")
 
