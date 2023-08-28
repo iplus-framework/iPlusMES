@@ -4427,7 +4427,8 @@ namespace gip.mes.processapplication
             var configStores = MandatoryConfigStores?.ToArray();
             if (configStores != null)
             {
-                return ConfigManagerIPlus.GetParametersInfo(configStores);
+                string preConfigACUrl = RootPW.PreValueACUrl;
+                return ConfigManagerIPlus.GetParametersInfo(configStores, preConfigACUrl);
             }
 
             return null;
