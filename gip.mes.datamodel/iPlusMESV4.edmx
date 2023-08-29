@@ -1981,7 +1981,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
-          <Property Name="VBiPAAClassID" Type="uniqueidentifier" />
+          <Property Name="VBiPAACClassID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="MaintOrderAssignment">
           <Key>
@@ -9297,6 +9297,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_MaintOrder_PAACClassID">
+          <End Role="ACClass" Type="Self.ACClass" Multiplicity="0..1" />
+          <End Role="MaintOrder" Type="Self.MaintOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClass">
+              <PropertyRef Name="ACClassID" />
+            </Principal>
+            <Dependent Role="MaintOrder">
+              <PropertyRef Name="VBiPAACClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_MaintOrder_PickingID">
           <End Role="Picking" Type="Self.Picking" Multiplicity="0..1" />
           <End Role="MaintOrder" Type="Self.MaintOrder" Multiplicity="*" />
@@ -15314,6 +15326,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="MDMaintOrderState" EntitySet="MDMaintOrderState" />
             <End Role="MaintOrder" EntitySet="MaintOrder" />
           </AssociationSet>
+          <AssociationSet Name="FK_MaintOrder_PAACClassID" Association="Self.FK_MaintOrder_PAACClassID">
+            <End Role="ACClass" EntitySet="ACClass" />
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+          </AssociationSet>
           <AssociationSet Name="FK_MaintOrder_PickingID" Association="Self.FK_MaintOrder_PickingID">
             <End Role="Picking" EntitySet="Picking" />
             <End Role="MaintOrder" EntitySet="MaintOrder" />
@@ -19643,6 +19659,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           </AssociationSet>
           <EntitySet Name="MaintOrder" EntityType="iPlusMESV4_Model.MaintOrder" />
           <EntitySet Name="MaintOrderTask" EntityType="iPlusMESV4_Model.MaintOrderTask" />
+          <AssociationSet Name="FK_MaintOrder_PAACClassID" Association="iPlusMESV4_Model.FK_MaintOrder_PAACClassID">
+            <End Role="ACClass" EntitySet="ACClass" />
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+          </AssociationSet>
           <AssociationSet Name="FK_MaintOrder_FacilityID" Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID">
             <End Role="Facility" EntitySet="Facility" />
             <End Role="MaintOrder" EntitySet="MaintOrder" />
@@ -19824,6 +19844,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="OperationLog_RefACClass" Relationship="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID" FromRole="ACClass" ToRole="OperationLog" />
           <NavigationProperty Name="MaintACClass_VBiACClass" Relationship="iPlusMESV4_Model.FK_MaintACClass_ACClassID" FromRole="ACClass" ToRole="MaintACClass" />
           <NavigationProperty Name="ACClassTask_TaskTypeACClass" Relationship="iPlusMESV4_Model.FK_ACClassTask_TaskTypeACClassID" FromRole="ACClass" ToRole="ACClassTask" />
+          <NavigationProperty Name="MaintOrder_VBiPAACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_PAACClassID" FromRole="ACClass" ToRole="MaintOrder" />
         </EntityType>
         <EntityType Name="ACClassConfig">
           <Key>
@@ -34349,7 +34370,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="VBiPAAClassID" Type="Guid" />
+          <Property Name="VBiPAACClassID" Type="Guid" />
+          <NavigationProperty Name="VBiPAACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_PAACClassID" FromRole="MaintOrder" ToRole="ACClass" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="MaintOrder" ToRole="Facility" />
           <NavigationProperty Name="MaintACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" FromRole="MaintOrder" ToRole="MaintACClass" />
           <NavigationProperty Name="MaintOrder_BasedOnMaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" FromRole="MaintOrder" ToRole="MaintOrder1" />
@@ -34382,6 +34404,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrderTask" ToRole="MaintOrder" />
           <NavigationProperty Name="MDMaintTaskState" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" FromRole="MaintOrderTask" ToRole="MDMaintTaskState" />
         </EntityType>
+        <Association Name="FK_MaintOrder_PAACClassID">
+          <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClass">
+              <PropertyRef Name="ACClassID" />
+            </Principal>
+            <Dependent Role="MaintOrder">
+              <PropertyRef Name="VBiPAACClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_MaintOrder_FacilityID">
           <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
@@ -39718,7 +39752,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="MaintOrder">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrder">
               <MappingFragment StoreEntitySet="MaintOrder">
-                <ScalarProperty Name="VBiPAAClassID" ColumnName="VBiPAAClassID" />
+                <ScalarProperty Name="VBiPAACClassID" ColumnName="VBiPAACClassID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -40705,6 +40739,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointRelation_TargetTandTv3MixPointID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrder" Width="1.5" PointX="84.25" PointY="303.75" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderTask" Width="1.5" PointX="86.5" PointY="300.25" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_PAACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" />

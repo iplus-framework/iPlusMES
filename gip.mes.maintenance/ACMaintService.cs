@@ -567,7 +567,7 @@
 //                        if (openMaintenanceOrders.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
 //                            continue;
 
-//                        maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
+//                        maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAAClassID == maintInstance.Instance.ComponentClass.ACClassID)
 //                                                                   .OrderByDescending(x => x.MaintActEndDate)
 //                                                                   .FirstOrDefault();
 
@@ -730,7 +730,7 @@
 //        protected void SetNewMaintOrder(Guid maintACClassID, ACComponent acComponent, vd.DatabaseApp dbApp)
 //        {
 //            GenerateMaintOrder(maintACClassID, acComponent, dbApp);
-            
+
 //            ACMaintWarning warning = null;
 
 //            using (ACMonitor.Lock(_60010_WarningLock))
@@ -752,7 +752,7 @@
 //        private void GenerateMaintOrder(Guid maintACClassID, ACComponent acComponent, DatabaseApp dbApp)
 //        {
 
-//            if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == acComponent.ComponentClass.ACClassID
+//            if (dbApp.MaintOrder.Any(c => c.VBiPAAClassID == acComponent.ComponentClass.ACClassID
 //                           && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
 //                return;
 
@@ -843,7 +843,7 @@
 //            ComponentsWarningList.ValueT = CompWarningList.ToList();
 //            IsMaintenanceWarning.ValueT = true;
 
-            
+
 //            if (!onInit && (tempList == null || !tempList.Contains(warning)))
 //                OnNewAlarmOccurred(OnNewWarningAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace warning ({0}) is appeard for {1} {2}", warning.Text, acComponent.ACCaption, acComponent.ACUrl)));
 //        }
