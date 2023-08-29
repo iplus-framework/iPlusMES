@@ -33,6 +33,20 @@ namespace gip.mes.maintenance
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_SelectionManager != null)
+            {
+                _SelectionManager.Detach();
+                _SelectionManager.ObjectDetaching -= _SelectionManager_ObjectDetaching;
+                _SelectionManager.ObjectAttached -= _SelectionManager_ObjectAttached;
+                _SelectionManager = null;
+            }
+
+            if (_CurrentACComponent != null)
+            {
+                _CurrentACComponent.Detach();
+                _CurrentACComponent = null;
+            }
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -213,17 +227,17 @@ namespace gip.mes.maintenance
                     _CurrentACComponent = null;
                 else
                     _CurrentACComponent = new ACRef<IACObject>(value, this);
-                //if (_CurrentACComponent != null)
-                //{
-                //    if (objectSwapped)
-                //    {
-                //        OnSelectionChanged();
-                //    }
-                //}
-                //else
-                //{
-                //    OnSelectionChanged();
-                //}
+                if (_CurrentACComponent != null)
+                {
+                    if (objectSwapped)
+                    {
+                        OnSelectionChanged();
+                    }
+                }
+                else
+                {
+                    OnSelectionChanged();
+                }
                 OnPropertyChanged();
             }
         }
@@ -864,8 +878,45 @@ namespace gip.mes.maintenance
         protected virtual void OnSelectionChanged()
         {
             core.datamodel.ACClass selectedClass = CurrentACComponent != null ? CurrentACComponent.ACType as core.datamodel.ACClass : null;
-            //SetACClass(selectedClass);
+            
+            if (selectedClass != null)
+            {
+                List<MaintOrder> templates = new List<MaintOrder>();
+                LoadTemplates(selectedClass, templates);
+
+                if (templates.Any())
+                {
+                    AccessPrimary.ToNavList(templates);
+                    OnPropertyChanged(nameof(MaintOrderList));
+                    return;
+                }
+
+                var hierarchy = selectedClass.ClassHierarchy.ToArray();
+                foreach(core.datamodel.ACClass acClass in hierarchy)
+                {
+                    LoadTemplates(acClass, templates);
+
+                    if (templates.Any())
+                    {
+                        AccessPrimary.ToNavList(templates);
+                        OnPropertyChanged(nameof(MaintOrderList));
+                        return;
+                    }
+
+                }
+            }
         }
+
+        private void LoadTemplates(core.datamodel.ACClass acClass, List<MaintOrder> templates)
+        {
+            datamodel.ACClass acClassApp = acClass.FromAppContext<datamodel.ACClass>(DatabaseApp);
+            foreach (MaintACClass maintACClass in acClassApp.MaintACClass_VBiACClass)
+            {
+                var templ = maintACClass.MaintOrder_MaintACClass.Where(c => c.BasedOnMaintOrderID == null);
+                templates.AddRange(templ);
+            }
+        }
+
 
         #endregion
     }

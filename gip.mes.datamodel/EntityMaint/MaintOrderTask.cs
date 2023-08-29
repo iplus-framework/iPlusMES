@@ -57,7 +57,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999, "", "en{'Task name'}de{'Task name'}")]
-        public string TaskName
+        public string MaintTaskName
         {
             get
             {

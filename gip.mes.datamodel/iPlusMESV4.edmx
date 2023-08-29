@@ -1981,6 +1981,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="VBiPAAClassID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="MaintOrderAssignment">
           <Key>
@@ -2044,6 +2045,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="TaskName" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Material">
           <Key>
@@ -4792,7 +4794,7 @@
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4825,7 +4827,7 @@ warning 6002: The table/view 'MalzersV4.dbo.ACProgramLogView' does not have a pr
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4849,7 +4851,7 @@ warning 6002: The table/view 'MalzersV4.dbo.MachineMaterialPosView' does not hav
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4873,7 +4875,7 @@ warning 6002: The table/view 'MalzersV4.dbo.MachineMaterialRelView' does not hav
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4898,7 +4900,7 @@ warning 6002: The table/view 'MalzersV4.dbo.MachineMaterialView' does not have a
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4927,7 +4929,7 @@ warning 6002: The table/view 'MalzersV4.dbo.OrderLogPosMachines' does not have a
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4957,7 +4959,7 @@ warning 6002: The table/view 'MalzersV4.dbo.OrderLogPosView' does not have a pri
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5007,7 +5009,7 @@ warning 6002: The table/view 'MalzersV4.dbo.OrderLogRelView' does not have a pri
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5027,7 +5029,7 @@ warning 6002: The table/view 'MalzersV4.dbo.ProdOrderConnectionsDetailView' does
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5041,7 +5043,7 @@ warning 6002: The table/view 'MalzersV4.dbo.ProdOrderConnectionsView' does not h
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5063,7 +5065,7 @@ warning 6002: The table/view 'MalzersV4.dbo.ProdOrderInwardsView' does not have 
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5087,7 +5089,7 @@ warning 6002: The table/view 'MalzersV4.dbo.ProdOrderOutwardsView' does not have
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5100,7 +5102,7 @@ warning 6002: The table/view 'MalzersV4.dbo.VBSystemColumns' does not have a pri
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -19452,11 +19454,9 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           </AssociationSet>
           <EntitySet Name="MaintACClass" EntityType="iPlusMESV4_Model.MaintACClass" />
           <EntitySet Name="MaintACClassProperty" EntityType="iPlusMESV4_Model.MaintACClassProperty" />
-          <EntitySet Name="MaintOrder" EntityType="iPlusMESV4_Model.MaintOrder" />
           <EntitySet Name="MaintOrderAssignment" EntityType="iPlusMESV4_Model.MaintOrderAssignment" />
           <EntitySet Name="MaintOrderPos" EntityType="iPlusMESV4_Model.MaintOrderPos" />
           <EntitySet Name="MaintOrderProperty" EntityType="iPlusMESV4_Model.MaintOrderProperty" />
-          <EntitySet Name="MaintOrderTask" EntityType="iPlusMESV4_Model.MaintOrderTask" />
           <AssociationSet Name="FK_MaintACClass_ACClassID" Association="iPlusMESV4_Model.FK_MaintACClass_ACClassID">
             <End Role="ACClass" EntitySet="ACClass" />
             <End Role="MaintACClass" EntitySet="MaintACClass" />
@@ -19469,49 +19469,13 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
             <End Role="Company" EntitySet="Company" />
             <End Role="MaintOrderAssignment" EntitySet="MaintOrderAssignment" />
           </AssociationSet>
-          <AssociationSet Name="FK_MaintOrder_FacilityID" Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID">
-            <End Role="Facility" EntitySet="Facility" />
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-          </AssociationSet>
           <AssociationSet Name="FK_MaintACClassProperty_MaintACClassID" Association="iPlusMESV4_Model.FK_MaintACClassProperty_MaintACClassID">
             <End Role="MaintACClass" EntitySet="MaintACClass" />
             <End Role="MaintACClassProperty" EntitySet="MaintACClassProperty" />
           </AssociationSet>
-          <AssociationSet Name="FK_MaintOrder_MaintACClassID" Association="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID">
-            <End Role="MaintACClass" EntitySet="MaintACClass" />
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-          </AssociationSet>
           <AssociationSet Name="FK_MaintOrderProperty_MaintACClassPropertyID" Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintACClassPropertyID">
             <End Role="MaintACClassProperty" EntitySet="MaintACClassProperty" />
             <End Role="MaintOrderProperty" EntitySet="MaintOrderProperty" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrder_BasedOnMaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID">
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-            <End Role="MaintOrder1" EntitySet="MaintOrder" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrder_MDMaintOrderStateID" Association="iPlusMESV4_Model.FK_MaintOrder_MDMaintOrderStateID">
-            <End Role="MDMaintOrderState" EntitySet="MDMaintOrderState" />
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrder_PickingID" Association="iPlusMESV4_Model.FK_MaintOrder_PickingID">
-            <End Role="Picking" EntitySet="Picking" />
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrderAssignment_MaintOrder" Association="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder">
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-            <End Role="MaintOrderAssignment" EntitySet="MaintOrderAssignment" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrderPos_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID">
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-            <End Role="MaintOrderPos" EntitySet="MaintOrderPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrderProperty_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID">
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-            <End Role="MaintOrderProperty" EntitySet="MaintOrderProperty" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrderTask_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID">
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-            <End Role="MaintOrderTask" EntitySet="MaintOrderTask" />
           </AssociationSet>
           <AssociationSet Name="FK_MaintOrderAssignment_VBGroup" Association="iPlusMESV4_Model.FK_MaintOrderAssignment_VBGroup">
             <End Role="VBGroup" EntitySet="VBGroup" />
@@ -19528,10 +19492,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <AssociationSet Name="FK_MaintOrderPos_ParentMaintOrderPosID" Association="iPlusMESV4_Model.FK_MaintOrderPos_ParentMaintOrderPosID">
             <End Role="Material" EntitySet="Material" />
             <End Role="MaintOrderPos" EntitySet="MaintOrderPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrderTask_MDMaintTaskStateID" Association="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID">
-            <End Role="MDMaintTaskState" EntitySet="MDMaintTaskState" />
-            <End Role="MaintOrderTask" EntitySet="MaintOrderTask" />
           </AssociationSet>
           <EntitySet Name="ACClassTask" EntityType="iPlusMESV4_Model.ACClassTask" />
           <EntitySet Name="PickingPos" EntityType="iPlusMESV4_Model.PickingPos" />
@@ -19680,6 +19640,48 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <AssociationSet Name="FK_TandTv3MixPointRelation_TargetTandTv3MixPointID" Association="iPlusMESV4_Model.FK_TandTv3MixPointRelation_TargetTandTv3MixPointID">
             <End Role="TandTv3MixPoint" EntitySet="TandTv3MixPoint" />
             <End Role="TandTv3MixPointRelation" EntitySet="TandTv3MixPointRelation" />
+          </AssociationSet>
+          <EntitySet Name="MaintOrder" EntityType="iPlusMESV4_Model.MaintOrder" />
+          <EntitySet Name="MaintOrderTask" EntityType="iPlusMESV4_Model.MaintOrderTask" />
+          <AssociationSet Name="FK_MaintOrder_FacilityID" Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID">
+            <End Role="Facility" EntitySet="Facility" />
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrder_MaintACClassID" Association="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID">
+            <End Role="MaintACClass" EntitySet="MaintACClass" />
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrder_BasedOnMaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID">
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+            <End Role="MaintOrder1" EntitySet="MaintOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrder_MDMaintOrderStateID" Association="iPlusMESV4_Model.FK_MaintOrder_MDMaintOrderStateID">
+            <End Role="MDMaintOrderState" EntitySet="MDMaintOrderState" />
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrder_PickingID" Association="iPlusMESV4_Model.FK_MaintOrder_PickingID">
+            <End Role="Picking" EntitySet="Picking" />
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrderAssignment_MaintOrder" Association="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder">
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+            <End Role="MaintOrderAssignment" EntitySet="MaintOrderAssignment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrderPos_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID">
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+            <End Role="MaintOrderPos" EntitySet="MaintOrderPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrderProperty_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID">
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+            <End Role="MaintOrderProperty" EntitySet="MaintOrderProperty" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrderTask_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID">
+            <End Role="MaintOrder" EntitySet="MaintOrder" />
+            <End Role="MaintOrderTask" EntitySet="MaintOrderTask" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MaintOrderTask_MDMaintTaskStateID" Association="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID">
+            <End Role="MDMaintTaskState" EntitySet="MDMaintTaskState" />
+            <End Role="MaintOrderTask" EntitySet="MaintOrderTask" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -24286,8 +24288,8 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="Tourplan" Relationship="iPlusMESV4_Model.FK_Picking_TourplanID" FromRole="Picking" ToRole="Tourplan" />
           <NavigationProperty Name="VisitorVoucher" Relationship="iPlusMESV4_Model.FK_Picking_VisitorVoucherID" FromRole="Picking" ToRole="VisitorVoucher" />
           <NavigationProperty Name="PickingConfig_Picking" Relationship="iPlusMESV4_Model.FK_PickingConfig_PickingID" FromRole="Picking" ToRole="PickingConfig" />
-          <NavigationProperty Name="MaintOrder_Picking" Relationship="iPlusMESV4_Model.FK_MaintOrder_PickingID" FromRole="Picking" ToRole="MaintOrder" />
           <NavigationProperty Name="PickingPos_Picking" Relationship="iPlusMESV4_Model.FK_PickingPos_PickingID" FromRole="Picking" ToRole="PickingPos" />
+          <NavigationProperty Name="MaintOrder_Picking" Relationship="iPlusMESV4_Model.FK_MaintOrder_PickingID" FromRole="Picking" ToRole="MaintOrder" />
         </EntityType>
         <EntityType Name="PickingConfig">
           <Key>
@@ -32252,9 +32254,9 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="FacilityInventory_Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="Facility" ToRole="FacilityInventory" />
           <NavigationProperty Name="FacilityMaterial_Facility" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility" FromRole="Facility" ToRole="FacilityMaterial" />
           <NavigationProperty Name="FacilityMDSchedulingGroup_Facility" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility" FromRole="Facility" ToRole="FacilityMDSchedulingGroup" />
-          <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
           <NavigationProperty Name="PickingPos_FromFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_FromFacilityID" FromRole="Facility" ToRole="PickingPos" />
           <NavigationProperty Name="PickingPos_ToFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID" FromRole="Facility" ToRole="PickingPos" />
+          <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -33612,43 +33614,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="MaintACClass" Relationship="iPlusMESV4_Model.FK_MaintACClassProperty_MaintACClassID" FromRole="MaintACClassProperty" ToRole="MaintACClass" />
           <NavigationProperty Name="MaintOrderProperty_MaintACClassProperty" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintACClassPropertyID" FromRole="MaintACClassProperty" ToRole="MaintOrderProperty" />
         </EntityType>
-        <EntityType Name="MaintOrder">
-          <Key>
-            <PropertyRef Name="MaintOrderID" />
-          </Key>
-          <Property Name="MaintOrderID" Type="Guid" Nullable="false" />
-          <Property Name="BasedOnMaintOrderID" Type="Guid" />
-          <Property Name="MaintOrderNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="MDMaintOrderStateID" Type="Guid" />
-          <Property Name="MaintACClassID" Type="Guid" />
-          <Property Name="FacilityID" Type="Guid" />
-          <Property Name="PickingID" Type="Guid" />
-          <Property Name="MaintModeIndex" Type="Int32" Nullable="false" />
-          <Property Name="IsActive" Type="Boolean" Nullable="false" />
-          <Property Name="MaintInterval" Type="Int32" />
-          <Property Name="LastMaintTerm" Type="DateTime" Precision="3" />
-          <Property Name="WarningDiff" Type="Int32" />
-          <Property Name="PlannedStartDate" Type="DateTime" Precision="3" />
-          <Property Name="PlannedDuration" Type="Int32" />
-          <Property Name="StartDate" Type="DateTime" Precision="3" />
-          <Property Name="EndDate" Type="DateTime" Precision="3" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="MaintOrder" ToRole="Facility" />
-          <NavigationProperty Name="MaintACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" FromRole="MaintOrder" ToRole="MaintACClass" />
-          <NavigationProperty Name="MaintOrder_BasedOnMaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" FromRole="MaintOrder" ToRole="MaintOrder1" />
-          <NavigationProperty Name="MaintOrder1_BasedOnMaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" FromRole="MaintOrder1" ToRole="MaintOrder" />
-          <NavigationProperty Name="MDMaintOrderState" Relationship="iPlusMESV4_Model.FK_MaintOrder_MDMaintOrderStateID" FromRole="MaintOrder" ToRole="MDMaintOrderState" />
-          <NavigationProperty Name="Picking" Relationship="iPlusMESV4_Model.FK_MaintOrder_PickingID" FromRole="MaintOrder" ToRole="Picking" />
-          <NavigationProperty Name="MaintOrderAssignment_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" FromRole="MaintOrder" ToRole="MaintOrderAssignment" />
-          <NavigationProperty Name="MaintOrderPos_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderPos" />
-          <NavigationProperty Name="MaintOrderProperty_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderProperty" />
-          <NavigationProperty Name="MaintOrderTask_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderTask" />
-        </EntityType>
         <EntityType Name="MaintOrderAssignment">
           <Key>
             <PropertyRef Name="MaintOrderAssignmentID" />
@@ -33666,9 +33631,9 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" FromRole="MaintOrderAssignment" ToRole="Company" />
-          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" FromRole="MaintOrderAssignment" ToRole="MaintOrder" />
           <NavigationProperty Name="VBGroup" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_VBGroup" FromRole="MaintOrderAssignment" ToRole="VBGroup" />
           <NavigationProperty Name="VBUser" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_VBUserID" FromRole="MaintOrderAssignment" ToRole="VBUser" />
+          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" FromRole="MaintOrderAssignment" ToRole="MaintOrder" />
         </EntityType>
         <EntityType Name="MaintOrderPos">
           <Key>
@@ -33683,10 +33648,10 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" FromRole="MaintOrderPos" ToRole="MaintOrder" />
           <NavigationProperty Name="MaintOrderPos_MaintOrderPos" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderPos" FromRole="MaintOrderPos" ToRole="MaintOrderPos1" />
           <NavigationProperty Name="MaintOrderPos1_MaintOrderPos" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderPos" FromRole="MaintOrderPos1" ToRole="MaintOrderPos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_ParentMaintOrderPosID" FromRole="MaintOrderPos" ToRole="Material" />
+          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" FromRole="MaintOrderPos" ToRole="MaintOrder" />
         </EntityType>
         <EntityType Name="MaintOrderProperty">
           <Key>
@@ -33703,26 +33668,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MaintACClassProperty" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintACClassPropertyID" FromRole="MaintOrderProperty" ToRole="MaintACClassProperty" />
           <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" FromRole="MaintOrderProperty" ToRole="MaintOrder" />
-        </EntityType>
-        <EntityType Name="MaintOrderTask">
-          <Key>
-            <PropertyRef Name="MaintOrderTaskID" />
-          </Key>
-          <Property Name="MaintOrderTaskID" Type="Guid" Nullable="false" />
-          <Property Name="MaintOrderID" Type="Guid" Nullable="false" />
-          <Property Name="MDMaintTaskStateID" Type="Guid" Nullable="false" />
-          <Property Name="TaskDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="PlannedStartDate" Type="DateTime" Precision="3" />
-          <Property Name="PlannedDuration" Type="Int32" />
-          <Property Name="StartDate" Type="DateTime" Precision="3" />
-          <Property Name="EndDate" Type="DateTime" Precision="3" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrderTask" ToRole="MaintOrder" />
-          <NavigationProperty Name="MDMaintTaskState" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" FromRole="MaintOrderTask" ToRole="MDMaintTaskState" />
         </EntityType>
         <Association Name="FK_MaintACClass_ACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="1">
@@ -33764,18 +33709,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_MaintOrder_FacilityID">
-          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="MaintOrder">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_MaintACClassProperty_MaintACClassID">
           <End Type="iPlusMESV4_Model.MaintACClass" Role="MaintACClass" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.MaintACClassProperty" Role="MaintACClassProperty" Multiplicity="*" />
@@ -33784,18 +33717,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
               <PropertyRef Name="MaintACClassID" />
             </Principal>
             <Dependent Role="MaintACClassProperty">
-              <PropertyRef Name="MaintACClassID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrder_MaintACClassID">
-          <End Type="iPlusMESV4_Model.MaintACClass" Role="MaintACClass" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaintACClass">
-              <PropertyRef Name="MaintACClassID" />
-            </Principal>
-            <Dependent Role="MaintOrder">
               <PropertyRef Name="MaintACClassID" />
             </Dependent>
           </ReferentialConstraint>
@@ -33809,90 +33730,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
             </Principal>
             <Dependent Role="MaintOrderProperty">
               <PropertyRef Name="MaintACClassPropertyID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrder_BasedOnMaintOrderID">
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaintOrder">
-              <PropertyRef Name="MaintOrderID" />
-            </Principal>
-            <Dependent Role="MaintOrder1">
-              <PropertyRef Name="BasedOnMaintOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrder_MDMaintOrderStateID">
-          <End Type="iPlusMESV4_Model.MDMaintOrderState" Role="MDMaintOrderState" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDMaintOrderState">
-              <PropertyRef Name="MDMaintOrderStateID" />
-            </Principal>
-            <Dependent Role="MaintOrder">
-              <PropertyRef Name="MDMaintOrderStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrder_PickingID">
-          <End Type="iPlusMESV4_Model.Picking" Role="Picking" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Picking">
-              <PropertyRef Name="PickingID" />
-            </Principal>
-            <Dependent Role="MaintOrder">
-              <PropertyRef Name="PickingID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrderAssignment_MaintOrder">
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.MaintOrderAssignment" Role="MaintOrderAssignment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaintOrder">
-              <PropertyRef Name="MaintOrderID" />
-            </Principal>
-            <Dependent Role="MaintOrderAssignment">
-              <PropertyRef Name="MaintOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrderPos_MaintOrderID">
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.MaintOrderPos" Role="MaintOrderPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaintOrder">
-              <PropertyRef Name="MaintOrderID" />
-            </Principal>
-            <Dependent Role="MaintOrderPos">
-              <PropertyRef Name="MaintOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrderProperty_MaintOrderID">
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.MaintOrderProperty" Role="MaintOrderProperty" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaintOrder">
-              <PropertyRef Name="MaintOrderID" />
-            </Principal>
-            <Dependent Role="MaintOrderProperty">
-              <PropertyRef Name="MaintOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrderTask_MaintOrderID">
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.MaintOrderTask" Role="MaintOrderTask" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaintOrder">
-              <PropertyRef Name="MaintOrderID" />
-            </Principal>
-            <Dependent Role="MaintOrderTask">
-              <PropertyRef Name="MaintOrderID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -33941,18 +33778,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
             </Principal>
             <Dependent Role="MaintOrderPos">
               <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrderTask_MDMaintTaskStateID">
-          <End Type="iPlusMESV4_Model.MDMaintTaskState" Role="MDMaintTaskState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.MaintOrderTask" Role="MaintOrderTask" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDMaintTaskState">
-              <PropertyRef Name="MDMaintTaskStateID" />
-            </Principal>
-            <Dependent Role="MaintOrderTask">
-              <PropertyRef Name="MDMaintTaskStateID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -34495,6 +34320,185 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
             </Principal>
             <Dependent Role="TandTv3MixPointRelation">
               <PropertyRef Name="TargetTandTv3MixPointID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="MaintOrder">
+          <Key>
+            <PropertyRef Name="MaintOrderID" />
+          </Key>
+          <Property Name="MaintOrderID" Type="Guid" Nullable="false" />
+          <Property Name="BasedOnMaintOrderID" Type="Guid" />
+          <Property Name="MaintOrderNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="MDMaintOrderStateID" Type="Guid" />
+          <Property Name="MaintACClassID" Type="Guid" />
+          <Property Name="FacilityID" Type="Guid" />
+          <Property Name="PickingID" Type="Guid" />
+          <Property Name="MaintModeIndex" Type="Int32" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="MaintInterval" Type="Int32" />
+          <Property Name="LastMaintTerm" Type="DateTime" Precision="3" />
+          <Property Name="WarningDiff" Type="Int32" />
+          <Property Name="PlannedStartDate" Type="DateTime" Precision="3" />
+          <Property Name="PlannedDuration" Type="Int32" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="VBiPAAClassID" Type="Guid" />
+          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="MaintOrder" ToRole="Facility" />
+          <NavigationProperty Name="MaintACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" FromRole="MaintOrder" ToRole="MaintACClass" />
+          <NavigationProperty Name="MaintOrder_BasedOnMaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" FromRole="MaintOrder" ToRole="MaintOrder1" />
+          <NavigationProperty Name="MaintOrder1_BasedOnMaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" FromRole="MaintOrder1" ToRole="MaintOrder" />
+          <NavigationProperty Name="MDMaintOrderState" Relationship="iPlusMESV4_Model.FK_MaintOrder_MDMaintOrderStateID" FromRole="MaintOrder" ToRole="MDMaintOrderState" />
+          <NavigationProperty Name="Picking" Relationship="iPlusMESV4_Model.FK_MaintOrder_PickingID" FromRole="MaintOrder" ToRole="Picking" />
+          <NavigationProperty Name="MaintOrderAssignment_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" FromRole="MaintOrder" ToRole="MaintOrderAssignment" />
+          <NavigationProperty Name="MaintOrderPos_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderPos" />
+          <NavigationProperty Name="MaintOrderProperty_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderProperty" />
+          <NavigationProperty Name="MaintOrderTask_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderTask" />
+        </EntityType>
+        <EntityType Name="MaintOrderTask">
+          <Key>
+            <PropertyRef Name="MaintOrderTaskID" />
+          </Key>
+          <Property Name="MaintOrderTaskID" Type="Guid" Nullable="false" />
+          <Property Name="MaintOrderID" Type="Guid" Nullable="false" />
+          <Property Name="MDMaintTaskStateID" Type="Guid" Nullable="false" />
+          <Property Name="TaskDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="PlannedStartDate" Type="DateTime" Precision="3" />
+          <Property Name="PlannedDuration" Type="Int32" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TaskName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrderTask" ToRole="MaintOrder" />
+          <NavigationProperty Name="MDMaintTaskState" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" FromRole="MaintOrderTask" ToRole="MDMaintTaskState" />
+        </EntityType>
+        <Association Name="FK_MaintOrder_FacilityID">
+          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Facility">
+              <PropertyRef Name="FacilityID" />
+            </Principal>
+            <Dependent Role="MaintOrder">
+              <PropertyRef Name="FacilityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrder_MaintACClassID">
+          <End Type="iPlusMESV4_Model.MaintACClass" Role="MaintACClass" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaintACClass">
+              <PropertyRef Name="MaintACClassID" />
+            </Principal>
+            <Dependent Role="MaintOrder">
+              <PropertyRef Name="MaintACClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrder_BasedOnMaintOrderID">
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaintOrder">
+              <PropertyRef Name="MaintOrderID" />
+            </Principal>
+            <Dependent Role="MaintOrder1">
+              <PropertyRef Name="BasedOnMaintOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrder_MDMaintOrderStateID">
+          <End Type="iPlusMESV4_Model.MDMaintOrderState" Role="MDMaintOrderState" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDMaintOrderState">
+              <PropertyRef Name="MDMaintOrderStateID" />
+            </Principal>
+            <Dependent Role="MaintOrder">
+              <PropertyRef Name="MDMaintOrderStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrder_PickingID">
+          <End Type="iPlusMESV4_Model.Picking" Role="Picking" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Picking">
+              <PropertyRef Name="PickingID" />
+            </Principal>
+            <Dependent Role="MaintOrder">
+              <PropertyRef Name="PickingID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrderAssignment_MaintOrder">
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.MaintOrderAssignment" Role="MaintOrderAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaintOrder">
+              <PropertyRef Name="MaintOrderID" />
+            </Principal>
+            <Dependent Role="MaintOrderAssignment">
+              <PropertyRef Name="MaintOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrderPos_MaintOrderID">
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.MaintOrderPos" Role="MaintOrderPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaintOrder">
+              <PropertyRef Name="MaintOrderID" />
+            </Principal>
+            <Dependent Role="MaintOrderPos">
+              <PropertyRef Name="MaintOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrderProperty_MaintOrderID">
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.MaintOrderProperty" Role="MaintOrderProperty" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaintOrder">
+              <PropertyRef Name="MaintOrderID" />
+            </Principal>
+            <Dependent Role="MaintOrderProperty">
+              <PropertyRef Name="MaintOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrderTask_MaintOrderID">
+          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.MaintOrderTask" Role="MaintOrderTask" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaintOrder">
+              <PropertyRef Name="MaintOrderID" />
+            </Principal>
+            <Dependent Role="MaintOrderTask">
+              <PropertyRef Name="MaintOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MaintOrderTask_MDMaintTaskStateID">
+          <End Type="iPlusMESV4_Model.MDMaintTaskState" Role="MDMaintTaskState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.MaintOrderTask" Role="MaintOrderTask" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDMaintTaskState">
+              <PropertyRef Name="MDMaintTaskStateID" />
+            </Principal>
+            <Dependent Role="MaintOrderTask">
+              <PropertyRef Name="MDMaintTaskStateID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -39595,34 +39599,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="MaintOrder">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrder">
-              <MappingFragment StoreEntitySet="MaintOrder">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
-                <ScalarProperty Name="PlannedDuration" ColumnName="PlannedDuration" />
-                <ScalarProperty Name="PlannedStartDate" ColumnName="PlannedStartDate" />
-                <ScalarProperty Name="WarningDiff" ColumnName="WarningDiff" />
-                <ScalarProperty Name="LastMaintTerm" ColumnName="LastMaintTerm" />
-                <ScalarProperty Name="MaintInterval" ColumnName="MaintInterval" />
-                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
-                <ScalarProperty Name="MaintModeIndex" ColumnName="MaintModeIndex" />
-                <ScalarProperty Name="PickingID" ColumnName="PickingID" />
-                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
-                <ScalarProperty Name="MaintACClassID" ColumnName="MaintACClassID" />
-                <ScalarProperty Name="MDMaintOrderStateID" ColumnName="MDMaintOrderStateID" />
-                <ScalarProperty Name="MaintOrderNo" ColumnName="MaintOrderNo" />
-                <ScalarProperty Name="BasedOnMaintOrderID" ColumnName="BasedOnMaintOrderID" />
-                <ScalarProperty Name="MaintOrderID" ColumnName="MaintOrderID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="MaintOrderAssignment">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrderAssignment">
               <MappingFragment StoreEntitySet="MaintOrderAssignment">
@@ -39668,25 +39644,6 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
                 <ScalarProperty Name="MaintACClassPropertyID" ColumnName="MaintACClassPropertyID" />
                 <ScalarProperty Name="MaintOrderID" ColumnName="MaintOrderID" />
                 <ScalarProperty Name="MaintOrderPropertyID" ColumnName="MaintOrderPropertyID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="MaintOrderTask">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrderTask">
-              <MappingFragment StoreEntitySet="MaintOrderTask">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
-                <ScalarProperty Name="PlannedDuration" ColumnName="PlannedDuration" />
-                <ScalarProperty Name="PlannedStartDate" ColumnName="PlannedStartDate" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="TaskDescription" ColumnName="TaskDescription" />
-                <ScalarProperty Name="MDMaintTaskStateID" ColumnName="MDMaintTaskStateID" />
-                <ScalarProperty Name="MaintOrderID" ColumnName="MaintOrderID" />
-                <ScalarProperty Name="MaintOrderTaskID" ColumnName="MaintOrderTaskID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -39755,6 +39712,55 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
                 <ScalarProperty Name="PickingPosID" ColumnName="PickingPosID" />
                 <ScalarProperty Name="TandTv3MixPointID" ColumnName="TandTv3MixPointID" />
                 <ScalarProperty Name="TandTv3MixPointPickingPosID" ColumnName="TandTv3MixPointPickingPosID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MaintOrder">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrder">
+              <MappingFragment StoreEntitySet="MaintOrder">
+                <ScalarProperty Name="VBiPAAClassID" ColumnName="VBiPAAClassID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="PlannedDuration" ColumnName="PlannedDuration" />
+                <ScalarProperty Name="PlannedStartDate" ColumnName="PlannedStartDate" />
+                <ScalarProperty Name="WarningDiff" ColumnName="WarningDiff" />
+                <ScalarProperty Name="LastMaintTerm" ColumnName="LastMaintTerm" />
+                <ScalarProperty Name="MaintInterval" ColumnName="MaintInterval" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="MaintModeIndex" ColumnName="MaintModeIndex" />
+                <ScalarProperty Name="PickingID" ColumnName="PickingID" />
+                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
+                <ScalarProperty Name="MaintACClassID" ColumnName="MaintACClassID" />
+                <ScalarProperty Name="MDMaintOrderStateID" ColumnName="MDMaintOrderStateID" />
+                <ScalarProperty Name="MaintOrderNo" ColumnName="MaintOrderNo" />
+                <ScalarProperty Name="BasedOnMaintOrderID" ColumnName="BasedOnMaintOrderID" />
+                <ScalarProperty Name="MaintOrderID" ColumnName="MaintOrderID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MaintOrderTask">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrderTask">
+              <MappingFragment StoreEntitySet="MaintOrderTask">
+                <ScalarProperty Name="TaskName" ColumnName="TaskName" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="PlannedDuration" ColumnName="PlannedDuration" />
+                <ScalarProperty Name="PlannedStartDate" ColumnName="PlannedStartDate" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="TaskDescription" ColumnName="TaskDescription" />
+                <ScalarProperty Name="MDMaintTaskStateID" ColumnName="MDMaintTaskStateID" />
+                <ScalarProperty Name="MaintOrderID" ColumnName="MaintOrderID" />
+                <ScalarProperty Name="MaintOrderTaskID" ColumnName="MaintOrderTaskID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -40645,30 +40651,18 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
         <AssociationConnector Association="iPlusMESV4_Model.FK_OperationLog_OperationLogRefACClassID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintACClass" Width="1.5" PointX="82" PointY="300.125" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintACClassProperty" Width="1.5" PointX="84.25" PointY="298.625" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrder" Width="1.5" PointX="84.25" PointY="303.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderAssignment" Width="1.5" PointX="86.5" PointY="316" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderPos" Width="1.5" PointX="86.5" PointY="310.125" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderProperty" Width="1.5" PointX="86.5" PointY="305.875" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderTask" Width="1.5" PointX="86.5" PointY="301.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintACClass_ACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintACClassProperty_ACClassPropertyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintACClassProperty_MaintACClassID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintACClassPropertyID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_MDMaintOrderStateID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_PickingID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderAssignment_VBGroup" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderAssignment_VBUserID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderPos_ParentMaintOrderPosID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ACClassTask" Width="1.5" PointX="81.5" PointY="322.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PickingPos" Width="1.5" PointX="79.25" PointY="330.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACClassTask_TaskTypeACClassID" />
@@ -40709,6 +40703,18 @@ warning 6002: The table/view 'MalzersV4.dbo.VBTranslationView' does not have a p
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPosRelation_TandTv3TandTv3MixPointID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointRelation_SourceTandTv3MixPointID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointRelation_TargetTandTv3MixPointID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrder" Width="1.5" PointX="84.25" PointY="303.75" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderTask" Width="1.5" PointX="86.5" PointY="300.25" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_BasedOnMaintOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_MDMaintOrderStateID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_PickingID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" />
       </Diagram>
     </Diagrams>
   </Designer>

@@ -55,6 +55,9 @@ namespace gip.mes.maintenance
             set
             {
                 AccessPrimary.Selected = value;
+                if (CurrentMaintOrder != value)
+                    CurrentMaintOrder = value;
+                OnPropertyChanged();
             }
         }
 
@@ -86,6 +89,7 @@ namespace gip.mes.maintenance
                     MaintOrderTaskList = null;
                     MaintOrderAssignmentList = null;
                 }
+                OnPropertyChanged();
             }
         }
 
