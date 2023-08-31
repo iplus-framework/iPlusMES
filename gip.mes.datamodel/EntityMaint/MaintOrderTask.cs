@@ -11,12 +11,13 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, "MaintOrder", "en{'MaintOrder'}de{'MaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName, "", true)]
     [ACPropertyEntity(2, "MDMaintTaskState", "en{'Status of Work Task'}de{'Aufgabenstatus'}", Const.ContextDatabase + "\\" + MDMaintTaskState.ClassName, "", true)]
     [ACPropertyEntity(3, "TaskDescription", "en{'Task description'}de{'Task description'}", "", "", true)]
-    [ACPropertyEntity(3, "PlannedStartDate", "en{'Planned start date'}de{'Planned start date'}", "", "", true)]
-    [ACPropertyEntity(4, "PlannedDuration", "en{'PlannedDuration'}de{'PlannedDuration'}", "", "", true)]
-    [ACPropertyEntity(3, "StartDate", "en{'Task commenced on'}de{'Aufgabe begonnen am'}", "", "", true)]
-    [ACPropertyEntity(4, "EndDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
-    [ACPropertyEntity(5, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
-    [ACPropertyEntity(6, "IsRepair", "en{'Is repaired'}de{'Repariert'}", "", "", true)]
+    [ACPropertyEntity(4, "TaskName", "en{'Task name'}de{'Task name'}", "", "", true)]
+    [ACPropertyEntity(5, "PlannedStartDate", "en{'Planned start date'}de{'Planned start date'}", "", "", true)]
+    [ACPropertyEntity(6, "PlannedDuration", "en{'PlannedDuration'}de{'PlannedDuration'}", "", "", true)]
+    [ACPropertyEntity(7, "StartDate", "en{'Task commenced on'}de{'Aufgabe begonnen am'}", "", "", true)]
+    [ACPropertyEntity(8, "EndDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
+    [ACPropertyEntity(9, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
+    [ACPropertyEntity(10, "IsRepair", "en{'Is repaired'}de{'Repariert'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -61,6 +62,9 @@ namespace gip.mes.datamodel
         {
             get
             {
+                if (!string.IsNullOrEmpty(TaskName))
+                    return TaskName;
+
                 if (MaintOrder != null)
                 {
                     var tasks = MaintOrder.MaintOrderTask_MaintOrder.OrderBy(c => c.InsertDate).ToList();
@@ -69,6 +73,16 @@ namespace gip.mes.datamodel
                 }
 
                 return "001";
+            }
+        }
+
+        protected override void OnPropertyChanged(string property)
+        {
+            base.OnPropertyChanged(property);
+
+            if (property == nameof(TaskName))
+            {
+                OnPropertyChanged(nameof(MaintTaskName));
             }
         }
 

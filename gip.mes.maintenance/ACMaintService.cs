@@ -851,43 +851,44 @@ namespace gip.mes.maintenance
 
         private void GenerateMaintOrder(ACComponent instance, Facility facilityInstance, MaintOrder template, DatabaseApp dbApp)
         {
+            MaintOrder tempTemplate = template.FromAppContext<MaintOrder>(dbApp);
+
             if (instance != null && dbApp.MaintOrder.Any(c => c.VBiPAACClassID == instance.ComponentClass.ACClassID
-                           && c.BasedOnMaintOrderID == template.MaintOrderID
+                           && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
                            && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
                 return;
 
             if (facilityInstance != null && dbApp.MaintOrder.Any(c => c.FacilityID == facilityInstance.FacilityID
-                           && c.BasedOnMaintOrderID == template.MaintOrderID
+                           && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
                            && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
                 return;
 
 
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaintOrder), MaintOrder.NoColumnName, MaintOrder.FormatNewNo, this);
             MaintOrder maintOrder = MaintOrder.NewACObject(dbApp, null, secondaryKey);
-            maintOrder.MaintOrder1_BasedOnMaintOrder = template.FromAppContext<MaintOrder>(dbApp);
+            maintOrder.MaintOrder1_BasedOnMaintOrder = tempTemplate;
             maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
 
             if (instance != null)
                 maintOrder.VBiPAACClassID = instance.ComponentClass.ACClassID;
 
-            if (template.MaintACClassID.HasValue)
+            if (tempTemplate.MaintACClassID.HasValue)
             {
 
                 var maintACClass = dbApp.MaintACClass.Include("MaintACClassProperty_MaintACClass")
-                                                    .Include("MaintACClassVBGroup_MaintACClass")
-                                                    .Where(c => c.MaintACClassID == template.MaintACClassID)
-                                                    .FirstOrDefault();
+                                                     .Where(c => c.MaintACClassID == tempTemplate.MaintACClassID)
+                                                     .FirstOrDefault();
 
                 maintOrder.MaintACClass = maintACClass;
             }
 
-            foreach (MaintOrderTask task in template.MaintOrderTask_MaintOrder)
+            foreach (MaintOrderTask task in tempTemplate.MaintOrderTask_MaintOrder)
             {
                 MaintOrderTask newTask = MaintOrderTask.NewACObject(dbApp, maintOrder);
                 task.CopyTaskValues(newTask);
             }
 
-            foreach (MaintOrderAssignment assignment in template.MaintOrderAssignment_MaintOrder)
+            foreach (MaintOrderAssignment assignment in tempTemplate.MaintOrderAssignment_MaintOrder)
             {
                 MaintOrderAssignment newAssignment = MaintOrderAssignment.NewACObject(dbApp, maintOrder);
                 assignment.CopyAssignmentValues(newAssignment);

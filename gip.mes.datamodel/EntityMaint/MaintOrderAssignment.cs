@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -74,11 +75,11 @@ namespace gip.mes.datamodel
             get
             {
                 if (VBUser != null)
-                    return "User";
+                    return ACRoot.SRoot.Environment.TranslateText(this, "txtUser");
                 else if (VBGroup != null)
-                    return "Group";
+                    return ACRoot.SRoot.Environment.TranslateText(this, "txtGroup");
                 else if (Company != null)
-                    return "Company";
+                    return ACRoot.SRoot.Environment.TranslateText(this, "txtCompany");
 
                 return null;
             }

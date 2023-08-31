@@ -27,6 +27,7 @@ namespace gip.mes.maintenance
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             bool result = base.ACInit(startChildMode);
+            AttachToMaintServices();
             Search();
             return result;
         }
@@ -46,6 +47,8 @@ namespace gip.mes.maintenance
                 _CurrentACComponent.Detach();
                 _CurrentACComponent = null;
             }
+
+            DetachMaintServices();
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -69,6 +72,15 @@ namespace gip.mes.maintenance
         #endregion
 
         #region Properties
+
+        private List<ACRef<ACComponent>> _MaintServices = null;
+        public List<ACRef<ACComponent>> MaintServices
+        {
+            get
+            {
+                return _MaintServices;
+            }
+        }
 
         #region Properties => Facility
 
@@ -598,7 +610,7 @@ namespace gip.mes.maintenance
             return true;
         }
 
-        [ACMethodInfo("","",9999, true)]
+        [ACMethodInfo("", "en{'Next'}de{'Weiter'}", 9999, true)]
         public void WizzardNext()
         {
             if (CurrentWizzardStep == MaintenanceWizzardStepsEnum.FacilityOrClass)
@@ -665,7 +677,7 @@ namespace gip.mes.maintenance
             return true;
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Back'}de{'Zurück'}", 9999, true)]
         public void WizzardBack()
         {
             if (CurrentWizzardStep == MaintenanceWizzardStepsEnum.TimeEvent)
@@ -689,7 +701,7 @@ namespace gip.mes.maintenance
             return true;
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Close'}de{'Schließen'}", 9999, true)]
         public void CloseWizzard()
         {
             DatabaseApp.ACUndoChanges();
@@ -821,7 +833,7 @@ namespace gip.mes.maintenance
 
         #endregion
 
-        [ACMethodInfo("","",9999, true)]
+        [ACMethodInfo("", "en{'Add task'}de{'Aufgabe hinzufügen'}", 9999, true)]
         public void AddNewTask()
         {
             SelectedMaintOrderTask = MaintOrderTask.NewACObject(DatabaseApp, CurrentMaintOrder);
@@ -831,7 +843,7 @@ namespace gip.mes.maintenance
             MaintOrderTaskList = tempList;
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Remove task'}de{'Aufgabe entfernen'}", 9999, true)]
         public void RemoveTask()
         {
             MaintOrderTaskList.Remove(SelectedMaintOrderTask);
@@ -842,7 +854,7 @@ namespace gip.mes.maintenance
 
         #region Methods => Assignment
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Add performer'}de{'Darsteller hinzufügen'}", 9999, true)]
         public void AddNewMaintAssignment()
         {
             SelectedMaintOrderAssignment = MaintOrderAssignment.NewACObject(DatabaseApp, CurrentMaintOrder);
@@ -875,7 +887,7 @@ namespace gip.mes.maintenance
             return true;
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Remove performer'}de{'Darsteller entfernen'}", 9999, true)]
         public void RemoveMaintAssignment()
         {
             MaintOrderAssignmentList.Remove(SelectedMaintOrderAssignment);
@@ -891,7 +903,7 @@ namespace gip.mes.maintenance
             return SelectedMaintOrderAssignment != null;
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Unselect'}de{'Auswahl aufheben'}", 9999, true)]
         public void UnselectPerformer()
         {
             SelectedVBUser = null;
@@ -943,6 +955,36 @@ namespace gip.mes.maintenance
             }
         }
 
+        #region Methods => MaintService
+
+        public void AttachToMaintServices()
+        {
+            if (_MaintServices != null)
+                return;
+            _MaintServices = new List<ACRef<ACComponent>>();
+            List<ACComponent> appManagers = this.Root.FindChildComponents<ACComponent>(c => c is ApplicationManagerProxy || c is ApplicationManager, null, 1);
+            foreach (var appManager in appManagers)
+            {
+                var maintService = appManager.ACUrlCommand("?" + nameof(ACMaintService)) as ACComponent;
+                if (maintService == null)
+                {
+                    appManager.StartComponent(nameof(ACMaintService), null, null, ACStartCompOptions.NoServerReqFromProxy | ACStartCompOptions.OnlyAutomatic);
+                    continue;
+                }
+                ACRef<ACComponent> refToService = new ACRef<ACComponent>(maintService, this);
+                _MaintServices.Add(refToService);
+            }
+        }
+
+        public void DetachMaintServices()
+        {
+            if (_MaintServices == null)
+                return;
+            _MaintServices.ForEach(c => c.Detach());
+            _MaintServices = null;
+        }
+
+        #endregion
 
         #endregion
     }
