@@ -84,6 +84,17 @@ namespace gip.mes.datamodel
             }
         }
 
+        public void CopyAssignmentValues(MaintOrderAssignment newAssignment)
+        {
+            newAssignment.VBUserID = VBUserID;
+            newAssignment.VBGroupID = VBGroupID;
+            newAssignment.CompanyID = CompanyID;
+            newAssignment.Comment = Comment;
+            newAssignment.IsActive = IsActive;
+            newAssignment.IsDefault = IsDefault;
+            newAssignment.XMLConfig = XMLConfig;
+        }
+
         #endregion
     }
 }

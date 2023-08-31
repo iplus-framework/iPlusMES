@@ -72,6 +72,14 @@ namespace gip.mes.datamodel
             }
         }
 
+        public void CopyTaskValues(MaintOrderTask newTask)
+        {
+            newTask.TaskDescription = TaskDescription;
+            newTask.TaskName = TaskName;
+            newTask.PlannedStartDate = PlannedStartDate;
+            newTask.PlannedDuration = PlannedDuration;
+        }
+
     }
 
     public enum MaintTaskState : short

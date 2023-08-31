@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
 
         public void CopyMaintACClassPropertiesToLocalCache()
         {
-            //_LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
+            _LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
         }
 
         #region VBIplus-Context

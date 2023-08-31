@@ -16,7 +16,7 @@ namespace gip.mes.maintenance
     {
         [DataMember]
         [ACPropertyInfo(999)]
-        public string ACComponentACUrl
+        public string InstanceName
         {
             get;
             set;

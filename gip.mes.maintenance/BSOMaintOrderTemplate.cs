@@ -562,6 +562,32 @@ namespace gip.mes.maintenance
             return CurrentACComponent != null;
         }
 
+        [ACMethodCommand(nameof(MaintOrder), "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void Delete()
+        {
+            MaintOrderTask[] tempTasksList = SelectedMaintOrder.MaintOrderTask_MaintOrder.ToArray();
+            foreach (MaintOrderTask task in tempTasksList)
+            {
+                DatabaseApp.DeleteObject(task);
+            }
+
+            MaintOrderAssignment[] tempAssignmentList = SelectedMaintOrder.MaintOrderAssignment_MaintOrder.ToArray();
+            foreach (MaintOrderAssignment assignment in tempAssignmentList)
+            {
+                DatabaseApp.DeleteObject(assignment);
+            }
+           
+
+            DatabaseApp.DeleteObject(SelectedMaintOrder);
+            DatabaseApp.ACSaveChanges();
+            AccessPrimary.NavList.Remove(SelectedMaintOrder);
+            OnPropertyChanged(nameof(MaintOrderList));
+        }
+
+        public bool IsEnabledDelete()
+        {
+            return SelectedMaintOrder != null;
+        }
 
         /// <summary>
         /// Determines whether [is enabled new].

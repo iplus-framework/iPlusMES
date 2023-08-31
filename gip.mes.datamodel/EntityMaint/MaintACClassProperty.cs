@@ -157,5 +157,16 @@ namespace gip.mes.datamodel
             OnPropertyChanged("ACClassProperty");
         }
 
+
+        #region Additional properties
+
+        public MaintOrder MaintOrderTemplate
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
     }
 }
