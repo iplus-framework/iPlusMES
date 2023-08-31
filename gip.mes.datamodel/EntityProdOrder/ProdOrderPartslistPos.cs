@@ -1081,13 +1081,13 @@ namespace gip.mes.datamodel
         [NotMapped]
         public IEnumerable<IPartslistPosRelation> I_PartslistPosRelation_TargetPartslistPos
         {
-            get { return this.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos; }
+            get { return this.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray(); }
         }
 
         [NotMapped]
         public IEnumerable<IPartslistPosRelation> I_PartslistPosRelation_SourcePartslistPos
         {
-            get { return this.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos; }
+            get { return this.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.ToArray(); }
         }
         #endregion
 

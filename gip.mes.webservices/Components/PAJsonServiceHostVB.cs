@@ -49,24 +49,24 @@ namespace gip.mes.webservices
 
         public override void OnAddKnownTypesToOperationContract(ServiceEndpoint endpoint, OperationDescription opDescr)
         {
-            //if (   opDescr.Name == nameof(VBWebService.InvokeBarcodeSequence)
-            //    || opDescr.Name == nameof(VBWebService.FinishPickingOrdersByMaterial))
-            //{
-            //    var knownTypes = ACKnownTypes.GetKnownType();
-            //    foreach (var knownType in knownTypes)
-            //    {
-            //        opDescr.KnownTypes.Add(knownType);
-            //    }
-            //    foreach (IOperationBehavior behavior in opDescr.OperationBehaviors)
-            //    {
-            //        if (behavior is DataContractSerializerOperationBehavior)
-            //        {
-            //            DataContractSerializerOperationBehavior dataContractBeh = behavior as DataContractSerializerOperationBehavior;
-            //            //dataContractBeh.MaxItemsInObjectGraph = WCFServiceManager.MaxItemsInObjectGraph;
-            //            dataContractBeh.DataContractResolver = ACConvert.MyDataContractResolver;
-            //        }
-            //    }
-            //}
+            if (   opDescr.Name == nameof(VBWebService.InvokeBarcodeSequence)
+                || opDescr.Name == nameof(VBWebService.FinishPickingOrdersByMaterial))
+            {
+                var knownTypes = ACKnownTypes.GetKnownType();
+                foreach (var knownType in knownTypes)
+                {
+                    opDescr.KnownTypes.Add(knownType);
+                }
+                foreach (IOperationBehavior behavior in opDescr.OperationBehaviors)
+                {
+                    if (behavior is DataContractSerializerOperationBehavior)
+                    {
+                        DataContractSerializerOperationBehavior dataContractBeh = behavior as DataContractSerializerOperationBehavior;
+                        //dataContractBeh.MaxItemsInObjectGraph = WCFServiceManager.MaxItemsInObjectGraph;
+                        dataContractBeh.DataContractResolver = ACConvert.MyDataContractResolver;
+                    }
+                }
+            }
 
         }
 

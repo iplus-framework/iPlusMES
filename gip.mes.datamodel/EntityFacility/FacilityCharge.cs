@@ -66,6 +66,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbApp);
             entity.FillingDate = DateTime.Now;
+            dbApp.Add(entity);
             entity.SplitNo = 0;
             if (parentACObject is Material)
             {

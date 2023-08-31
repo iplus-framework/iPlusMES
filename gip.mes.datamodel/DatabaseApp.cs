@@ -1477,11 +1477,41 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999)]
         [NotMapped]
+        public IEnumerable<MaintOrderAssignment> MaintOrderAssignmentList
+        {
+            get
+            {
+                return MaintOrderAssignment.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintOrderPos> MaintOrderPosList
+        {
+            get
+            {
+                return MaintOrderPos.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<MaintOrderProperty> MaintOrderPropertyList
         {
             get
             {
                 return MaintOrderProperty.ToArray();
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public IEnumerable<MaintOrderTask> MaintOrderTaskList
+        {
+            get
+            {
+                return MaintOrderTask.ToArray();
             }
         }
 
