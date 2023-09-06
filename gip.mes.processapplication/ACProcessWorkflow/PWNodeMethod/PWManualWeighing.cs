@@ -2099,11 +2099,22 @@ namespace gip.mes.processapplication
                         return StartNextCompResult.CycleWait;
                     }
 
-                    ProdOrderPartslistPosRelation[] queryOpenMaterials = OnGetAllMaterials(dbIPlus, dbApp, intermediateChildPos);
-                    if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && queryOpenMaterials != null && queryOpenMaterials.Any())
-                        queryOpenMaterials = queryOpenMaterials.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
-                                                            .OrderBy(c => c.Sequence)
-                                                            .ToArray();
+                    ProdOrderPartslistPosRelation[] queryOpenMaterials = null;
+
+                    try
+                    {
+                        queryOpenMaterials = OnGetAllMaterials(dbIPlus, dbApp, intermediateChildPos);
+                        if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && queryOpenMaterials != null && queryOpenMaterials.Any())
+                            queryOpenMaterials = queryOpenMaterials.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                                                .OrderBy(c => c.Sequence)
+                                                                .ToArray();
+                    }
+                    catch (Exception e)
+                    {
+                        Messages.LogException(this.GetACUrl(), nameof(StartManualWeighingProd)+"(80)", e);
+                        return StartNextCompResult.CycleWait;
+                    }
+
                     if (queryOpenMaterials == null || !queryOpenMaterials.Any())
                     {
                         return StartNextCompResult.Done;
