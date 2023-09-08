@@ -100,8 +100,8 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private ICollection<CalendarHoliday> _CalendarHoliday_MDCountryLand;
     public virtual ICollection<CalendarHoliday> CalendarHoliday_MDCountryLand
     {
-        get => LazyLoader.Load(this, ref _CalendarHoliday_MDCountryLand);
-        set => _CalendarHoliday_MDCountryLand = value;
+        get { return LazyLoader.Load(this, ref _CalendarHoliday_MDCountryLand); }
+        set { _CalendarHoliday_MDCountryLand = value; }
     }
 
     public bool CalendarHoliday_MDCountryLand_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private ICollection<CompanyAddress> _CompanyAddress_MDCountryLand;
     public virtual ICollection<CompanyAddress> CompanyAddress_MDCountryLand
     {
-        get => LazyLoader.Load(this, ref _CompanyAddress_MDCountryLand);
-        set => _CompanyAddress_MDCountryLand = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddress_MDCountryLand); }
+        set { _CompanyAddress_MDCountryLand = value; }
     }
 
     public bool CompanyAddress_MDCountryLand_IsLoaded
@@ -140,8 +140,8 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private MDCountry _MDCountry;
     public virtual MDCountry MDCountry
     { 
-        get => LazyLoader.Load(this, ref _MDCountry);
-        set => _MDCountry = value;
+        get { return LazyLoader.Load(this, ref _MDCountry); } 
+        set { SetProperty<MDCountry>(ref _MDCountry, value); }
     }
 
     public bool MDCountry_IsLoaded

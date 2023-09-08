@@ -100,8 +100,8 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDProdOrderPartslistPosState;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDProdOrderPartslistPosState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDProdOrderPartslistPosState);
-        set => _ProdOrderPartslistPos_MDProdOrderPartslistPosState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDProdOrderPartslistPosState); }
+        set { _ProdOrderPartslistPos_MDProdOrderPartslistPosState = value; }
     }
 
     public bool ProdOrderPartslistPos_MDProdOrderPartslistPosState_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
     private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState;
     public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState);
-        set => _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState); }
+        set { _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState = value; }
     }
 
     public bool ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState_IsLoaded

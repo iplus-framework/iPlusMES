@@ -226,8 +226,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _Delivery2CompanyAddress;
     public virtual CompanyAddress Delivery2CompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _Delivery2CompanyAddress);
-        set => _Delivery2CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _Delivery2CompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _Delivery2CompanyAddress, value); }
     }
 
     public bool Delivery2CompanyAddress_IsLoaded
@@ -246,8 +246,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _DeliveryCompanyAddress;
     public virtual CompanyAddress DeliveryCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _DeliveryCompanyAddress);
-        set => _DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _DeliveryCompanyAddress, value); }
     }
 
     public bool DeliveryCompanyAddress_IsLoaded
@@ -266,8 +266,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DeliveryNotePos> _DeliveryNotePos_DeliveryNote;
     public virtual ICollection<DeliveryNotePos> DeliveryNotePos_DeliveryNote
     {
-        get => LazyLoader.Load(this, ref _DeliveryNotePos_DeliveryNote);
-        set => _DeliveryNotePos_DeliveryNote = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNotePos_DeliveryNote); }
+        set { _DeliveryNotePos_DeliveryNote = value; }
     }
 
     public bool DeliveryNotePos_DeliveryNote_IsLoaded
@@ -286,8 +286,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDDelivNoteState _MDDelivNoteState;
     public virtual MDDelivNoteState MDDelivNoteState
     { 
-        get => LazyLoader.Load(this, ref _MDDelivNoteState);
-        set => _MDDelivNoteState = value;
+        get { return LazyLoader.Load(this, ref _MDDelivNoteState); } 
+        set { SetProperty<MDDelivNoteState>(ref _MDDelivNoteState, value); }
     }
 
     public bool MDDelivNoteState_IsLoaded
@@ -306,8 +306,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Rating> _Rating_DeliveryNote;
     public virtual ICollection<Rating> Rating_DeliveryNote
     {
-        get => LazyLoader.Load(this, ref _Rating_DeliveryNote);
-        set => _Rating_DeliveryNote = value;
+        get { return LazyLoader.Load(this, ref _Rating_DeliveryNote); }
+        set { _Rating_DeliveryNote = value; }
     }
 
     public bool Rating_DeliveryNote_IsLoaded
@@ -326,8 +326,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _ShipperCompanyAddress;
     public virtual CompanyAddress ShipperCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _ShipperCompanyAddress);
-        set => _ShipperCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _ShipperCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _ShipperCompanyAddress, value); }
     }
 
     public bool ShipperCompanyAddress_IsLoaded
@@ -346,8 +346,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private TourplanPos _TourplanPos;
     public virtual TourplanPos TourplanPos
     { 
-        get => LazyLoader.Load(this, ref _TourplanPos);
-        set => _TourplanPos = value;
+        get { return LazyLoader.Load(this, ref _TourplanPos); } 
+        set { SetProperty<TourplanPos>(ref _TourplanPos, value); }
     }
 
     public bool TourplanPos_IsLoaded
@@ -366,8 +366,8 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     private VisitorVoucher _VisitorVoucher;
     public virtual VisitorVoucher VisitorVoucher
     { 
-        get => LazyLoader.Load(this, ref _VisitorVoucher);
-        set => _VisitorVoucher = value;
+        get { return LazyLoader.Load(this, ref _VisitorVoucher); } 
+        set { SetProperty<VisitorVoucher>(ref _VisitorVoucher, value); }
     }
 
     public bool VisitorVoucher_IsLoaded

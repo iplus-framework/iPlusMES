@@ -142,8 +142,8 @@ public partial class MDTour : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
     private ICollection<Tourplan> _Tourplan_MDTour;
     public virtual ICollection<Tourplan> Tourplan_MDTour
     {
-        get => LazyLoader.Load(this, ref _Tourplan_MDTour);
-        set => _Tourplan_MDTour = value;
+        get { return LazyLoader.Load(this, ref _Tourplan_MDTour); }
+        set { _Tourplan_MDTour = value; }
     }
 
     public bool Tourplan_MDTour_IsLoaded

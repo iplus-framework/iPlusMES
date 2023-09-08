@@ -65,8 +65,8 @@ public partial class CompanyMaterialPickup : VBEntityObject
     private CompanyMaterial _CompanyMaterial;
     public virtual CompanyMaterial CompanyMaterial
     { 
-        get => LazyLoader.Load(this, ref _CompanyMaterial);
-        set => _CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterial); } 
+        set { SetProperty<CompanyMaterial>(ref _CompanyMaterial, value); }
     }
 
     public bool CompanyMaterial_IsLoaded
@@ -85,8 +85,8 @@ public partial class CompanyMaterialPickup : VBEntityObject
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -105,8 +105,8 @@ public partial class CompanyMaterialPickup : VBEntityObject
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded

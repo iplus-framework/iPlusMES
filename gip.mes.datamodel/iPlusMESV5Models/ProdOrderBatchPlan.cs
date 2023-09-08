@@ -240,8 +240,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<FacilityReservation> _FacilityReservation_ProdOrderBatchPlan;
     public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderBatchPlan
     {
-        get => LazyLoader.Load(this, ref _FacilityReservation_ProdOrderBatchPlan);
-        set => _FacilityReservation_ProdOrderBatchPlan = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation_ProdOrderBatchPlan); }
+        set { _FacilityReservation_ProdOrderBatchPlan = value; }
     }
 
     public bool FacilityReservation_ProdOrderBatchPlan_IsLoaded
@@ -260,8 +260,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private MDBatchPlanGroup _MDBatchPlanGroup;
     public virtual MDBatchPlanGroup MDBatchPlanGroup
     { 
-        get => LazyLoader.Load(this, ref _MDBatchPlanGroup);
-        set => _MDBatchPlanGroup = value;
+        get { return LazyLoader.Load(this, ref _MDBatchPlanGroup); } 
+        set { SetProperty<MDBatchPlanGroup>(ref _MDBatchPlanGroup, value); }
     }
 
     public bool MDBatchPlanGroup_IsLoaded
@@ -280,8 +280,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private MaterialWFACClassMethod _MaterialWFACClassMethod;
     public virtual MaterialWFACClassMethod MaterialWFACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _MaterialWFACClassMethod);
-        set => _MaterialWFACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFACClassMethod); } 
+        set { SetProperty<MaterialWFACClassMethod>(ref _MaterialWFACClassMethod, value); }
     }
 
     public bool MaterialWFACClassMethod_IsLoaded
@@ -300,8 +300,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<ProdOrderBatch> _ProdOrderBatch_ProdOrderBatchPlan;
     public virtual ICollection<ProdOrderBatch> ProdOrderBatch_ProdOrderBatchPlan
     {
-        get => LazyLoader.Load(this, ref _ProdOrderBatch_ProdOrderBatchPlan);
-        set => _ProdOrderBatch_ProdOrderBatchPlan = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderBatch_ProdOrderBatchPlan); }
+        set { _ProdOrderBatch_ProdOrderBatchPlan = value; }
     }
 
     public bool ProdOrderBatch_ProdOrderBatchPlan_IsLoaded
@@ -320,8 +320,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private ProdOrderPartslist _ProdOrderPartslist;
     public virtual ProdOrderPartslist ProdOrderPartslist
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist);
-        set => _ProdOrderPartslist = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist); } 
+        set { SetProperty<ProdOrderPartslist>(ref _ProdOrderPartslist, value); }
     }
 
     public bool ProdOrderPartslist_IsLoaded
@@ -340,8 +340,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded
@@ -360,8 +360,8 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded

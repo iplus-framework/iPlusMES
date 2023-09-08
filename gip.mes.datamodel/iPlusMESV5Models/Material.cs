@@ -352,8 +352,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDUnit _BaseMDUnit;
     public virtual MDUnit BaseMDUnit
     { 
-        get => LazyLoader.Load(this, ref _BaseMDUnit);
-        set => _BaseMDUnit = value;
+        get { return LazyLoader.Load(this, ref _BaseMDUnit); } 
+        set { SetProperty<MDUnit>(ref _BaseMDUnit, value); }
     }
 
     public bool BaseMDUnit_IsLoaded
@@ -372,8 +372,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterial> _CompanyMaterial_Material;
     public virtual ICollection<CompanyMaterial> CompanyMaterial_Material
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterial_Material);
-        set => _CompanyMaterial_Material = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterial_Material); }
+        set { _CompanyMaterial_Material = value; }
     }
 
     public bool CompanyMaterial_Material_IsLoaded
@@ -392,8 +392,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DemandOrderPos> _DemandOrderPos_Material;
     public virtual ICollection<DemandOrderPos> DemandOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPos_Material);
-        set => _DemandOrderPos_Material = value;
+        get { return LazyLoader.Load(this, ref _DemandOrderPos_Material); }
+        set { _DemandOrderPos_Material = value; }
     }
 
     public bool DemandOrderPos_Material_IsLoaded
@@ -412,8 +412,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DemandPrimary> _DemandPrimary_Material;
     public virtual ICollection<DemandPrimary> DemandPrimary_Material
     {
-        get => LazyLoader.Load(this, ref _DemandPrimary_Material);
-        set => _DemandPrimary_Material = value;
+        get { return LazyLoader.Load(this, ref _DemandPrimary_Material); }
+        set { _DemandPrimary_Material = value; }
     }
 
     public bool DemandPrimary_Material_IsLoaded
@@ -432,8 +432,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Facility> _Facility_Material;
     public virtual ICollection<Facility> Facility_Material
     {
-        get => LazyLoader.Load(this, ref _Facility_Material);
-        set => _Facility_Material = value;
+        get { return LazyLoader.Load(this, ref _Facility_Material); }
+        set { _Facility_Material = value; }
     }
 
     public bool Facility_Material_IsLoaded
@@ -452,8 +452,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardMaterial;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardMaterial);
-        set => _FacilityBookingCharge_InwardMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardMaterial); }
+        set { _FacilityBookingCharge_InwardMaterial = value; }
     }
 
     public bool FacilityBookingCharge_InwardMaterial_IsLoaded
@@ -472,8 +472,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardMaterial;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardMaterial);
-        set => _FacilityBookingCharge_OutwardMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardMaterial); }
+        set { _FacilityBookingCharge_OutwardMaterial = value; }
     }
 
     public bool FacilityBookingCharge_OutwardMaterial_IsLoaded
@@ -492,8 +492,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_InwardMaterial;
     public virtual ICollection<FacilityBooking> FacilityBooking_InwardMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_InwardMaterial);
-        set => _FacilityBooking_InwardMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_InwardMaterial); }
+        set { _FacilityBooking_InwardMaterial = value; }
     }
 
     public bool FacilityBooking_InwardMaterial_IsLoaded
@@ -512,8 +512,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_OutwardMaterial;
     public virtual ICollection<FacilityBooking> FacilityBooking_OutwardMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_OutwardMaterial);
-        set => _FacilityBooking_OutwardMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_OutwardMaterial); }
+        set { _FacilityBooking_OutwardMaterial = value; }
     }
 
     public bool FacilityBooking_OutwardMaterial_IsLoaded
@@ -532,8 +532,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityCharge> _FacilityCharge_Material;
     public virtual ICollection<FacilityCharge> FacilityCharge_Material
     {
-        get => LazyLoader.Load(this, ref _FacilityCharge_Material);
-        set => _FacilityCharge_Material = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge_Material); }
+        set { _FacilityCharge_Material = value; }
     }
 
     public bool FacilityCharge_Material_IsLoaded
@@ -552,8 +552,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityLot> _FacilityLot_Material;
     public virtual ICollection<FacilityLot> FacilityLot_Material
     {
-        get => LazyLoader.Load(this, ref _FacilityLot_Material);
-        set => _FacilityLot_Material = value;
+        get { return LazyLoader.Load(this, ref _FacilityLot_Material); }
+        set { _FacilityLot_Material = value; }
     }
 
     public bool FacilityLot_Material_IsLoaded
@@ -572,8 +572,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityMaterial> _FacilityMaterial_Material;
     public virtual ICollection<FacilityMaterial> FacilityMaterial_Material
     {
-        get => LazyLoader.Load(this, ref _FacilityMaterial_Material);
-        set => _FacilityMaterial_Material = value;
+        get { return LazyLoader.Load(this, ref _FacilityMaterial_Material); }
+        set { _FacilityMaterial_Material = value; }
     }
 
     public bool FacilityMaterial_Material_IsLoaded
@@ -592,8 +592,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityReservation> _FacilityReservation_Material;
     public virtual ICollection<FacilityReservation> FacilityReservation_Material
     {
-        get => LazyLoader.Load(this, ref _FacilityReservation_Material);
-        set => _FacilityReservation_Material = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation_Material); }
+        set { _FacilityReservation_Material = value; }
     }
 
     public bool FacilityReservation_Material_IsLoaded
@@ -612,8 +612,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _InFacility;
     public virtual Facility InFacility
     { 
-        get => LazyLoader.Load(this, ref _InFacility);
-        set => _InFacility = value;
+        get { return LazyLoader.Load(this, ref _InFacility); } 
+        set { SetProperty<Facility>(ref _InFacility, value); }
     }
 
     public bool InFacility_IsLoaded
@@ -632,8 +632,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrderConfig> _InOrderConfig_Material;
     public virtual ICollection<InOrderConfig> InOrderConfig_Material
     {
-        get => LazyLoader.Load(this, ref _InOrderConfig_Material);
-        set => _InOrderConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _InOrderConfig_Material); }
+        set { _InOrderConfig_Material = value; }
     }
 
     public bool InOrderConfig_Material_IsLoaded
@@ -652,8 +652,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrderPos> _InOrderPos_Material;
     public virtual ICollection<InOrderPos> InOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _InOrderPos_Material);
-        set => _InOrderPos_Material = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos_Material); }
+        set { _InOrderPos_Material = value; }
     }
 
     public bool InOrderPos_Material_IsLoaded
@@ -672,8 +672,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequestConfig> _InRequestConfig_Material;
     public virtual ICollection<InRequestConfig> InRequestConfig_Material
     {
-        get => LazyLoader.Load(this, ref _InRequestConfig_Material);
-        set => _InRequestConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _InRequestConfig_Material); }
+        set { _InRequestConfig_Material = value; }
     }
 
     public bool InRequestConfig_Material_IsLoaded
@@ -692,8 +692,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequestPos> _InRequestPos_Material;
     public virtual ICollection<InRequestPos> InRequestPos_Material
     {
-        get => LazyLoader.Load(this, ref _InRequestPos_Material);
-        set => _InRequestPos_Material = value;
+        get { return LazyLoader.Load(this, ref _InRequestPos_Material); }
+        set { _InRequestPos_Material = value; }
     }
 
     public bool InRequestPos_Material_IsLoaded
@@ -712,8 +712,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Material> _Material_ProductionMaterial;
     public virtual ICollection<Material> Material_ProductionMaterial
     {
-        get => LazyLoader.Load(this, ref _Material_ProductionMaterial);
-        set => _Material_ProductionMaterial = value;
+        get { return LazyLoader.Load(this, ref _Material_ProductionMaterial); }
+        set { _Material_ProductionMaterial = value; }
     }
 
     public bool Material_ProductionMaterial_IsLoaded
@@ -732,8 +732,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InvoicePos> _InvoicePos_Material;
     public virtual ICollection<InvoicePos> InvoicePos_Material
     {
-        get => LazyLoader.Load(this, ref _InvoicePos_Material);
-        set => _InvoicePos_Material = value;
+        get { return LazyLoader.Load(this, ref _InvoicePos_Material); }
+        set { _InvoicePos_Material = value; }
     }
 
     public bool InvoicePos_Material_IsLoaded
@@ -752,8 +752,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<LabOrder> _LabOrder_Material;
     public virtual ICollection<LabOrder> LabOrder_Material
     {
-        get => LazyLoader.Load(this, ref _LabOrder_Material);
-        set => _LabOrder_Material = value;
+        get { return LazyLoader.Load(this, ref _LabOrder_Material); }
+        set { _LabOrder_Material = value; }
     }
 
     public bool LabOrder_Material_IsLoaded
@@ -772,8 +772,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private Label _Label;
     public virtual Label Label
     { 
-        get => LazyLoader.Load(this, ref _Label);
-        set => _Label = value;
+        get { return LazyLoader.Load(this, ref _Label); } 
+        set { SetProperty<Label>(ref _Label, value); }
     }
 
     public bool Label_IsLoaded
@@ -792,8 +792,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MDCountrySalesTaxMaterial> _MDCountrySalesTaxMaterial_Material;
     public virtual ICollection<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_Material
     {
-        get => LazyLoader.Load(this, ref _MDCountrySalesTaxMaterial_Material);
-        set => _MDCountrySalesTaxMaterial_Material = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTaxMaterial_Material); }
+        set { _MDCountrySalesTaxMaterial_Material = value; }
     }
 
     public bool MDCountrySalesTaxMaterial_Material_IsLoaded
@@ -812,8 +812,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDFacilityManagementType _MDFacilityManagementType;
     public virtual MDFacilityManagementType MDFacilityManagementType
     { 
-        get => LazyLoader.Load(this, ref _MDFacilityManagementType);
-        set => _MDFacilityManagementType = value;
+        get { return LazyLoader.Load(this, ref _MDFacilityManagementType); } 
+        set { SetProperty<MDFacilityManagementType>(ref _MDFacilityManagementType, value); }
     }
 
     public bool MDFacilityManagementType_IsLoaded
@@ -832,8 +832,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDGMPMaterialGroup _MDGMPMaterialGroup;
     public virtual MDGMPMaterialGroup MDGMPMaterialGroup
     { 
-        get => LazyLoader.Load(this, ref _MDGMPMaterialGroup);
-        set => _MDGMPMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _MDGMPMaterialGroup); } 
+        set { SetProperty<MDGMPMaterialGroup>(ref _MDGMPMaterialGroup, value); }
     }
 
     public bool MDGMPMaterialGroup_IsLoaded
@@ -852,8 +852,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDInventoryManagementType _MDInventoryManagementType;
     public virtual MDInventoryManagementType MDInventoryManagementType
     { 
-        get => LazyLoader.Load(this, ref _MDInventoryManagementType);
-        set => _MDInventoryManagementType = value;
+        get { return LazyLoader.Load(this, ref _MDInventoryManagementType); } 
+        set { SetProperty<MDInventoryManagementType>(ref _MDInventoryManagementType, value); }
     }
 
     public bool MDInventoryManagementType_IsLoaded
@@ -872,8 +872,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDMaterialGroup _MDMaterialGroup;
     public virtual MDMaterialGroup MDMaterialGroup
     { 
-        get => LazyLoader.Load(this, ref _MDMaterialGroup);
-        set => _MDMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _MDMaterialGroup); } 
+        set { SetProperty<MDMaterialGroup>(ref _MDMaterialGroup, value); }
     }
 
     public bool MDMaterialGroup_IsLoaded
@@ -892,8 +892,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDMaterialType _MDMaterialType;
     public virtual MDMaterialType MDMaterialType
     { 
-        get => LazyLoader.Load(this, ref _MDMaterialType);
-        set => _MDMaterialType = value;
+        get { return LazyLoader.Load(this, ref _MDMaterialType); } 
+        set { SetProperty<MDMaterialType>(ref _MDMaterialType, value); }
     }
 
     public bool MDMaterialType_IsLoaded
@@ -912,8 +912,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrderPos> _MaintOrderPos_Material;
     public virtual ICollection<MaintOrderPos> MaintOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _MaintOrderPos_Material);
-        set => _MaintOrderPos_Material = value;
+        get { return LazyLoader.Load(this, ref _MaintOrderPos_Material); }
+        set { _MaintOrderPos_Material = value; }
     }
 
     public bool MaintOrderPos_Material_IsLoaded
@@ -932,8 +932,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialCalculation> _MaterialCalculation_Material;
     public virtual ICollection<MaterialCalculation> MaterialCalculation_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialCalculation_Material);
-        set => _MaterialCalculation_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialCalculation_Material); }
+        set { _MaterialCalculation_Material = value; }
     }
 
     public bool MaterialCalculation_Material_IsLoaded
@@ -952,8 +952,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialConfig> _MaterialConfig_Material;
     public virtual ICollection<MaterialConfig> MaterialConfig_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialConfig_Material);
-        set => _MaterialConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialConfig_Material); }
+        set { _MaterialConfig_Material = value; }
     }
 
     public bool MaterialConfig_Material_IsLoaded
@@ -972,8 +972,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialGMPAdditive> _MaterialGMPAdditive_Material;
     public virtual ICollection<MaterialGMPAdditive> MaterialGMPAdditive_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialGMPAdditive_Material);
-        set => _MaterialGMPAdditive_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialGMPAdditive_Material); }
+        set { _MaterialGMPAdditive_Material = value; }
     }
 
     public bool MaterialGMPAdditive_Material_IsLoaded
@@ -992,8 +992,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialHistory> _MaterialHistory_Material;
     public virtual ICollection<MaterialHistory> MaterialHistory_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialHistory_Material);
-        set => _MaterialHistory_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialHistory_Material); }
+        set { _MaterialHistory_Material = value; }
     }
 
     public bool MaterialHistory_Material_IsLoaded
@@ -1012,8 +1012,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialStock> _MaterialStock_Material;
     public virtual ICollection<MaterialStock> MaterialStock_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialStock_Material);
-        set => _MaterialStock_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialStock_Material); }
+        set { _MaterialStock_Material = value; }
     }
 
     public bool MaterialStock_Material_IsLoaded
@@ -1032,8 +1032,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialUnit> _MaterialUnit_Material;
     public virtual ICollection<MaterialUnit> MaterialUnit_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialUnit_Material);
-        set => _MaterialUnit_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialUnit_Material); }
+        set { _MaterialUnit_Material = value; }
     }
 
     public bool MaterialUnit_Material_IsLoaded
@@ -1052,8 +1052,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialWFConnection> _MaterialWFConnection_Material;
     public virtual ICollection<MaterialWFConnection> MaterialWFConnection_Material
     {
-        get => LazyLoader.Load(this, ref _MaterialWFConnection_Material);
-        set => _MaterialWFConnection_Material = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFConnection_Material); }
+        set { _MaterialWFConnection_Material = value; }
     }
 
     public bool MaterialWFConnection_Material_IsLoaded
@@ -1072,8 +1072,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialWFRelation> _MaterialWFRelation_SourceMaterial;
     public virtual ICollection<MaterialWFRelation> MaterialWFRelation_SourceMaterial
     {
-        get => LazyLoader.Load(this, ref _MaterialWFRelation_SourceMaterial);
-        set => _MaterialWFRelation_SourceMaterial = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFRelation_SourceMaterial); }
+        set { _MaterialWFRelation_SourceMaterial = value; }
     }
 
     public bool MaterialWFRelation_SourceMaterial_IsLoaded
@@ -1092,8 +1092,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialWFRelation> _MaterialWFRelation_TargetMaterial;
     public virtual ICollection<MaterialWFRelation> MaterialWFRelation_TargetMaterial
     {
-        get => LazyLoader.Load(this, ref _MaterialWFRelation_TargetMaterial);
-        set => _MaterialWFRelation_TargetMaterial = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFRelation_TargetMaterial); }
+        set { _MaterialWFRelation_TargetMaterial = value; }
     }
 
     public bool MaterialWFRelation_TargetMaterial_IsLoaded
@@ -1112,8 +1112,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _OutFacility;
     public virtual Facility OutFacility
     { 
-        get => LazyLoader.Load(this, ref _OutFacility);
-        set => _OutFacility = value;
+        get { return LazyLoader.Load(this, ref _OutFacility); } 
+        set { SetProperty<Facility>(ref _OutFacility, value); }
     }
 
     public bool OutFacility_IsLoaded
@@ -1132,8 +1132,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOfferConfig> _OutOfferConfig_Material;
     public virtual ICollection<OutOfferConfig> OutOfferConfig_Material
     {
-        get => LazyLoader.Load(this, ref _OutOfferConfig_Material);
-        set => _OutOfferConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _OutOfferConfig_Material); }
+        set { _OutOfferConfig_Material = value; }
     }
 
     public bool OutOfferConfig_Material_IsLoaded
@@ -1152,8 +1152,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOfferPos> _OutOfferPos_Material;
     public virtual ICollection<OutOfferPos> OutOfferPos_Material
     {
-        get => LazyLoader.Load(this, ref _OutOfferPos_Material);
-        set => _OutOfferPos_Material = value;
+        get { return LazyLoader.Load(this, ref _OutOfferPos_Material); }
+        set { _OutOfferPos_Material = value; }
     }
 
     public bool OutOfferPos_Material_IsLoaded
@@ -1172,8 +1172,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrderConfig> _OutOrderConfig_Material;
     public virtual ICollection<OutOrderConfig> OutOrderConfig_Material
     {
-        get => LazyLoader.Load(this, ref _OutOrderConfig_Material);
-        set => _OutOrderConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _OutOrderConfig_Material); }
+        set { _OutOrderConfig_Material = value; }
     }
 
     public bool OutOrderConfig_Material_IsLoaded
@@ -1192,8 +1192,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrderPos> _OutOrderPos_Material;
     public virtual ICollection<OutOrderPos> OutOrderPos_Material
     {
-        get => LazyLoader.Load(this, ref _OutOrderPos_Material);
-        set => _OutOrderPos_Material = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos_Material); }
+        set { _OutOrderPos_Material = value; }
     }
 
     public bool OutOrderPos_Material_IsLoaded
@@ -1212,8 +1212,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrderPosUtilization> _OutOrderPosUtilization_Material;
     public virtual ICollection<OutOrderPosUtilization> OutOrderPosUtilization_Material
     {
-        get => LazyLoader.Load(this, ref _OutOrderPosUtilization_Material);
-        set => _OutOrderPosUtilization_Material = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPosUtilization_Material); }
+        set { _OutOrderPosUtilization_Material = value; }
     }
 
     public bool OutOrderPosUtilization_Material_IsLoaded
@@ -1232,8 +1232,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PartslistConfig> _PartslistConfig_Material;
     public virtual ICollection<PartslistConfig> PartslistConfig_Material
     {
-        get => LazyLoader.Load(this, ref _PartslistConfig_Material);
-        set => _PartslistConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _PartslistConfig_Material); }
+        set { _PartslistConfig_Material = value; }
     }
 
     public bool PartslistConfig_Material_IsLoaded
@@ -1252,8 +1252,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PartslistPos> _PartslistPos_Material;
     public virtual ICollection<PartslistPos> PartslistPos_Material
     {
-        get => LazyLoader.Load(this, ref _PartslistPos_Material);
-        set => _PartslistPos_Material = value;
+        get { return LazyLoader.Load(this, ref _PartslistPos_Material); }
+        set { _PartslistPos_Material = value; }
     }
 
     public bool PartslistPos_Material_IsLoaded
@@ -1272,8 +1272,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Partslist> _Partslist_Material;
     public virtual ICollection<Partslist> Partslist_Material
     {
-        get => LazyLoader.Load(this, ref _Partslist_Material);
-        set => _Partslist_Material = value;
+        get { return LazyLoader.Load(this, ref _Partslist_Material); }
+        set { _Partslist_Material = value; }
     }
 
     public bool Partslist_Material_IsLoaded
@@ -1292,8 +1292,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PickingConfig> _PickingConfig_Material;
     public virtual ICollection<PickingConfig> PickingConfig_Material
     {
-        get => LazyLoader.Load(this, ref _PickingConfig_Material);
-        set => _PickingConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _PickingConfig_Material); }
+        set { _PickingConfig_Material = value; }
     }
 
     public bool PickingConfig_Material_IsLoaded
@@ -1312,8 +1312,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PickingPos> _PickingPos_PickingMaterial;
     public virtual ICollection<PickingPos> PickingPos_PickingMaterial
     {
-        get => LazyLoader.Load(this, ref _PickingPos_PickingMaterial);
-        set => _PickingPos_PickingMaterial = value;
+        get { return LazyLoader.Load(this, ref _PickingPos_PickingMaterial); }
+        set { _PickingPos_PickingMaterial = value; }
     }
 
     public bool PickingPos_PickingMaterial_IsLoaded
@@ -1332,8 +1332,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PriceListMaterial> _PriceListMaterial_Material;
     public virtual ICollection<PriceListMaterial> PriceListMaterial_Material
     {
-        get => LazyLoader.Load(this, ref _PriceListMaterial_Material);
-        set => _PriceListMaterial_Material = value;
+        get { return LazyLoader.Load(this, ref _PriceListMaterial_Material); }
+        set { _PriceListMaterial_Material = value; }
     }
 
     public bool PriceListMaterial_Material_IsLoaded
@@ -1352,8 +1352,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_Material;
     public virtual ICollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_Material
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistConfig_Material);
-        set => _ProdOrderPartslistConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistConfig_Material); }
+        set { _ProdOrderPartslistConfig_Material = value; }
     }
 
     public bool ProdOrderPartslistConfig_Material_IsLoaded
@@ -1372,8 +1372,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_Material;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_Material
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_Material);
-        set => _ProdOrderPartslistPos_Material = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_Material); }
+        set { _ProdOrderPartslistPos_Material = value; }
     }
 
     public bool ProdOrderPartslistPos_Material_IsLoaded
@@ -1392,8 +1392,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material1_ProductionMaterial;
     public virtual Material Material1_ProductionMaterial
     { 
-        get => LazyLoader.Load(this, ref _Material1_ProductionMaterial);
-        set => _Material1_ProductionMaterial = value;
+        get { return LazyLoader.Load(this, ref _Material1_ProductionMaterial); } 
+        set { SetProperty<Material>(ref _Material1_ProductionMaterial, value); }
     }
 
     public bool Material1_ProductionMaterial_IsLoaded
@@ -1412,8 +1412,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_Material;
     public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_Material
     {
-        get => LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_Material);
-        set => _TandTv3FilterTrackingMaterial_Material = value;
+        get { return LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_Material); }
+        set { _TandTv3FilterTrackingMaterial_Material = value; }
     }
 
     public bool TandTv3FilterTrackingMaterial_Material_IsLoaded
@@ -1432,8 +1432,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardMaterial;
     public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardMaterial
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint_InwardMaterial);
-        set => _TandTv3MixPoint_InwardMaterial = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint_InwardMaterial); }
+        set { _TandTv3MixPoint_InwardMaterial = value; }
     }
 
     public bool TandTv3MixPoint_InwardMaterial_IsLoaded
@@ -1452,8 +1452,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TourplanConfig> _TourplanConfig_Material;
     public virtual ICollection<TourplanConfig> TourplanConfig_Material
     {
-        get => LazyLoader.Load(this, ref _TourplanConfig_Material);
-        set => _TourplanConfig_Material = value;
+        get { return LazyLoader.Load(this, ref _TourplanConfig_Material); }
+        set { _TourplanConfig_Material = value; }
     }
 
     public bool TourplanConfig_Material_IsLoaded
@@ -1472,8 +1472,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassMethod _VBiProgramACClassMethod;
     public virtual ACClassMethod VBiProgramACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _VBiProgramACClassMethod);
-        set => _VBiProgramACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _VBiProgramACClassMethod); } 
+        set { SetProperty<ACClassMethod>(ref _VBiProgramACClassMethod, value); }
     }
 
     public bool VBiProgramACClassMethod_IsLoaded
@@ -1492,8 +1492,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiStackCalculatorACClass;
     public virtual ACClass VBiStackCalculatorACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiStackCalculatorACClass);
-        set => _VBiStackCalculatorACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiStackCalculatorACClass); } 
+        set { SetProperty<ACClass>(ref _VBiStackCalculatorACClass, value); }
     }
 
     public bool VBiStackCalculatorACClass_IsLoaded
@@ -1512,8 +1512,8 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Visitor> _Visitor_Material;
     public virtual ICollection<Visitor> Visitor_Material
     {
-        get => LazyLoader.Load(this, ref _Visitor_Material);
-        set => _Visitor_Material = value;
+        get { return LazyLoader.Load(this, ref _Visitor_Material); }
+        set { _Visitor_Material = value; }
     }
 
     public bool Visitor_Material_IsLoaded

@@ -86,8 +86,8 @@ public partial class MaintOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private MaintOrder _MaintOrder;
     public virtual MaintOrder MaintOrder
     { 
-        get => LazyLoader.Load(this, ref _MaintOrder);
-        set => _MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder); } 
+        set { SetProperty<MaintOrder>(ref _MaintOrder, value); }
     }
 
     public bool MaintOrder_IsLoaded
@@ -106,8 +106,8 @@ public partial class MaintOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded

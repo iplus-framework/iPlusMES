@@ -44,8 +44,8 @@ public partial class TandTv3FilterTrackingMaterial : VBEntityObject
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -64,8 +64,8 @@ public partial class TandTv3FilterTrackingMaterial : VBEntityObject
     private TandTv3FilterTracking _TandTv3FilterTracking;
     public virtual TandTv3FilterTracking TandTv3FilterTracking
     { 
-        get => LazyLoader.Load(this, ref _TandTv3FilterTracking);
-        set => _TandTv3FilterTracking = value;
+        get { return LazyLoader.Load(this, ref _TandTv3FilterTracking); } 
+        set { SetProperty<TandTv3FilterTracking>(ref _TandTv3FilterTracking, value); }
     }
 
     public bool TandTv3FilterTracking_IsLoaded

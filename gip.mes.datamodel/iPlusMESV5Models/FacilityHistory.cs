@@ -191,8 +191,8 @@ public partial class FacilityHistory : VBEntityObject
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -211,8 +211,8 @@ public partial class FacilityHistory : VBEntityObject
     private History _History;
     public virtual History History
     { 
-        get => LazyLoader.Load(this, ref _History);
-        set => _History = value;
+        get { return LazyLoader.Load(this, ref _History); } 
+        set { SetProperty<History>(ref _History, value); }
     }
 
     public bool History_IsLoaded

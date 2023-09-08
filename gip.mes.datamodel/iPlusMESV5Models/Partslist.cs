@@ -247,8 +247,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<DemandOrderPos> _DemandOrderPos_Partslist;
     public virtual ICollection<DemandOrderPos> DemandOrderPos_Partslist
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPos_Partslist);
-        set => _DemandOrderPos_Partslist = value;
+        get { return LazyLoader.Load(this, ref _DemandOrderPos_Partslist); }
+        set { _DemandOrderPos_Partslist = value; }
     }
 
     public bool DemandOrderPos_Partslist_IsLoaded
@@ -267,8 +267,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<Facility> _Facility_Partslist;
     public virtual ICollection<Facility> Facility_Partslist
     {
-        get => LazyLoader.Load(this, ref _Facility_Partslist);
-        set => _Facility_Partslist = value;
+        get { return LazyLoader.Load(this, ref _Facility_Partslist); }
+        set { _Facility_Partslist = value; }
     }
 
     public bool Facility_Partslist_IsLoaded
@@ -287,8 +287,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardPartslist;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardPartslist
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardPartslist);
-        set => _FacilityBookingCharge_InwardPartslist = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardPartslist); }
+        set { _FacilityBookingCharge_InwardPartslist = value; }
     }
 
     public bool FacilityBookingCharge_InwardPartslist_IsLoaded
@@ -307,8 +307,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardPartslist;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardPartslist
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardPartslist);
-        set => _FacilityBookingCharge_OutwardPartslist = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardPartslist); }
+        set { _FacilityBookingCharge_OutwardPartslist = value; }
     }
 
     public bool FacilityBookingCharge_OutwardPartslist_IsLoaded
@@ -327,8 +327,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<FacilityBooking> _FacilityBooking_InwardPartslist;
     public virtual ICollection<FacilityBooking> FacilityBooking_InwardPartslist
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_InwardPartslist);
-        set => _FacilityBooking_InwardPartslist = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_InwardPartslist); }
+        set { _FacilityBooking_InwardPartslist = value; }
     }
 
     public bool FacilityBooking_InwardPartslist_IsLoaded
@@ -347,8 +347,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<FacilityBooking> _FacilityBooking_OutwardPartslist;
     public virtual ICollection<FacilityBooking> FacilityBooking_OutwardPartslist
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_OutwardPartslist);
-        set => _FacilityBooking_OutwardPartslist = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_OutwardPartslist); }
+        set { _FacilityBooking_OutwardPartslist = value; }
     }
 
     public bool FacilityBooking_OutwardPartslist_IsLoaded
@@ -367,8 +367,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<FacilityCharge> _FacilityCharge_Partslist;
     public virtual ICollection<FacilityCharge> FacilityCharge_Partslist
     {
-        get => LazyLoader.Load(this, ref _FacilityCharge_Partslist);
-        set => _FacilityCharge_Partslist = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge_Partslist); }
+        set { _FacilityCharge_Partslist = value; }
     }
 
     public bool FacilityCharge_Partslist_IsLoaded
@@ -387,8 +387,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<Partslist> _Partslist_PreviousPartslist;
     public virtual ICollection<Partslist> Partslist_PreviousPartslist
     {
-        get => LazyLoader.Load(this, ref _Partslist_PreviousPartslist);
-        set => _Partslist_PreviousPartslist = value;
+        get { return LazyLoader.Load(this, ref _Partslist_PreviousPartslist); }
+        set { _Partslist_PreviousPartslist = value; }
     }
 
     public bool Partslist_PreviousPartslist_IsLoaded
@@ -407,8 +407,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -427,8 +427,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -447,8 +447,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private MaterialWF _MaterialWF;
     public virtual MaterialWF MaterialWF
     { 
-        get => LazyLoader.Load(this, ref _MaterialWF);
-        set => _MaterialWF = value;
+        get { return LazyLoader.Load(this, ref _MaterialWF); } 
+        set { SetProperty<MaterialWF>(ref _MaterialWF, value); }
     }
 
     public bool MaterialWF_IsLoaded
@@ -467,8 +467,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<PartslistACClassMethod> _PartslistACClassMethod_Partslist;
     public virtual ICollection<PartslistACClassMethod> PartslistACClassMethod_Partslist
     {
-        get => LazyLoader.Load(this, ref _PartslistACClassMethod_Partslist);
-        set => _PartslistACClassMethod_Partslist = value;
+        get { return LazyLoader.Load(this, ref _PartslistACClassMethod_Partslist); }
+        set { _PartslistACClassMethod_Partslist = value; }
     }
 
     public bool PartslistACClassMethod_Partslist_IsLoaded
@@ -487,8 +487,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<PartslistConfig> _PartslistConfig_Partslist;
     public virtual ICollection<PartslistConfig> PartslistConfig_Partslist
     {
-        get => LazyLoader.Load(this, ref _PartslistConfig_Partslist);
-        set => _PartslistConfig_Partslist = value;
+        get { return LazyLoader.Load(this, ref _PartslistConfig_Partslist); }
+        set { _PartslistConfig_Partslist = value; }
     }
 
     public bool PartslistConfig_Partslist_IsLoaded
@@ -507,8 +507,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<PartslistPos> _PartslistPos_ParentPartslist;
     public virtual ICollection<PartslistPos> PartslistPos_ParentPartslist
     {
-        get => LazyLoader.Load(this, ref _PartslistPos_ParentPartslist);
-        set => _PartslistPos_ParentPartslist = value;
+        get { return LazyLoader.Load(this, ref _PartslistPos_ParentPartslist); }
+        set { _PartslistPos_ParentPartslist = value; }
     }
 
     public bool PartslistPos_ParentPartslist_IsLoaded
@@ -527,8 +527,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<PartslistPos> _PartslistPos_Partslist;
     public virtual ICollection<PartslistPos> PartslistPos_Partslist
     {
-        get => LazyLoader.Load(this, ref _PartslistPos_Partslist);
-        set => _PartslistPos_Partslist = value;
+        get { return LazyLoader.Load(this, ref _PartslistPos_Partslist); }
+        set { _PartslistPos_Partslist = value; }
     }
 
     public bool PartslistPos_Partslist_IsLoaded
@@ -547,8 +547,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<PartslistStock> _PartslistStock_Partslist;
     public virtual ICollection<PartslistStock> PartslistStock_Partslist
     {
-        get => LazyLoader.Load(this, ref _PartslistStock_Partslist);
-        set => _PartslistStock_Partslist = value;
+        get { return LazyLoader.Load(this, ref _PartslistStock_Partslist); }
+        set { _PartslistStock_Partslist = value; }
     }
 
     public bool PartslistStock_Partslist_IsLoaded
@@ -567,8 +567,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private Partslist _Partslist1_PreviousPartslist;
     public virtual Partslist Partslist1_PreviousPartslist
     { 
-        get => LazyLoader.Load(this, ref _Partslist1_PreviousPartslist);
-        set => _Partslist1_PreviousPartslist = value;
+        get { return LazyLoader.Load(this, ref _Partslist1_PreviousPartslist); } 
+        set { SetProperty<Partslist>(ref _Partslist1_PreviousPartslist, value); }
     }
 
     public bool Partslist1_PreviousPartslist_IsLoaded
@@ -587,8 +587,8 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     private ICollection<ProdOrderPartslist> _ProdOrderPartslist_Partslist;
     public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_Partslist
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist_Partslist);
-        set => _ProdOrderPartslist_Partslist = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist_Partslist); }
+        set { _ProdOrderPartslist_Partslist = value; }
     }
 
     public bool ProdOrderPartslist_Partslist_IsLoaded

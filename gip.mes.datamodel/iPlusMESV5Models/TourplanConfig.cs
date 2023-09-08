@@ -142,8 +142,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TourplanConfig> _TourplanConfig_ParentTourplanConfig;
     public virtual ICollection<TourplanConfig> TourplanConfig_ParentTourplanConfig
     {
-        get => LazyLoader.Load(this, ref _TourplanConfig_ParentTourplanConfig);
-        set => _TourplanConfig_ParentTourplanConfig = value;
+        get { return LazyLoader.Load(this, ref _TourplanConfig_ParentTourplanConfig); }
+        set { _TourplanConfig_ParentTourplanConfig = value; }
     }
 
     public bool TourplanConfig_ParentTourplanConfig_IsLoaded
@@ -162,8 +162,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -182,8 +182,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private TourplanConfig _TourplanConfig1_ParentTourplanConfig;
     public virtual TourplanConfig TourplanConfig1_ParentTourplanConfig
     { 
-        get => LazyLoader.Load(this, ref _TourplanConfig1_ParentTourplanConfig);
-        set => _TourplanConfig1_ParentTourplanConfig = value;
+        get { return LazyLoader.Load(this, ref _TourplanConfig1_ParentTourplanConfig); } 
+        set { SetProperty<TourplanConfig>(ref _TourplanConfig1_ParentTourplanConfig, value); }
     }
 
     public bool TourplanConfig1_ParentTourplanConfig_IsLoaded
@@ -202,8 +202,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Tourplan _Tourplan;
     public virtual Tourplan Tourplan
     { 
-        get => LazyLoader.Load(this, ref _Tourplan);
-        set => _Tourplan = value;
+        get { return LazyLoader.Load(this, ref _Tourplan); } 
+        set { SetProperty<Tourplan>(ref _Tourplan, value); }
     }
 
     public bool Tourplan_IsLoaded
@@ -222,8 +222,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -242,8 +242,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -262,8 +262,8 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

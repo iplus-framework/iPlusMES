@@ -149,8 +149,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ICollection<ProdOrderPartslistConfig> _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig;
     public virtual ICollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_ParentProdOrderPartslistConfig
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig);
-        set => _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig); }
+        set { _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig = value; }
     }
 
     public bool ProdOrderPartslistConfig_ParentProdOrderPartslistConfig_IsLoaded
@@ -169,8 +169,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -189,8 +189,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ProdOrderPartslistConfig _ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig;
     public virtual ProdOrderPartslistConfig ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig);
-        set => _ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig); } 
+        set { SetProperty<ProdOrderPartslistConfig>(ref _ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig, value); }
     }
 
     public bool ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig_IsLoaded
@@ -209,8 +209,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ProdOrderPartslist _ProdOrderPartslist;
     public virtual ProdOrderPartslist ProdOrderPartslist
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist);
-        set => _ProdOrderPartslist = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist); } 
+        set { SetProperty<ProdOrderPartslist>(ref _ProdOrderPartslist, value); }
     }
 
     public bool ProdOrderPartslist_IsLoaded
@@ -229,8 +229,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -249,8 +249,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -269,8 +269,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded
@@ -289,8 +289,8 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

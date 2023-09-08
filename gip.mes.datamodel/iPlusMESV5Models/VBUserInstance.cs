@@ -198,8 +198,8 @@ public partial class VBUserInstance : VBEntityObject, IInsertInfo, IUpdateInfo
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded

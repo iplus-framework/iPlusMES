@@ -86,8 +86,8 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _Company;
     public virtual Company Company
     { 
-        get => LazyLoader.Load(this, ref _Company);
-        set => _Company = value;
+        get { return LazyLoader.Load(this, ref _Company); } 
+        set { SetProperty<Company>(ref _Company, value); }
     }
 
     public bool Company_IsLoaded
@@ -106,8 +106,8 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyPerson _CompanyPerson;
     public virtual CompanyPerson CompanyPerson
     { 
-        get => LazyLoader.Load(this, ref _CompanyPerson);
-        set => _CompanyPerson = value;
+        get { return LazyLoader.Load(this, ref _CompanyPerson); } 
+        set { SetProperty<CompanyPerson>(ref _CompanyPerson, value); }
     }
 
     public bool CompanyPerson_IsLoaded
@@ -126,8 +126,8 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     private DeliveryNote _DeliveryNote;
     public virtual DeliveryNote DeliveryNote
     { 
-        get => LazyLoader.Load(this, ref _DeliveryNote);
-        set => _DeliveryNote = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNote); } 
+        set { SetProperty<DeliveryNote>(ref _DeliveryNote, value); }
     }
 
     public bool DeliveryNote_IsLoaded
@@ -146,8 +146,8 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<RatingComplaint> _RatingComplaint_Rating;
     public virtual ICollection<RatingComplaint> RatingComplaint_Rating
     {
-        get => LazyLoader.Load(this, ref _RatingComplaint_Rating);
-        set => _RatingComplaint_Rating = value;
+        get { return LazyLoader.Load(this, ref _RatingComplaint_Rating); }
+        set { _RatingComplaint_Rating = value; }
     }
 
     public bool RatingComplaint_Rating_IsLoaded

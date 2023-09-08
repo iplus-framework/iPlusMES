@@ -121,8 +121,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _Company;
     public virtual Company Company
     { 
-        get => LazyLoader.Load(this, ref _Company);
-        set => _Company = value;
+        get { return LazyLoader.Load(this, ref _Company); } 
+        set { SetProperty<Company>(ref _Company, value); }
     }
 
     public bool Company_IsLoaded
@@ -141,8 +141,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _CompanyAddress;
     public virtual CompanyAddress CompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _CompanyAddress);
-        set => _CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _CompanyAddress, value); }
     }
 
     public bool CompanyAddress_IsLoaded
@@ -161,8 +161,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddressUnloadingpoint _CompanyAddressUnloadingpoint;
     public virtual CompanyAddressUnloadingpoint CompanyAddressUnloadingpoint
     { 
-        get => LazyLoader.Load(this, ref _CompanyAddressUnloadingpoint);
-        set => _CompanyAddressUnloadingpoint = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddressUnloadingpoint); } 
+        set { SetProperty<CompanyAddressUnloadingpoint>(ref _CompanyAddressUnloadingpoint, value); }
     }
 
     public bool CompanyAddressUnloadingpoint_IsLoaded
@@ -181,8 +181,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DeliveryNote> _DeliveryNote_TourplanPos;
     public virtual ICollection<DeliveryNote> DeliveryNote_TourplanPos
     {
-        get => LazyLoader.Load(this, ref _DeliveryNote_TourplanPos);
-        set => _DeliveryNote_TourplanPos = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNote_TourplanPos); }
+        set { _DeliveryNote_TourplanPos = value; }
     }
 
     public bool DeliveryNote_TourplanPos_IsLoaded
@@ -201,8 +201,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTimeRange _MDTimeRange;
     public virtual MDTimeRange MDTimeRange
     { 
-        get => LazyLoader.Load(this, ref _MDTimeRange);
-        set => _MDTimeRange = value;
+        get { return LazyLoader.Load(this, ref _MDTimeRange); } 
+        set { SetProperty<MDTimeRange>(ref _MDTimeRange, value); }
     }
 
     public bool MDTimeRange_IsLoaded
@@ -221,8 +221,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTourplanPosState _MDTourplanPosState;
     public virtual MDTourplanPosState MDTourplanPosState
     { 
-        get => LazyLoader.Load(this, ref _MDTourplanPosState);
-        set => _MDTourplanPosState = value;
+        get { return LazyLoader.Load(this, ref _MDTourplanPosState); } 
+        set { SetProperty<MDTourplanPosState>(ref _MDTourplanPosState, value); }
     }
 
     public bool MDTourplanPosState_IsLoaded
@@ -241,8 +241,8 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     private Tourplan _Tourplan;
     public virtual Tourplan Tourplan
     { 
-        get => LazyLoader.Load(this, ref _Tourplan);
-        set => _Tourplan = value;
+        get { return LazyLoader.Load(this, ref _Tourplan); } 
+        set { SetProperty<Tourplan>(ref _Tourplan, value); }
     }
 
     public bool Tourplan_IsLoaded

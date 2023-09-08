@@ -93,8 +93,8 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -113,8 +113,8 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     private ICollection<FacilityInventoryPos> _FacilityInventoryPos_FacilityInventory;
     public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityInventory
     {
-        get => LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityInventory);
-        set => _FacilityInventoryPos_FacilityInventory = value;
+        get { return LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityInventory); }
+        set { _FacilityInventoryPos_FacilityInventory = value; }
     }
 
     public bool FacilityInventoryPos_FacilityInventory_IsLoaded
@@ -133,8 +133,8 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     private MDFacilityInventoryState _MDFacilityInventoryState;
     public virtual MDFacilityInventoryState MDFacilityInventoryState
     { 
-        get => LazyLoader.Load(this, ref _MDFacilityInventoryState);
-        set => _MDFacilityInventoryState = value;
+        get { return LazyLoader.Load(this, ref _MDFacilityInventoryState); } 
+        set { SetProperty<MDFacilityInventoryState>(ref _MDFacilityInventoryState, value); }
     }
 
     public bool MDFacilityInventoryState_IsLoaded

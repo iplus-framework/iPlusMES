@@ -520,8 +520,8 @@ public partial class CompanyMaterialStock : VBEntityObject, IInsertInfo, IUpdate
     private CompanyMaterial _CompanyMaterial;
     public virtual CompanyMaterial CompanyMaterial
     { 
-        get => LazyLoader.Load(this, ref _CompanyMaterial);
-        set => _CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterial); } 
+        set { SetProperty<CompanyMaterial>(ref _CompanyMaterial, value); }
     }
 
     public bool CompanyMaterial_IsLoaded
@@ -540,8 +540,8 @@ public partial class CompanyMaterialStock : VBEntityObject, IInsertInfo, IUpdate
     private MDReleaseState _MDReleaseState;
     public virtual MDReleaseState MDReleaseState
     { 
-        get => LazyLoader.Load(this, ref _MDReleaseState);
-        set => _MDReleaseState = value;
+        get { return LazyLoader.Load(this, ref _MDReleaseState); } 
+        set { SetProperty<MDReleaseState>(ref _MDReleaseState, value); }
     }
 
     public bool MDReleaseState_IsLoaded

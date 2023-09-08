@@ -100,8 +100,8 @@ public partial class MDFacilityInventoryPosState : VBEntityObject, IInsertInfo, 
     private ICollection<FacilityInventoryPos> _FacilityInventoryPos_MDFacilityInventoryPosState;
     public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_MDFacilityInventoryPosState
     {
-        get => LazyLoader.Load(this, ref _FacilityInventoryPos_MDFacilityInventoryPosState);
-        set => _FacilityInventoryPos_MDFacilityInventoryPosState = value;
+        get { return LazyLoader.Load(this, ref _FacilityInventoryPos_MDFacilityInventoryPosState); }
+        set { _FacilityInventoryPos_MDFacilityInventoryPosState = value; }
     }
 
     public bool FacilityInventoryPos_MDFacilityInventoryPosState_IsLoaded

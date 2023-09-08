@@ -44,8 +44,8 @@ public partial class PickingPosProdOrderPartslistPos : VBEntityObject
     private PickingPos _PickingPos;
     public virtual PickingPos PickingPos
     { 
-        get => LazyLoader.Load(this, ref _PickingPos);
-        set => _PickingPos = value;
+        get { return LazyLoader.Load(this, ref _PickingPos); } 
+        set { SetProperty<PickingPos>(ref _PickingPos, value); }
     }
 
     public bool PickingPos_IsLoaded
@@ -64,8 +64,8 @@ public partial class PickingPosProdOrderPartslistPos : VBEntityObject
     private ProdOrderPartslistPos _ProdorderPartslistPos;
     public virtual ProdOrderPartslistPos ProdorderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdorderPartslistPos);
-        set => _ProdorderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdorderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdorderPartslistPos, value); }
     }
 
     public bool ProdorderPartslistPos_IsLoaded

@@ -128,8 +128,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassTaskValue> _ACClassTaskValue_ACClassTask;
     public virtual ICollection<ACClassTaskValue> ACClassTaskValue_ACClassTask
     {
-        get => LazyLoader.Load(this, ref _ACClassTaskValue_ACClassTask);
-        set => _ACClassTaskValue_ACClassTask = value;
+        get { return LazyLoader.Load(this, ref _ACClassTaskValue_ACClassTask); }
+        set { _ACClassTaskValue_ACClassTask = value; }
     }
 
     public bool ACClassTaskValue_ACClassTask_IsLoaded
@@ -148,8 +148,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACProgram _ACProgram;
     public virtual ACProgram ACProgram
     { 
-        get => LazyLoader.Load(this, ref _ACProgram);
-        set => _ACProgram = value;
+        get { return LazyLoader.Load(this, ref _ACProgram); } 
+        set { SetProperty<ACProgram>(ref _ACProgram, value); }
     }
 
     public bool ACProgram_IsLoaded
@@ -168,8 +168,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassWF _ContentACClassWF;
     public virtual ACClassWF ContentACClassWF
     { 
-        get => LazyLoader.Load(this, ref _ContentACClassWF);
-        set => _ContentACClassWF = value;
+        get { return LazyLoader.Load(this, ref _ContentACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _ContentACClassWF, value); }
     }
 
     public bool ContentACClassWF_IsLoaded
@@ -188,8 +188,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassTask> _ACClassTask_ParentACClassTask;
     public virtual ICollection<ACClassTask> ACClassTask_ParentACClassTask
     {
-        get => LazyLoader.Load(this, ref _ACClassTask_ParentACClassTask);
-        set => _ACClassTask_ParentACClassTask = value;
+        get { return LazyLoader.Load(this, ref _ACClassTask_ParentACClassTask); }
+        set { _ACClassTask_ParentACClassTask = value; }
     }
 
     public bool ACClassTask_ParentACClassTask_IsLoaded
@@ -208,8 +208,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassTask _ACClassTask1_ParentACClassTask;
     public virtual ACClassTask ACClassTask1_ParentACClassTask
     { 
-        get => LazyLoader.Load(this, ref _ACClassTask1_ParentACClassTask);
-        set => _ACClassTask1_ParentACClassTask = value;
+        get { return LazyLoader.Load(this, ref _ACClassTask1_ParentACClassTask); } 
+        set { SetProperty<ACClassTask>(ref _ACClassTask1_ParentACClassTask, value); }
     }
 
     public bool ACClassTask1_ParentACClassTask_IsLoaded
@@ -228,8 +228,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PickingPos> _PickingPos_ACClassTask;
     public virtual ICollection<PickingPos> PickingPos_ACClassTask
     {
-        get => LazyLoader.Load(this, ref _PickingPos_ACClassTask);
-        set => _PickingPos_ACClassTask = value;
+        get { return LazyLoader.Load(this, ref _PickingPos_ACClassTask); }
+        set { _PickingPos_ACClassTask = value; }
     }
 
     public bool PickingPos_ACClassTask_IsLoaded
@@ -248,8 +248,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ACClassTask;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ACClassTask
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_ACClassTask);
-        set => _ProdOrderPartslistPos_ACClassTask = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_ACClassTask); }
+        set { _ProdOrderPartslistPos_ACClassTask = value; }
     }
 
     public bool ProdOrderPartslistPos_ACClassTask_IsLoaded
@@ -268,8 +268,8 @@ public partial class ACClassTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _TaskTypeACClass;
     public virtual ACClass TaskTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _TaskTypeACClass);
-        set => _TaskTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _TaskTypeACClass); } 
+        set { SetProperty<ACClass>(ref _TaskTypeACClass, value); }
     }
 
     public bool TaskTypeACClass_IsLoaded

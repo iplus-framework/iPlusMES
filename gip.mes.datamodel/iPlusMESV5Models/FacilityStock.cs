@@ -541,8 +541,8 @@ public partial class FacilityStock : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -561,8 +561,8 @@ public partial class FacilityStock : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDReleaseState _MDReleaseState;
     public virtual MDReleaseState MDReleaseState
     { 
-        get => LazyLoader.Load(this, ref _MDReleaseState);
-        set => _MDReleaseState = value;
+        get { return LazyLoader.Load(this, ref _MDReleaseState); } 
+        set { SetProperty<MDReleaseState>(ref _MDReleaseState, value); }
     }
 
     public bool MDReleaseState_IsLoaded

@@ -219,8 +219,8 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
     private ICollection<<#= targetType #>> _<#= relName #>;
     public virtual ICollection<<#= targetType #>> <#= relName #>
     {
-        get => LazyLoader.Load(this, ref _<#= relName #>);
-        set => _<#= relName #> = value;
+        get { return LazyLoader.Load(this, ref _<#= relName #>); }
+        set { _<#= relName #> = value; }
     }
 
     public bool <#= relName #>_IsLoaded
@@ -262,8 +262,8 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
     private <#= targetType #><#= needsNullable ? "?" : "" #> _<#= navPIdname #>;
     public virtual <#= targetType #><#= needsNullable ? "?" : "" #> <#= navPIdname #>
     { 
-        get => LazyLoader.Load(this, ref _<#= navPIdname #>);
-        set => _<#= navPIdname #> = value;
+        get { return LazyLoader.Load(this, ref _<#= navPIdname #>); } 
+        set { SetProperty<<#= targetType#><#= needsNullable ? "?" : "" #>>(ref _<#= navPIdname#>, value); }
     }<#= needsInitializer ? " = null!;" : "" #>
 
     public bool <#= navPIdname #>_IsLoaded
@@ -299,8 +299,8 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
     private ICollection<<#= skipNavigation.TargetEntityType.Name #>> _<#= skipNavigation.Name #>;
     public virtual ICollection<<#= skipNavigation.TargetEntityType.Name #>> <#= skipNavigation.Name #>
     {
-        get => LazyLoader.Load(this, ref _<#= skipNavigation.Name #>);
-        set => _<#= skipNavigation.Name #> = value;
+        get { return LazyLoader.Load(this, ref _<#= skipNavigation.Name #>); }
+        set { _<#= skipNavigation.Name #> = value; }
     }
 
     public virtual CollectionEntry <#= skipNavigation.Name + "Reference"#>

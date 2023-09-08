@@ -72,8 +72,8 @@ public partial class VBGroupRight : VBEntityObject
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded
@@ -92,8 +92,8 @@ public partial class VBGroupRight : VBEntityObject
     private ACClassDesign _ACClassDesign;
     public virtual ACClassDesign ACClassDesign
     { 
-        get => LazyLoader.Load(this, ref _ACClassDesign);
-        set => _ACClassDesign = value;
+        get { return LazyLoader.Load(this, ref _ACClassDesign); } 
+        set { SetProperty<ACClassDesign>(ref _ACClassDesign, value); }
     }
 
     public bool ACClassDesign_IsLoaded
@@ -112,8 +112,8 @@ public partial class VBGroupRight : VBEntityObject
     private ACClassMethod _ACClassMethod;
     public virtual ACClassMethod ACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _ACClassMethod);
-        set => _ACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _ACClassMethod); } 
+        set { SetProperty<ACClassMethod>(ref _ACClassMethod, value); }
     }
 
     public bool ACClassMethod_IsLoaded
@@ -132,8 +132,8 @@ public partial class VBGroupRight : VBEntityObject
     private ACClassProperty _ACClassProperty;
     public virtual ACClassProperty ACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _ACClassProperty);
-        set => _ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty); } 
+        set { SetProperty<ACClassProperty>(ref _ACClassProperty, value); }
     }
 
     public bool ACClassProperty_IsLoaded
@@ -152,8 +152,8 @@ public partial class VBGroupRight : VBEntityObject
     private VBGroup _VBGroup;
     public virtual VBGroup VBGroup
     { 
-        get => LazyLoader.Load(this, ref _VBGroup);
-        set => _VBGroup = value;
+        get { return LazyLoader.Load(this, ref _VBGroup); } 
+        set { SetProperty<VBGroup>(ref _VBGroup, value); }
     }
 
     public bool VBGroup_IsLoaded

@@ -86,8 +86,8 @@ public partial class MDUnitConversion : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -106,8 +106,8 @@ public partial class MDUnitConversion : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDUnit _ToMDUnit;
     public virtual MDUnit ToMDUnit
     { 
-        get => LazyLoader.Load(this, ref _ToMDUnit);
-        set => _ToMDUnit = value;
+        get { return LazyLoader.Load(this, ref _ToMDUnit); } 
+        set { SetProperty<MDUnit>(ref _ToMDUnit, value); }
     }
 
     public bool ToMDUnit_IsLoaded

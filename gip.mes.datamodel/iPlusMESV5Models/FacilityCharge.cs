@@ -303,8 +303,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyMaterial _CPartnerCompanyMaterial;
     public virtual CompanyMaterial CPartnerCompanyMaterial
     { 
-        get => LazyLoader.Load(this, ref _CPartnerCompanyMaterial);
-        set => _CPartnerCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CPartnerCompanyMaterial); } 
+        set { SetProperty<CompanyMaterial>(ref _CPartnerCompanyMaterial, value); }
     }
 
     public bool CPartnerCompanyMaterial_IsLoaded
@@ -323,8 +323,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyMaterial _CompanyMaterial;
     public virtual CompanyMaterial CompanyMaterial
     { 
-        get => LazyLoader.Load(this, ref _CompanyMaterial);
-        set => _CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterial); } 
+        set { SetProperty<CompanyMaterial>(ref _CompanyMaterial, value); }
     }
 
     public bool CompanyMaterial_IsLoaded
@@ -343,8 +343,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -363,8 +363,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardFacilityCharge;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityCharge);
-        set => _FacilityBookingCharge_InwardFacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityCharge); }
+        set { _FacilityBookingCharge_InwardFacilityCharge = value; }
     }
 
     public bool FacilityBookingCharge_InwardFacilityCharge_IsLoaded
@@ -383,8 +383,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardFacilityCharge;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityCharge);
-        set => _FacilityBookingCharge_OutwardFacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityCharge); }
+        set { _FacilityBookingCharge_OutwardFacilityCharge = value; }
     }
 
     public bool FacilityBookingCharge_OutwardFacilityCharge_IsLoaded
@@ -403,8 +403,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_InwardFacilityCharge;
     public virtual ICollection<FacilityBooking> FacilityBooking_InwardFacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityCharge);
-        set => _FacilityBooking_InwardFacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityCharge); }
+        set { _FacilityBooking_InwardFacilityCharge = value; }
     }
 
     public bool FacilityBooking_InwardFacilityCharge_IsLoaded
@@ -423,8 +423,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_OutwardFacilityCharge;
     public virtual ICollection<FacilityBooking> FacilityBooking_OutwardFacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityCharge);
-        set => _FacilityBooking_OutwardFacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityCharge); }
+        set { _FacilityBooking_OutwardFacilityCharge = value; }
     }
 
     public bool FacilityBooking_OutwardFacilityCharge_IsLoaded
@@ -443,8 +443,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityInventoryPos> _FacilityInventoryPos_FacilityCharge;
     public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityCharge);
-        set => _FacilityInventoryPos_FacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityCharge); }
+        set { _FacilityInventoryPos_FacilityCharge = value; }
     }
 
     public bool FacilityInventoryPos_FacilityCharge_IsLoaded
@@ -463,8 +463,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private FacilityLot _FacilityLot;
     public virtual FacilityLot FacilityLot
     { 
-        get => LazyLoader.Load(this, ref _FacilityLot);
-        set => _FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityLot); } 
+        set { SetProperty<FacilityLot>(ref _FacilityLot, value); }
     }
 
     public bool FacilityLot_IsLoaded
@@ -483,8 +483,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityReservation> _FacilityReservation_FacilityCharge;
     public virtual ICollection<FacilityReservation> FacilityReservation_FacilityCharge
     {
-        get => LazyLoader.Load(this, ref _FacilityReservation_FacilityCharge);
-        set => _FacilityReservation_FacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation_FacilityCharge); }
+        set { _FacilityReservation_FacilityCharge = value; }
     }
 
     public bool FacilityReservation_FacilityCharge_IsLoaded
@@ -503,8 +503,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDReleaseState _MDReleaseState;
     public virtual MDReleaseState MDReleaseState
     { 
-        get => LazyLoader.Load(this, ref _MDReleaseState);
-        set => _MDReleaseState = value;
+        get { return LazyLoader.Load(this, ref _MDReleaseState); } 
+        set { SetProperty<MDReleaseState>(ref _MDReleaseState, value); }
     }
 
     public bool MDReleaseState_IsLoaded
@@ -523,8 +523,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -543,8 +543,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -563,8 +563,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OperationLog> _OperationLog_FacilityCharge;
     public virtual ICollection<OperationLog> OperationLog_FacilityCharge
     {
-        get => LazyLoader.Load(this, ref _OperationLog_FacilityCharge);
-        set => _OperationLog_FacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _OperationLog_FacilityCharge); }
+        set { _OperationLog_FacilityCharge = value; }
     }
 
     public bool OperationLog_FacilityCharge_IsLoaded
@@ -583,8 +583,8 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     private Partslist _Partslist;
     public virtual Partslist Partslist
     { 
-        get => LazyLoader.Load(this, ref _Partslist);
-        set => _Partslist = value;
+        get { return LazyLoader.Load(this, ref _Partslist); } 
+        set { SetProperty<Partslist>(ref _Partslist, value); }
     }
 
     public bool Partslist_IsLoaded

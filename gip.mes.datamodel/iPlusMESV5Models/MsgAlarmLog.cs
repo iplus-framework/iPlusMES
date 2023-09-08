@@ -142,8 +142,8 @@ public partial class MsgAlarmLog : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded
@@ -162,8 +162,8 @@ public partial class MsgAlarmLog : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACProgramLog _ACProgramLog;
     public virtual ACProgramLog ACProgramLog
     { 
-        get => LazyLoader.Load(this, ref _ACProgramLog);
-        set => _ACProgramLog = value;
+        get { return LazyLoader.Load(this, ref _ACProgramLog); } 
+        set { SetProperty<ACProgramLog>(ref _ACProgramLog, value); }
     }
 
     public bool ACProgramLog_IsLoaded

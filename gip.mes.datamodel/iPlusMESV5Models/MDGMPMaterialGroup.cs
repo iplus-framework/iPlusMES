@@ -100,8 +100,8 @@ public partial class MDGMPMaterialGroup : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPos_MDGMPMaterialGroup;
     public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPMaterialGroup);
-        set => _MDGMPMaterialGroupPos_MDGMPMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPMaterialGroup); }
+        set { _MDGMPMaterialGroupPos_MDGMPMaterialGroup = value; }
     }
 
     public bool MDGMPMaterialGroupPos_MDGMPMaterialGroup_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDGMPMaterialGroup : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<Material> _Material_MDGMPMaterialGroup;
     public virtual ICollection<Material> Material_MDGMPMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _Material_MDGMPMaterialGroup);
-        set => _Material_MDGMPMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _Material_MDGMPMaterialGroup); }
+        set { _Material_MDGMPMaterialGroup = value; }
     }
 
     public bool Material_MDGMPMaterialGroup_IsLoaded

@@ -93,8 +93,8 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
     private CompanyAddress _CompanyAddress;
     public virtual CompanyAddress CompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _CompanyAddress);
-        set => _CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _CompanyAddress, value); }
     }
 
     public bool CompanyAddress_IsLoaded
@@ -113,8 +113,8 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
     private ICollection<OutOrderPos> _OutOrderPos_CompanyAddressUnloadingpoint;
     public virtual ICollection<OutOrderPos> OutOrderPos_CompanyAddressUnloadingpoint
     {
-        get => LazyLoader.Load(this, ref _OutOrderPos_CompanyAddressUnloadingpoint);
-        set => _OutOrderPos_CompanyAddressUnloadingpoint = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos_CompanyAddressUnloadingpoint); }
+        set { _OutOrderPos_CompanyAddressUnloadingpoint = value; }
     }
 
     public bool OutOrderPos_CompanyAddressUnloadingpoint_IsLoaded
@@ -133,8 +133,8 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
     private ICollection<TourplanPos> _TourplanPos_CompanyAddressUnloadingpoint;
     public virtual ICollection<TourplanPos> TourplanPos_CompanyAddressUnloadingpoint
     {
-        get => LazyLoader.Load(this, ref _TourplanPos_CompanyAddressUnloadingpoint);
-        set => _TourplanPos_CompanyAddressUnloadingpoint = value;
+        get { return LazyLoader.Load(this, ref _TourplanPos_CompanyAddressUnloadingpoint); }
+        set { _TourplanPos_CompanyAddressUnloadingpoint = value; }
     }
 
     public bool TourplanPos_CompanyAddressUnloadingpoint_IsLoaded

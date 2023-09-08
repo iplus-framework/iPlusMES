@@ -121,8 +121,8 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -141,8 +141,8 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityMaterialOEE> _FacilityMaterialOEE_FacilityMaterial;
     public virtual ICollection<FacilityMaterialOEE> FacilityMaterialOEE_FacilityMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityMaterialOEE_FacilityMaterial);
-        set => _FacilityMaterialOEE_FacilityMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityMaterialOEE_FacilityMaterial); }
+        set { _FacilityMaterialOEE_FacilityMaterial = value; }
     }
 
     public bool FacilityMaterialOEE_FacilityMaterial_IsLoaded
@@ -161,8 +161,8 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded

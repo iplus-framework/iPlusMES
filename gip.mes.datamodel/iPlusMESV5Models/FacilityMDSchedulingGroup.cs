@@ -79,8 +79,8 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -99,8 +99,8 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     private MDPickingType _MDPickingType;
     public virtual MDPickingType MDPickingType
     { 
-        get => LazyLoader.Load(this, ref _MDPickingType);
-        set => _MDPickingType = value;
+        get { return LazyLoader.Load(this, ref _MDPickingType); } 
+        set { SetProperty<MDPickingType>(ref _MDPickingType, value); }
     }
 
     public bool MDPickingType_IsLoaded
@@ -119,8 +119,8 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     private MDSchedulingGroup _MDSchedulingGroup;
     public virtual MDSchedulingGroup MDSchedulingGroup
     { 
-        get => LazyLoader.Load(this, ref _MDSchedulingGroup);
-        set => _MDSchedulingGroup = value;
+        get { return LazyLoader.Load(this, ref _MDSchedulingGroup); } 
+        set { SetProperty<MDSchedulingGroup>(ref _MDSchedulingGroup, value); }
     }
 
     public bool MDSchedulingGroup_IsLoaded

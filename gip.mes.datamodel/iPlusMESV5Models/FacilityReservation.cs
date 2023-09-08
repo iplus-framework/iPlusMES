@@ -163,8 +163,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -183,8 +183,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private FacilityCharge _FacilityCharge;
     public virtual FacilityCharge FacilityCharge
     { 
-        get => LazyLoader.Load(this, ref _FacilityCharge);
-        set => _FacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge); } 
+        set { SetProperty<FacilityCharge>(ref _FacilityCharge, value); }
     }
 
     public bool FacilityCharge_IsLoaded
@@ -203,8 +203,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private FacilityLot _FacilityLot;
     public virtual FacilityLot FacilityLot
     { 
-        get => LazyLoader.Load(this, ref _FacilityLot);
-        set => _FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityLot); } 
+        set { SetProperty<FacilityLot>(ref _FacilityLot, value); }
     }
 
     public bool FacilityLot_IsLoaded
@@ -223,8 +223,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -243,8 +243,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private ICollection<FacilityReservation> _FacilityReservation_ParentFacilityReservation;
     public virtual ICollection<FacilityReservation> FacilityReservation_ParentFacilityReservation
     {
-        get => LazyLoader.Load(this, ref _FacilityReservation_ParentFacilityReservation);
-        set => _FacilityReservation_ParentFacilityReservation = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation_ParentFacilityReservation); }
+        set { _FacilityReservation_ParentFacilityReservation = value; }
     }
 
     public bool FacilityReservation_ParentFacilityReservation_IsLoaded
@@ -263,8 +263,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -283,8 +283,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded
@@ -303,8 +303,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private FacilityReservation _FacilityReservation1_ParentFacilityReservation;
     public virtual FacilityReservation FacilityReservation1_ParentFacilityReservation
     { 
-        get => LazyLoader.Load(this, ref _FacilityReservation1_ParentFacilityReservation);
-        set => _FacilityReservation1_ParentFacilityReservation = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation1_ParentFacilityReservation); } 
+        set { SetProperty<FacilityReservation>(ref _FacilityReservation1_ParentFacilityReservation, value); }
     }
 
     public bool FacilityReservation1_ParentFacilityReservation_IsLoaded
@@ -323,8 +323,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private ProdOrderBatchPlan _ProdOrderBatchPlan;
     public virtual ProdOrderBatchPlan ProdOrderBatchPlan
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderBatchPlan);
-        set => _ProdOrderBatchPlan = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan); } 
+        set { SetProperty<ProdOrderBatchPlan>(ref _ProdOrderBatchPlan, value); }
     }
 
     public bool ProdOrderBatchPlan_IsLoaded
@@ -343,8 +343,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded
@@ -363,8 +363,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private ProdOrderPartslistPosRelation _ProdOrderPartslistPosRelation;
     public virtual ProdOrderPartslistPosRelation ProdOrderPartslistPosRelation
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation);
-        set => _ProdOrderPartslistPosRelation = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation); } 
+        set { SetProperty<ProdOrderPartslistPosRelation>(ref _ProdOrderPartslistPosRelation, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_IsLoaded
@@ -383,8 +383,8 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded

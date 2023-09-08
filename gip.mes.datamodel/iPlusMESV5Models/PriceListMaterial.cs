@@ -51,8 +51,8 @@ public partial class PriceListMaterial : VBEntityObject
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -71,8 +71,8 @@ public partial class PriceListMaterial : VBEntityObject
     private PriceList _PriceList;
     public virtual PriceList PriceList
     { 
-        get => LazyLoader.Load(this, ref _PriceList);
-        set => _PriceList = value;
+        get { return LazyLoader.Load(this, ref _PriceList); } 
+        set { SetProperty<PriceList>(ref _PriceList, value); }
     }
 
     public bool PriceList_IsLoaded

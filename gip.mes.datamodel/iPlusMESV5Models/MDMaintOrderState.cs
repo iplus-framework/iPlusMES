@@ -100,8 +100,8 @@ public partial class MDMaintOrderState : VBEntityObject, IInsertInfo, IUpdateInf
     private ICollection<MaintOrder> _MaintOrder_MDMaintOrderState;
     public virtual ICollection<MaintOrder> MaintOrder_MDMaintOrderState
     {
-        get => LazyLoader.Load(this, ref _MaintOrder_MDMaintOrderState);
-        set => _MaintOrder_MDMaintOrderState = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder_MDMaintOrderState); }
+        set { _MaintOrder_MDMaintOrderState = value; }
     }
 
     public bool MaintOrder_MDMaintOrderState_IsLoaded

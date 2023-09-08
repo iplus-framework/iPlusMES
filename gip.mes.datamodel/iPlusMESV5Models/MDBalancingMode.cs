@@ -100,8 +100,8 @@ public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDBalancingMode;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDBalancingMode
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDBalancingMode);
-        set => _FacilityBookingCharge_MDBalancingMode = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDBalancingMode); }
+        set { _FacilityBookingCharge_MDBalancingMode = value; }
     }
 
     public bool FacilityBookingCharge_MDBalancingMode_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     private ICollection<FacilityBooking> _FacilityBooking_MDBalancingMode;
     public virtual ICollection<FacilityBooking> FacilityBooking_MDBalancingMode
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_MDBalancingMode);
-        set => _FacilityBooking_MDBalancingMode = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_MDBalancingMode); }
+        set { _FacilityBooking_MDBalancingMode = value; }
     }
 
     public bool FacilityBooking_MDBalancingMode_IsLoaded

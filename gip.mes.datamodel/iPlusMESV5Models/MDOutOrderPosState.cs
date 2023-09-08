@@ -100,8 +100,8 @@ public partial class MDOutOrderPosState : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<OutOrderPos> _OutOrderPos_MDOutOrderPosState;
     public virtual ICollection<OutOrderPos> OutOrderPos_MDOutOrderPosState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPos_MDOutOrderPosState);
-        set => _OutOrderPos_MDOutOrderPosState = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos_MDOutOrderPosState); }
+        set { _OutOrderPos_MDOutOrderPosState = value; }
     }
 
     public bool OutOrderPos_MDOutOrderPosState_IsLoaded

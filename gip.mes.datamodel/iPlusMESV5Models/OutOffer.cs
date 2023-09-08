@@ -226,8 +226,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _BillingCompanyAddress;
     public virtual CompanyAddress BillingCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _BillingCompanyAddress);
-        set => _BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _BillingCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _BillingCompanyAddress, value); }
     }
 
     public bool BillingCompanyAddress_IsLoaded
@@ -246,8 +246,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _CustomerCompany;
     public virtual Company CustomerCompany
     { 
-        get => LazyLoader.Load(this, ref _CustomerCompany);
-        set => _CustomerCompany = value;
+        get { return LazyLoader.Load(this, ref _CustomerCompany); } 
+        set { SetProperty<Company>(ref _CustomerCompany, value); }
     }
 
     public bool CustomerCompany_IsLoaded
@@ -266,8 +266,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _DeliveryCompanyAddress;
     public virtual CompanyAddress DeliveryCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _DeliveryCompanyAddress);
-        set => _DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _DeliveryCompanyAddress, value); }
     }
 
     public bool DeliveryCompanyAddress_IsLoaded
@@ -286,8 +286,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _IssuerCompanyAddress;
     public virtual CompanyAddress IssuerCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _IssuerCompanyAddress);
-        set => _IssuerCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _IssuerCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _IssuerCompanyAddress, value); }
     }
 
     public bool IssuerCompanyAddress_IsLoaded
@@ -306,8 +306,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyPerson _IssuerCompanyPerson;
     public virtual CompanyPerson IssuerCompanyPerson
     { 
-        get => LazyLoader.Load(this, ref _IssuerCompanyPerson);
-        set => _IssuerCompanyPerson = value;
+        get { return LazyLoader.Load(this, ref _IssuerCompanyPerson); } 
+        set { SetProperty<CompanyPerson>(ref _IssuerCompanyPerson, value); }
     }
 
     public bool IssuerCompanyPerson_IsLoaded
@@ -326,8 +326,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCurrency _MDCurrency;
     public virtual MDCurrency MDCurrency
     { 
-        get => LazyLoader.Load(this, ref _MDCurrency);
-        set => _MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _MDCurrency); } 
+        set { SetProperty<MDCurrency>(ref _MDCurrency, value); }
     }
 
     public bool MDCurrency_IsLoaded
@@ -346,8 +346,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDDelivType _MDDelivType;
     public virtual MDDelivType MDDelivType
     { 
-        get => LazyLoader.Load(this, ref _MDDelivType);
-        set => _MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _MDDelivType); } 
+        set { SetProperty<MDDelivType>(ref _MDDelivType, value); }
     }
 
     public bool MDDelivType_IsLoaded
@@ -366,8 +366,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDOutOfferState _MDOutOfferState;
     public virtual MDOutOfferState MDOutOfferState
     { 
-        get => LazyLoader.Load(this, ref _MDOutOfferState);
-        set => _MDOutOfferState = value;
+        get { return LazyLoader.Load(this, ref _MDOutOfferState); } 
+        set { SetProperty<MDOutOfferState>(ref _MDOutOfferState, value); }
     }
 
     public bool MDOutOfferState_IsLoaded
@@ -386,8 +386,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDOutOrderType _MDOutOrderType;
     public virtual MDOutOrderType MDOutOrderType
     { 
-        get => LazyLoader.Load(this, ref _MDOutOrderType);
-        set => _MDOutOrderType = value;
+        get { return LazyLoader.Load(this, ref _MDOutOrderType); } 
+        set { SetProperty<MDOutOrderType>(ref _MDOutOrderType, value); }
     }
 
     public bool MDOutOrderType_IsLoaded
@@ -406,8 +406,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTermOfPayment _MDTermOfPayment;
     public virtual MDTermOfPayment MDTermOfPayment
     { 
-        get => LazyLoader.Load(this, ref _MDTermOfPayment);
-        set => _MDTermOfPayment = value;
+        get { return LazyLoader.Load(this, ref _MDTermOfPayment); } 
+        set { SetProperty<MDTermOfPayment>(ref _MDTermOfPayment, value); }
     }
 
     public bool MDTermOfPayment_IsLoaded
@@ -426,8 +426,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTimeRange _MDTimeRange;
     public virtual MDTimeRange MDTimeRange
     { 
-        get => LazyLoader.Load(this, ref _MDTimeRange);
-        set => _MDTimeRange = value;
+        get { return LazyLoader.Load(this, ref _MDTimeRange); } 
+        set { SetProperty<MDTimeRange>(ref _MDTimeRange, value); }
     }
 
     public bool MDTimeRange_IsLoaded
@@ -446,8 +446,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOfferConfig> _OutOfferConfig_OutOffer;
     public virtual ICollection<OutOfferConfig> OutOfferConfig_OutOffer
     {
-        get => LazyLoader.Load(this, ref _OutOfferConfig_OutOffer);
-        set => _OutOfferConfig_OutOffer = value;
+        get { return LazyLoader.Load(this, ref _OutOfferConfig_OutOffer); }
+        set { _OutOfferConfig_OutOffer = value; }
     }
 
     public bool OutOfferConfig_OutOffer_IsLoaded
@@ -466,8 +466,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOfferPos> _OutOfferPos_OutOffer;
     public virtual ICollection<OutOfferPos> OutOfferPos_OutOffer
     {
-        get => LazyLoader.Load(this, ref _OutOfferPos_OutOffer);
-        set => _OutOfferPos_OutOffer = value;
+        get { return LazyLoader.Load(this, ref _OutOfferPos_OutOffer); }
+        set { _OutOfferPos_OutOffer = value; }
     }
 
     public bool OutOfferPos_OutOffer_IsLoaded
@@ -486,8 +486,8 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrder> _OutOrder_BasedOnOutOffer;
     public virtual ICollection<OutOrder> OutOrder_BasedOnOutOffer
     {
-        get => LazyLoader.Load(this, ref _OutOrder_BasedOnOutOffer);
-        set => _OutOrder_BasedOnOutOffer = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_BasedOnOutOffer); }
+        set { _OutOrder_BasedOnOutOffer = value; }
     }
 
     public bool OutOrder_BasedOnOutOffer_IsLoaded

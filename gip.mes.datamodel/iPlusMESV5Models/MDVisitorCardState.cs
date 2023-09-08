@@ -100,8 +100,8 @@ public partial class MDVisitorCardState : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<MDVisitorCard> _MDVisitorCard_MDVisitorCardState;
     public virtual ICollection<MDVisitorCard> MDVisitorCard_MDVisitorCardState
     {
-        get => LazyLoader.Load(this, ref _MDVisitorCard_MDVisitorCardState);
-        set => _MDVisitorCard_MDVisitorCardState = value;
+        get { return LazyLoader.Load(this, ref _MDVisitorCard_MDVisitorCardState); }
+        set { _MDVisitorCard_MDVisitorCardState = value; }
     }
 
     public bool MDVisitorCard_MDVisitorCardState_IsLoaded

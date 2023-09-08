@@ -100,8 +100,8 @@ public partial class TandTv3FilterTracking : VBEntityObject
     private ICollection<TandTv3FilterTrackingMaterial> _TandTv3FilterTrackingMaterial_TandTv3FilterTracking;
     public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_TandTv3FilterTracking
     {
-        get => LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_TandTv3FilterTracking);
-        set => _TandTv3FilterTrackingMaterial_TandTv3FilterTracking = value;
+        get { return LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_TandTv3FilterTracking); }
+        set { _TandTv3FilterTrackingMaterial_TandTv3FilterTracking = value; }
     }
 
     public bool TandTv3FilterTrackingMaterial_TandTv3FilterTracking_IsLoaded
@@ -120,8 +120,8 @@ public partial class TandTv3FilterTracking : VBEntityObject
     private TandTv3MDTrackingDirection _TandTv3MDTrackingDirection;
     public virtual TandTv3MDTrackingDirection TandTv3MDTrackingDirection
     { 
-        get => LazyLoader.Load(this, ref _TandTv3MDTrackingDirection);
-        set => _TandTv3MDTrackingDirection = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MDTrackingDirection); } 
+        set { SetProperty<TandTv3MDTrackingDirection>(ref _TandTv3MDTrackingDirection, value); }
     }
 
     public bool TandTv3MDTrackingDirection_IsLoaded
@@ -140,8 +140,8 @@ public partial class TandTv3FilterTracking : VBEntityObject
     private TandTv3MDTrackingStartItemType _TandTv3MDTrackingStartItemType;
     public virtual TandTv3MDTrackingStartItemType TandTv3MDTrackingStartItemType
     { 
-        get => LazyLoader.Load(this, ref _TandTv3MDTrackingStartItemType);
-        set => _TandTv3MDTrackingStartItemType = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MDTrackingStartItemType); } 
+        set { SetProperty<TandTv3MDTrackingStartItemType>(ref _TandTv3MDTrackingStartItemType, value); }
     }
 
     public bool TandTv3MDTrackingStartItemType_IsLoaded
@@ -160,8 +160,8 @@ public partial class TandTv3FilterTracking : VBEntityObject
     private ICollection<TandTv3Step> _TandTv3Step_TandTv3FilterTracking;
     public virtual ICollection<TandTv3Step> TandTv3Step_TandTv3FilterTracking
     {
-        get => LazyLoader.Load(this, ref _TandTv3Step_TandTv3FilterTracking);
-        set => _TandTv3Step_TandTv3FilterTracking = value;
+        get { return LazyLoader.Load(this, ref _TandTv3Step_TandTv3FilterTracking); }
+        set { _TandTv3Step_TandTv3FilterTracking = value; }
     }
 
     public bool TandTv3Step_TandTv3FilterTracking_IsLoaded

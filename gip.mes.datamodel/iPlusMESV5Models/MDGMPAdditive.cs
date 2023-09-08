@@ -121,8 +121,8 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private ICollection<MDGMPMaterialGroupPos> _MDGMPMaterialGroupPos_MDGMPAdditive;
     public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPAdditive
     {
-        get => LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPAdditive);
-        set => _MDGMPMaterialGroupPos_MDGMPAdditive = value;
+        get { return LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPAdditive); }
+        set { _MDGMPMaterialGroupPos_MDGMPAdditive = value; }
     }
 
     public bool MDGMPMaterialGroupPos_MDGMPAdditive_IsLoaded
@@ -141,8 +141,8 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private MDProcessErrorAction _MDProcessErrorAction;
     public virtual MDProcessErrorAction MDProcessErrorAction
     { 
-        get => LazyLoader.Load(this, ref _MDProcessErrorAction);
-        set => _MDProcessErrorAction = value;
+        get { return LazyLoader.Load(this, ref _MDProcessErrorAction); } 
+        set { SetProperty<MDProcessErrorAction>(ref _MDProcessErrorAction, value); }
     }
 
     public bool MDProcessErrorAction_IsLoaded
@@ -161,8 +161,8 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private MDUnit _MDQuantityUnit;
     public virtual MDUnit MDQuantityUnit
     { 
-        get => LazyLoader.Load(this, ref _MDQuantityUnit);
-        set => _MDQuantityUnit = value;
+        get { return LazyLoader.Load(this, ref _MDQuantityUnit); } 
+        set { SetProperty<MDUnit>(ref _MDQuantityUnit, value); }
     }
 
     public bool MDQuantityUnit_IsLoaded
@@ -181,8 +181,8 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private ICollection<MaterialGMPAdditive> _MaterialGMPAdditive_MDGMPAdditive;
     public virtual ICollection<MaterialGMPAdditive> MaterialGMPAdditive_MDGMPAdditive
     {
-        get => LazyLoader.Load(this, ref _MaterialGMPAdditive_MDGMPAdditive);
-        set => _MaterialGMPAdditive_MDGMPAdditive = value;
+        get { return LazyLoader.Load(this, ref _MaterialGMPAdditive_MDGMPAdditive); }
+        set { _MaterialGMPAdditive_MDGMPAdditive = value; }
     }
 
     public bool MaterialGMPAdditive_MDGMPAdditive_IsLoaded

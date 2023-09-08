@@ -72,8 +72,8 @@ public partial class VBUserGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     private VBGroup _VBGroup;
     public virtual VBGroup VBGroup
     { 
-        get => LazyLoader.Load(this, ref _VBGroup);
-        set => _VBGroup = value;
+        get { return LazyLoader.Load(this, ref _VBGroup); } 
+        set { SetProperty<VBGroup>(ref _VBGroup, value); }
     }
 
     public bool VBGroup_IsLoaded
@@ -92,8 +92,8 @@ public partial class VBUserGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded

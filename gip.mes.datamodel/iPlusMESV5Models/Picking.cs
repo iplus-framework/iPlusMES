@@ -156,8 +156,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassMethod _ACClassMethod;
     public virtual ACClassMethod ACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _ACClassMethod);
-        set => _ACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _ACClassMethod); } 
+        set { SetProperty<ACClassMethod>(ref _ACClassMethod, value); }
     }
 
     public bool ACClassMethod_IsLoaded
@@ -176,8 +176,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _DeliveryCompanyAddress;
     public virtual CompanyAddress DeliveryCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _DeliveryCompanyAddress);
-        set => _DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _DeliveryCompanyAddress, value); }
     }
 
     public bool DeliveryCompanyAddress_IsLoaded
@@ -196,8 +196,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDPickingType _MDPickingType;
     public virtual MDPickingType MDPickingType
     { 
-        get => LazyLoader.Load(this, ref _MDPickingType);
-        set => _MDPickingType = value;
+        get { return LazyLoader.Load(this, ref _MDPickingType); } 
+        set { SetProperty<MDPickingType>(ref _MDPickingType, value); }
     }
 
     public bool MDPickingType_IsLoaded
@@ -216,8 +216,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrder> _MaintOrder_Picking;
     public virtual ICollection<MaintOrder> MaintOrder_Picking
     {
-        get => LazyLoader.Load(this, ref _MaintOrder_Picking);
-        set => _MaintOrder_Picking = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder_Picking); }
+        set { _MaintOrder_Picking = value; }
     }
 
     public bool MaintOrder_Picking_IsLoaded
@@ -236,8 +236,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PickingConfig> _PickingConfig_Picking;
     public virtual ICollection<PickingConfig> PickingConfig_Picking
     {
-        get => LazyLoader.Load(this, ref _PickingConfig_Picking);
-        set => _PickingConfig_Picking = value;
+        get { return LazyLoader.Load(this, ref _PickingConfig_Picking); }
+        set { _PickingConfig_Picking = value; }
     }
 
     public bool PickingConfig_Picking_IsLoaded
@@ -256,8 +256,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PickingPos> _PickingPos_Picking;
     public virtual ICollection<PickingPos> PickingPos_Picking
     {
-        get => LazyLoader.Load(this, ref _PickingPos_Picking);
-        set => _PickingPos_Picking = value;
+        get { return LazyLoader.Load(this, ref _PickingPos_Picking); }
+        set { _PickingPos_Picking = value; }
     }
 
     public bool PickingPos_Picking_IsLoaded
@@ -276,8 +276,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private Tourplan _Tourplan;
     public virtual Tourplan Tourplan
     { 
-        get => LazyLoader.Load(this, ref _Tourplan);
-        set => _Tourplan = value;
+        get { return LazyLoader.Load(this, ref _Tourplan); } 
+        set { SetProperty<Tourplan>(ref _Tourplan, value); }
     }
 
     public bool Tourplan_IsLoaded
@@ -296,8 +296,8 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     private VisitorVoucher _VisitorVoucher;
     public virtual VisitorVoucher VisitorVoucher
     { 
-        get => LazyLoader.Load(this, ref _VisitorVoucher);
-        set => _VisitorVoucher = value;
+        get { return LazyLoader.Load(this, ref _VisitorVoucher); } 
+        set { SetProperty<VisitorVoucher>(ref _VisitorVoucher, value); }
     }
 
     public bool VisitorVoucher_IsLoaded

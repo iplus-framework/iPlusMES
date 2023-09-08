@@ -65,8 +65,8 @@ public partial class OrderLog : VBEntityObject
     private DeliveryNotePos _DeliveryNotePos;
     public virtual DeliveryNotePos DeliveryNotePos
     { 
-        get => LazyLoader.Load(this, ref _DeliveryNotePos);
-        set => _DeliveryNotePos = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNotePos); } 
+        set { SetProperty<DeliveryNotePos>(ref _DeliveryNotePos, value); }
     }
 
     public bool DeliveryNotePos_IsLoaded
@@ -85,8 +85,8 @@ public partial class OrderLog : VBEntityObject
     private FacilityBooking _FacilityBooking;
     public virtual FacilityBooking FacilityBooking
     { 
-        get => LazyLoader.Load(this, ref _FacilityBooking);
-        set => _FacilityBooking = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking); } 
+        set { SetProperty<FacilityBooking>(ref _FacilityBooking, value); }
     }
 
     public bool FacilityBooking_IsLoaded
@@ -105,8 +105,8 @@ public partial class OrderLog : VBEntityObject
     private PickingPos _PickingPos;
     public virtual PickingPos PickingPos
     { 
-        get => LazyLoader.Load(this, ref _PickingPos);
-        set => _PickingPos = value;
+        get { return LazyLoader.Load(this, ref _PickingPos); } 
+        set { SetProperty<PickingPos>(ref _PickingPos, value); }
     }
 
     public bool PickingPos_IsLoaded
@@ -125,8 +125,8 @@ public partial class OrderLog : VBEntityObject
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded
@@ -145,8 +145,8 @@ public partial class OrderLog : VBEntityObject
     private ProdOrderPartslistPosRelation _ProdOrderPartslistPosRelation;
     public virtual ProdOrderPartslistPosRelation ProdOrderPartslistPosRelation
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation);
-        set => _ProdOrderPartslistPosRelation = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation); } 
+        set { SetProperty<ProdOrderPartslistPosRelation>(ref _ProdOrderPartslistPosRelation, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_IsLoaded
@@ -165,8 +165,8 @@ public partial class OrderLog : VBEntityObject
     private ACProgramLog _VBiACProgramLog;
     public virtual ACProgramLog VBiACProgramLog
     { 
-        get => LazyLoader.Load(this, ref _VBiACProgramLog);
-        set => _VBiACProgramLog = value;
+        get { return LazyLoader.Load(this, ref _VBiACProgramLog); } 
+        set { SetProperty<ACProgramLog>(ref _VBiACProgramLog, value); }
     }
 
     public bool VBiACProgramLog_IsLoaded

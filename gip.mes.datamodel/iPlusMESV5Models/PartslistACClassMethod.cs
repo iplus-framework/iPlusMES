@@ -65,8 +65,8 @@ public partial class PartslistACClassMethod : VBEntityObject
     private MaterialWFACClassMethod _MaterialWFACClassMethod;
     public virtual MaterialWFACClassMethod MaterialWFACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _MaterialWFACClassMethod);
-        set => _MaterialWFACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFACClassMethod); } 
+        set { SetProperty<MaterialWFACClassMethod>(ref _MaterialWFACClassMethod, value); }
     }
 
     public bool MaterialWFACClassMethod_IsLoaded
@@ -85,8 +85,8 @@ public partial class PartslistACClassMethod : VBEntityObject
     private Partslist _Partslist;
     public virtual Partslist Partslist
     { 
-        get => LazyLoader.Load(this, ref _Partslist);
-        set => _Partslist = value;
+        get { return LazyLoader.Load(this, ref _Partslist); } 
+        set { SetProperty<Partslist>(ref _Partslist, value); }
     }
 
     public bool Partslist_IsLoaded

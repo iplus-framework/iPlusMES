@@ -93,8 +93,8 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     private Calendar _Calendar;
     public virtual Calendar Calendar
     { 
-        get => LazyLoader.Load(this, ref _Calendar);
-        set => _Calendar = value;
+        get { return LazyLoader.Load(this, ref _Calendar); } 
+        set { SetProperty<Calendar>(ref _Calendar, value); }
     }
 
     public bool Calendar_IsLoaded
@@ -113,8 +113,8 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCountry _MDCountry;
     public virtual MDCountry MDCountry
     { 
-        get => LazyLoader.Load(this, ref _MDCountry);
-        set => _MDCountry = value;
+        get { return LazyLoader.Load(this, ref _MDCountry); } 
+        set { SetProperty<MDCountry>(ref _MDCountry, value); }
     }
 
     public bool MDCountry_IsLoaded
@@ -133,8 +133,8 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCountryLand _MDCountryLand;
     public virtual MDCountryLand MDCountryLand
     { 
-        get => LazyLoader.Load(this, ref _MDCountryLand);
-        set => _MDCountryLand = value;
+        get { return LazyLoader.Load(this, ref _MDCountryLand); } 
+        set { SetProperty<MDCountryLand>(ref _MDCountryLand, value); }
     }
 
     public bool MDCountryLand_IsLoaded

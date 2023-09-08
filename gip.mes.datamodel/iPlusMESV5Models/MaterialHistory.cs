@@ -205,8 +205,8 @@ public partial class MaterialHistory : VBEntityObject
     private History _History;
     public virtual History History
     { 
-        get => LazyLoader.Load(this, ref _History);
-        set => _History = value;
+        get { return LazyLoader.Load(this, ref _History); } 
+        set { SetProperty<History>(ref _History, value); }
     }
 
     public bool History_IsLoaded
@@ -225,8 +225,8 @@ public partial class MaterialHistory : VBEntityObject
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded

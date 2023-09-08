@@ -142,8 +142,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private History _History;
     public virtual History History
     { 
-        get => LazyLoader.Load(this, ref _History);
-        set => _History = value;
+        get { return LazyLoader.Load(this, ref _History); } 
+        set { SetProperty<History>(ref _History, value); }
     }
 
     public bool History_IsLoaded
@@ -162,8 +162,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<HistoryConfig> _HistoryConfig_ParentHistoryConfig;
     public virtual ICollection<HistoryConfig> HistoryConfig_ParentHistoryConfig
     {
-        get => LazyLoader.Load(this, ref _HistoryConfig_ParentHistoryConfig);
-        set => _HistoryConfig_ParentHistoryConfig = value;
+        get { return LazyLoader.Load(this, ref _HistoryConfig_ParentHistoryConfig); }
+        set { _HistoryConfig_ParentHistoryConfig = value; }
     }
 
     public bool HistoryConfig_ParentHistoryConfig_IsLoaded
@@ -182,8 +182,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private HistoryConfig _HistoryConfig1_ParentHistoryConfig;
     public virtual HistoryConfig HistoryConfig1_ParentHistoryConfig
     { 
-        get => LazyLoader.Load(this, ref _HistoryConfig1_ParentHistoryConfig);
-        set => _HistoryConfig1_ParentHistoryConfig = value;
+        get { return LazyLoader.Load(this, ref _HistoryConfig1_ParentHistoryConfig); } 
+        set { SetProperty<HistoryConfig>(ref _HistoryConfig1_ParentHistoryConfig, value); }
     }
 
     public bool HistoryConfig1_ParentHistoryConfig_IsLoaded
@@ -202,8 +202,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -222,8 +222,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -242,8 +242,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded
@@ -262,8 +262,8 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

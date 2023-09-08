@@ -268,8 +268,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<CompanyMaterialPickup> _CompanyMaterialPickup_InOrderPos;
     public virtual ICollection<CompanyMaterialPickup> CompanyMaterialPickup_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterialPickup_InOrderPos);
-        set => _CompanyMaterialPickup_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterialPickup_InOrderPos); }
+        set { _CompanyMaterialPickup_InOrderPos = value; }
     }
 
     public bool CompanyMaterialPickup_InOrderPos_IsLoaded
@@ -288,8 +288,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<DeliveryNotePos> _DeliveryNotePos_InOrderPos;
     public virtual ICollection<DeliveryNotePos> DeliveryNotePos_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _DeliveryNotePos_InOrderPos);
-        set => _DeliveryNotePos_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNotePos_InOrderPos); }
+        set { _DeliveryNotePos_InOrderPos = value; }
     }
 
     public bool DeliveryNotePos_InOrderPos_IsLoaded
@@ -308,8 +308,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InOrderPos;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InOrderPos);
-        set => _FacilityBookingCharge_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InOrderPos); }
+        set { _FacilityBookingCharge_InOrderPos = value; }
     }
 
     public bool FacilityBookingCharge_InOrderPos_IsLoaded
@@ -328,8 +328,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<FacilityBooking> _FacilityBooking_InOrderPos;
     public virtual ICollection<FacilityBooking> FacilityBooking_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_InOrderPos);
-        set => _FacilityBooking_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_InOrderPos); }
+        set { _FacilityBooking_InOrderPos = value; }
     }
 
     public bool FacilityBooking_InOrderPos_IsLoaded
@@ -348,8 +348,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<FacilityPreBooking> _FacilityPreBooking_InOrderPos;
     public virtual ICollection<FacilityPreBooking> FacilityPreBooking_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _FacilityPreBooking_InOrderPos);
-        set => _FacilityPreBooking_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _FacilityPreBooking_InOrderPos); }
+        set { _FacilityPreBooking_InOrderPos = value; }
     }
 
     public bool FacilityPreBooking_InOrderPos_IsLoaded
@@ -368,8 +368,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<FacilityReservation> _FacilityReservation_InOrderPos;
     public virtual ICollection<FacilityReservation> FacilityReservation_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _FacilityReservation_InOrderPos);
-        set => _FacilityReservation_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation_InOrderPos); }
+        set { _FacilityReservation_InOrderPos = value; }
     }
 
     public bool FacilityReservation_InOrderPos_IsLoaded
@@ -388,8 +388,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private InOrder _InOrder;
     public virtual InOrder InOrder
     { 
-        get => LazyLoader.Load(this, ref _InOrder);
-        set => _InOrder = value;
+        get { return LazyLoader.Load(this, ref _InOrder); } 
+        set { SetProperty<InOrder>(ref _InOrder, value); }
     }
 
     public bool InOrder_IsLoaded
@@ -408,8 +408,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<InOrderPosSplit> _InOrderPosSplit_InOrderPos;
     public virtual ICollection<InOrderPosSplit> InOrderPosSplit_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _InOrderPosSplit_InOrderPos);
-        set => _InOrderPosSplit_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPosSplit_InOrderPos); }
+        set { _InOrderPosSplit_InOrderPos = value; }
     }
 
     public bool InOrderPosSplit_InOrderPos_IsLoaded
@@ -428,8 +428,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<InOrderPos> _InOrderPos_ParentInOrderPos;
     public virtual ICollection<InOrderPos> InOrderPos_ParentInOrderPos
     {
-        get => LazyLoader.Load(this, ref _InOrderPos_ParentInOrderPos);
-        set => _InOrderPos_ParentInOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos_ParentInOrderPos); }
+        set { _InOrderPos_ParentInOrderPos = value; }
     }
 
     public bool InOrderPos_ParentInOrderPos_IsLoaded
@@ -448,8 +448,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<LabOrder> _LabOrder_InOrderPos;
     public virtual ICollection<LabOrder> LabOrder_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _LabOrder_InOrderPos);
-        set => _LabOrder_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _LabOrder_InOrderPos); }
+        set { _LabOrder_InOrderPos = value; }
     }
 
     public bool LabOrder_InOrderPos_IsLoaded
@@ -468,8 +468,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDCountrySalesTax _MDCountrySalesTax;
     public virtual MDCountrySalesTax MDCountrySalesTax
     { 
-        get => LazyLoader.Load(this, ref _MDCountrySalesTax);
-        set => _MDCountrySalesTax = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTax); } 
+        set { SetProperty<MDCountrySalesTax>(ref _MDCountrySalesTax, value); }
     }
 
     public bool MDCountrySalesTax_IsLoaded
@@ -488,8 +488,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDDelivPosLoadState _MDDelivPosLoadState;
     public virtual MDDelivPosLoadState MDDelivPosLoadState
     { 
-        get => LazyLoader.Load(this, ref _MDDelivPosLoadState);
-        set => _MDDelivPosLoadState = value;
+        get { return LazyLoader.Load(this, ref _MDDelivPosLoadState); } 
+        set { SetProperty<MDDelivPosLoadState>(ref _MDDelivPosLoadState, value); }
     }
 
     public bool MDDelivPosLoadState_IsLoaded
@@ -508,8 +508,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDDelivPosState _MDDelivPosState;
     public virtual MDDelivPosState MDDelivPosState
     { 
-        get => LazyLoader.Load(this, ref _MDDelivPosState);
-        set => _MDDelivPosState = value;
+        get { return LazyLoader.Load(this, ref _MDDelivPosState); } 
+        set { SetProperty<MDDelivPosState>(ref _MDDelivPosState, value); }
     }
 
     public bool MDDelivPosState_IsLoaded
@@ -528,8 +528,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDInOrderPosState _MDInOrderPosState;
     public virtual MDInOrderPosState MDInOrderPosState
     { 
-        get => LazyLoader.Load(this, ref _MDInOrderPosState);
-        set => _MDInOrderPosState = value;
+        get { return LazyLoader.Load(this, ref _MDInOrderPosState); } 
+        set { SetProperty<MDInOrderPosState>(ref _MDInOrderPosState, value); }
     }
 
     public bool MDInOrderPosState_IsLoaded
@@ -548,8 +548,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDTimeRange _MDTimeRange;
     public virtual MDTimeRange MDTimeRange
     { 
-        get => LazyLoader.Load(this, ref _MDTimeRange);
-        set => _MDTimeRange = value;
+        get { return LazyLoader.Load(this, ref _MDTimeRange); } 
+        set { SetProperty<MDTimeRange>(ref _MDTimeRange, value); }
     }
 
     public bool MDTimeRange_IsLoaded
@@ -568,8 +568,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDTransportMode _MDTransportMode;
     public virtual MDTransportMode MDTransportMode
     { 
-        get => LazyLoader.Load(this, ref _MDTransportMode);
-        set => _MDTransportMode = value;
+        get { return LazyLoader.Load(this, ref _MDTransportMode); } 
+        set { SetProperty<MDTransportMode>(ref _MDTransportMode, value); }
     }
 
     public bool MDTransportMode_IsLoaded
@@ -588,8 +588,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -608,8 +608,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -628,8 +628,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private InOrderPos _InOrderPos1_ParentInOrderPos;
     public virtual InOrderPos InOrderPos1_ParentInOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos1_ParentInOrderPos);
-        set => _InOrderPos1_ParentInOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos1_ParentInOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos1_ParentInOrderPos, value); }
     }
 
     public bool InOrderPos1_ParentInOrderPos_IsLoaded
@@ -648,8 +648,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<PickingPos> _PickingPos_InOrderPos;
     public virtual ICollection<PickingPos> PickingPos_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _PickingPos_InOrderPos);
-        set => _PickingPos_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _PickingPos_InOrderPos); }
+        set { _PickingPos_InOrderPos = value; }
     }
 
     public bool PickingPos_InOrderPos_IsLoaded
@@ -668,8 +668,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private CompanyMaterial _PickupCompanyMaterial;
     public virtual CompanyMaterial PickupCompanyMaterial
     { 
-        get => LazyLoader.Load(this, ref _PickupCompanyMaterial);
-        set => _PickupCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _PickupCompanyMaterial); } 
+        set { SetProperty<CompanyMaterial>(ref _PickupCompanyMaterial, value); }
     }
 
     public bool PickupCompanyMaterial_IsLoaded
@@ -688,8 +688,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPos_InOrderPos;
     public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointInOrderPos_InOrderPos);
-        set => _TandTv3MixPointInOrderPos_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPointInOrderPos_InOrderPos); }
+        set { _TandTv3MixPointInOrderPos_InOrderPos = value; }
     }
 
     public bool TandTv3MixPointInOrderPos_InOrderPos_IsLoaded
@@ -708,8 +708,8 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private ICollection<Weighing> _Weighing_InOrderPos;
     public virtual ICollection<Weighing> Weighing_InOrderPos
     {
-        get => LazyLoader.Load(this, ref _Weighing_InOrderPos);
-        set => _Weighing_InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _Weighing_InOrderPos); }
+        set { _Weighing_InOrderPos = value; }
     }
 
     public bool Weighing_InOrderPos_IsLoaded

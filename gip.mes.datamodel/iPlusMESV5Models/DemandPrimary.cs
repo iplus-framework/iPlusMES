@@ -100,8 +100,8 @@ public partial class DemandPrimary : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private Calendar _Calendar;
     public virtual Calendar Calendar
     { 
-        get => LazyLoader.Load(this, ref _Calendar);
-        set => _Calendar = value;
+        get { return LazyLoader.Load(this, ref _Calendar); } 
+        set { SetProperty<Calendar>(ref _Calendar, value); }
     }
 
     public bool Calendar_IsLoaded
@@ -120,8 +120,8 @@ public partial class DemandPrimary : VBEntityObject, IInsertInfo, IUpdateInfo, I
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded

@@ -93,8 +93,8 @@ public partial class InOrderPosSplit : VBEntityObject, IInsertInfo, IUpdateInfo,
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded

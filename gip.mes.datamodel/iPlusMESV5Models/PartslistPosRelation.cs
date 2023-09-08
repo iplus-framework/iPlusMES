@@ -86,8 +86,8 @@ public partial class PartslistPosRelation : VBEntityObject, ISequence, ITargetQu
     private MaterialWFRelation _MaterialWFRelation;
     public virtual MaterialWFRelation MaterialWFRelation
     { 
-        get => LazyLoader.Load(this, ref _MaterialWFRelation);
-        set => _MaterialWFRelation = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFRelation); } 
+        set { SetProperty<MaterialWFRelation>(ref _MaterialWFRelation, value); }
     }
 
     public bool MaterialWFRelation_IsLoaded
@@ -106,8 +106,8 @@ public partial class PartslistPosRelation : VBEntityObject, ISequence, ITargetQu
     private PartslistPos _SourcePartslistPos;
     public virtual PartslistPos SourcePartslistPos
     { 
-        get => LazyLoader.Load(this, ref _SourcePartslistPos);
-        set => _SourcePartslistPos = value;
+        get { return LazyLoader.Load(this, ref _SourcePartslistPos); } 
+        set { SetProperty<PartslistPos>(ref _SourcePartslistPos, value); }
     }
 
     public bool SourcePartslistPos_IsLoaded
@@ -126,8 +126,8 @@ public partial class PartslistPosRelation : VBEntityObject, ISequence, ITargetQu
     private PartslistPos _TargetPartslistPos;
     public virtual PartslistPos TargetPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _TargetPartslistPos);
-        set => _TargetPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _TargetPartslistPos); } 
+        set { SetProperty<PartslistPos>(ref _TargetPartslistPos, value); }
     }
 
     public bool TargetPartslistPos_IsLoaded

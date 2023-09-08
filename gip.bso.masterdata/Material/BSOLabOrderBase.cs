@@ -337,7 +337,7 @@ namespace gip.bso.masterdata
 
         protected virtual void CurrentLabOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "MDLabTagID")
+            if (e.PropertyName == "MDLabTagID" || e.PropertyName == "MDLabTag")
                 OnPropertyChanged(nameof(LabOrderPosList));
         }
 

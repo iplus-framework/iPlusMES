@@ -100,8 +100,8 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrderPos> _OutOrderPos_MDToleranceState;
     public virtual ICollection<OutOrderPos> OutOrderPos_MDToleranceState
     {
-        get => LazyLoader.Load(this, ref _OutOrderPos_MDToleranceState);
-        set => _OutOrderPos_MDToleranceState = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos_MDToleranceState); }
+        set { _OutOrderPos_MDToleranceState = value; }
     }
 
     public bool OutOrderPos_MDToleranceState_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDToleranceState;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDToleranceState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDToleranceState);
-        set => _ProdOrderPartslistPos_MDToleranceState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDToleranceState); }
+        set { _ProdOrderPartslistPos_MDToleranceState = value; }
     }
 
     public bool ProdOrderPartslistPos_MDToleranceState_IsLoaded
@@ -140,8 +140,8 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_MDToleranceState;
     public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDToleranceState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_MDToleranceState);
-        set => _ProdOrderPartslistPosRelation_MDToleranceState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_MDToleranceState); }
+        set { _ProdOrderPartslistPosRelation_MDToleranceState = value; }
     }
 
     public bool ProdOrderPartslistPosRelation_MDToleranceState_IsLoaded

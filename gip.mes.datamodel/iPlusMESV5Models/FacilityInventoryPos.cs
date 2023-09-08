@@ -121,8 +121,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_FacilityInventoryPos;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_FacilityInventoryPos
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_FacilityInventoryPos);
-        set => _FacilityBookingCharge_FacilityInventoryPos = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_FacilityInventoryPos); }
+        set { _FacilityBookingCharge_FacilityInventoryPos = value; }
     }
 
     public bool FacilityBookingCharge_FacilityInventoryPos_IsLoaded
@@ -141,8 +141,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     private ICollection<FacilityBooking> _FacilityBooking_FacilityInventoryPos;
     public virtual ICollection<FacilityBooking> FacilityBooking_FacilityInventoryPos
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_FacilityInventoryPos);
-        set => _FacilityBooking_FacilityInventoryPos = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_FacilityInventoryPos); }
+        set { _FacilityBooking_FacilityInventoryPos = value; }
     }
 
     public bool FacilityBooking_FacilityInventoryPos_IsLoaded
@@ -161,8 +161,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     private FacilityCharge _FacilityCharge;
     public virtual FacilityCharge FacilityCharge
     { 
-        get => LazyLoader.Load(this, ref _FacilityCharge);
-        set => _FacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge); } 
+        set { SetProperty<FacilityCharge>(ref _FacilityCharge, value); }
     }
 
     public bool FacilityCharge_IsLoaded
@@ -181,8 +181,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     private FacilityInventory _FacilityInventory;
     public virtual FacilityInventory FacilityInventory
     { 
-        get => LazyLoader.Load(this, ref _FacilityInventory);
-        set => _FacilityInventory = value;
+        get { return LazyLoader.Load(this, ref _FacilityInventory); } 
+        set { SetProperty<FacilityInventory>(ref _FacilityInventory, value); }
     }
 
     public bool FacilityInventory_IsLoaded
@@ -201,8 +201,8 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     private MDFacilityInventoryPosState _MDFacilityInventoryPosState;
     public virtual MDFacilityInventoryPosState MDFacilityInventoryPosState
     { 
-        get => LazyLoader.Load(this, ref _MDFacilityInventoryPosState);
-        set => _MDFacilityInventoryPosState = value;
+        get { return LazyLoader.Load(this, ref _MDFacilityInventoryPosState); } 
+        set { SetProperty<MDFacilityInventoryPosState>(ref _MDFacilityInventoryPosState, value); }
     }
 
     public bool MDFacilityInventoryPosState_IsLoaded

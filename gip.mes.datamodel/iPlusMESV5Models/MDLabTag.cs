@@ -100,8 +100,8 @@ public partial class MDLabTag : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTra
     private ICollection<LabOrderPos> _LabOrderPos_MDLabTag;
     public virtual ICollection<LabOrderPos> LabOrderPos_MDLabTag
     {
-        get => LazyLoader.Load(this, ref _LabOrderPos_MDLabTag);
-        set => _LabOrderPos_MDLabTag = value;
+        get { return LazyLoader.Load(this, ref _LabOrderPos_MDLabTag); }
+        set { _LabOrderPos_MDLabTag = value; }
     }
 
     public bool LabOrderPos_MDLabTag_IsLoaded

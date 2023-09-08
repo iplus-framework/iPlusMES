@@ -44,8 +44,8 @@ public partial class TandTv3MixPointDeliveryNotePos : VBEntityObject
     private DeliveryNotePos _DeliveryNotePos;
     public virtual DeliveryNotePos DeliveryNotePos
     { 
-        get => LazyLoader.Load(this, ref _DeliveryNotePos);
-        set => _DeliveryNotePos = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNotePos); } 
+        set { SetProperty<DeliveryNotePos>(ref _DeliveryNotePos, value); }
     }
 
     public bool DeliveryNotePos_IsLoaded
@@ -64,8 +64,8 @@ public partial class TandTv3MixPointDeliveryNotePos : VBEntityObject
     private TandTv3MixPoint _TandTv3MixPoint;
     public virtual TandTv3MixPoint TandTv3MixPoint
     { 
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint);
-        set => _TandTv3MixPoint = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint); } 
+        set { SetProperty<TandTv3MixPoint>(ref _TandTv3MixPoint, value); }
     }
 
     public bool TandTv3MixPoint_IsLoaded

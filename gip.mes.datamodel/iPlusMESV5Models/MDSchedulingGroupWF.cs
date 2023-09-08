@@ -72,8 +72,8 @@ public partial class MDSchedulingGroupWF : VBEntityObject, IInsertInfo, IUpdateI
     private MDSchedulingGroup _MDSchedulingGroup;
     public virtual MDSchedulingGroup MDSchedulingGroup
     { 
-        get => LazyLoader.Load(this, ref _MDSchedulingGroup);
-        set => _MDSchedulingGroup = value;
+        get { return LazyLoader.Load(this, ref _MDSchedulingGroup); } 
+        set { SetProperty<MDSchedulingGroup>(ref _MDSchedulingGroup, value); }
     }
 
     public bool MDSchedulingGroup_IsLoaded
@@ -92,8 +92,8 @@ public partial class MDSchedulingGroupWF : VBEntityObject, IInsertInfo, IUpdateI
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded

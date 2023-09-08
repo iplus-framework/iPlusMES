@@ -149,8 +149,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PickingConfig> _PickingConfig_ParentPickingConfig;
     public virtual ICollection<PickingConfig> PickingConfig_ParentPickingConfig
     {
-        get => LazyLoader.Load(this, ref _PickingConfig_ParentPickingConfig);
-        set => _PickingConfig_ParentPickingConfig = value;
+        get { return LazyLoader.Load(this, ref _PickingConfig_ParentPickingConfig); }
+        set { _PickingConfig_ParentPickingConfig = value; }
     }
 
     public bool PickingConfig_ParentPickingConfig_IsLoaded
@@ -169,8 +169,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -189,8 +189,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private PickingConfig _PickingConfig1_ParentPickingConfig;
     public virtual PickingConfig PickingConfig1_ParentPickingConfig
     { 
-        get => LazyLoader.Load(this, ref _PickingConfig1_ParentPickingConfig);
-        set => _PickingConfig1_ParentPickingConfig = value;
+        get { return LazyLoader.Load(this, ref _PickingConfig1_ParentPickingConfig); } 
+        set { SetProperty<PickingConfig>(ref _PickingConfig1_ParentPickingConfig, value); }
     }
 
     public bool PickingConfig1_ParentPickingConfig_IsLoaded
@@ -209,8 +209,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Picking _Picking;
     public virtual Picking Picking
     { 
-        get => LazyLoader.Load(this, ref _Picking);
-        set => _Picking = value;
+        get { return LazyLoader.Load(this, ref _Picking); } 
+        set { SetProperty<Picking>(ref _Picking, value); }
     }
 
     public bool Picking_IsLoaded
@@ -229,8 +229,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -249,8 +249,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -269,8 +269,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded
@@ -289,8 +289,8 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

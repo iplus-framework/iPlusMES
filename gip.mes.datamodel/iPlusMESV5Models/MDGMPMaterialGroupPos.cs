@@ -93,8 +93,8 @@ public partial class MDGMPMaterialGroupPos : VBEntityObject, IInsertInfo, IUpdat
     private MDGMPAdditive _MDGMPAdditive;
     public virtual MDGMPAdditive MDGMPAdditive
     { 
-        get => LazyLoader.Load(this, ref _MDGMPAdditive);
-        set => _MDGMPAdditive = value;
+        get { return LazyLoader.Load(this, ref _MDGMPAdditive); } 
+        set { SetProperty<MDGMPAdditive>(ref _MDGMPAdditive, value); }
     }
 
     public bool MDGMPAdditive_IsLoaded
@@ -113,8 +113,8 @@ public partial class MDGMPMaterialGroupPos : VBEntityObject, IInsertInfo, IUpdat
     private MDGMPMaterialGroup _MDGMPMaterialGroup;
     public virtual MDGMPMaterialGroup MDGMPMaterialGroup
     { 
-        get => LazyLoader.Load(this, ref _MDGMPMaterialGroup);
-        set => _MDGMPMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _MDGMPMaterialGroup); } 
+        set { SetProperty<MDGMPMaterialGroup>(ref _MDGMPMaterialGroup, value); }
     }
 
     public bool MDGMPMaterialGroup_IsLoaded

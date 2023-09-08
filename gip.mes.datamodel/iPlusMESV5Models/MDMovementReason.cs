@@ -100,8 +100,8 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDMovementReason;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDMovementReason
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDMovementReason);
-        set => _FacilityBookingCharge_MDMovementReason = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDMovementReason); }
+        set { _FacilityBookingCharge_MDMovementReason = value; }
     }
 
     public bool FacilityBookingCharge_MDMovementReason_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_MDMovementReason;
     public virtual ICollection<FacilityBooking> FacilityBooking_MDMovementReason
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_MDMovementReason);
-        set => _FacilityBooking_MDMovementReason = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_MDMovementReason); }
+        set { _FacilityBooking_MDMovementReason = value; }
     }
 
     public bool FacilityBooking_MDMovementReason_IsLoaded

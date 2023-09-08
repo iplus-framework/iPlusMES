@@ -135,8 +135,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterial> _CompanyMaterial_MDUnit;
     public virtual ICollection<CompanyMaterial> CompanyMaterial_MDUnit
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterial_MDUnit);
-        set => _CompanyMaterial_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterial_MDUnit); }
+        set { _CompanyMaterial_MDUnit = value; }
     }
 
     public bool CompanyMaterial_MDUnit_IsLoaded
@@ -155,8 +155,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Facility> _Facility_MDUnit;
     public virtual ICollection<Facility> Facility_MDUnit
     {
-        get => LazyLoader.Load(this, ref _Facility_MDUnit);
-        set => _Facility_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _Facility_MDUnit); }
+        set { _Facility_MDUnit = value; }
     }
 
     public bool Facility_MDUnit_IsLoaded
@@ -175,8 +175,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDUnit;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDUnit
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDUnit);
-        set => _FacilityBookingCharge_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDUnit); }
+        set { _FacilityBookingCharge_MDUnit = value; }
     }
 
     public bool FacilityBookingCharge_MDUnit_IsLoaded
@@ -195,8 +195,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_MDUnit;
     public virtual ICollection<FacilityBooking> FacilityBooking_MDUnit
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_MDUnit);
-        set => _FacilityBooking_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_MDUnit); }
+        set { _FacilityBooking_MDUnit = value; }
     }
 
     public bool FacilityBooking_MDUnit_IsLoaded
@@ -215,8 +215,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityCharge> _FacilityCharge_MDUnit;
     public virtual ICollection<FacilityCharge> FacilityCharge_MDUnit
     {
-        get => LazyLoader.Load(this, ref _FacilityCharge_MDUnit);
-        set => _FacilityCharge_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge_MDUnit); }
+        set { _FacilityCharge_MDUnit = value; }
     }
 
     public bool FacilityCharge_MDUnit_IsLoaded
@@ -235,8 +235,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrderPos> _InOrderPos_MDUnit;
     public virtual ICollection<InOrderPos> InOrderPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _InOrderPos_MDUnit);
-        set => _InOrderPos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos_MDUnit); }
+        set { _InOrderPos_MDUnit = value; }
     }
 
     public bool InOrderPos_MDUnit_IsLoaded
@@ -255,8 +255,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequestPos> _InRequestPos_MDUnit;
     public virtual ICollection<InRequestPos> InRequestPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _InRequestPos_MDUnit);
-        set => _InRequestPos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _InRequestPos_MDUnit); }
+        set { _InRequestPos_MDUnit = value; }
     }
 
     public bool InRequestPos_MDUnit_IsLoaded
@@ -275,8 +275,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InvoicePos> _InvoicePos_MDUnit;
     public virtual ICollection<InvoicePos> InvoicePos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _InvoicePos_MDUnit);
-        set => _InvoicePos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _InvoicePos_MDUnit); }
+        set { _InvoicePos_MDUnit = value; }
     }
 
     public bool InvoicePos_MDUnit_IsLoaded
@@ -295,8 +295,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MDGMPAdditive> _MDGMPAdditive_MDQuantityUnit;
     public virtual ICollection<MDGMPAdditive> MDGMPAdditive_MDQuantityUnit
     {
-        get => LazyLoader.Load(this, ref _MDGMPAdditive_MDQuantityUnit);
-        set => _MDGMPAdditive_MDQuantityUnit = value;
+        get { return LazyLoader.Load(this, ref _MDGMPAdditive_MDQuantityUnit); }
+        set { _MDGMPAdditive_MDQuantityUnit = value; }
     }
 
     public bool MDGMPAdditive_MDQuantityUnit_IsLoaded
@@ -315,8 +315,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MDUnitConversion> _MDUnitConversion_MDUnit;
     public virtual ICollection<MDUnitConversion> MDUnitConversion_MDUnit
     {
-        get => LazyLoader.Load(this, ref _MDUnitConversion_MDUnit);
-        set => _MDUnitConversion_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnitConversion_MDUnit); }
+        set { _MDUnitConversion_MDUnit = value; }
     }
 
     public bool MDUnitConversion_MDUnit_IsLoaded
@@ -335,8 +335,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MDUnitConversion> _MDUnitConversion_ToMDUnit;
     public virtual ICollection<MDUnitConversion> MDUnitConversion_ToMDUnit
     {
-        get => LazyLoader.Load(this, ref _MDUnitConversion_ToMDUnit);
-        set => _MDUnitConversion_ToMDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnitConversion_ToMDUnit); }
+        set { _MDUnitConversion_ToMDUnit = value; }
     }
 
     public bool MDUnitConversion_ToMDUnit_IsLoaded
@@ -355,8 +355,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialUnit> _MaterialUnit_ToMDUnit;
     public virtual ICollection<MaterialUnit> MaterialUnit_ToMDUnit
     {
-        get => LazyLoader.Load(this, ref _MaterialUnit_ToMDUnit);
-        set => _MaterialUnit_ToMDUnit = value;
+        get { return LazyLoader.Load(this, ref _MaterialUnit_ToMDUnit); }
+        set { _MaterialUnit_ToMDUnit = value; }
     }
 
     public bool MaterialUnit_ToMDUnit_IsLoaded
@@ -375,8 +375,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Material> _Material_BaseMDUnit;
     public virtual ICollection<Material> Material_BaseMDUnit
     {
-        get => LazyLoader.Load(this, ref _Material_BaseMDUnit);
-        set => _Material_BaseMDUnit = value;
+        get { return LazyLoader.Load(this, ref _Material_BaseMDUnit); }
+        set { _Material_BaseMDUnit = value; }
     }
 
     public bool Material_BaseMDUnit_IsLoaded
@@ -395,8 +395,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOfferPos> _OutOfferPos_MDUnit;
     public virtual ICollection<OutOfferPos> OutOfferPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _OutOfferPos_MDUnit);
-        set => _OutOfferPos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _OutOfferPos_MDUnit); }
+        set { _OutOfferPos_MDUnit = value; }
     }
 
     public bool OutOfferPos_MDUnit_IsLoaded
@@ -415,8 +415,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrderPos> _OutOrderPos_MDUnit;
     public virtual ICollection<OutOrderPos> OutOrderPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _OutOrderPos_MDUnit);
-        set => _OutOrderPos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos_MDUnit); }
+        set { _OutOrderPos_MDUnit = value; }
     }
 
     public bool OutOrderPos_MDUnit_IsLoaded
@@ -435,8 +435,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PartslistPos> _PartslistPos_MDUnit;
     public virtual ICollection<PartslistPos> PartslistPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _PartslistPos_MDUnit);
-        set => _PartslistPos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _PartslistPos_MDUnit); }
+        set { _PartslistPos_MDUnit = value; }
     }
 
     public bool PartslistPos_MDUnit_IsLoaded
@@ -455,8 +455,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Partslist> _Partslist_MDUnit;
     public virtual ICollection<Partslist> Partslist_MDUnit
     {
-        get => LazyLoader.Load(this, ref _Partslist_MDUnit);
-        set => _Partslist_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _Partslist_MDUnit); }
+        set { _Partslist_MDUnit = value; }
     }
 
     public bool Partslist_MDUnit_IsLoaded
@@ -475,8 +475,8 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_MDUnit;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_MDUnit
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDUnit);
-        set => _ProdOrderPartslistPos_MDUnit = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_MDUnit); }
+        set { _ProdOrderPartslistPos_MDUnit = value; }
     }
 
     public bool ProdOrderPartslistPos_MDUnit_IsLoaded

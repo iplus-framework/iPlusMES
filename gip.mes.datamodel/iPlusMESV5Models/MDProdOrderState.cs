@@ -100,8 +100,8 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderBatch> _ProdOrderBatch_MDProdOrderState;
     public virtual ICollection<ProdOrderBatch> ProdOrderBatch_MDProdOrderState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderBatch_MDProdOrderState);
-        set => _ProdOrderBatch_MDProdOrderState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderBatch_MDProdOrderState); }
+        set { _ProdOrderBatch_MDProdOrderState = value; }
     }
 
     public bool ProdOrderBatch_MDProdOrderState_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslist> _ProdOrderPartslist_MDProdOrderState;
     public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_MDProdOrderState
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist_MDProdOrderState);
-        set => _ProdOrderPartslist_MDProdOrderState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist_MDProdOrderState); }
+        set { _ProdOrderPartslist_MDProdOrderState = value; }
     }
 
     public bool ProdOrderPartslist_MDProdOrderState_IsLoaded
@@ -140,8 +140,8 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrder> _ProdOrder_MDProdOrderState;
     public virtual ICollection<ProdOrder> ProdOrder_MDProdOrderState
     {
-        get => LazyLoader.Load(this, ref _ProdOrder_MDProdOrderState);
-        set => _ProdOrder_MDProdOrderState = value;
+        get { return LazyLoader.Load(this, ref _ProdOrder_MDProdOrderState); }
+        set { _ProdOrder_MDProdOrderState = value; }
     }
 
     public bool ProdOrder_MDProdOrderState_IsLoaded

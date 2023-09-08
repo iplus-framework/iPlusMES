@@ -79,8 +79,8 @@ public partial class ACChangeLog : VBEntityObject
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded
@@ -99,8 +99,8 @@ public partial class ACChangeLog : VBEntityObject
     private ACClassProperty _ACClassProperty;
     public virtual ACClassProperty ACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _ACClassProperty);
-        set => _ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty); } 
+        set { SetProperty<ACClassProperty>(ref _ACClassProperty, value); }
     }
 
     public bool ACClassProperty_IsLoaded
@@ -119,8 +119,8 @@ public partial class ACChangeLog : VBEntityObject
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded

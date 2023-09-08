@@ -177,8 +177,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private MaintOrder _MaintOrder1_BasedOnMaintOrder;
     public virtual MaintOrder MaintOrder1_BasedOnMaintOrder
     { 
-        get => LazyLoader.Load(this, ref _MaintOrder1_BasedOnMaintOrder);
-        set => _MaintOrder1_BasedOnMaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder1_BasedOnMaintOrder); } 
+        set { SetProperty<MaintOrder>(ref _MaintOrder1_BasedOnMaintOrder, value); }
     }
 
     public bool MaintOrder1_BasedOnMaintOrder_IsLoaded
@@ -197,8 +197,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _Facility;
     public virtual Facility Facility
     { 
-        get => LazyLoader.Load(this, ref _Facility);
-        set => _Facility = value;
+        get { return LazyLoader.Load(this, ref _Facility); } 
+        set { SetProperty<Facility>(ref _Facility, value); }
     }
 
     public bool Facility_IsLoaded
@@ -217,8 +217,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrder> _MaintOrder_BasedOnMaintOrder;
     public virtual ICollection<MaintOrder> MaintOrder_BasedOnMaintOrder
     {
-        get => LazyLoader.Load(this, ref _MaintOrder_BasedOnMaintOrder);
-        set => _MaintOrder_BasedOnMaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder_BasedOnMaintOrder); }
+        set { _MaintOrder_BasedOnMaintOrder = value; }
     }
 
     public bool MaintOrder_BasedOnMaintOrder_IsLoaded
@@ -237,8 +237,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDMaintOrderState _MDMaintOrderState;
     public virtual MDMaintOrderState MDMaintOrderState
     { 
-        get => LazyLoader.Load(this, ref _MDMaintOrderState);
-        set => _MDMaintOrderState = value;
+        get { return LazyLoader.Load(this, ref _MDMaintOrderState); } 
+        set { SetProperty<MDMaintOrderState>(ref _MDMaintOrderState, value); }
     }
 
     public bool MDMaintOrderState_IsLoaded
@@ -257,8 +257,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private MaintACClass _MaintACClass;
     public virtual MaintACClass MaintACClass
     { 
-        get => LazyLoader.Load(this, ref _MaintACClass);
-        set => _MaintACClass = value;
+        get { return LazyLoader.Load(this, ref _MaintACClass); } 
+        set { SetProperty<MaintACClass>(ref _MaintACClass, value); }
     }
 
     public bool MaintACClass_IsLoaded
@@ -277,8 +277,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrderAssignment> _MaintOrderAssignment_MaintOrder;
     public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_MaintOrder
     {
-        get => LazyLoader.Load(this, ref _MaintOrderAssignment_MaintOrder);
-        set => _MaintOrderAssignment_MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrderAssignment_MaintOrder); }
+        set { _MaintOrderAssignment_MaintOrder = value; }
     }
 
     public bool MaintOrderAssignment_MaintOrder_IsLoaded
@@ -297,8 +297,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrderPos> _MaintOrderPos_MaintOrder;
     public virtual ICollection<MaintOrderPos> MaintOrderPos_MaintOrder
     {
-        get => LazyLoader.Load(this, ref _MaintOrderPos_MaintOrder);
-        set => _MaintOrderPos_MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrderPos_MaintOrder); }
+        set { _MaintOrderPos_MaintOrder = value; }
     }
 
     public bool MaintOrderPos_MaintOrder_IsLoaded
@@ -317,8 +317,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrderProperty> _MaintOrderProperty_MaintOrder;
     public virtual ICollection<MaintOrderProperty> MaintOrderProperty_MaintOrder
     {
-        get => LazyLoader.Load(this, ref _MaintOrderProperty_MaintOrder);
-        set => _MaintOrderProperty_MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrderProperty_MaintOrder); }
+        set { _MaintOrderProperty_MaintOrder = value; }
     }
 
     public bool MaintOrderProperty_MaintOrder_IsLoaded
@@ -337,8 +337,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrderTask> _MaintOrderTask_MaintOrder;
     public virtual ICollection<MaintOrderTask> MaintOrderTask_MaintOrder
     {
-        get => LazyLoader.Load(this, ref _MaintOrderTask_MaintOrder);
-        set => _MaintOrderTask_MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrderTask_MaintOrder); }
+        set { _MaintOrderTask_MaintOrder = value; }
     }
 
     public bool MaintOrderTask_MaintOrder_IsLoaded
@@ -357,8 +357,8 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private Picking _Picking;
     public virtual Picking Picking
     { 
-        get => LazyLoader.Load(this, ref _Picking);
-        set => _Picking = value;
+        get { return LazyLoader.Load(this, ref _Picking); } 
+        set { SetProperty<Picking>(ref _Picking, value); }
     }
 
     public bool Picking_IsLoaded

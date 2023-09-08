@@ -149,8 +149,8 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     private LabOrder _LabOrder;
     public virtual LabOrder LabOrder
     { 
-        get => LazyLoader.Load(this, ref _LabOrder);
-        set => _LabOrder = value;
+        get { return LazyLoader.Load(this, ref _LabOrder); } 
+        set { SetProperty<LabOrder>(ref _LabOrder, value); }
     }
 
     public bool LabOrder_IsLoaded
@@ -169,8 +169,8 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     private MDLabOrderPosState _MDLabOrderPosState;
     public virtual MDLabOrderPosState MDLabOrderPosState
     { 
-        get => LazyLoader.Load(this, ref _MDLabOrderPosState);
-        set => _MDLabOrderPosState = value;
+        get { return LazyLoader.Load(this, ref _MDLabOrderPosState); } 
+        set { SetProperty<MDLabOrderPosState>(ref _MDLabOrderPosState, value); }
     }
 
     public bool MDLabOrderPosState_IsLoaded
@@ -189,8 +189,8 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     private MDLabTag _MDLabTag;
     public virtual MDLabTag MDLabTag
     { 
-        get => LazyLoader.Load(this, ref _MDLabTag);
-        set => _MDLabTag = value;
+        get { return LazyLoader.Load(this, ref _MDLabTag); } 
+        set { SetProperty<MDLabTag>(ref _MDLabTag, value); }
     }
 
     public bool MDLabTag_IsLoaded
@@ -209,8 +209,8 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     private ICollection<Weighing> _Weighing_LabOrderPos;
     public virtual ICollection<Weighing> Weighing_LabOrderPos
     {
-        get => LazyLoader.Load(this, ref _Weighing_LabOrderPos);
-        set => _Weighing_LabOrderPos = value;
+        get { return LazyLoader.Load(this, ref _Weighing_LabOrderPos); }
+        set { _Weighing_LabOrderPos = value; }
     }
 
     public bool Weighing_LabOrderPos_IsLoaded

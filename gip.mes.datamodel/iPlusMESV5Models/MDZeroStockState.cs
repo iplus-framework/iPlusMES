@@ -100,8 +100,8 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDZeroStockState;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDZeroStockState
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDZeroStockState);
-        set => _FacilityBookingCharge_MDZeroStockState = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDZeroStockState); }
+        set { _FacilityBookingCharge_MDZeroStockState = value; }
     }
 
     public bool FacilityBookingCharge_MDZeroStockState_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_MDZeroStockState;
     public virtual ICollection<FacilityBooking> FacilityBooking_MDZeroStockState
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_MDZeroStockState);
-        set => _FacilityBooking_MDZeroStockState = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_MDZeroStockState); }
+        set { _FacilityBooking_MDZeroStockState = value; }
     }
 
     public bool FacilityBooking_MDZeroStockState_IsLoaded

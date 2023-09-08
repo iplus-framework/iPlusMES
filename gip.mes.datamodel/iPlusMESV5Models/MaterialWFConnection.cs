@@ -79,8 +79,8 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     private ACClassWF _ACClassWF;
     public virtual ACClassWF ACClassWF
     { 
-        get => LazyLoader.Load(this, ref _ACClassWF);
-        set => _ACClassWF = value;
+        get { return LazyLoader.Load(this, ref _ACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _ACClassWF, value); }
     }
 
     public bool ACClassWF_IsLoaded
@@ -99,8 +99,8 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -119,8 +119,8 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     private MaterialWFACClassMethod _MaterialWFACClassMethod;
     public virtual MaterialWFACClassMethod MaterialWFACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _MaterialWFACClassMethod);
-        set => _MaterialWFACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFACClassMethod); } 
+        set { SetProperty<MaterialWFACClassMethod>(ref _MaterialWFACClassMethod, value); }
     }
 
     public bool MaterialWFACClassMethod_IsLoaded

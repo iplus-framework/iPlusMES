@@ -65,8 +65,8 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintACClassProperty> _MaintACClassProperty_MaintACClass;
     public virtual ICollection<MaintACClassProperty> MaintACClassProperty_MaintACClass
     {
-        get => LazyLoader.Load(this, ref _MaintACClassProperty_MaintACClass);
-        set => _MaintACClassProperty_MaintACClass = value;
+        get { return LazyLoader.Load(this, ref _MaintACClassProperty_MaintACClass); }
+        set { _MaintACClassProperty_MaintACClass = value; }
     }
 
     public bool MaintACClassProperty_MaintACClass_IsLoaded
@@ -85,8 +85,8 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrder> _MaintOrder_MaintACClass;
     public virtual ICollection<MaintOrder> MaintOrder_MaintACClass
     {
-        get => LazyLoader.Load(this, ref _MaintOrder_MaintACClass);
-        set => _MaintOrder_MaintACClass = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder_MaintACClass); }
+        set { _MaintOrder_MaintACClass = value; }
     }
 
     public bool MaintOrder_MaintACClass_IsLoaded
@@ -105,8 +105,8 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded

@@ -128,8 +128,8 @@ public partial class Weighing : VBEntityObject
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -148,8 +148,8 @@ public partial class Weighing : VBEntityObject
     private LabOrderPos _LabOrderPos;
     public virtual LabOrderPos LabOrderPos
     { 
-        get => LazyLoader.Load(this, ref _LabOrderPos);
-        set => _LabOrderPos = value;
+        get { return LazyLoader.Load(this, ref _LabOrderPos); } 
+        set { SetProperty<LabOrderPos>(ref _LabOrderPos, value); }
     }
 
     public bool LabOrderPos_IsLoaded
@@ -168,8 +168,8 @@ public partial class Weighing : VBEntityObject
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded
@@ -188,8 +188,8 @@ public partial class Weighing : VBEntityObject
     private PickingPos _PickingPos;
     public virtual PickingPos PickingPos
     { 
-        get => LazyLoader.Load(this, ref _PickingPos);
-        set => _PickingPos = value;
+        get { return LazyLoader.Load(this, ref _PickingPos); } 
+        set { SetProperty<PickingPos>(ref _PickingPos, value); }
     }
 
     public bool PickingPos_IsLoaded

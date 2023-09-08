@@ -226,8 +226,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _Company;
     public virtual Company Company
     { 
-        get => LazyLoader.Load(this, ref _Company);
-        set => _Company = value;
+        get { return LazyLoader.Load(this, ref _Company); } 
+        set { SetProperty<Company>(ref _Company, value); }
     }
 
     public bool Company_IsLoaded
@@ -246,8 +246,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyAddressDepartment> _CompanyAddressDepartment_CompanyAddress;
     public virtual ICollection<CompanyAddressDepartment> CompanyAddressDepartment_CompanyAddress
     {
-        get => LazyLoader.Load(this, ref _CompanyAddressDepartment_CompanyAddress);
-        set => _CompanyAddressDepartment_CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddressDepartment_CompanyAddress); }
+        set { _CompanyAddressDepartment_CompanyAddress = value; }
     }
 
     public bool CompanyAddressDepartment_CompanyAddress_IsLoaded
@@ -266,8 +266,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyAddressUnloadingpoint> _CompanyAddressUnloadingpoint_CompanyAddress;
     public virtual ICollection<CompanyAddressUnloadingpoint> CompanyAddressUnloadingpoint_CompanyAddress
     {
-        get => LazyLoader.Load(this, ref _CompanyAddressUnloadingpoint_CompanyAddress);
-        set => _CompanyAddressUnloadingpoint_CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddressUnloadingpoint_CompanyAddress); }
+        set { _CompanyAddressUnloadingpoint_CompanyAddress = value; }
     }
 
     public bool CompanyAddressUnloadingpoint_CompanyAddress_IsLoaded
@@ -286,8 +286,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DeliveryNote> _DeliveryNote_Delivery2CompanyAddress;
     public virtual ICollection<DeliveryNote> DeliveryNote_Delivery2CompanyAddress
     {
-        get => LazyLoader.Load(this, ref _DeliveryNote_Delivery2CompanyAddress);
-        set => _DeliveryNote_Delivery2CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNote_Delivery2CompanyAddress); }
+        set { _DeliveryNote_Delivery2CompanyAddress = value; }
     }
 
     public bool DeliveryNote_Delivery2CompanyAddress_IsLoaded
@@ -306,8 +306,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DeliveryNote> _DeliveryNote_DeliveryCompanyAddress;
     public virtual ICollection<DeliveryNote> DeliveryNote_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _DeliveryNote_DeliveryCompanyAddress);
-        set => _DeliveryNote_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNote_DeliveryCompanyAddress); }
+        set { _DeliveryNote_DeliveryCompanyAddress = value; }
     }
 
     public bool DeliveryNote_DeliveryCompanyAddress_IsLoaded
@@ -326,8 +326,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DeliveryNote> _DeliveryNote_ShipperCompanyAddress;
     public virtual ICollection<DeliveryNote> DeliveryNote_ShipperCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _DeliveryNote_ShipperCompanyAddress);
-        set => _DeliveryNote_ShipperCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNote_ShipperCompanyAddress); }
+        set { _DeliveryNote_ShipperCompanyAddress = value; }
     }
 
     public bool DeliveryNote_ShipperCompanyAddress_IsLoaded
@@ -346,8 +346,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrder> _InOrder_BillingCompanyAddress;
     public virtual ICollection<InOrder> InOrder_BillingCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _InOrder_BillingCompanyAddress);
-        set => _InOrder_BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _InOrder_BillingCompanyAddress); }
+        set { _InOrder_BillingCompanyAddress = value; }
     }
 
     public bool InOrder_BillingCompanyAddress_IsLoaded
@@ -366,8 +366,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrder> _InOrder_DeliveryCompanyAddress;
     public virtual ICollection<InOrder> InOrder_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _InOrder_DeliveryCompanyAddress);
-        set => _InOrder_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _InOrder_DeliveryCompanyAddress); }
+        set { _InOrder_DeliveryCompanyAddress = value; }
     }
 
     public bool InOrder_DeliveryCompanyAddress_IsLoaded
@@ -386,8 +386,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequest> _InRequest_BillingCompanyAddress;
     public virtual ICollection<InRequest> InRequest_BillingCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _InRequest_BillingCompanyAddress);
-        set => _InRequest_BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _InRequest_BillingCompanyAddress); }
+        set { _InRequest_BillingCompanyAddress = value; }
     }
 
     public bool InRequest_BillingCompanyAddress_IsLoaded
@@ -406,8 +406,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequest> _InRequest_DeliveryCompanyAddress;
     public virtual ICollection<InRequest> InRequest_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _InRequest_DeliveryCompanyAddress);
-        set => _InRequest_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _InRequest_DeliveryCompanyAddress); }
+        set { _InRequest_DeliveryCompanyAddress = value; }
     }
 
     public bool InRequest_DeliveryCompanyAddress_IsLoaded
@@ -426,8 +426,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Invoice> _Invoice_BillingCompanyAddress;
     public virtual ICollection<Invoice> Invoice_BillingCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _Invoice_BillingCompanyAddress);
-        set => _Invoice_BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _Invoice_BillingCompanyAddress); }
+        set { _Invoice_BillingCompanyAddress = value; }
     }
 
     public bool Invoice_BillingCompanyAddress_IsLoaded
@@ -446,8 +446,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Invoice> _Invoice_DeliveryCompanyAddress;
     public virtual ICollection<Invoice> Invoice_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _Invoice_DeliveryCompanyAddress);
-        set => _Invoice_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _Invoice_DeliveryCompanyAddress); }
+        set { _Invoice_DeliveryCompanyAddress = value; }
     }
 
     public bool Invoice_DeliveryCompanyAddress_IsLoaded
@@ -466,8 +466,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Invoice> _Invoice_IssuerCompanyAddress;
     public virtual ICollection<Invoice> Invoice_IssuerCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _Invoice_IssuerCompanyAddress);
-        set => _Invoice_IssuerCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _Invoice_IssuerCompanyAddress); }
+        set { _Invoice_IssuerCompanyAddress = value; }
     }
 
     public bool Invoice_IssuerCompanyAddress_IsLoaded
@@ -486,8 +486,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCountry _MDCountry;
     public virtual MDCountry MDCountry
     { 
-        get => LazyLoader.Load(this, ref _MDCountry);
-        set => _MDCountry = value;
+        get { return LazyLoader.Load(this, ref _MDCountry); } 
+        set { SetProperty<MDCountry>(ref _MDCountry, value); }
     }
 
     public bool MDCountry_IsLoaded
@@ -506,8 +506,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCountryLand _MDCountryLand;
     public virtual MDCountryLand MDCountryLand
     { 
-        get => LazyLoader.Load(this, ref _MDCountryLand);
-        set => _MDCountryLand = value;
+        get { return LazyLoader.Load(this, ref _MDCountryLand); } 
+        set { SetProperty<MDCountryLand>(ref _MDCountryLand, value); }
     }
 
     public bool MDCountryLand_IsLoaded
@@ -526,8 +526,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDDelivType _MDDelivType;
     public virtual MDDelivType MDDelivType
     { 
-        get => LazyLoader.Load(this, ref _MDDelivType);
-        set => _MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _MDDelivType); } 
+        set { SetProperty<MDDelivType>(ref _MDDelivType, value); }
     }
 
     public bool MDDelivType_IsLoaded
@@ -546,8 +546,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOffer> _OutOffer_BillingCompanyAddress;
     public virtual ICollection<OutOffer> OutOffer_BillingCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _OutOffer_BillingCompanyAddress);
-        set => _OutOffer_BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_BillingCompanyAddress); }
+        set { _OutOffer_BillingCompanyAddress = value; }
     }
 
     public bool OutOffer_BillingCompanyAddress_IsLoaded
@@ -566,8 +566,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOffer> _OutOffer_DeliveryCompanyAddress;
     public virtual ICollection<OutOffer> OutOffer_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _OutOffer_DeliveryCompanyAddress);
-        set => _OutOffer_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_DeliveryCompanyAddress); }
+        set { _OutOffer_DeliveryCompanyAddress = value; }
     }
 
     public bool OutOffer_DeliveryCompanyAddress_IsLoaded
@@ -586,8 +586,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOffer> _OutOffer_IssuerCompanyAddress;
     public virtual ICollection<OutOffer> OutOffer_IssuerCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _OutOffer_IssuerCompanyAddress);
-        set => _OutOffer_IssuerCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_IssuerCompanyAddress); }
+        set { _OutOffer_IssuerCompanyAddress = value; }
     }
 
     public bool OutOffer_IssuerCompanyAddress_IsLoaded
@@ -606,8 +606,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrder> _OutOrder_BillingCompanyAddress;
     public virtual ICollection<OutOrder> OutOrder_BillingCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _OutOrder_BillingCompanyAddress);
-        set => _OutOrder_BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_BillingCompanyAddress); }
+        set { _OutOrder_BillingCompanyAddress = value; }
     }
 
     public bool OutOrder_BillingCompanyAddress_IsLoaded
@@ -626,8 +626,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrder> _OutOrder_DeliveryCompanyAddress;
     public virtual ICollection<OutOrder> OutOrder_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _OutOrder_DeliveryCompanyAddress);
-        set => _OutOrder_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_DeliveryCompanyAddress); }
+        set { _OutOrder_DeliveryCompanyAddress = value; }
     }
 
     public bool OutOrder_DeliveryCompanyAddress_IsLoaded
@@ -646,8 +646,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrder> _OutOrder_IssuerCompanyAddress;
     public virtual ICollection<OutOrder> OutOrder_IssuerCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _OutOrder_IssuerCompanyAddress);
-        set => _OutOrder_IssuerCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_IssuerCompanyAddress); }
+        set { _OutOrder_IssuerCompanyAddress = value; }
     }
 
     public bool OutOrder_IssuerCompanyAddress_IsLoaded
@@ -666,8 +666,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Picking> _Picking_DeliveryCompanyAddress;
     public virtual ICollection<Picking> Picking_DeliveryCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _Picking_DeliveryCompanyAddress);
-        set => _Picking_DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _Picking_DeliveryCompanyAddress); }
+        set { _Picking_DeliveryCompanyAddress = value; }
     }
 
     public bool Picking_DeliveryCompanyAddress_IsLoaded
@@ -686,8 +686,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TourplanPos> _TourplanPos_CompanyAddress;
     public virtual ICollection<TourplanPos> TourplanPos_CompanyAddress
     {
-        get => LazyLoader.Load(this, ref _TourplanPos_CompanyAddress);
-        set => _TourplanPos_CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _TourplanPos_CompanyAddress); }
+        set { _TourplanPos_CompanyAddress = value; }
     }
 
     public bool TourplanPos_CompanyAddress_IsLoaded
@@ -706,8 +706,8 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<UserSettings> _UserSettings_InvoiceCompanyAddress;
     public virtual ICollection<UserSettings> UserSettings_InvoiceCompanyAddress
     {
-        get => LazyLoader.Load(this, ref _UserSettings_InvoiceCompanyAddress);
-        set => _UserSettings_InvoiceCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _UserSettings_InvoiceCompanyAddress); }
+        set { _UserSettings_InvoiceCompanyAddress = value; }
     }
 
     public bool UserSettings_InvoiceCompanyAddress_IsLoaded

@@ -156,8 +156,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private LabOrder _LabOrder1_BasedOnTemplate;
     public virtual LabOrder LabOrder1_BasedOnTemplate
     { 
-        get => LazyLoader.Load(this, ref _LabOrder1_BasedOnTemplate);
-        set => _LabOrder1_BasedOnTemplate = value;
+        get { return LazyLoader.Load(this, ref _LabOrder1_BasedOnTemplate); } 
+        set { SetProperty<LabOrder>(ref _LabOrder1_BasedOnTemplate, value); }
     }
 
     public bool LabOrder1_BasedOnTemplate_IsLoaded
@@ -176,8 +176,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private FacilityLot _FacilityLot;
     public virtual FacilityLot FacilityLot
     { 
-        get => LazyLoader.Load(this, ref _FacilityLot);
-        set => _FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityLot); } 
+        set { SetProperty<FacilityLot>(ref _FacilityLot, value); }
     }
 
     public bool FacilityLot_IsLoaded
@@ -196,8 +196,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -216,8 +216,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<LabOrder> _LabOrder_BasedOnTemplate;
     public virtual ICollection<LabOrder> LabOrder_BasedOnTemplate
     {
-        get => LazyLoader.Load(this, ref _LabOrder_BasedOnTemplate);
-        set => _LabOrder_BasedOnTemplate = value;
+        get { return LazyLoader.Load(this, ref _LabOrder_BasedOnTemplate); }
+        set { _LabOrder_BasedOnTemplate = value; }
     }
 
     public bool LabOrder_BasedOnTemplate_IsLoaded
@@ -236,8 +236,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<LabOrderPos> _LabOrderPos_LabOrder;
     public virtual ICollection<LabOrderPos> LabOrderPos_LabOrder
     {
-        get => LazyLoader.Load(this, ref _LabOrderPos_LabOrder);
-        set => _LabOrderPos_LabOrder = value;
+        get { return LazyLoader.Load(this, ref _LabOrderPos_LabOrder); }
+        set { _LabOrderPos_LabOrder = value; }
     }
 
     public bool LabOrderPos_LabOrder_IsLoaded
@@ -256,8 +256,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDLabOrderState _MDLabOrderState;
     public virtual MDLabOrderState MDLabOrderState
     { 
-        get => LazyLoader.Load(this, ref _MDLabOrderState);
-        set => _MDLabOrderState = value;
+        get { return LazyLoader.Load(this, ref _MDLabOrderState); } 
+        set { SetProperty<MDLabOrderState>(ref _MDLabOrderState, value); }
     }
 
     public bool MDLabOrderState_IsLoaded
@@ -276,8 +276,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -296,8 +296,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded
@@ -316,8 +316,8 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded

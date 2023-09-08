@@ -170,8 +170,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private Invoice _Invoice;
     public virtual Invoice Invoice
     { 
-        get => LazyLoader.Load(this, ref _Invoice);
-        set => _Invoice = value;
+        get { return LazyLoader.Load(this, ref _Invoice); } 
+        set { SetProperty<Invoice>(ref _Invoice, value); }
     }
 
     public bool Invoice_IsLoaded
@@ -190,8 +190,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDCountrySalesTax _MDCountrySalesTax;
     public virtual MDCountrySalesTax MDCountrySalesTax
     { 
-        get => LazyLoader.Load(this, ref _MDCountrySalesTax);
-        set => _MDCountrySalesTax = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTax); } 
+        set { SetProperty<MDCountrySalesTax>(ref _MDCountrySalesTax, value); }
     }
 
     public bool MDCountrySalesTax_IsLoaded
@@ -210,8 +210,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDCountrySalesTaxMDMaterialGroup _MDCountrySalesTaxMDMaterialGroup;
     public virtual MDCountrySalesTaxMDMaterialGroup MDCountrySalesTaxMDMaterialGroup
     { 
-        get => LazyLoader.Load(this, ref _MDCountrySalesTaxMDMaterialGroup);
-        set => _MDCountrySalesTaxMDMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTaxMDMaterialGroup); } 
+        set { SetProperty<MDCountrySalesTaxMDMaterialGroup>(ref _MDCountrySalesTaxMDMaterialGroup, value); }
     }
 
     public bool MDCountrySalesTaxMDMaterialGroup_IsLoaded
@@ -230,8 +230,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDCountrySalesTaxMaterial _MDCountrySalesTaxMaterial;
     public virtual MDCountrySalesTaxMaterial MDCountrySalesTaxMaterial
     { 
-        get => LazyLoader.Load(this, ref _MDCountrySalesTaxMaterial);
-        set => _MDCountrySalesTaxMaterial = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTaxMaterial); } 
+        set { SetProperty<MDCountrySalesTaxMaterial>(ref _MDCountrySalesTaxMaterial, value); }
     }
 
     public bool MDCountrySalesTaxMaterial_IsLoaded
@@ -250,8 +250,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -270,8 +270,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -290,8 +290,8 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded

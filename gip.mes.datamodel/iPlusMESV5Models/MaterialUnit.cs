@@ -121,8 +121,8 @@ public partial class MaterialUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -141,8 +141,8 @@ public partial class MaterialUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDUnit _ToMDUnit;
     public virtual MDUnit ToMDUnit
     { 
-        get => LazyLoader.Load(this, ref _ToMDUnit);
-        set => _ToMDUnit = value;
+        get { return LazyLoader.Load(this, ref _ToMDUnit); } 
+        set { SetProperty<MDUnit>(ref _ToMDUnit, value); }
     }
 
     public bool ToMDUnit_IsLoaded

@@ -142,8 +142,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private InRequest _InRequest;
     public virtual InRequest InRequest
     { 
-        get => LazyLoader.Load(this, ref _InRequest);
-        set => _InRequest = value;
+        get { return LazyLoader.Load(this, ref _InRequest); } 
+        set { SetProperty<InRequest>(ref _InRequest, value); }
     }
 
     public bool InRequest_IsLoaded
@@ -162,8 +162,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequestConfig> _InRequestConfig_ParentInRequestConfig;
     public virtual ICollection<InRequestConfig> InRequestConfig_ParentInRequestConfig
     {
-        get => LazyLoader.Load(this, ref _InRequestConfig_ParentInRequestConfig);
-        set => _InRequestConfig_ParentInRequestConfig = value;
+        get { return LazyLoader.Load(this, ref _InRequestConfig_ParentInRequestConfig); }
+        set { _InRequestConfig_ParentInRequestConfig = value; }
     }
 
     public bool InRequestConfig_ParentInRequestConfig_IsLoaded
@@ -182,8 +182,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -202,8 +202,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private InRequestConfig _InRequestConfig1_ParentInRequestConfig;
     public virtual InRequestConfig InRequestConfig1_ParentInRequestConfig
     { 
-        get => LazyLoader.Load(this, ref _InRequestConfig1_ParentInRequestConfig);
-        set => _InRequestConfig1_ParentInRequestConfig = value;
+        get { return LazyLoader.Load(this, ref _InRequestConfig1_ParentInRequestConfig); } 
+        set { SetProperty<InRequestConfig>(ref _InRequestConfig1_ParentInRequestConfig, value); }
     }
 
     public bool InRequestConfig1_ParentInRequestConfig_IsLoaded
@@ -222,8 +222,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -242,8 +242,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -262,8 +262,8 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

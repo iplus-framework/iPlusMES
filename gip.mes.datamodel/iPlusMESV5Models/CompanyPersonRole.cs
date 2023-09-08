@@ -86,8 +86,8 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     private CompanyAddressDepartment _CompanyAddressDepartment;
     public virtual CompanyAddressDepartment CompanyAddressDepartment
     { 
-        get => LazyLoader.Load(this, ref _CompanyAddressDepartment);
-        set => _CompanyAddressDepartment = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddressDepartment); } 
+        set { SetProperty<CompanyAddressDepartment>(ref _CompanyAddressDepartment, value); }
     }
 
     public bool CompanyAddressDepartment_IsLoaded
@@ -106,8 +106,8 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     private CompanyPerson _CompanyPerson;
     public virtual CompanyPerson CompanyPerson
     { 
-        get => LazyLoader.Load(this, ref _CompanyPerson);
-        set => _CompanyPerson = value;
+        get { return LazyLoader.Load(this, ref _CompanyPerson); } 
+        set { SetProperty<CompanyPerson>(ref _CompanyPerson, value); }
     }
 
     public bool CompanyPerson_IsLoaded
@@ -126,8 +126,8 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     private ACClass _VBiRoleACClass;
     public virtual ACClass VBiRoleACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiRoleACClass);
-        set => _VBiRoleACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiRoleACClass); } 
+        set { SetProperty<ACClass>(ref _VBiRoleACClass, value); }
     }
 
     public bool VBiRoleACClass_IsLoaded

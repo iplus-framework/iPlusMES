@@ -100,8 +100,8 @@ public partial class MDProcessErrorAction : VBEntityObject, IInsertInfo, IUpdate
     private ICollection<MDGMPAdditive> _MDGMPAdditive_MDProcessErrorAction;
     public virtual ICollection<MDGMPAdditive> MDGMPAdditive_MDProcessErrorAction
     {
-        get => LazyLoader.Load(this, ref _MDGMPAdditive_MDProcessErrorAction);
-        set => _MDGMPAdditive_MDProcessErrorAction = value;
+        get { return LazyLoader.Load(this, ref _MDGMPAdditive_MDProcessErrorAction); }
+        set { _MDGMPAdditive_MDProcessErrorAction = value; }
     }
 
     public bool MDGMPAdditive_MDProcessErrorAction_IsLoaded

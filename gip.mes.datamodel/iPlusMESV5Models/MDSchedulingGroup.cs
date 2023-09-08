@@ -86,8 +86,8 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
     private ICollection<FacilityMDSchedulingGroup> _FacilityMDSchedulingGroup_MDSchedulingGroup;
     public virtual ICollection<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDSchedulingGroup
     {
-        get => LazyLoader.Load(this, ref _FacilityMDSchedulingGroup_MDSchedulingGroup);
-        set => _FacilityMDSchedulingGroup_MDSchedulingGroup = value;
+        get { return LazyLoader.Load(this, ref _FacilityMDSchedulingGroup_MDSchedulingGroup); }
+        set { _FacilityMDSchedulingGroup_MDSchedulingGroup = value; }
     }
 
     public bool FacilityMDSchedulingGroup_MDSchedulingGroup_IsLoaded
@@ -106,8 +106,8 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
     private ICollection<MDSchedulingGroupWF> _MDSchedulingGroupWF_MDSchedulingGroup;
     public virtual ICollection<MDSchedulingGroupWF> MDSchedulingGroupWF_MDSchedulingGroup
     {
-        get => LazyLoader.Load(this, ref _MDSchedulingGroupWF_MDSchedulingGroup);
-        set => _MDSchedulingGroupWF_MDSchedulingGroup = value;
+        get { return LazyLoader.Load(this, ref _MDSchedulingGroupWF_MDSchedulingGroup); }
+        set { _MDSchedulingGroupWF_MDSchedulingGroup = value; }
     }
 
     public bool MDSchedulingGroupWF_MDSchedulingGroup_IsLoaded

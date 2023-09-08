@@ -44,8 +44,8 @@ public partial class TandTv3MixPointInOrderPos : VBEntityObject
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -64,8 +64,8 @@ public partial class TandTv3MixPointInOrderPos : VBEntityObject
     private TandTv3MixPoint _TandTv3MixPoint;
     public virtual TandTv3MixPoint TandTv3MixPoint
     { 
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint);
-        set => _TandTv3MixPoint = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint); } 
+        set { SetProperty<TandTv3MixPoint>(ref _TandTv3MixPoint, value); }
     }
 
     public bool TandTv3MixPoint_IsLoaded

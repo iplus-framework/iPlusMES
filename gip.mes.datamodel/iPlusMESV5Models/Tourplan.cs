@@ -233,8 +233,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _Company;
     public virtual Company Company
     { 
-        get => LazyLoader.Load(this, ref _Company);
-        set => _Company = value;
+        get { return LazyLoader.Load(this, ref _Company); } 
+        set { SetProperty<Company>(ref _Company, value); }
     }
 
     public bool Company_IsLoaded
@@ -253,8 +253,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTour _MDTour;
     public virtual MDTour MDTour
     { 
-        get => LazyLoader.Load(this, ref _MDTour);
-        set => _MDTour = value;
+        get { return LazyLoader.Load(this, ref _MDTour); } 
+        set { SetProperty<MDTour>(ref _MDTour, value); }
     }
 
     public bool MDTour_IsLoaded
@@ -273,8 +273,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTourplanState _MDTourplanState;
     public virtual MDTourplanState MDTourplanState
     { 
-        get => LazyLoader.Load(this, ref _MDTourplanState);
-        set => _MDTourplanState = value;
+        get { return LazyLoader.Load(this, ref _MDTourplanState); } 
+        set { SetProperty<MDTourplanState>(ref _MDTourplanState, value); }
     }
 
     public bool MDTourplanState_IsLoaded
@@ -293,8 +293,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Picking> _Picking_Tourplan;
     public virtual ICollection<Picking> Picking_Tourplan
     {
-        get => LazyLoader.Load(this, ref _Picking_Tourplan);
-        set => _Picking_Tourplan = value;
+        get { return LazyLoader.Load(this, ref _Picking_Tourplan); }
+        set { _Picking_Tourplan = value; }
     }
 
     public bool Picking_Tourplan_IsLoaded
@@ -313,8 +313,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TourplanConfig> _TourplanConfig_Tourplan;
     public virtual ICollection<TourplanConfig> TourplanConfig_Tourplan
     {
-        get => LazyLoader.Load(this, ref _TourplanConfig_Tourplan);
-        set => _TourplanConfig_Tourplan = value;
+        get { return LazyLoader.Load(this, ref _TourplanConfig_Tourplan); }
+        set { _TourplanConfig_Tourplan = value; }
     }
 
     public bool TourplanConfig_Tourplan_IsLoaded
@@ -333,8 +333,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TourplanPos> _TourplanPos_Tourplan;
     public virtual ICollection<TourplanPos> TourplanPos_Tourplan
     {
-        get => LazyLoader.Load(this, ref _TourplanPos_Tourplan);
-        set => _TourplanPos_Tourplan = value;
+        get { return LazyLoader.Load(this, ref _TourplanPos_Tourplan); }
+        set { _TourplanPos_Tourplan = value; }
     }
 
     public bool TourplanPos_Tourplan_IsLoaded
@@ -353,8 +353,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _TrailerFacility;
     public virtual Facility TrailerFacility
     { 
-        get => LazyLoader.Load(this, ref _TrailerFacility);
-        set => _TrailerFacility = value;
+        get { return LazyLoader.Load(this, ref _TrailerFacility); } 
+        set { SetProperty<Facility>(ref _TrailerFacility, value); }
     }
 
     public bool TrailerFacility_IsLoaded
@@ -373,8 +373,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _VehicleFacility;
     public virtual Facility VehicleFacility
     { 
-        get => LazyLoader.Load(this, ref _VehicleFacility);
-        set => _VehicleFacility = value;
+        get { return LazyLoader.Load(this, ref _VehicleFacility); } 
+        set { SetProperty<Facility>(ref _VehicleFacility, value); }
     }
 
     public bool VehicleFacility_IsLoaded
@@ -393,8 +393,8 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     private VisitorVoucher _VisitorVoucher;
     public virtual VisitorVoucher VisitorVoucher
     { 
-        get => LazyLoader.Load(this, ref _VisitorVoucher);
-        set => _VisitorVoucher = value;
+        get { return LazyLoader.Load(this, ref _VisitorVoucher); } 
+        set { SetProperty<VisitorVoucher>(ref _VisitorVoucher, value); }
     }
 
     public bool VisitorVoucher_IsLoaded

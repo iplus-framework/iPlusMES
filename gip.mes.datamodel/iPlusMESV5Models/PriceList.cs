@@ -100,8 +100,8 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCurrency _MDCurrency;
     public virtual MDCurrency MDCurrency
     { 
-        get => LazyLoader.Load(this, ref _MDCurrency);
-        set => _MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _MDCurrency); } 
+        set { SetProperty<MDCurrency>(ref _MDCurrency, value); }
     }
 
     public bool MDCurrency_IsLoaded
@@ -120,8 +120,8 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PriceListMaterial> _PriceListMaterial_PriceList;
     public virtual ICollection<PriceListMaterial> PriceListMaterial_PriceList
     {
-        get => LazyLoader.Load(this, ref _PriceListMaterial_PriceList);
-        set => _PriceListMaterial_PriceList = value;
+        get { return LazyLoader.Load(this, ref _PriceListMaterial_PriceList); }
+        set { _PriceListMaterial_PriceList = value; }
     }
 
     public bool PriceListMaterial_PriceList_IsLoaded

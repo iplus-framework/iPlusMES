@@ -405,7 +405,7 @@ namespace gip.bso.masterdata
             if (e.PropertyName == "MaterialID")
                 OnPropertyChanged(nameof(DialogTemplateList));
 
-            if (e.PropertyName == "InOrderPosID")
+            if (e.PropertyName == "InOrderPosID" || e.PropertyName == "InOrderPos")
             {
                 if (CurrentLabOrder != null && CurrentLabOrder.InOrderPos != null)
                     CurrentLabOrder.Material = CurrentLabOrder.InOrderPos.Material;
@@ -449,12 +449,12 @@ namespace gip.bso.masterdata
         /// Ruft die Liste der Laborvorlagen im Laborauftragsdialog ab.
         /// </summary>
         [ACPropertyInfo(710, "Dialog", "en{'Template'}de{'Vorlage'}", "DialogTemplateList", false)]
-        public IQueryable<LabOrder> DialogTemplateList
+        public IEnumerable<LabOrder> DialogTemplateList
         {
             get
             {
                 if (CurrentLabOrder != null)
-                    return LabOrderManager.ReturnLabOrderTemplateList(DatabaseApp).Where(c => c.MaterialID == CurrentLabOrder.MaterialID);
+                    return LabOrderManager.ReturnLabOrderTemplateList(DatabaseApp).Where(c => c.MaterialID == CurrentLabOrder.MaterialID).ToList();
                 return null;
             }
         }

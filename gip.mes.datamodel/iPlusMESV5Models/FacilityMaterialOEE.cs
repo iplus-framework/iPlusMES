@@ -184,8 +184,8 @@ public partial class FacilityMaterialOEE : VBEntityObject, IInsertInfo, IUpdateI
     private FacilityMaterial _FacilityMaterial;
     public virtual FacilityMaterial FacilityMaterial
     { 
-        get => LazyLoader.Load(this, ref _FacilityMaterial);
-        set => _FacilityMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityMaterial); } 
+        set { SetProperty<FacilityMaterial>(ref _FacilityMaterial, value); }
     }
 
     public bool FacilityMaterial_IsLoaded

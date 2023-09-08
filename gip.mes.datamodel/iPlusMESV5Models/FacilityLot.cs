@@ -149,8 +149,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardFacilityLot;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityLot);
-        set => _FacilityBookingCharge_InwardFacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityLot); }
+        set { _FacilityBookingCharge_InwardFacilityLot = value; }
     }
 
     public bool FacilityBookingCharge_InwardFacilityLot_IsLoaded
@@ -169,8 +169,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardFacilityLot;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityLot);
-        set => _FacilityBookingCharge_OutwardFacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityLot); }
+        set { _FacilityBookingCharge_OutwardFacilityLot = value; }
     }
 
     public bool FacilityBookingCharge_OutwardFacilityLot_IsLoaded
@@ -189,8 +189,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_InwardFacilityLot;
     public virtual ICollection<FacilityBooking> FacilityBooking_InwardFacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityLot);
-        set => _FacilityBooking_InwardFacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityLot); }
+        set { _FacilityBooking_InwardFacilityLot = value; }
     }
 
     public bool FacilityBooking_InwardFacilityLot_IsLoaded
@@ -209,8 +209,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_OutwardFacilityLot;
     public virtual ICollection<FacilityBooking> FacilityBooking_OutwardFacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityLot);
-        set => _FacilityBooking_OutwardFacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityLot); }
+        set { _FacilityBooking_OutwardFacilityLot = value; }
     }
 
     public bool FacilityBooking_OutwardFacilityLot_IsLoaded
@@ -229,8 +229,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityCharge> _FacilityCharge_FacilityLot;
     public virtual ICollection<FacilityCharge> FacilityCharge_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityCharge_FacilityLot);
-        set => _FacilityCharge_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge_FacilityLot); }
+        set { _FacilityCharge_FacilityLot = value; }
     }
 
     public bool FacilityCharge_FacilityLot_IsLoaded
@@ -249,8 +249,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityLotStock> _FacilityLotStock_FacilityLot;
     public virtual ICollection<FacilityLotStock> FacilityLotStock_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityLotStock_FacilityLot);
-        set => _FacilityLotStock_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityLotStock_FacilityLot); }
+        set { _FacilityLotStock_FacilityLot = value; }
     }
 
     public bool FacilityLotStock_FacilityLot_IsLoaded
@@ -269,8 +269,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityReservation> _FacilityReservation_FacilityLot;
     public virtual ICollection<FacilityReservation> FacilityReservation_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityReservation_FacilityLot);
-        set => _FacilityReservation_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityReservation_FacilityLot); }
+        set { _FacilityReservation_FacilityLot = value; }
     }
 
     public bool FacilityReservation_FacilityLot_IsLoaded
@@ -289,8 +289,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<LabOrder> _LabOrder_FacilityLot;
     public virtual ICollection<LabOrder> LabOrder_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _LabOrder_FacilityLot);
-        set => _LabOrder_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _LabOrder_FacilityLot); }
+        set { _LabOrder_FacilityLot = value; }
     }
 
     public bool LabOrder_FacilityLot_IsLoaded
@@ -309,8 +309,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDReleaseState _MDReleaseState;
     public virtual MDReleaseState MDReleaseState
     { 
-        get => LazyLoader.Load(this, ref _MDReleaseState);
-        set => _MDReleaseState = value;
+        get { return LazyLoader.Load(this, ref _MDReleaseState); } 
+        set { SetProperty<MDReleaseState>(ref _MDReleaseState, value); }
     }
 
     public bool MDReleaseState_IsLoaded
@@ -329,8 +329,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -349,8 +349,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_FacilityLot;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_FacilityLot);
-        set => _ProdOrderPartslistPos_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_FacilityLot); }
+        set { _ProdOrderPartslistPos_FacilityLot = value; }
     }
 
     public bool ProdOrderPartslistPos_FacilityLot_IsLoaded
@@ -369,8 +369,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPosFacilityLot> _ProdOrderPartslistPosFacilityLot_FacilityLot;
     public virtual ICollection<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosFacilityLot_FacilityLot);
-        set => _ProdOrderPartslistPosFacilityLot_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosFacilityLot_FacilityLot); }
+        set { _ProdOrderPartslistPosFacilityLot_FacilityLot = value; }
     }
 
     public bool ProdOrderPartslistPosFacilityLot_FacilityLot_IsLoaded
@@ -389,8 +389,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TandTv3MixPoint> _TandTv3MixPoint_InwardLot;
     public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_InwardLot
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint_InwardLot);
-        set => _TandTv3MixPoint_InwardLot = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint_InwardLot); }
+        set { _TandTv3MixPoint_InwardLot = value; }
     }
 
     public bool TandTv3MixPoint_InwardLot_IsLoaded
@@ -409,8 +409,8 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TandTv3MixPointFacilityLot> _TandTv3MixPointFacilityLot_FacilityLot;
     public virtual ICollection<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_FacilityLot
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointFacilityLot_FacilityLot);
-        set => _TandTv3MixPointFacilityLot_FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPointFacilityLot_FacilityLot); }
+        set { _TandTv3MixPointFacilityLot_FacilityLot = value; }
     }
 
     public bool TandTv3MixPointFacilityLot_FacilityLot_IsLoaded

@@ -142,8 +142,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOfferConfig> _OutOfferConfig_ParentOutOfferConfig;
     public virtual ICollection<OutOfferConfig> OutOfferConfig_ParentOutOfferConfig
     {
-        get => LazyLoader.Load(this, ref _OutOfferConfig_ParentOutOfferConfig);
-        set => _OutOfferConfig_ParentOutOfferConfig = value;
+        get { return LazyLoader.Load(this, ref _OutOfferConfig_ParentOutOfferConfig); }
+        set { _OutOfferConfig_ParentOutOfferConfig = value; }
     }
 
     public bool OutOfferConfig_ParentOutOfferConfig_IsLoaded
@@ -162,8 +162,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -182,8 +182,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private OutOffer _OutOffer;
     public virtual OutOffer OutOffer
     { 
-        get => LazyLoader.Load(this, ref _OutOffer);
-        set => _OutOffer = value;
+        get { return LazyLoader.Load(this, ref _OutOffer); } 
+        set { SetProperty<OutOffer>(ref _OutOffer, value); }
     }
 
     public bool OutOffer_IsLoaded
@@ -202,8 +202,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private OutOfferConfig _OutOfferConfig1_ParentOutOfferConfig;
     public virtual OutOfferConfig OutOfferConfig1_ParentOutOfferConfig
     { 
-        get => LazyLoader.Load(this, ref _OutOfferConfig1_ParentOutOfferConfig);
-        set => _OutOfferConfig1_ParentOutOfferConfig = value;
+        get { return LazyLoader.Load(this, ref _OutOfferConfig1_ParentOutOfferConfig); } 
+        set { SetProperty<OutOfferConfig>(ref _OutOfferConfig1_ParentOutOfferConfig, value); }
     }
 
     public bool OutOfferConfig1_ParentOutOfferConfig_IsLoaded
@@ -222,8 +222,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -242,8 +242,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -262,8 +262,8 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

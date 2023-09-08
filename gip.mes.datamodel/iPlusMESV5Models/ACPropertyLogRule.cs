@@ -72,8 +72,8 @@ public partial class ACPropertyLogRule : VBEntityObject, IInsertInfo, IUpdateInf
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded

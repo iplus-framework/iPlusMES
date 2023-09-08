@@ -149,8 +149,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PartslistConfig> _PartslistConfig_ParentPartslistConfig;
     public virtual ICollection<PartslistConfig> PartslistConfig_ParentPartslistConfig
     {
-        get => LazyLoader.Load(this, ref _PartslistConfig_ParentPartslistConfig);
-        set => _PartslistConfig_ParentPartslistConfig = value;
+        get { return LazyLoader.Load(this, ref _PartslistConfig_ParentPartslistConfig); }
+        set { _PartslistConfig_ParentPartslistConfig = value; }
     }
 
     public bool PartslistConfig_ParentPartslistConfig_IsLoaded
@@ -169,8 +169,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -189,8 +189,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private PartslistConfig _PartslistConfig1_ParentPartslistConfig;
     public virtual PartslistConfig PartslistConfig1_ParentPartslistConfig
     { 
-        get => LazyLoader.Load(this, ref _PartslistConfig1_ParentPartslistConfig);
-        set => _PartslistConfig1_ParentPartslistConfig = value;
+        get { return LazyLoader.Load(this, ref _PartslistConfig1_ParentPartslistConfig); } 
+        set { SetProperty<PartslistConfig>(ref _PartslistConfig1_ParentPartslistConfig, value); }
     }
 
     public bool PartslistConfig1_ParentPartslistConfig_IsLoaded
@@ -209,8 +209,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Partslist _Partslist;
     public virtual Partslist Partslist
     { 
-        get => LazyLoader.Load(this, ref _Partslist);
-        set => _Partslist = value;
+        get { return LazyLoader.Load(this, ref _Partslist); } 
+        set { SetProperty<Partslist>(ref _Partslist, value); }
     }
 
     public bool Partslist_IsLoaded
@@ -229,8 +229,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -249,8 +249,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -269,8 +269,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded
@@ -289,8 +289,8 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

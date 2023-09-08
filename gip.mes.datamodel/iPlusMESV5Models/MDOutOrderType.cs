@@ -100,8 +100,8 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private ICollection<OutOffer> _OutOffer_MDOutOrderType;
     public virtual ICollection<OutOffer> OutOffer_MDOutOrderType
     {
-        get => LazyLoader.Load(this, ref _OutOffer_MDOutOrderType);
-        set => _OutOffer_MDOutOrderType = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_MDOutOrderType); }
+        set { _OutOffer_MDOutOrderType = value; }
     }
 
     public bool OutOffer_MDOutOrderType_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private ICollection<OutOrder> _OutOrder_MDOutOrderType;
     public virtual ICollection<OutOrder> OutOrder_MDOutOrderType
     {
-        get => LazyLoader.Load(this, ref _OutOrder_MDOutOrderType);
-        set => _OutOrder_MDOutOrderType = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_MDOutOrderType); }
+        set { _OutOrder_MDOutOrderType = value; }
     }
 
     public bool OutOrder_MDOutOrderType_IsLoaded

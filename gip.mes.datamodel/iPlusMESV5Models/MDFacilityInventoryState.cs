@@ -100,8 +100,8 @@ public partial class MDFacilityInventoryState : VBEntityObject, IInsertInfo, IUp
     private ICollection<FacilityInventory> _FacilityInventory_MDFacilityInventoryState;
     public virtual ICollection<FacilityInventory> FacilityInventory_MDFacilityInventoryState
     {
-        get => LazyLoader.Load(this, ref _FacilityInventory_MDFacilityInventoryState);
-        set => _FacilityInventory_MDFacilityInventoryState = value;
+        get { return LazyLoader.Load(this, ref _FacilityInventory_MDFacilityInventoryState); }
+        set { _FacilityInventory_MDFacilityInventoryState = value; }
     }
 
     public bool FacilityInventory_MDFacilityInventoryState_IsLoaded

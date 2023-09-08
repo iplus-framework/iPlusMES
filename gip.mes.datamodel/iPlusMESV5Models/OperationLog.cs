@@ -107,8 +107,8 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACProgramLog _ACProgramLog;
     public virtual ACProgramLog ACProgramLog
     { 
-        get => LazyLoader.Load(this, ref _ACProgramLog);
-        set => _ACProgramLog = value;
+        get { return LazyLoader.Load(this, ref _ACProgramLog); } 
+        set { SetProperty<ACProgramLog>(ref _ACProgramLog, value); }
     }
 
     public bool ACProgramLog_IsLoaded
@@ -127,8 +127,8 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     private FacilityCharge _FacilityCharge;
     public virtual FacilityCharge FacilityCharge
     { 
-        get => LazyLoader.Load(this, ref _FacilityCharge);
-        set => _FacilityCharge = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge); } 
+        set { SetProperty<FacilityCharge>(ref _FacilityCharge, value); }
     }
 
     public bool FacilityCharge_IsLoaded
@@ -147,8 +147,8 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _RefACClass;
     public virtual ACClass RefACClass
     { 
-        get => LazyLoader.Load(this, ref _RefACClass);
-        set => _RefACClass = value;
+        get { return LazyLoader.Load(this, ref _RefACClass); } 
+        set { SetProperty<ACClass>(ref _RefACClass, value); }
     }
 
     public bool RefACClass_IsLoaded

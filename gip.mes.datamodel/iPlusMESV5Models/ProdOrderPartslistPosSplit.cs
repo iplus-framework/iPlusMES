@@ -93,8 +93,8 @@ public partial class ProdOrderPartslistPosSplit : VBEntityObject, IInsertInfo, I
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded

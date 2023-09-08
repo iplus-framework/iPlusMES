@@ -100,8 +100,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDProdOrderState _MDProdOrderState;
     public virtual MDProdOrderState MDProdOrderState
     { 
-        get => LazyLoader.Load(this, ref _MDProdOrderState);
-        set => _MDProdOrderState = value;
+        get { return LazyLoader.Load(this, ref _MDProdOrderState); } 
+        set { SetProperty<MDProdOrderState>(ref _MDProdOrderState, value); }
     }
 
     public bool MDProdOrderState_IsLoaded
@@ -120,8 +120,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     private ProdOrderBatchPlan _ProdOrderBatchPlan;
     public virtual ProdOrderBatchPlan ProdOrderBatchPlan
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderBatchPlan);
-        set => _ProdOrderBatchPlan = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan); } 
+        set { SetProperty<ProdOrderBatchPlan>(ref _ProdOrderBatchPlan, value); }
     }
 
     public bool ProdOrderBatchPlan_IsLoaded
@@ -140,8 +140,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     private ProdOrderPartslist _ProdOrderPartslist;
     public virtual ProdOrderPartslist ProdOrderPartslist
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist);
-        set => _ProdOrderPartslist = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist); } 
+        set { SetProperty<ProdOrderPartslist>(ref _ProdOrderPartslist, value); }
     }
 
     public bool ProdOrderPartslist_IsLoaded
@@ -160,8 +160,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPos> _ProdOrderPartslistPos_ProdOrderBatch;
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ProdOrderBatch
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos_ProdOrderBatch);
-        set => _ProdOrderPartslistPos_ProdOrderBatch = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_ProdOrderBatch); }
+        set { _ProdOrderPartslistPos_ProdOrderBatch = value; }
     }
 
     public bool ProdOrderPartslistPos_ProdOrderBatch_IsLoaded
@@ -180,8 +180,8 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslistPosRelation> _ProdOrderPartslistPosRelation_ProdOrderBatch;
     public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ProdOrderBatch
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_ProdOrderBatch);
-        set => _ProdOrderPartslistPosRelation_ProdOrderBatch = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_ProdOrderBatch); }
+        set { _ProdOrderPartslistPosRelation_ProdOrderBatch = value; }
     }
 
     public bool ProdOrderPartslistPosRelation_ProdOrderBatch_IsLoaded

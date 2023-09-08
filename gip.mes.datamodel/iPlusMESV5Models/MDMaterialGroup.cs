@@ -107,8 +107,8 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
     private ICollection<MDCountrySalesTaxMDMaterialGroup> _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup;
     public virtual ICollection<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup);
-        set => _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup); }
+        set { _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup = value; }
     }
 
     public bool MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup_IsLoaded
@@ -127,8 +127,8 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
     private ICollection<Material> _Material_MDMaterialGroup;
     public virtual ICollection<Material> Material_MDMaterialGroup
     {
-        get => LazyLoader.Load(this, ref _Material_MDMaterialGroup);
-        set => _Material_MDMaterialGroup = value;
+        get { return LazyLoader.Load(this, ref _Material_MDMaterialGroup); }
+        set { _Material_MDMaterialGroup = value; }
     }
 
     public bool Material_MDMaterialGroup_IsLoaded

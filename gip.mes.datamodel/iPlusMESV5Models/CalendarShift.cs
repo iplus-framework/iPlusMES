@@ -100,8 +100,8 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     private Calendar _Calendar;
     public virtual Calendar Calendar
     { 
-        get => LazyLoader.Load(this, ref _Calendar);
-        set => _Calendar = value;
+        get { return LazyLoader.Load(this, ref _Calendar); } 
+        set { SetProperty<Calendar>(ref _Calendar, value); }
     }
 
     public bool Calendar_IsLoaded
@@ -120,8 +120,8 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CalendarShiftPerson> _CalendarShiftPerson_CalendarShift;
     public virtual ICollection<CalendarShiftPerson> CalendarShiftPerson_CalendarShift
     {
-        get => LazyLoader.Load(this, ref _CalendarShiftPerson_CalendarShift);
-        set => _CalendarShiftPerson_CalendarShift = value;
+        get { return LazyLoader.Load(this, ref _CalendarShiftPerson_CalendarShift); }
+        set { _CalendarShiftPerson_CalendarShift = value; }
     }
 
     public bool CalendarShiftPerson_CalendarShift_IsLoaded
@@ -140,8 +140,8 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTimeRange _MDTimeRange;
     public virtual MDTimeRange MDTimeRange
     { 
-        get => LazyLoader.Load(this, ref _MDTimeRange);
-        set => _MDTimeRange = value;
+        get { return LazyLoader.Load(this, ref _MDTimeRange); } 
+        set { SetProperty<MDTimeRange>(ref _MDTimeRange, value); }
     }
 
     public bool MDTimeRange_IsLoaded
@@ -160,8 +160,8 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACProject _VBiACProject;
     public virtual ACProject VBiACProject
     { 
-        get => LazyLoader.Load(this, ref _VBiACProject);
-        set => _VBiACProject = value;
+        get { return LazyLoader.Load(this, ref _VBiACProject); } 
+        set { SetProperty<ACProject>(ref _VBiACProject, value); }
     }
 
     public bool VBiACProject_IsLoaded

@@ -79,8 +79,8 @@ public partial class DemandProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private DemandOrder _DemandOrder;
     public virtual DemandOrder DemandOrder
     { 
-        get => LazyLoader.Load(this, ref _DemandOrder);
-        set => _DemandOrder = value;
+        get { return LazyLoader.Load(this, ref _DemandOrder); } 
+        set { SetProperty<DemandOrder>(ref _DemandOrder, value); }
     }
 
     public bool DemandOrder_IsLoaded

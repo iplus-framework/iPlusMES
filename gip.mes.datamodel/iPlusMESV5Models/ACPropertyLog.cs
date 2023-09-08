@@ -65,8 +65,8 @@ public partial class ACPropertyLog : VBEntityObject
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded
@@ -85,8 +85,8 @@ public partial class ACPropertyLog : VBEntityObject
     private ACClassProperty _ACClassProperty;
     public virtual ACClassProperty ACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _ACClassProperty);
-        set => _ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty); } 
+        set { SetProperty<ACClassProperty>(ref _ACClassProperty, value); }
     }
 
     public bool ACClassProperty_IsLoaded

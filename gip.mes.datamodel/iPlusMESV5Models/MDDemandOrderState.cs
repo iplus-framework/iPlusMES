@@ -100,8 +100,8 @@ public partial class MDDemandOrderState : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<DemandOrder> _DemandOrder_MDDemandOrderState;
     public virtual ICollection<DemandOrder> DemandOrder_MDDemandOrderState
     {
-        get => LazyLoader.Load(this, ref _DemandOrder_MDDemandOrderState);
-        set => _DemandOrder_MDDemandOrderState = value;
+        get { return LazyLoader.Load(this, ref _DemandOrder_MDDemandOrderState); }
+        set { _DemandOrder_MDDemandOrderState = value; }
     }
 
     public bool DemandOrder_MDDemandOrderState_IsLoaded

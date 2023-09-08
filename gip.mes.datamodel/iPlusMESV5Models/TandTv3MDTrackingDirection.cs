@@ -30,8 +30,8 @@ public partial class TandTv3MDTrackingDirection : VBEntityObject
     private ICollection<TandTv3FilterTracking> _TandTv3FilterTracking_TandTv3MDTrackingDirection;
     public virtual ICollection<TandTv3FilterTracking> TandTv3FilterTracking_TandTv3MDTrackingDirection
     {
-        get => LazyLoader.Load(this, ref _TandTv3FilterTracking_TandTv3MDTrackingDirection);
-        set => _TandTv3FilterTracking_TandTv3MDTrackingDirection = value;
+        get { return LazyLoader.Load(this, ref _TandTv3FilterTracking_TandTv3MDTrackingDirection); }
+        set { _TandTv3FilterTracking_TandTv3MDTrackingDirection = value; }
     }
 
     public bool TandTv3FilterTracking_TandTv3MDTrackingDirection_IsLoaded

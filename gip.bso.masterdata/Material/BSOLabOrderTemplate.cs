@@ -173,6 +173,16 @@ namespace gip.bso.masterdata
         }
         #endregion
 
+        //public bool IsEnabledUpdatePos()
+        //{
+        //    return SelectedLabOrderPos != null;
+        //}
+
+        //public void UpdatePos()
+        //{
+        //    OnPropertyChanged(nameof(SelectedLabOrderPos));
+        //}
+
         #region Execute-Helper-Handlers
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

@@ -93,8 +93,8 @@ public partial class FacilityPreBooking : VBEntityObject
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -113,8 +113,8 @@ public partial class FacilityPreBooking : VBEntityObject
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded
@@ -133,8 +133,8 @@ public partial class FacilityPreBooking : VBEntityObject
     private PickingPos _PickingPos;
     public virtual PickingPos PickingPos
     { 
-        get => LazyLoader.Load(this, ref _PickingPos);
-        set => _PickingPos = value;
+        get { return LazyLoader.Load(this, ref _PickingPos); } 
+        set { SetProperty<PickingPos>(ref _PickingPos, value); }
     }
 
     public bool PickingPos_IsLoaded
@@ -153,8 +153,8 @@ public partial class FacilityPreBooking : VBEntityObject
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded
@@ -173,8 +173,8 @@ public partial class FacilityPreBooking : VBEntityObject
     private ProdOrderPartslistPosRelation _ProdOrderPartslistPosRelation;
     public virtual ProdOrderPartslistPosRelation ProdOrderPartslistPosRelation
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation);
-        set => _ProdOrderPartslistPosRelation = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation); } 
+        set { SetProperty<ProdOrderPartslistPosRelation>(ref _ProdOrderPartslistPosRelation, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_IsLoaded
@@ -193,8 +193,8 @@ public partial class FacilityPreBooking : VBEntityObject
     private ICollection<TandTv3MixPointFacilityPreBooking> _TandTv3MixPointFacilityPreBooking_FacilityPreBooking;
     public virtual ICollection<TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking_FacilityPreBooking
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointFacilityPreBooking_FacilityPreBooking);
-        set => _TandTv3MixPointFacilityPreBooking_FacilityPreBooking = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPointFacilityPreBooking_FacilityPreBooking); }
+        set { _TandTv3MixPointFacilityPreBooking_FacilityPreBooking = value; }
     }
 
     public bool TandTv3MixPointFacilityPreBooking_FacilityPreBooking_IsLoaded

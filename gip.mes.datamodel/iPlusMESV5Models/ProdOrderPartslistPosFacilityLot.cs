@@ -79,8 +79,8 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosFacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot);
-        set => _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot); }
+        set { _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot = value; }
     }
 
     public bool FacilityBookingCharge_ProdOrderPartslistPosFacilityLot_IsLoaded
@@ -99,8 +99,8 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     private ICollection<FacilityBooking> _FacilityBooking_ProdOrderPartslistPosFacilityLot;
     public virtual ICollection<FacilityBooking> FacilityBooking_ProdOrderPartslistPosFacilityLot
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPosFacilityLot);
-        set => _FacilityBooking_ProdOrderPartslistPosFacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPosFacilityLot); }
+        set { _FacilityBooking_ProdOrderPartslistPosFacilityLot = value; }
     }
 
     public bool FacilityBooking_ProdOrderPartslistPosFacilityLot_IsLoaded
@@ -119,8 +119,8 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     private FacilityLot _FacilityLot;
     public virtual FacilityLot FacilityLot
     { 
-        get => LazyLoader.Load(this, ref _FacilityLot);
-        set => _FacilityLot = value;
+        get { return LazyLoader.Load(this, ref _FacilityLot); } 
+        set { SetProperty<FacilityLot>(ref _FacilityLot, value); }
     }
 
     public bool FacilityLot_IsLoaded
@@ -139,8 +139,8 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     private ProdOrderPartslistPos _ProdOrderPartslistPos;
     public virtual ProdOrderPartslistPos ProdOrderPartslistPos
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPos);
-        set => _ProdOrderPartslistPos = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos); } 
+        set { SetProperty<ProdOrderPartslistPos>(ref _ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_IsLoaded

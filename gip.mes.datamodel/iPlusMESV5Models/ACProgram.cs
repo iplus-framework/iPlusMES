@@ -114,8 +114,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassTask> _ACClassTask_ACProgram;
     public virtual ICollection<ACClassTask> ACClassTask_ACProgram
     {
-        get => LazyLoader.Load(this, ref _ACClassTask_ACProgram);
-        set => _ACClassTask_ACProgram = value;
+        get { return LazyLoader.Load(this, ref _ACClassTask_ACProgram); }
+        set { _ACClassTask_ACProgram = value; }
     }
 
     public bool ACClassTask_ACProgram_IsLoaded
@@ -134,8 +134,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACProgramConfig> _ACProgramConfig_ACProgram;
     public virtual ICollection<ACProgramConfig> ACProgramConfig_ACProgram
     {
-        get => LazyLoader.Load(this, ref _ACProgramConfig_ACProgram);
-        set => _ACProgramConfig_ACProgram = value;
+        get { return LazyLoader.Load(this, ref _ACProgramConfig_ACProgram); }
+        set { _ACProgramConfig_ACProgram = value; }
     }
 
     public bool ACProgramConfig_ACProgram_IsLoaded
@@ -154,8 +154,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACProgramLog> _ACProgramLog_ACProgram;
     public virtual ICollection<ACProgramLog> ACProgramLog_ACProgram
     {
-        get => LazyLoader.Load(this, ref _ACProgramLog_ACProgram);
-        set => _ACProgramLog_ACProgram = value;
+        get { return LazyLoader.Load(this, ref _ACProgramLog_ACProgram); }
+        set { _ACProgramLog_ACProgram = value; }
     }
 
     public bool ACProgramLog_ACProgram_IsLoaded
@@ -174,8 +174,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DemandOrderPos> _DemandOrderPos_ACProgram;
     public virtual ICollection<DemandOrderPos> DemandOrderPos_ACProgram
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPos_ACProgram);
-        set => _DemandOrderPos_ACProgram = value;
+        get { return LazyLoader.Load(this, ref _DemandOrderPos_ACProgram); }
+        set { _DemandOrderPos_ACProgram = value; }
     }
 
     public bool DemandOrderPos_ACProgram_IsLoaded
@@ -194,8 +194,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslist> _ProdOrderPartslist_VBiACProgram;
     public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_VBiACProgram
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist_VBiACProgram);
-        set => _ProdOrderPartslist_VBiACProgram = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist_VBiACProgram); }
+        set { _ProdOrderPartslist_VBiACProgram = value; }
     }
 
     public bool ProdOrderPartslist_VBiACProgram_IsLoaded
@@ -214,8 +214,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassMethod _ProgramACClassMethod;
     public virtual ACClassMethod ProgramACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _ProgramACClassMethod);
-        set => _ProgramACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _ProgramACClassMethod); } 
+        set { SetProperty<ACClassMethod>(ref _ProgramACClassMethod, value); }
     }
 
     public bool ProgramACClassMethod_IsLoaded
@@ -234,8 +234,8 @@ public partial class ACProgram : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _WorkflowTypeACClass;
     public virtual ACClass WorkflowTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _WorkflowTypeACClass);
-        set => _WorkflowTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _WorkflowTypeACClass); } 
+        set { SetProperty<ACClass>(ref _WorkflowTypeACClass, value); }
     }
 
     public bool WorkflowTypeACClass_IsLoaded

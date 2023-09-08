@@ -93,8 +93,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<Company> _Company_MDCurrency;
     public virtual ICollection<Company> Company_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _Company_MDCurrency);
-        set => _Company_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _Company_MDCurrency); }
+        set { _Company_MDCurrency = value; }
     }
 
     public bool Company_MDCurrency_IsLoaded
@@ -113,8 +113,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<InOrder> _InOrder_MDCurrency;
     public virtual ICollection<InOrder> InOrder_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _InOrder_MDCurrency);
-        set => _InOrder_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _InOrder_MDCurrency); }
+        set { _InOrder_MDCurrency = value; }
     }
 
     public bool InOrder_MDCurrency_IsLoaded
@@ -133,8 +133,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<Invoice> _Invoice_MDCurrency;
     public virtual ICollection<Invoice> Invoice_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _Invoice_MDCurrency);
-        set => _Invoice_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _Invoice_MDCurrency); }
+        set { _Invoice_MDCurrency = value; }
     }
 
     public bool Invoice_MDCurrency_IsLoaded
@@ -153,8 +153,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<MDCountry> _MDCountry_MDCurrency;
     public virtual ICollection<MDCountry> MDCountry_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _MDCountry_MDCurrency);
-        set => _MDCountry_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _MDCountry_MDCurrency); }
+        set { _MDCountry_MDCurrency = value; }
     }
 
     public bool MDCountry_MDCurrency_IsLoaded
@@ -173,8 +173,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<MDCurrencyExchange> _MDCurrencyExchange_MDCurrency;
     public virtual ICollection<MDCurrencyExchange> MDCurrencyExchange_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _MDCurrencyExchange_MDCurrency);
-        set => _MDCurrencyExchange_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _MDCurrencyExchange_MDCurrency); }
+        set { _MDCurrencyExchange_MDCurrency = value; }
     }
 
     public bool MDCurrencyExchange_MDCurrency_IsLoaded
@@ -193,8 +193,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<MDCurrencyExchange> _MDCurrencyExchange_ToMDCurrency;
     public virtual ICollection<MDCurrencyExchange> MDCurrencyExchange_ToMDCurrency
     {
-        get => LazyLoader.Load(this, ref _MDCurrencyExchange_ToMDCurrency);
-        set => _MDCurrencyExchange_ToMDCurrency = value;
+        get { return LazyLoader.Load(this, ref _MDCurrencyExchange_ToMDCurrency); }
+        set { _MDCurrencyExchange_ToMDCurrency = value; }
     }
 
     public bool MDCurrencyExchange_ToMDCurrency_IsLoaded
@@ -213,8 +213,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<OutOffer> _OutOffer_MDCurrency;
     public virtual ICollection<OutOffer> OutOffer_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _OutOffer_MDCurrency);
-        set => _OutOffer_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_MDCurrency); }
+        set { _OutOffer_MDCurrency = value; }
     }
 
     public bool OutOffer_MDCurrency_IsLoaded
@@ -233,8 +233,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<OutOrder> _OutOrder_MDCurrency;
     public virtual ICollection<OutOrder> OutOrder_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _OutOrder_MDCurrency);
-        set => _OutOrder_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_MDCurrency); }
+        set { _OutOrder_MDCurrency = value; }
     }
 
     public bool OutOrder_MDCurrency_IsLoaded
@@ -253,8 +253,8 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     private ICollection<PriceList> _PriceList_MDCurrency;
     public virtual ICollection<PriceList> PriceList_MDCurrency
     {
-        get => LazyLoader.Load(this, ref _PriceList_MDCurrency);
-        set => _PriceList_MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _PriceList_MDCurrency); }
+        set { _PriceList_MDCurrency = value; }
     }
 
     public bool PriceList_MDCurrency_IsLoaded

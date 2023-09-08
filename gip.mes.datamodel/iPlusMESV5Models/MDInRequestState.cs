@@ -100,8 +100,8 @@ public partial class MDInRequestState : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequest> _InRequest_MDInRequestState;
     public virtual ICollection<InRequest> InRequest_MDInRequestState
     {
-        get => LazyLoader.Load(this, ref _InRequest_MDInRequestState);
-        set => _InRequest_MDInRequestState = value;
+        get { return LazyLoader.Load(this, ref _InRequest_MDInRequestState); }
+        set { _InRequest_MDInRequestState = value; }
     }
 
     public bool InRequest_MDInRequestState_IsLoaded

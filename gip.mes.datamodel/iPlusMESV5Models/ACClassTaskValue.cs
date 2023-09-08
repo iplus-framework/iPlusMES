@@ -93,8 +93,8 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassProperty _ACClassProperty;
     public virtual ACClassProperty ACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _ACClassProperty);
-        set => _ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty); } 
+        set { SetProperty<ACClassProperty>(ref _ACClassProperty, value); }
     }
 
     public bool ACClassProperty_IsLoaded
@@ -113,8 +113,8 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassTask _ACClassTask;
     public virtual ACClassTask ACClassTask
     { 
-        get => LazyLoader.Load(this, ref _ACClassTask);
-        set => _ACClassTask = value;
+        get { return LazyLoader.Load(this, ref _ACClassTask); } 
+        set { SetProperty<ACClassTask>(ref _ACClassTask, value); }
     }
 
     public bool ACClassTask_IsLoaded
@@ -133,8 +133,8 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassTaskValuePos> _ACClassTaskValuePos_ACClassTaskValue;
     public virtual ICollection<ACClassTaskValuePos> ACClassTaskValuePos_ACClassTaskValue
     {
-        get => LazyLoader.Load(this, ref _ACClassTaskValuePos_ACClassTaskValue);
-        set => _ACClassTaskValuePos_ACClassTaskValue = value;
+        get { return LazyLoader.Load(this, ref _ACClassTaskValuePos_ACClassTaskValue); }
+        set { _ACClassTaskValuePos_ACClassTaskValue = value; }
     }
 
     public bool ACClassTaskValuePos_ACClassTaskValue_IsLoaded
@@ -153,8 +153,8 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded

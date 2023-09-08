@@ -226,8 +226,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTermOfPayment _BillingMDTermOfPayment;
     public virtual MDTermOfPayment BillingMDTermOfPayment
     { 
-        get => LazyLoader.Load(this, ref _BillingMDTermOfPayment);
-        set => _BillingMDTermOfPayment = value;
+        get { return LazyLoader.Load(this, ref _BillingMDTermOfPayment); } 
+        set { SetProperty<MDTermOfPayment>(ref _BillingMDTermOfPayment, value); }
     }
 
     public bool BillingMDTermOfPayment_IsLoaded
@@ -246,8 +246,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyAddress> _CompanyAddress_Company;
     public virtual ICollection<CompanyAddress> CompanyAddress_Company
     {
-        get => LazyLoader.Load(this, ref _CompanyAddress_Company);
-        set => _CompanyAddress_Company = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddress_Company); }
+        set { _CompanyAddress_Company = value; }
     }
 
     public bool CompanyAddress_Company_IsLoaded
@@ -266,8 +266,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterial> _CompanyMaterial_Company;
     public virtual ICollection<CompanyMaterial> CompanyMaterial_Company
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterial_Company);
-        set => _CompanyMaterial_Company = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterial_Company); }
+        set { _CompanyMaterial_Company = value; }
     }
 
     public bool CompanyMaterial_Company_IsLoaded
@@ -286,8 +286,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyPerson> _CompanyPerson_Company;
     public virtual ICollection<CompanyPerson> CompanyPerson_Company
     {
-        get => LazyLoader.Load(this, ref _CompanyPerson_Company);
-        set => _CompanyPerson_Company = value;
+        get { return LazyLoader.Load(this, ref _CompanyPerson_Company); }
+        set { _CompanyPerson_Company = value; }
     }
 
     public bool CompanyPerson_Company_IsLoaded
@@ -306,8 +306,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Facility> _Facility_Company;
     public virtual ICollection<Facility> Facility_Company
     {
-        get => LazyLoader.Load(this, ref _Facility_Company);
-        set => _Facility_Company = value;
+        get { return LazyLoader.Load(this, ref _Facility_Company); }
+        set { _Facility_Company = value; }
     }
 
     public bool Facility_Company_IsLoaded
@@ -326,8 +326,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_CPartnerCompany;
     public virtual ICollection<FacilityBooking> FacilityBooking_CPartnerCompany
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_CPartnerCompany);
-        set => _FacilityBooking_CPartnerCompany = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_CPartnerCompany); }
+        set { _FacilityBooking_CPartnerCompany = value; }
     }
 
     public bool FacilityBooking_CPartnerCompany_IsLoaded
@@ -346,8 +346,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrder> _InOrder_CPartnerCompany;
     public virtual ICollection<InOrder> InOrder_CPartnerCompany
     {
-        get => LazyLoader.Load(this, ref _InOrder_CPartnerCompany);
-        set => _InOrder_CPartnerCompany = value;
+        get { return LazyLoader.Load(this, ref _InOrder_CPartnerCompany); }
+        set { _InOrder_CPartnerCompany = value; }
     }
 
     public bool InOrder_CPartnerCompany_IsLoaded
@@ -366,8 +366,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrder> _InOrder_DistributorCompany;
     public virtual ICollection<InOrder> InOrder_DistributorCompany
     {
-        get => LazyLoader.Load(this, ref _InOrder_DistributorCompany);
-        set => _InOrder_DistributorCompany = value;
+        get { return LazyLoader.Load(this, ref _InOrder_DistributorCompany); }
+        set { _InOrder_DistributorCompany = value; }
     }
 
     public bool InOrder_DistributorCompany_IsLoaded
@@ -386,8 +386,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequest> _InRequest_DistributorCompany;
     public virtual ICollection<InRequest> InRequest_DistributorCompany
     {
-        get => LazyLoader.Load(this, ref _InRequest_DistributorCompany);
-        set => _InRequest_DistributorCompany = value;
+        get { return LazyLoader.Load(this, ref _InRequest_DistributorCompany); }
+        set { _InRequest_DistributorCompany = value; }
     }
 
     public bool InRequest_DistributorCompany_IsLoaded
@@ -406,8 +406,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Company> _Company_ParentCompany;
     public virtual ICollection<Company> Company_ParentCompany
     {
-        get => LazyLoader.Load(this, ref _Company_ParentCompany);
-        set => _Company_ParentCompany = value;
+        get { return LazyLoader.Load(this, ref _Company_ParentCompany); }
+        set { _Company_ParentCompany = value; }
     }
 
     public bool Company_ParentCompany_IsLoaded
@@ -426,8 +426,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Invoice> _Invoice_CustomerCompany;
     public virtual ICollection<Invoice> Invoice_CustomerCompany
     {
-        get => LazyLoader.Load(this, ref _Invoice_CustomerCompany);
-        set => _Invoice_CustomerCompany = value;
+        get { return LazyLoader.Load(this, ref _Invoice_CustomerCompany); }
+        set { _Invoice_CustomerCompany = value; }
     }
 
     public bool Invoice_CustomerCompany_IsLoaded
@@ -446,8 +446,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDCurrency _MDCurrency;
     public virtual MDCurrency MDCurrency
     { 
-        get => LazyLoader.Load(this, ref _MDCurrency);
-        set => _MDCurrency = value;
+        get { return LazyLoader.Load(this, ref _MDCurrency); } 
+        set { SetProperty<MDCurrency>(ref _MDCurrency, value); }
     }
 
     public bool MDCurrency_IsLoaded
@@ -466,8 +466,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintOrderAssignment> _MaintOrderAssignment_Company;
     public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_Company
     {
-        get => LazyLoader.Load(this, ref _MaintOrderAssignment_Company);
-        set => _MaintOrderAssignment_Company = value;
+        get { return LazyLoader.Load(this, ref _MaintOrderAssignment_Company); }
+        set { _MaintOrderAssignment_Company = value; }
     }
 
     public bool MaintOrderAssignment_Company_IsLoaded
@@ -486,8 +486,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOffer> _OutOffer_CustomerCompany;
     public virtual ICollection<OutOffer> OutOffer_CustomerCompany
     {
-        get => LazyLoader.Load(this, ref _OutOffer_CustomerCompany);
-        set => _OutOffer_CustomerCompany = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_CustomerCompany); }
+        set { _OutOffer_CustomerCompany = value; }
     }
 
     public bool OutOffer_CustomerCompany_IsLoaded
@@ -506,8 +506,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrder> _OutOrder_CPartnerCompany;
     public virtual ICollection<OutOrder> OutOrder_CPartnerCompany
     {
-        get => LazyLoader.Load(this, ref _OutOrder_CPartnerCompany);
-        set => _OutOrder_CPartnerCompany = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_CPartnerCompany); }
+        set { _OutOrder_CPartnerCompany = value; }
     }
 
     public bool OutOrder_CPartnerCompany_IsLoaded
@@ -526,8 +526,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrder> _OutOrder_CustomerCompany;
     public virtual ICollection<OutOrder> OutOrder_CustomerCompany
     {
-        get => LazyLoader.Load(this, ref _OutOrder_CustomerCompany);
-        set => _OutOrder_CustomerCompany = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_CustomerCompany); }
+        set { _OutOrder_CustomerCompany = value; }
     }
 
     public bool OutOrder_CustomerCompany_IsLoaded
@@ -546,8 +546,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _Company1_ParentCompany;
     public virtual Company Company1_ParentCompany
     { 
-        get => LazyLoader.Load(this, ref _Company1_ParentCompany);
-        set => _Company1_ParentCompany = value;
+        get { return LazyLoader.Load(this, ref _Company1_ParentCompany); } 
+        set { SetProperty<Company>(ref _Company1_ParentCompany, value); }
     }
 
     public bool Company1_ParentCompany_IsLoaded
@@ -566,8 +566,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrder> _ProdOrder_CPartnerCompany;
     public virtual ICollection<ProdOrder> ProdOrder_CPartnerCompany
     {
-        get => LazyLoader.Load(this, ref _ProdOrder_CPartnerCompany);
-        set => _ProdOrder_CPartnerCompany = value;
+        get { return LazyLoader.Load(this, ref _ProdOrder_CPartnerCompany); }
+        set { _ProdOrder_CPartnerCompany = value; }
     }
 
     public bool ProdOrder_CPartnerCompany_IsLoaded
@@ -586,8 +586,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Rating> _Rating_Company;
     public virtual ICollection<Rating> Rating_Company
     {
-        get => LazyLoader.Load(this, ref _Rating_Company);
-        set => _Rating_Company = value;
+        get { return LazyLoader.Load(this, ref _Rating_Company); }
+        set { _Rating_Company = value; }
     }
 
     public bool Rating_Company_IsLoaded
@@ -606,8 +606,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTermOfPayment _ShippingMDTermOfPayment;
     public virtual MDTermOfPayment ShippingMDTermOfPayment
     { 
-        get => LazyLoader.Load(this, ref _ShippingMDTermOfPayment);
-        set => _ShippingMDTermOfPayment = value;
+        get { return LazyLoader.Load(this, ref _ShippingMDTermOfPayment); } 
+        set { SetProperty<MDTermOfPayment>(ref _ShippingMDTermOfPayment, value); }
     }
 
     public bool ShippingMDTermOfPayment_IsLoaded
@@ -626,8 +626,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<TourplanPos> _TourplanPos_Company;
     public virtual ICollection<TourplanPos> TourplanPos_Company
     {
-        get => LazyLoader.Load(this, ref _TourplanPos_Company);
-        set => _TourplanPos_Company = value;
+        get { return LazyLoader.Load(this, ref _TourplanPos_Company); }
+        set { _TourplanPos_Company = value; }
     }
 
     public bool TourplanPos_Company_IsLoaded
@@ -646,8 +646,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Tourplan> _Tourplan_Company;
     public virtual ICollection<Tourplan> Tourplan_Company
     {
-        get => LazyLoader.Load(this, ref _Tourplan_Company);
-        set => _Tourplan_Company = value;
+        get { return LazyLoader.Load(this, ref _Tourplan_Company); }
+        set { _Tourplan_Company = value; }
     }
 
     public bool Tourplan_Company_IsLoaded
@@ -666,8 +666,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<UserSettings> _UserSettings_TenantCompany;
     public virtual ICollection<UserSettings> UserSettings_TenantCompany
     {
-        get => LazyLoader.Load(this, ref _UserSettings_TenantCompany);
-        set => _UserSettings_TenantCompany = value;
+        get { return LazyLoader.Load(this, ref _UserSettings_TenantCompany); }
+        set { _UserSettings_TenantCompany = value; }
     }
 
     public bool UserSettings_TenantCompany_IsLoaded
@@ -686,8 +686,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded
@@ -706,8 +706,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Visitor> _Visitor_VisitedCompany;
     public virtual ICollection<Visitor> Visitor_VisitedCompany
     {
-        get => LazyLoader.Load(this, ref _Visitor_VisitedCompany);
-        set => _Visitor_VisitedCompany = value;
+        get { return LazyLoader.Load(this, ref _Visitor_VisitedCompany); }
+        set { _Visitor_VisitedCompany = value; }
     }
 
     public bool Visitor_VisitedCompany_IsLoaded
@@ -726,8 +726,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<Visitor> _Visitor_VisitorCompany;
     public virtual ICollection<Visitor> Visitor_VisitorCompany
     {
-        get => LazyLoader.Load(this, ref _Visitor_VisitorCompany);
-        set => _Visitor_VisitorCompany = value;
+        get { return LazyLoader.Load(this, ref _Visitor_VisitorCompany); }
+        set { _Visitor_VisitorCompany = value; }
     }
 
     public bool Visitor_VisitorCompany_IsLoaded
@@ -746,8 +746,8 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VisitorVoucher> _VisitorVoucher_VisitorCompany;
     public virtual ICollection<VisitorVoucher> VisitorVoucher_VisitorCompany
     {
-        get => LazyLoader.Load(this, ref _VisitorVoucher_VisitorCompany);
-        set => _VisitorVoucher_VisitorCompany = value;
+        get { return LazyLoader.Load(this, ref _VisitorVoucher_VisitorCompany); }
+        set { _VisitorVoucher_VisitorCompany = value; }
     }
 
     public bool VisitorVoucher_VisitorCompany_IsLoaded

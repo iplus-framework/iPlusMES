@@ -93,8 +93,8 @@ public partial class PartslistPosSplit : VBEntityObject, IInsertInfo, IUpdateInf
     private PartslistPos _PartslistPos;
     public virtual PartslistPos PartslistPos
     { 
-        get => LazyLoader.Load(this, ref _PartslistPos);
-        set => _PartslistPos = value;
+        get { return LazyLoader.Load(this, ref _PartslistPos); } 
+        set { SetProperty<PartslistPos>(ref _PartslistPos, value); }
     }
 
     public bool PartslistPos_IsLoaded

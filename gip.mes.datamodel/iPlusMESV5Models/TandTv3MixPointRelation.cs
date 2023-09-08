@@ -44,8 +44,8 @@ public partial class TandTv3MixPointRelation : VBEntityObject
     private TandTv3MixPoint _SourceTandTv3MixPoint;
     public virtual TandTv3MixPoint SourceTandTv3MixPoint
     { 
-        get => LazyLoader.Load(this, ref _SourceTandTv3MixPoint);
-        set => _SourceTandTv3MixPoint = value;
+        get { return LazyLoader.Load(this, ref _SourceTandTv3MixPoint); } 
+        set { SetProperty<TandTv3MixPoint>(ref _SourceTandTv3MixPoint, value); }
     }
 
     public bool SourceTandTv3MixPoint_IsLoaded
@@ -64,8 +64,8 @@ public partial class TandTv3MixPointRelation : VBEntityObject
     private TandTv3MixPoint _TargetTandTv3MixPoint;
     public virtual TandTv3MixPoint TargetTandTv3MixPoint
     { 
-        get => LazyLoader.Load(this, ref _TargetTandTv3MixPoint);
-        set => _TargetTandTv3MixPoint = value;
+        get { return LazyLoader.Load(this, ref _TargetTandTv3MixPoint); } 
+        set { SetProperty<TandTv3MixPoint>(ref _TargetTandTv3MixPoint, value); }
     }
 
     public bool TargetTandTv3MixPoint_IsLoaded

@@ -198,8 +198,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private InRequest _InRequest;
     public virtual InRequest InRequest
     { 
-        get => LazyLoader.Load(this, ref _InRequest);
-        set => _InRequest = value;
+        get { return LazyLoader.Load(this, ref _InRequest); } 
+        set { SetProperty<InRequest>(ref _InRequest, value); }
     }
 
     public bool InRequest_IsLoaded
@@ -218,8 +218,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private ICollection<InRequestPos> _InRequestPos_ParentInRequestPos;
     public virtual ICollection<InRequestPos> InRequestPos_ParentInRequestPos
     {
-        get => LazyLoader.Load(this, ref _InRequestPos_ParentInRequestPos);
-        set => _InRequestPos_ParentInRequestPos = value;
+        get { return LazyLoader.Load(this, ref _InRequestPos_ParentInRequestPos); }
+        set { _InRequestPos_ParentInRequestPos = value; }
     }
 
     public bool InRequestPos_ParentInRequestPos_IsLoaded
@@ -238,8 +238,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private MDCountrySalesTax _MDCountrySalesTax;
     public virtual MDCountrySalesTax MDCountrySalesTax
     { 
-        get => LazyLoader.Load(this, ref _MDCountrySalesTax);
-        set => _MDCountrySalesTax = value;
+        get { return LazyLoader.Load(this, ref _MDCountrySalesTax); } 
+        set { SetProperty<MDCountrySalesTax>(ref _MDCountrySalesTax, value); }
     }
 
     public bool MDCountrySalesTax_IsLoaded
@@ -258,8 +258,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private MDTimeRange _MDTimeRange;
     public virtual MDTimeRange MDTimeRange
     { 
-        get => LazyLoader.Load(this, ref _MDTimeRange);
-        set => _MDTimeRange = value;
+        get { return LazyLoader.Load(this, ref _MDTimeRange); } 
+        set { SetProperty<MDTimeRange>(ref _MDTimeRange, value); }
     }
 
     public bool MDTimeRange_IsLoaded
@@ -278,8 +278,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -298,8 +298,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -318,8 +318,8 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     private InRequestPos _InRequestPos1_ParentInRequestPos;
     public virtual InRequestPos InRequestPos1_ParentInRequestPos
     { 
-        get => LazyLoader.Load(this, ref _InRequestPos1_ParentInRequestPos);
-        set => _InRequestPos1_ParentInRequestPos = value;
+        get { return LazyLoader.Load(this, ref _InRequestPos1_ParentInRequestPos); } 
+        set { SetProperty<InRequestPos>(ref _InRequestPos1_ParentInRequestPos, value); }
     }
 
     public bool InRequestPos1_ParentInRequestPos_IsLoaded

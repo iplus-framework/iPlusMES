@@ -93,8 +93,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterialHistory> _CompanyMaterialHistory_History;
     public virtual ICollection<CompanyMaterialHistory> CompanyMaterialHistory_History
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterialHistory_History);
-        set => _CompanyMaterialHistory_History = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterialHistory_History); }
+        set { _CompanyMaterialHistory_History = value; }
     }
 
     public bool CompanyMaterialHistory_History_IsLoaded
@@ -113,8 +113,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_History;
     public virtual ICollection<FacilityBooking> FacilityBooking_History
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_History);
-        set => _FacilityBooking_History = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_History); }
+        set { _FacilityBooking_History = value; }
     }
 
     public bool FacilityBooking_History_IsLoaded
@@ -133,8 +133,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityHistory> _FacilityHistory_History;
     public virtual ICollection<FacilityHistory> FacilityHistory_History
     {
-        get => LazyLoader.Load(this, ref _FacilityHistory_History);
-        set => _FacilityHistory_History = value;
+        get { return LazyLoader.Load(this, ref _FacilityHistory_History); }
+        set { _FacilityHistory_History = value; }
     }
 
     public bool FacilityHistory_History_IsLoaded
@@ -153,8 +153,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<HistoryConfig> _HistoryConfig_History;
     public virtual ICollection<HistoryConfig> HistoryConfig_History
     {
-        get => LazyLoader.Load(this, ref _HistoryConfig_History);
-        set => _HistoryConfig_History = value;
+        get { return LazyLoader.Load(this, ref _HistoryConfig_History); }
+        set { _HistoryConfig_History = value; }
     }
 
     public bool HistoryConfig_History_IsLoaded
@@ -173,8 +173,8 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaterialHistory> _MaterialHistory_History;
     public virtual ICollection<MaterialHistory> MaterialHistory_History
     {
-        get => LazyLoader.Load(this, ref _MaterialHistory_History);
-        set => _MaterialHistory_History = value;
+        get { return LazyLoader.Load(this, ref _MaterialHistory_History); }
+        set { _MaterialHistory_History = value; }
     }
 
     public bool MaterialHistory_History_IsLoaded

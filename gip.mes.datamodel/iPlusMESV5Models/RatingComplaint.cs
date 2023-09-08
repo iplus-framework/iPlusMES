@@ -86,8 +86,8 @@ public partial class RatingComplaint : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDRatingComplaintType _MDRatingComplaintType;
     public virtual MDRatingComplaintType MDRatingComplaintType
     { 
-        get => LazyLoader.Load(this, ref _MDRatingComplaintType);
-        set => _MDRatingComplaintType = value;
+        get { return LazyLoader.Load(this, ref _MDRatingComplaintType); } 
+        set { SetProperty<MDRatingComplaintType>(ref _MDRatingComplaintType, value); }
     }
 
     public bool MDRatingComplaintType_IsLoaded
@@ -106,8 +106,8 @@ public partial class RatingComplaint : VBEntityObject, IInsertInfo, IUpdateInfo
     private Rating _Rating;
     public virtual Rating Rating
     { 
-        get => LazyLoader.Load(this, ref _Rating);
-        set => _Rating = value;
+        get { return LazyLoader.Load(this, ref _Rating); } 
+        set { SetProperty<Rating>(ref _Rating, value); }
     }
 
     public bool Rating_IsLoaded

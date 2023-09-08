@@ -149,8 +149,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private InOrder _InOrder;
     public virtual InOrder InOrder
     { 
-        get => LazyLoader.Load(this, ref _InOrder);
-        set => _InOrder = value;
+        get { return LazyLoader.Load(this, ref _InOrder); } 
+        set { SetProperty<InOrder>(ref _InOrder, value); }
     }
 
     public bool InOrder_IsLoaded
@@ -169,8 +169,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrderConfig> _InOrderConfig_ParentInOrderConfig;
     public virtual ICollection<InOrderConfig> InOrderConfig_ParentInOrderConfig
     {
-        get => LazyLoader.Load(this, ref _InOrderConfig_ParentInOrderConfig);
-        set => _InOrderConfig_ParentInOrderConfig = value;
+        get { return LazyLoader.Load(this, ref _InOrderConfig_ParentInOrderConfig); }
+        set { _InOrderConfig_ParentInOrderConfig = value; }
     }
 
     public bool InOrderConfig_ParentInOrderConfig_IsLoaded
@@ -189,8 +189,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -209,8 +209,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private InOrderConfig _InOrderConfig1_ParentInOrderConfig;
     public virtual InOrderConfig InOrderConfig1_ParentInOrderConfig
     { 
-        get => LazyLoader.Load(this, ref _InOrderConfig1_ParentInOrderConfig);
-        set => _InOrderConfig1_ParentInOrderConfig = value;
+        get { return LazyLoader.Load(this, ref _InOrderConfig1_ParentInOrderConfig); } 
+        set { SetProperty<InOrderConfig>(ref _InOrderConfig1_ParentInOrderConfig, value); }
     }
 
     public bool InOrderConfig1_ParentInOrderConfig_IsLoaded
@@ -229,8 +229,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -249,8 +249,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -269,8 +269,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded
@@ -289,8 +289,8 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

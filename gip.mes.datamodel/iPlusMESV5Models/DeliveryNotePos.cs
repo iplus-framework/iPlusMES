@@ -107,8 +107,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     private DeliveryNote _DeliveryNote;
     public virtual DeliveryNote DeliveryNote
     { 
-        get => LazyLoader.Load(this, ref _DeliveryNote);
-        set => _DeliveryNote = value;
+        get { return LazyLoader.Load(this, ref _DeliveryNote); } 
+        set { SetProperty<DeliveryNote>(ref _DeliveryNote, value); }
     }
 
     public bool DeliveryNote_IsLoaded
@@ -127,8 +127,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 
-        get => LazyLoader.Load(this, ref _InOrderPos);
-        set => _InOrderPos = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos); } 
+        set { SetProperty<InOrderPos>(ref _InOrderPos, value); }
     }
 
     public bool InOrderPos_IsLoaded
@@ -147,8 +147,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     private ICollection<OrderLog> _OrderLog_DeliveryNotePos;
     public virtual ICollection<OrderLog> OrderLog_DeliveryNotePos
     {
-        get => LazyLoader.Load(this, ref _OrderLog_DeliveryNotePos);
-        set => _OrderLog_DeliveryNotePos = value;
+        get { return LazyLoader.Load(this, ref _OrderLog_DeliveryNotePos); }
+        set { _OrderLog_DeliveryNotePos = value; }
     }
 
     public bool OrderLog_DeliveryNotePos_IsLoaded
@@ -167,8 +167,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
-        get => LazyLoader.Load(this, ref _OutOrderPos);
-        set => _OutOrderPos = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
     }
 
     public bool OutOrderPos_IsLoaded
@@ -187,8 +187,8 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     private ICollection<TandTv3MixPointDeliveryNotePos> _TandTv3MixPointDeliveryNotePos_DeliveryNotePos;
     public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePos_DeliveryNotePos);
-        set => _TandTv3MixPointDeliveryNotePos_DeliveryNotePos = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePos_DeliveryNotePos); }
+        set { _TandTv3MixPointDeliveryNotePos_DeliveryNotePos = value; }
     }
 
     public bool TandTv3MixPointDeliveryNotePos_DeliveryNotePos_IsLoaded

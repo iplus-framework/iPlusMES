@@ -107,8 +107,8 @@ public partial class CalendarShiftPerson : VBEntityObject, IInsertInfo, IUpdateI
     private CalendarShift _CalendarShift;
     public virtual CalendarShift CalendarShift
     { 
-        get => LazyLoader.Load(this, ref _CalendarShift);
-        set => _CalendarShift = value;
+        get { return LazyLoader.Load(this, ref _CalendarShift); } 
+        set { SetProperty<CalendarShift>(ref _CalendarShift, value); }
     }
 
     public bool CalendarShift_IsLoaded
@@ -127,8 +127,8 @@ public partial class CalendarShiftPerson : VBEntityObject, IInsertInfo, IUpdateI
     private CompanyPerson _CompanyPerson;
     public virtual CompanyPerson CompanyPerson
     { 
-        get => LazyLoader.Load(this, ref _CompanyPerson);
-        set => _CompanyPerson = value;
+        get { return LazyLoader.Load(this, ref _CompanyPerson); } 
+        set { SetProperty<CompanyPerson>(ref _CompanyPerson, value); }
     }
 
     public bool CompanyPerson_IsLoaded

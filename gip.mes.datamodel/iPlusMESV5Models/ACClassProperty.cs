@@ -394,8 +394,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACChangeLog> _ACChangeLog_ACClassProperty;
     public virtual ICollection<ACChangeLog> ACChangeLog_ACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACChangeLog_ACClassProperty);
-        set => _ACChangeLog_ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACChangeLog_ACClassProperty); }
+        set { _ACChangeLog_ACClassProperty = value; }
     }
 
     public bool ACChangeLog_ACClassProperty_IsLoaded
@@ -414,8 +414,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded
@@ -434,8 +434,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassPropertyRelation> _ACClassPropertyRelation_SourceACClassProperty;
     public virtual ICollection<ACClassPropertyRelation> ACClassPropertyRelation_SourceACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassPropertyRelation_SourceACClassProperty);
-        set => _ACClassPropertyRelation_SourceACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassPropertyRelation_SourceACClassProperty); }
+        set { _ACClassPropertyRelation_SourceACClassProperty = value; }
     }
 
     public bool ACClassPropertyRelation_SourceACClassProperty_IsLoaded
@@ -454,8 +454,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassPropertyRelation> _ACClassPropertyRelation_TargetACClassProperty;
     public virtual ICollection<ACClassPropertyRelation> ACClassPropertyRelation_TargetACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassPropertyRelation_TargetACClassProperty);
-        set => _ACClassPropertyRelation_TargetACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassPropertyRelation_TargetACClassProperty); }
+        set { _ACClassPropertyRelation_TargetACClassProperty = value; }
     }
 
     public bool ACClassPropertyRelation_TargetACClassProperty_IsLoaded
@@ -474,8 +474,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassTaskValue> _ACClassTaskValue_ACClassProperty;
     public virtual ICollection<ACClassTaskValue> ACClassTaskValue_ACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassTaskValue_ACClassProperty);
-        set => _ACClassTaskValue_ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassTaskValue_ACClassProperty); }
+        set { _ACClassTaskValue_ACClassProperty = value; }
     }
 
     public bool ACClassTaskValue_ACClassProperty_IsLoaded
@@ -494,8 +494,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassWFEdge> _ACClassWFEdge_SourceACClassProperty;
     public virtual ICollection<ACClassWFEdge> ACClassWFEdge_SourceACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassWFEdge_SourceACClassProperty);
-        set => _ACClassWFEdge_SourceACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassWFEdge_SourceACClassProperty); }
+        set { _ACClassWFEdge_SourceACClassProperty = value; }
     }
 
     public bool ACClassWFEdge_SourceACClassProperty_IsLoaded
@@ -514,8 +514,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassWFEdge> _ACClassWFEdge_TargetACClassProperty;
     public virtual ICollection<ACClassWFEdge> ACClassWFEdge_TargetACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassWFEdge_TargetACClassProperty);
-        set => _ACClassWFEdge_TargetACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassWFEdge_TargetACClassProperty); }
+        set { _ACClassWFEdge_TargetACClassProperty = value; }
     }
 
     public bool ACClassWFEdge_TargetACClassProperty_IsLoaded
@@ -534,8 +534,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACPropertyLog> _ACPropertyLog_ACClassProperty;
     public virtual ICollection<ACPropertyLog> ACPropertyLog_ACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACPropertyLog_ACClassProperty);
-        set => _ACPropertyLog_ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACPropertyLog_ACClassProperty); }
+        set { _ACPropertyLog_ACClassProperty = value; }
     }
 
     public bool ACPropertyLog_ACClassProperty_IsLoaded
@@ -554,8 +554,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassProperty _ACClassProperty1_BasedOnACClassProperty;
     public virtual ACClassProperty ACClassProperty1_BasedOnACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _ACClassProperty1_BasedOnACClassProperty);
-        set => _ACClassProperty1_BasedOnACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty1_BasedOnACClassProperty); } 
+        set { SetProperty<ACClassProperty>(ref _ACClassProperty1_BasedOnACClassProperty, value); }
     }
 
     public bool ACClassProperty1_BasedOnACClassProperty_IsLoaded
@@ -574,8 +574,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _ConfigACClass;
     public virtual ACClass ConfigACClass
     { 
-        get => LazyLoader.Load(this, ref _ConfigACClass);
-        set => _ConfigACClass = value;
+        get { return LazyLoader.Load(this, ref _ConfigACClass); } 
+        set { SetProperty<ACClass>(ref _ConfigACClass, value); }
     }
 
     public bool ConfigACClass_IsLoaded
@@ -594,8 +594,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassProperty> _ACClassProperty_BasedOnACClassProperty;
     public virtual ICollection<ACClassProperty> ACClassProperty_BasedOnACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassProperty_BasedOnACClassProperty);
-        set => _ACClassProperty_BasedOnACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty_BasedOnACClassProperty); }
+        set { _ACClassProperty_BasedOnACClassProperty = value; }
     }
 
     public bool ACClassProperty_BasedOnACClassProperty_IsLoaded
@@ -614,8 +614,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ACClassProperty> _ACClassProperty_ParentACClassProperty;
     public virtual ICollection<ACClassProperty> ACClassProperty_ParentACClassProperty
     {
-        get => LazyLoader.Load(this, ref _ACClassProperty_ParentACClassProperty);
-        set => _ACClassProperty_ParentACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty_ParentACClassProperty); }
+        set { _ACClassProperty_ParentACClassProperty = value; }
     }
 
     public bool ACClassProperty_ParentACClassProperty_IsLoaded
@@ -634,8 +634,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<MaintACClassProperty> _MaintACClassProperty_VBiACClassProperty;
     public virtual ICollection<MaintACClassProperty> MaintACClassProperty_VBiACClassProperty
     {
-        get => LazyLoader.Load(this, ref _MaintACClassProperty_VBiACClassProperty);
-        set => _MaintACClassProperty_VBiACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _MaintACClassProperty_VBiACClassProperty); }
+        set { _MaintACClassProperty_VBiACClassProperty = value; }
     }
 
     public bool MaintACClassProperty_VBiACClassProperty_IsLoaded
@@ -654,8 +654,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClassProperty _ACClassProperty1_ParentACClassProperty;
     public virtual ACClassProperty ACClassProperty1_ParentACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _ACClassProperty1_ParentACClassProperty);
-        set => _ACClassProperty1_ParentACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _ACClassProperty1_ParentACClassProperty); } 
+        set { SetProperty<ACClassProperty>(ref _ACClassProperty1_ParentACClassProperty, value); }
     }
 
     public bool ACClassProperty1_ParentACClassProperty_IsLoaded
@@ -674,8 +674,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VBGroupRight> _VBGroupRight_ACClassProperty;
     public virtual ICollection<VBGroupRight> VBGroupRight_ACClassProperty
     {
-        get => LazyLoader.Load(this, ref _VBGroupRight_ACClassProperty);
-        set => _VBGroupRight_ACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _VBGroupRight_ACClassProperty); }
+        set { _VBGroupRight_ACClassProperty = value; }
     }
 
     public bool VBGroupRight_ACClassProperty_IsLoaded
@@ -694,8 +694,8 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _ValueTypeACClass;
     public virtual ACClass ValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _ValueTypeACClass);
-        set => _ValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _ValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _ValueTypeACClass, value); }
     }
 
     public bool ValueTypeACClass_IsLoaded

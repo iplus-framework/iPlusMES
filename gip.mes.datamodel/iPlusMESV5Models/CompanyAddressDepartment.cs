@@ -79,8 +79,8 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
     private CompanyAddress _CompanyAddress;
     public virtual CompanyAddress CompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _CompanyAddress);
-        set => _CompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _CompanyAddress, value); }
     }
 
     public bool CompanyAddress_IsLoaded
@@ -99,8 +99,8 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
     private ICollection<CompanyPersonRole> _CompanyPersonRole_CompanyAddressDepartment;
     public virtual ICollection<CompanyPersonRole> CompanyPersonRole_CompanyAddressDepartment
     {
-        get => LazyLoader.Load(this, ref _CompanyPersonRole_CompanyAddressDepartment);
-        set => _CompanyPersonRole_CompanyAddressDepartment = value;
+        get { return LazyLoader.Load(this, ref _CompanyPersonRole_CompanyAddressDepartment); }
+        set { _CompanyPersonRole_CompanyAddressDepartment = value; }
     }
 
     public bool CompanyPersonRole_CompanyAddressDepartment_IsLoaded

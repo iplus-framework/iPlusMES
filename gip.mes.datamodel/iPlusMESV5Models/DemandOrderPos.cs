@@ -156,8 +156,8 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private ACProgram _ACProgram;
     public virtual ACProgram ACProgram
     { 
-        get => LazyLoader.Load(this, ref _ACProgram);
-        set => _ACProgram = value;
+        get { return LazyLoader.Load(this, ref _ACProgram); } 
+        set { SetProperty<ACProgram>(ref _ACProgram, value); }
     }
 
     public bool ACProgram_IsLoaded
@@ -176,8 +176,8 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private DemandOrder _DemandOrder;
     public virtual DemandOrder DemandOrder
     { 
-        get => LazyLoader.Load(this, ref _DemandOrder);
-        set => _DemandOrder = value;
+        get { return LazyLoader.Load(this, ref _DemandOrder); } 
+        set { SetProperty<DemandOrder>(ref _DemandOrder, value); }
     }
 
     public bool DemandOrder_IsLoaded
@@ -196,8 +196,8 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -216,8 +216,8 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private Partslist _Partslist;
     public virtual Partslist Partslist
     { 
-        get => LazyLoader.Load(this, ref _Partslist);
-        set => _Partslist = value;
+        get { return LazyLoader.Load(this, ref _Partslist); } 
+        set { SetProperty<Partslist>(ref _Partslist, value); }
     }
 
     public bool Partslist_IsLoaded
@@ -236,8 +236,8 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     private ACClassMethod _VBiProgramACClassMethod;
     public virtual ACClassMethod VBiProgramACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _VBiProgramACClassMethod);
-        set => _VBiProgramACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _VBiProgramACClassMethod); } 
+        set { SetProperty<ACClassMethod>(ref _VBiProgramACClassMethod, value); }
     }
 
     public bool VBiProgramACClassMethod_IsLoaded

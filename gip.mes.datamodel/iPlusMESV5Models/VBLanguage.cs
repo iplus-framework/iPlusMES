@@ -107,8 +107,8 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<LabelTranslation> _LabelTranslation_VBLanguage;
     public virtual ICollection<LabelTranslation> LabelTranslation_VBLanguage
     {
-        get => LazyLoader.Load(this, ref _LabelTranslation_VBLanguage);
-        set => _LabelTranslation_VBLanguage = value;
+        get { return LazyLoader.Load(this, ref _LabelTranslation_VBLanguage); }
+        set { _LabelTranslation_VBLanguage = value; }
     }
 
     public bool LabelTranslation_VBLanguage_IsLoaded
@@ -127,8 +127,8 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VBUser> _VBUser_VBLanguage;
     public virtual ICollection<VBUser> VBUser_VBLanguage
     {
-        get => LazyLoader.Load(this, ref _VBUser_VBLanguage);
-        set => _VBUser_VBLanguage = value;
+        get { return LazyLoader.Load(this, ref _VBUser_VBLanguage); }
+        set { _VBUser_VBLanguage = value; }
     }
 
     public bool VBUser_VBLanguage_IsLoaded

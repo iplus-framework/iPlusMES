@@ -184,8 +184,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _BillingCompanyAddress;
     public virtual CompanyAddress BillingCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _BillingCompanyAddress);
-        set => _BillingCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _BillingCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _BillingCompanyAddress, value); }
     }
 
     public bool BillingCompanyAddress_IsLoaded
@@ -204,8 +204,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyAddress _DeliveryCompanyAddress;
     public virtual CompanyAddress DeliveryCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _DeliveryCompanyAddress);
-        set => _DeliveryCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _DeliveryCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _DeliveryCompanyAddress, value); }
     }
 
     public bool DeliveryCompanyAddress_IsLoaded
@@ -224,8 +224,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _DistributorCompany;
     public virtual Company DistributorCompany
     { 
-        get => LazyLoader.Load(this, ref _DistributorCompany);
-        set => _DistributorCompany = value;
+        get { return LazyLoader.Load(this, ref _DistributorCompany); } 
+        set { SetProperty<Company>(ref _DistributorCompany, value); }
     }
 
     public bool DistributorCompany_IsLoaded
@@ -244,8 +244,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrder> _InOrder_BasedOnInRequest;
     public virtual ICollection<InOrder> InOrder_BasedOnInRequest
     {
-        get => LazyLoader.Load(this, ref _InOrder_BasedOnInRequest);
-        set => _InOrder_BasedOnInRequest = value;
+        get { return LazyLoader.Load(this, ref _InOrder_BasedOnInRequest); }
+        set { _InOrder_BasedOnInRequest = value; }
     }
 
     public bool InOrder_BasedOnInRequest_IsLoaded
@@ -264,8 +264,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequestConfig> _InRequestConfig_InRequest;
     public virtual ICollection<InRequestConfig> InRequestConfig_InRequest
     {
-        get => LazyLoader.Load(this, ref _InRequestConfig_InRequest);
-        set => _InRequestConfig_InRequest = value;
+        get { return LazyLoader.Load(this, ref _InRequestConfig_InRequest); }
+        set { _InRequestConfig_InRequest = value; }
     }
 
     public bool InRequestConfig_InRequest_IsLoaded
@@ -284,8 +284,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InRequestPos> _InRequestPos_InRequest;
     public virtual ICollection<InRequestPos> InRequestPos_InRequest
     {
-        get => LazyLoader.Load(this, ref _InRequestPos_InRequest);
-        set => _InRequestPos_InRequest = value;
+        get { return LazyLoader.Load(this, ref _InRequestPos_InRequest); }
+        set { _InRequestPos_InRequest = value; }
     }
 
     public bool InRequestPos_InRequest_IsLoaded
@@ -304,8 +304,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDDelivType _MDDelivType;
     public virtual MDDelivType MDDelivType
     { 
-        get => LazyLoader.Load(this, ref _MDDelivType);
-        set => _MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _MDDelivType); } 
+        set { SetProperty<MDDelivType>(ref _MDDelivType, value); }
     }
 
     public bool MDDelivType_IsLoaded
@@ -324,8 +324,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDInOrderType _MDInOrderType;
     public virtual MDInOrderType MDInOrderType
     { 
-        get => LazyLoader.Load(this, ref _MDInOrderType);
-        set => _MDInOrderType = value;
+        get { return LazyLoader.Load(this, ref _MDInOrderType); } 
+        set { SetProperty<MDInOrderType>(ref _MDInOrderType, value); }
     }
 
     public bool MDInOrderType_IsLoaded
@@ -344,8 +344,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDInRequestState _MDInRequestState;
     public virtual MDInRequestState MDInRequestState
     { 
-        get => LazyLoader.Load(this, ref _MDInRequestState);
-        set => _MDInRequestState = value;
+        get { return LazyLoader.Load(this, ref _MDInRequestState); } 
+        set { SetProperty<MDInRequestState>(ref _MDInRequestState, value); }
     }
 
     public bool MDInRequestState_IsLoaded
@@ -364,8 +364,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTermOfPayment _MDTermOfPayment;
     public virtual MDTermOfPayment MDTermOfPayment
     { 
-        get => LazyLoader.Load(this, ref _MDTermOfPayment);
-        set => _MDTermOfPayment = value;
+        get { return LazyLoader.Load(this, ref _MDTermOfPayment); } 
+        set { SetProperty<MDTermOfPayment>(ref _MDTermOfPayment, value); }
     }
 
     public bool MDTermOfPayment_IsLoaded
@@ -384,8 +384,8 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDTimeRange _MDTimeRange;
     public virtual MDTimeRange MDTimeRange
     { 
-        get => LazyLoader.Load(this, ref _MDTimeRange);
-        set => _MDTimeRange = value;
+        get { return LazyLoader.Load(this, ref _MDTimeRange); } 
+        set { SetProperty<MDTimeRange>(ref _MDTimeRange, value); }
     }
 
     public bool MDTimeRange_IsLoaded

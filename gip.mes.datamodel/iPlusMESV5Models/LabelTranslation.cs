@@ -58,8 +58,8 @@ public partial class LabelTranslation : VBEntityObject
     private Label _Label;
     public virtual Label Label
     { 
-        get => LazyLoader.Load(this, ref _Label);
-        set => _Label = value;
+        get { return LazyLoader.Load(this, ref _Label); } 
+        set { SetProperty<Label>(ref _Label, value); }
     }
 
     public bool Label_IsLoaded
@@ -78,8 +78,8 @@ public partial class LabelTranslation : VBEntityObject
     private VBLanguage _VBLanguage;
     public virtual VBLanguage VBLanguage
     { 
-        get => LazyLoader.Load(this, ref _VBLanguage);
-        set => _VBLanguage = value;
+        get { return LazyLoader.Load(this, ref _VBLanguage); } 
+        set { SetProperty<VBLanguage>(ref _VBLanguage, value); }
     }
 
     public bool VBLanguage_IsLoaded

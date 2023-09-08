@@ -114,8 +114,8 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDMaintTaskState _MDMaintTaskState;
     public virtual MDMaintTaskState MDMaintTaskState
     { 
-        get => LazyLoader.Load(this, ref _MDMaintTaskState);
-        set => _MDMaintTaskState = value;
+        get { return LazyLoader.Load(this, ref _MDMaintTaskState); } 
+        set { SetProperty<MDMaintTaskState>(ref _MDMaintTaskState, value); }
     }
 
     public bool MDMaintTaskState_IsLoaded
@@ -134,8 +134,8 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
     private MaintOrder _MaintOrder;
     public virtual MaintOrder MaintOrder
     { 
-        get => LazyLoader.Load(this, ref _MaintOrder);
-        set => _MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder); } 
+        set { SetProperty<MaintOrder>(ref _MaintOrder, value); }
     }
 
     public bool MaintOrder_IsLoaded

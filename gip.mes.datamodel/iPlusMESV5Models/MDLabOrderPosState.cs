@@ -100,8 +100,8 @@ public partial class MDLabOrderPosState : VBEntityObject, IInsertInfo, IUpdateIn
     private ICollection<LabOrderPos> _LabOrderPos_MDLabOrderPosState;
     public virtual ICollection<LabOrderPos> LabOrderPos_MDLabOrderPosState
     {
-        get => LazyLoader.Load(this, ref _LabOrderPos_MDLabOrderPosState);
-        set => _LabOrderPos_MDLabOrderPosState = value;
+        get { return LazyLoader.Load(this, ref _LabOrderPos_MDLabOrderPosState); }
+        set { _LabOrderPos_MDLabOrderPosState = value; }
     }
 
     public bool LabOrderPos_MDLabOrderPosState_IsLoaded

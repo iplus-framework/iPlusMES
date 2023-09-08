@@ -58,8 +58,8 @@ public partial class UserSettings : VBEntityObject
     private CompanyAddress _InvoiceCompanyAddress;
     public virtual CompanyAddress InvoiceCompanyAddress
     { 
-        get => LazyLoader.Load(this, ref _InvoiceCompanyAddress);
-        set => _InvoiceCompanyAddress = value;
+        get { return LazyLoader.Load(this, ref _InvoiceCompanyAddress); } 
+        set { SetProperty<CompanyAddress>(ref _InvoiceCompanyAddress, value); }
     }
 
     public bool InvoiceCompanyAddress_IsLoaded
@@ -78,8 +78,8 @@ public partial class UserSettings : VBEntityObject
     private CompanyPerson _InvoiceCompanyPerson;
     public virtual CompanyPerson InvoiceCompanyPerson
     { 
-        get => LazyLoader.Load(this, ref _InvoiceCompanyPerson);
-        set => _InvoiceCompanyPerson = value;
+        get { return LazyLoader.Load(this, ref _InvoiceCompanyPerson); } 
+        set { SetProperty<CompanyPerson>(ref _InvoiceCompanyPerson, value); }
     }
 
     public bool InvoiceCompanyPerson_IsLoaded
@@ -98,8 +98,8 @@ public partial class UserSettings : VBEntityObject
     private Company _TenantCompany;
     public virtual Company TenantCompany
     { 
-        get => LazyLoader.Load(this, ref _TenantCompany);
-        set => _TenantCompany = value;
+        get { return LazyLoader.Load(this, ref _TenantCompany); } 
+        set { SetProperty<Company>(ref _TenantCompany, value); }
     }
 
     public bool TenantCompany_IsLoaded
@@ -118,8 +118,8 @@ public partial class UserSettings : VBEntityObject
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded

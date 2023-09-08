@@ -72,8 +72,8 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CalendarHoliday> _CalendarHoliday_Calendar;
     public virtual ICollection<CalendarHoliday> CalendarHoliday_Calendar
     {
-        get => LazyLoader.Load(this, ref _CalendarHoliday_Calendar);
-        set => _CalendarHoliday_Calendar = value;
+        get { return LazyLoader.Load(this, ref _CalendarHoliday_Calendar); }
+        set { _CalendarHoliday_Calendar = value; }
     }
 
     public bool CalendarHoliday_Calendar_IsLoaded
@@ -92,8 +92,8 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CalendarShift> _CalendarShift_Calendar;
     public virtual ICollection<CalendarShift> CalendarShift_Calendar
     {
-        get => LazyLoader.Load(this, ref _CalendarShift_Calendar);
-        set => _CalendarShift_Calendar = value;
+        get { return LazyLoader.Load(this, ref _CalendarShift_Calendar); }
+        set { _CalendarShift_Calendar = value; }
     }
 
     public bool CalendarShift_Calendar_IsLoaded
@@ -112,8 +112,8 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DemandPrimary> _DemandPrimary_Calendar;
     public virtual ICollection<DemandPrimary> DemandPrimary_Calendar
     {
-        get => LazyLoader.Load(this, ref _DemandPrimary_Calendar);
-        set => _DemandPrimary_Calendar = value;
+        get { return LazyLoader.Load(this, ref _DemandPrimary_Calendar); }
+        set { _DemandPrimary_Calendar = value; }
     }
 
     public bool DemandPrimary_Calendar_IsLoaded

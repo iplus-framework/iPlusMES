@@ -149,8 +149,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDVisitorCard _MDVisitorCard;
     public virtual MDVisitorCard MDVisitorCard
     { 
-        get => LazyLoader.Load(this, ref _MDVisitorCard);
-        set => _MDVisitorCard = value;
+        get { return LazyLoader.Load(this, ref _MDVisitorCard); } 
+        set { SetProperty<MDVisitorCard>(ref _MDVisitorCard, value); }
     }
 
     public bool MDVisitorCard_IsLoaded
@@ -169,8 +169,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -189,8 +189,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _TrailerFacility;
     public virtual Facility TrailerFacility
     { 
-        get => LazyLoader.Load(this, ref _TrailerFacility);
-        set => _TrailerFacility = value;
+        get { return LazyLoader.Load(this, ref _TrailerFacility); } 
+        set { SetProperty<Facility>(ref _TrailerFacility, value); }
     }
 
     public bool TrailerFacility_IsLoaded
@@ -209,8 +209,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private Facility _VehicleFacility;
     public virtual Facility VehicleFacility
     { 
-        get => LazyLoader.Load(this, ref _VehicleFacility);
-        set => _VehicleFacility = value;
+        get { return LazyLoader.Load(this, ref _VehicleFacility); } 
+        set { SetProperty<Facility>(ref _VehicleFacility, value); }
     }
 
     public bool VehicleFacility_IsLoaded
@@ -229,8 +229,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _VisitedCompany;
     public virtual Company VisitedCompany
     { 
-        get => LazyLoader.Load(this, ref _VisitedCompany);
-        set => _VisitedCompany = value;
+        get { return LazyLoader.Load(this, ref _VisitedCompany); } 
+        set { SetProperty<Company>(ref _VisitedCompany, value); }
     }
 
     public bool VisitedCompany_IsLoaded
@@ -249,8 +249,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _VisitorCompany;
     public virtual Company VisitorCompany
     { 
-        get => LazyLoader.Load(this, ref _VisitorCompany);
-        set => _VisitorCompany = value;
+        get { return LazyLoader.Load(this, ref _VisitorCompany); } 
+        set { SetProperty<Company>(ref _VisitorCompany, value); }
     }
 
     public bool VisitorCompany_IsLoaded
@@ -269,8 +269,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private CompanyPerson _VisitorCompanyPerson;
     public virtual CompanyPerson VisitorCompanyPerson
     { 
-        get => LazyLoader.Load(this, ref _VisitorCompanyPerson);
-        set => _VisitorCompanyPerson = value;
+        get { return LazyLoader.Load(this, ref _VisitorCompanyPerson); } 
+        set { SetProperty<CompanyPerson>(ref _VisitorCompanyPerson, value); }
     }
 
     public bool VisitorCompanyPerson_IsLoaded
@@ -289,8 +289,8 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VisitorVoucher> _VisitorVoucher_Visitor;
     public virtual ICollection<VisitorVoucher> VisitorVoucher_Visitor
     {
-        get => LazyLoader.Load(this, ref _VisitorVoucher_Visitor);
-        set => _VisitorVoucher_Visitor = value;
+        get { return LazyLoader.Load(this, ref _VisitorVoucher_Visitor); }
+        set { _VisitorVoucher_Visitor = value; }
     }
 
     public bool VisitorVoucher_Visitor_IsLoaded

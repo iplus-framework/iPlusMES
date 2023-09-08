@@ -100,8 +100,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     private ICollection<CompanyAddress> _CompanyAddress_MDDelivType;
     public virtual ICollection<CompanyAddress> CompanyAddress_MDDelivType
     {
-        get => LazyLoader.Load(this, ref _CompanyAddress_MDDelivType);
-        set => _CompanyAddress_MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _CompanyAddress_MDDelivType); }
+        set { _CompanyAddress_MDDelivType = value; }
     }
 
     public bool CompanyAddress_MDDelivType_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     private ICollection<InOrder> _InOrder_MDDelivType;
     public virtual ICollection<InOrder> InOrder_MDDelivType
     {
-        get => LazyLoader.Load(this, ref _InOrder_MDDelivType);
-        set => _InOrder_MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _InOrder_MDDelivType); }
+        set { _InOrder_MDDelivType = value; }
     }
 
     public bool InOrder_MDDelivType_IsLoaded
@@ -140,8 +140,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     private ICollection<InRequest> _InRequest_MDDelivType;
     public virtual ICollection<InRequest> InRequest_MDDelivType
     {
-        get => LazyLoader.Load(this, ref _InRequest_MDDelivType);
-        set => _InRequest_MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _InRequest_MDDelivType); }
+        set { _InRequest_MDDelivType = value; }
     }
 
     public bool InRequest_MDDelivType_IsLoaded
@@ -160,8 +160,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     private ICollection<OutOffer> _OutOffer_MDDelivType;
     public virtual ICollection<OutOffer> OutOffer_MDDelivType
     {
-        get => LazyLoader.Load(this, ref _OutOffer_MDDelivType);
-        set => _OutOffer_MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _OutOffer_MDDelivType); }
+        set { _OutOffer_MDDelivType = value; }
     }
 
     public bool OutOffer_MDDelivType_IsLoaded
@@ -180,8 +180,8 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     private ICollection<OutOrder> _OutOrder_MDDelivType;
     public virtual ICollection<OutOrder> OutOrder_MDDelivType
     {
-        get => LazyLoader.Load(this, ref _OutOrder_MDDelivType);
-        set => _OutOrder_MDDelivType = value;
+        get { return LazyLoader.Load(this, ref _OutOrder_MDDelivType); }
+        set { _OutOrder_MDDelivType = value; }
     }
 
     public bool OutOrder_MDDelivType_IsLoaded

@@ -44,8 +44,8 @@ public partial class TandTv3MixPointProdOrderPartslistPosRelation : VBEntityObje
     private ProdOrderPartslistPosRelation _ProdOrderPartslistPosRelation;
     public virtual ProdOrderPartslistPosRelation ProdOrderPartslistPosRelation
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation);
-        set => _ProdOrderPartslistPosRelation = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation); } 
+        set { SetProperty<ProdOrderPartslistPosRelation>(ref _ProdOrderPartslistPosRelation, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_IsLoaded
@@ -64,8 +64,8 @@ public partial class TandTv3MixPointProdOrderPartslistPosRelation : VBEntityObje
     private TandTv3MixPoint _TandTv3MixPoint;
     public virtual TandTv3MixPoint TandTv3MixPoint
     { 
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint);
-        set => _TandTv3MixPoint = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint); } 
+        set { SetProperty<TandTv3MixPoint>(ref _TandTv3MixPoint, value); }
     }
 
     public bool TandTv3MixPoint_IsLoaded

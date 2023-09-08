@@ -86,8 +86,8 @@ public partial class MaintOrderProperty : VBEntityObject, IInsertInfo, IUpdateIn
     private MaintACClassProperty _MaintACClassProperty;
     public virtual MaintACClassProperty MaintACClassProperty
     { 
-        get => LazyLoader.Load(this, ref _MaintACClassProperty);
-        set => _MaintACClassProperty = value;
+        get { return LazyLoader.Load(this, ref _MaintACClassProperty); } 
+        set { SetProperty<MaintACClassProperty>(ref _MaintACClassProperty, value); }
     }
 
     public bool MaintACClassProperty_IsLoaded
@@ -106,8 +106,8 @@ public partial class MaintOrderProperty : VBEntityObject, IInsertInfo, IUpdateIn
     private MaintOrder _MaintOrder;
     public virtual MaintOrder MaintOrder
     { 
-        get => LazyLoader.Load(this, ref _MaintOrder);
-        set => _MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder); } 
+        set { SetProperty<MaintOrder>(ref _MaintOrder, value); }
     }
 
     public bool MaintOrder_IsLoaded

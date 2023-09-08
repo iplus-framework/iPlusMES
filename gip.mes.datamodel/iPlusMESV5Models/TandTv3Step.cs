@@ -51,8 +51,8 @@ public partial class TandTv3Step : VBEntityObject
     private TandTv3FilterTracking _TandTv3FilterTracking;
     public virtual TandTv3FilterTracking TandTv3FilterTracking
     { 
-        get => LazyLoader.Load(this, ref _TandTv3FilterTracking);
-        set => _TandTv3FilterTracking = value;
+        get { return LazyLoader.Load(this, ref _TandTv3FilterTracking); } 
+        set { SetProperty<TandTv3FilterTracking>(ref _TandTv3FilterTracking, value); }
     }
 
     public bool TandTv3FilterTracking_IsLoaded
@@ -71,8 +71,8 @@ public partial class TandTv3Step : VBEntityObject
     private ICollection<TandTv3MixPoint> _TandTv3MixPoint_TandTv3Step;
     public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_TandTv3Step
     {
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint_TandTv3Step);
-        set => _TandTv3MixPoint_TandTv3Step = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint_TandTv3Step); }
+        set { _TandTv3MixPoint_TandTv3Step = value; }
     }
 
     public bool TandTv3MixPoint_TandTv3Step_IsLoaded

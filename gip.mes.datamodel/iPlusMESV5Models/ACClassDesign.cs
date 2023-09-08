@@ -219,8 +219,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
-        get => LazyLoader.Load(this, ref _ACClass);
-        set => _ACClass = value;
+        get { return LazyLoader.Load(this, ref _ACClass); } 
+        set { SetProperty<ACClass>(ref _ACClass, value); }
     }
 
     public bool ACClass_IsLoaded
@@ -239,8 +239,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VBGroupRight> _VBGroupRight_ACClassDesign;
     public virtual ICollection<VBGroupRight> VBGroupRight_ACClassDesign
     {
-        get => LazyLoader.Load(this, ref _VBGroupRight_ACClassDesign);
-        set => _VBGroupRight_ACClassDesign = value;
+        get { return LazyLoader.Load(this, ref _VBGroupRight_ACClassDesign); }
+        set { _VBGroupRight_ACClassDesign = value; }
     }
 
     public bool VBGroupRight_ACClassDesign_IsLoaded
@@ -259,8 +259,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VBUserACClassDesign> _VBUserACClassDesign_ACClassDesign;
     public virtual ICollection<VBUserACClassDesign> VBUserACClassDesign_ACClassDesign
     {
-        get => LazyLoader.Load(this, ref _VBUserACClassDesign_ACClassDesign);
-        set => _VBUserACClassDesign_ACClassDesign = value;
+        get { return LazyLoader.Load(this, ref _VBUserACClassDesign_ACClassDesign); }
+        set { _VBUserACClassDesign_ACClassDesign = value; }
     }
 
     public bool VBUserACClassDesign_ACClassDesign_IsLoaded
@@ -279,8 +279,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<VBUser> _VBUser_MenuACClassDesign;
     public virtual ICollection<VBUser> VBUser_MenuACClassDesign
     {
-        get => LazyLoader.Load(this, ref _VBUser_MenuACClassDesign);
-        set => _VBUser_MenuACClassDesign = value;
+        get { return LazyLoader.Load(this, ref _VBUser_MenuACClassDesign); }
+        set { _VBUser_MenuACClassDesign = value; }
     }
 
     public bool VBUser_MenuACClassDesign_IsLoaded
@@ -299,8 +299,8 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
     private ACClass _ValueTypeACClass;
     public virtual ACClass ValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _ValueTypeACClass);
-        set => _ValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _ValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _ValueTypeACClass, value); }
     }
 
     public bool ValueTypeACClass_IsLoaded

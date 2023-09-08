@@ -86,8 +86,8 @@ public partial class MaterialGMPAdditive : VBEntityObject, IInsertInfo, IUpdateI
     private MDGMPAdditive _MDGMPAdditive;
     public virtual MDGMPAdditive MDGMPAdditive
     { 
-        get => LazyLoader.Load(this, ref _MDGMPAdditive);
-        set => _MDGMPAdditive = value;
+        get { return LazyLoader.Load(this, ref _MDGMPAdditive); } 
+        set { SetProperty<MDGMPAdditive>(ref _MDGMPAdditive, value); }
     }
 
     public bool MDGMPAdditive_IsLoaded
@@ -106,8 +106,8 @@ public partial class MaterialGMPAdditive : VBEntityObject, IInsertInfo, IUpdateI
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded

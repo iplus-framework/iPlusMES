@@ -86,8 +86,8 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     private InOrder _InOrder;
     public virtual InOrder InOrder
     { 
-        get => LazyLoader.Load(this, ref _InOrder);
-        set => _InOrder = value;
+        get { return LazyLoader.Load(this, ref _InOrder); } 
+        set { SetProperty<InOrder>(ref _InOrder, value); }
     }
 
     public bool InOrder_IsLoaded
@@ -106,8 +106,8 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     private PlanningMR _PlanningMR;
     public virtual PlanningMR PlanningMR
     { 
-        get => LazyLoader.Load(this, ref _PlanningMR);
-        set => _PlanningMR = value;
+        get { return LazyLoader.Load(this, ref _PlanningMR); } 
+        set { SetProperty<PlanningMR>(ref _PlanningMR, value); }
     }
 
     public bool PlanningMR_IsLoaded
@@ -126,8 +126,8 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     private ProdOrder _ProdOrder;
     public virtual ProdOrder ProdOrder
     { 
-        get => LazyLoader.Load(this, ref _ProdOrder);
-        set => _ProdOrder = value;
+        get { return LazyLoader.Load(this, ref _ProdOrder); } 
+        set { SetProperty<ProdOrder>(ref _ProdOrder, value); }
     }
 
     public bool ProdOrder_IsLoaded
@@ -146,8 +146,8 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     private ProdOrderPartslist _ProdOrderPartslist;
     public virtual ProdOrderPartslist ProdOrderPartslist
     { 
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist);
-        set => _ProdOrderPartslist = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist); } 
+        set { SetProperty<ProdOrderPartslist>(ref _ProdOrderPartslist, value); }
     }
 
     public bool ProdOrderPartslist_IsLoaded

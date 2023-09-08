@@ -44,8 +44,8 @@ public partial class TandTv3MixPointFacilityPreBooking : VBEntityObject
     private FacilityPreBooking _FacilityPreBooking;
     public virtual FacilityPreBooking FacilityPreBooking
     { 
-        get => LazyLoader.Load(this, ref _FacilityPreBooking);
-        set => _FacilityPreBooking = value;
+        get { return LazyLoader.Load(this, ref _FacilityPreBooking); } 
+        set { SetProperty<FacilityPreBooking>(ref _FacilityPreBooking, value); }
     }
 
     public bool FacilityPreBooking_IsLoaded
@@ -64,8 +64,8 @@ public partial class TandTv3MixPointFacilityPreBooking : VBEntityObject
     private TandTv3MixPoint _TandTv3MixPoint;
     public virtual TandTv3MixPoint TandTv3MixPoint
     { 
-        get => LazyLoader.Load(this, ref _TandTv3MixPoint);
-        set => _TandTv3MixPoint = value;
+        get { return LazyLoader.Load(this, ref _TandTv3MixPoint); } 
+        set { SetProperty<TandTv3MixPoint>(ref _TandTv3MixPoint, value); }
     }
 
     public bool TandTv3MixPoint_IsLoaded

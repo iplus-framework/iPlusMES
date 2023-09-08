@@ -93,8 +93,8 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _CPartnerCompany;
     public virtual Company CPartnerCompany
     { 
-        get => LazyLoader.Load(this, ref _CPartnerCompany);
-        set => _CPartnerCompany = value;
+        get { return LazyLoader.Load(this, ref _CPartnerCompany); } 
+        set { SetProperty<Company>(ref _CPartnerCompany, value); }
     }
 
     public bool CPartnerCompany_IsLoaded
@@ -113,8 +113,8 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDProdOrderState _MDProdOrderState;
     public virtual MDProdOrderState MDProdOrderState
     { 
-        get => LazyLoader.Load(this, ref _MDProdOrderState);
-        set => _MDProdOrderState = value;
+        get { return LazyLoader.Load(this, ref _MDProdOrderState); } 
+        set { SetProperty<MDProdOrderState>(ref _MDProdOrderState, value); }
     }
 
     public bool MDProdOrderState_IsLoaded
@@ -133,8 +133,8 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<PlanningMRProposal> _PlanningMRProposal_ProdOrder;
     public virtual ICollection<PlanningMRProposal> PlanningMRProposal_ProdOrder
     {
-        get => LazyLoader.Load(this, ref _PlanningMRProposal_ProdOrder);
-        set => _PlanningMRProposal_ProdOrder = value;
+        get { return LazyLoader.Load(this, ref _PlanningMRProposal_ProdOrder); }
+        set { _PlanningMRProposal_ProdOrder = value; }
     }
 
     public bool PlanningMRProposal_ProdOrder_IsLoaded
@@ -153,8 +153,8 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<ProdOrderPartslist> _ProdOrderPartslist_ProdOrder;
     public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_ProdOrder
     {
-        get => LazyLoader.Load(this, ref _ProdOrderPartslist_ProdOrder);
-        set => _ProdOrderPartslist_ProdOrder = value;
+        get { return LazyLoader.Load(this, ref _ProdOrderPartslist_ProdOrder); }
+        set { _ProdOrderPartslist_ProdOrder = value; }
     }
 
     public bool ProdOrderPartslist_ProdOrder_IsLoaded

@@ -100,8 +100,8 @@ public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInf
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDReservationMode;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDReservationMode
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDReservationMode);
-        set => _FacilityBookingCharge_MDReservationMode = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDReservationMode); }
+        set { _FacilityBookingCharge_MDReservationMode = value; }
     }
 
     public bool FacilityBookingCharge_MDReservationMode_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInf
     private ICollection<FacilityBooking> _FacilityBooking_MDReservationMode;
     public virtual ICollection<FacilityBooking> FacilityBooking_MDReservationMode
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_MDReservationMode);
-        set => _FacilityBooking_MDReservationMode = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_MDReservationMode); }
+        set { _FacilityBooking_MDReservationMode = value; }
     }
 
     public bool FacilityBooking_MDReservationMode_IsLoaded

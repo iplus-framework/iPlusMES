@@ -107,8 +107,8 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     private Company _Company;
     public virtual Company Company
     { 
-        get => LazyLoader.Load(this, ref _Company);
-        set => _Company = value;
+        get { return LazyLoader.Load(this, ref _Company); } 
+        set { SetProperty<Company>(ref _Company, value); }
     }
 
     public bool Company_IsLoaded
@@ -127,8 +127,8 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     private MaintOrder _MaintOrder;
     public virtual MaintOrder MaintOrder
     { 
-        get => LazyLoader.Load(this, ref _MaintOrder);
-        set => _MaintOrder = value;
+        get { return LazyLoader.Load(this, ref _MaintOrder); } 
+        set { SetProperty<MaintOrder>(ref _MaintOrder, value); }
     }
 
     public bool MaintOrder_IsLoaded
@@ -147,8 +147,8 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     private VBGroup _VBGroup;
     public virtual VBGroup VBGroup
     { 
-        get => LazyLoader.Load(this, ref _VBGroup);
-        set => _VBGroup = value;
+        get { return LazyLoader.Load(this, ref _VBGroup); } 
+        set { SetProperty<VBGroup>(ref _VBGroup, value); }
     }
 
     public bool VBGroup_IsLoaded
@@ -167,8 +167,8 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 
-        get => LazyLoader.Load(this, ref _VBUser);
-        set => _VBUser = value;
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
     }
 
     public bool VBUser_IsLoaded

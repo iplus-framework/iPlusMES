@@ -156,8 +156,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private Company _Company;
     public virtual Company Company
     { 
-        get => LazyLoader.Load(this, ref _Company);
-        set => _Company = value;
+        get { return LazyLoader.Load(this, ref _Company); } 
+        set { SetProperty<Company>(ref _Company, value); }
     }
 
     public bool Company_IsLoaded
@@ -176,8 +176,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterialHistory> _CompanyMaterialHistory_CompanyMaterial;
     public virtual ICollection<CompanyMaterialHistory> CompanyMaterialHistory_CompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterialHistory_CompanyMaterial);
-        set => _CompanyMaterialHistory_CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterialHistory_CompanyMaterial); }
+        set { _CompanyMaterialHistory_CompanyMaterial = value; }
     }
 
     public bool CompanyMaterialHistory_CompanyMaterial_IsLoaded
@@ -196,8 +196,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterialPickup> _CompanyMaterialPickup_CompanyMaterial;
     public virtual ICollection<CompanyMaterialPickup> CompanyMaterialPickup_CompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterialPickup_CompanyMaterial);
-        set => _CompanyMaterialPickup_CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterialPickup_CompanyMaterial); }
+        set { _CompanyMaterialPickup_CompanyMaterial = value; }
     }
 
     public bool CompanyMaterialPickup_CompanyMaterial_IsLoaded
@@ -216,8 +216,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<CompanyMaterialStock> _CompanyMaterialStock_CompanyMaterial;
     public virtual ICollection<CompanyMaterialStock> CompanyMaterialStock_CompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _CompanyMaterialStock_CompanyMaterial);
-        set => _CompanyMaterialStock_CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _CompanyMaterialStock_CompanyMaterial); }
+        set { _CompanyMaterialStock_CompanyMaterial = value; }
     }
 
     public bool CompanyMaterialStock_CompanyMaterial_IsLoaded
@@ -236,8 +236,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardCPartnerCompMat;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardCPartnerCompMat
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardCPartnerCompMat);
-        set => _FacilityBookingCharge_InwardCPartnerCompMat = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardCPartnerCompMat); }
+        set { _FacilityBookingCharge_InwardCPartnerCompMat = value; }
     }
 
     public bool FacilityBookingCharge_InwardCPartnerCompMat_IsLoaded
@@ -256,8 +256,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_InwardCompanyMaterial;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_InwardCompanyMaterial);
-        set => _FacilityBookingCharge_InwardCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardCompanyMaterial); }
+        set { _FacilityBookingCharge_InwardCompanyMaterial = value; }
     }
 
     public bool FacilityBookingCharge_InwardCompanyMaterial_IsLoaded
@@ -276,8 +276,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardCPartnerCompMat;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardCPartnerCompMat
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardCPartnerCompMat);
-        set => _FacilityBookingCharge_OutwardCPartnerCompMat = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardCPartnerCompMat); }
+        set { _FacilityBookingCharge_OutwardCPartnerCompMat = value; }
     }
 
     public bool FacilityBookingCharge_OutwardCPartnerCompMat_IsLoaded
@@ -296,8 +296,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_OutwardCompanyMaterial;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardCompanyMaterial);
-        set => _FacilityBookingCharge_OutwardCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardCompanyMaterial); }
+        set { _FacilityBookingCharge_OutwardCompanyMaterial = value; }
     }
 
     public bool FacilityBookingCharge_OutwardCompanyMaterial_IsLoaded
@@ -316,8 +316,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_InwardCompanyMaterial;
     public virtual ICollection<FacilityBooking> FacilityBooking_InwardCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_InwardCompanyMaterial);
-        set => _FacilityBooking_InwardCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_InwardCompanyMaterial); }
+        set { _FacilityBooking_InwardCompanyMaterial = value; }
     }
 
     public bool FacilityBooking_InwardCompanyMaterial_IsLoaded
@@ -336,8 +336,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityBooking> _FacilityBooking_OutwardCompanyMaterial;
     public virtual ICollection<FacilityBooking> FacilityBooking_OutwardCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_OutwardCompanyMaterial);
-        set => _FacilityBooking_OutwardCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_OutwardCompanyMaterial); }
+        set { _FacilityBooking_OutwardCompanyMaterial = value; }
     }
 
     public bool FacilityBooking_OutwardCompanyMaterial_IsLoaded
@@ -356,8 +356,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityCharge> _FacilityCharge_CPartnerCompanyMaterial;
     public virtual ICollection<FacilityCharge> FacilityCharge_CPartnerCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityCharge_CPartnerCompanyMaterial);
-        set => _FacilityCharge_CPartnerCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge_CPartnerCompanyMaterial); }
+        set { _FacilityCharge_CPartnerCompanyMaterial = value; }
     }
 
     public bool FacilityCharge_CPartnerCompanyMaterial_IsLoaded
@@ -376,8 +376,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<FacilityCharge> _FacilityCharge_CompanyMaterial;
     public virtual ICollection<FacilityCharge> FacilityCharge_CompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _FacilityCharge_CompanyMaterial);
-        set => _FacilityCharge_CompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _FacilityCharge_CompanyMaterial); }
+        set { _FacilityCharge_CompanyMaterial = value; }
     }
 
     public bool FacilityCharge_CompanyMaterial_IsLoaded
@@ -396,8 +396,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<InOrderPos> _InOrderPos_PickupCompanyMaterial;
     public virtual ICollection<InOrderPos> InOrderPos_PickupCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _InOrderPos_PickupCompanyMaterial);
-        set => _InOrderPos_PickupCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _InOrderPos_PickupCompanyMaterial); }
+        set { _InOrderPos_PickupCompanyMaterial = value; }
     }
 
     public bool InOrderPos_PickupCompanyMaterial_IsLoaded
@@ -416,8 +416,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDUnit _MDUnit;
     public virtual MDUnit MDUnit
     { 
-        get => LazyLoader.Load(this, ref _MDUnit);
-        set => _MDUnit = value;
+        get { return LazyLoader.Load(this, ref _MDUnit); } 
+        set { SetProperty<MDUnit>(ref _MDUnit, value); }
     }
 
     public bool MDUnit_IsLoaded
@@ -436,8 +436,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private Material _Material;
     public virtual Material Material
     { 
-        get => LazyLoader.Load(this, ref _Material);
-        set => _Material = value;
+        get { return LazyLoader.Load(this, ref _Material); } 
+        set { SetProperty<Material>(ref _Material, value); }
     }
 
     public bool Material_IsLoaded
@@ -456,8 +456,8 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<OutOrderPos> _OutOrderPos_PickupCompanyMaterial;
     public virtual ICollection<OutOrderPos> OutOrderPos_PickupCompanyMaterial
     {
-        get => LazyLoader.Load(this, ref _OutOrderPos_PickupCompanyMaterial);
-        set => _OutOrderPos_PickupCompanyMaterial = value;
+        get { return LazyLoader.Load(this, ref _OutOrderPos_PickupCompanyMaterial); }
+        set { _OutOrderPos_PickupCompanyMaterial = value; }
     }
 
     public bool OutOrderPos_PickupCompanyMaterial_IsLoaded

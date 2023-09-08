@@ -100,8 +100,8 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
     private ICollection<FacilityBookingCharge> _FacilityBookingCharge_MDBookingNotAvailableMode;
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDBookingNotAvailableMode
     {
-        get => LazyLoader.Load(this, ref _FacilityBookingCharge_MDBookingNotAvailableMode);
-        set => _FacilityBookingCharge_MDBookingNotAvailableMode = value;
+        get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDBookingNotAvailableMode); }
+        set { _FacilityBookingCharge_MDBookingNotAvailableMode = value; }
     }
 
     public bool FacilityBookingCharge_MDBookingNotAvailableMode_IsLoaded
@@ -120,8 +120,8 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
     private ICollection<FacilityBooking> _FacilityBooking_MDBookingNotAvailableMode;
     public virtual ICollection<FacilityBooking> FacilityBooking_MDBookingNotAvailableMode
     {
-        get => LazyLoader.Load(this, ref _FacilityBooking_MDBookingNotAvailableMode);
-        set => _FacilityBooking_MDBookingNotAvailableMode = value;
+        get { return LazyLoader.Load(this, ref _FacilityBooking_MDBookingNotAvailableMode); }
+        set { _FacilityBooking_MDBookingNotAvailableMode = value; }
     }
 
     public bool FacilityBooking_MDBookingNotAvailableMode_IsLoaded

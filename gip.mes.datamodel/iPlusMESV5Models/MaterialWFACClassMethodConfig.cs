@@ -142,8 +142,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private ICollection<MaterialWFACClassMethodConfig> _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig;
     public virtual ICollection<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig
     {
-        get => LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig);
-        set => _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig); }
+        set { _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig = value; }
     }
 
     public bool MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig_IsLoaded
@@ -162,8 +162,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private MaterialWFACClassMethod _MaterialWFACClassMethod;
     public virtual MaterialWFACClassMethod MaterialWFACClassMethod
     { 
-        get => LazyLoader.Load(this, ref _MaterialWFACClassMethod);
-        set => _MaterialWFACClassMethod = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFACClassMethod); } 
+        set { SetProperty<MaterialWFACClassMethod>(ref _MaterialWFACClassMethod, value); }
     }
 
     public bool MaterialWFACClassMethod_IsLoaded
@@ -182,8 +182,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private MaterialWFACClassMethodConfig _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig;
     public virtual MaterialWFACClassMethodConfig MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig
     { 
-        get => LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig);
-        set => _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig = value;
+        get { return LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig); } 
+        set { SetProperty<MaterialWFACClassMethodConfig>(ref _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig, value); }
     }
 
     public bool MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig_IsLoaded
@@ -202,8 +202,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private ACClass _VBiACClass;
     public virtual ACClass VBiACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiACClass);
-        set => _VBiACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiACClass); } 
+        set { SetProperty<ACClass>(ref _VBiACClass, value); }
     }
 
     public bool VBiACClass_IsLoaded
@@ -222,8 +222,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private ACClassPropertyRelation _VBiACClassPropertyRelation;
     public virtual ACClassPropertyRelation VBiACClassPropertyRelation
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassPropertyRelation);
-        set => _VBiACClassPropertyRelation = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassPropertyRelation); } 
+        set { SetProperty<ACClassPropertyRelation>(ref _VBiACClassPropertyRelation, value); }
     }
 
     public bool VBiACClassPropertyRelation_IsLoaded
@@ -242,8 +242,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private ACClassWF _VBiACClassWF;
     public virtual ACClassWF VBiACClassWF
     { 
-        get => LazyLoader.Load(this, ref _VBiACClassWF);
-        set => _VBiACClassWF = value;
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
     }
 
     public bool VBiACClassWF_IsLoaded
@@ -262,8 +262,8 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     private ACClass _VBiValueTypeACClass;
     public virtual ACClass VBiValueTypeACClass
     { 
-        get => LazyLoader.Load(this, ref _VBiValueTypeACClass);
-        set => _VBiValueTypeACClass = value;
+        get { return LazyLoader.Load(this, ref _VBiValueTypeACClass); } 
+        set { SetProperty<ACClass>(ref _VBiValueTypeACClass, value); }
     }
 
     public bool VBiValueTypeACClass_IsLoaded

@@ -58,8 +58,8 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     private MaterialWF _MaterialWF;
     public virtual MaterialWF MaterialWF
     { 
-        get => LazyLoader.Load(this, ref _MaterialWF);
-        set => _MaterialWF = value;
+        get { return LazyLoader.Load(this, ref _MaterialWF); } 
+        set { SetProperty<MaterialWF>(ref _MaterialWF, value); }
     }
 
     public bool MaterialWF_IsLoaded
@@ -78,8 +78,8 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     private ICollection<PartslistPosRelation> _PartslistPosRelation_MaterialWFRelation;
     public virtual ICollection<PartslistPosRelation> PartslistPosRelation_MaterialWFRelation
     {
-        get => LazyLoader.Load(this, ref _PartslistPosRelation_MaterialWFRelation);
-        set => _PartslistPosRelation_MaterialWFRelation = value;
+        get { return LazyLoader.Load(this, ref _PartslistPosRelation_MaterialWFRelation); }
+        set { _PartslistPosRelation_MaterialWFRelation = value; }
     }
 
     public bool PartslistPosRelation_MaterialWFRelation_IsLoaded
@@ -98,8 +98,8 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     private Material _SourceMaterial;
     public virtual Material SourceMaterial
     { 
-        get => LazyLoader.Load(this, ref _SourceMaterial);
-        set => _SourceMaterial = value;
+        get { return LazyLoader.Load(this, ref _SourceMaterial); } 
+        set { SetProperty<Material>(ref _SourceMaterial, value); }
     }
 
     public bool SourceMaterial_IsLoaded
@@ -118,8 +118,8 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     private Material _TargetMaterial;
     public virtual Material TargetMaterial
     { 
-        get => LazyLoader.Load(this, ref _TargetMaterial);
-        set => _TargetMaterial = value;
+        get { return LazyLoader.Load(this, ref _TargetMaterial); } 
+        set { SetProperty<Material>(ref _TargetMaterial, value); }
     }
 
     public bool TargetMaterial_IsLoaded

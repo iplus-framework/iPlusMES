@@ -93,8 +93,8 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DemandOrderPos> _DemandOrderPos_DemandOrder;
     public virtual ICollection<DemandOrderPos> DemandOrderPos_DemandOrder
     {
-        get => LazyLoader.Load(this, ref _DemandOrderPos_DemandOrder);
-        set => _DemandOrderPos_DemandOrder = value;
+        get { return LazyLoader.Load(this, ref _DemandOrderPos_DemandOrder); }
+        set { _DemandOrderPos_DemandOrder = value; }
     }
 
     public bool DemandOrderPos_DemandOrder_IsLoaded
@@ -113,8 +113,8 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private ICollection<DemandProdOrder> _DemandProdOrder_DemandOrder;
     public virtual ICollection<DemandProdOrder> DemandProdOrder_DemandOrder
     {
-        get => LazyLoader.Load(this, ref _DemandProdOrder_DemandOrder);
-        set => _DemandProdOrder_DemandOrder = value;
+        get { return LazyLoader.Load(this, ref _DemandProdOrder_DemandOrder); }
+        set { _DemandProdOrder_DemandOrder = value; }
     }
 
     public bool DemandProdOrder_DemandOrder_IsLoaded
@@ -133,8 +133,8 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     private MDDemandOrderState _MDDemandOrderState;
     public virtual MDDemandOrderState MDDemandOrderState
     { 
-        get => LazyLoader.Load(this, ref _MDDemandOrderState);
-        set => _MDDemandOrderState = value;
+        get { return LazyLoader.Load(this, ref _MDDemandOrderState); } 
+        set { SetProperty<MDDemandOrderState>(ref _MDDemandOrderState, value); }
     }
 
     public bool MDDemandOrderState_IsLoaded
