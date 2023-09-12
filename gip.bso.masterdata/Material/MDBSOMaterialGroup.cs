@@ -19,6 +19,7 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using System.IO;
 using System;
+using gip.core.media;
 
 namespace gip.bso.masterdata
 {
@@ -29,11 +30,7 @@ namespace gip.bso.masterdata
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Group'}de{'Materialgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDMaterialGroup.ClassName)]
     public class MDBSOMaterialGroup : ACBSOvbNav
     {
-        #region Settings Image
-        public MediaSettings MediaSettings { get; private set; }
-
-        #endregion
-
+        
         #region c´tors
 
         /// <summary>
@@ -58,14 +55,8 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            MediaSettings = new MediaSettings();
-            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
-            if (ShowImages)
-            {
-                MDMaterialGroup dummyMDMaterialGroup = DatabaseApp.MDMaterialGroup.FirstOrDefault();
-                if (dummyMDMaterialGroup != null)
-                    MediaSettings.LoadTypeFolder(dummyMDMaterialGroup);
-            }
+            
+            MediaController = ACMediaController.GetServiceInstance(this);
 
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
                 BSOMedia_Child.Value.OnDefaultImageDelete += Value_OnDefaultImageDelete;
@@ -83,9 +74,11 @@ namespace gip.bso.masterdata
                 _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
-            MediaSettings = null;
+           
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
                 BSOMedia_Child.Value.OnDefaultImageDelete -= Value_OnDefaultImageDelete;
+
+            MediaController = null;
             return b;
         }
 
@@ -94,6 +87,12 @@ namespace gip.bso.masterdata
             OnPropertyChanged("MaterialGroupList");
         }
 
+
+        #endregion
+
+        #region Managers
+        
+        public ACMediaController MediaController { get; set; }
 
         #endregion
 
@@ -212,7 +211,7 @@ namespace gip.bso.masterdata
                 {
                     foreach (var item in groupList)
                     {
-                        MediaSettings.LoadImage(item);
+                        MediaController.LoadIImageInfo(item);
                     }
                 }
                 return groupList;

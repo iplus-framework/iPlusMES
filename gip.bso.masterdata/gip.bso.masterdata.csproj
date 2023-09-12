@@ -157,7 +157,6 @@
     <Compile Include="SourceSelectionRules\SourceSelectionRulesResult.cs" />
     <Compile Include="System\BSOCompany.cs" />
     <Compile Include="System\BSOCtrlUpdateMessageInfo.cs" />
-    <Compile Include="System\BSOMedia.cs" />
     <Compile Include="System\BSOUserSettings.cs" />
     <Compile Include="System\MDBSOCountry.cs" />
     <Compile Include="Logistics\MDBSOTourplanPosState.cs" />
@@ -213,6 +212,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
       <Project>{3a9383d8-5c6d-429c-89d3-57c1d2565ad1}</Project>
       <Name>gip.core.manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj">
+      <Project>{F9620201-705D-432C-8941-353E9BFFE5E0}</Project>
+      <Name>gip.core.media</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
       <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
