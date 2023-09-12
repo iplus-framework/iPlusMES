@@ -201,7 +201,7 @@ namespace gip.mes.datamodel
 
         public gip.core.datamodel.ACClass GetACClass(Database db)
         {
-            if (this.VBiACClassID == null || this.VBiACClassID == Guid.Empty)
+            if (this.VBiACClassID == Guid.Empty)
                 return null;
             if (this.VBiACClass == null)
             {

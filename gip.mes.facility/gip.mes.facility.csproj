@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <OutputType>Library</OutputType>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -17,7 +17,6 @@
     <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj" />
