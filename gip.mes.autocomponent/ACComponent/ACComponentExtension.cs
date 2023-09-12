@@ -40,7 +40,7 @@ namespace gip.mes.datamodel
                 || forceSeperateContext)
             {
                 Database parentIPlusContext = new Database();
-                dbApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>("BSOAppContext", null, parentIPlusContext);
+                dbApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>(forceSeperateContext ? bso.ACIdentifier : "BSOAppContext", null, parentIPlusContext);
             }
             return dbApp;
         }
