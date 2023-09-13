@@ -203,6 +203,10 @@
       <Project>{A294786A-0921-4773-A0BF-F98F5AFCAE0D}</Project>
       <Name>gip.core.layoutengine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj">
+      <Project>{f9620201-705d-432c-8941-353e9bffe5e0}</Project>
+      <Name>gip.core.media</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
       <Project>{6AD88CAF-A168-4BC2-9ECE-F62E7B216465}</Project>
       <Name>gip.core.reporthandler</Name>
