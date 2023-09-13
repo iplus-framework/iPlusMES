@@ -39,7 +39,7 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
 
-            MediaController = ACUrlCommand(ACMediaController.MediaControllerPath) as ACMediaController;
+            MediaController = ACMediaController.GetServiceInstance(this);
             if (MediaController == null)
             {
                 throw new Exception($"{ACMediaController.MediaControllerPath} not found!");
