@@ -149,6 +149,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.core.sql", "..\iPlus\gi
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "gip.core.processapplication.shared", "..\iPlus\gip.core.processapplication.shared\gip.core.processapplication.shared.shproj", "{38889580-0345-42CC-AB4D-931CA15AFA85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.core.media", "..\iPlus\gip.core.media\gip.core.media.csproj", "{F9620201-705D-432C-8941-353E9BFFE5E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -472,6 +474,12 @@ Global
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.DebugDiag|Any CPU.Deploy.0 = Debug|Any CPU
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F9620201-705D-432C-8941-353E9BFFE5E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9620201-705D-432C-8941-353E9BFFE5E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9620201-705D-432C-8941-353E9BFFE5E0}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9620201-705D-432C-8941-353E9BFFE5E0}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
+		{F9620201-705D-432C-8941-353E9BFFE5E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9620201-705D-432C-8941-353E9BFFE5E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -545,6 +553,7 @@ Global
 		{71C000C3-7BEF-410E-9922-7282476FCEAD} = {3C7E5EA9-3F24-4077-BD6D-28C8B8B805E3}
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12} = {B5C7FEEF-A87E-4FDE-8092-3A03B1E092A9}
 		{38889580-0345-42CC-AB4D-931CA15AFA85} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
+		{F9620201-705D-432C-8941-353E9BFFE5E0} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3D892D3-D698-40B1-927D-CB943150F1E1}
