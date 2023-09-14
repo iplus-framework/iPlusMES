@@ -5,15 +5,12 @@ using System.Linq;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.core.autocomponent;
-using gip.core.manager;
 using System.Collections.ObjectModel;
-using gip.mes.facility;
 using gip.mes.processapplication;
-using System.Data.Objects;
 using gip.bso.masterdata;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using System.IO;
 using System.Data;
+using gip.core.media;
 
 namespace gip.bso.manufacturing
 {
@@ -155,21 +152,25 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            using (var dialog = new CommonOpenFileDialog())
-            {
-                if (Directory.Exists(ExportFilePath))
-                    dialog.InitialDirectory = Path.GetDirectoryName(ExportFilePath);
-                dialog.DefaultExtension = ".xlsx";
-                dialog.Filters.Add(new CommonFileDialogFilter("Excel Files", "*.xlsx, *.csv, *.xls"));
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
+            string exportFilePath = mediaController.OpenFileDialog(
+                false,
+                ExportFilePath,
+                false,
+                ".xlsx",
+                new Dictionary<string, string>()
                 {
-                    if (Directory.Exists(Path.GetDirectoryName(dialog.FileName)))
                     {
-                        ExportFilePath = dialog.FileName;
-                        BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoExportExcel);
-                        ShowDialog(this, DesignNameProgressBar);
+                        "Excel Files",
+                        "*.xlsx, *.csv, *.xls"
                     }
-                }
+                });
+
+            if (exportFilePath != null && Directory.Exists(Path.GetDirectoryName(exportFilePath)))
+            {
+                ExportFilePath = exportFilePath;
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoExportExcel);
+                ShowDialog(this, DesignNameProgressBar);
             }
 
         }
