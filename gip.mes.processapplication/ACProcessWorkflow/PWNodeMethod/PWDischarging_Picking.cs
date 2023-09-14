@@ -306,6 +306,15 @@ namespace gip.mes.processapplication
                     acValue.Value = (Int16)ParentPWMethod<PWMethodTransportBase>().IsLastBatch;
             }
 
+            acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
+            if (acValue != null
+                && ParentPWGroup != null
+                && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
+                    || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
+            {
+                acValue.Value = (Int16)1;
+            }
+
             NoTargetWait = null;
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 return StartDisResult.CycleWait;
@@ -613,6 +622,15 @@ namespace gip.mes.processapplication
                 acValue = acMethod.ParameterValueList.GetACValue(PWMethodVBBase.IsLastBatchParamName);
                 if (acValue != null && acValue.ParamAsInt16 <= (Int16)0)
                     acValue.Value = (Int16)ParentPWMethod<PWMethodTransportBase>().IsLastBatch;
+            }
+
+            acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
+            if (acValue != null
+                && ParentPWGroup != null
+                && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
+                    || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
+            {
+                acValue.Value = (Int16)1;
             }
 
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
