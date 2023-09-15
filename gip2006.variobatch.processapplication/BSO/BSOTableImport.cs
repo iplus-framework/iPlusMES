@@ -25,6 +25,7 @@ using System.ComponentModel;
 using System.IO;
 using gip.core.processapplication;
 using System.Data;
+using gip.core.media;
 
 namespace gip2006.variobatch.processapplication
 {
@@ -401,7 +402,8 @@ namespace gip2006.variobatch.processapplication
         [ACMethodInfo("Import", "en{'...'}de{'...'}", 9999, false, false, true)]
         public void ImportFolder()
         {
-            string folderPath = Messages.SelectFolderDialog(CurrentImportFolder);
+            ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
+            string folderPath = mediaController.OpenFileDialog(true, CurrentImportFolder, true);
             if (!string.IsNullOrEmpty(folderPath))
             {
                 CurrentImportFolder = folderPath;

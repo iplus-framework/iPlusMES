@@ -55,7 +55,9 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            
+
+            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
+
             MediaController = ACMediaController.GetServiceInstance(this);
 
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
