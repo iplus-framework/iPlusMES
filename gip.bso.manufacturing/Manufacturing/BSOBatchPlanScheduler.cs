@@ -16,6 +16,7 @@ using System.Text;
 using VD = gip.mes.datamodel;
 using System.Xml;
 using System.Data;
+using gip.core.media;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -238,6 +239,8 @@ namespace gip.bso.manufacturing
             if (_SchedulingForecastManager == null)
                 throw new Exception("SchedulingForecastManager not configured");
 
+            MediaController = ACMediaController.GetServiceInstance(this);
+
             _ = AutoRemoveMDSGroupFrom;
             _ = AutoRemoveMDSGroupTo;
             _ = CreatedBatchState;
@@ -247,18 +250,11 @@ namespace gip.bso.manufacturing
             _ = PABatchPlanSchedulerURL;
             _ = RoundingQuantity;
 
-            if (ShowImages)
-            {
-                Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
-                if (dummyMaterial != null)
-                    MediaSettings.LoadTypeFolder(dummyMaterial);
-            }
 
             var refBatchPlanSchedulerComponent = ACUrlCommand(PABatchPlanSchedulerURL) as ACComponent;
             if (refBatchPlanSchedulerComponent != null)
                 _BatchPlanScheduler = new ACRef<ACComponent>(refBatchPlanSchedulerComponent, this);
 
-            MediaSettings = new MediaSettings();
             InitBatchPlanSchedulerComponent();
 
             if (FilterProdPartslistOrderList != null)
@@ -321,7 +317,7 @@ namespace gip.bso.manufacturing
             if (LocalBSOBatchPlan != null)
                 LocalBSOBatchPlan.PropertyChanged += ChildBSO_PropertyChanged;
 
-            MediaSettings = null;
+            MediaController = null;
             SelectedProdOrderBatchPlan = null;
             IsWizard = false;
 
@@ -741,6 +737,9 @@ namespace gip.bso.manufacturing
                 return _SchedulingForecastManager.ValueT;
             }
         }
+
+        public ACMediaController MediaController { get; set; }
+
         #endregion
 
         #region Child (Local BSOs)
@@ -1355,7 +1354,7 @@ namespace gip.bso.manufacturing
                     foreach (var batchPlan in prodOrderBatchPlans)
                     {
                         Material material = batchPlan.ProdOrderPartslist.Partslist.Material;
-                        MediaSettings.LoadImage(material);
+                        MediaController.LoadIImageInfo(material);
                     }
                 }
             }
@@ -1411,11 +1410,6 @@ namespace gip.bso.manufacturing
                 return _PartslistMDSchedulerGroupConnections;
             }
         }
-
-
-
-        public MediaSettings MediaSettings { get; private set; }
-
 
         private PlanningMR _FilterPlanningMR;
         public PlanningMR FilterPlanningMR
@@ -4489,7 +4483,7 @@ namespace gip.bso.manufacturing
             {
                 List<Guid> groupsForRefresh = new List<Guid>();
                 List<ProdOrderBatchPlan> batchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
-                
+
                 if (batchPlans.Any(c => c.IsSelected))
                 {
                     batchPlans = batchPlans.Where(c => c.IsSelected).ToList();

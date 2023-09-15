@@ -1825,10 +1825,17 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (CurrentPartslist != null && value != null)
+                if (CurrentPartslist != null && value != CurrentPartslist.MDUnit)
                 {
                     CurrentPartslist.MDUnit = value;
-                    CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.Material.BaseMDUnit, CurrentPartslist.MDUnit);
+                    if(CurrentPartslist.MDUnit != null  && CurrentPartslist.Material != null && CurrentPartslist.MDUnit != CurrentPartslist.Material.BaseMDUnit)
+                    {
+                        CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.Material.BaseMDUnit, CurrentPartslist.MDUnit);
+                    }
+                    else
+                    {
+                        CurrentPartslist.TargetQuantity = CurrentPartslist.TargetQuantityUOM;
+                    }
                     OnPropertyChanged();
                 }
             }

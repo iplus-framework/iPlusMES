@@ -4,13 +4,12 @@ using dbMes = gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using System.IO;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Data;
 using ClosedXML.Excel;
-using System.Data.SqlTypes;
+using gip.core.media;
 
 namespace gip.bso.manufacturing
 {
@@ -145,25 +144,44 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledSetFilePath())
                 return;
-            using (var dialog = new CommonOpenFileDialog())
-            {
-                dialog.IsFolderPicker = false;
-                dialog.Filters.Clear();
-                dialog.Filters.Add(new CommonFileDialogFilter("Excel (*.xlsx)", ".xlsx"));
-                dialog.DefaultExtension = ".xlsx";
-                if (!string.IsNullOrEmpty(FilePath))
+
+            ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
+            string filePath = mediaController.OpenFileDialog(
+                false,
+                FilePath,
+                false,
+                ".xlsx",
+                new Dictionary<string, string>()
                 {
-                    dialog.DefaultDirectory = Path.GetDirectoryName(FilePath);
-                    dialog.DefaultFileName = Path.GetFileName(FilePath);
-                }
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    if (!string.IsNullOrEmpty(dialog.FileName) && Directory.Exists(Path.GetDirectoryName(dialog.FileName)))
                     {
-                        FilePath = dialog.FileName;
+                        "Excel Files",
+                        "*.xlsx, *.csv, *.xls"
                     }
-                }
+                });
+
+            if(filePath != null && Directory.Exists(Path.GetDirectoryName(filePath)))
+            {
+                FilePath = filePath;
             }
+            //using (var dialog = new CommonOpenFileDialog())
+            //{
+            //    dialog.IsFolderPicker = false;
+            //    dialog.Filters.Clear();
+            //    dialog.Filters.Add(new CommonFileDialogFilter("Excel (*.xlsx)", ".xlsx"));
+            //    dialog.DefaultExtension = ".xlsx";
+            //    if (!string.IsNullOrEmpty(FilePath))
+            //    {
+            //        dialog.DefaultDirectory = Path.GetDirectoryName(FilePath);
+            //        dialog.DefaultFileName = Path.GetFileName(FilePath);
+            //    }
+            //    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            //    {
+            //        if (!string.IsNullOrEmpty(dialog.FileName) && Directory.Exists(Path.GetDirectoryName(dialog.FileName)))
+            //        {
+            //            FilePath = dialog.FileName;
+            //        }
+            //    }
+            //}
         }
 
         public bool IsEnabledSetFilePath()

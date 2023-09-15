@@ -307,6 +307,15 @@ namespace gip.mes.processapplication
                         if (acValue != null)
                             OnSetLastBatchParam(acValue, acMethod, targetModule, dbApp, batchPlan, currentBatchPos);
 
+                        acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
+                        if (   acValue != null
+                            && ParentPWGroup != null
+                            && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
+                                || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
+                        {
+                            acValue.Value = (Int16)1;
+                        }
+
                         NoTargetWait = null;
                         if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
@@ -488,6 +497,15 @@ namespace gip.mes.processapplication
                                 }
                                 if (acValue != null)
                                     OnSetLastBatchParam(acValue, acMethod, dischargeToModule, dbApp, batchPlan, currentBatchPos);
+
+                                acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
+                                if (acValue != null
+                                    && ParentPWGroup != null
+                                    && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
+                                        || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
+                                {
+                                    acValue.Value = (Int16)1;
+                                }
 
                                 PWNodeCheckWeighing checkWeighing = this.FindSuccessors<PWNodeCheckWeighing>(false, c => c is PWNodeCheckWeighing, null, 1).FirstOrDefault();
                                 if (checkWeighing != null)
@@ -1051,6 +1069,15 @@ namespace gip.mes.processapplication
 
                     if (CurrentDischargingRoute != null)
                         CurrentDischargingRoute.Detach(true);
+
+                    acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
+                    if (acValue != null
+                        && ParentPWGroup != null
+                        && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
+                            || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
+                    {
+                        acValue.Value = (Int16)1;
+                    }
 
                     if (isNewACMethod)
                     {

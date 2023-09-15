@@ -23,6 +23,12 @@ namespace gip.mes.datamodel
         {
             var entity = new MaintACClass();
             entity.MaintACClassID = Guid.NewGuid();
+
+            if (parentACObject is ACClass)
+            {
+                entity.VBiACClass = parentACObject as ACClass;
+            }
+
             entity.DefaultValuesACObject();
             dbApp.MaintACClass.Add(entity);
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
@@ -148,7 +154,7 @@ namespace gip.mes.datamodel
 
         public void CopyMaintACClassPropertiesToLocalCache()
         {
-            //_LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
+            _LocalPropertyCache = this.MaintACClassProperty_MaintACClass.ToArray();
         }
 
         #region VBIplus-Context

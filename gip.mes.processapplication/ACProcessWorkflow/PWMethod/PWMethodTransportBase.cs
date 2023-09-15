@@ -314,7 +314,9 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
+                            PickingPos currentPickingPosTemp = currentPickingPos.FromAppContext<PickingPos>(dbApp);
                             currentPickingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
+                            currentPickingPosTemp.ACClassTaskID = this.ContentTask.ACClassTaskID;
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             orderLog.PickingPosID = currentPickingPos.PickingPosID;
                             dbApp.OrderLog.Add(orderLog);

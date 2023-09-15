@@ -7,7 +7,7 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using System.Threading;
 using System.Globalization;
-using VD = gip.mes.datamodel;
+using gip.mes.datamodel;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.maintenance
@@ -27,7 +27,7 @@ namespace gip.mes.maintenance
             RegisterExecuteHandler(typeof(ACMaintService), HandleExecuteACMethod_ACMaintService);
         }
 
-        public ACMaintService(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
+        public ACMaintService(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
 
@@ -38,9 +38,9 @@ namespace gip.mes.maintenance
             if (!base.ACInit(startChildMode))
                 return false;
             CompWarningList = new List<ACMaintWarning>();
-            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
+            using (DatabaseApp dbApp = new DatabaseApp())
             {
-                if (dbApp.MaintOrder.Any(c => c.MDMaintOrderState.MDMaintOrderStateIndex == (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceNeeded))
+                if (dbApp.MaintOrder.Any(c => c.MDMaintOrderState.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded))
                     IsMaintenanceWarning.ValueT = true;
             }
             return true;
@@ -75,16 +75,18 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Wrapper-Class for Maintenance-Rule (MaintACClass). It helps to resolve and cache the information about .NET-Types and iPlus-ACTypes
         /// </summary>
-        private class MaintTypeInfo
+        public class MaintTypeInfo
         {
-            public MaintTypeInfo(VD.MaintACClass maintACClass, ACClass acType)
+            public MaintTypeInfo(MaintOrder maintOrderTemplate, core.datamodel.ACClass acType)
             {
-                _MaintACClass = maintACClass;
+                _MaintOrderTemplate = maintOrderTemplate;
+                _MaintACClass = maintOrderTemplate.MaintACClass;
                 _ACType = acType;
             }
 
-            private VD.MaintACClass _MaintACClass;
-            private ACClass _ACType;
+            private MaintOrder _MaintOrderTemplate;
+            private MaintACClass _MaintACClass;
+            private core.datamodel.ACClass _ACType;
 
             private Type _NETType = null;
             public Type NETType
@@ -97,7 +99,7 @@ namespace gip.mes.maintenance
                 }
             }
 
-            public ACClass ACType
+            public core.datamodel.ACClass ACType
             {
                 get
                 {
@@ -105,12 +107,14 @@ namespace gip.mes.maintenance
                 }
             }
 
-            public VD.MaintACClass MaintACClass
+            public MaintOrder MaintOrderTemplate
             {
-                get
-                {
-                    return _MaintACClass;
-                }
+                get => _MaintOrderTemplate;
+            }
+
+            public MaintACClass MaintACClass
+            {
+                get => _MaintACClass;
             }
 
         }
@@ -118,12 +122,19 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Wrapper-Class for holding a reference to each ACComponent-Instance and a reference to a Maintenance-Rule
         /// </summary>
-        private class MaintainableInstance
+        public class MaintainableInstance
         {
             public MaintainableInstance(ACRef<ACComponent> acComponent, MaintTypeInfo maintInfo)
             {
                 _MaintInfo = maintInfo;
                 _Instance = acComponent;
+                InstanceName = acComponent.ACUrl;
+            }
+
+            public MaintainableInstance(MaintTypeInfo maintInfo)
+            {
+                _MaintInfo = maintInfo;
+                InstanceName = maintInfo.MaintOrderTemplate.Facility?.FacilityNo;
             }
 
             public ACRef<ACComponent> _Instance;
@@ -131,7 +142,15 @@ namespace gip.mes.maintenance
             {
                 get
                 {
-                    return _Instance.ValueT;
+                    return _Instance?.ValueT;
+                }
+            }
+
+            public Facility FacilityInstance
+            {
+                get
+                {
+                    return MaintInfo?.MaintOrderTemplate?.Facility;
                 }
             }
 
@@ -146,6 +165,12 @@ namespace gip.mes.maintenance
                 {
                     _MaintInfo = value;
                 }
+            }
+
+            public string InstanceName
+            {
+                get;
+                set;
             }
         }
 
@@ -225,7 +250,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Dictionary with Property-ACUrl of each Instance which has to be maintainted event-driven
         /// </summary>
-        Dictionary<string, VD.MaintACClassProperty> _MaintConfigForPropertyInstance = null;
+        Dictionary<string, MaintACClassProperty> _MaintConfigForPropertyInstance = null;
         private object _LockMaintConfigForPropertyInstance = new object();
 
         private DateTime? _RebuildCacheAt = null;
@@ -239,15 +264,15 @@ namespace gip.mes.maintenance
         #region Methods
 
         #region Execute-Helper-Handlers
-        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, ACClassMethod acClassMethod, params object[] acParameter)
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
-                case "SetNewMaintOrderManual":
+                case nameof(SetNewMaintOrderManual):
                     SetNewMaintOrderManual(acParameter[0] as string);
                     return true;
-                case "RebuildMaintCache":
+                case nameof(RebuildMaintCache):
                     RebuildMaintCache();
                     return true;
             }
@@ -259,7 +284,7 @@ namespace gip.mes.maintenance
             result = null;
             switch (acMethodName)
             {
-                case "ShowMaintenanceWarning":
+                case nameof(ShowMaintenanceWarning):
                     ShowMaintenanceWarning(acComponent);
                     return true;
                     //case Const.IsEnabledPrefix + "ShowMaintenanceWarning":
@@ -284,9 +309,9 @@ namespace gip.mes.maintenance
             MaintTypeInfo maintTypeInfo = FindMaintTypeInfo(acComponent);
             if (maintTypeInfo != null)
             {
-                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    SetNewMaintOrder(maintTypeInfo.MaintACClass.MaintACClassID, acComponent, dbApp);
+                    //SetNewMaintOrder(maintTypeInfo.MaintACClass.MaintACClassID, acComponent, dbApp);
                 }
             }
         }
@@ -316,73 +341,76 @@ namespace gip.mes.maintenance
         {
             try
             {
-                //_CacheRebuilded = false;
-                //// 1. Rebuild the static shared Rule-Cache
-                //lock (_LockAllMaintainableTypes)
-                //{
-                //    // Another Thread is currently Rebulding the Maintenance-Rule-Cache
-                //    if (_ThisMaintainableTypesVersion < MaintainableTypesVersion)
-                //        _ThisMaintainableTypesVersion = MaintainableTypesVersion;
-                //    // This Service is the first, which should rebuild the Maintenance-Rule-Cache
-                //    else
-                //    {
-                //        _AllMaintainableTypes = new Dictionary<Guid, MaintTypeInfo>();
-                //        using (var dbApp = new VD.DatabaseApp())
-                //        {
-                //            var configuredClassesForMaint = dbApp.MaintACClass
-                //                                                .Include("MaintACClassProperty_MaintACClass");
-                //                                                //.Include(c => c.MDMaintMode)
-                //                                                //.Where(c => c.IsActive);
-                //            if (!configuredClassesForMaint.Any())
-                //                return;
-                //            foreach (var maintACClass in configuredClassesForMaint)
-                //            {
-                //                maintACClass.CopyMaintACClassPropertiesToLocalCache();
-                //                AddMaintRuleToCache(maintACClass);
-                //            }
-                //        }
-                //        _MaintainableTypesVersion++;
-                //        _ThisMaintainableTypesVersion = _MaintainableTypesVersion;
-                //    }
-                //    if (_AllMaintainableTypes == null || !_AllMaintainableTypes.Any())
-                //        return;
-                //}
+                
+                _CacheRebuilded = false;
+                // 1. Rebuild the static shared Rule-Cache
+                lock (_LockAllMaintainableTypes)
+                {
+                    // Another Thread is currently Rebulding the Maintenance-Rule-Cache
+                    if (_ThisMaintainableTypesVersion < MaintainableTypesVersion)
+                        _ThisMaintainableTypesVersion = MaintainableTypesVersion;
+                    // This Service is the first, which should rebuild the Maintenance-Rule-Cache
+                    else
+                    {
+                        _AllMaintainableTypes = new Dictionary<Guid, MaintTypeInfo>();
+                        using (DatabaseApp dbApp = new DatabaseApp())
+                        {
+                            var maintOrderTemplates = dbApp.MaintOrder.Include(c => c.MaintACClass)
+                                                                      .Where(c => c.BasedOnMaintOrderID == null);
+                            if (!maintOrderTemplates.Any())
+                                return;
+                            foreach (MaintOrder maintOrderTemplate in maintOrderTemplates)
+                            {
+                                if (maintOrderTemplate.MaintACClassID.HasValue)
+                                    maintOrderTemplate.MaintACClass.CopyMaintACClassPropertiesToLocalCache();
 
-                //// 2. Rebuild the Instance-Cache for this Application-Manager
-                //lock (_LockMaintConfigForPropertyInstance)
-                //{
-                //    _MaintainableInstancesTime = new Dictionary<int, MaintainableInstance>();
-                //    _MaintConfigForPropertyInstance = new Dictionary<string, VD.MaintACClassProperty>();
-                //}
+                                AddMaintRuleToCache(maintOrderTemplate);
+                            }
+                        }
+                        _MaintainableTypesVersion++;
+                        _ThisMaintainableTypesVersion = _MaintainableTypesVersion;
+                    }
+                    if (_AllMaintainableTypes == null || !_AllMaintainableTypes.Any())
+                        return;
+                }
 
-                //// 2.1 Determine Instances which has to be periodically maintained in this Application and build the cache
-                //var appManager = ApplicationManager;
-                //IEnumerable<MaintTypeInfo> maintenanceRules = null;
-                //lock (_LockAllMaintainableTypes)
-                //{
-                //    maintenanceRules = _AllMaintainableTypes.Values.ToArray();
-                //}
-                //foreach (var maintRule in maintenanceRules)
-                //{
-                //    ApplyTimeBasedRuleToInstances(maintRule, appManager);
-                //}
+                // 2. Rebuild the Instance-Cache for this Application-Manager
+                lock (_LockMaintConfigForPropertyInstance)
+                {
+                    _MaintainableInstancesTime = new Dictionary<int, MaintainableInstance>();
+                    _MaintConfigForPropertyInstance = new Dictionary<string, MaintACClassProperty>();
+                }
 
-                //// 2.2 Determine instances which has to be maintained event driven when it's property is relevant von maintenance
-                //using (var dbApp = new VD.DatabaseApp())
-                //{
-                //    var queryEventBasedProps = dbApp.MaintACClassProperty
-                //                            .Include(c => c.MaintACClass)
-                //                            .Include(c => c.MaintACClass.MDMaintMode)
-                //                            .Include(c => c.VBiACClassProperty)
-                //                            .Where(x => x.IsActive
-                //                                        && x.MaintACClass.IsActive
-                //                                        && x.MaintACClass.MDMaintMode.MDMaintModeIndex >= (short)VD.MDMaintMode.MaintModes.EventOnly);
+                // 2.1 Determine Instances which has to be periodically maintained in this Application and build the cache
+                var appManager = ApplicationManager;
+                IEnumerable<MaintTypeInfo> maintenanceRules = null;
+                lock (_LockAllMaintainableTypes)
+                {
+                    maintenanceRules = _AllMaintainableTypes.Values.ToArray();
+                }
+                foreach (var maintRule in maintenanceRules)
+                {
+                    ApplyTimeBasedRuleToInstances(maintRule, appManager);
+                }
 
-                //    foreach (VD.MaintACClassProperty maintACClassProperty in queryEventBasedProps)
-                //    {
-                //        ApplyEventBasedRuleToInstances(maintACClassProperty, appManager);
-                //    }
-                //}
+                // 2.2 Determine instances which has to be maintained event driven when it's property is relevant von maintenance
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    var maintOrderTemplates = dbApp.MaintOrder.Include(c => c.MaintACClass)
+                                                              .Where(c => c.BasedOnMaintOrderID == null
+                                                                       && c.MaintACClassID.HasValue);
+
+
+                    foreach (MaintOrder template in maintOrderTemplates)
+                    {
+                        var queryEventBasedProps = template.MaintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive);
+
+                        foreach (MaintACClassProperty maintACClassProperty in queryEventBasedProps)
+                        {
+                            ApplyEventBasedRuleToInstances(maintACClassProperty, appManager, template);
+                        }
+                    }
+                }
             }
             catch (Exception ec)
             {
@@ -400,7 +428,7 @@ namespace gip.mes.maintenance
             }
         }
 
-        private MaintTypeInfo AddMaintRuleToCache(VD.MaintACClass maintACClass)
+        private MaintTypeInfo AddMaintRuleToCache(MaintOrder maintOrderTemplate)
         {
             MaintTypeInfo typeInfo = null;
             lock (_LockAllMaintainableTypes)
@@ -408,13 +436,25 @@ namespace gip.mes.maintenance
                 if (_AllMaintainableTypes == null)
                     return null;
 
-                if (!_AllMaintainableTypes.TryGetValue(maintACClass.VBiACClassID, out typeInfo))
+                Guid id = Guid.Empty;
+                if (maintOrderTemplate.MaintACClassID.HasValue)
+                    id = maintOrderTemplate.MaintACClass.VBiACClassID;
+                else if (maintOrderTemplate.FacilityID.HasValue)
+                    id = maintOrderTemplate.FacilityID.Value;
+
+                if (!_AllMaintainableTypes.TryGetValue(id, out typeInfo))
                 {
-                    ACClass iPlusACClass = maintACClass.GetACClass(this.Root.Database.ContextIPlus);
+                    core.datamodel.ACClass iPlusACClass = maintOrderTemplate.MaintACClass?.GetACClass(this.Root.Database.ContextIPlus);
+                    if (iPlusACClass == null && maintOrderTemplate.Facility != null)
+                    {
+                        iPlusACClass = maintOrderTemplate.Facility.ACType as core.datamodel.ACClass;
+                    }
+
                     if (iPlusACClass == null)
                         return null;
-                    typeInfo = new MaintTypeInfo(maintACClass, iPlusACClass);
-                    _AllMaintainableTypes.Add(maintACClass.VBiACClassID, typeInfo);
+
+                    typeInfo = new MaintTypeInfo(maintOrderTemplate, iPlusACClass);
+                    _AllMaintainableTypes.Add(id, typeInfo);
                 }
             }
             return typeInfo;
@@ -422,35 +462,54 @@ namespace gip.mes.maintenance
 
         private void ApplyTimeBasedRuleToInstances(MaintTypeInfo maintRule, ApplicationManager appManager)
         {
-            //if (!(maintRule.MaintACClass.MDMaintMode.MaintMode == VD.MDMaintMode.MaintModes.TimeOnly || maintRule.MaintACClass.MDMaintMode.MaintMode == VD.MDMaintMode.MaintModes.TimeAndEvent))
-            //    return;
-            //IEnumerable<ACComponent> affectedComponents = GetAffectedInstances(maintRule.MaintACClass.VBiACClassID, appManager);
-            //if (affectedComponents == null || !affectedComponents.Any())
-            //    return;
-            //foreach (var affectedComponent in affectedComponents)
-            //{
-            //    MaintainableInstance maintInstance = null;
-            //    lock (_LockMaintainableInstancesTime)
-            //    {
-            //        if (_MaintainableInstancesTime.TryGetValue(affectedComponent.GetHashCode(), out maintInstance))
-            //        {
-            //            // Check if Maintenance-Rule is more concrete because of overriden rule, then replace MaintTypeInfo
-            //            if (maintRule != maintInstance.MaintInfo
-            //                && maintRule.ACType.InheritanceLevel > maintInstance.MaintInfo.ACType.InheritanceLevel)
-            //                maintInstance.MaintInfo = maintRule;
-            //            else
-            //                continue;
-            //        }
-            //        else
-            //        {
-            //            ACRef<ACComponent> affectedRef = new ACRef<ACComponent>(affectedComponent, this);
-            //            _MaintainableInstancesTime.Add(affectedComponent.GetHashCode(), new MaintainableInstance(affectedRef, maintRule));
-            //        }
-            //    }
-            //}
+            if (maintRule.MaintOrderTemplate.MaintInterval == null)
+                return;
+
+            if (maintRule.MaintACClass != null)
+            {
+                IEnumerable<ACComponent> affectedComponents = GetAffectedInstances(maintRule.MaintACClass.VBiACClassID, appManager);
+                if (affectedComponents == null || !affectedComponents.Any())
+                    return;
+
+                foreach (var affectedComponent in affectedComponents)
+                {
+                    MaintainableInstance maintInstance = null;
+                    lock (_LockMaintainableInstancesTime)
+                    {
+                        if (_MaintainableInstancesTime.TryGetValue(affectedComponent.GetHashCode(), out maintInstance))
+                        {
+                            // Check if Maintenance-Rule is more concrete because of overriden rule, then replace MaintTypeInfo
+                            if (maintRule != maintInstance.MaintInfo
+                                && maintRule.ACType.InheritanceLevel > maintInstance.MaintInfo.ACType.InheritanceLevel)
+                                maintInstance.MaintInfo = maintRule;
+                            else
+                                continue;
+                        }
+                        else
+                        {
+                            ACRef<ACComponent> affectedRef = new ACRef<ACComponent>(affectedComponent, this);
+                            _MaintainableInstancesTime.Add(affectedComponent.GetHashCode(), new MaintainableInstance(affectedRef, maintRule));
+                        }
+                    }
+                }
+            }
+            else if (maintRule.MaintOrderTemplate.FacilityID.HasValue)
+            {
+                Facility facility = maintRule.MaintOrderTemplate.Facility;
+
+                lock (_LockMaintainableInstancesTime)
+                {
+                    MaintainableInstance maintInstance = null;
+                    int hash = facility.GetHashCode();
+                    if (!_MaintainableInstancesTime.TryGetValue(hash, out maintInstance))
+                    {
+                        _MaintainableInstancesTime.Add(hash, new MaintainableInstance(maintRule));
+                    }
+                }
+            }
         }
 
-        private void ApplyEventBasedRuleToInstances(VD.MaintACClassProperty maintACClassProperty, ApplicationManager appManager)
+        private void ApplyEventBasedRuleToInstances(MaintACClassProperty maintACClassProperty, ApplicationManager appManager, MaintOrder template)
         {
             IEnumerable<ACComponent> affectedComponents = GetAffectedInstances(maintACClassProperty.MaintACClass.VBiACClassID, appManager);
             if (affectedComponents == null || !affectedComponents.Any())
@@ -467,6 +526,7 @@ namespace gip.mes.maintenance
                     {
                         if (!_MaintConfigForPropertyInstance.ContainsKey(propertyUrl))
                         {
+                            maintACClassProperty.MaintOrderTemplate = template;
                             _MaintConfigForPropertyInstance.Add(propertyUrl, maintACClassProperty);
                         }
                     }
@@ -542,59 +602,79 @@ namespace gip.mes.maintenance
 
         private void PeriodicalCheck()
         {
-            //ACComponent applicationManager = this.ApplicationManager;
-            //if (applicationManager == null || _MaintainableInstancesTime == null)
-            //    return;
-            //lock (_LockAllMaintainableTypes)
-            //{
-            //    if (!_CacheRebuilded || !_MaintainableInstancesTime.Any())
-            //        return;
-            //}
+            ACComponent applicationManager = this.ApplicationManager;
+            if (applicationManager == null || _MaintainableInstancesTime == null)
+                return;
+            lock (_LockAllMaintainableTypes)
+            {
+                if (!_CacheRebuilded || !_MaintainableInstancesTime.Any())
+                    return;
+            }
 
-            //using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
-            //{
-            //    lock (_LockAllMaintainableTypes)
-            //    {
-            //        var openMaintenanceOrders = dbApp.MaintOrder
-            //                                        .Where(c => c.MDMaintOrderState.MDMaintOrderStateIndex < (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted)
-            //                                        .ToDictionary(c => c.VBiPAACClassID);
-            //        foreach (MaintainableInstance maintInstance in _MaintainableInstancesTime.Values)
-            //        {
-            //            if (maintInstance.Instance == null)
-            //                continue;
-            //            VD.MaintOrder maintOrder = null;
-            //            if (openMaintenanceOrders.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
-            //                continue;
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                lock (_LockAllMaintainableTypes)
+                {
+                    var openMaintenanceOrders = dbApp.MaintOrder
+                                                    .Where(c => c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted
+                                                             && c.BasedOnMaintOrderID != null)
+                                                    .ToArray();
 
-            //            maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
-            //                                                       .OrderByDescending(x => x.MaintActEndDate)
-            //                                                       .FirstOrDefault();
+                    var openMaintenanceOrdersComp = openMaintenanceOrders.Where(c => c.VBiPAACClassID.HasValue).ToDictionary(c => c.VBiPAACClassID);
+                    var openMaintenanceOrdersFacility = openMaintenanceOrders.Where(c => c.FacilityID.HasValue).ToDictionary(c => c.FacilityID);
+                 
 
-            //            if (maintOrder == null)
-            //            {
-            //                if (maintInstance.MaintInfo.MaintACClass.NextMaintTerm.HasValue
-            //                    && DateTime.Now > maintInstance.MaintInfo.MaintACClass.NextMaintTerm)
-            //                {
-            //                    SetNewMaintOrder(maintInstance.MaintInfo.MaintACClass.MaintACClassID, maintInstance.Instance, dbApp);
-            //                }
-            //                else if (maintInstance.MaintInfo.MaintACClass.IsWarningActive
-            //                    && maintInstance.MaintInfo.MaintACClass.NextMaintTerm.HasValue
-            //                    && DateTime.Now >= maintInstance.MaintInfo.MaintACClass.NextMaintTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintACClass.WarningDiff.Value)))
-            //                    SetMaintenanceWarning(maintInstance.Instance, maintInstance.MaintInfo.MaintACClass.NextMaintTerm.Value);
-            //            }
-            //            else if (maintOrder != null && maintOrder.MaintActEndDate.HasValue && maintInstance.MaintInfo.MaintACClass != null && maintInstance.MaintInfo.MaintACClass.MaintInterval.HasValue)
-            //            {
-            //                DateTime? nextTerm = maintOrder.MaintActEndDate + TimeSpan.FromDays(maintInstance.MaintInfo.MaintACClass.MaintInterval.Value);
-            //                if (nextTerm != null && DateTime.Now >= nextTerm.Value)
-            //                {
-            //                    SetNewMaintOrder(maintInstance.MaintInfo.MaintACClass.MaintACClassID, maintInstance.Instance, dbApp);
-            //                }
-            //                else if (maintInstance.MaintInfo.MaintACClass.IsWarningActive && nextTerm != null && DateTime.Now >= nextTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintACClass.WarningDiff.Value)))
-            //                    SetMaintenanceWarning(maintInstance.Instance, nextTerm.Value);
-            //            }
-            //        }
-            //    }
-            //}
+                    foreach (MaintainableInstance maintInstance in _MaintainableInstancesTime.Values)
+                    {
+                        MaintOrder maintOrder = null;
+
+                        if (maintInstance.Instance != null)
+                        {
+                            if (openMaintenanceOrdersComp.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
+                                continue;
+
+                            maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
+                                                         .OrderByDescending(x => x.UpdateDate)
+                                                         .FirstOrDefault();
+                        }
+                        else if (maintInstance.FacilityInstance != null)
+                        {
+                            if (openMaintenanceOrdersFacility.TryGetValue(maintInstance.FacilityInstance.FacilityID, out maintOrder))
+                                continue;
+
+                            maintOrder = dbApp.MaintOrder.Where(c => c.FacilityID == maintInstance.FacilityInstance.FacilityID)
+                                                         .OrderByDescending(x => x.UpdateDate)
+                                                         .FirstOrDefault();
+                        }
+
+                        if (maintOrder == null)
+                        {
+                            if (maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.HasValue
+                                && DateTime.Now > maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm)
+                            {
+                                SetNewMaintOrder(maintInstance, dbApp);
+                            }
+                            else if (maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.HasValue
+                                && maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.HasValue
+                                && DateTime.Now >= maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.Value)))
+                            {
+                                SetMaintenanceWarning(maintInstance.Instance, maintInstance.FacilityInstance, maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.Value);
+                            }
+                        }
+                        else if (maintOrder != null && maintOrder.EndDate.HasValue && maintInstance.MaintInfo.MaintOrderTemplate != null 
+                                                                                   && maintInstance.MaintInfo.MaintOrderTemplate.MaintInterval.HasValue)
+                        {
+                            DateTime? nextTerm = maintOrder.EndDate + TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.MaintInterval.Value);
+                            if (nextTerm != null && DateTime.Now >= nextTerm.Value)
+                            {
+                                SetNewMaintOrder(maintInstance, dbApp);
+                            }
+                            else if (maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.HasValue && nextTerm != null && DateTime.Now >= nextTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.Value)))
+                                SetMaintenanceWarning(maintInstance.Instance, maintInstance.FacilityInstance, nextTerm.Value);
+                        }
+                    }
+                }
+            }
         }
 
         #endregion
@@ -664,7 +744,7 @@ namespace gip.mes.maintenance
             if (this.ApplicationManager != ((PAClassAlarmingBase)e.ForACComponent).ApplicationManager)
                 return;
             string propertyUrl = e.NetValueEventArgs.ACUrl + "\\" + e.NetValueEventArgs.ACIdentifier;
-            VD.MaintACClassProperty configProp = null;
+            MaintACClassProperty configProp = null;
             lock (_LockMaintConfigForPropertyInstance)
             {
                 if (!_MaintConfigForPropertyInstance.TryGetValue(propertyUrl, out configProp))
@@ -677,7 +757,7 @@ namespace gip.mes.maintenance
             });
         }
 
-        private void CheckPropertyValue(ACPropertyNetSendEventArgs eventArgs, VD.MaintACClassProperty configProp)
+        private void CheckPropertyValue(ACPropertyNetSendEventArgs eventArgs, MaintACClassProperty configProp)
         {
             try
             {
@@ -690,9 +770,9 @@ namespace gip.mes.maintenance
                     return;
                 if (changedValue.CompareTo(maxValue) >= 0)
                 {
-                    using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
+                    using (DatabaseApp dbApp = new DatabaseApp())
                     {
-                        SetNewMaintOrder(configProp.MaintACClass.MaintACClassID, eventArgs.ForACComponent as ACComponent, dbApp);
+                        SetNewMaintOrder(configProp, eventArgs.ForACComponent as ACComponent, dbApp);
                     }
                 }
 
@@ -711,7 +791,7 @@ namespace gip.mes.maintenance
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msg += " Inner:" + ec.InnerException.Message;
 
-                this.Root().Messages.LogException("ACMaintService", "CheckPropertyValue", msg);
+                this.Root().Messages.LogException(nameof(ACMaintService), nameof(CheckPropertyValue), msg);
             }
         }
 
@@ -726,17 +806,15 @@ namespace gip.mes.maintenance
 
         #region Maintenance Order
 
-        protected void SetNewMaintOrder(Guid maintACClassID, ACComponent acComponent, VD.DatabaseApp dbApp)
+        protected void SetNewMaintOrder(MaintainableInstance instance, DatabaseApp dbApp)
         {
-            GenerateMaintOrder(maintACClassID, acComponent, dbApp);
+            GenerateMaintOrder(instance.Instance, instance.FacilityInstance, instance.MaintInfo.MaintOrderTemplate, dbApp);
 
-
-            
             ACMaintWarning warning = null;
 
             using (ACMonitor.Lock(_60010_WarningLock))
             {
-                warning = CompWarningList.FirstOrDefault(c => c.ACComponentACUrl == acComponent.ACUrl);
+                warning = CompWarningList.FirstOrDefault(c => c.InstanceName == instance.InstanceName);
             }
             if (warning != null)
             {
@@ -750,67 +828,106 @@ namespace gip.mes.maintenance
             //    IsMaintenanceWarning.ValueT = false;
         }
 
-        private void GenerateMaintOrder(Guid maintACClassID, ACComponent acComponent, VD.DatabaseApp dbApp)
+        protected void SetNewMaintOrder(MaintACClassProperty maintProperty, ACComponent acComponent, DatabaseApp dbApp)
         {
+            GenerateMaintOrder(acComponent, null, maintProperty.MaintOrderTemplate, dbApp);
 
-            //if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == acComponent.ComponentClass.ACClassID
-            //               && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
-            //    return;
+            ACMaintWarning warning = null;
 
-            //var maintACClass = dbApp.MaintACClass.Include("MaintACClassProperty_MaintACClass")
-            //                                    .Include("MaintACClassVBGroup_MaintACClass")
-            //                                    .Where(c => c.MaintACClassID == maintACClassID)
-            //                                    .FirstOrDefault();
+            using (ACMonitor.Lock(_60010_WarningLock))
+            {
+                warning = CompWarningList.FirstOrDefault(c => c.InstanceName == acComponent.ACUrl);
+            }
+            if (warning != null)
+            {
+                using (ACMonitor.Lock(_60010_WarningLock))
+                {
+                    CompWarningList.Remove(warning);
+                }
+                ComponentsWarningList.ValueT = CompWarningList.ToList();
+            }
+            //if (!CompWarningList.Any())
+            //    IsMaintenanceWarning.ValueT = false;
+        }
 
-            //string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(VD.MaintOrder), VD.MaintOrder.NoColumnName, VD.MaintOrder.FormatNewNo, this);
-            //VD.MaintOrder maintOrder = VD.MaintOrder.NewACObject(dbApp, null, secondaryKey);
-            //maintOrder.MaintACClass = maintACClass;
-            //maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)VD.MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
-            //maintOrder.VBiPAACClassID = acComponent.ComponentClass.ACClassID;
-            //maintOrder.MDMaintMode = maintACClass.MDMaintMode;
-            //maintOrder.MaintSetDate = DateTime.Now;
+        private void GenerateMaintOrder(ACComponent instance, Facility facilityInstance, MaintOrder template, DatabaseApp dbApp)
+        {
+            MaintOrder tempTemplate = template.FromAppContext<MaintOrder>(dbApp);
 
-            //foreach (VD.MaintACClassVBGroup maintVBGroup in maintACClass.MaintACClassVBGroup_MaintACClass.Where(c => c.IsActive))
-            //{
-            //    VD.MaintTask maintTask = VD.MaintTask.NewACObject(dbApp, maintOrder);
-            //    maintTask.MaintACClassVBGroup = maintVBGroup;
-            //    maintTask.MDMaintTaskState = dbApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)VD.MaintTaskState.UnfinishedTask);
-            //}
+            if (instance != null && dbApp.MaintOrder.Any(c => c.VBiPAACClassID == instance.ComponentClass.ACClassID
+                           && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
+                           && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+                return;
 
-            //if ((maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeOnly ||
-            //    maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeAndEvent)
-            //    && maintACClass.MaintInterval.HasValue)
-            //    maintOrder.MaintSetDuration = maintACClass.MaintInterval.Value;
+            if (facilityInstance != null && dbApp.MaintOrder.Any(c => c.FacilityID == facilityInstance.FacilityID
+                           && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
+                           && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+                return;
 
-            //if (maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.EventOnly
-            //    || maintACClass.MDMaintMode.MDMaintModeIndex == (short)VD.MDMaintMode.MaintModes.TimeAndEvent)
-            //{
-            //    foreach (VD.MaintACClassProperty maintACClassProperty in maintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive))
-            //    {
-            //        var property = acComponent.GetProperty(maintACClassProperty.VBiACClassProperty.ACIdentifier);
-            //        if (property != null)
-            //        {
-            //            VD.MaintOrderProperty maintOrderProperty = VD.MaintOrderProperty.NewACObject(dbApp, maintOrder);
-            //            maintOrderProperty.SetValue = maintACClassProperty.MaxValue;
-            //            if (property.Value != null)
-            //                maintOrderProperty.ActValue = property.Value.ToString();
-            //            ResetPropertyValue(acComponent, property);
-            //            maintOrderProperty.MaintACClassProperty = maintACClassProperty;
-            //        }
-            //    }
-            //}
 
-            //Msg msg = dbApp.ACSaveChanges();
-            //if (msg != null)
-            //{
-            //    if (IsAlarmActive(MaintAlarm, msg.Message) == null)
-            //        Messages.LogError(this.GetACUrl(), "GenerateMaintOrder(1)", msg.Message);
-            //    OnNewAlarmOccurred(MaintAlarm, new Msg(msg.Message, this, eMsgLevel.Error, ClassName, "GenerateMaintOrder", 1000), true);
-            //}
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaintOrder), MaintOrder.NoColumnName, MaintOrder.FormatNewNo, this);
+            MaintOrder maintOrder = MaintOrder.NewACObject(dbApp, null, secondaryKey);
+            maintOrder.MaintOrder1_BasedOnMaintOrder = tempTemplate;
+            maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
 
-            //OnNewAlarmOccurred(OnNewMaintOrderAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace order {0} is generated for {1} {2}", maintOrder.MaintOrderNo, acComponent.ACCaption, acComponent.ACUrl)));
+            if (instance != null)
+                maintOrder.VBiPAACClassID = instance.ComponentClass.ACClassID;
 
-            //IsMaintenanceWarning.ValueT = true;
+            if (tempTemplate.MaintACClassID.HasValue)
+            {
+
+                var maintACClass = dbApp.MaintACClass.Include("MaintACClassProperty_MaintACClass")
+                                                     .Where(c => c.MaintACClassID == tempTemplate.MaintACClassID)
+                                                     .FirstOrDefault();
+
+                maintOrder.MaintACClass = maintACClass;
+            }
+
+            foreach (MaintOrderTask task in tempTemplate.MaintOrderTask_MaintOrder)
+            {
+                MaintOrderTask newTask = MaintOrderTask.NewACObject(dbApp, maintOrder);
+                task.CopyTaskValues(newTask);
+            }
+
+            foreach (MaintOrderAssignment assignment in tempTemplate.MaintOrderAssignment_MaintOrder)
+            {
+                MaintOrderAssignment newAssignment = MaintOrderAssignment.NewACObject(dbApp, maintOrder);
+                assignment.CopyAssignmentValues(newAssignment);
+            }
+
+            if (maintOrder.MaintACClass != null && instance != null)
+            {
+                foreach (MaintACClassProperty maintACClassProperty in maintOrder.MaintACClass.MaintACClassProperty_MaintACClass.Where(c => c.IsActive))
+                {
+                    var property = instance.GetProperty(maintACClassProperty.VBiACClassProperty.ACIdentifier);
+                    if (property != null)
+                    {
+                        MaintOrderProperty maintOrderProperty = MaintOrderProperty.NewACObject(dbApp, maintOrder);
+                        maintOrderProperty.SetValue = maintACClassProperty.MaxValue;
+                        if (property.Value != null)
+                            maintOrderProperty.ActValue = property.Value.ToString();
+                        ResetPropertyValue(instance, property);
+                        maintOrderProperty.MaintACClassProperty = maintACClassProperty;
+                    }
+                }
+
+            }
+
+            Msg msg = dbApp.ACSaveChanges();
+            if (msg != null)
+            {
+                if (IsAlarmActive(MaintAlarm, msg.Message) == null)
+                    Messages.LogError(this.GetACUrl(), "GenerateMaintOrder(1)", msg.Message);
+                OnNewAlarmOccurred(MaintAlarm, new Msg(msg.Message, this, eMsgLevel.Error, ClassName, nameof(GenerateMaintOrder), 1000), true);
+            }
+
+            string instanceName = instance?.ACUrl;
+            if (string.IsNullOrEmpty(instanceName))
+                instanceName = facilityInstance.FacilityNo;
+
+            OnNewAlarmOccurred(OnNewMaintOrderAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace order {0} is generated for {1}", maintOrder.MaintOrderNo, instanceName)));
+
+            IsMaintenanceWarning.ValueT = true;
         }
 
         #endregion
@@ -823,7 +940,7 @@ namespace gip.mes.maintenance
         /// </summary>
         private void SetMaintenanceWarning(ACComponent acComponent, gip.mes.datamodel.MaintACClassProperty maintACClassProperty, string propertyACIdentifier, IComparable changedValue, bool onInit = false)
         {
-            ACMaintWarning warning = GetOrCreateWarningFor(acComponent);
+            ACMaintWarning warning = GetOrCreateWarningFor(acComponent.ACUrl);
             ACMaintDetailsWarning warningDetail = warning.DetailsList.FirstOrDefault(c => c.ACIdentifier == maintACClassProperty.VBiACClassProperty.ACIdentifier);
             if (warningDetail == null)
             {
@@ -844,7 +961,7 @@ namespace gip.mes.maintenance
             ComponentsWarningList.ValueT = CompWarningList.ToList();
             IsMaintenanceWarning.ValueT = true;
 
-            
+
             if (!onInit && (tempList == null || !tempList.Contains(warning)))
                 OnNewAlarmOccurred(OnNewWarningAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace warning ({0}) is appeard for {1} {2}", warning.Text, acComponent.ACCaption, acComponent.ACUrl)));
         }
@@ -852,16 +969,22 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Create Warning periodic Maintenance
         /// </summary>
-        private void SetMaintenanceWarning(ACComponent acComponent, DateTime maintTerm)
+        private void SetMaintenanceWarning(ACComponent instance, Facility facilityInstance, DateTime maintTerm)
         {
-            ACMaintWarning warning = GetOrCreateWarningFor(acComponent);
+            string instanceName = null;
+            if (instance != null)
+                instanceName = instance.ACUrl;
+            else if (facilityInstance != null)
+                instanceName = facilityInstance.FacilityNo;
+
+            ACMaintWarning warning = GetOrCreateWarningFor(instanceName);
             ACMaintDetailsWarning warningDetail = warning.DetailsList.FirstOrDefault(c => c.ACIdentifier == "MaintenanceInterval");
             if (warningDetail == null)
             {
                 warningDetail = new ACMaintDetailsWarning()
                 {
                     ACIdentifier = "MaintenanceInterval",
-                    ACCaptionTranslation = "en{'Next maintenance at '}de{'Nächste Wartung bei'}",
+                    ACCaptionTranslation = "en{'Next maintenance at '}de{'Nächste Wartung bei '}", //TODO: translation and constant
                     ActualValue = maintTerm.ToShortDateString()
                 };
                 warning.DetailsList.Add(warningDetail);
@@ -872,24 +995,26 @@ namespace gip.mes.maintenance
             IsMaintenanceWarning.ValueT = true;
 
             if (tempList == null || !tempList.Contains(warning))
-                OnNewAlarmOccurred(OnNewWarningAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace warning ({0}) is appeard for {1} {2}", warning.Text, acComponent.ACCaption, acComponent.ACUrl)));
+            {
+                OnNewAlarmOccurred(OnNewWarningAlarm, new Msg(eMsgLevel.Info, String.Format("New maintenace warning ({0}) is appeard for {1}", warning.Text, instanceName)));
+            }
         }
 
         /// <summary>
         /// Create and add Warning to List
         /// </summary>
-        private ACMaintWarning GetOrCreateWarningFor(ACComponent acComponent)
+        private ACMaintWarning GetOrCreateWarningFor(string instanceName)
         {
             ACMaintWarning warning = null;
 
             using (ACMonitor.Lock(_60010_WarningLock))
             {
-                warning = CompWarningList.FirstOrDefault(c => c.ACComponentACUrl == acComponent.ACUrl);
+                warning = CompWarningList.FirstOrDefault(c => c.InstanceName == instanceName);
             }
             if (warning == null)
             {
                 warning = new ACMaintWarning();
-                warning.ACComponentACUrl = acComponent.ACUrl;
+                warning.InstanceName = instanceName;
                 warning.DetailsList = new List<ACMaintDetailsWarning>();
 
                 using (ACMonitor.Lock(_60010_WarningLock))

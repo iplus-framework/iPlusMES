@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System;
 using gip.core.autocomponent;
 using Microsoft.EntityFrameworkCore;
+using gip.core.media;
 
 namespace gip.bso.masterdata
 {
@@ -19,11 +20,6 @@ namespace gip.bso.masterdata
 
         public BSOMaterialExplorer _CloneFrom = null;
 
-        public string MediaRootFolder { get; set; }
-
-        public MediaSettings MediaSettings { get; private set; }
-
-        public string MaterialTypeRootFolder { get; private set; }
         #endregion
 
         #region c´tors
@@ -51,15 +47,8 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            MediaSettings = new MediaSettings();
             _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
-            if (ShowImages)
-            {
-                Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
-                if (dummyMaterial != null)
-                    MediaSettings.LoadTypeFolder(dummyMaterial);
-            }
-
+            MediaController = ACMediaController.GetServiceInstance(this);
             return true;
         }
 
@@ -74,8 +63,17 @@ namespace gip.bso.masterdata
                 _AccessAssociatedPartslistPos.ACDeInit(false);
                 _AccessAssociatedPartslistPos = null;
             }
+
+            MediaController = null;
+
             return b;
         }
+
+        #endregion
+
+        #region Managers
+
+        public ACMediaController MediaController { get; set; }
 
         #endregion
 
@@ -277,7 +275,7 @@ namespace gip.bso.masterdata
                 {
                     foreach (var material in materials)
                     {
-                        MediaSettings.LoadImage(material);
+                        MediaController.LoadIImageInfo(material, true);
                     }
                 }
                 return materials;

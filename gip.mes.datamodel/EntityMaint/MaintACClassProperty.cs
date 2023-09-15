@@ -165,5 +165,21 @@ namespace gip.mes.datamodel
             }
         }
 
+        partial void OnVBiACClassPropertyIDChanged()
+        {
+            OnPropertyChanged("ACClassProperty");
+        }
+
+
+        #region Additional properties
+
+        public MaintOrder MaintOrderTemplate
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
     }
 }

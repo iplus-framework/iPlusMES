@@ -10,6 +10,8 @@ using System.Xml;
 using System.Collections.Specialized;
 using gip.mes.facility;
 using System.Globalization;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Web;
 
 namespace gip.mes.processapplication
@@ -438,16 +440,47 @@ namespace gip.mes.processapplication
                         .Select(c => c as IPAFuncScaleConfig).ToArray();
                 }
             }
-        }        
+        }
         #endregion
 
 
         #region Properties, Range 400
-        [ACPropertyBindingSource(401, "Configuration", "en{'Facility'}de{'Lagerplatz'}", "", true, false)]
+        [ACPropertyBindingTarget(400, "Read from PLC", "en{'Fill level'}de{'Füllstand'}", "", false, false, RemotePropID = 20)]
+        public IACContainerTNet<Double> FillLevel { get; set; }
+
+        [ACPropertyBindingSource(401, "ACConfig", "en{'Start time'}de{'Startzeit'}", "", false, true)]
+        public IACContainerTNet<DateTime> StartTime { get; set; }
+
+        [ACPropertyBindingSource(402, "ACConfig", "en{'End time'}de{'Endezeit'}", "", false, true)]
+        public IACContainerTNet<DateTime> EndTime { get; set; }
+
+        [ACPropertyBindingSource(403, "ACConfig", "en{'Waiting time'}de{'Wartezeit'}", "", false, true)]
+        public IACContainerTNet<TimeSpan> WaitingTime { get; set; }
+
+        [ACPropertyBindingSource(703, "ACConfig", "en{'Remaining time'}de{'Restzeit'}", "", false, false)]
+        public IACContainerTNet<TimeSpan> RemainingTime { get; set; }
+
+        [ACPropertyBindingSource(704, "ACConfig", "en{'Elapsed time'}de{'Abgelaufene Zeit'}", "", false, false)]
+        public IACContainerTNet<TimeSpan> ElapsedTime { get; set; }
+
+        [ACPropertyBindingSource(705, "ACConfig", "en{'Is waiting'}de{'Wartet'}", "", false, false)]
+        public IACContainerTNet<bool> IsWaiting { get; set; }
+
+        [ACPropertyBindingSource(708, "ACConfig", "en{'Priority'}de{'Priorisierung'}", "", false, false)]
+        public IACContainerTNet<int> Priority { get; set; }
+
+        [ACPropertyBindingSource(710, "ACConfig", "en{'Order group'}de{'Auftragsgruppe'}", "", false, false)]
+        public IACContainerTNet<int> OrderGroup { get; set; }
+
+        [ACPropertyBindingSource(711, "ACConfig", "en{'Priority per order'}de{'Priorisierung pro Auftrag'}", "", false, false)]
+        public IACContainerTNet<int> PriorityPerOrderGroup { get; set; }
+
+
+        [ACPropertyBindingSource(440, "Configuration", "en{'Facility'}de{'Lagerplatz'}", "", true, false)]
         public IACContainerTNet<ACRef<Facility>> Facility { get; set; }
 
-        [ACPropertyBindingTarget(441, "Read from PLC", "en{'Fill level'}de{'Füllstand'}", "", false, false, RemotePropID = 20)]
-        public IACContainerTNet<Double> FillLevel { get; set; }
+        [ACPropertyBindingSource(441, "ACConfig", "en{'Filling Date'}de{'Fülldatum'}", "", false, true)]
+        public IACContainerTNet<DateTime> FillingDate { get; set; }
 
         [ACPropertyBindingTarget(442, "Read from PLC", "en{'Materialname'}de{'Materialname'}", "", false, false)] //, RemotePropID = 21
         public IACContainerTNet<String> MaterialName { get; set; }
@@ -1051,7 +1084,164 @@ namespace gip.mes.processapplication
                     FillLevelAlarm.ValueT = PANotifyState.Off;
                 }
             }
+            RecalcTimes(facilitySilo);
         }
+
+        #region Filllevel and Time calculation
+        protected void RecalcTimes(Facility facilitySilo)
+        {
+            Material material = null;
+            Facility parentFacility = null;
+            RootDbOpQueue.AppContextQueue.ProcessAction(() =>
+            {
+                try
+                {
+                    parentFacility = facilitySilo.Facility1_ParentFacility;
+                    if (facilitySilo.Material != null)
+                    {
+                        // Falls Zwischenprodukt, dann gebe Stücklistennummer an
+                        if (facilitySilo.Material.MaterialNo.StartsWith("_") && facilitySilo.PartslistID.HasValue && facilitySilo.Partslist.Material != null)
+                            material = facilitySilo.Partslist.Material;
+                        else
+                            material = facilitySilo.Material;
+                    }
+                    if (material != null)
+                        material.AutoRefresh();
+                }
+                catch (Exception qEx)
+                {
+                    Messages.LogException(this.GetACUrl(), "OnRefreshFacility(1)", qEx);
+                }
+            });
+
+            if (material != null)
+            {
+                WaitingTime.ValueT = GetMaterialWaitingTime(material, parentFacility);
+            }
+            else
+                WaitingTime.ValueT = TimeSpan.Zero;
+
+            using (var dbApp = new DatabaseApp())
+            {
+                var quants = s_cQry_Quants(dbApp, facilitySilo);
+                FacilityCharge fc = quants.FirstOrDefault();
+                if (fc == null)
+                {
+                    WaitingTime.ValueT = TimeSpan.Zero;
+                    StartTime.ValueT = DateTime.Now;
+                    FillingDate.ValueT = DateTime.Now;
+                    OrderInfo.ValueT = "";
+                }
+                else
+                {
+                    StartTime.ValueT = fc.FillingDate.Value;
+                    quants = s_cQry_QuantsReverse(dbApp, facilitySilo);
+                    FacilityCharge fcOldest = quants.FirstOrDefault();
+                    if (fcOldest == null)
+                        FillingDate.ValueT = DateTime.Now;
+                    else
+                        FillingDate.ValueT = fcOldest.FillingDate.Value;
+                    string poNo = fc.ProdOrderProgramNo;
+                    OrderInfo.ValueT = poNo;
+                }
+            }
+            //}
+            //else
+            //StartTime.ValueT = DateTime.Now;
+
+            EndTime.ValueT = StartTime.ValueT + WaitingTime.ValueT;
+            RefreshElapsingTime();
+        }
+
+        public void RefreshElapsingTime()
+        {
+            if (String.IsNullOrEmpty(MaterialNo.ValueT))
+            {
+                IsWaiting.ValueT = false;
+                Priority.ValueT = 0;
+                OrderGroup.ValueT = 0;
+                PriorityPerOrderGroup.ValueT = 0;
+            }
+            else
+            {
+                if (WaitingTime.ValueT > TimeSpan.Zero)
+                {
+                    RemainingTime.ValueT = EndTime.ValueT - DateTime.Now;
+                    ElapsedTime.ValueT = DateTime.Now - StartTime.ValueT;
+                    IsWaiting.ValueT = RemainingTime.ValueT > TimeSpan.Zero;
+                }
+                else
+                {
+                    RemainingTime.ValueT = TimeSpan.Zero;
+                    ElapsedTime.ValueT = TimeSpan.Zero;
+                    IsWaiting.ValueT = false;
+                }
+
+                if ((FillLevel.ValueT <= -0.001 || FillLevel.ValueT >= 0.001)
+                    && this.ApplicationManager != null)
+                {
+                    var silosInThisApp = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PAMSilo>(true);
+                    if (silosInThisApp != null && silosInThisApp.Any())
+                    {
+                        var sortedByPriority = silosInThisApp.Where(c => !String.IsNullOrEmpty(c.MaterialNo.ValueT)
+                                                && c.MaterialNo.ValueT == this.MaterialNo.ValueT
+                                                && (c.FillLevel.ValueT <= -0.001 || c.FillLevel.ValueT >= 0.001))
+                                      .OrderBy(c => c.FillingDate.ValueT);
+                        if (sortedByPriority != null && sortedByPriority.Any())
+                        {
+                            int priority = 1;
+                            foreach (var priorizedSilo in sortedByPriority)
+                            {
+                                priorizedSilo.Priority.ValueT = priority;
+                                if (String.IsNullOrEmpty(priorizedSilo.OrderInfo.ValueT))
+                                {
+                                    priorizedSilo.PriorityPerOrderGroup.ValueT = priority;
+                                    priorizedSilo.OrderGroup.ValueT = 0;
+                                }
+                                priority++;
+                            }
+                        }
+                        if (!String.IsNullOrEmpty(OrderInfo.ValueT))
+                        {
+                            var groupedByOrderPriority = silosInThisApp.Where(c => !String.IsNullOrEmpty(c.OrderInfo.ValueT)
+                                                    && (c.FillLevel.ValueT <= -0.001 || c.FillLevel.ValueT >= 0.001))
+                                          .OrderBy(c => c.OrderInfo.ValueT)
+                                          .GroupBy(c => c.OrderInfo.ValueT);
+                            int orderGroup = 1;
+                            foreach (var kvp in groupedByOrderPriority)
+                            {
+                                int priority = 1;
+                                foreach (var priorizedSilo in kvp.OrderBy(c => c.FillingDate.ValueT))
+                                {
+                                    priorizedSilo.OrderGroup.ValueT = orderGroup;
+                                    priorizedSilo.PriorityPerOrderGroup.ValueT = priority;
+                                    priority++;
+                                }
+                                orderGroup++;
+                            }
+                        }
+                        else
+                        {
+                            OrderGroup.ValueT = 0;
+                            PriorityPerOrderGroup.ValueT = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    Priority.ValueT = 0;
+                    OrderGroup.ValueT = 0;
+                    PriorityPerOrderGroup.ValueT = 0;
+                }
+            }
+        }
+
+        public virtual TimeSpan GetMaterialWaitingTime(Material material, Facility facility)
+        {
+            return TimeSpan.Zero;
+        }
+
+        #endregion
 
         protected virtual void RecalcFillLevelScale()
         {
@@ -1692,7 +1882,26 @@ namespace gip.mes.processapplication
             }
         }
         #endregion
-        
+
+        #region Precompiled Queries
+
+        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_Quants =
+        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
+            (ctx, facility) => from c in ctx.FacilityCharge
+                               where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
+                               orderby c.FillingDate descending
+                               select c
+        );
+
+        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
+        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
+            (ctx, facility) => from c in ctx.FacilityCharge
+                               where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
+                               orderby c.FillingDate
+                               select c
+        );
+        #endregion
+
         #endregion
     }
 }

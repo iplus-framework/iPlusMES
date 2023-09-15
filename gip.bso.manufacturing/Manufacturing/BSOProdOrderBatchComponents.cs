@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.media;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,11 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
 
+            MediaController = ACMediaController.GetServiceInstance(this);
+            if (MediaController == null)
+            {
+                throw new Exception($"{ACMediaController.MediaControllerPath} not found!");
+            }
 
             return true;
         }
@@ -52,6 +58,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties
+
+        public ACMediaController MediaController { get; set; }  
 
         #region Properties -> Component
 
@@ -204,12 +212,10 @@ namespace gip.bso.manufacturing
 
         public void LoadMaterialImage(Material material)
         {
-            MediaSettings mediaSettings = new MediaSettings();
 
-            MediaController mediaController = new MediaController(mediaSettings, material);
-            MediaSet imageMediaSet = mediaController.Items[MediaItemTypeEnum.Image];
+            MediaSet imageMediaSet = MediaController.GetMediaSet(material, MediaItemTypeEnum.Image, "", "", true);
 
-            List<MediaItemPresentation> mediaItemPresentations = imageMediaSet.GetFiles(1);
+            List<MediaItemPresentation> mediaItemPresentations = MediaController.GetFiles(imageMediaSet, 1);
 
             if (mediaItemPresentations != null && mediaItemPresentations.Any())
             {

@@ -18,6 +18,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(4, "EndDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
     [ACPropertyEntity(5, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
     [ACPropertyEntity(6, "IsRepair", "en{'Is repaired'}de{'Repariert'}", "", "", true)]
+    [ACPropertyEntity(7, "StartDate", "en{'Task commenced on'}de{'Aufgabe begonnen am'}", "", "", true)]
+    [ACPropertyEntity(8, "EndDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
+    [ACPropertyEntity(9, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
+    [ACPropertyEntity(10, "IsRepair", "en{'Is repaired'}de{'Repariert'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -35,11 +39,67 @@ namespace gip.mes.datamodel
             MaintOrderTask entity = new MaintOrderTask();
             entity.MaintOrderTaskID = Guid.NewGuid();
             entity.DefaultValuesACObject();
+            entity.MDMaintTaskState = dbApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.UnfinishedTask);
+
             if (parentACObject is MaintOrder)
                 entity.MaintOrder = parentACObject as MaintOrder;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
+
+        [ACPropertyInfo(9999, "", "en{'Planned duration'}de{'Geplante Dauer'}")]
+        public TimeSpan PlannedDurationTS
+        {
+            get
+            {
+                if (PlannedDuration.HasValue)
+                    return TimeSpan.FromMinutes(PlannedDuration.Value);
+                return TimeSpan.Zero;
+        }
+            set
+            {
+                PlannedDuration = (int)value.TotalMinutes;
+                OnPropertyChanged(nameof(PlannedDurationTS));
+            }
+        }
+
+        [ACPropertyInfo(9999, "", "en{'Task name'}de{'Task name'}")]
+        public string MaintTaskName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(TaskName))
+                    return TaskName;
+
+                if (MaintOrder != null)
+                {
+                    var tasks = MaintOrder.MaintOrderTask_MaintOrder.OrderBy(c => c.InsertDate).ToList();
+                    if (tasks != null)
+                        return (tasks.IndexOf(this) + 1).ToString();
+                }
+
+                return "001";
+            }
+        }
+
+        protected override void OnPropertyChanged(string property)
+        {
+            base.OnPropertyChanged(property);
+
+            if (property == nameof(TaskName))
+            {
+                OnPropertyChanged(nameof(MaintTaskName));
+            }
+        }
+
+        public void CopyTaskValues(MaintOrderTask newTask)
+        {
+            newTask.TaskDescription = TaskDescription;
+            newTask.TaskName = TaskName;
+            newTask.PlannedStartDate = PlannedStartDate;
+            newTask.PlannedDuration = PlannedDuration;
+        }
+
     }
 
     public enum MaintTaskState : short

@@ -8,6 +8,7 @@ using gip.mes.datamodel;
 using gip.mes.autocomponent;
 using gip.core.layoutengine;
 using gip.core.autocomponent;
+using gip.core.media;
 
 namespace gip.bso.manufacturing
 {
@@ -24,12 +25,6 @@ namespace gip.bso.manufacturing
 
         public const string ProdMatStorage = @"ProdMatStorage";
         public double Const_RangeStockQuantityTolerance = 0.1;
-        #endregion
-
-        #region DI Properties
-
-        public MediaSettings MediaSettings { get; private set; }
-
         #endregion
 
         #region ctor's
@@ -54,9 +49,7 @@ namespace gip.bso.manufacturing
             if (_PickingManager == null)
                 throw new Exception("PickingManager not configured");
 
-            MediaSettings = new MediaSettings();
-            Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
-            MediaSettings.LoadTypeFolder(dummyMaterial);
+            MediaController = ACMediaController.GetServiceInstance(this);
 
             return true;
         }
@@ -75,7 +68,7 @@ namespace gip.bso.manufacturing
 
             CleanUp();
 
-            MediaSettings = null;
+            MediaController = null;
 
             return b;
         }
@@ -150,6 +143,8 @@ namespace gip.bso.manufacturing
                 return _PickingManager.ValueT;
             }
         }
+
+        public ACMediaController MediaController { get;set;}
 
         #endregion
 
@@ -704,7 +699,7 @@ namespace gip.bso.manufacturing
             {
                 Guid materialID = item.Key;
                 Material material = materials.FirstOrDefault(c => c.MaterialID == materialID);
-                MediaSettings.LoadImage(material);
+                MediaController.LoadIImageInfo(material);
                 Guid[] posIDs = item.Select(c => c.SourcePosID).Distinct().ToArray();
                 nr++;
                 PreparedMaterial preparedMaterial = new PreparedMaterial() { Sn = nr, PickingRelationType = PickingRelationTypeEnum.ProductionLine };

@@ -69,6 +69,9 @@ namespace gip.bso.facility
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (CurrentFacilityCharge != null)
+                CurrentFacilityCharge.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
+
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
             this._BookParamInwardMovement = null;

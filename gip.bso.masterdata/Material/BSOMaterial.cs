@@ -20,6 +20,7 @@ using gip.core.autocomponent;
 using static gip.core.datamodel.Global;
 using Microsoft.EntityFrameworkCore;
 using gip.mes.facility;
+using gip.core.media;
 
 namespace gip.bso.masterdata
 {
@@ -271,9 +272,20 @@ namespace gip.bso.masterdata
 
                     try
                     {
-                        if (value != null && BSOMedia_Child != null && BSOMedia_Child.Value != null)
+                        if (
+                            value != null
+                            && BSOMedia_Child != null
+                            && BSOMedia_Child.Value != null
+                            )
                         {
-                            BSOMedia_Child.Value.LoadMedia(value);
+                            if (value !=  null && value.EntityState != System.Data.EntityState.Added)
+                            {
+                                BSOMedia_Child.Value.LoadMedia(value);
+                            }
+                            else
+                            {
+                                BSOMedia_Child.Value.Clean();
+                            }
                         }
                     }
                     catch (Exception e)
@@ -962,10 +974,9 @@ namespace gip.bso.masterdata
             if (!PreExecute("New")) return;
             CurrentMaterial = Material.NewACObject(DatabaseApp, null);
             DatabaseApp.Material.Add(CurrentMaterial);
-            AccessPrimary.NavList.Add(CurrentMaterial);
-            AccessPrimary.Selected = CurrentMaterial;
-            OnPropertyChanged("SelectedMaterial");
-            OnPropertyChanged("MaterialList");
+            AccessPrimary.NavList.Insert(0, CurrentMaterial);
+            SelectedMaterial = CurrentMaterial;
+            OnPropertyChanged(nameof(MaterialList));
 
             ACState = Const.SMNew;
             PostExecute("New");
@@ -987,16 +998,24 @@ namespace gip.bso.masterdata
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
+
+            if(BSOMedia_Child != null && BSOMedia_Child.Value != null)
+            {
+                BSOMedia_Child.Value.DeleteACObject(CurrentMaterial);
+            }
+
             Msg msg = CurrentMaterial.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.Msg(msg);
                 return;
             }
-            if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMaterial);
+            if (AccessPrimary == null) return; 
+            AccessPrimary.NavList.Remove(CurrentMaterial);
+            
             SelectedMaterial = AccessPrimary.NavList.FirstOrDefault();
             Load();
-            OnPropertyChanged("MaterialList");
+            OnPropertyChanged(nameof(MaterialList));
             PostExecute("Delete");
         }
 
@@ -1025,6 +1044,16 @@ namespace gip.bso.masterdata
             if (_VisitedMaterials != null && _VisitedMaterials.Any())
             {
                 _VisitedMaterials.RemoveAll(c => c.EntityState == EntityState.Unchanged);
+            }
+            if (
+                CurrentMaterial != null
+                && BSOMedia_Child != null
+                && BSOMedia_Child.Value != null
+                && CurrentMaterial.EntityState == System.Data.EntityState.Added
+                && !string.IsNullOrEmpty(CurrentMaterial.MaterialNo)
+              )
+            {
+                BSOMedia_Child.Value.LoadMedia(CurrentMaterial);
             }
             return base.OnPreSave();
         }
