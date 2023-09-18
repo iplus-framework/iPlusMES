@@ -8,7 +8,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Order'}de{'Wartungsauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaintOrder")]
 
     [ACPropertyEntity(1, "MaintOrderNo", "en{'Maintorder-No.'}de{'Wartungauftrags-Nr.'}", "", "", true)]
-    [ACPropertyEntity(2, "BasedOnMaintOrder", "en{'BasedOnMaintOrder'}de{'BasedOnMaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName, "", true)]
+    [ACPropertyEntity(2, "MaintOrder1_BasedOnMaintOrder", "en{'BasedOnMaintOrder'}de{'BasedOnMaintOrder'}", Const.ContextDatabase + "\\" + MaintOrder.ClassName, "", true)]
     [ACPropertyEntity(3, "Facility", "en{'Facility'}de{'Facility'}", Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
     [ACPropertyEntity(4, "Picking", "en{'Picking'}de{'Picking'}", Const.ContextDatabase + "\\" + Picking.ClassName, "", true)]
     [ACPropertyEntity(5, "IsActive", "en{'Active'}de{'Aktiv'}", "", "", true)]
@@ -18,6 +18,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9, "PlannedStartDate", "en{'Planned start date'}de{'Geplantes Startdatum'}", "", "", true)]
     [ACPropertyEntity(10, "StartDate", "en{'Start date'}de{'Startdatum'}", "", "", true)]
     [ACPropertyEntity(11, "EndDate", "en{'Completed at'}de{'Fertiggestellt am'}", "", "", true)]
+    [ACPropertyEntity(12, "PlannedDuration", "en{'Planned duration'}de{'Geplante Dauer'}", "", "", true)]
     [ACPropertyEntity(8, "MDMaintOrderState", "en{'Status'}de{'Status'}", Const.ContextDatabase + "\\MDMaintOrderState", "", true)]
     [ACPropertyEntity(13, "MaintACClass", "en{'Maintenance Objekt'}de{Wartungsobjekt'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]

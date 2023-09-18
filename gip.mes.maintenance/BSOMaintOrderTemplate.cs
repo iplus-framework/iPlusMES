@@ -138,6 +138,22 @@ namespace gip.mes.maintenance
 
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
+        public override List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem basedOnFilter = new ACFilterItem(Global.FilterTypes.filter, nameof(MaintOrder.MaintOrder1_BasedOnMaintOrder), Global.LogicalOperators.equal, Global.Operators.and, null, true);
+                aCFilterItems.Add(basedOnFilter);
+
+                ACFilterItem maintOrderNoFilter = new ACFilterItem(FilterTypes.filter, nameof(MaintOrder.MaintOrderNo), LogicalOperators.contains, Operators.and, null, true, true);
+                aCFilterItems.Add(maintOrderNoFilter);
+
+                return aCFilterItems;
+            }
+        }
+
         #endregion
 
         #endregion
