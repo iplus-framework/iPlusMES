@@ -7,7 +7,6 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
@@ -552,7 +551,7 @@ namespace gip.mes.maintenance
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaintOrder), nameof(MaintOrder.MaintOrderNo), MaintOrder.FormatNewNoTemplate, this);
             CurrentMaintOrder = MaintOrder.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.MaintOrder.AddObject(CurrentMaintOrder);
+            DatabaseApp.MaintOrder.Add(CurrentMaintOrder);
             ACState = Const.SMNew;
 
             mes.datamodel.ACClass tempACClass = null;
@@ -580,17 +579,17 @@ namespace gip.mes.maintenance
             MaintOrderTask[] tempTasksList = SelectedMaintOrder.MaintOrderTask_MaintOrder.ToArray();
             foreach (MaintOrderTask task in tempTasksList)
             {
-                DatabaseApp.DeleteObject(task);
+                DatabaseApp.Remove(task);
             }
 
             MaintOrderAssignment[] tempAssignmentList = SelectedMaintOrder.MaintOrderAssignment_MaintOrder.ToArray();
             foreach (MaintOrderAssignment assignment in tempAssignmentList)
             {
-                DatabaseApp.DeleteObject(assignment);
+                DatabaseApp.Remove(assignment);
             }
            
 
-            DatabaseApp.DeleteObject(SelectedMaintOrder);
+            DatabaseApp.Remove(SelectedMaintOrder);
             DatabaseApp.ACSaveChanges();
             AccessPrimary.NavList.Remove(SelectedMaintOrder);
             OnPropertyChanged(nameof(MaintOrderList));

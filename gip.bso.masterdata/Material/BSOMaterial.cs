@@ -278,7 +278,7 @@ namespace gip.bso.masterdata
                             && BSOMedia_Child.Value != null
                             )
                         {
-                            if (value !=  null && value.EntityState != System.Data.EntityState.Added)
+                            if (value !=  null && value.EntityState != EntityState.Added)
                             {
                                 BSOMedia_Child.Value.LoadMedia(value);
                             }
@@ -1049,7 +1049,7 @@ namespace gip.bso.masterdata
                 CurrentMaterial != null
                 && BSOMedia_Child != null
                 && BSOMedia_Child.Value != null
-                && CurrentMaterial.EntityState == System.Data.EntityState.Added
+                && CurrentMaterial.EntityState == EntityState.Added
                 && !string.IsNullOrEmpty(CurrentMaterial.MaterialNo)
               )
             {

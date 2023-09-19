@@ -10,9 +10,8 @@ using System.Xml;
 using System.Collections.Specialized;
 using gip.mes.facility;
 using System.Globalization;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Wordprocessing;
 using System.Web;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
@@ -1885,16 +1884,16 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
 
-        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_Quants =
-        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Facility, IEnumerable<FacilityCharge>> s_cQry_Quants =
+        EF.CompileQuery<DatabaseApp, Facility, IEnumerable<FacilityCharge>>(
             (ctx, facility) => from c in ctx.FacilityCharge
                                where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
                                orderby c.FillingDate descending
                                select c
         );
 
-        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
-        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Facility, IEnumerable<FacilityCharge>> s_cQry_QuantsReverse =
+        EF.CompileQuery<DatabaseApp, Facility, IEnumerable<FacilityCharge>>(
             (ctx, facility) => from c in ctx.FacilityCharge
                                where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
                                orderby c.FillingDate
