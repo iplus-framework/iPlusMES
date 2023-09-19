@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using gip.core.datamodel;
 
@@ -178,6 +179,19 @@ namespace gip.mes.datamodel
                 }
 
                 return null;
+            }
+        }
+
+        [ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
+        public TimeSpan MaintOrderDuration
+        {
+            get
+            {
+                if (StartDate.HasValue && EndDate.HasValue && EndDate.Value > StartDate.Value)
+                {
+                    return EndDate.Value - StartDate.Value;
+                }
+                return TimeSpan.Zero;
             }
         }
 

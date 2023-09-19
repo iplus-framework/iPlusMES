@@ -47,7 +47,7 @@ namespace gip.mes.maintenance
             }
         }
 
-        private IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
+        protected virtual IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
         {
             return result;   
         }

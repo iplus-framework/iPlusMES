@@ -57,6 +57,19 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
+        public TimeSpan MaintOrderTaskDuration
+        {
+            get
+            {
+                if (StartDate.HasValue && EndDate.HasValue && EndDate.Value > StartDate.Value)
+                {
+                    return EndDate.Value - StartDate.Value;
+                }
+                return TimeSpan.Zero;
+            }
+        }
+
         [ACPropertyInfo(9999, "", "en{'Task name'}de{'Task name'}")]
         public string MaintTaskName
         {

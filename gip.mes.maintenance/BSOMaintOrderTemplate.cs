@@ -541,6 +541,11 @@ namespace gip.mes.maintenance
 
         #region Methods
 
+        protected override IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
+        {
+            return result.Where(c => c.BasedOnMaintOrderID.HasValue);
+        }
+
         /// <summary>
         /// News this instance.
         /// </summary>

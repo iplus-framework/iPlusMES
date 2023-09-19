@@ -6,6 +6,8 @@ using gip.mes.datamodel;
 using gip.mes.autocomponent;
 using gip.core.autocomponent;
 using gip.bso.iplus;
+using System.Runtime.Remoting.Messaging;
+using gip.bso.masterdata;
 
 namespace gip.mes.maintenance
 {
@@ -121,37 +123,7 @@ namespace gip.mes.maintenance
 
         #region ACProperty => MaintOrder
 
-
-
-        public override IAccessNav AccessNav => throw new NotImplementedException();
-
-        //private ACQueryDefinition _ACQueryDefinition;
-
-        //private void SetSubList()
-        //{
-        //    if (CurrentMaintOrder != null)
-        //    {
-        //        MaintOrderPropertyList = CurrentMaintOrder.MaintOrderProperty_MaintOrder.ToList();
-        //        if (MaintOrderPropertyList.Any())
-        //            SelectedMaintOrderProperty = MaintOrderPropertyList.FirstOrDefault();
-        //        MaintTaskList = CurrentMaintOrder.MaintTask_MaintOrder;
-        //        if (MaintTaskList.Any())
-        //            SelectedMaintTask = MaintTaskList.FirstOrDefault();
-        //        //MaintOrderHistoryList = DatabaseApp.MaintOrder.Where(c => c.VBiPAACClassID == CurrentMaintOrder.VBiPAACClassID && c.MaintOrderID != CurrentMaintOrder.MaintOrderID
-        //        //                                                       && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceInProcess);
-        //        //if (MaintOrderHistoryList.Any())
-        //        //    SelectedMaintOrderHistory = MaintOrderHistoryList.LastOrDefault();
-        //        //else
-        //        //    SelectedMaintOrderHistory = null;
-        //    }
-        //    else
-        //    {
-        //        MaintOrderPropertyList = null;
-        //        MaintTaskList = null;
-        //        //SelectedMaintOrderHistory = null;
-        //        //MaintOrderHistoryList = null;
-        //    }
-        //}
+        public override IAccessNav AccessNav => AccessPrimary;
 
         private string _MaintOrderTask;
         [ACPropertyInfo(999, "", "en{'Tasks'}de{'Aufgaben'}")]
@@ -228,40 +200,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-        #region ACProperty => MaintTask
-
-        //private MaintOrderTask _SelectedMaintTask;
-        //[ACPropertySelected(999, "MaintTask")]
-        //public MaintOrderTask SelectedMaintTask
-        //{
-        //    get
-        //    {
-        //        return _SelectedMaintTask;
-        //    }
-        //    set
-        //    {
-        //        _SelectedMaintTask = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        //private IEnumerable<MaintOrderTask> _MaintTaskList;
-        //[ACPropertyList(999, "MaintTask")]
-        //public IEnumerable<MaintOrderTask> MaintTaskList
-        //{
-        //    get
-        //    {
-        //        return _MaintTaskList;
-        //    }
-        //    set
-        //    {
-        //        _MaintTaskList = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
-
-        #endregion
-
         [ACPropertySelected(999, "Warning")]
         public ACMaintWarning CurrentWarningComponent
         {
@@ -312,7 +250,35 @@ namespace gip.mes.maintenance
             set
             {
                 _CurrentComponentFilter = value;
-                OnPropertyChanged("CurrentComponentFilter");
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentObjectFilter));
+            }
+        }
+
+        private Facility _CurrentFacilityFilter;
+        [ACPropertyInfo(9999, "", "en{'Facility'}de{'Anlage'}")]
+        public Facility CurrentFacilityFilter
+        {
+            get => _CurrentFacilityFilter;
+            set
+            {
+                _CurrentFacilityFilter = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentObjectFilter));
+            }
+        }
+
+        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
+        public string CurrentObjectFilter
+        {
+            get
+            {
+                if (CurrentFacilityFilter != null)
+                    return CurrentFacilityFilter.ACCaption;
+                else if (CurrentComponentFilter != null)
+                    return CurrentComponentFilter.ACUrlComponent;
+
+                return null;
             }
         }
 
@@ -403,6 +369,27 @@ namespace gip.mes.maintenance
 
         #region BSO -> ACMethod
 
+        protected override IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
+        {
+            result = result.Where(c => c.BasedOnMaintOrderID.HasValue);
+
+            if (ShowMyTasks)
+            {
+                result = result.Where(c => c.MaintOrderAssignment_MaintOrder.Any(x => x.VBUserID == Root.Environment.User.VBUserID && x.IsActive)
+                                        || c.MaintOrderAssignment_MaintOrder.Any(x => x.IsActive && Root.Environment.User.VBUserGroup_VBUser.Any(t => t.VBGroupID == x.VBGroupID)));
+            }
+            else if (ShowMyDefaultTasks)
+            {
+                result = result.Where(c => c.MaintOrderAssignment_MaintOrder.Any(x => x.VBUserID == Root.Environment.User.VBUserID && x.IsDefault && x.IsActive));
+            }
+            else if (ShowOutsourcedTasks)
+            {
+                result = result.Where(c => c.MaintOrderAssignment_MaintOrder.Any(x => x.IsActive && x.CompanyID.HasValue));
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Deletes this instance.
         /// </summary>
@@ -425,15 +412,25 @@ namespace gip.mes.maintenance
                 }
             }
 
-            //foreach (MaintTask maintTask in CurrentMaintOrder.MaintTask_MaintOrder.ToArray())
-            //{
-            //    Msg msgTask = maintTask.DeleteACObject(DatabaseApp, true);
-            //    if (msgTask != null)
-            //    {
-            //        Messages.Msg(msgTask);
-            //        return;
-            //    }
-            //}
+            foreach (MaintOrderTask maintTask in CurrentMaintOrder.MaintOrderTask_MaintOrder.ToArray())
+            {
+                Msg msgTask = maintTask.DeleteACObject(DatabaseApp, true);
+                if (msgTask != null)
+                {
+                    Messages.Msg(msgTask);
+                    return;
+                }
+            }
+
+            foreach (MaintOrderAssignment assignment in CurrentMaintOrder.MaintOrderAssignment_MaintOrder.ToArray())
+            {
+                Msg msgAssignment = assignment.DeleteACObject(DatabaseApp, true);
+                if (msgAssignment != null)
+                {
+                    Messages.Msg(msgAssignment);
+                    return;
+                }
+            }
 
             Msg msg = CurrentMaintOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
@@ -456,53 +453,46 @@ namespace gip.mes.maintenance
         [ACMethodInfo("", "en{'Start Worktask'}de{'Arbeitsauftrag beginnen'}", 999)]
         public void StartMaintenanceTask()
         {
-            ////SelectedMaintTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskInProcess);
-            ////SelectedMaintTask.StartTaskDate = DateTime.Now;
-            ////OnPropertyChanged("SelectedMaintTask");
-            ////if (CurrentMaintOrder != null && CurrentMaintOrder.MDMaintOrderState.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded)
-            ////{
-            ////    CurrentMaintOrder.MDMaintOrderState = DatabaseApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceInProcess);
-            ////    OnPropertyChanged("CurrentMaintOrder");
-            ////}
-            ////Save();
+            SelectedMaintOrderTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskInProcess);
+            SelectedMaintOrderTask.StartDate = DateTime.Now;
+            OnPropertyChanged(nameof(SelectedMaintOrderTask));
+            if (CurrentMaintOrder != null && CurrentMaintOrder.MDMaintOrderState.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded)
+            {
+                CurrentMaintOrder.MDMaintOrderState = DatabaseApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceInProcess);
+                OnPropertyChanged(nameof(CurrentMaintOrder));
+            }
+            Save();
         }
 
         public bool IsEnabledStartMaintenanceTask()
         {
-            //if (SelectedMaintTask != null
-            // && (Root.Environment.User.VBUserGroup_VBUser.Any(c => c.VBGroupID == SelectedMaintTask.MaintACClassVBGroup.VBGroupID
-            //    || Root.Environment.User.IsSuperuser)
-            // && SelectedMaintTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.UnfinishedTask))
-            //    return true;
-            return false;
+            return SelectedMaintOrderTask != null && SelectedMaintOrderTask.MDMaintTaskState != null
+                                                  && SelectedMaintOrderTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.UnfinishedTask;
         }
 
         [ACMethodInfo("", "en{'Worktask completed'}de{'Arbeitsauftrag erledigt'}", 999)]
         public void EndMaintenanceTask()
         {
-            //SelectedMaintTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskCompleted);
-            //OnPropertyChanged(nameof(SelectedMaintTask));
-            //MaintTaskList = _MaintTaskList.ToList();
-            //if (!MaintTaskList.Any(c => c.MDMaintTaskState.MDMaintTaskStateIndex != (short)MaintTaskState.TaskCompleted))
-            //{
-            //    CurrentMaintOrder.MDMaintOrderStateID = DatabaseApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted).MDMaintOrderStateID;
-            //    CurrentMaintOrder.MaintActStartDate = MaintTaskList.Min(c => c.StartTaskDate);
-            //    CurrentMaintOrder.MaintActEndDate = MaintTaskList.Max(c => c.EndTaskDate);
-            //    CurrentMaintOrder.MaintActDurationTS = CurrentMaintOrder.MaintActEndDate.Value - CurrentMaintOrder.MaintActStartDate.Value;
-            //    Save();
-            //    OnPropertyChanged(nameof(CurrentMaintOrder));
-            //}
-            //Save();
+            SelectedMaintOrderTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskCompleted);
+            SelectedMaintOrderTask.EndDate = DateTime.Now;
+            OnPropertyChanged(nameof(SelectedMaintOrderTask));
+            MaintOrderTaskList = MaintOrderTaskList.ToList();
+            if (!MaintOrderTaskList.Any(c => c.MDMaintTaskState.MDMaintTaskStateIndex != (short)MaintTaskState.TaskCompleted))
+            {
+                CurrentMaintOrder.MDMaintOrderStateID = DatabaseApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted).MDMaintOrderStateID;
+                CurrentMaintOrder.StartDate = MaintOrderTaskList.Min(c => c.StartDate);
+                CurrentMaintOrder.EndDate = MaintOrderTaskList.Max(c => c.EndDate);
+                
+                Save();
+                OnPropertyChanged(nameof(CurrentMaintOrder));
+            }
+            Save();
         }
 
         public bool IsEnabledEndMaintenanceTask()
         {
-            //if (SelectedMaintTask != null && SelectedMaintTask.StartTaskDate != null && SelectedMaintTask.EndTaskDate != null
-            //    && (Root.Environment.User.VBUserGroup_VBUser.Any(c => c.VBGroupID == SelectedMaintTask.MaintACClassVBGroup.VBGroupID
-            //        || Root.Environment.User.IsSuperuser)
-            //    && SelectedMaintTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.TaskInProcess))
-            //    return true;
-            return false;
+            return SelectedMaintOrderTask != null && SelectedMaintOrderTask.MDMaintTaskState != null
+                                                 && SelectedMaintOrderTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.TaskInProcess;
         }
 
         [ACMethodInfo("", "", 999)]
@@ -568,6 +558,10 @@ namespace gip.mes.maintenance
         public void SearchFilter()
         {
             CurrentMaintOrder = null;
+
+
+
+
             if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter == null)
             {
                 if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
@@ -630,17 +624,33 @@ namespace gip.mes.maintenance
         {
             if (!IsEnabledChooseComponent())
                 return;
-            CurrentComponentFilter = (core.datamodel.ACClass)ComponentSelector.ACUrlCommand("!ShowComponentSelector", ComponentTypeFilter, "", "");
+
+            ShowDialog(this, "MaintOrderEntity");
+
+            BSOFacilityExplorer facilityExpl = FindChildComponents<BSOFacilityExplorer>(c => c is BSOFacilityExplorer).FirstOrDefault();
+            if (facilityExpl != null && facilityExpl.SelectedFacility != null)
+            {
+                CurrentFacilityFilter = facilityExpl.SelectedFacility;
+            }
+            else
+            {
+                BSOComponentSelector compExpl = FindChildComponents<BSOComponentSelector>(c => c is BSOComponentSelector).FirstOrDefault();
+                if (compExpl != null && compExpl.CurrentProjectItemCS != null)
+                {
+                    CurrentComponentFilter = compExpl.CurrentProjectItemCS.ValueT;
+                }
+            }
         }
 
         public bool IsEnabledChooseComponent()
         {
-            return ComponentSelector != null;
+            return true;
         }
 
         [ACMethodInfo("", "", 999)]
         public void ClearChosenComponent()
         {
+            CurrentFacilityFilter = null;
             CurrentComponentFilter = null;
         }
 
