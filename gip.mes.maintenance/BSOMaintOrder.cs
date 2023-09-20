@@ -6,8 +6,8 @@ using gip.mes.datamodel;
 using gip.mes.autocomponent;
 using gip.core.autocomponent;
 using gip.bso.iplus;
-using System.Runtime.Remoting.Messaging;
 using gip.bso.masterdata;
+using gip.core.media;
 
 namespace gip.mes.maintenance
 {
@@ -214,6 +214,19 @@ namespace gip.mes.maintenance
             set;
         }
 
+        ACChildItem<BSOMedia> _BSOMedia_Child;
+        [ACPropertyInfo(9999)]
+        [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
+        public ACChildItem<BSOMedia> BSOMedia_Child
+        {
+            get
+            {
+                if (_BSOMedia_Child == null)
+                    _BSOMedia_Child = new ACChildItem<BSOMedia>(this, "BSOMedia_Child");
+                return _BSOMedia_Child;
+            }
+        }
+
         #region ACProperty => Filter
 
         [ACPropertyCurrent(9999, "MaintOrderStateFilter", "en{'Order state'}de{'Auftragsstatus'}")]
@@ -373,6 +386,11 @@ namespace gip.mes.maintenance
         {
             result = result.Where(c => c.BasedOnMaintOrderID.HasValue);
 
+            if (CurrentMaintOrderStateFilter != null)
+            {
+                result = result.Where(c => c.MDMaintOrderStateID == CurrentMaintOrderStateFilter.MDMaintOrderStateID);
+            }
+
             if (ShowMyTasks)
             {
                 result = result.Where(c => c.MaintOrderAssignment_MaintOrder.Any(x => x.VBUserID == Root.Environment.User.VBUserID && x.IsActive)
@@ -385,6 +403,15 @@ namespace gip.mes.maintenance
             else if (ShowOutsourcedTasks)
             {
                 result = result.Where(c => c.MaintOrderAssignment_MaintOrder.Any(x => x.IsActive && x.CompanyID.HasValue));
+            }
+
+            if (CurrentFacilityFilter != null)
+            {
+                result = result.Where(c => c.FacilityID == CurrentFacilityFilter.FacilityID);
+            }
+            else if (CurrentComponentFilter != null)
+            {
+                result = result.Where(c => c.VBiPAACClassID == CurrentComponentFilter.ACClassID);
             }
 
             return result;
@@ -559,63 +586,60 @@ namespace gip.mes.maintenance
         {
             CurrentMaintOrder = null;
 
-
-
-
-            if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter == null)
-            {
-                if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
-                    || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
-                {
-                    _ACQueryDefinition.ClearFilter(true);
-                    _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
-                        Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
-                }
-            }
-            else if (CurrentMaintOrderStateFilter == null && CurrentComponentFilter != null)
-            {
-                if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "VBiPAACClassID"
-                    || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentComponentFilter.ACClassID.ToString())
-                {
-                    _ACQueryDefinition.ClearFilter(true);
-                    _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
-                        Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
-                }
-            }
-            else if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter != null)
-            {
-                bool rebuildACQuery = false;
-                if (_ACQueryDefinition.ACFilterColumns.Count != 2)
-                    rebuildACQuery = true;
-                else
-                {
-                    ACFilterItem state = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "MDMaintOrderState\\MDMaintOrderStateIndex");
-                    if (state == null)
-                        rebuildACQuery = true;
-                    else if (state.SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
-                        rebuildACQuery = true;
-                    if (!rebuildACQuery)
-                    {
-                        ACFilterItem acClassID = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "VBiPAACClassID");
-                        if (acClassID == null)
-                            rebuildACQuery = true;
-                        else if (acClassID.SearchWord != CurrentComponentFilter.ACClassID.ToString())
-                            rebuildACQuery = true;
-                    }
-                }
-                if (rebuildACQuery)
-                {
-                    _ACQueryDefinition.ClearFilter(true);
-                    _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
-                        Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
-                    _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
-                        Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
-                }
-            }
-            else
-            {
-                _ACQueryDefinition.ClearFilter(true);
-            }
+            //if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter == null)
+            //{
+            //    if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
+            //        || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
+            //    {
+            //        _ACQueryDefinition.ClearFilter(true);
+            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
+            //            Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
+            //    }
+            //}
+            //else if (CurrentMaintOrderStateFilter == null && CurrentComponentFilter != null)
+            //{
+            //    if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "VBiPAACClassID"
+            //        || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentComponentFilter.ACClassID.ToString())
+            //    {
+            //        _ACQueryDefinition.ClearFilter(true);
+            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
+            //            Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
+            //    }
+            //}
+            //else if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter != null)
+            //{
+            //    bool rebuildACQuery = false;
+            //    if (_ACQueryDefinition.ACFilterColumns.Count != 2)
+            //        rebuildACQuery = true;
+            //    else
+            //    {
+            //        ACFilterItem state = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "MDMaintOrderState\\MDMaintOrderStateIndex");
+            //        if (state == null)
+            //            rebuildACQuery = true;
+            //        else if (state.SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
+            //            rebuildACQuery = true;
+            //        if (!rebuildACQuery)
+            //        {
+            //            ACFilterItem acClassID = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "VBiPAACClassID");
+            //            if (acClassID == null)
+            //                rebuildACQuery = true;
+            //            else if (acClassID.SearchWord != CurrentComponentFilter.ACClassID.ToString())
+            //                rebuildACQuery = true;
+            //        }
+            //    }
+            //    if (rebuildACQuery)
+            //    {
+            //        _ACQueryDefinition.ClearFilter(true);
+            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
+            //            Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
+            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
+            //            Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
+            //    }
+            //}
+            //else
+            //{
+            //    _ACQueryDefinition.ClearFilter(true);
+            //}
             Search();
         }
 

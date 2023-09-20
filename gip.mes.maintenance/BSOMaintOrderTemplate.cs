@@ -2,6 +2,7 @@
 using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.media;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
@@ -537,6 +538,19 @@ namespace gip.mes.maintenance
 
         #endregion
 
+        ACChildItem<BSOMedia> _BSOMedia_Child;
+        [ACPropertyInfo(9999)]
+        [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
+        public ACChildItem<BSOMedia> BSOMedia_Child
+        {
+            get
+            {
+                if (_BSOMedia_Child == null)
+                    _BSOMedia_Child = new ACChildItem<BSOMedia>(this, "BSOMedia_Child");
+                return _BSOMedia_Child;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -974,6 +988,18 @@ namespace gip.mes.maintenance
                 var templ = maintACClass.MaintOrder_MaintACClass.Where(c => c.BasedOnMaintOrderID == null);
                 templates.AddRange(templ);
             }
+        }
+
+        [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999, true)]
+        public void OpenTaskDocumentation()
+        {
+            BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+            ShowDialog(BSOMedia_Child.Value, "MediaDialog");
+        }
+
+        public bool IsEnabledOpenDocumentation()
+        {
+            return SelectedMaintOrderTask != null;
         }
 
         #region Methods => MaintService

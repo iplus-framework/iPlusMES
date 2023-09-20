@@ -131,7 +131,7 @@ namespace gip.mes.datamodel
             {
                 if (string.IsNullOrEmpty(_ACClassACUrl) && this.ACClass != null)
                 {
-                    _ACClassACUrl = this.ACClass.GetACUrl();
+                    _ACClassACUrl = this.ACClass.ACUrlComponent;
                 }
                 return _ACClassACUrl;
             }
