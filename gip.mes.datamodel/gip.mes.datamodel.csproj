@@ -35,6 +35,15 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="DbScripts\iPlusMES\dbsync_2023-06-26_09-26_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2023-07-11_10-40_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2023-07-28_08-40_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="DbScripts\iPlusMES\info.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -190,15 +199,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json" />
-    <Content Include="DbScripts\iPlusMES\dbsync_2023-07-28_08-40_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2023-07-11_10-40_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2023-06-26_09-26_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="DbScripts\iPlusMES\dbsync_2023-08-29_09-26_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
