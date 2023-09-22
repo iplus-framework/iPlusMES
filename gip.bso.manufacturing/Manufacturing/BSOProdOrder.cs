@@ -3864,7 +3864,49 @@ namespace gip.bso.manufacturing
             {
                 if (SelectedBatch == null)
                     return null;
+
+                core.datamodel.ACProgramLog programLog = SelectedBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
+                                                                      .SelectMany(c => c.OrderLog_ProdOrderPartslistPosRelation)
+                                                                      .Select(x => x.ACProgramLog)
+                                                                      .FirstOrDefault();
+
+                core.datamodel.ACProgramLog tempProgramLog = programLog;
+                for (int i=0; i < 200; i++)
+                {
+                    if (tempProgramLog == null)
+                        break;
+
+                    using (ACMonitor.Lock(core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
+                    {
+                        core.datamodel.ACClass acClass = core.datamodel.Database.GlobalDatabase.ACClass.FirstOrDefault(c => c.ACClassID == tempProgramLog.ACClassID);
+                        if (acClass != null)
+                        {
+                            if (acClass.IsDerivedClassFrom(nameof(PWProcessFunction)))
+                                break;
+
+                            tempProgramLog = tempProgramLog.ACProgramLog1_ParentACProgramLog;
+                        }
+                    }
+                }
+
+                if (tempProgramLog != null)
+                {
+                    List<core.datamodel.ACProgramLog> programLogList = new List<core.datamodel.ACProgramLog>();
+                    FillACProgramLogList(tempProgramLog, programLogList);
+                    return programLogList;
+                }
+
                 return SelectedBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.SelectMany(c => c.OrderLog_ProdOrderPartslistPosRelation).Select(x => x.ACProgramLog);
+            }
+        }
+
+        private void FillACProgramLogList(core.datamodel.ACProgramLog programLog, List<core.datamodel.ACProgramLog> programList)
+        {
+            programList.AddRange(programLog.ACProgramLog_ParentACProgramLog);
+
+            foreach (var pLog in programLog.ACProgramLog_ParentACProgramLog)
+            {
+                FillACProgramLogList(pLog, programList);
             }
         }
 

@@ -165,7 +165,7 @@ namespace gip.mes.maintenance
 
         private MaintOrderTask _SelectedMaintOrderTask;
         [ACPropertySelected(9999, "OrderTasks")]
-        public MaintOrderTask SelectedMaintOrderTask
+        public virtual MaintOrderTask SelectedMaintOrderTask
         {
             get => _SelectedMaintOrderTask;
             set
@@ -176,8 +176,6 @@ namespace gip.mes.maintenance
         }
 
         private List<MaintOrderTask> _MaintOrderTaskList;
-
-        public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         [ACPropertyList(9999, "OrderTasks")]
         public List<MaintOrderTask> MaintOrderTaskList
@@ -190,8 +188,7 @@ namespace gip.mes.maintenance
             }
         }
 
-
-
+        public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         #region Methods
 

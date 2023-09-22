@@ -66,6 +66,9 @@ namespace gip.mes.maintenance
 
         #region BSO -> ACProperty
 
+        private bool _IsDocumentationOpen = false;
+
+
         #region Config
         private ACPropertyConfigValue<string> _CN_BSOProcessControl;
         [ACPropertyConfig("en{'Classname BSOProcessControl'}de{'Klassenname BSOProcessControl'}")]
@@ -125,18 +128,38 @@ namespace gip.mes.maintenance
 
         public override IAccessNav AccessNav => AccessPrimary;
 
-        private string _MaintOrderTask;
-        [ACPropertyInfo(999, "", "en{'Tasks'}de{'Aufgaben'}")]
-        public string MaintOrderTask
+        public override MaintOrder SelectedMaintOrder 
         {
-            get
-            {
-                return _MaintOrderTask;
-            }
+            get => base.SelectedMaintOrder;
             set
             {
-                _MaintOrderTask = value;
-                OnPropertyChanged("MaintOrderTask");
+                base.SelectedMaintOrder = value;
+                MaintOrderTaskListDocu = value.MaintOrderTask_MaintOrder.ToList();
+            }
+        }
+
+        private MaintOrderTask _SelectedMaintOrderTaskDocu;
+        [ACPropertySelected(9999, "OrderDocuTasks")]
+        public virtual MaintOrderTask SelectedMaintOrderTaskDocu
+        {
+            get => _SelectedMaintOrderTaskDocu;
+            set
+            {
+                _SelectedMaintOrderTaskDocu = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private List<MaintOrderTask> _MaintOrderTaskListDocu;
+
+        [ACPropertyList(9999, "OrderDocuTasks")]
+        public List<MaintOrderTask> MaintOrderTaskListDocu
+        {
+            get => _MaintOrderTaskListDocu;
+            set
+            {
+                _MaintOrderTaskListDocu = value;
+                OnPropertyChanged();
             }
         }
 
@@ -681,7 +704,12 @@ namespace gip.mes.maintenance
         [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999)]
         public void OpenDocumentation()
         {
+            
 
+
+
+            BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+            ShowDialog(this, "MaintOrderTaskDocumentation");
         }
 
         /// <summary>Called inside the GetControlModes-Method to get the Global.ControlModes from derivations.
