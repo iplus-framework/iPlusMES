@@ -270,7 +270,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_FacilityMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMaterialOEEFacilityMaterial = principalEntityType.AddNavigation("FacilityMaterialOEE_FacilityMaterial",
+            var facilityMaterialOEE_FacilityMaterial = principalEntityType.AddNavigation("FacilityMaterialOEE_FacilityMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityMaterialOEE>),

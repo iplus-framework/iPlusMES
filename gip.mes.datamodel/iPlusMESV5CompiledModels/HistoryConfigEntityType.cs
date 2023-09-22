@@ -207,7 +207,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(HistoryConfig).GetField("_History", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var historyConfigHistory = principalEntityType.AddNavigation("HistoryConfig_History",
+            var historyConfig_History = principalEntityType.AddNavigation("HistoryConfig_History",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<HistoryConfig>),
@@ -225,7 +225,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("HistoryConfigID") }),
                 principalEntityType);
 
-            var historyConfig1ParentHistoryConfig = declaringEntityType.AddNavigation("HistoryConfig1_ParentHistoryConfig",
+            var historyConfig1_ParentHistoryConfig = declaringEntityType.AddNavigation("HistoryConfig1_ParentHistoryConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(HistoryConfig),
@@ -233,7 +233,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(HistoryConfig).GetField("_HistoryConfig1_ParentHistoryConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var historyConfigParentHistoryConfig = principalEntityType.AddNavigation("HistoryConfig_ParentHistoryConfig",
+            var historyConfig_ParentHistoryConfig = principalEntityType.AddNavigation("HistoryConfig_ParentHistoryConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<HistoryConfig>),
@@ -259,7 +259,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(HistoryConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var historyConfigVBiACClass = principalEntityType.AddNavigation("HistoryConfig_VBiACClass",
+            var historyConfig_VBiACClass = principalEntityType.AddNavigation("HistoryConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<HistoryConfig>),
@@ -285,7 +285,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(HistoryConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var historyConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("HistoryConfig_VBiACClassPropertyRelation",
+            var historyConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("HistoryConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<HistoryConfig>),
@@ -312,7 +312,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(HistoryConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var historyConfigVBiACClassWF = principalEntityType.AddNavigation("HistoryConfig_VBiACClassWF",
+            var historyConfig_VBiACClassWF = principalEntityType.AddNavigation("HistoryConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<HistoryConfig>),
@@ -339,7 +339,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(HistoryConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var historyConfigVBiValueTypeACClass = principalEntityType.AddNavigation("HistoryConfig_VBiValueTypeACClass",
+            var historyConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("HistoryConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<HistoryConfig>),

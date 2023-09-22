@@ -67,11 +67,11 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { materialWFID });
 
-            var nCIFKMaterialWFRelationSourceMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFRelation_SourceMaterialID = runtimeEntityType.AddIndex(
                 new[] { sourceMaterialID },
                 name: "NCI_FK_MaterialWFRelation_SourceMaterialID");
 
-            var nCIFKMaterialWFRelationTargetMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFRelation_TargetMaterialID = runtimeEntityType.AddIndex(
                 new[] { targetMaterialID },
                 name: "NCI_FK_MaterialWFRelation_TargetMaterialID");
 
@@ -93,7 +93,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFRelation).GetField("_MaterialWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFRelationMaterialWF = principalEntityType.AddNavigation("MaterialWFRelation_MaterialWF",
+            var materialWFRelation_MaterialWF = principalEntityType.AddNavigation("MaterialWFRelation_MaterialWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFRelation>),
@@ -120,7 +120,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFRelation).GetField("_SourceMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFRelationSourceMaterial = principalEntityType.AddNavigation("MaterialWFRelation_SourceMaterial",
+            var materialWFRelation_SourceMaterial = principalEntityType.AddNavigation("MaterialWFRelation_SourceMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFRelation>),
@@ -147,7 +147,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFRelation).GetField("_TargetMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFRelationTargetMaterial = principalEntityType.AddNavigation("MaterialWFRelation_TargetMaterial",
+            var materialWFRelation_TargetMaterial = principalEntityType.AddNavigation("MaterialWFRelation_TargetMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFRelation>),

@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDInvoiceStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uXMDInvoiceStateMDKey = runtimeEntityType.AddIndex(
+            var uX_MDInvoiceState_MDKey = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UX_MDInvoiceState_MDKey",
                 unique: true);

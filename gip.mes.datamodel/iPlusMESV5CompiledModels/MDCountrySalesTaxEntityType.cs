@@ -136,11 +136,11 @@ namespace gip.mes.datamodel
                 new[] { mDCountrySalesTaxID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDCountrySalesTaxMDCountryID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDCountrySalesTax_MDCountryID = runtimeEntityType.AddIndex(
                 new[] { mDCountryID },
                 name: "NCI_FK_MDCountrySalesTax_MDCountryID");
 
-            var uIXMDCountrySalesTax = runtimeEntityType.AddIndex(
+            var uIX_MDCountrySalesTax = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDCountrySalesTax",
                 unique: true);
@@ -164,7 +164,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCountrySalesTax).GetField("_MDCountry", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCountrySalesTaxMDCountry = principalEntityType.AddNavigation("MDCountrySalesTax_MDCountry",
+            var mDCountrySalesTax_MDCountry = principalEntityType.AddNavigation("MDCountrySalesTax_MDCountry",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCountrySalesTax>),

@@ -118,23 +118,23 @@ namespace gip.mes.datamodel
                 new[] { prodOrderBatchID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKProdOrderBatchMDProdOrderStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderBatch_MDProdOrderStateID = runtimeEntityType.AddIndex(
                 new[] { mDProdOrderStateID },
                 name: "NCI_FK_ProdOrderBatch_MDProdOrderStateID");
 
-            var nCIFKProdOrderBatchProdOrderBatchPlanID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderBatch_ProdOrderBatchPlanID = runtimeEntityType.AddIndex(
                 new[] { prodOrderBatchPlanID },
                 name: "NCI_FK_ProdOrderBatch_ProdOrderBatchPlanID");
 
-            var nCIFKProdOrderBatchProdOrderPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderBatch_ProdOrderPartslistID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistID },
                 name: "NCI_FK_ProdOrderBatch_ProdOrderPartslistID");
 
-            var nCIProdOrderBatchProdOrderBatchNo = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderBatch_ProdOrderBatchNo = runtimeEntityType.AddIndex(
                 new[] { prodOrderBatchNo },
                 name: "NCI_ProdOrderBatch_ProdOrderBatchNo");
 
-            var uIXProdOrderBatchProdOrderBatchNo = runtimeEntityType.AddIndex(
+            var uIX_ProdOrderBatch_ProdOrderBatchNo = runtimeEntityType.AddIndex(
                 new[] { prodOrderBatchNo },
                 name: "UIX_ProdOrderBatch_ProdOrderBatchNo",
                 unique: true);
@@ -157,7 +157,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderBatch).GetField("_MDProdOrderState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderBatchMDProdOrderState = principalEntityType.AddNavigation("ProdOrderBatch_MDProdOrderState",
+            var prodOrderBatch_MDProdOrderState = principalEntityType.AddNavigation("ProdOrderBatch_MDProdOrderState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderBatch>),
@@ -183,7 +183,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderBatch).GetField("_ProdOrderBatchPlan", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderBatchProdOrderBatchPlan = principalEntityType.AddNavigation("ProdOrderBatch_ProdOrderBatchPlan",
+            var prodOrderBatch_ProdOrderBatchPlan = principalEntityType.AddNavigation("ProdOrderBatch_ProdOrderBatchPlan",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderBatch>),
@@ -210,7 +210,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderBatch).GetField("_ProdOrderPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderBatchProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderBatch_ProdOrderPartslist",
+            var prodOrderBatch_ProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderBatch_ProdOrderPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderBatch>),

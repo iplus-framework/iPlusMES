@@ -102,15 +102,15 @@ namespace gip.mes.datamodel
                 new[] { companyPersonRoleID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyPersonRoleCompanyAddressDepartmentID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyPersonRole_CompanyAddressDepartmentID = runtimeEntityType.AddIndex(
                 new[] { companyAddressDepartmentID },
                 name: "NCI_FK_CompanyPersonRole_CompanyAddressDepartmentID");
 
-            var nCIFKCompanyPersonRoleCompanyPersonID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyPersonRole_CompanyPersonID = runtimeEntityType.AddIndex(
                 new[] { companyPersonID },
                 name: "NCI_FK_CompanyPersonRole_CompanyPersonID");
 
-            var nCIFKCompanyPersonRoleVBiRoleACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyPersonRole_VBiRoleACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiRoleACClassID },
                 name: "NCI_FK_CompanyPersonRole_VBiRoleACClassID");
 
@@ -132,7 +132,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyPersonRole).GetField("_CompanyAddressDepartment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyPersonRoleCompanyAddressDepartment = principalEntityType.AddNavigation("CompanyPersonRole_CompanyAddressDepartment",
+            var companyPersonRole_CompanyAddressDepartment = principalEntityType.AddNavigation("CompanyPersonRole_CompanyAddressDepartment",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyPersonRole>),
@@ -160,7 +160,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyPersonRole).GetField("_CompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyPersonRoleCompanyPerson = principalEntityType.AddNavigation("CompanyPersonRole_CompanyPerson",
+            var companyPersonRole_CompanyPerson = principalEntityType.AddNavigation("CompanyPersonRole_CompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyPersonRole>),
@@ -188,7 +188,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyPersonRole).GetField("_VBiRoleACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyPersonRoleVBiRoleACClass = principalEntityType.AddNavigation("CompanyPersonRole_VBiRoleACClass",
+            var companyPersonRole_VBiRoleACClass = principalEntityType.AddNavigation("CompanyPersonRole_VBiRoleACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyPersonRole>),

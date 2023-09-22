@@ -310,7 +310,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOfferPosID") }),
                 principalEntityType);
 
-            var outOfferPos1GroupOutOfferPos = declaringEntityType.AddNavigation("OutOfferPos1_GroupOutOfferPos",
+            var outOfferPos1_GroupOutOfferPos = declaringEntityType.AddNavigation("OutOfferPos1_GroupOutOfferPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(OutOfferPos),
@@ -318,7 +318,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_OutOfferPos1_GroupOutOfferPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosGroupOutOfferPos = principalEntityType.AddNavigation("OutOfferPos_GroupOutOfferPos",
+            var outOfferPos_GroupOutOfferPos = principalEntityType.AddNavigation("OutOfferPos_GroupOutOfferPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_MDCountrySalesTax", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosMDCountrySalesTax = principalEntityType.AddNavigation("OutOfferPos_MDCountrySalesTax",
+            var outOfferPos_MDCountrySalesTax = principalEntityType.AddNavigation("OutOfferPos_MDCountrySalesTax",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -370,7 +370,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_MDCountrySalesTaxMDMaterialGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosMDCountrySalesTaxMDMaterialGroup = principalEntityType.AddNavigation("OutOfferPos_MDCountrySalesTaxMDMaterialGroup",
+            var outOfferPos_MDCountrySalesTaxMDMaterialGroup = principalEntityType.AddNavigation("OutOfferPos_MDCountrySalesTaxMDMaterialGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -396,7 +396,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_MDCountrySalesTaxMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosMDCountrySalesTaxMaterial = principalEntityType.AddNavigation("OutOfferPos_MDCountrySalesTaxMaterial",
+            var outOfferPos_MDCountrySalesTaxMaterial = principalEntityType.AddNavigation("OutOfferPos_MDCountrySalesTaxMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -422,7 +422,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosMDTimeRange = principalEntityType.AddNavigation("OutOfferPos_MDTimeRange",
+            var outOfferPos_MDTimeRange = principalEntityType.AddNavigation("OutOfferPos_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -448,7 +448,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosMDUnit = principalEntityType.AddNavigation("OutOfferPos_MDUnit",
+            var outOfferPos_MDUnit = principalEntityType.AddNavigation("OutOfferPos_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -475,7 +475,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosMaterial = principalEntityType.AddNavigation("OutOfferPos_Material",
+            var outOfferPos_Material = principalEntityType.AddNavigation("OutOfferPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -503,7 +503,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_OutOffer", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosOutOffer = principalEntityType.AddNavigation("OutOfferPos_OutOffer",
+            var outOfferPos_OutOffer = principalEntityType.AddNavigation("OutOfferPos_OutOffer",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),
@@ -521,7 +521,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOfferPosID") }),
                 principalEntityType);
 
-            var outOfferPos1ParentOutOfferPos = declaringEntityType.AddNavigation("OutOfferPos1_ParentOutOfferPos",
+            var outOfferPos1_ParentOutOfferPos = declaringEntityType.AddNavigation("OutOfferPos1_ParentOutOfferPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(OutOfferPos),
@@ -529,7 +529,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_OutOfferPos1_ParentOutOfferPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferPosParentOutOfferPos = principalEntityType.AddNavigation("OutOfferPos_ParentOutOfferPos",
+            var outOfferPos_ParentOutOfferPos = principalEntityType.AddNavigation("OutOfferPos_ParentOutOfferPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferPos>),

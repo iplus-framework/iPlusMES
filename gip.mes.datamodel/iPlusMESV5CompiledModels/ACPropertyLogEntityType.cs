@@ -99,7 +99,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACPropertyLog).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCPropertyLogACClass = principalEntityType.AddNavigation("ACPropertyLog_ACClass",
+            var aCPropertyLog_ACClass = principalEntityType.AddNavigation("ACPropertyLog_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACPropertyLog>),
@@ -126,7 +126,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACPropertyLog).GetField("_ACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCPropertyLogACClassProperty = principalEntityType.AddNavigation("ACPropertyLog_ACClassProperty",
+            var aCPropertyLog_ACClassProperty = principalEntityType.AddNavigation("ACPropertyLog_ACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACPropertyLog>),

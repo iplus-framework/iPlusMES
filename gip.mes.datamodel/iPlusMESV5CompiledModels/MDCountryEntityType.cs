@@ -134,11 +134,11 @@ namespace gip.mes.datamodel
                 new[] { mDCountryID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDCountryMDCurrencyID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDCountry_MDCurrencyID = runtimeEntityType.AddIndex(
                 new[] { mDCurrencyID },
                 name: "NCI_FK_MDCountry_MDCurrencyID");
 
-            var uIXMDCountry = runtimeEntityType.AddIndex(
+            var uIX_MDCountry = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDCountry",
                 unique: true);
@@ -161,7 +161,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCountry).GetField("_MDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCountryMDCurrency = principalEntityType.AddNavigation("MDCountry_MDCurrency",
+            var mDCountry_MDCurrency = principalEntityType.AddNavigation("MDCountry_MDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCountry>),

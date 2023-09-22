@@ -96,7 +96,7 @@ namespace gip.mes.datamodel
                 new[] { demandProdOrderID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKDemandProdOrderDemandOrderID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandProdOrder_DemandOrderID = runtimeEntityType.AddIndex(
                 new[] { demandOrderID },
                 name: "NCI_FK_DemandProdOrder_DemandOrderID");
 
@@ -119,7 +119,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandProdOrder).GetField("_DemandOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandProdOrderDemandOrder = principalEntityType.AddNavigation("DemandProdOrder_DemandOrder",
+            var demandProdOrder_DemandOrder = principalEntityType.AddNavigation("DemandProdOrder_DemandOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandProdOrder>),

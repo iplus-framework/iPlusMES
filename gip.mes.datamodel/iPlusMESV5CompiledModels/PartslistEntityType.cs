@@ -297,32 +297,32 @@ namespace gip.mes.datamodel
                 new[] { partslistID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKPartslistMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_Partslist_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_Partslist_MDUnitID");
 
-            var nCIFKPartslistMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_Partslist_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_Partslist_MaterialID");
 
-            var nCIFKPartslistMaterialWFID = runtimeEntityType.AddIndex(
+            var nCI_FK_Partslist_MaterialWFID = runtimeEntityType.AddIndex(
                 new[] { materialWFID },
                 name: "NCI_FK_Partslist_MaterialWFID");
 
-            var nCIFKPartslistPreviousPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_Partslist_PreviousPartslistID = runtimeEntityType.AddIndex(
                 new[] { previousPartslistID },
                 name: "NCI_FK_Partslist_PreviousPartslistID");
 
-            var nCIPartslistPartslistIDMaterialID = runtimeEntityType.AddIndex(
+            var nCI_Partslist_PartslistID_MaterialID = runtimeEntityType.AddIndex(
                 new[] { partslistID, materialID },
                 name: "NCI_Partslist_PartslistID_MaterialID");
 
-            var partslistVersionPartslistNo = runtimeEntityType.AddIndex(
+            var partslistVersion_PartslistNo = runtimeEntityType.AddIndex(
                 new[] { partslistNo, partslistVersion, deleteDate },
                 name: "PartslistVersion_PartslistNo",
                 unique: true);
 
-            var dboudfIsTimeSpanActualEnabledFromEnabledTo = runtimeEntityType.AddTrigger(
+            var dboudf_IsTimeSpanActualEnabledFromEnabledTo = runtimeEntityType.AddTrigger(
                 "([dbo].[udf_IsTimeSpanActual]([EnabledFrom],[EnabledTo]))");
 
             return runtimeEntityType;
@@ -342,7 +342,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Partslist).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistMDUnit = principalEntityType.AddNavigation("Partslist_MDUnit",
+            var partslist_MDUnit = principalEntityType.AddNavigation("Partslist_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Partslist>),
@@ -369,7 +369,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Partslist).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistMaterial = principalEntityType.AddNavigation("Partslist_Material",
+            var partslist_Material = principalEntityType.AddNavigation("Partslist_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Partslist>),
@@ -395,7 +395,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Partslist).GetField("_MaterialWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistMaterialWF = principalEntityType.AddNavigation("Partslist_MaterialWF",
+            var partslist_MaterialWF = principalEntityType.AddNavigation("Partslist_MaterialWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Partslist>),
@@ -413,7 +413,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PartslistID") }),
                 principalEntityType);
 
-            var partslist1PreviousPartslist = declaringEntityType.AddNavigation("Partslist1_PreviousPartslist",
+            var partslist1_PreviousPartslist = declaringEntityType.AddNavigation("Partslist1_PreviousPartslist",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Partslist),
@@ -421,7 +421,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Partslist).GetField("_Partslist1_PreviousPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPreviousPartslist = principalEntityType.AddNavigation("Partslist_PreviousPartslist",
+            var partslist_PreviousPartslist = principalEntityType.AddNavigation("Partslist_PreviousPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Partslist>),

@@ -181,23 +181,23 @@ namespace gip.mes.datamodel
                 new[] { demandOrderPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKDemandOrderPosACProgramID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandOrderPos_ACProgramID = runtimeEntityType.AddIndex(
                 new[] { aCProgramID },
                 name: "NCI_FK_DemandOrderPos_ACProgramID");
 
-            var nCIFKDemandOrderPosDemandOrderID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandOrderPos_DemandOrderID = runtimeEntityType.AddIndex(
                 new[] { demandOrderID },
                 name: "NCI_FK_DemandOrderPos_DemandOrderID");
 
-            var nCIFKDemandOrderPosMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandOrderPos_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_DemandOrderPos_MaterialID");
 
-            var nCIFKDemandOrderPosPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandOrderPos_PartslistID = runtimeEntityType.AddIndex(
                 new[] { partslistID },
                 name: "NCI_FK_DemandOrderPos_PartslistID");
 
-            var nCIFKDemandOrderPosVBiProgramACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandOrderPos_VBiProgramACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { vBiProgramACClassMethodID },
                 name: "NCI_FK_DemandOrderPos_VBiProgramACClassMethodID");
 
@@ -218,7 +218,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandOrderPos).GetField("_ACProgram", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandOrderPosACProgram = principalEntityType.AddNavigation("DemandOrderPos_ACProgram",
+            var demandOrderPos_ACProgram = principalEntityType.AddNavigation("DemandOrderPos_ACProgram",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandOrderPos>),
@@ -245,7 +245,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandOrderPos).GetField("_DemandOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandOrderPosDemandOrder = principalEntityType.AddNavigation("DemandOrderPos_DemandOrder",
+            var demandOrderPos_DemandOrder = principalEntityType.AddNavigation("DemandOrderPos_DemandOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandOrderPos>),
@@ -272,7 +272,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandOrderPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandOrderPosMaterial = principalEntityType.AddNavigation("DemandOrderPos_Material",
+            var demandOrderPos_Material = principalEntityType.AddNavigation("DemandOrderPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandOrderPos>),
@@ -298,7 +298,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandOrderPos).GetField("_Partslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandOrderPosPartslist = principalEntityType.AddNavigation("DemandOrderPos_Partslist",
+            var demandOrderPos_Partslist = principalEntityType.AddNavigation("DemandOrderPos_Partslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandOrderPos>),
@@ -325,7 +325,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandOrderPos).GetField("_VBiProgramACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandOrderPosVBiProgramACClassMethod = principalEntityType.AddNavigation("DemandOrderPos_VBiProgramACClassMethod",
+            var demandOrderPos_VBiProgramACClassMethod = principalEntityType.AddNavigation("DemandOrderPos_VBiProgramACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandOrderPos>),

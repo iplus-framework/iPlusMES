@@ -112,11 +112,11 @@ namespace gip.mes.datamodel
                 new[] { companyAddressUnloadingpointID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyAddressUnloadingpointCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyAddressUnloadingpoint_CompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { companyAddressID },
                 name: "NCI_FK_CompanyAddressUnloadingpoint_CompanyAddressID");
 
-            var uIXCompanyAddressUnloadingpoint = runtimeEntityType.AddIndex(
+            var uIX_CompanyAddressUnloadingpoint = runtimeEntityType.AddIndex(
                 new[] { companyAddressUnloadingpointID, sequence },
                 name: "UIX_CompanyAddressUnloadingpoint",
                 unique: true);
@@ -140,7 +140,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyAddressUnloadingpoint).GetField("_CompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyAddressUnloadingpointCompanyAddress = principalEntityType.AddNavigation("CompanyAddressUnloadingpoint_CompanyAddress",
+            var companyAddressUnloadingpoint_CompanyAddress = principalEntityType.AddNavigation("CompanyAddressUnloadingpoint_CompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyAddressUnloadingpoint>),

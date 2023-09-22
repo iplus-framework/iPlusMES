@@ -53,7 +53,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID });
 
-            var uIXTandTv3MixPointProdOrderPartslistPosRelation = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointProdOrderPartslistPosRelation = runtimeEntityType.AddIndex(
                 new[] { tandTv3MixPointID, prodOrderPartslistPosRelationID },
                 name: "UIX_TandTv3MixPointProdOrderPartslistPosRelation",
                 unique: true);
@@ -76,7 +76,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointProdOrderPartslistPosRelation).GetField("_ProdOrderPartslistPosRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointProdOrderPartslistPosRelationProdOrderPartslistPosRelation = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation",
+            var tandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointProdOrderPartslistPosRelation>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointProdOrderPartslistPosRelation).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointProdOrderPartslistPosRelationTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint",
+            var tandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointProdOrderPartslistPosRelation>),

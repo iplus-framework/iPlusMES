@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDMaintModeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDMaintMode = runtimeEntityType.AddIndex(
+            var uIX_MDMaintMode = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDMaintMode",
                 unique: true);

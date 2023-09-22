@@ -79,23 +79,23 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { facilityBookingID });
 
-            var nCIFKOrderLogDeliveryNotePosID = runtimeEntityType.AddIndex(
+            var nCI_FK_OrderLog_DeliveryNotePosID = runtimeEntityType.AddIndex(
                 new[] { deliveryNotePosID },
                 name: "NCI_FK_OrderLog_DeliveryNotePosID");
 
-            var nCIFKOrderLogPickingPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_OrderLog_PickingPosID = runtimeEntityType.AddIndex(
                 new[] { pickingPosID },
                 name: "NCI_FK_OrderLog_PickingPosID");
 
-            var nCIFKOrderLogProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_OrderLog_ProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_FK_OrderLog_ProdOrderPartslistPosID");
 
-            var nCIFKOrderLogProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_OrderLog_ProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID },
                 name: "NCI_FK_OrderLog_ProdOrderPartslistPosRelationID");
 
-            var nCIFKOrderLogVBiACProgramLogID = runtimeEntityType.AddIndex(
+            var nCI_FK_OrderLog_VBiACProgramLogID = runtimeEntityType.AddIndex(
                 new[] { vBiACProgramLogID },
                 name: "NCI_FK_OrderLog_VBiACProgramLogID");
 
@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_DeliveryNotePos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLogDeliveryNotePos = principalEntityType.AddNavigation("OrderLog_DeliveryNotePos",
+            var orderLog_DeliveryNotePos = principalEntityType.AddNavigation("OrderLog_DeliveryNotePos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OrderLog>),
@@ -142,7 +142,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_FacilityBooking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLogFacilityBooking = principalEntityType.AddNavigation("OrderLog_FacilityBooking",
+            var orderLog_FacilityBooking = principalEntityType.AddNavigation("OrderLog_FacilityBooking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OrderLog>),
@@ -168,7 +168,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLogPickingPos = principalEntityType.AddNavigation("OrderLog_PickingPos",
+            var orderLog_PickingPos = principalEntityType.AddNavigation("OrderLog_PickingPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OrderLog>),
@@ -194,7 +194,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_ProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLogProdOrderPartslistPos = principalEntityType.AddNavigation("OrderLog_ProdOrderPartslistPos",
+            var orderLog_ProdOrderPartslistPos = principalEntityType.AddNavigation("OrderLog_ProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OrderLog>),
@@ -220,7 +220,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_ProdOrderPartslistPosRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLogProdOrderPartslistPosRelation = principalEntityType.AddNavigation("OrderLog_ProdOrderPartslistPosRelation",
+            var orderLog_ProdOrderPartslistPosRelation = principalEntityType.AddNavigation("OrderLog_ProdOrderPartslistPosRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OrderLog>),
@@ -248,7 +248,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_VBiACProgramLog", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLogVBiACProgramLog = principalEntityType.AddNavigation("OrderLog_VBiACProgramLog",
+            var orderLog_VBiACProgramLog = principalEntityType.AddNavigation("OrderLog_VBiACProgramLog",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(OrderLog),

@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDFacilityTypeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDFacilityType = runtimeEntityType.AddIndex(
+            var uIX_MDFacilityType = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDFacilityType",
                 unique: true);

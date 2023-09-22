@@ -183,19 +183,19 @@ namespace gip.mes.datamodel
                 new[] { companyMaterialID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyMaterialCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterial_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_CompanyMaterial_CompanyID");
 
-            var nCIFKCompanyMaterialMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterial_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_CompanyMaterial_MDUnitID");
 
-            var nCIFKCompanyMaterialMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterial_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_CompanyMaterial_MaterialID");
 
-            var uIXCompanyMaterialCompanyMaterialNo = runtimeEntityType.AddIndex(
+            var uIX_CompanyMaterial_CompanyMaterialNo = runtimeEntityType.AddIndex(
                 new[] { companyMaterialNo },
                 name: "UIX_CompanyMaterial_CompanyMaterialNo",
                 unique: true);
@@ -218,7 +218,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterial).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialCompany = principalEntityType.AddNavigation("CompanyMaterial_Company",
+            var companyMaterial_Company = principalEntityType.AddNavigation("CompanyMaterial_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterial>),
@@ -245,7 +245,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterial).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialMDUnit = principalEntityType.AddNavigation("CompanyMaterial_MDUnit",
+            var companyMaterial_MDUnit = principalEntityType.AddNavigation("CompanyMaterial_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterial>),
@@ -272,7 +272,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterial).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialMaterial = principalEntityType.AddNavigation("CompanyMaterial_Material",
+            var companyMaterial_Material = principalEntityType.AddNavigation("CompanyMaterial_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterial>),

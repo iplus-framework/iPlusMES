@@ -106,7 +106,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACPropertyLogRule).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCPropertyLogRuleACClass = principalEntityType.AddNavigation("ACPropertyLogRule_ACClass",
+            var aCPropertyLogRule_ACClass = principalEntityType.AddNavigation("ACPropertyLogRule_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACPropertyLogRule>),

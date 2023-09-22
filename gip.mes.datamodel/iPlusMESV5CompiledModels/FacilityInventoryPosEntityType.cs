@@ -166,7 +166,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityInventoryPos).GetField("_FacilityCharge", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityInventoryPosFacilityCharge = principalEntityType.AddNavigation("FacilityInventoryPos_FacilityCharge",
+            var facilityInventoryPos_FacilityCharge = principalEntityType.AddNavigation("FacilityInventoryPos_FacilityCharge",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityInventoryPos>),
@@ -194,7 +194,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityInventoryPos).GetField("_FacilityInventory", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityInventoryPosFacilityInventory = principalEntityType.AddNavigation("FacilityInventoryPos_FacilityInventory",
+            var facilityInventoryPos_FacilityInventory = principalEntityType.AddNavigation("FacilityInventoryPos_FacilityInventory",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityInventoryPos>),
@@ -221,7 +221,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityInventoryPos).GetField("_MDFacilityInventoryPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityInventoryPosMDFacilityInventoryPosState = principalEntityType.AddNavigation("FacilityInventoryPos_MDFacilityInventoryPosState",
+            var facilityInventoryPos_MDFacilityInventoryPosState = principalEntityType.AddNavigation("FacilityInventoryPos_MDFacilityInventoryPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityInventoryPos>),

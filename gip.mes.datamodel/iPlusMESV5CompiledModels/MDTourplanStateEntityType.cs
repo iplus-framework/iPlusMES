@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDTourplanStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDTourplanState = runtimeEntityType.AddIndex(
+            var uIX_MDTourplanState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDTourplanState",
                 unique: true);

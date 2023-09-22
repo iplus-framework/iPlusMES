@@ -91,15 +91,15 @@ namespace gip.mes.datamodel
                 new[] { materialWFConnectionID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialWFConnectionACClassWFID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFConnection_ACClassWFID = runtimeEntityType.AddIndex(
                 new[] { aCClassWFID },
                 name: "NCI_FK_MaterialWFConnection_ACClassWFID");
 
-            var nCIFKMaterialWFConnectionMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFConnection_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialWFConnection_MaterialID");
 
-            var nCIFKMaterialWFConnectionMaterialWFACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFConnection_MaterialWFACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { materialWFACClassMethodID },
                 name: "NCI_FK_MaterialWFConnection_MaterialWFACClassMethodID");
 
@@ -121,7 +121,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFConnection).GetField("_ACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFConnectionACClassWF = principalEntityType.AddNavigation("MaterialWFConnection_ACClassWF",
+            var materialWFConnection_ACClassWF = principalEntityType.AddNavigation("MaterialWFConnection_ACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFConnection>),
@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFConnection).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFConnectionMaterial = principalEntityType.AddNavigation("MaterialWFConnection_Material",
+            var materialWFConnection_Material = principalEntityType.AddNavigation("MaterialWFConnection_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFConnection>),
@@ -175,7 +175,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFConnection).GetField("_MaterialWFACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFConnectionMaterialWFACClassMethod = principalEntityType.AddNavigation("MaterialWFConnection_MaterialWFACClassMethod",
+            var materialWFConnection_MaterialWFACClassMethod = principalEntityType.AddNavigation("MaterialWFConnection_MaterialWFACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFConnection>),

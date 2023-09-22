@@ -112,7 +112,7 @@ namespace gip.mes.datamodel
                 new[] { aCClassTextID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXACClassText = runtimeEntityType.AddIndex(
+            var uIX_ACClassText = runtimeEntityType.AddIndex(
                 new[] { aCClassID, aCIdentifier },
                 name: "UIX_ACClassText",
                 unique: true);
@@ -136,7 +136,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassText).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTextACClass = principalEntityType.AddNavigation("ACClassText_ACClass",
+            var aCClassText_ACClass = principalEntityType.AddNavigation("ACClassText_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassText>),

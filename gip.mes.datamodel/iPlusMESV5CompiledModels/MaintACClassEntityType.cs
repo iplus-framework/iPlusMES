@@ -99,7 +99,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintACClass).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintACClassVBiACClass = principalEntityType.AddNavigation("MaintACClass_VBiACClass",
+            var maintACClass_VBiACClass = principalEntityType.AddNavigation("MaintACClass_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintACClass>),

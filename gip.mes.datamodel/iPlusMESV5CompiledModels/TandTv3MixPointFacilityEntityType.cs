@@ -64,7 +64,7 @@ namespace gip.mes.datamodel
             var index0 = runtimeEntityType.AddIndex(
                 new[] { tandTv3MDBookingDirectionID });
 
-            var uIXTandTv3MixPointFacility = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointFacility = runtimeEntityType.AddIndex(
                 new[] { tandTv3MixPointID, tandTv3MDBookingDirectionID, facilityID },
                 name: "UIX_TandTv3MixPointFacility",
                 unique: true);
@@ -87,7 +87,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacility).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityFacility = principalEntityType.AddNavigation("TandTv3MixPointFacility_Facility",
+            var tandTv3MixPointFacility_Facility = principalEntityType.AddNavigation("TandTv3MixPointFacility_Facility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacility>),
@@ -114,7 +114,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacility).GetField("_TandTv3MDBookingDirection", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityTandTv3MDBookingDirection = principalEntityType.AddNavigation("TandTv3MixPointFacility_TandTv3MDBookingDirection",
+            var tandTv3MixPointFacility_TandTv3MDBookingDirection = principalEntityType.AddNavigation("TandTv3MixPointFacility_TandTv3MDBookingDirection",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacility>),
@@ -141,7 +141,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacility).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacility_TandTv3MixPoint",
+            var tandTv3MixPointFacility_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacility_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacility>),

@@ -114,23 +114,23 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { pickingPosID });
 
-            var nCIFKFacilityPreBookingInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityPreBooking_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_FacilityPreBooking_InOrderPosID");
 
-            var nCIFKFacilityPreBookingOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityPreBooking_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_FacilityPreBooking_OutOrderPosID");
 
-            var nCIFKFacilityPreBookingProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityPreBooking_ProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_FK_FacilityPreBooking_ProdOrderPartslistPosID");
 
-            var nCIFKFacilityPreBookingProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityPreBooking_ProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID },
                 name: "NCI_FK_FacilityPreBooking_ProdOrderPartslistPosRelationID");
 
-            var uIXFacilityPreBookingFacilityPreBookingNo = runtimeEntityType.AddIndex(
+            var uIX_FacilityPreBooking_FacilityPreBookingNo = runtimeEntityType.AddIndex(
                 new[] { facilityPreBookingNo },
                 name: "UIX_FacilityPreBooking_FacilityPreBookingNo",
                 unique: true);
@@ -152,7 +152,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityPreBooking).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityPreBookingInOrderPos = principalEntityType.AddNavigation("FacilityPreBooking_InOrderPos",
+            var facilityPreBooking_InOrderPos = principalEntityType.AddNavigation("FacilityPreBooking_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityPreBooking>),
@@ -178,7 +178,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityPreBooking).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityPreBookingOutOrderPos = principalEntityType.AddNavigation("FacilityPreBooking_OutOrderPos",
+            var facilityPreBooking_OutOrderPos = principalEntityType.AddNavigation("FacilityPreBooking_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityPreBooking>),
@@ -204,7 +204,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityPreBooking).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityPreBookingPickingPos = principalEntityType.AddNavigation("FacilityPreBooking_PickingPos",
+            var facilityPreBooking_PickingPos = principalEntityType.AddNavigation("FacilityPreBooking_PickingPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityPreBooking>),
@@ -230,7 +230,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityPreBooking).GetField("_ProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityPreBookingProdOrderPartslistPos = principalEntityType.AddNavigation("FacilityPreBooking_ProdOrderPartslistPos",
+            var facilityPreBooking_ProdOrderPartslistPos = principalEntityType.AddNavigation("FacilityPreBooking_ProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityPreBooking>),
@@ -256,7 +256,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityPreBooking).GetField("_ProdOrderPartslistPosRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityPreBookingProdOrderPartslistPosRelation = principalEntityType.AddNavigation("FacilityPreBooking_ProdOrderPartslistPosRelation",
+            var facilityPreBooking_ProdOrderPartslistPosRelation = principalEntityType.AddNavigation("FacilityPreBooking_ProdOrderPartslistPosRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityPreBooking>),

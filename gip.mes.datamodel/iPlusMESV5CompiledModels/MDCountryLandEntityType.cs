@@ -120,11 +120,11 @@ namespace gip.mes.datamodel
                 new[] { mDCountryLandID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDCountryLandMDCountryID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDCountryLand_MDCountryID = runtimeEntityType.AddIndex(
                 new[] { mDCountryID },
                 name: "NCI_FK_MDCountryLand_MDCountryID");
 
-            var uIXMDCountryLand = runtimeEntityType.AddIndex(
+            var uIX_MDCountryLand = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDCountryLand",
                 unique: true);
@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCountryLand).GetField("_MDCountry", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCountryLandMDCountry = principalEntityType.AddNavigation("MDCountryLand_MDCountry",
+            var mDCountryLand_MDCountry = principalEntityType.AddNavigation("MDCountryLand_MDCountry",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCountryLand>),

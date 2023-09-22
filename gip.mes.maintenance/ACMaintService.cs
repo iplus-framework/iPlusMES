@@ -620,7 +620,7 @@ namespace gip.mes.maintenance
                                                              && c.BasedOnMaintOrderID != null)
                                                     .ToArray();
 
-                    //var openMaintenanceOrdersComp = openMaintenanceOrders.Where(c => c.VBiPAACClassID.HasValue).ToDictionary(c => c.VBiPAACClassID);
+                    var openMaintenanceOrdersComp = openMaintenanceOrders.Where(c => c.VBiPAACClassID.HasValue).ToDictionary(c => c.VBiPAACClassID);
                     var openMaintenanceOrdersFacility = openMaintenanceOrders.Where(c => c.FacilityID.HasValue).ToDictionary(c => c.FacilityID);
                  
 
@@ -630,12 +630,12 @@ namespace gip.mes.maintenance
 
                         if (maintInstance.Instance != null)
                         {
-                            //if (openMaintenanceOrdersComp.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
-                            //    continue;
+                            if (openMaintenanceOrdersComp.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
+                                continue;
 
-                            //maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
-                            //                             .OrderByDescending(x => x.UpdateDate)
-                            //                             .FirstOrDefault();
+                            maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
+                                                         .OrderByDescending(x => x.UpdateDate)
+                                                         .FirstOrDefault();
                         }
                         else if (maintInstance.FacilityInstance != null)
                         {
@@ -854,10 +854,10 @@ namespace gip.mes.maintenance
         {
             MaintOrder tempTemplate = template.FromAppContext<MaintOrder>(dbApp);
 
-            //if (instance != null && dbApp.MaintOrder.Any(c => c.VBiPAACClassID == instance.ComponentClass.ACClassID
-            //               && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
-            //               && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
-            //    return;
+            if (instance != null && dbApp.MaintOrder.Any(c => c.VBiPAACClassID == instance.ComponentClass.ACClassID
+                           && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
+                           && c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+                return;
 
             if (facilityInstance != null && dbApp.MaintOrder.Any(c => c.FacilityID == facilityInstance.FacilityID
                            && c.BasedOnMaintOrderID == tempTemplate.MaintOrderID
@@ -870,8 +870,8 @@ namespace gip.mes.maintenance
             maintOrder.MaintOrder1_BasedOnMaintOrder = tempTemplate;
             maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
 
-            //if (instance != null)
-            //    maintOrder.VBiPAACClassID = instance.ComponentClass.ACClassID;
+            if (instance != null)
+                maintOrder.VBiPAACClassID = instance.ComponentClass.ACClassID;
 
             if (tempTemplate.MaintACClassID.HasValue)
             {

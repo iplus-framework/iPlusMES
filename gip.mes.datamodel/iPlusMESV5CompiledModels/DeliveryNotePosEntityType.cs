@@ -128,15 +128,15 @@ namespace gip.mes.datamodel
                 new[] { deliveryNotePosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKDeliveryNotePosDeliveryNoteID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNotePos_DeliveryNoteID = runtimeEntityType.AddIndex(
                 new[] { deliveryNoteID },
                 name: "NCI_FK_DeliveryNotePos_DeliveryNoteID");
 
-            var nCIFKDeliveryNotePosInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNotePos_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_DeliveryNotePos_InOrderPosID");
 
-            var nCIFKDeliveryNotePosOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNotePos_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_DeliveryNotePos_OutOrderPosID");
 
@@ -159,7 +159,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNotePos).GetField("_DeliveryNote", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNotePosDeliveryNote = principalEntityType.AddNavigation("DeliveryNotePos_DeliveryNote",
+            var deliveryNotePos_DeliveryNote = principalEntityType.AddNavigation("DeliveryNotePos_DeliveryNote",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNotePos>),
@@ -185,7 +185,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNotePos).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNotePosInOrderPos = principalEntityType.AddNavigation("DeliveryNotePos_InOrderPos",
+            var deliveryNotePos_InOrderPos = principalEntityType.AddNavigation("DeliveryNotePos_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNotePos>),
@@ -211,7 +211,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNotePos).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNotePosOutOrderPos = principalEntityType.AddNavigation("DeliveryNotePos_OutOrderPos",
+            var deliveryNotePos_OutOrderPos = principalEntityType.AddNavigation("DeliveryNotePos_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNotePos>),

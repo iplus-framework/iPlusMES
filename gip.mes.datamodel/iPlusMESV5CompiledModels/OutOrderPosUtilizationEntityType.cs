@@ -157,15 +157,15 @@ namespace gip.mes.datamodel
                 new[] { outOrderPosUtilizationID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKOutOrderPosUtilizationMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderPosUtilization_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_OutOrderPosUtilization_MaterialID");
 
-            var nCIFKOutOrderPosUtilizationOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderPosUtilization_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_OutOrderPosUtilization_OutOrderPosID");
 
-            var uIXOutOrderPosUtilizationOutOrderPosUtilizationNo = runtimeEntityType.AddIndex(
+            var uIX_OutOrderPosUtilization_OutOrderPosUtilizationNo = runtimeEntityType.AddIndex(
                 new[] { outOrderPosUtilizationNo },
                 name: "UIX_OutOrderPosUtilization_OutOrderPosUtilizationNo",
                 unique: true);
@@ -187,7 +187,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderPosUtilization).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderPosUtilizationMaterial = principalEntityType.AddNavigation("OutOrderPosUtilization_Material",
+            var outOrderPosUtilization_Material = principalEntityType.AddNavigation("OutOrderPosUtilization_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderPosUtilization>),
@@ -214,7 +214,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderPosUtilization).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderPosUtilizationOutOrderPos = principalEntityType.AddNavigation("OutOrderPosUtilization_OutOrderPos",
+            var outOrderPosUtilization_OutOrderPos = principalEntityType.AddNavigation("OutOrderPosUtilization_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderPosUtilization>),

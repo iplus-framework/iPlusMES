@@ -179,35 +179,35 @@ namespace gip.mes.datamodel
                 new[] { visitorID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVisitorMDVisitorCardID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_MDVisitorCardID = runtimeEntityType.AddIndex(
                 new[] { mDVisitorCardID },
                 name: "NCI_FK_Visitor_MDVisitorCardID");
 
-            var nCIFKVisitorMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_Visitor_MaterialID");
 
-            var nCIFKVisitorTrailerFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_TrailerFacilityID = runtimeEntityType.AddIndex(
                 new[] { trailerFacilityID },
                 name: "NCI_FK_Visitor_TrailerFacilityID");
 
-            var nCIFKVisitorVehicleFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_VehicleFacilityID = runtimeEntityType.AddIndex(
                 new[] { vehicleFacilityID },
                 name: "NCI_FK_Visitor_VehicleFacilityID");
 
-            var nCIFKVisitorVisitedCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_VisitedCompanyID = runtimeEntityType.AddIndex(
                 new[] { visitedCompanyID },
                 name: "NCI_FK_Visitor_VisitedCompanyID");
 
-            var nCIFKVisitorVisitorCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_VisitorCompanyID = runtimeEntityType.AddIndex(
                 new[] { visitorCompanyID },
                 name: "NCI_FK_Visitor_VisitorCompanyID");
 
-            var nCIFKVisitorVisitorCompanyPersonID = runtimeEntityType.AddIndex(
+            var nCI_FK_Visitor_VisitorCompanyPersonID = runtimeEntityType.AddIndex(
                 new[] { visitorCompanyPersonID },
                 name: "NCI_FK_Visitor_VisitorCompanyPersonID");
 
-            var uIXVisitorVisitorNo = runtimeEntityType.AddIndex(
+            var uIX_Visitor_VisitorNo = runtimeEntityType.AddIndex(
                 new[] { visitorNo },
                 name: "UIX_Visitor_VisitorNo",
                 unique: true);
@@ -229,7 +229,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_MDVisitorCard", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorMDVisitorCard = principalEntityType.AddNavigation("Visitor_MDVisitorCard",
+            var visitor_MDVisitorCard = principalEntityType.AddNavigation("Visitor_MDVisitorCard",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),
@@ -255,7 +255,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorMaterial = principalEntityType.AddNavigation("Visitor_Material",
+            var visitor_Material = principalEntityType.AddNavigation("Visitor_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),
@@ -281,7 +281,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_TrailerFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorTrailerFacility = principalEntityType.AddNavigation("Visitor_TrailerFacility",
+            var visitor_TrailerFacility = principalEntityType.AddNavigation("Visitor_TrailerFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),
@@ -307,7 +307,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_VehicleFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVehicleFacility = principalEntityType.AddNavigation("Visitor_VehicleFacility",
+            var visitor_VehicleFacility = principalEntityType.AddNavigation("Visitor_VehicleFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),
@@ -334,7 +334,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_VisitedCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVisitedCompany = principalEntityType.AddNavigation("Visitor_VisitedCompany",
+            var visitor_VisitedCompany = principalEntityType.AddNavigation("Visitor_VisitedCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),
@@ -360,7 +360,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_VisitorCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVisitorCompany = principalEntityType.AddNavigation("Visitor_VisitorCompany",
+            var visitor_VisitorCompany = principalEntityType.AddNavigation("Visitor_VisitorCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),
@@ -386,7 +386,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Visitor).GetField("_VisitorCompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVisitorCompanyPerson = principalEntityType.AddNavigation("Visitor_VisitorCompanyPerson",
+            var visitor_VisitorCompanyPerson = principalEntityType.AddNavigation("Visitor_VisitorCompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Visitor>),

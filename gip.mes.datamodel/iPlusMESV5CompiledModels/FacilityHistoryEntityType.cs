@@ -207,11 +207,11 @@ namespace gip.mes.datamodel
                 new[] { facilityHistoryID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKFacilityHistoryFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityHistory_FacilityID = runtimeEntityType.AddIndex(
                 new[] { facilityID },
                 name: "NCI_FK_FacilityHistory_FacilityID");
 
-            var nCIFKFacilityHistoryHistoryID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityHistory_HistoryID = runtimeEntityType.AddIndex(
                 new[] { historyID },
                 name: "NCI_FK_FacilityHistory_HistoryID");
 
@@ -233,7 +233,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityHistory).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityHistoryFacility = principalEntityType.AddNavigation("FacilityHistory_Facility",
+            var facilityHistory_Facility = principalEntityType.AddNavigation("FacilityHistory_Facility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityHistory>),
@@ -260,7 +260,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityHistory).GetField("_History", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityHistoryHistory = principalEntityType.AddNavigation("FacilityHistory_History",
+            var facilityHistory_History = principalEntityType.AddNavigation("FacilityHistory_History",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityHistory>),

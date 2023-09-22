@@ -142,39 +142,39 @@ namespace gip.mes.datamodel
             runtimeEntityType.SetPrimaryKey(key);
             key.AddAnnotation("Relational:Name", "PK_ProdOrderPartslistPosRelationID");
 
-            var nCIFKProdOrderPartslistPosRelationMDProdOrderPartslistPosStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPosRelation_MDProdOrderPartslistPosStateID = runtimeEntityType.AddIndex(
                 new[] { mDProdOrderPartslistPosStateID },
                 name: "NCI_FK_ProdOrderPartslistPosRelation_MDProdOrderPartslistPosStateID");
 
-            var nCIFKProdOrderPartslistPosRelationMDToleranceStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPosRelation_MDToleranceStateID = runtimeEntityType.AddIndex(
                 new[] { mDToleranceStateID },
                 name: "NCI_FK_ProdOrderPartslistPosRelation_MDToleranceStateID");
 
-            var nCIFKProdOrderPartslistPosRelationParentProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
                 new[] { parentProdOrderPartslistPosRelationID },
                 name: "NCI_FK_ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelationID");
 
-            var nCIFKProdOrderPartslistPosRelationProdOrderBatchID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPosRelation_ProdOrderBatchID = runtimeEntityType.AddIndex(
                 new[] { prodOrderBatchID },
                 name: "NCI_FK_ProdOrderPartslistPosRelation_ProdOrderBatchID");
 
-            var nCIFKProdOrderPartslistPosRelationSourceProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { sourceProdOrderPartslistPosID },
                 name: "NCI_FK_ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosID");
 
-            var nCIFKProdOrderPartslistPosRelationTargetProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { targetProdOrderPartslistPosID },
                 name: "NCI_FK_ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosID");
 
-            var nCIProdOrderPartslistPosRelationTargetProdOrderPartslistPosIDOT1 = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosID_OT1 = runtimeEntityType.AddIndex(
                 new[] { targetProdOrderPartslistPosID },
                 name: "NCI_ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosID_OT1");
 
-            var nCIProdOrderPartslistPosRelationTargetProdOrderPartslistPosIDOT2 = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosID_OT2 = runtimeEntityType.AddIndex(
                 new[] { targetProdOrderPartslistPosID, sequence, sourceProdOrderPartslistPosID, prodOrderPartslistPosRelationID, targetQuantity, actualQuantity, targetQuantityUOM, actualQuantityUOM, parentProdOrderPartslistPosRelationID, prodOrderBatchID, mDToleranceStateID, mDProdOrderPartslistPosStateID },
                 name: "NCI_ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosID_OT2");
 
-            var nCIProdOrderPartslistPosRelationTargetSource = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderPartslistPosRelation_Target_Source = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID, targetProdOrderPartslistPosID, sourceProdOrderPartslistPosID },
                 name: "NCI_ProdOrderPartslistPosRelation_Target_Source");
 
@@ -196,7 +196,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_MDProdOrderPartslistPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosRelationMDProdOrderPartslistPosState = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState",
+            var prodOrderPartslistPosRelation_MDProdOrderPartslistPosState = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosRelation>),
@@ -223,7 +223,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_MDToleranceState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosRelationMDToleranceState = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_MDToleranceState",
+            var prodOrderPartslistPosRelation_MDToleranceState = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_MDToleranceState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosRelation>),
@@ -241,7 +241,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosRelationID") }),
                 principalEntityType);
 
-            var prodOrderPartslistPosRelation1ParentProdOrderPartslistPosRelation = declaringEntityType.AddNavigation("ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation",
+            var prodOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation = declaringEntityType.AddNavigation("ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ProdOrderPartslistPosRelation),
@@ -249,7 +249,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosRelationParentProdOrderPartslistPosRelation = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation",
+            var prodOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosRelation>),
@@ -275,7 +275,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ProdOrderBatch", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosRelationProdOrderBatch = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_ProdOrderBatch",
+            var prodOrderPartslistPosRelation_ProdOrderBatch = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_ProdOrderBatch",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosRelation>),
@@ -302,7 +302,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_SourceProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosRelationSourceProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos",
+            var prodOrderPartslistPosRelation_SourceProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosRelation>),
@@ -329,7 +329,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_TargetProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosRelationTargetProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos",
+            var prodOrderPartslistPosRelation_TargetProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosRelation>),

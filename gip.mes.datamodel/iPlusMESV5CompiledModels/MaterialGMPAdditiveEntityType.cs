@@ -101,11 +101,11 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { mDGMPAdditiveID });
 
-            var nCIFKMaterialGMPAdditiveMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialGMPAdditive_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialGMPAdditive_MaterialID");
 
-            var uIXMaterialGMPAdditive = runtimeEntityType.AddIndex(
+            var uIX_MaterialGMPAdditive = runtimeEntityType.AddIndex(
                 new[] { materialGMPAdditiveID, sequence },
                 name: "UIX_MaterialGMPAdditive",
                 unique: true);
@@ -129,7 +129,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialGMPAdditive).GetField("_MDGMPAdditive", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialGMPAdditiveMDGMPAdditive = principalEntityType.AddNavigation("MaterialGMPAdditive_MDGMPAdditive",
+            var materialGMPAdditive_MDGMPAdditive = principalEntityType.AddNavigation("MaterialGMPAdditive_MDGMPAdditive",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialGMPAdditive>),
@@ -157,7 +157,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialGMPAdditive).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialGMPAdditiveMaterial = principalEntityType.AddNavigation("MaterialGMPAdditive_Material",
+            var materialGMPAdditive_Material = principalEntityType.AddNavigation("MaterialGMPAdditive_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialGMPAdditive>),

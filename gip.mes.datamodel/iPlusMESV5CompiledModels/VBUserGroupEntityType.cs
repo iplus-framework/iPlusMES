@@ -84,11 +84,11 @@ namespace gip.mes.datamodel
                 new[] { vBUserGroupID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVBUserGroupVBGroupID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUserGroup_VBGroupID = runtimeEntityType.AddIndex(
                 new[] { vBGroupID },
                 name: "NCI_FK_VBUserGroup_VBGroupID");
 
-            var nCIFKVBUserGroupVBUserID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUserGroup_VBUserID = runtimeEntityType.AddIndex(
                 new[] { vBUserID },
                 name: "NCI_FK_VBUserGroup_VBUserID");
 
@@ -111,7 +111,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUserGroup).GetField("_VBGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserGroupVBGroup = principalEntityType.AddNavigation("VBUserGroup_VBGroup",
+            var vBUserGroup_VBGroup = principalEntityType.AddNavigation("VBUserGroup_VBGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUserGroup>),
@@ -139,7 +139,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUserGroup).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserGroupVBUser = principalEntityType.AddNavigation("VBUserGroup_VBUser",
+            var vBUserGroup_VBUser = principalEntityType.AddNavigation("VBUserGroup_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUserGroup>),

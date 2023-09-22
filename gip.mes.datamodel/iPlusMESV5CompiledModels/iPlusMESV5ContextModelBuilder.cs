@@ -614,12 +614,14 @@ namespace gip.mes.datamodel
             MDVisitorCardEntityType.CreateForeignKey1(mDVisitorCard, mDVisitorCardState);
             MaintACClassEntityType.CreateForeignKey1(maintACClass, aCClass);
             MaintACClassPropertyEntityType.CreateForeignKey1(maintACClassProperty, maintACClass);
-            MaintACClassPropertyEntityType.CreateForeignKey2(maintACClassProperty, aCClassProperty);
+            MaintACClassPropertyEntityType.CreateForeignKey2(maintACClassProperty, maintOrder);
+            MaintACClassPropertyEntityType.CreateForeignKey3(maintACClassProperty, aCClassProperty);
             MaintOrderEntityType.CreateForeignKey1(maintOrder, maintOrder);
             MaintOrderEntityType.CreateForeignKey2(maintOrder, facility);
             MaintOrderEntityType.CreateForeignKey3(maintOrder, mDMaintOrderState);
             MaintOrderEntityType.CreateForeignKey4(maintOrder, maintACClass);
             MaintOrderEntityType.CreateForeignKey5(maintOrder, picking);
+            MaintOrderEntityType.CreateForeignKey6(maintOrder, aCClass);
             MaintOrderAssignmentEntityType.CreateForeignKey1(maintOrderAssignment, company);
             MaintOrderAssignmentEntityType.CreateForeignKey2(maintOrderAssignment, maintOrder);
             MaintOrderAssignmentEntityType.CreateForeignKey3(maintOrderAssignment, vBGroup);
@@ -1191,7 +1193,7 @@ namespace gip.mes.datamodel
             VisitorVoucherEntityType.CreateAnnotations(visitorVoucher);
             WeighingEntityType.CreateAnnotations(weighing);
 
-            AddAnnotation("ProductVersion", "7.0.2");
+            AddAnnotation("ProductVersion", "7.0.11");
             AddAnnotation("Relational:MaxIdentifierLength", 128);
             AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
         }

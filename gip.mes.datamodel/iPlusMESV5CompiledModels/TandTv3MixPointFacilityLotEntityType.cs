@@ -64,7 +64,7 @@ namespace gip.mes.datamodel
             var index0 = runtimeEntityType.AddIndex(
                 new[] { tandTv3MDBookingDirectionID });
 
-            var uIXTandTv3MixPointFacilityLot = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointFacilityLot = runtimeEntityType.AddIndex(
                 new[] { tandTv3MixPointID, tandTv3MDBookingDirectionID, facilityLotID },
                 name: "UIX_TandTv3MixPointFacilityLot",
                 unique: true);
@@ -87,7 +87,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_FacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityLotFacilityLot = principalEntityType.AddNavigation("TandTv3MixPointFacilityLot_FacilityLot",
+            var tandTv3MixPointFacilityLot_FacilityLot = principalEntityType.AddNavigation("TandTv3MixPointFacilityLot_FacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityLot>),
@@ -114,7 +114,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_TandTv3MDBookingDirection", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityLotTandTv3MDBookingDirection = principalEntityType.AddNavigation("TandTv3MixPointFacilityLot_TandTv3MDBookingDirection",
+            var tandTv3MixPointFacilityLot_TandTv3MDBookingDirection = principalEntityType.AddNavigation("TandTv3MixPointFacilityLot_TandTv3MDBookingDirection",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityLot>),
@@ -141,7 +141,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityLotTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacilityLot_TandTv3MixPoint",
+            var tandTv3MixPointFacilityLot_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacilityLot_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityLot>),

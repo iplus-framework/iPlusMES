@@ -155,19 +155,19 @@ namespace gip.mes.datamodel
                 new[] { vBConfigID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVBConfigACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBConfig_ACClassID = runtimeEntityType.AddIndex(
                 new[] { aCClassID },
                 name: "NCI_FK_VBConfig_ACClassID");
 
-            var nCIFKVBConfigACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBConfig_ACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { aCClassPropertyRelationID },
                 name: "NCI_FK_VBConfig_ACClassPropertyRelationID");
 
-            var nCIFKVBConfigParentVBConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBConfig_ParentVBConfigID = runtimeEntityType.AddIndex(
                 new[] { parentVBConfigID },
                 name: "NCI_FK_VBConfig_ParentVBConfigID");
 
-            var nCIFKVBConfigValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBConfig_ValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { valueTypeACClassID },
                 name: "NCI_FK_VBConfig_ValueTypeACClassID");
 
@@ -188,7 +188,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBConfig).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBConfigACClass = principalEntityType.AddNavigation("VBConfig_ACClass",
+            var vBConfig_ACClass = principalEntityType.AddNavigation("VBConfig_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBConfig>),
@@ -214,7 +214,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBConfig).GetField("_ACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBConfigACClassPropertyRelation = principalEntityType.AddNavigation("VBConfig_ACClassPropertyRelation",
+            var vBConfig_ACClassPropertyRelation = principalEntityType.AddNavigation("VBConfig_ACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBConfig>),
@@ -232,7 +232,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("VBConfigID") }),
                 principalEntityType);
 
-            var vBConfig1ParentVBConfig = declaringEntityType.AddNavigation("VBConfig1_ParentVBConfig",
+            var vBConfig1_ParentVBConfig = declaringEntityType.AddNavigation("VBConfig1_ParentVBConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(VBConfig),
@@ -240,7 +240,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBConfig).GetField("_VBConfig1_ParentVBConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBConfigParentVBConfig = principalEntityType.AddNavigation("VBConfig_ParentVBConfig",
+            var vBConfig_ParentVBConfig = principalEntityType.AddNavigation("VBConfig_ParentVBConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBConfig>),
@@ -267,7 +267,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBConfig).GetField("_ValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBConfigValueTypeACClass = principalEntityType.AddNavigation("VBConfig_ValueTypeACClass",
+            var vBConfig_ValueTypeACClass = principalEntityType.AddNavigation("VBConfig_ValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBConfig>),

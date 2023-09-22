@@ -236,7 +236,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_Invoice", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosInvoice = principalEntityType.AddNavigation("InvoicePos_Invoice",
+            var invoicePos_Invoice = principalEntityType.AddNavigation("InvoicePos_Invoice",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),
@@ -262,7 +262,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_MDCountrySalesTax", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosMDCountrySalesTax = principalEntityType.AddNavigation("InvoicePos_MDCountrySalesTax",
+            var invoicePos_MDCountrySalesTax = principalEntityType.AddNavigation("InvoicePos_MDCountrySalesTax",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),
@@ -288,7 +288,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_MDCountrySalesTaxMDMaterialGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosMDCountrySalesTaxMDMaterialGroup = principalEntityType.AddNavigation("InvoicePos_MDCountrySalesTaxMDMaterialGroup",
+            var invoicePos_MDCountrySalesTaxMDMaterialGroup = principalEntityType.AddNavigation("InvoicePos_MDCountrySalesTaxMDMaterialGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),
@@ -314,7 +314,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_MDCountrySalesTaxMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosMDCountrySalesTaxMaterial = principalEntityType.AddNavigation("InvoicePos_MDCountrySalesTaxMaterial",
+            var invoicePos_MDCountrySalesTaxMaterial = principalEntityType.AddNavigation("InvoicePos_MDCountrySalesTaxMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),
@@ -340,7 +340,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosMDUnit = principalEntityType.AddNavigation("InvoicePos_MDUnit",
+            var invoicePos_MDUnit = principalEntityType.AddNavigation("InvoicePos_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),
@@ -367,7 +367,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosMaterial = principalEntityType.AddNavigation("InvoicePos_Material",
+            var invoicePos_Material = principalEntityType.AddNavigation("InvoicePos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),
@@ -393,7 +393,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InvoicePos).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoicePosOutOrderPos = principalEntityType.AddNavigation("InvoicePos_OutOrderPos",
+            var invoicePos_OutOrderPos = principalEntityType.AddNavigation("InvoicePos_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InvoicePos>),

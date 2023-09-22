@@ -130,7 +130,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PlanningMRProposal).GetField("_InOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var planningMRProposalInOrder = principalEntityType.AddNavigation("PlanningMRProposal_InOrder",
+            var planningMRProposal_InOrder = principalEntityType.AddNavigation("PlanningMRProposal_InOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PlanningMRProposal>),
@@ -157,7 +157,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PlanningMRProposal).GetField("_PlanningMR", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var planningMRProposalPlanningMR = principalEntityType.AddNavigation("PlanningMRProposal_PlanningMR",
+            var planningMRProposal_PlanningMR = principalEntityType.AddNavigation("PlanningMRProposal_PlanningMR",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PlanningMRProposal>),
@@ -183,7 +183,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PlanningMRProposal).GetField("_ProdOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var planningMRProposalProdOrder = principalEntityType.AddNavigation("PlanningMRProposal_ProdOrder",
+            var planningMRProposal_ProdOrder = principalEntityType.AddNavigation("PlanningMRProposal_ProdOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PlanningMRProposal>),
@@ -209,7 +209,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PlanningMRProposal).GetField("_ProdOrderPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var planningMRProposalProdOrderPartslist = principalEntityType.AddNavigation("PlanningMRProposal_ProdOrderPartslist",
+            var planningMRProposal_ProdOrderPartslist = principalEntityType.AddNavigation("PlanningMRProposal_ProdOrderPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PlanningMRProposal>),

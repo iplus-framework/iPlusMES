@@ -216,7 +216,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigMaterial = principalEntityType.AddNavigation("ProdOrderPartslistConfig_Material",
+            var prodOrderPartslistConfig_Material = principalEntityType.AddNavigation("ProdOrderPartslistConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),
@@ -234,7 +234,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistConfigID") }),
                 principalEntityType);
 
-            var prodOrderPartslistConfig1ParentProdOrderPartslistConfig = declaringEntityType.AddNavigation("ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig",
+            var prodOrderPartslistConfig1_ParentProdOrderPartslistConfig = declaringEntityType.AddNavigation("ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ProdOrderPartslistConfig),
@@ -242,7 +242,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigParentProdOrderPartslistConfig = principalEntityType.AddNavigation("ProdOrderPartslistConfig_ParentProdOrderPartslistConfig",
+            var prodOrderPartslistConfig_ParentProdOrderPartslistConfig = principalEntityType.AddNavigation("ProdOrderPartslistConfig_ParentProdOrderPartslistConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),
@@ -270,7 +270,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_ProdOrderPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderPartslistConfig_ProdOrderPartslist",
+            var prodOrderPartslistConfig_ProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderPartslistConfig_ProdOrderPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),
@@ -296,7 +296,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigVBiACClass = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiACClass",
+            var prodOrderPartslistConfig_VBiACClass = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),
@@ -322,7 +322,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiACClassPropertyRelation",
+            var prodOrderPartslistConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),
@@ -349,7 +349,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigVBiACClassWF = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiACClassWF",
+            var prodOrderPartslistConfig_VBiACClassWF = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),
@@ -376,7 +376,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistConfigVBiValueTypeACClass = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiValueTypeACClass",
+            var prodOrderPartslistConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("ProdOrderPartslistConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistConfig>),

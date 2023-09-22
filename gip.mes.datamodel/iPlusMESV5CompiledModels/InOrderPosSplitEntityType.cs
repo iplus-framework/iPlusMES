@@ -108,7 +108,7 @@ namespace gip.mes.datamodel
                 new[] { inOrderPosSplitID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKInOrderPosSplitInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPosSplit_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_InOrderPosSplit_InOrderPosID");
 
@@ -131,7 +131,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPosSplit).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosSplitInOrderPos = principalEntityType.AddNavigation("InOrderPosSplit_InOrderPos",
+            var inOrderPosSplit_InOrderPos = principalEntityType.AddNavigation("InOrderPosSplit_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPosSplit>),

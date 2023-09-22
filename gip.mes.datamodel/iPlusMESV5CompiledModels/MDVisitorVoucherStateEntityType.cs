@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDVisitorVoucherStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDVisitorVoucherState = runtimeEntityType.AddIndex(
+            var uIX_MDVisitorVoucherState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDVisitorVoucherState",
                 unique: true);

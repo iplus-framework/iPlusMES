@@ -182,19 +182,19 @@ namespace gip.mes.datamodel
                 new[] { facilityLotID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKFacilityLotMDReleaseStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityLot_MDReleaseStateID = runtimeEntityType.AddIndex(
                 new[] { mDReleaseStateID },
                 name: "NCI_FK_FacilityLot_MDReleaseStateID");
 
-            var nCIFKFacilityLotMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityLot_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_FacilityLot_MaterialID");
 
-            var nCIFacilityLotExternLotNoFacilityLotID = runtimeEntityType.AddIndex(
+            var nCI_FacilityLot_ExternLotNo_FacilityLotID = runtimeEntityType.AddIndex(
                 new[] { externLotNo },
                 name: "NCI_FacilityLot_ExternLotNo_FacilityLotID");
 
-            var uIXFacilityLot = runtimeEntityType.AddIndex(
+            var uIX_FacilityLot = runtimeEntityType.AddIndex(
                 new[] { lotNo },
                 name: "UIX_FacilityLot",
                 unique: true);
@@ -216,7 +216,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityLot).GetField("_MDReleaseState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityLotMDReleaseState = principalEntityType.AddNavigation("FacilityLot_MDReleaseState",
+            var facilityLot_MDReleaseState = principalEntityType.AddNavigation("FacilityLot_MDReleaseState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityLot>),
@@ -242,7 +242,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityLot).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityLotMaterial = principalEntityType.AddNavigation("FacilityLot_Material",
+            var facilityLot_Material = principalEntityType.AddNavigation("FacilityLot_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityLot>),

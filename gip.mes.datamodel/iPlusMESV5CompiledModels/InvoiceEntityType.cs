@@ -274,7 +274,7 @@ namespace gip.mes.datamodel
             var index9 = runtimeEntityType.AddIndex(
                 new[] { outOrderID });
 
-            var uXInvoiceNo = runtimeEntityType.AddIndex(
+            var uX_InvoiceNo = runtimeEntityType.AddIndex(
                 new[] { invoiceNo },
                 name: "UX_InvoiceNo",
                 unique: true);
@@ -296,7 +296,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_BillingCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceBillingCompanyAddress = principalEntityType.AddNavigation("Invoice_BillingCompanyAddress",
+            var invoice_BillingCompanyAddress = principalEntityType.AddNavigation("Invoice_BillingCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -323,7 +323,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_CustomerCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceCustomerCompany = principalEntityType.AddNavigation("Invoice_CustomerCompany",
+            var invoice_CustomerCompany = principalEntityType.AddNavigation("Invoice_CustomerCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -349,7 +349,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_DeliveryCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceDeliveryCompanyAddress = principalEntityType.AddNavigation("Invoice_DeliveryCompanyAddress",
+            var invoice_DeliveryCompanyAddress = principalEntityType.AddNavigation("Invoice_DeliveryCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -375,7 +375,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_IssuerCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceIssuerCompanyAddress = principalEntityType.AddNavigation("Invoice_IssuerCompanyAddress",
+            var invoice_IssuerCompanyAddress = principalEntityType.AddNavigation("Invoice_IssuerCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -401,7 +401,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_IssuerCompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceIssuerCompanyPerson = principalEntityType.AddNavigation("Invoice_IssuerCompanyPerson",
+            var invoice_IssuerCompanyPerson = principalEntityType.AddNavigation("Invoice_IssuerCompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -427,7 +427,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_MDCurrencyExchange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceMDCurrencyExchange = principalEntityType.AddNavigation("Invoice_MDCurrencyExchange",
+            var invoice_MDCurrencyExchange = principalEntityType.AddNavigation("Invoice_MDCurrencyExchange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -454,7 +454,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_MDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceMDCurrency = principalEntityType.AddNavigation("Invoice_MDCurrency",
+            var invoice_MDCurrency = principalEntityType.AddNavigation("Invoice_MDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -481,7 +481,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_MDInvoiceState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceMDInvoiceState = principalEntityType.AddNavigation("Invoice_MDInvoiceState",
+            var invoice_MDInvoiceState = principalEntityType.AddNavigation("Invoice_MDInvoiceState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -508,7 +508,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_MDInvoiceType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceMDInvoiceType = principalEntityType.AddNavigation("Invoice_MDInvoiceType",
+            var invoice_MDInvoiceType = principalEntityType.AddNavigation("Invoice_MDInvoiceType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -534,7 +534,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_MDTermOfPayment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceMDTermOfPayment = principalEntityType.AddNavigation("Invoice_MDTermOfPayment",
+            var invoice_MDTermOfPayment = principalEntityType.AddNavigation("Invoice_MDTermOfPayment",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),
@@ -560,7 +560,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Invoice).GetField("_OutOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var invoiceOutOrder = principalEntityType.AddNavigation("Invoice_OutOrder",
+            var invoice_OutOrder = principalEntityType.AddNavigation("Invoice_OutOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Invoice>),

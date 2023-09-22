@@ -207,7 +207,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethodConfig).GetField("_MaterialWFACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodConfigMaterialWFACClassMethod = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_MaterialWFACClassMethod",
+            var materialWFACClassMethodConfig_MaterialWFACClassMethod = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_MaterialWFACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethodConfig>),
@@ -225,7 +225,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaterialWFACClassMethodConfigID") }),
                 principalEntityType);
 
-            var materialWFACClassMethodConfig1ParentMaterialWFACClassMethodConfig = declaringEntityType.AddNavigation("MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig",
+            var materialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig = declaringEntityType.AddNavigation("MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(MaterialWFACClassMethodConfig),
@@ -233,7 +233,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethodConfig).GetField("_MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodConfigParentMaterialWFACClassMethodConfig = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig",
+            var materialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethodConfig>),
@@ -259,7 +259,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethodConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodConfigVBiACClass = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiACClass",
+            var materialWFACClassMethodConfig_VBiACClass = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethodConfig>),
@@ -285,7 +285,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethodConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiACClassPropertyRelation",
+            var materialWFACClassMethodConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethodConfig>),
@@ -312,7 +312,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethodConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodConfigVBiACClassWF = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiACClassWF",
+            var materialWFACClassMethodConfig_VBiACClassWF = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethodConfig>),
@@ -339,7 +339,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethodConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodConfigVBiValueTypeACClass = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiValueTypeACClass",
+            var materialWFACClassMethodConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("MaterialWFACClassMethodConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethodConfig>),

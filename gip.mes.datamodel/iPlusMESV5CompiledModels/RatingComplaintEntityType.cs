@@ -104,7 +104,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { ratingID });
 
-            var iXRatingComplaint = runtimeEntityType.AddIndex(
+            var iX_RatingComplaint = runtimeEntityType.AddIndex(
                 new[] { mDRatingComplaintTypeID, ratingID },
                 name: "IX_RatingComplaint",
                 unique: true);
@@ -127,7 +127,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(RatingComplaint).GetField("_MDRatingComplaintType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var ratingComplaintMDRatingComplaintType = principalEntityType.AddNavigation("RatingComplaint_MDRatingComplaintType",
+            var ratingComplaint_MDRatingComplaintType = principalEntityType.AddNavigation("RatingComplaint_MDRatingComplaintType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<RatingComplaint>),
@@ -154,7 +154,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(RatingComplaint).GetField("_Rating", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var ratingComplaintRating = principalEntityType.AddNavigation("RatingComplaint_Rating",
+            var ratingComplaint_Rating = principalEntityType.AddNavigation("RatingComplaint_Rating",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<RatingComplaint>),

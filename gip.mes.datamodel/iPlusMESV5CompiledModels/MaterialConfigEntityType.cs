@@ -174,23 +174,23 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { vBiACClassWFID });
 
-            var nCIFKMaterialConfigMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialConfig_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialConfig_MaterialID");
 
-            var nCIFKMaterialConfigParentMaterialConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialConfig_ParentMaterialConfigID = runtimeEntityType.AddIndex(
                 new[] { parentMaterialConfigID },
                 name: "NCI_FK_MaterialConfig_ParentMaterialConfigID");
 
-            var nCIFKMaterialConfigVBiACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialConfig_VBiACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
                 name: "NCI_FK_MaterialConfig_VBiACClassID");
 
-            var nCIFKMaterialConfigVBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialConfig_VBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassPropertyRelationID },
                 name: "NCI_FK_MaterialConfig_VBiACClassPropertyRelationID");
 
-            var nCIFKMaterialConfigVBiValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialConfig_VBiValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiValueTypeACClassID },
                 name: "NCI_FK_MaterialConfig_VBiValueTypeACClassID");
 
@@ -212,7 +212,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialConfigMaterial = principalEntityType.AddNavigation("MaterialConfig_Material",
+            var materialConfig_Material = principalEntityType.AddNavigation("MaterialConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialConfig>),
@@ -230,7 +230,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaterialConfigID") }),
                 principalEntityType);
 
-            var materialConfig1ParentMaterialConfig = declaringEntityType.AddNavigation("MaterialConfig1_ParentMaterialConfig",
+            var materialConfig1_ParentMaterialConfig = declaringEntityType.AddNavigation("MaterialConfig1_ParentMaterialConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(MaterialConfig),
@@ -238,7 +238,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialConfig).GetField("_MaterialConfig1_ParentMaterialConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialConfigParentMaterialConfig = principalEntityType.AddNavigation("MaterialConfig_ParentMaterialConfig",
+            var materialConfig_ParentMaterialConfig = principalEntityType.AddNavigation("MaterialConfig_ParentMaterialConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialConfig>),
@@ -264,7 +264,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialConfigVBiACClass = principalEntityType.AddNavigation("MaterialConfig_VBiACClass",
+            var materialConfig_VBiACClass = principalEntityType.AddNavigation("MaterialConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialConfig>),
@@ -290,7 +290,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("MaterialConfig_VBiACClassPropertyRelation",
+            var materialConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("MaterialConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialConfig>),
@@ -317,7 +317,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialConfigVBiACClassWF = principalEntityType.AddNavigation("MaterialConfig_VBiACClassWF",
+            var materialConfig_VBiACClassWF = principalEntityType.AddNavigation("MaterialConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialConfig>),
@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialConfigVBiValueTypeACClass = principalEntityType.AddNavigation("MaterialConfig_VBiValueTypeACClass",
+            var materialConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("MaterialConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialConfig>),

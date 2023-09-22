@@ -199,11 +199,11 @@ namespace gip.mes.datamodel
                 new[] { materialCalculationID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialCalculationMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialCalculation_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialCalculation_MaterialID");
 
-            var uIXMaterialCalculationMaterialCalculationNo = runtimeEntityType.AddIndex(
+            var uIX_MaterialCalculation_MaterialCalculationNo = runtimeEntityType.AddIndex(
                 new[] { materialCalculationNo },
                 name: "UIX_MaterialCalculation_MaterialCalculationNo",
                 unique: true);
@@ -227,7 +227,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialCalculation).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialCalculationMaterial = principalEntityType.AddNavigation("MaterialCalculation_Material",
+            var materialCalculation_Material = principalEntityType.AddNavigation("MaterialCalculation_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialCalculation>),

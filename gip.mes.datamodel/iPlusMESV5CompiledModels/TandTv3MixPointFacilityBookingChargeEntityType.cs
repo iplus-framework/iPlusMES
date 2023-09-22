@@ -53,7 +53,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { facilityBookingChargeID });
 
-            var uIXTandTv3MixPointFacilityBookingCharge = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointFacilityBookingCharge = runtimeEntityType.AddIndex(
                 new[] { tandTv3MixPointID, facilityBookingChargeID },
                 name: "UIX_TandTv3MixPointFacilityBookingCharge",
                 unique: true);
@@ -76,7 +76,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityBookingCharge).GetField("_FacilityBookingCharge", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityBookingChargeFacilityBookingCharge = principalEntityType.AddNavigation("TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge",
+            var tandTv3MixPointFacilityBookingCharge_FacilityBookingCharge = principalEntityType.AddNavigation("TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityBookingCharge>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityBookingCharge).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityBookingChargeTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacilityBookingCharge_TandTv3MixPoint",
+            var tandTv3MixPointFacilityBookingCharge_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacilityBookingCharge_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityBookingCharge>),

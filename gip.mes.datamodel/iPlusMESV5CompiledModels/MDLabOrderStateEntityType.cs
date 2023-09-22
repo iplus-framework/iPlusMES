@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDLabOrderStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDLabOrderState = runtimeEntityType.AddIndex(
+            var uIX_MDLabOrderState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDLabOrderState",
                 unique: true);

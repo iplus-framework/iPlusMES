@@ -306,55 +306,55 @@ namespace gip.mes.datamodel
                 new[] { inOrderPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKInOrderPosInOrderID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_InOrderID = runtimeEntityType.AddIndex(
                 new[] { inOrderID },
                 name: "NCI_FK_InOrderPos_InOrderID");
 
-            var nCIFKInOrderPosMDCountrySalesTaxID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDCountrySalesTaxID = runtimeEntityType.AddIndex(
                 new[] { mDCountrySalesTaxID },
                 name: "NCI_FK_InOrderPos_MDCountrySalesTaxID");
 
-            var nCIFKInOrderPosMDDelivPosLoadStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDDelivPosLoadStateID = runtimeEntityType.AddIndex(
                 new[] { mDDelivPosLoadStateID },
                 name: "NCI_FK_InOrderPos_MDDelivPosLoadStateID");
 
-            var nCIFKInOrderPosMDDelivPosStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDDelivPosStateID = runtimeEntityType.AddIndex(
                 new[] { mDDelivPosStateID },
                 name: "NCI_FK_InOrderPos_MDDelivPosStateID");
 
-            var nCIFKInOrderPosMDInOrderPosStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDInOrderPosStateID = runtimeEntityType.AddIndex(
                 new[] { mDInOrderPosStateID },
                 name: "NCI_FK_InOrderPos_MDInOrderPosStateID");
 
-            var nCIFKInOrderPosMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_InOrderPos_MDTimeRangeID");
 
-            var nCIFKInOrderPosMDTransportModeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDTransportModeID = runtimeEntityType.AddIndex(
                 new[] { mDTransportModeID },
                 name: "NCI_FK_InOrderPos_MDTransportModeID");
 
-            var nCIFKInOrderPosMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_InOrderPos_MDUnitID");
 
-            var nCIFKInOrderPosMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_InOrderPos_MaterialID");
 
-            var nCIFKInOrderPosParentInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_ParentInOrderPosID = runtimeEntityType.AddIndex(
                 new[] { parentInOrderPosID },
                 name: "NCI_FK_InOrderPos_ParentInOrderPosID");
 
-            var nCIFKInOrderPosPickupCompanyMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrderPos_PickupCompanyMaterialID = runtimeEntityType.AddIndex(
                 new[] { pickupCompanyMaterialID },
                 name: "NCI_FK_InOrderPos_PickupCompanyMaterialID");
 
-            var nCIInOrderPosInOrderPosIDMDDelivPosLoadStateID = runtimeEntityType.AddIndex(
+            var nCI_InOrderPos_InOrderPosID_MDDelivPosLoadStateID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID, mDDelivPosLoadStateID, mDDelivPosStateID },
                 name: "NCI_InOrderPos_InOrderPosID_MDDelivPosLoadStateID");
 
-            var uIXInOrderPos = runtimeEntityType.AddIndex(
+            var uIX_InOrderPos = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID, sequence },
                 name: "UIX_InOrderPos",
                 unique: true);
@@ -378,7 +378,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_InOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosInOrder = principalEntityType.AddNavigation("InOrderPos_InOrder",
+            var inOrderPos_InOrder = principalEntityType.AddNavigation("InOrderPos_InOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -404,7 +404,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDCountrySalesTax", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDCountrySalesTax = principalEntityType.AddNavigation("InOrderPos_MDCountrySalesTax",
+            var inOrderPos_MDCountrySalesTax = principalEntityType.AddNavigation("InOrderPos_MDCountrySalesTax",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -430,7 +430,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDDelivPosLoadState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDDelivPosLoadState = principalEntityType.AddNavigation("InOrderPos_MDDelivPosLoadState",
+            var inOrderPos_MDDelivPosLoadState = principalEntityType.AddNavigation("InOrderPos_MDDelivPosLoadState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -457,7 +457,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDDelivPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDDelivPosState = principalEntityType.AddNavigation("InOrderPos_MDDelivPosState",
+            var inOrderPos_MDDelivPosState = principalEntityType.AddNavigation("InOrderPos_MDDelivPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -484,7 +484,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDInOrderPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDInOrderPosState = principalEntityType.AddNavigation("InOrderPos_MDInOrderPosState",
+            var inOrderPos_MDInOrderPosState = principalEntityType.AddNavigation("InOrderPos_MDInOrderPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -510,7 +510,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDTimeRange = principalEntityType.AddNavigation("InOrderPos_MDTimeRange",
+            var inOrderPos_MDTimeRange = principalEntityType.AddNavigation("InOrderPos_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -536,7 +536,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDTransportMode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDTransportMode = principalEntityType.AddNavigation("InOrderPos_MDTransportMode",
+            var inOrderPos_MDTransportMode = principalEntityType.AddNavigation("InOrderPos_MDTransportMode",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -562,7 +562,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMDUnit = principalEntityType.AddNavigation("InOrderPos_MDUnit",
+            var inOrderPos_MDUnit = principalEntityType.AddNavigation("InOrderPos_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -589,7 +589,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosMaterial = principalEntityType.AddNavigation("InOrderPos_Material",
+            var inOrderPos_Material = principalEntityType.AddNavigation("InOrderPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -607,7 +607,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("InOrderPosID") }),
                 principalEntityType);
 
-            var inOrderPos1ParentInOrderPos = declaringEntityType.AddNavigation("InOrderPos1_ParentInOrderPos",
+            var inOrderPos1_ParentInOrderPos = declaringEntityType.AddNavigation("InOrderPos1_ParentInOrderPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(InOrderPos),
@@ -615,7 +615,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_InOrderPos1_ParentInOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosParentInOrderPos = principalEntityType.AddNavigation("InOrderPos_ParentInOrderPos",
+            var inOrderPos_ParentInOrderPos = principalEntityType.AddNavigation("InOrderPos_ParentInOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),
@@ -641,7 +641,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrderPos).GetField("_PickupCompanyMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderPosPickupCompanyMaterial = principalEntityType.AddNavigation("InOrderPos_PickupCompanyMaterial",
+            var inOrderPos_PickupCompanyMaterial = principalEntityType.AddNavigation("InOrderPos_PickupCompanyMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrderPos>),

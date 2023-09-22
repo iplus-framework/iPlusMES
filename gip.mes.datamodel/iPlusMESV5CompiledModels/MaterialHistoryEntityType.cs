@@ -219,11 +219,11 @@ namespace gip.mes.datamodel
                 new[] { materialHistoryID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialHistoryHistoryID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialHistory_HistoryID = runtimeEntityType.AddIndex(
                 new[] { historyID },
                 name: "NCI_FK_MaterialHistory_HistoryID");
 
-            var nCIFKMaterialHistoryMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialHistory_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialHistory_MaterialID");
 
@@ -246,7 +246,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialHistory).GetField("_History", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialHistoryHistory = principalEntityType.AddNavigation("MaterialHistory_History",
+            var materialHistory_History = principalEntityType.AddNavigation("MaterialHistory_History",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialHistory>),
@@ -274,7 +274,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialHistory).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialHistoryMaterial = principalEntityType.AddNavigation("MaterialHistory_Material",
+            var materialHistory_Material = principalEntityType.AddNavigation("MaterialHistory_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialHistory>),

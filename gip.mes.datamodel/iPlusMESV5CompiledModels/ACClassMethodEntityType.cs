@@ -334,19 +334,19 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { attachedFromACClassID });
 
-            var nCIFKACClassMethodPWACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassMethod_PWACClassID = runtimeEntityType.AddIndex(
                 new[] { pWACClassID },
                 name: "NCI_FK_ACClassMethod_PWACClassID");
 
-            var nCIFKACClassMethodParentACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassMethod_ParentACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { parentACClassMethodID },
                 name: "NCI_FK_ACClassMethod_ParentACClassMethodID");
 
-            var nCIFKACClassMethodValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassMethod_ValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { valueTypeACClassID },
                 name: "NCI_FK_ACClassMethod_ValueTypeACClassID");
 
-            var uIXACClassMethod = runtimeEntityType.AddIndex(
+            var uIX_ACClassMethod = runtimeEntityType.AddIndex(
                 new[] { aCClassID, aCIdentifier },
                 name: "UIX_ACClassMethod",
                 unique: true);
@@ -370,7 +370,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassMethod).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassMethodACClass = principalEntityType.AddNavigation("ACClassMethod_ACClass",
+            var aCClassMethod_ACClass = principalEntityType.AddNavigation("ACClassMethod_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassMethod>),
@@ -396,7 +396,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassMethod).GetField("_AttachedFromACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassMethodAttachedFromACClass = principalEntityType.AddNavigation("ACClassMethod_AttachedFromACClass",
+            var aCClassMethod_AttachedFromACClass = principalEntityType.AddNavigation("ACClassMethod_AttachedFromACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassMethod>),
@@ -422,7 +422,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassMethod).GetField("_PWACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassMethodPWACClass = principalEntityType.AddNavigation("ACClassMethod_PWACClass",
+            var aCClassMethod_PWACClass = principalEntityType.AddNavigation("ACClassMethod_PWACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassMethod>),
@@ -440,7 +440,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassMethodID") }),
                 principalEntityType);
 
-            var aCClassMethod1ParentACClassMethod = declaringEntityType.AddNavigation("ACClassMethod1_ParentACClassMethod",
+            var aCClassMethod1_ParentACClassMethod = declaringEntityType.AddNavigation("ACClassMethod1_ParentACClassMethod",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ACClassMethod),
@@ -448,7 +448,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassMethod).GetField("_ACClassMethod1_ParentACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassMethodParentACClassMethod = principalEntityType.AddNavigation("ACClassMethod_ParentACClassMethod",
+            var aCClassMethod_ParentACClassMethod = principalEntityType.AddNavigation("ACClassMethod_ParentACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassMethod>),
@@ -474,7 +474,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassMethod).GetField("_ValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassMethodValueTypeACClass = principalEntityType.AddNavigation("ACClassMethod_ValueTypeACClass",
+            var aCClassMethod_ValueTypeACClass = principalEntityType.AddNavigation("ACClassMethod_ValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassMethod>),

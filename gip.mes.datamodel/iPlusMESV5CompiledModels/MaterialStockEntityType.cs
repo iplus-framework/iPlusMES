@@ -548,11 +548,11 @@ namespace gip.mes.datamodel
                 new[] { materialStockID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialStockMDReleaseStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialStock_MDReleaseStateID = runtimeEntityType.AddIndex(
                 new[] { mDReleaseStateID },
                 name: "NCI_FK_MaterialStock_MDReleaseStateID");
 
-            var nCIFKMaterialStockMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialStock_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialStock_MaterialID");
 
@@ -573,7 +573,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialStock).GetField("_MDReleaseState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialStockMDReleaseState = principalEntityType.AddNavigation("MaterialStock_MDReleaseState",
+            var materialStock_MDReleaseState = principalEntityType.AddNavigation("MaterialStock_MDReleaseState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialStock>),
@@ -601,7 +601,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialStock).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialStockMaterial = principalEntityType.AddNavigation("MaterialStock_Material",
+            var materialStock_Material = principalEntityType.AddNavigation("MaterialStock_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialStock>),

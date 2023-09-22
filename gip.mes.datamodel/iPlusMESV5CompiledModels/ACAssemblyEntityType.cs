@@ -102,7 +102,7 @@ namespace gip.mes.datamodel
                 new[] { aCAssemblyID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXAssembly = runtimeEntityType.AddIndex(
+            var uIX_Assembly = runtimeEntityType.AddIndex(
                 new[] { assemblyName },
                 name: "UIX_Assembly",
                 unique: true);

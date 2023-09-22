@@ -108,15 +108,15 @@ namespace gip.mes.datamodel
                 new[] { aCClassTaskValueID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKACClassTaskValueACClassPropertyID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTaskValue_ACClassPropertyID = runtimeEntityType.AddIndex(
                 new[] { aCClassPropertyID },
                 name: "NCI_FK_ACClassTaskValue_ACClassPropertyID");
 
-            var nCIFKACClassTaskValueACClassTaskID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTaskValue_ACClassTaskID = runtimeEntityType.AddIndex(
                 new[] { aCClassTaskID },
                 name: "NCI_FK_ACClassTaskValue_ACClassTaskID");
 
-            var nCIFKACClassTaskValueVBUserID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTaskValue_VBUserID = runtimeEntityType.AddIndex(
                 new[] { vBUserID },
                 name: "NCI_FK_ACClassTaskValue_VBUserID");
 
@@ -138,7 +138,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTaskValue).GetField("_ACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskValueACClassProperty = principalEntityType.AddNavigation("ACClassTaskValue_ACClassProperty",
+            var aCClassTaskValue_ACClassProperty = principalEntityType.AddNavigation("ACClassTaskValue_ACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTaskValue>),
@@ -166,7 +166,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTaskValue).GetField("_ACClassTask", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskValueACClassTask = principalEntityType.AddNavigation("ACClassTaskValue_ACClassTask",
+            var aCClassTaskValue_ACClassTask = principalEntityType.AddNavigation("ACClassTaskValue_ACClassTask",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTaskValue>),
@@ -193,7 +193,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTaskValue).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskValueVBUser = principalEntityType.AddNavigation("ACClassTaskValue_VBUser",
+            var aCClassTaskValue_VBUser = principalEntityType.AddNavigation("ACClassTaskValue_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTaskValue>),

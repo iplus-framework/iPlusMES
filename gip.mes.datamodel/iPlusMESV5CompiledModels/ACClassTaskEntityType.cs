@@ -150,19 +150,19 @@ namespace gip.mes.datamodel
                 new[] { aCClassTaskID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKACClassTaskACProgramID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTask_ACProgramID = runtimeEntityType.AddIndex(
                 new[] { aCProgramID },
                 name: "NCI_FK_ACClassTask_ACProgramID");
 
-            var nCIFKACClassTaskContentACClassWFID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTask_ContentACClassWFID = runtimeEntityType.AddIndex(
                 new[] { contentACClassWFID },
                 name: "NCI_FK_ACClassTask_ContentACClassWFID");
 
-            var nCIFKACClassTaskParentACClassTaskID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTask_ParentACClassTaskID = runtimeEntityType.AddIndex(
                 new[] { parentACClassTaskID },
                 name: "NCI_FK_ACClassTask_ParentACClassTaskID");
 
-            var nCIFKACClassTaskTaskTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassTask_TaskTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { taskTypeACClassID },
                 name: "NCI_FK_ACClassTask_TaskTypeACClassID");
 
@@ -183,7 +183,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTask).GetField("_ACProgram", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskACProgram = principalEntityType.AddNavigation("ACClassTask_ACProgram",
+            var aCClassTask_ACProgram = principalEntityType.AddNavigation("ACClassTask_ACProgram",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTask>),
@@ -209,7 +209,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTask).GetField("_ContentACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskContentACClassWF = principalEntityType.AddNavigation("ACClassTask_ContentACClassWF",
+            var aCClassTask_ContentACClassWF = principalEntityType.AddNavigation("ACClassTask_ContentACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTask>),
@@ -227,7 +227,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassTaskID") }),
                 principalEntityType);
 
-            var aCClassTask1ParentACClassTask = declaringEntityType.AddNavigation("ACClassTask1_ParentACClassTask",
+            var aCClassTask1_ParentACClassTask = declaringEntityType.AddNavigation("ACClassTask1_ParentACClassTask",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ACClassTask),
@@ -235,7 +235,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTask).GetField("_ACClassTask1_ParentACClassTask", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskParentACClassTask = principalEntityType.AddNavigation("ACClassTask_ParentACClassTask",
+            var aCClassTask_ParentACClassTask = principalEntityType.AddNavigation("ACClassTask_ParentACClassTask",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTask>),
@@ -263,7 +263,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassTask).GetField("_TaskTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassTaskTaskTypeACClass = principalEntityType.AddNavigation("ACClassTask_TaskTypeACClass",
+            var aCClassTask_TaskTypeACClass = principalEntityType.AddNavigation("ACClassTask_TaskTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassTask>),

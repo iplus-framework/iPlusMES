@@ -98,7 +98,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPoint).GetField("_InwardLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointInwardLot = principalEntityType.AddNavigation("TandTv3MixPoint_InwardLot",
+            var tandTv3MixPoint_InwardLot = principalEntityType.AddNavigation("TandTv3MixPoint_InwardLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPoint>),
@@ -125,7 +125,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPoint).GetField("_InwardMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointInwardMaterial = principalEntityType.AddNavigation("TandTv3MixPoint_InwardMaterial",
+            var tandTv3MixPoint_InwardMaterial = principalEntityType.AddNavigation("TandTv3MixPoint_InwardMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPoint>),
@@ -152,7 +152,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPoint).GetField("_TandTv3Step", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointTandTv3Step = principalEntityType.AddNavigation("TandTv3MixPoint_TandTv3Step",
+            var tandTv3MixPoint_TandTv3Step = principalEntityType.AddNavigation("TandTv3MixPoint_TandTv3Step",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPoint>),

@@ -121,31 +121,31 @@ namespace gip.mes.datamodel
                 new[] { aCClassWFEdgeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKACClassWFEdgeACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_ACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { aCClassMethodID },
                 name: "NCI_FK_ACClassWFEdge_ACClassMethodID");
 
-            var nCIFKACClassWFEdgeSourceACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_SourceACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { sourceACClassMethodID },
                 name: "NCI_FK_ACClassWFEdge_SourceACClassMethodID");
 
-            var nCIFKACClassWFEdgeSourceACClassPropertyID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_SourceACClassPropertyID = runtimeEntityType.AddIndex(
                 new[] { sourceACClassPropertyID },
                 name: "NCI_FK_ACClassWFEdge_SourceACClassPropertyID");
 
-            var nCIFKACClassWFEdgeSourceACClassWFID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_SourceACClassWFID = runtimeEntityType.AddIndex(
                 new[] { sourceACClassWFID },
                 name: "NCI_FK_ACClassWFEdge_SourceACClassWFID");
 
-            var nCIFKACClassWFEdgeTargetACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_TargetACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { targetACClassMethodID },
                 name: "NCI_FK_ACClassWFEdge_TargetACClassMethodID");
 
-            var nCIFKACClassWFEdgeTargetACClassPropertyID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_TargetACClassPropertyID = runtimeEntityType.AddIndex(
                 new[] { targetACClassPropertyID },
                 name: "NCI_FK_ACClassWFEdge_TargetACClassPropertyID");
 
-            var nCIFKACClassWFEdgeTargetACClassWFID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassWFEdge_TargetACClassWFID = runtimeEntityType.AddIndex(
                 new[] { targetACClassWFID },
                 name: "NCI_FK_ACClassWFEdge_TargetACClassWFID");
 
@@ -168,7 +168,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_ACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeACClassMethod = principalEntityType.AddNavigation("ACClassWFEdge_ACClassMethod",
+            var aCClassWFEdge_ACClassMethod = principalEntityType.AddNavigation("ACClassWFEdge_ACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),
@@ -194,7 +194,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_SourceACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeSourceACClassMethod = principalEntityType.AddNavigation("ACClassWFEdge_SourceACClassMethod",
+            var aCClassWFEdge_SourceACClassMethod = principalEntityType.AddNavigation("ACClassWFEdge_SourceACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),
@@ -221,7 +221,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_SourceACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeSourceACClassProperty = principalEntityType.AddNavigation("ACClassWFEdge_SourceACClassProperty",
+            var aCClassWFEdge_SourceACClassProperty = principalEntityType.AddNavigation("ACClassWFEdge_SourceACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),
@@ -248,7 +248,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_SourceACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeSourceACClassWF = principalEntityType.AddNavigation("ACClassWFEdge_SourceACClassWF",
+            var aCClassWFEdge_SourceACClassWF = principalEntityType.AddNavigation("ACClassWFEdge_SourceACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),
@@ -274,7 +274,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_TargetACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeTargetACClassMethod = principalEntityType.AddNavigation("ACClassWFEdge_TargetACClassMethod",
+            var aCClassWFEdge_TargetACClassMethod = principalEntityType.AddNavigation("ACClassWFEdge_TargetACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),
@@ -301,7 +301,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_TargetACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeTargetACClassProperty = principalEntityType.AddNavigation("ACClassWFEdge_TargetACClassProperty",
+            var aCClassWFEdge_TargetACClassProperty = principalEntityType.AddNavigation("ACClassWFEdge_TargetACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),
@@ -328,7 +328,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWFEdge).GetField("_TargetACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassWFEdgeTargetACClassWF = principalEntityType.AddNavigation("ACClassWFEdge_TargetACClassWF",
+            var aCClassWFEdge_TargetACClassWF = principalEntityType.AddNavigation("ACClassWFEdge_TargetACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassWFEdge>),

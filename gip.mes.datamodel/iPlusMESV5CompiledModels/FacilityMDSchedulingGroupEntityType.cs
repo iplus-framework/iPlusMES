@@ -98,7 +98,7 @@ namespace gip.mes.datamodel
             var index0 = runtimeEntityType.AddIndex(
                 new[] { mDSchedulingGroupID });
 
-            var uIXFacilityMDSchedulingGroup = runtimeEntityType.AddIndex(
+            var uIX_FacilityMDSchedulingGroup = runtimeEntityType.AddIndex(
                 new[] { facilityID, mDSchedulingGroupID },
                 name: "UIX_FacilityMDSchedulingGroup",
                 unique: true);
@@ -121,7 +121,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityMDSchedulingGroup).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMDSchedulingGroupFacility = principalEntityType.AddNavigation("FacilityMDSchedulingGroup_Facility",
+            var facilityMDSchedulingGroup_Facility = principalEntityType.AddNavigation("FacilityMDSchedulingGroup_Facility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityMDSchedulingGroup>),
@@ -147,7 +147,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityMDSchedulingGroup).GetField("_MDPickingType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMDSchedulingGroupMDPickingType = principalEntityType.AddNavigation("FacilityMDSchedulingGroup_MDPickingType",
+            var facilityMDSchedulingGroup_MDPickingType = principalEntityType.AddNavigation("FacilityMDSchedulingGroup_MDPickingType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityMDSchedulingGroup>),
@@ -174,7 +174,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityMDSchedulingGroup).GetField("_MDSchedulingGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMDSchedulingGroupMDSchedulingGroup = principalEntityType.AddNavigation("FacilityMDSchedulingGroup_MDSchedulingGroup",
+            var facilityMDSchedulingGroup_MDSchedulingGroup = principalEntityType.AddNavigation("FacilityMDSchedulingGroup_MDSchedulingGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityMDSchedulingGroup>),

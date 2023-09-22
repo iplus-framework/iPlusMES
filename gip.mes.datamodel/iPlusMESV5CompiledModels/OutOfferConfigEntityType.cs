@@ -205,7 +205,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferConfigMaterial = principalEntityType.AddNavigation("OutOfferConfig_Material",
+            var outOfferConfig_Material = principalEntityType.AddNavigation("OutOfferConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferConfig>),
@@ -233,7 +233,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferConfig).GetField("_OutOffer", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferConfigOutOffer = principalEntityType.AddNavigation("OutOfferConfig_OutOffer",
+            var outOfferConfig_OutOffer = principalEntityType.AddNavigation("OutOfferConfig_OutOffer",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferConfig>),
@@ -251,7 +251,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOfferConfigID") }),
                 principalEntityType);
 
-            var outOfferConfig1ParentOutOfferConfig = declaringEntityType.AddNavigation("OutOfferConfig1_ParentOutOfferConfig",
+            var outOfferConfig1_ParentOutOfferConfig = declaringEntityType.AddNavigation("OutOfferConfig1_ParentOutOfferConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(OutOfferConfig),
@@ -259,7 +259,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferConfig).GetField("_OutOfferConfig1_ParentOutOfferConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferConfigParentOutOfferConfig = principalEntityType.AddNavigation("OutOfferConfig_ParentOutOfferConfig",
+            var outOfferConfig_ParentOutOfferConfig = principalEntityType.AddNavigation("OutOfferConfig_ParentOutOfferConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferConfig>),
@@ -285,7 +285,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferConfigVBiACClass = principalEntityType.AddNavigation("OutOfferConfig_VBiACClass",
+            var outOfferConfig_VBiACClass = principalEntityType.AddNavigation("OutOfferConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferConfig>),
@@ -311,7 +311,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("OutOfferConfig_VBiACClassPropertyRelation",
+            var outOfferConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("OutOfferConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferConfig>),
@@ -338,7 +338,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOfferConfigVBiValueTypeACClass = principalEntityType.AddNavigation("OutOfferConfig_VBiValueTypeACClass",
+            var outOfferConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("OutOfferConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOfferConfig>),

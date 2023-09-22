@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDBookingNotAvailableModeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDBookingNotAvailableMode = runtimeEntityType.AddIndex(
+            var uIX_MDBookingNotAvailableMode = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDBookingNotAvailableMode",
                 unique: true);

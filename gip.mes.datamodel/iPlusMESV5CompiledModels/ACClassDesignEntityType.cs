@@ -254,11 +254,11 @@ namespace gip.mes.datamodel
                 new[] { aCClassDesignID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKACClassDesignValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassDesign_ValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { valueTypeACClassID },
                 name: "NCI_FK_ACClassDesign_ValueTypeACClassID");
 
-            var uIXACClassDesign = runtimeEntityType.AddIndex(
+            var uIX_ACClassDesign = runtimeEntityType.AddIndex(
                 new[] { aCClassID, aCIdentifier },
                 name: "UIX_ACClassDesign",
                 unique: true);
@@ -282,7 +282,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassDesign).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassDesignACClass = principalEntityType.AddNavigation("ACClassDesign_ACClass",
+            var aCClassDesign_ACClass = principalEntityType.AddNavigation("ACClassDesign_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassDesign>),
@@ -308,7 +308,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassDesign).GetField("_ValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassDesignValueTypeACClass = principalEntityType.AddNavigation("ACClassDesign_ValueTypeACClass",
+            var aCClassDesign_ValueTypeACClass = principalEntityType.AddNavigation("ACClassDesign_ValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassDesign>),

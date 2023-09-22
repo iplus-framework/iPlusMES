@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDDelivTypeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDDelivType = runtimeEntityType.AddIndex(
+            var uIX_MDDelivType = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDDelivType",
                 unique: true);

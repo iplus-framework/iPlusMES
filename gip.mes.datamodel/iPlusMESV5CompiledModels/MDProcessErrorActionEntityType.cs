@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDProcessErrorActionID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDProcessErrorAction = runtimeEntityType.AddIndex(
+            var uIX_MDProcessErrorAction = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDProcessErrorAction",
                 unique: true);

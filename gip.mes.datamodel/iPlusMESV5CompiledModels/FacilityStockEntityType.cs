@@ -569,11 +569,11 @@ namespace gip.mes.datamodel
                 new[] { facilityStockID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKFacilityStockFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityStock_FacilityID = runtimeEntityType.AddIndex(
                 new[] { facilityID },
                 name: "NCI_FK_FacilityStock_FacilityID");
 
-            var nCIFKFacilityStockMDReleaseStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityStock_MDReleaseStateID = runtimeEntityType.AddIndex(
                 new[] { mDReleaseStateID },
                 name: "NCI_FK_FacilityStock_MDReleaseStateID");
 
@@ -595,7 +595,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityStock).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityStockFacility = principalEntityType.AddNavigation("FacilityStock_Facility",
+            var facilityStock_Facility = principalEntityType.AddNavigation("FacilityStock_Facility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityStock>),
@@ -621,7 +621,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityStock).GetField("_MDReleaseState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityStockMDReleaseState = principalEntityType.AddNavigation("FacilityStock_MDReleaseState",
+            var facilityStock_MDReleaseState = principalEntityType.AddNavigation("FacilityStock_MDReleaseState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityStock>),

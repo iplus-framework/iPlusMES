@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDLabTagID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDLabTag = runtimeEntityType.AddIndex(
+            var uIX_MDLabTag = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDLabTag",
                 unique: true);

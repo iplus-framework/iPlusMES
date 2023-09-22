@@ -162,23 +162,23 @@ namespace gip.mes.datamodel
                 new[] { aCProgramConfigID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKACProgramConfigACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACProgramConfig_ACClassID = runtimeEntityType.AddIndex(
                 new[] { aCClassID },
                 name: "NCI_FK_ACProgramConfig_ACClassID");
 
-            var nCIFKACProgramConfigACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACProgramConfig_ACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { aCClassPropertyRelationID },
                 name: "NCI_FK_ACProgramConfig_ACClassPropertyRelationID");
 
-            var nCIFKACProgramConfigACProgramID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACProgramConfig_ACProgramID = runtimeEntityType.AddIndex(
                 new[] { aCProgramID },
                 name: "NCI_FK_ACProgramConfig_ACProgramID");
 
-            var nCIFKACProgramConfigParentACProgramConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACProgramConfig_ParentACProgramConfigID = runtimeEntityType.AddIndex(
                 new[] { parentACProgramConfigID },
                 name: "NCI_FK_ACProgramConfig_ParentACProgramConfigID");
 
-            var nCIFKACProgramConfigValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACProgramConfig_ValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { valueTypeACClassID },
                 name: "NCI_FK_ACProgramConfig_ValueTypeACClassID");
 
@@ -199,7 +199,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACProgramConfig).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCProgramConfigACClass = principalEntityType.AddNavigation("ACProgramConfig_ACClass",
+            var aCProgramConfig_ACClass = principalEntityType.AddNavigation("ACProgramConfig_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACProgramConfig>),
@@ -225,7 +225,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACProgramConfig).GetField("_ACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCProgramConfigACClassPropertyRelation = principalEntityType.AddNavigation("ACProgramConfig_ACClassPropertyRelation",
+            var aCProgramConfig_ACClassPropertyRelation = principalEntityType.AddNavigation("ACProgramConfig_ACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACProgramConfig>),
@@ -253,7 +253,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACProgramConfig).GetField("_ACProgram", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCProgramConfigACProgram = principalEntityType.AddNavigation("ACProgramConfig_ACProgram",
+            var aCProgramConfig_ACProgram = principalEntityType.AddNavigation("ACProgramConfig_ACProgram",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACProgramConfig>),
@@ -271,7 +271,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACProgramConfigID") }),
                 principalEntityType);
 
-            var aCProgramConfig1ParentACProgramConfig = declaringEntityType.AddNavigation("ACProgramConfig1_ParentACProgramConfig",
+            var aCProgramConfig1_ParentACProgramConfig = declaringEntityType.AddNavigation("ACProgramConfig1_ParentACProgramConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ACProgramConfig),
@@ -279,7 +279,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACProgramConfig).GetField("_ACProgramConfig1_ParentACProgramConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCProgramConfigParentACProgramConfig = principalEntityType.AddNavigation("ACProgramConfig_ParentACProgramConfig",
+            var aCProgramConfig_ParentACProgramConfig = principalEntityType.AddNavigation("ACProgramConfig_ParentACProgramConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACProgramConfig>),
@@ -306,7 +306,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACProgramConfig).GetField("_ValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCProgramConfigValueTypeACClass = principalEntityType.AddNavigation("ACProgramConfig_ValueTypeACClass",
+            var aCProgramConfig_ValueTypeACClass = principalEntityType.AddNavigation("ACProgramConfig_ValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACProgramConfig>),

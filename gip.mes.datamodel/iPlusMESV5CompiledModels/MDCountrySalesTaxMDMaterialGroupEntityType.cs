@@ -61,7 +61,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { mDMaterialGroupID });
 
-            var uXMDCountrySalesTaxMDMaterialGroup = runtimeEntityType.AddIndex(
+            var uX_MDCountrySalesTax_MDMaterialGroup = runtimeEntityType.AddIndex(
                 new[] { mDCountrySalesTaxID, mDMaterialGroupID },
                 name: "UX_MDCountrySalesTax_MDMaterialGroup",
                 unique: true);
@@ -84,7 +84,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetField("_MDCountrySalesTax", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCountrySalesTaxMDMaterialGroupMDCountrySalesTax = principalEntityType.AddNavigation("MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax",
+            var mDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax = principalEntityType.AddNavigation("MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCountrySalesTaxMDMaterialGroup>),
@@ -111,7 +111,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetField("_MDMaterialGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCountrySalesTaxMDMaterialGroupMDMaterialGroup = principalEntityType.AddNavigation("MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup",
+            var mDCountrySalesTaxMDMaterialGroup_MDMaterialGroup = principalEntityType.AddNavigation("MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCountrySalesTaxMDMaterialGroup>),

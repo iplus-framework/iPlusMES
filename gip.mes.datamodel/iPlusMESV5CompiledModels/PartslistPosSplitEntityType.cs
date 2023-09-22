@@ -108,7 +108,7 @@ namespace gip.mes.datamodel
                 new[] { partslistPosSplitID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKPartslistPosSplitPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPosSplit_PartslistPosID = runtimeEntityType.AddIndex(
                 new[] { partslistPosID },
                 name: "NCI_FK_PartslistPosSplit_PartslistPosID");
 
@@ -131,7 +131,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPosSplit).GetField("_PartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosSplitPartslistPos = principalEntityType.AddNavigation("PartslistPosSplit_PartslistPos",
+            var partslistPosSplit_PartslistPos = principalEntityType.AddNavigation("PartslistPosSplit_PartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPosSplit>),

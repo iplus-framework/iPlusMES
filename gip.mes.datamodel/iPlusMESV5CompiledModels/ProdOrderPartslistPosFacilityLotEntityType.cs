@@ -118,7 +118,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosFacilityLot).GetField("_FacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosFacilityLotFacilityLot = principalEntityType.AddNavigation("ProdOrderPartslistPosFacilityLot_FacilityLot",
+            var prodOrderPartslistPosFacilityLot_FacilityLot = principalEntityType.AddNavigation("ProdOrderPartslistPosFacilityLot_FacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosFacilityLot>),
@@ -145,7 +145,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosFacilityLot).GetField("_ProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosFacilityLotProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos",
+            var prodOrderPartslistPosFacilityLot_ProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPosFacilityLot>),

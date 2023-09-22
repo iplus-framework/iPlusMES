@@ -196,15 +196,15 @@ namespace gip.mes.datamodel
             var index1 = runtimeEntityType.AddIndex(
                 new[] { mDPickingTypeID });
 
-            var nCIFKPickingTourplanID = runtimeEntityType.AddIndex(
+            var nCI_FK_Picking_TourplanID = runtimeEntityType.AddIndex(
                 new[] { tourplanID },
                 name: "NCI_FK_Picking_TourplanID");
 
-            var nCIFKPickingVisitorVoucherID = runtimeEntityType.AddIndex(
+            var nCI_FK_Picking_VisitorVoucherID = runtimeEntityType.AddIndex(
                 new[] { visitorVoucherID },
                 name: "NCI_FK_Picking_VisitorVoucherID");
 
-            var uIXPickingPickingNo = runtimeEntityType.AddIndex(
+            var uIX_Picking_PickingNo = runtimeEntityType.AddIndex(
                 new[] { pickingNo },
                 name: "UIX_Picking_PickingNo",
                 unique: true);
@@ -226,7 +226,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_ACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingACClassMethod = principalEntityType.AddNavigation("Picking_ACClassMethod",
+            var picking_ACClassMethod = principalEntityType.AddNavigation("Picking_ACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Picking>),
@@ -252,7 +252,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_DeliveryCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingDeliveryCompanyAddress = principalEntityType.AddNavigation("Picking_DeliveryCompanyAddress",
+            var picking_DeliveryCompanyAddress = principalEntityType.AddNavigation("Picking_DeliveryCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Picking>),
@@ -279,7 +279,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_MDPickingType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingMDPickingType = principalEntityType.AddNavigation("Picking_MDPickingType",
+            var picking_MDPickingType = principalEntityType.AddNavigation("Picking_MDPickingType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Picking>),
@@ -305,7 +305,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_Tourplan", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingTourplan = principalEntityType.AddNavigation("Picking_Tourplan",
+            var picking_Tourplan = principalEntityType.AddNavigation("Picking_Tourplan",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Picking>),
@@ -331,7 +331,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_VisitorVoucher", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingVisitorVoucher = principalEntityType.AddNavigation("Picking_VisitorVoucher",
+            var picking_VisitorVoucher = principalEntityType.AddNavigation("Picking_VisitorVoucher",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Picking>),

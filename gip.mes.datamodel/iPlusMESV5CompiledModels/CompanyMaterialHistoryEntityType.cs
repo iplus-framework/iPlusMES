@@ -205,11 +205,11 @@ namespace gip.mes.datamodel
                 new[] { companyMaterialHistoryID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyMaterialHistoryCompanyMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialHistory_CompanyMaterialID = runtimeEntityType.AddIndex(
                 new[] { companyMaterialID },
                 name: "NCI_FK_CompanyMaterialHistory_CompanyMaterialID");
 
-            var nCIFKCompanyMaterialHistoryHistoryID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialHistory_HistoryID = runtimeEntityType.AddIndex(
                 new[] { historyID },
                 name: "NCI_FK_CompanyMaterialHistory_HistoryID");
 
@@ -232,7 +232,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialHistory).GetField("_CompanyMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialHistoryCompanyMaterial = principalEntityType.AddNavigation("CompanyMaterialHistory_CompanyMaterial",
+            var companyMaterialHistory_CompanyMaterial = principalEntityType.AddNavigation("CompanyMaterialHistory_CompanyMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialHistory>),
@@ -260,7 +260,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialHistory).GetField("_History", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialHistoryHistory = principalEntityType.AddNavigation("CompanyMaterialHistory_History",
+            var companyMaterialHistory_History = principalEntityType.AddNavigation("CompanyMaterialHistory_History",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialHistory>),

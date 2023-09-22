@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDBalancingModeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDBalancingMode = runtimeEntityType.AddIndex(
+            var uIX_MDBalancingMode = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDBalancingMode",
                 unique: true);

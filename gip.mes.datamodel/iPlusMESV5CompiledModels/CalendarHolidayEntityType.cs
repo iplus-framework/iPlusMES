@@ -111,15 +111,15 @@ namespace gip.mes.datamodel
                 new[] { calendarHolidayID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCalendarHolidayCalendarID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarHoliday_CalendarID = runtimeEntityType.AddIndex(
                 new[] { calendarID },
                 name: "NCI_FK_CalendarHoliday_CalendarID");
 
-            var nCIFKCalendarHolidayMDCountryID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarHoliday_MDCountryID = runtimeEntityType.AddIndex(
                 new[] { mDCountryID },
                 name: "NCI_FK_CalendarHoliday_MDCountryID");
 
-            var nCIFKCalendarHolidayMDCountryLandID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarHoliday_MDCountryLandID = runtimeEntityType.AddIndex(
                 new[] { mDCountryLandID },
                 name: "NCI_FK_CalendarHoliday_MDCountryLandID");
 
@@ -142,7 +142,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarHoliday).GetField("_Calendar", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarHolidayCalendar = principalEntityType.AddNavigation("CalendarHoliday_Calendar",
+            var calendarHoliday_Calendar = principalEntityType.AddNavigation("CalendarHoliday_Calendar",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarHoliday>),
@@ -169,7 +169,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarHoliday).GetField("_MDCountry", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarHolidayMDCountry = principalEntityType.AddNavigation("CalendarHoliday_MDCountry",
+            var calendarHoliday_MDCountry = principalEntityType.AddNavigation("CalendarHoliday_MDCountry",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarHoliday>),
@@ -195,7 +195,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarHoliday).GetField("_MDCountryLand", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarHolidayMDCountryLand = principalEntityType.AddNavigation("CalendarHoliday_MDCountryLand",
+            var calendarHoliday_MDCountryLand = principalEntityType.AddNavigation("CalendarHoliday_MDCountryLand",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarHoliday>),

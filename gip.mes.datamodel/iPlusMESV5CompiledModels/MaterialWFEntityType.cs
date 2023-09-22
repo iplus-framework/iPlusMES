@@ -104,7 +104,7 @@ namespace gip.mes.datamodel
                 new[] { materialWFID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMaterialWFMaterialWFNo = runtimeEntityType.AddIndex(
+            var uIX_MaterialWF_MaterialWFNo = runtimeEntityType.AddIndex(
                 new[] { materialWFNo },
                 name: "UIX_MaterialWF_MaterialWFNo",
                 unique: true);

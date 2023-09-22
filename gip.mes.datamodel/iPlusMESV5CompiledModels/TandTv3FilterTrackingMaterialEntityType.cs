@@ -75,7 +75,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3FilterTrackingMaterial).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3FilterTrackingMaterialMaterial = principalEntityType.AddNavigation("TandTv3FilterTrackingMaterial_Material",
+            var tandTv3FilterTrackingMaterial_Material = principalEntityType.AddNavigation("TandTv3FilterTrackingMaterial_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3FilterTrackingMaterial>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3FilterTrackingMaterial).GetField("_TandTv3FilterTracking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3FilterTrackingMaterialTandTv3FilterTracking = principalEntityType.AddNavigation("TandTv3FilterTrackingMaterial_TandTv3FilterTracking",
+            var tandTv3FilterTrackingMaterial_TandTv3FilterTracking = principalEntityType.AddNavigation("TandTv3FilterTrackingMaterial_TandTv3FilterTracking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3FilterTrackingMaterial>),

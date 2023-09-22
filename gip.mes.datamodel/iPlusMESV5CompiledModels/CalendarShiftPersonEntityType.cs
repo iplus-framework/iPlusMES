@@ -126,11 +126,11 @@ namespace gip.mes.datamodel
                 new[] { calendarShiftPersonID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCalendarShiftPersonCalendarShiftID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarShiftPerson_CalendarShiftID = runtimeEntityType.AddIndex(
                 new[] { calendarShiftID },
                 name: "NCI_FK_CalendarShiftPerson_CalendarShiftID");
 
-            var nCIFKCalendarShiftPersonCompanyPersonID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarShiftPerson_CompanyPersonID = runtimeEntityType.AddIndex(
                 new[] { companyPersonID },
                 name: "NCI_FK_CalendarShiftPerson_CompanyPersonID");
 
@@ -153,7 +153,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShiftPerson).GetField("_CalendarShift", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarShiftPersonCalendarShift = principalEntityType.AddNavigation("CalendarShiftPerson_CalendarShift",
+            var calendarShiftPerson_CalendarShift = principalEntityType.AddNavigation("CalendarShiftPerson_CalendarShift",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarShiftPerson>),
@@ -181,7 +181,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShiftPerson).GetField("_CompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarShiftPersonCompanyPerson = principalEntityType.AddNavigation("CalendarShiftPerson_CompanyPerson",
+            var calendarShiftPerson_CompanyPerson = principalEntityType.AddNavigation("CalendarShiftPerson_CompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarShiftPerson>),

@@ -98,11 +98,11 @@ namespace gip.mes.datamodel
                 new[] { mDUnitConversionID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDUnitConversionMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDUnitConversion_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_MDUnitConversion_MDUnitID");
 
-            var nCIFKMDUnitConversionToMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDUnitConversion_ToMDUnitID = runtimeEntityType.AddIndex(
                 new[] { toMDUnitID },
                 name: "NCI_FK_MDUnitConversion_ToMDUnitID");
 
@@ -125,7 +125,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDUnitConversion).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDUnitConversionMDUnit = principalEntityType.AddNavigation("MDUnitConversion_MDUnit",
+            var mDUnitConversion_MDUnit = principalEntityType.AddNavigation("MDUnitConversion_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDUnitConversion>),
@@ -152,7 +152,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDUnitConversion).GetField("_ToMDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDUnitConversionToMDUnit = principalEntityType.AddNavigation("MDUnitConversion_ToMDUnit",
+            var mDUnitConversion_ToMDUnit = principalEntityType.AddNavigation("MDUnitConversion_ToMDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDUnitConversion>),

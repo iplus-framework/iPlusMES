@@ -98,7 +98,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistACClassMethod).GetField("_MaterialWFACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistACClassMethodMaterialWFACClassMethod = principalEntityType.AddNavigation("PartslistACClassMethod_MaterialWFACClassMethod",
+            var partslistACClassMethod_MaterialWFACClassMethod = principalEntityType.AddNavigation("PartslistACClassMethod_MaterialWFACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistACClassMethod>),
@@ -125,7 +125,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistACClassMethod).GetField("_Partslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistACClassMethodPartslist = principalEntityType.AddNavigation("PartslistACClassMethod_Partslist",
+            var partslistACClassMethod_Partslist = principalEntityType.AddNavigation("PartslistACClassMethod_Partslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistACClassMethod>),

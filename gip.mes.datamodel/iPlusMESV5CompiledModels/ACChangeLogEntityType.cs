@@ -114,7 +114,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACChangeLog).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCChangeLogACClass = principalEntityType.AddNavigation("ACChangeLog_ACClass",
+            var aCChangeLog_ACClass = principalEntityType.AddNavigation("ACChangeLog_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACChangeLog>),
@@ -141,7 +141,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACChangeLog).GetField("_ACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCChangeLogACClassProperty = principalEntityType.AddNavigation("ACChangeLog_ACClassProperty",
+            var aCChangeLog_ACClassProperty = principalEntityType.AddNavigation("ACChangeLog_ACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACChangeLog>),
@@ -168,7 +168,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACChangeLog).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCChangeLogVBUser = principalEntityType.AddNavigation("ACChangeLog_VBUser",
+            var aCChangeLog_VBUser = principalEntityType.AddNavigation("ACChangeLog_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACChangeLog>),

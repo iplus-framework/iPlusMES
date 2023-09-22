@@ -216,7 +216,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigMaterial = principalEntityType.AddNavigation("PickingConfig_Material",
+            var pickingConfig_Material = principalEntityType.AddNavigation("PickingConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),
@@ -234,7 +234,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PickingConfigID") }),
                 principalEntityType);
 
-            var pickingConfig1ParentPickingConfig = declaringEntityType.AddNavigation("PickingConfig1_ParentPickingConfig",
+            var pickingConfig1_ParentPickingConfig = declaringEntityType.AddNavigation("PickingConfig1_ParentPickingConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(PickingConfig),
@@ -242,7 +242,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_PickingConfig1_ParentPickingConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigParentPickingConfig = principalEntityType.AddNavigation("PickingConfig_ParentPickingConfig",
+            var pickingConfig_ParentPickingConfig = principalEntityType.AddNavigation("PickingConfig_ParentPickingConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),
@@ -269,7 +269,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_Picking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigPicking = principalEntityType.AddNavigation("PickingConfig_Picking",
+            var pickingConfig_Picking = principalEntityType.AddNavigation("PickingConfig_Picking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),
@@ -295,7 +295,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigVBiACClass = principalEntityType.AddNavigation("PickingConfig_VBiACClass",
+            var pickingConfig_VBiACClass = principalEntityType.AddNavigation("PickingConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),
@@ -321,7 +321,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("PickingConfig_VBiACClassPropertyRelation",
+            var pickingConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("PickingConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),
@@ -348,7 +348,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigVBiACClassWF = principalEntityType.AddNavigation("PickingConfig_VBiACClassWF",
+            var pickingConfig_VBiACClassWF = principalEntityType.AddNavigation("PickingConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),
@@ -375,7 +375,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingConfigVBiValueTypeACClass = principalEntityType.AddNavigation("PickingConfig_VBiValueTypeACClass",
+            var pickingConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("PickingConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingConfig>),

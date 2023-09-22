@@ -138,11 +138,11 @@ namespace gip.mes.datamodel
                 new[] { materialUnitID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialUnitMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialUnit_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_MaterialUnit_MaterialID");
 
-            var nCIFKMaterialUnitToMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialUnit_ToMDUnitID = runtimeEntityType.AddIndex(
                 new[] { toMDUnitID },
                 name: "NCI_FK_MaterialUnit_ToMDUnitID");
 
@@ -165,7 +165,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialUnit).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialUnitMaterial = principalEntityType.AddNavigation("MaterialUnit_Material",
+            var materialUnit_Material = principalEntityType.AddNavigation("MaterialUnit_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialUnit>),
@@ -192,7 +192,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialUnit).GetField("_ToMDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialUnitToMDUnit = principalEntityType.AddNavigation("MaterialUnit_ToMDUnit",
+            var materialUnit_ToMDUnit = principalEntityType.AddNavigation("MaterialUnit_ToMDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialUnit>),

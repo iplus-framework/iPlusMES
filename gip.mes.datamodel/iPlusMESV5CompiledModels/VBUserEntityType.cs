@@ -145,11 +145,11 @@ namespace gip.mes.datamodel
                 new[] { vBUserID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVBUserMenuACClassDesignID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUser_MenuACClassDesignID = runtimeEntityType.AddIndex(
                 new[] { menuACClassDesignID },
                 name: "NCI_FK_VBUser_MenuACClassDesignID");
 
-            var nCIFKVBUserVBLanguageID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUser_VBLanguageID = runtimeEntityType.AddIndex(
                 new[] { vBLanguageID },
                 name: "NCI_FK_VBUser_VBLanguageID");
 
@@ -170,7 +170,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUser).GetField("_MenuACClassDesign", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserMenuACClassDesign = principalEntityType.AddNavigation("VBUser_MenuACClassDesign",
+            var vBUser_MenuACClassDesign = principalEntityType.AddNavigation("VBUser_MenuACClassDesign",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUser>),
@@ -197,7 +197,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUser).GetField("_VBLanguage", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserVBLanguage = principalEntityType.AddNavigation("VBUser_VBLanguage",
+            var vBUser_VBLanguage = principalEntityType.AddNavigation("VBUser_VBLanguage",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUser>),

@@ -111,11 +111,11 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { mDGMPMaterialGroupID });
 
-            var nCIFKMDGMPMaterialGroupPosMDGMPAdditiveID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDGMPMaterialGroupPos_MDGMPAdditiveID = runtimeEntityType.AddIndex(
                 new[] { mDGMPAdditiveID },
                 name: "NCI_FK_MDGMPMaterialGroupPos_MDGMPAdditiveID");
 
-            var uIXMDGMPMaterialGroupPos = runtimeEntityType.AddIndex(
+            var uIX_MDGMPMaterialGroupPos = runtimeEntityType.AddIndex(
                 new[] { mDGMPMaterialGroupPosID, sequence },
                 name: "UIX_MDGMPMaterialGroupPos",
                 unique: true);
@@ -139,7 +139,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDGMPMaterialGroupPos).GetField("_MDGMPAdditive", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDGMPMaterialGroupPosMDGMPAdditive = principalEntityType.AddNavigation("MDGMPMaterialGroupPos_MDGMPAdditive",
+            var mDGMPMaterialGroupPos_MDGMPAdditive = principalEntityType.AddNavigation("MDGMPMaterialGroupPos_MDGMPAdditive",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDGMPMaterialGroupPos>),
@@ -167,7 +167,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDGMPMaterialGroupPos).GetField("_MDGMPMaterialGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDGMPMaterialGroupPosMDGMPMaterialGroup = principalEntityType.AddNavigation("MDGMPMaterialGroupPos_MDGMPMaterialGroup",
+            var mDGMPMaterialGroupPos_MDGMPMaterialGroup = principalEntityType.AddNavigation("MDGMPMaterialGroupPos_MDGMPMaterialGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDGMPMaterialGroupPos>),

@@ -111,7 +111,7 @@ namespace gip.mes.datamodel
                 new[] { mDCurrencyID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDCurrency = runtimeEntityType.AddIndex(
+            var uIX_MDCurrency = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDCurrency",
                 unique: true);

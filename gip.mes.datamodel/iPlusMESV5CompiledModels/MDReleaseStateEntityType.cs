@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDReleaseStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDReleaseState = runtimeEntityType.AddIndex(
+            var uIX_MDReleaseState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDReleaseState",
                 unique: true);

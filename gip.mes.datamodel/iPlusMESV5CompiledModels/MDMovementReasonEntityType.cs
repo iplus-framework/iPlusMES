@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDMovementReasonID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDMovementReason = runtimeEntityType.AddIndex(
+            var uIX_MDMovementReason = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDMovementReason",
                 unique: true);

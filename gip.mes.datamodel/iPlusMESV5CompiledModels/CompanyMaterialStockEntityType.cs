@@ -548,11 +548,11 @@ namespace gip.mes.datamodel
                 new[] { companyMaterialStockID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyMaterialStockCompanyMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialStock_CompanyMaterialID = runtimeEntityType.AddIndex(
                 new[] { companyMaterialID },
                 name: "NCI_FK_CompanyMaterialStock_CompanyMaterialID");
 
-            var nCIFKCompanyMaterialStockMDReleaseStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialStock_MDReleaseStateID = runtimeEntityType.AddIndex(
                 new[] { mDReleaseStateID },
                 name: "NCI_FK_CompanyMaterialStock_MDReleaseStateID");
 
@@ -575,7 +575,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialStock).GetField("_CompanyMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialStockCompanyMaterial = principalEntityType.AddNavigation("CompanyMaterialStock_CompanyMaterial",
+            var companyMaterialStock_CompanyMaterial = principalEntityType.AddNavigation("CompanyMaterialStock_CompanyMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialStock>),
@@ -601,7 +601,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialStock).GetField("_MDReleaseState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialStockMDReleaseState = principalEntityType.AddNavigation("CompanyMaterialStock_MDReleaseState",
+            var companyMaterialStock_MDReleaseState = principalEntityType.AddNavigation("CompanyMaterialStock_MDReleaseState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialStock>),

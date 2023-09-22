@@ -87,7 +87,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { vBiACClassWFID });
 
-            var uXSchedulingGroupWf = runtimeEntityType.AddIndex(
+            var uX_SchedulingGroup_Wf = runtimeEntityType.AddIndex(
                 new[] { mDSchedulingGroupID, vBiACClassWFID },
                 name: "UX_SchedulingGroup_Wf",
                 unique: true);
@@ -110,7 +110,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDSchedulingGroupWF).GetField("_MDSchedulingGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDSchedulingGroupWFMDSchedulingGroup = principalEntityType.AddNavigation("MDSchedulingGroupWF_MDSchedulingGroup",
+            var mDSchedulingGroupWF_MDSchedulingGroup = principalEntityType.AddNavigation("MDSchedulingGroupWF_MDSchedulingGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDSchedulingGroupWF>),
@@ -137,7 +137,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDSchedulingGroupWF).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDSchedulingGroupWFVBiACClassWF = principalEntityType.AddNavigation("MDSchedulingGroupWF_VBiACClassWF",
+            var mDSchedulingGroupWF_VBiACClassWF = principalEntityType.AddNavigation("MDSchedulingGroupWF_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDSchedulingGroupWF>),

@@ -102,15 +102,15 @@ namespace gip.mes.datamodel
                 new[] { ratingID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKRatingCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Rating_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_Rating_CompanyID");
 
-            var nCIFKRatingCompanyPersonID = runtimeEntityType.AddIndex(
+            var nCI_FK_Rating_CompanyPersonID = runtimeEntityType.AddIndex(
                 new[] { companyPersonID },
                 name: "NCI_FK_Rating_CompanyPersonID");
 
-            var nCIFKRatingDeliveryNoteID = runtimeEntityType.AddIndex(
+            var nCI_FK_Rating_DeliveryNoteID = runtimeEntityType.AddIndex(
                 new[] { deliveryNoteID },
                 name: "NCI_FK_Rating_DeliveryNoteID");
 
@@ -131,7 +131,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Rating).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var ratingCompany = principalEntityType.AddNavigation("Rating_Company",
+            var rating_Company = principalEntityType.AddNavigation("Rating_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Rating>),
@@ -157,7 +157,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Rating).GetField("_CompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var ratingCompanyPerson = principalEntityType.AddNavigation("Rating_CompanyPerson",
+            var rating_CompanyPerson = principalEntityType.AddNavigation("Rating_CompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Rating>),
@@ -183,7 +183,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Rating).GetField("_DeliveryNote", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var ratingDeliveryNote = principalEntityType.AddNavigation("Rating_DeliveryNote",
+            var rating_DeliveryNote = principalEntityType.AddNavigation("Rating_DeliveryNote",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Rating>),

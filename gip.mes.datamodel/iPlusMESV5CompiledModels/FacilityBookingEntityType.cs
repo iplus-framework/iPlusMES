@@ -566,139 +566,139 @@ namespace gip.mes.datamodel
             var index1 = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosFacilityLotID });
 
-            var nCIFKFacilityBookingCPartnerCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_CPartnerCompanyID = runtimeEntityType.AddIndex(
                 new[] { cPartnerCompanyID },
                 name: "NCI_FK_FacilityBooking_CPartnerCompanyID");
 
-            var nCIFKFacilityBookingHistoryID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_HistoryID = runtimeEntityType.AddIndex(
                 new[] { historyID },
                 name: "NCI_FK_FacilityBooking_HistoryID");
 
-            var nCIFKFacilityBookingInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_FacilityBooking_InOrderPosID");
 
-            var nCIFKFacilityBookingInwardCompanyMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardCompanyMaterialID = runtimeEntityType.AddIndex(
                 new[] { inwardCompanyMaterialID },
                 name: "NCI_FK_FacilityBooking_InwardCompanyMaterialID");
 
-            var nCIFKFacilityBookingInwardFacilityChargeID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardFacilityChargeID = runtimeEntityType.AddIndex(
                 new[] { inwardFacilityChargeID },
                 name: "NCI_FK_FacilityBooking_InwardFacilityChargeID");
 
-            var nCIFKFacilityBookingInwardFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardFacilityID = runtimeEntityType.AddIndex(
                 new[] { inwardFacilityID },
                 name: "NCI_FK_FacilityBooking_InwardFacilityID");
 
-            var nCIFKFacilityBookingInwardFacilityLocationID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardFacilityLocationID = runtimeEntityType.AddIndex(
                 new[] { inwardFacilityLocationID },
                 name: "NCI_FK_FacilityBooking_InwardFacilityLocationID");
 
-            var nCIFKFacilityBookingInwardFacilityLotID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardFacilityLotID = runtimeEntityType.AddIndex(
                 new[] { inwardFacilityLotID },
                 name: "NCI_FK_FacilityBooking_InwardFacilityLotID");
 
-            var nCIFKFacilityBookingInwardMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardMaterialID = runtimeEntityType.AddIndex(
                 new[] { inwardMaterialID },
                 name: "NCI_FK_FacilityBooking_InwardMaterialID");
 
-            var nCIFKFacilityBookingInwardPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_InwardPartslistID = runtimeEntityType.AddIndex(
                 new[] { inwardPartslistID },
                 name: "NCI_FK_FacilityBooking_InwardPartslistID");
 
-            var nCIFKFacilityBookingMDBalancingModeID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDBalancingModeID = runtimeEntityType.AddIndex(
                 new[] { mDBalancingModeID },
                 name: "NCI_FK_FacilityBooking_MDBalancingModeID");
 
-            var nCIFKFacilityBookingMDBookingNotAvailableModeID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDBookingNotAvailableModeID = runtimeEntityType.AddIndex(
                 new[] { mDBookingNotAvailableModeID },
                 name: "NCI_FK_FacilityBooking_MDBookingNotAvailableModeID");
 
-            var nCIFKFacilityBookingMDMovementReasonID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDMovementReasonID = runtimeEntityType.AddIndex(
                 new[] { mDMovementReasonID },
                 name: "NCI_FK_FacilityBooking_MDMovementReasonID");
 
-            var nCIFKFacilityBookingMDReleaseStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDReleaseStateID = runtimeEntityType.AddIndex(
                 new[] { mDReleaseStateID },
                 name: "NCI_FK_FacilityBooking_MDReleaseStateID");
 
-            var nCIFKFacilityBookingMDReservationModeID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDReservationModeID = runtimeEntityType.AddIndex(
                 new[] { mDReservationModeID },
                 name: "NCI_FK_FacilityBooking_MDReservationModeID");
 
-            var nCIFKFacilityBookingMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_FacilityBooking_MDUnitID");
 
-            var nCIFKFacilityBookingMDZeroStockStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_MDZeroStockStateID = runtimeEntityType.AddIndex(
                 new[] { mDZeroStockStateID },
                 name: "NCI_FK_FacilityBooking_MDZeroStockStateID");
 
-            var nCIFKFacilityBookingOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_FacilityBooking_OutOrderPosID");
 
-            var nCIFKFacilityBookingOutwardCompanyMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardCompanyMaterialID = runtimeEntityType.AddIndex(
                 new[] { outwardCompanyMaterialID },
                 name: "NCI_FK_FacilityBooking_OutwardCompanyMaterialID");
 
-            var nCIFKFacilityBookingOutwardFacilityChargeID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardFacilityChargeID = runtimeEntityType.AddIndex(
                 new[] { outwardFacilityChargeID },
                 name: "NCI_FK_FacilityBooking_OutwardFacilityChargeID");
 
-            var nCIFKFacilityBookingOutwardFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardFacilityID = runtimeEntityType.AddIndex(
                 new[] { outwardFacilityID },
                 name: "NCI_FK_FacilityBooking_OutwardFacilityID");
 
-            var nCIFKFacilityBookingOutwardFacilityLocationID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardFacilityLocationID = runtimeEntityType.AddIndex(
                 new[] { outwardFacilityLocationID },
                 name: "NCI_FK_FacilityBooking_OutwardFacilityLocationID");
 
-            var nCIFKFacilityBookingOutwardFacilityLotID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardFacilityLotID = runtimeEntityType.AddIndex(
                 new[] { outwardFacilityLotID },
                 name: "NCI_FK_FacilityBooking_OutwardFacilityLotID");
 
-            var nCIFKFacilityBookingOutwardMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardMaterialID = runtimeEntityType.AddIndex(
                 new[] { outwardMaterialID },
                 name: "NCI_FK_FacilityBooking_OutwardMaterialID");
 
-            var nCIFKFacilityBookingOutwardPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_OutwardPartslistID = runtimeEntityType.AddIndex(
                 new[] { outwardPartslistID },
                 name: "NCI_FK_FacilityBooking_OutwardPartslistID");
 
-            var nCIFKFacilityBookingProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_ProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_FK_FacilityBooking_ProdOrderPartslistPosID");
 
-            var nCIFKFacilityBookingProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_ProdOrderPartslistPosRelationID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID },
                 name: "NCI_FK_FacilityBooking_ProdOrderPartslistPosRelationID");
 
-            var nCIFKFacilityBookingVBiStackCalculatorACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_FacilityBooking_VBiStackCalculatorACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiStackCalculatorACClassID },
                 name: "NCI_FK_FacilityBooking_VBiStackCalculatorACClassID");
 
-            var nCIFacilityBookingInwardFacilityLotIDInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FacilityBooking_InwardFacilityLotID_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inwardFacilityLotID, inOrderPosID },
                 name: "NCI_FacilityBooking_InwardFacilityLotID_InOrderPosID");
 
-            var nCIFacilityBookingProdOrderPartslistPosIDInsertDate = runtimeEntityType.AddIndex(
+            var nCI_FacilityBooking_ProdOrderPartslistPosID_InsertDate = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_FacilityBooking_ProdOrderPartslistPosID_InsertDate");
 
-            var nCIFacilityBookingProdOrderPartslistPosIDOT = runtimeEntityType.AddIndex(
+            var nCI_FacilityBooking_ProdOrderPartslistPosID_OT = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_FacilityBooking_ProdOrderPartslistPosID_OT");
 
-            var nCIFacilityBookingProdOrderPartslistPosRelationIDInsertDate = runtimeEntityType.AddIndex(
+            var nCI_FacilityBooking_ProdOrderPartslistPosRelationID_InsertDate = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID },
                 name: "NCI_FacilityBooking_ProdOrderPartslistPosRelationID_InsertDate");
 
-            var nCIFacilityBookingProdOrderPartslistPosRelationIDOT = runtimeEntityType.AddIndex(
+            var nCI_FacilityBooking_ProdOrderPartslistPosRelationID_OT = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosRelationID },
                 name: "NCI_FacilityBooking_ProdOrderPartslistPosRelationID_OT");
 
-            var uIXFacilityBookingFacilityBookingNo = runtimeEntityType.AddIndex(
+            var uIX_FacilityBooking_FacilityBookingNo = runtimeEntityType.AddIndex(
                 new[] { facilityBookingNo },
                 name: "UIX_FacilityBooking_FacilityBookingNo",
                 unique: true);
@@ -720,7 +720,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_CPartnerCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingCPartnerCompany = principalEntityType.AddNavigation("FacilityBooking_CPartnerCompany",
+            var facilityBooking_CPartnerCompany = principalEntityType.AddNavigation("FacilityBooking_CPartnerCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -746,7 +746,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_FacilityInventoryPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingFacilityInventoryPos = principalEntityType.AddNavigation("FacilityBooking_FacilityInventoryPos",
+            var facilityBooking_FacilityInventoryPos = principalEntityType.AddNavigation("FacilityBooking_FacilityInventoryPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -772,7 +772,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_History", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingHistory = principalEntityType.AddNavigation("FacilityBooking_History",
+            var facilityBooking_History = principalEntityType.AddNavigation("FacilityBooking_History",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -798,7 +798,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInOrderPos = principalEntityType.AddNavigation("FacilityBooking_InOrderPos",
+            var facilityBooking_InOrderPos = principalEntityType.AddNavigation("FacilityBooking_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -824,7 +824,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardCompanyMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardCompanyMaterial = principalEntityType.AddNavigation("FacilityBooking_InwardCompanyMaterial",
+            var facilityBooking_InwardCompanyMaterial = principalEntityType.AddNavigation("FacilityBooking_InwardCompanyMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -850,7 +850,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardFacilityCharge", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardFacilityCharge = principalEntityType.AddNavigation("FacilityBooking_InwardFacilityCharge",
+            var facilityBooking_InwardFacilityCharge = principalEntityType.AddNavigation("FacilityBooking_InwardFacilityCharge",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -876,7 +876,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardFacility = principalEntityType.AddNavigation("FacilityBooking_InwardFacility",
+            var facilityBooking_InwardFacility = principalEntityType.AddNavigation("FacilityBooking_InwardFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -902,7 +902,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardFacilityLocation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardFacilityLocation = principalEntityType.AddNavigation("FacilityBooking_InwardFacilityLocation",
+            var facilityBooking_InwardFacilityLocation = principalEntityType.AddNavigation("FacilityBooking_InwardFacilityLocation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -928,7 +928,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardFacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardFacilityLot = principalEntityType.AddNavigation("FacilityBooking_InwardFacilityLot",
+            var facilityBooking_InwardFacilityLot = principalEntityType.AddNavigation("FacilityBooking_InwardFacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -954,7 +954,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardMaterial = principalEntityType.AddNavigation("FacilityBooking_InwardMaterial",
+            var facilityBooking_InwardMaterial = principalEntityType.AddNavigation("FacilityBooking_InwardMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -980,7 +980,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_InwardPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingInwardPartslist = principalEntityType.AddNavigation("FacilityBooking_InwardPartslist",
+            var facilityBooking_InwardPartslist = principalEntityType.AddNavigation("FacilityBooking_InwardPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1006,7 +1006,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDBalancingMode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDBalancingMode = principalEntityType.AddNavigation("FacilityBooking_MDBalancingMode",
+            var facilityBooking_MDBalancingMode = principalEntityType.AddNavigation("FacilityBooking_MDBalancingMode",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1032,7 +1032,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDBookingNotAvailableMode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDBookingNotAvailableMode = principalEntityType.AddNavigation("FacilityBooking_MDBookingNotAvailableMode",
+            var facilityBooking_MDBookingNotAvailableMode = principalEntityType.AddNavigation("FacilityBooking_MDBookingNotAvailableMode",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1058,7 +1058,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDMovementReason", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDMovementReason = principalEntityType.AddNavigation("FacilityBooking_MDMovementReason",
+            var facilityBooking_MDMovementReason = principalEntityType.AddNavigation("FacilityBooking_MDMovementReason",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1084,7 +1084,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDReleaseState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDReleaseState = principalEntityType.AddNavigation("FacilityBooking_MDReleaseState",
+            var facilityBooking_MDReleaseState = principalEntityType.AddNavigation("FacilityBooking_MDReleaseState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1110,7 +1110,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDReservationMode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDReservationMode = principalEntityType.AddNavigation("FacilityBooking_MDReservationMode",
+            var facilityBooking_MDReservationMode = principalEntityType.AddNavigation("FacilityBooking_MDReservationMode",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1136,7 +1136,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDUnit = principalEntityType.AddNavigation("FacilityBooking_MDUnit",
+            var facilityBooking_MDUnit = principalEntityType.AddNavigation("FacilityBooking_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1162,7 +1162,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_MDZeroStockState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingMDZeroStockState = principalEntityType.AddNavigation("FacilityBooking_MDZeroStockState",
+            var facilityBooking_MDZeroStockState = principalEntityType.AddNavigation("FacilityBooking_MDZeroStockState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1188,7 +1188,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutOrderPos = principalEntityType.AddNavigation("FacilityBooking_OutOrderPos",
+            var facilityBooking_OutOrderPos = principalEntityType.AddNavigation("FacilityBooking_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1214,7 +1214,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardCompanyMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardCompanyMaterial = principalEntityType.AddNavigation("FacilityBooking_OutwardCompanyMaterial",
+            var facilityBooking_OutwardCompanyMaterial = principalEntityType.AddNavigation("FacilityBooking_OutwardCompanyMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1240,7 +1240,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardFacilityCharge", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardFacilityCharge = principalEntityType.AddNavigation("FacilityBooking_OutwardFacilityCharge",
+            var facilityBooking_OutwardFacilityCharge = principalEntityType.AddNavigation("FacilityBooking_OutwardFacilityCharge",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1266,7 +1266,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardFacility = principalEntityType.AddNavigation("FacilityBooking_OutwardFacility",
+            var facilityBooking_OutwardFacility = principalEntityType.AddNavigation("FacilityBooking_OutwardFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1292,7 +1292,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardFacilityLocation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardFacilityLocation = principalEntityType.AddNavigation("FacilityBooking_OutwardFacilityLocation",
+            var facilityBooking_OutwardFacilityLocation = principalEntityType.AddNavigation("FacilityBooking_OutwardFacilityLocation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1318,7 +1318,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardFacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardFacilityLot = principalEntityType.AddNavigation("FacilityBooking_OutwardFacilityLot",
+            var facilityBooking_OutwardFacilityLot = principalEntityType.AddNavigation("FacilityBooking_OutwardFacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1344,7 +1344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardMaterial = principalEntityType.AddNavigation("FacilityBooking_OutwardMaterial",
+            var facilityBooking_OutwardMaterial = principalEntityType.AddNavigation("FacilityBooking_OutwardMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1370,7 +1370,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_OutwardPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingOutwardPartslist = principalEntityType.AddNavigation("FacilityBooking_OutwardPartslist",
+            var facilityBooking_OutwardPartslist = principalEntityType.AddNavigation("FacilityBooking_OutwardPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1396,7 +1396,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingPickingPos = principalEntityType.AddNavigation("FacilityBooking_PickingPos",
+            var facilityBooking_PickingPos = principalEntityType.AddNavigation("FacilityBooking_PickingPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1422,7 +1422,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_ProdOrderPartslistPosFacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingProdOrderPartslistPosFacilityLot = principalEntityType.AddNavigation("FacilityBooking_ProdOrderPartslistPosFacilityLot",
+            var facilityBooking_ProdOrderPartslistPosFacilityLot = principalEntityType.AddNavigation("FacilityBooking_ProdOrderPartslistPosFacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1448,7 +1448,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_ProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingProdOrderPartslistPos = principalEntityType.AddNavigation("FacilityBooking_ProdOrderPartslistPos",
+            var facilityBooking_ProdOrderPartslistPos = principalEntityType.AddNavigation("FacilityBooking_ProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1474,7 +1474,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_ProdOrderPartslistPosRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingProdOrderPartslistPosRelation = principalEntityType.AddNavigation("FacilityBooking_ProdOrderPartslistPosRelation",
+            var facilityBooking_ProdOrderPartslistPosRelation = principalEntityType.AddNavigation("FacilityBooking_ProdOrderPartslistPosRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),
@@ -1500,7 +1500,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityBooking).GetField("_VBiStackCalculatorACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityBookingVBiStackCalculatorACClass = principalEntityType.AddNavigation("FacilityBooking_VBiStackCalculatorACClass",
+            var facilityBooking_VBiStackCalculatorACClass = principalEntityType.AddNavigation("FacilityBooking_VBiStackCalculatorACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityBooking>),

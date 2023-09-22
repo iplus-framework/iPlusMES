@@ -187,19 +187,19 @@ namespace gip.mes.datamodel
             var index1 = runtimeEntityType.AddIndex(
                 new[] { vBiACClassWFID });
 
-            var nCIFKPartslistConfigParentPartslistConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistConfig_ParentPartslistConfigID = runtimeEntityType.AddIndex(
                 new[] { parentPartslistConfigID },
                 name: "NCI_FK_PartslistConfig_ParentPartslistConfigID");
 
-            var nCIFKPartslistConfigVBiACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistConfig_VBiACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
                 name: "NCI_FK_PartslistConfig_VBiACClassID");
 
-            var nCIFKPartslistConfigVBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistConfig_VBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassPropertyRelationID },
                 name: "NCI_FK_PartslistConfig_VBiACClassPropertyRelationID");
 
-            var nCIFKPartslistConfigVBiValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistConfig_VBiValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiValueTypeACClassID },
                 name: "NCI_FK_PartslistConfig_VBiValueTypeACClassID");
 
@@ -220,7 +220,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigMaterial = principalEntityType.AddNavigation("PartslistConfig_Material",
+            var partslistConfig_Material = principalEntityType.AddNavigation("PartslistConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),
@@ -238,7 +238,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PartslistConfigID") }),
                 principalEntityType);
 
-            var partslistConfig1ParentPartslistConfig = declaringEntityType.AddNavigation("PartslistConfig1_ParentPartslistConfig",
+            var partslistConfig1_ParentPartslistConfig = declaringEntityType.AddNavigation("PartslistConfig1_ParentPartslistConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(PartslistConfig),
@@ -246,7 +246,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_PartslistConfig1_ParentPartslistConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigParentPartslistConfig = principalEntityType.AddNavigation("PartslistConfig_ParentPartslistConfig",
+            var partslistConfig_ParentPartslistConfig = principalEntityType.AddNavigation("PartslistConfig_ParentPartslistConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),
@@ -274,7 +274,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_Partslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigPartslist = principalEntityType.AddNavigation("PartslistConfig_Partslist",
+            var partslistConfig_Partslist = principalEntityType.AddNavigation("PartslistConfig_Partslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),
@@ -300,7 +300,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigVBiACClass = principalEntityType.AddNavigation("PartslistConfig_VBiACClass",
+            var partslistConfig_VBiACClass = principalEntityType.AddNavigation("PartslistConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),
@@ -326,7 +326,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("PartslistConfig_VBiACClassPropertyRelation",
+            var partslistConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("PartslistConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),
@@ -353,7 +353,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigVBiACClassWF = principalEntityType.AddNavigation("PartslistConfig_VBiACClassWF",
+            var partslistConfig_VBiACClassWF = principalEntityType.AddNavigation("PartslistConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),
@@ -380,7 +380,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistConfigVBiValueTypeACClass = principalEntityType.AddNavigation("PartslistConfig_VBiValueTypeACClass",
+            var partslistConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("PartslistConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistConfig>),

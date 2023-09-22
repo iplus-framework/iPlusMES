@@ -114,19 +114,19 @@ namespace gip.mes.datamodel
                 new[] { prodOrderID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKProdOrderCPartnerCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrder_CPartnerCompanyID = runtimeEntityType.AddIndex(
                 new[] { cPartnerCompanyID },
                 name: "NCI_FK_ProdOrder_CPartnerCompanyID");
 
-            var nCIFKProdOrderMDProdOrderStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrder_MDProdOrderStateID = runtimeEntityType.AddIndex(
                 new[] { mDProdOrderStateID },
                 name: "NCI_FK_ProdOrder_MDProdOrderStateID");
 
-            var nCIPProdOrderProdOrderIDMDProdOrderStateID = runtimeEntityType.AddIndex(
+            var nCI_PProdOrder_ProdOrderID_MDProdOrderStateID = runtimeEntityType.AddIndex(
                 new[] { prodOrderID, mDProdOrderStateID },
                 name: "NCI_PProdOrder_ProdOrderID_MDProdOrderStateID");
 
-            var uIXProdOrderProgramNo = runtimeEntityType.AddIndex(
+            var uIX_ProdOrder_ProgramNo = runtimeEntityType.AddIndex(
                 new[] { programNo },
                 name: "UIX_ProdOrder_ProgramNo",
                 unique: true);
@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrder).GetField("_CPartnerCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderCPartnerCompany = principalEntityType.AddNavigation("ProdOrder_CPartnerCompany",
+            var prodOrder_CPartnerCompany = principalEntityType.AddNavigation("ProdOrder_CPartnerCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrder>),
@@ -175,7 +175,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrder).GetField("_MDProdOrderState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderMDProdOrderState = principalEntityType.AddNavigation("ProdOrder_MDProdOrderState",
+            var prodOrder_MDProdOrderState = principalEntityType.AddNavigation("ProdOrder_MDProdOrderState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrder>),

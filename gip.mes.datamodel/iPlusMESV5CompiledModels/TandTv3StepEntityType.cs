@@ -82,7 +82,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3Step).GetField("_TandTv3FilterTracking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3StepTandTv3FilterTracking = principalEntityType.AddNavigation("TandTv3Step_TandTv3FilterTracking",
+            var tandTv3Step_TandTv3FilterTracking = principalEntityType.AddNavigation("TandTv3Step_TandTv3FilterTracking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3Step>),

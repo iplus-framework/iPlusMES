@@ -265,23 +265,23 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { vBUserID });
 
-            var nCIFKCompanyBillingMDTermOfPaymentID = runtimeEntityType.AddIndex(
+            var nCI_FK_Company_BillingMDTermOfPaymentID = runtimeEntityType.AddIndex(
                 new[] { billingMDTermOfPaymentID },
                 name: "NCI_FK_Company_BillingMDTermOfPaymentID");
 
-            var nCIFKCompanyMDCurrencyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Company_MDCurrencyID = runtimeEntityType.AddIndex(
                 new[] { mDCurrencyID },
                 name: "NCI_FK_Company_MDCurrencyID");
 
-            var nCIFKCompanyParentCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Company_ParentCompanyID = runtimeEntityType.AddIndex(
                 new[] { parentCompanyID },
                 name: "NCI_FK_Company_ParentCompanyID");
 
-            var nCIFKCompanyShippingMDTermOfPaymentID = runtimeEntityType.AddIndex(
+            var nCI_FK_Company_ShippingMDTermOfPaymentID = runtimeEntityType.AddIndex(
                 new[] { shippingMDTermOfPaymentID },
                 name: "NCI_FK_Company_ShippingMDTermOfPaymentID");
 
-            var uIXCompany = runtimeEntityType.AddIndex(
+            var uIX_Company = runtimeEntityType.AddIndex(
                 new[] { companyNo },
                 name: "UIX_Company",
                 unique: true);
@@ -303,7 +303,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Company).GetField("_BillingMDTermOfPayment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyBillingMDTermOfPayment = principalEntityType.AddNavigation("Company_BillingMDTermOfPayment",
+            var company_BillingMDTermOfPayment = principalEntityType.AddNavigation("Company_BillingMDTermOfPayment",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Company>),
@@ -330,7 +330,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Company).GetField("_MDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMDCurrency = principalEntityType.AddNavigation("Company_MDCurrency",
+            var company_MDCurrency = principalEntityType.AddNavigation("Company_MDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Company>),
@@ -348,7 +348,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("CompanyID") }),
                 principalEntityType);
 
-            var company1ParentCompany = declaringEntityType.AddNavigation("Company1_ParentCompany",
+            var company1_ParentCompany = declaringEntityType.AddNavigation("Company1_ParentCompany",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Company),
@@ -356,7 +356,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Company).GetField("_Company1_ParentCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyParentCompany = principalEntityType.AddNavigation("Company_ParentCompany",
+            var company_ParentCompany = principalEntityType.AddNavigation("Company_ParentCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Company>),
@@ -382,7 +382,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Company).GetField("_ShippingMDTermOfPayment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyShippingMDTermOfPayment = principalEntityType.AddNavigation("Company_ShippingMDTermOfPayment",
+            var company_ShippingMDTermOfPayment = principalEntityType.AddNavigation("Company_ShippingMDTermOfPayment",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Company>),
@@ -408,7 +408,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Company).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyVBUser = principalEntityType.AddNavigation("Company_VBUser",
+            var company_VBUser = principalEntityType.AddNavigation("Company_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Company>),

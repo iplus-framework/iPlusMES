@@ -53,7 +53,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { targetTandTv3MixPointID });
 
-            var uIXTandTv3MixPointRelation = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointRelation = runtimeEntityType.AddIndex(
                 new[] { sourceTandTv3MixPointID, targetTandTv3MixPointID },
                 name: "UIX_TandTv3MixPointRelation",
                 unique: true);
@@ -76,7 +76,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointRelation).GetField("_SourceTandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointRelationSourceTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointRelation_SourceTandTv3MixPoint",
+            var tandTv3MixPointRelation_SourceTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointRelation_SourceTandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointRelation>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointRelation).GetField("_TargetTandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointRelationTargetTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointRelation_TargetTandTv3MixPoint",
+            var tandTv3MixPointRelation_TargetTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointRelation_TargetTandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointRelation>),

@@ -111,6 +111,13 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    string _TaskName;
+    public string TaskName 
+    {
+        get { return _TaskName; }
+        set { SetProperty<string>(ref _TaskName, value); }
+    }
+
     private MDMaintTaskState _MDMaintTaskState;
     public virtual MDMaintTaskState MDMaintTaskState
     { 

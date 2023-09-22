@@ -194,39 +194,39 @@ namespace gip.mes.datamodel
                 new[] { visitorVoucherID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVisitorVoucherMDVisitorCardID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_MDVisitorCardID = runtimeEntityType.AddIndex(
                 new[] { mDVisitorCardID },
                 name: "NCI_FK_VisitorVoucher_MDVisitorCardID");
 
-            var nCIFKVisitorVoucherMDVisitorVoucherStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_MDVisitorVoucherStateID = runtimeEntityType.AddIndex(
                 new[] { mDVisitorVoucherStateID },
                 name: "NCI_FK_VisitorVoucher_MDVisitorVoucherStateID");
 
-            var nCIFKVisitorVoucherTrailerFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_TrailerFacilityID = runtimeEntityType.AddIndex(
                 new[] { trailerFacilityID },
                 name: "NCI_FK_VisitorVoucher_TrailerFacilityID");
 
-            var nCIFKVisitorVoucherVehicleFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_VehicleFacilityID = runtimeEntityType.AddIndex(
                 new[] { vehicleFacilityID },
                 name: "NCI_FK_VisitorVoucher_VehicleFacilityID");
 
-            var nCIFKVisitorVoucherVisitorCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_VisitorCompanyID = runtimeEntityType.AddIndex(
                 new[] { visitorCompanyID },
                 name: "NCI_FK_VisitorVoucher_VisitorCompanyID");
 
-            var nCIFKVisitorVoucherVisitorCompanyPersonID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_VisitorCompanyPersonID = runtimeEntityType.AddIndex(
                 new[] { visitorCompanyPersonID },
                 name: "NCI_FK_VisitorVoucher_VisitorCompanyPersonID");
 
-            var nCIFKVisitorVoucherVisitorID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_VisitorID = runtimeEntityType.AddIndex(
                 new[] { visitorID },
                 name: "NCI_FK_VisitorVoucher_VisitorID");
 
-            var nCIFKVisitorVoucherWeighingID = runtimeEntityType.AddIndex(
+            var nCI_FK_VisitorVoucher_WeighingID = runtimeEntityType.AddIndex(
                 new[] { weighingID },
                 name: "NCI_FK_VisitorVoucher_WeighingID");
 
-            var uIXVisitorVoucherVisitorVoucherNo = runtimeEntityType.AddIndex(
+            var uIX_VisitorVoucher_VisitorVoucherNo = runtimeEntityType.AddIndex(
                 new[] { visitorVoucherNo },
                 name: "UIX_VisitorVoucher_VisitorVoucherNo",
                 unique: true);
@@ -248,7 +248,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_MDVisitorCard", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherMDVisitorCard = principalEntityType.AddNavigation("VisitorVoucher_MDVisitorCard",
+            var visitorVoucher_MDVisitorCard = principalEntityType.AddNavigation("VisitorVoucher_MDVisitorCard",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),
@@ -275,7 +275,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_MDVisitorVoucherState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherMDVisitorVoucherState = principalEntityType.AddNavigation("VisitorVoucher_MDVisitorVoucherState",
+            var visitorVoucher_MDVisitorVoucherState = principalEntityType.AddNavigation("VisitorVoucher_MDVisitorVoucherState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),
@@ -301,7 +301,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_TrailerFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherTrailerFacility = principalEntityType.AddNavigation("VisitorVoucher_TrailerFacility",
+            var visitorVoucher_TrailerFacility = principalEntityType.AddNavigation("VisitorVoucher_TrailerFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),
@@ -327,7 +327,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_VehicleFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherVehicleFacility = principalEntityType.AddNavigation("VisitorVoucher_VehicleFacility",
+            var visitorVoucher_VehicleFacility = principalEntityType.AddNavigation("VisitorVoucher_VehicleFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),
@@ -353,7 +353,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherVisitorCompany = principalEntityType.AddNavigation("VisitorVoucher_VisitorCompany",
+            var visitorVoucher_VisitorCompany = principalEntityType.AddNavigation("VisitorVoucher_VisitorCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),
@@ -379,7 +379,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorCompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherVisitorCompanyPerson = principalEntityType.AddNavigation("VisitorVoucher_VisitorCompanyPerson",
+            var visitorVoucher_VisitorCompanyPerson = principalEntityType.AddNavigation("VisitorVoucher_VisitorCompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),
@@ -407,7 +407,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_Visitor", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var visitorVoucherVisitor = principalEntityType.AddNavigation("VisitorVoucher_Visitor",
+            var visitorVoucher_Visitor = principalEntityType.AddNavigation("VisitorVoucher_Visitor",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VisitorVoucher>),

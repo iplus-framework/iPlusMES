@@ -153,7 +153,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderAssignment).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderAssignmentCompany = principalEntityType.AddNavigation("MaintOrderAssignment_Company",
+            var maintOrderAssignment_Company = principalEntityType.AddNavigation("MaintOrderAssignment_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderAssignment>),
@@ -180,7 +180,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderAssignment).GetField("_MaintOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderAssignmentMaintOrder = principalEntityType.AddNavigation("MaintOrderAssignment_MaintOrder",
+            var maintOrderAssignment_MaintOrder = principalEntityType.AddNavigation("MaintOrderAssignment_MaintOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderAssignment>),
@@ -206,7 +206,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderAssignment).GetField("_VBGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderAssignmentVBGroup = principalEntityType.AddNavigation("MaintOrderAssignment_VBGroup",
+            var maintOrderAssignment_VBGroup = principalEntityType.AddNavigation("MaintOrderAssignment_VBGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderAssignment>),
@@ -232,7 +232,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderAssignment).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderAssignmentVBUser = principalEntityType.AddNavigation("MaintOrderAssignment_VBUser",
+            var maintOrderAssignment_VBUser = principalEntityType.AddNavigation("MaintOrderAssignment_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderAssignment>),

@@ -117,7 +117,7 @@ namespace gip.mes.datamodel
             runtimeEntityType.SetPrimaryKey(key);
             key.AddAnnotation("Relational:Name", "PK_MDMaintOrderProperty");
 
-            var uIXMDMaintOrderPropertyState = runtimeEntityType.AddIndex(
+            var uIX_MDMaintOrderPropertyState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDMaintOrderPropertyState",
                 unique: true);

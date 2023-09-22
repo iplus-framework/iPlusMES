@@ -203,23 +203,23 @@ namespace gip.mes.datamodel
             var index1 = runtimeEntityType.AddIndex(
                 new[] { pickingMaterialID });
 
-            var nCIFKPickingPosFromFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_PickingPos_FromFacilityID = runtimeEntityType.AddIndex(
                 new[] { fromFacilityID },
                 name: "NCI_FK_PickingPos_FromFacilityID");
 
-            var nCIFKPickingPosInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_PickingPos_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_PickingPos_InOrderPosID");
 
-            var nCIFKPickingPosOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_PickingPos_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_PickingPos_OutOrderPosID");
 
-            var nCIFKPickingPosPickingID = runtimeEntityType.AddIndex(
+            var nCI_FK_PickingPos_PickingID = runtimeEntityType.AddIndex(
                 new[] { pickingID },
                 name: "NCI_FK_PickingPos_PickingID");
 
-            var nCIFKPickingPosToFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_PickingPos_ToFacilityID = runtimeEntityType.AddIndex(
                 new[] { toFacilityID },
                 name: "NCI_FK_PickingPos_ToFacilityID");
 
@@ -241,7 +241,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_ACClassTask", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosACClassTask = principalEntityType.AddNavigation("PickingPos_ACClassTask",
+            var pickingPos_ACClassTask = principalEntityType.AddNavigation("PickingPos_ACClassTask",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -267,7 +267,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_FromFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosFromFacility = principalEntityType.AddNavigation("PickingPos_FromFacility",
+            var pickingPos_FromFacility = principalEntityType.AddNavigation("PickingPos_FromFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -293,7 +293,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosInOrderPos = principalEntityType.AddNavigation("PickingPos_InOrderPos",
+            var pickingPos_InOrderPos = principalEntityType.AddNavigation("PickingPos_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -319,7 +319,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_MDDelivPosLoadState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosMDDelivPosLoadState = principalEntityType.AddNavigation("PickingPos_MDDelivPosLoadState",
+            var pickingPos_MDDelivPosLoadState = principalEntityType.AddNavigation("PickingPos_MDDelivPosLoadState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -345,7 +345,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosOutOrderPos = principalEntityType.AddNavigation("PickingPos_OutOrderPos",
+            var pickingPos_OutOrderPos = principalEntityType.AddNavigation("PickingPos_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -373,7 +373,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_Picking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosPicking = principalEntityType.AddNavigation("PickingPos_Picking",
+            var pickingPos_Picking = principalEntityType.AddNavigation("PickingPos_Picking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -399,7 +399,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_PickingMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosPickingMaterial = principalEntityType.AddNavigation("PickingPos_PickingMaterial",
+            var pickingPos_PickingMaterial = principalEntityType.AddNavigation("PickingPos_PickingMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),
@@ -425,7 +425,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_ToFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosToFacility = principalEntityType.AddNavigation("PickingPos_ToFacility",
+            var pickingPos_ToFacility = principalEntityType.AddNavigation("PickingPos_ToFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPos>),

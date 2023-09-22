@@ -61,7 +61,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { materialID });
 
-            var uXPriceListMaterial = runtimeEntityType.AddIndex(
+            var uX_PriceList_Material = runtimeEntityType.AddIndex(
                 new[] { priceListID, materialID },
                 name: "UX_PriceList_Material",
                 unique: true);
@@ -84,7 +84,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PriceListMaterial).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var priceListMaterialMaterial = principalEntityType.AddNavigation("PriceListMaterial_Material",
+            var priceListMaterial_Material = principalEntityType.AddNavigation("PriceListMaterial_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PriceListMaterial>),
@@ -111,7 +111,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PriceListMaterial).GetField("_PriceList", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var priceListMaterialPriceList = principalEntityType.AddNavigation("PriceListMaterial_PriceList",
+            var priceListMaterial_PriceList = principalEntityType.AddNavigation("PriceListMaterial_PriceList",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PriceListMaterial>),

@@ -122,7 +122,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderPos).GetField("_MaintOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderPosMaintOrder = principalEntityType.AddNavigation("MaintOrderPos_MaintOrder",
+            var maintOrderPos_MaintOrder = principalEntityType.AddNavigation("MaintOrderPos_MaintOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderPos>),
@@ -149,7 +149,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderPosMaterial = principalEntityType.AddNavigation("MaintOrderPos_Material",
+            var maintOrderPos_Material = principalEntityType.AddNavigation("MaintOrderPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderPos>),

@@ -208,19 +208,19 @@ namespace gip.mes.datamodel
                 new[] { companyPersonID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyPersonCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyPerson_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_CompanyPerson_CompanyID");
 
-            var nCIFKCompanyPersonMDCountryID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyPerson_MDCountryID = runtimeEntityType.AddIndex(
                 new[] { mDCountryID },
                 name: "NCI_FK_CompanyPerson_MDCountryID");
 
-            var nCIFKCompanyPersonMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyPerson_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_CompanyPerson_MDTimeRangeID");
 
-            var uIXCompanyPersonCompanyPersonNo = runtimeEntityType.AddIndex(
+            var uIX_CompanyPerson_CompanyPersonNo = runtimeEntityType.AddIndex(
                 new[] { companyPersonNo },
                 name: "UIX_CompanyPerson_CompanyPersonNo",
                 unique: true);
@@ -244,7 +244,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyPerson).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyPersonCompany = principalEntityType.AddNavigation("CompanyPerson_Company",
+            var companyPerson_Company = principalEntityType.AddNavigation("CompanyPerson_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyPerson>),
@@ -270,7 +270,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyPerson).GetField("_MDCountry", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyPersonMDCountry = principalEntityType.AddNavigation("CompanyPerson_MDCountry",
+            var companyPerson_MDCountry = principalEntityType.AddNavigation("CompanyPerson_MDCountry",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyPerson>),
@@ -296,7 +296,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyPerson).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyPersonMDTimeRange = principalEntityType.AddNavigation("CompanyPerson_MDTimeRange",
+            var companyPerson_MDTimeRange = principalEntityType.AddNavigation("CompanyPerson_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyPerson>),

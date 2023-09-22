@@ -74,11 +74,11 @@ namespace gip.mes.datamodel
                 new[] { materialWFACClassMethodID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialWFACClassMethodACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFACClassMethod_ACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { aCClassMethodID },
                 name: "NCI_FK_MaterialWFACClassMethod_ACClassMethodID");
 
-            var nCIFKMaterialWFACClassMethodMaterialWFID = runtimeEntityType.AddIndex(
+            var nCI_FK_MaterialWFACClassMethod_MaterialWFID = runtimeEntityType.AddIndex(
                 new[] { materialWFID },
                 name: "NCI_FK_MaterialWFACClassMethod_MaterialWFID");
 
@@ -100,7 +100,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethod).GetField("_ACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodACClassMethod = principalEntityType.AddNavigation("MaterialWFACClassMethod_ACClassMethod",
+            var materialWFACClassMethod_ACClassMethod = principalEntityType.AddNavigation("MaterialWFACClassMethod_ACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethod>),
@@ -127,7 +127,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaterialWFACClassMethod).GetField("_MaterialWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialWFACClassMethodMaterialWF = principalEntityType.AddNavigation("MaterialWFACClassMethod_MaterialWF",
+            var materialWFACClassMethod_MaterialWF = principalEntityType.AddNavigation("MaterialWFACClassMethod_MaterialWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaterialWFACClassMethod>),

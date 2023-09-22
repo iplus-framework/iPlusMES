@@ -273,31 +273,31 @@ namespace gip.mes.datamodel
                 new[] { tourplanID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKTourplanCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Tourplan_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_Tourplan_CompanyID");
 
-            var nCIFKTourplanMDTourID = runtimeEntityType.AddIndex(
+            var nCI_FK_Tourplan_MDTourID = runtimeEntityType.AddIndex(
                 new[] { mDTourID },
                 name: "NCI_FK_Tourplan_MDTourID");
 
-            var nCIFKTourplanMDTourplanStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_Tourplan_MDTourplanStateID = runtimeEntityType.AddIndex(
                 new[] { mDTourplanStateID },
                 name: "NCI_FK_Tourplan_MDTourplanStateID");
 
-            var nCIFKTourplanTrailerFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Tourplan_TrailerFacilityID = runtimeEntityType.AddIndex(
                 new[] { trailerFacilityID },
                 name: "NCI_FK_Tourplan_TrailerFacilityID");
 
-            var nCIFKTourplanVehicleFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Tourplan_VehicleFacilityID = runtimeEntityType.AddIndex(
                 new[] { vehicleFacilityID },
                 name: "NCI_FK_Tourplan_VehicleFacilityID");
 
-            var nCIFKTourplanVisitorVoucherID = runtimeEntityType.AddIndex(
+            var nCI_FK_Tourplan_VisitorVoucherID = runtimeEntityType.AddIndex(
                 new[] { visitorVoucherID },
                 name: "NCI_FK_Tourplan_VisitorVoucherID");
 
-            var uIXTourplan = runtimeEntityType.AddIndex(
+            var uIX_Tourplan = runtimeEntityType.AddIndex(
                 new[] { tourplanNo },
                 name: "UIX_Tourplan",
                 unique: true);
@@ -320,7 +320,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Tourplan).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanCompany = principalEntityType.AddNavigation("Tourplan_Company",
+            var tourplan_Company = principalEntityType.AddNavigation("Tourplan_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Tourplan>),
@@ -346,7 +346,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Tourplan).GetField("_MDTour", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanMDTour = principalEntityType.AddNavigation("Tourplan_MDTour",
+            var tourplan_MDTour = principalEntityType.AddNavigation("Tourplan_MDTour",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Tourplan>),
@@ -373,7 +373,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Tourplan).GetField("_MDTourplanState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanMDTourplanState = principalEntityType.AddNavigation("Tourplan_MDTourplanState",
+            var tourplan_MDTourplanState = principalEntityType.AddNavigation("Tourplan_MDTourplanState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Tourplan>),
@@ -399,7 +399,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Tourplan).GetField("_TrailerFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanTrailerFacility = principalEntityType.AddNavigation("Tourplan_TrailerFacility",
+            var tourplan_TrailerFacility = principalEntityType.AddNavigation("Tourplan_TrailerFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Tourplan>),
@@ -425,7 +425,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Tourplan).GetField("_VehicleFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanVehicleFacility = principalEntityType.AddNavigation("Tourplan_VehicleFacility",
+            var tourplan_VehicleFacility = principalEntityType.AddNavigation("Tourplan_VehicleFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Tourplan>),
@@ -451,7 +451,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Tourplan).GetField("_VisitorVoucher", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanVisitorVoucher = principalEntityType.AddNavigation("Tourplan_VisitorVoucher",
+            var tourplan_VisitorVoucher = principalEntityType.AddNavigation("Tourplan_VisitorVoucher",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Tourplan>),

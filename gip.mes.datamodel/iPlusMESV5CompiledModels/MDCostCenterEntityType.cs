@@ -108,7 +108,7 @@ namespace gip.mes.datamodel
                 new[] { mDCostCenterID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDCostCenter = runtimeEntityType.AddIndex(
+            var uIX_MDCostCenter = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDCostCenter",
                 unique: true);

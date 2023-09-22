@@ -121,12 +121,12 @@ namespace gip.mes.datamodel
                 new[] { mDGMPMaterialGroupID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDGMPMaterialGroup = runtimeEntityType.AddIndex(
+            var uIX_MDGMPMaterialGroup = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDGMPMaterialGroup",
                 unique: true);
 
-            var uIXMDGMPMaterialGroupMDGMPMaterialGroupNo = runtimeEntityType.AddIndex(
+            var uIX_MDGMPMaterialGroup_MDGMPMaterialGroupNo = runtimeEntityType.AddIndex(
                 new[] { mDGMPMaterialGroupNo },
                 name: "UIX_MDGMPMaterialGroup_MDGMPMaterialGroupNo",
                 unique: true);

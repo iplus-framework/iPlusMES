@@ -96,7 +96,7 @@ namespace gip.mes.datamodel
                 new[] { companyAddressDepartmentID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyAddressDepartmentCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyAddressDepartment_CompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { companyAddressID },
                 name: "NCI_FK_CompanyAddressDepartment_CompanyAddressID");
 
@@ -119,7 +119,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyAddressDepartment).GetField("_CompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyAddressDepartmentCompanyAddress = principalEntityType.AddNavigation("CompanyAddressDepartment_CompanyAddress",
+            var companyAddressDepartment_CompanyAddress = principalEntityType.AddNavigation("CompanyAddressDepartment_CompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyAddressDepartment>),

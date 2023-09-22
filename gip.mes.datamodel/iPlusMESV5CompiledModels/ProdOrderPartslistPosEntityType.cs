@@ -324,63 +324,63 @@ namespace gip.mes.datamodel
                 new[] { prodOrderPartslistPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKProdOrderPartslistPosACClassTaskID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_ACClassTaskID = runtimeEntityType.AddIndex(
                 new[] { aCClassTaskID },
                 name: "NCI_FK_ProdOrderPartslistPos_ACClassTaskID");
 
-            var nCIFKProdOrderPartslistPosAlternativeProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { alternativeProdOrderPartslistPosID },
                 name: "NCI_FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID");
 
-            var nCIFKProdOrderPartslistPosBasedOnPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_BasedOnPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { basedOnPartslistPosID },
                 name: "NCI_FK_ProdOrderPartslistPos_BasedOnPartslistPosID");
 
-            var nCIFKProdOrderPartslistPosFacilityLotID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_FacilityLotID = runtimeEntityType.AddIndex(
                 new[] { facilityLotID },
                 name: "NCI_FK_ProdOrderPartslistPos_FacilityLotID");
 
-            var nCIFKProdOrderPartslistPosMDProdOrderPartslistPosStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_MDProdOrderPartslistPosStateID = runtimeEntityType.AddIndex(
                 new[] { mDProdOrderPartslistPosStateID },
                 name: "NCI_FK_ProdOrderPartslistPos_MDProdOrderPartslistPosStateID");
 
-            var nCIFKProdOrderPartslistPosMDToleranceStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_MDToleranceStateID = runtimeEntityType.AddIndex(
                 new[] { mDToleranceStateID },
                 name: "NCI_FK_ProdOrderPartslistPos_MDToleranceStateID");
 
-            var nCIFKProdOrderPartslistPosMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_ProdOrderPartslistPos_MDUnitID");
 
-            var nCIFKProdOrderPartslistPosMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_ProdOrderPartslistPos_MaterialID");
 
-            var nCIFKProdOrderPartslistPosParentProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_ParentProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { parentProdOrderPartslistPosID },
                 name: "NCI_FK_ProdOrderPartslistPos_ParentProdOrderPartslistPosID");
 
-            var nCIFKProdOrderPartslistPosPositionUsedForProdOrderPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_PositionUsedForProdOrderPartslistID = runtimeEntityType.AddIndex(
                 new[] { sourceProdOrderPartslistID },
                 name: "NCI_FK_ProdOrderPartslistPos_PositionUsedForProdOrderPartslistID");
 
-            var nCIFKProdOrderPartslistPosProdOrderBatchID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_ProdOrderBatchID = runtimeEntityType.AddIndex(
                 new[] { prodOrderBatchID },
                 name: "NCI_FK_ProdOrderPartslistPos_ProdOrderBatchID");
 
-            var nCIFKProdOrderPartslistPosProdOrderPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_ProdOrderPartslistPos_ProdOrderPartslistID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistID },
                 name: "NCI_FK_ProdOrderPartslistPos_ProdOrderPartslistID");
 
-            var nCIProdOrderPartslistPosOT = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderPartslistPos_OT = runtimeEntityType.AddIndex(
                 new[] { prodOrderBatchID, materialPosTypeIndex, prodOrderPartslistID, mDProdOrderPartslistPosStateID },
                 name: "NCI_ProdOrderPartslistPos_OT");
 
-            var nCIProdOrderPartslistPosProdOrderPartslistPosIDProdOrderPartslistID = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderPartslistPos_ProdOrderPartslistPosID_ProdOrderPartslistID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistID, prodOrderPartslistPosID },
                 name: "NCI_ProdOrderPartslistPos_ProdOrderPartslistPosID_ProdOrderPartslistID");
 
-            var nCIProdOrderPartslistPosProdOrderPartslistPosIDProdOrderPartslistIDMDProdOrderPartslistPosStateID = runtimeEntityType.AddIndex(
+            var nCI_ProdOrderPartslistPos_ProdOrderPartslistPosID_ProdOrderPartslistID_MDProdOrderPartslistPosStateID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID, prodOrderPartslistID, mDProdOrderPartslistPosStateID },
                 name: "NCI_ProdOrderPartslistPos_ProdOrderPartslistPosID_ProdOrderPartslistID_MDProdOrderPartslistPosStateID");
 
@@ -401,7 +401,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_ACClassTask", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosACClassTask = principalEntityType.AddNavigation("ProdOrderPartslistPos_ACClassTask",
+            var prodOrderPartslistPos_ACClassTask = principalEntityType.AddNavigation("ProdOrderPartslistPos_ACClassTask",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -419,7 +419,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosID") }),
                 principalEntityType);
 
-            var prodOrderPartslistPos1AlternativeProdOrderPartslistPos = declaringEntityType.AddNavigation("ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos",
+            var prodOrderPartslistPos1_AlternativeProdOrderPartslistPos = declaringEntityType.AddNavigation("ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ProdOrderPartslistPos),
@@ -427,7 +427,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosAlternativeProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPos_AlternativeProdOrderPartslistPos",
+            var prodOrderPartslistPos_AlternativeProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPos_AlternativeProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -453,7 +453,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_BasedOnPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosBasedOnPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPos_BasedOnPartslistPos",
+            var prodOrderPartslistPos_BasedOnPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPos_BasedOnPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -479,7 +479,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_FacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosFacilityLot = principalEntityType.AddNavigation("ProdOrderPartslistPos_FacilityLot",
+            var prodOrderPartslistPos_FacilityLot = principalEntityType.AddNavigation("ProdOrderPartslistPos_FacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -505,7 +505,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_MDProdOrderPartslistPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosMDProdOrderPartslistPosState = principalEntityType.AddNavigation("ProdOrderPartslistPos_MDProdOrderPartslistPosState",
+            var prodOrderPartslistPos_MDProdOrderPartslistPosState = principalEntityType.AddNavigation("ProdOrderPartslistPos_MDProdOrderPartslistPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -532,7 +532,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_MDToleranceState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosMDToleranceState = principalEntityType.AddNavigation("ProdOrderPartslistPos_MDToleranceState",
+            var prodOrderPartslistPos_MDToleranceState = principalEntityType.AddNavigation("ProdOrderPartslistPos_MDToleranceState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -558,7 +558,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosMDUnit = principalEntityType.AddNavigation("ProdOrderPartslistPos_MDUnit",
+            var prodOrderPartslistPos_MDUnit = principalEntityType.AddNavigation("ProdOrderPartslistPos_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -584,7 +584,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosMaterial = principalEntityType.AddNavigation("ProdOrderPartslistPos_Material",
+            var prodOrderPartslistPos_Material = principalEntityType.AddNavigation("ProdOrderPartslistPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -602,7 +602,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosID") }),
                 principalEntityType);
 
-            var prodOrderPartslistPos1ParentProdOrderPartslistPos = declaringEntityType.AddNavigation("ProdOrderPartslistPos1_ParentProdOrderPartslistPos",
+            var prodOrderPartslistPos1_ParentProdOrderPartslistPos = declaringEntityType.AddNavigation("ProdOrderPartslistPos1_ParentProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(ProdOrderPartslistPos),
@@ -610,7 +610,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_ProdOrderPartslistPos1_ParentProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosParentProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPos_ParentProdOrderPartslistPos",
+            var prodOrderPartslistPos_ParentProdOrderPartslistPos = principalEntityType.AddNavigation("ProdOrderPartslistPos_ParentProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -636,7 +636,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_ProdOrderBatch", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosProdOrderBatch = principalEntityType.AddNavigation("ProdOrderPartslistPos_ProdOrderBatch",
+            var prodOrderPartslistPos_ProdOrderBatch = principalEntityType.AddNavigation("ProdOrderPartslistPos_ProdOrderBatch",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -664,7 +664,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_ProdOrderPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderPartslistPos_ProdOrderPartslist",
+            var prodOrderPartslistPos_ProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderPartslistPos_ProdOrderPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),
@@ -690,7 +690,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPos).GetField("_SourceProdOrderPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var prodOrderPartslistPosSourceProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderPartslistPos_SourceProdOrderPartslist",
+            var prodOrderPartslistPos_SourceProdOrderPartslist = principalEntityType.AddNavigation("ProdOrderPartslistPos_SourceProdOrderPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ProdOrderPartslistPos>),

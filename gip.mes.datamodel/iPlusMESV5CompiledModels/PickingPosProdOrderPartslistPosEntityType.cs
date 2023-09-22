@@ -53,7 +53,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { prodorderPartslistPosID });
 
-            var pickingPosProdorderPartslistPos = runtimeEntityType.AddIndex(
+            var pickingPos_ProdorderPartslistPos = runtimeEntityType.AddIndex(
                 new[] { pickingPosID, prodorderPartslistPosID },
                 name: "PickingPos_ProdorderPartslistPos",
                 unique: true);
@@ -76,7 +76,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPosProdOrderPartslistPos).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosProdOrderPartslistPosPickingPos = principalEntityType.AddNavigation("PickingPosProdOrderPartslistPos_PickingPos",
+            var pickingPosProdOrderPartslistPos_PickingPos = principalEntityType.AddNavigation("PickingPosProdOrderPartslistPos_PickingPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPosProdOrderPartslistPos>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPosProdOrderPartslistPos).GetField("_ProdorderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var pickingPosProdOrderPartslistPosProdorderPartslistPos = principalEntityType.AddNavigation("PickingPosProdOrderPartslistPos_ProdorderPartslistPos",
+            var pickingPosProdOrderPartslistPos_ProdorderPartslistPos = principalEntityType.AddNavigation("PickingPosProdOrderPartslistPos_ProdorderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PickingPosProdOrderPartslistPos>),

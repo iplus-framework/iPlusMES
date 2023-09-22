@@ -256,47 +256,47 @@ namespace gip.mes.datamodel
             var index0 = runtimeEntityType.AddIndex(
                 new[] { mDCurrencyID });
 
-            var nCIFKInOrderBasedOnInRequestID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_BasedOnInRequestID = runtimeEntityType.AddIndex(
                 new[] { basedOnInRequestID },
                 name: "NCI_FK_InOrder_BasedOnInRequestID");
 
-            var nCIFKInOrderBillingCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_BillingCompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { billingCompanyAddressID },
                 name: "NCI_FK_InOrder_BillingCompanyAddressID");
 
-            var nCIFKInOrderCPartnerCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_CPartnerCompanyID = runtimeEntityType.AddIndex(
                 new[] { cPartnerCompanyID },
                 name: "NCI_FK_InOrder_CPartnerCompanyID");
 
-            var nCIFKInOrderDeliveryCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_DeliveryCompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { deliveryCompanyAddressID },
                 name: "NCI_FK_InOrder_DeliveryCompanyAddressID");
 
-            var nCIFKInOrderDistributorCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_DistributorCompanyID = runtimeEntityType.AddIndex(
                 new[] { distributorCompanyID },
                 name: "NCI_FK_InOrder_DistributorCompanyID");
 
-            var nCIFKInOrderMDDelivTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_MDDelivTypeID = runtimeEntityType.AddIndex(
                 new[] { mDDelivTypeID },
                 name: "NCI_FK_InOrder_MDDelivTypeID");
 
-            var nCIFKInOrderMDInOrderStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_MDInOrderStateID = runtimeEntityType.AddIndex(
                 new[] { mDInOrderStateID },
                 name: "NCI_FK_InOrder_MDInOrderStateID");
 
-            var nCIFKInOrderMDInOrderTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_MDInOrderTypeID = runtimeEntityType.AddIndex(
                 new[] { mDInOrderTypeID },
                 name: "NCI_FK_InOrder_MDInOrderTypeID");
 
-            var nCIFKInOrderMDTermOfPaymentID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_MDTermOfPaymentID = runtimeEntityType.AddIndex(
                 new[] { mDTermOfPaymentID },
                 name: "NCI_FK_InOrder_MDTermOfPaymentID");
 
-            var nCIFKInOrderMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InOrder_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_InOrder_MDTimeRangeID");
 
-            var uIXInOrder = runtimeEntityType.AddIndex(
+            var uIX_InOrder = runtimeEntityType.AddIndex(
                 new[] { inOrderNo },
                 name: "UIX_InOrder",
                 unique: true);
@@ -318,7 +318,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_BasedOnInRequest", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderBasedOnInRequest = principalEntityType.AddNavigation("InOrder_BasedOnInRequest",
+            var inOrder_BasedOnInRequest = principalEntityType.AddNavigation("InOrder_BasedOnInRequest",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_BillingCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderBillingCompanyAddress = principalEntityType.AddNavigation("InOrder_BillingCompanyAddress",
+            var inOrder_BillingCompanyAddress = principalEntityType.AddNavigation("InOrder_BillingCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -370,7 +370,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_CPartnerCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderCPartnerCompany = principalEntityType.AddNavigation("InOrder_CPartnerCompany",
+            var inOrder_CPartnerCompany = principalEntityType.AddNavigation("InOrder_CPartnerCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -396,7 +396,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_DeliveryCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderDeliveryCompanyAddress = principalEntityType.AddNavigation("InOrder_DeliveryCompanyAddress",
+            var inOrder_DeliveryCompanyAddress = principalEntityType.AddNavigation("InOrder_DeliveryCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -423,7 +423,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_DistributorCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderDistributorCompany = principalEntityType.AddNavigation("InOrder_DistributorCompany",
+            var inOrder_DistributorCompany = principalEntityType.AddNavigation("InOrder_DistributorCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -449,7 +449,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_IssuerCompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderIssuerCompanyPerson = principalEntityType.AddNavigation("InOrder_IssuerCompanyPerson",
+            var inOrder_IssuerCompanyPerson = principalEntityType.AddNavigation("InOrder_IssuerCompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -475,7 +475,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_MDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderMDCurrency = principalEntityType.AddNavigation("InOrder_MDCurrency",
+            var inOrder_MDCurrency = principalEntityType.AddNavigation("InOrder_MDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -502,7 +502,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_MDDelivType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderMDDelivType = principalEntityType.AddNavigation("InOrder_MDDelivType",
+            var inOrder_MDDelivType = principalEntityType.AddNavigation("InOrder_MDDelivType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -529,7 +529,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_MDInOrderState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderMDInOrderState = principalEntityType.AddNavigation("InOrder_MDInOrderState",
+            var inOrder_MDInOrderState = principalEntityType.AddNavigation("InOrder_MDInOrderState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -556,7 +556,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_MDInOrderType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderMDInOrderType = principalEntityType.AddNavigation("InOrder_MDInOrderType",
+            var inOrder_MDInOrderType = principalEntityType.AddNavigation("InOrder_MDInOrderType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -582,7 +582,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_MDTermOfPayment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderMDTermOfPayment = principalEntityType.AddNavigation("InOrder_MDTermOfPayment",
+            var inOrder_MDTermOfPayment = principalEntityType.AddNavigation("InOrder_MDTermOfPayment",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),
@@ -608,7 +608,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InOrder).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inOrderMDTimeRange = principalEntityType.AddNavigation("InOrder_MDTimeRange",
+            var inOrder_MDTimeRange = principalEntityType.AddNavigation("InOrder_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InOrder>),

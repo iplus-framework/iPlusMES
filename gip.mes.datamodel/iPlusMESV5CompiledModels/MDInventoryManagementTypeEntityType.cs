@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDInventoryManagementTypeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDInventoryManagementType = runtimeEntityType.AddIndex(
+            var uIX_MDInventoryManagementType = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDInventoryManagementType",
                 unique: true);

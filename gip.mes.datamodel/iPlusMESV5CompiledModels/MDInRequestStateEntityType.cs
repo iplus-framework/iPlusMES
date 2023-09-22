@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDInRequestStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDInRequestState = runtimeEntityType.AddIndex(
+            var uIX_MDInRequestState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDInRequestState",
                 unique: true);

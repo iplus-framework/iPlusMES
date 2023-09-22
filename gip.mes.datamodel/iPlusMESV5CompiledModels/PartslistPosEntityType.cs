@@ -219,27 +219,27 @@ namespace gip.mes.datamodel
                 new[] { partslistPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKPartslistPosAlternativePartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPos_AlternativePartslistPosID = runtimeEntityType.AddIndex(
                 new[] { alternativePartslistPosID },
                 name: "NCI_FK_PartslistPos_AlternativePartslistPosID");
 
-            var nCIFKPartslistPosMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPos_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_PartslistPos_MDUnitID");
 
-            var nCIFKPartslistPosMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPos_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_PartslistPos_MaterialID");
 
-            var nCIFKPartslistPosParentPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPos_ParentPartslistID = runtimeEntityType.AddIndex(
                 new[] { parentPartslistID },
                 name: "NCI_FK_PartslistPos_ParentPartslistID");
 
-            var nCIFKPartslistPosParentPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPos_ParentPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { parentPartslistPosID },
                 name: "NCI_FK_PartslistPos_ParentPartslistPosID");
 
-            var nCIFKPartslistPosPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistPos_PartslistID = runtimeEntityType.AddIndex(
                 new[] { partslistID },
                 name: "NCI_FK_PartslistPos_PartslistID");
 
@@ -252,7 +252,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PartslistPosID") }),
                 principalEntityType);
 
-            var partslistPos1AlternativePartslistPos = declaringEntityType.AddNavigation("PartslistPos1_AlternativePartslistPos",
+            var partslistPos1_AlternativePartslistPos = declaringEntityType.AddNavigation("PartslistPos1_AlternativePartslistPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(PartslistPos),
@@ -260,7 +260,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPos).GetField("_PartslistPos1_AlternativePartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosAlternativePartslistPos = principalEntityType.AddNavigation("PartslistPos_AlternativePartslistPos",
+            var partslistPos_AlternativePartslistPos = principalEntityType.AddNavigation("PartslistPos_AlternativePartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPos>),
@@ -286,7 +286,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPos).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosMDUnit = principalEntityType.AddNavigation("PartslistPos_MDUnit",
+            var partslistPos_MDUnit = principalEntityType.AddNavigation("PartslistPos_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPos>),
@@ -313,7 +313,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosMaterial = principalEntityType.AddNavigation("PartslistPos_Material",
+            var partslistPos_Material = principalEntityType.AddNavigation("PartslistPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPos>),
@@ -339,7 +339,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPos).GetField("_ParentPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosParentPartslist = principalEntityType.AddNavigation("PartslistPos_ParentPartslist",
+            var partslistPos_ParentPartslist = principalEntityType.AddNavigation("PartslistPos_ParentPartslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPos>),
@@ -357,7 +357,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PartslistPosID") }),
                 principalEntityType);
 
-            var partslistPos1ParentPartslistPos = declaringEntityType.AddNavigation("PartslistPos1_ParentPartslistPos",
+            var partslistPos1_ParentPartslistPos = declaringEntityType.AddNavigation("PartslistPos1_ParentPartslistPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(PartslistPos),
@@ -365,7 +365,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPos).GetField("_PartslistPos1_ParentPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosParentPartslistPos = principalEntityType.AddNavigation("PartslistPos_ParentPartslistPos",
+            var partslistPos_ParentPartslistPos = principalEntityType.AddNavigation("PartslistPos_ParentPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPos>),
@@ -392,7 +392,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistPos).GetField("_Partslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistPosPartslist = principalEntityType.AddNavigation("PartslistPos_Partslist",
+            var partslistPos_Partslist = principalEntityType.AddNavigation("PartslistPos_Partslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistPos>),

@@ -124,7 +124,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderProperty).GetField("_MaintACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderPropertyMaintACClassProperty = principalEntityType.AddNavigation("MaintOrderProperty_MaintACClassProperty",
+            var maintOrderProperty_MaintACClassProperty = principalEntityType.AddNavigation("MaintOrderProperty_MaintACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderProperty>),
@@ -151,7 +151,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderProperty).GetField("_MaintOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderPropertyMaintOrder = principalEntityType.AddNavigation("MaintOrderProperty_MaintOrder",
+            var maintOrderProperty_MaintOrder = principalEntityType.AddNavigation("MaintOrderProperty_MaintOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderProperty>),

@@ -108,7 +108,7 @@ namespace gip.mes.datamodel
                 new[] { outOrderPosSplitID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKOutOrderPosSplitOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderPosSplit_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_OutOrderPosSplit_OutOrderPosID");
 
@@ -131,7 +131,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderPosSplit).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderPosSplitOutOrderPos = principalEntityType.AddNavigation("OutOrderPosSplit_OutOrderPos",
+            var outOrderPosSplit_OutOrderPos = principalEntityType.AddNavigation("OutOrderPosSplit_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderPosSplit>),

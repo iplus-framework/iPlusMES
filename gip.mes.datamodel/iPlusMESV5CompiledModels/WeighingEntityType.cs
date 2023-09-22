@@ -165,11 +165,11 @@ namespace gip.mes.datamodel
             var index2 = runtimeEntityType.AddIndex(
                 new[] { pickingPosID });
 
-            var nCIFKWeighingACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_Weighing_ACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
                 name: "NCI_FK_Weighing_ACClassID");
 
-            var uIXWeighingWeighingNo = runtimeEntityType.AddIndex(
+            var uIX_Weighing_WeighingNo = runtimeEntityType.AddIndex(
                 new[] { weighingNo },
                 name: "UIX_Weighing_WeighingNo",
                 unique: true);
@@ -191,7 +191,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Weighing).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var weighingInOrderPos = principalEntityType.AddNavigation("Weighing_InOrderPos",
+            var weighing_InOrderPos = principalEntityType.AddNavigation("Weighing_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Weighing>),
@@ -217,7 +217,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Weighing).GetField("_LabOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var weighingLabOrderPos = principalEntityType.AddNavigation("Weighing_LabOrderPos",
+            var weighing_LabOrderPos = principalEntityType.AddNavigation("Weighing_LabOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Weighing>),
@@ -243,7 +243,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Weighing).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var weighingOutOrderPos = principalEntityType.AddNavigation("Weighing_OutOrderPos",
+            var weighing_OutOrderPos = principalEntityType.AddNavigation("Weighing_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Weighing>),
@@ -269,7 +269,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Weighing).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var weighingPickingPos = principalEntityType.AddNavigation("Weighing_PickingPos",
+            var weighing_PickingPos = principalEntityType.AddNavigation("Weighing_PickingPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Weighing>),

@@ -104,11 +104,11 @@ namespace gip.mes.datamodel
                 new[] { vBUserACClassDesignID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVBUserACClassDesignACClassDesignID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUserACClassDesign_ACClassDesignID = runtimeEntityType.AddIndex(
                 new[] { aCClassDesignID },
                 name: "NCI_FK_VBUserACClassDesign_ACClassDesignID");
 
-            var nCIFKVBUserACClassDesignVBUserID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUserACClassDesign_VBUserID = runtimeEntityType.AddIndex(
                 new[] { vBUserID },
                 name: "NCI_FK_VBUserACClassDesign_VBUserID");
 
@@ -130,7 +130,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUserACClassDesign).GetField("_ACClassDesign", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserACClassDesignACClassDesign = principalEntityType.AddNavigation("VBUserACClassDesign_ACClassDesign",
+            var vBUserACClassDesign_ACClassDesign = principalEntityType.AddNavigation("VBUserACClassDesign_ACClassDesign",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUserACClassDesign>),
@@ -158,7 +158,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUserACClassDesign).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserACClassDesignVBUser = principalEntityType.AddNavigation("VBUserACClassDesign_VBUser",
+            var vBUserACClassDesign_VBUser = principalEntityType.AddNavigation("VBUserACClassDesign_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUserACClassDesign>),

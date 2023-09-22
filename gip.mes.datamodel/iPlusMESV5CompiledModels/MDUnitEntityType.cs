@@ -157,7 +157,7 @@ namespace gip.mes.datamodel
                 new[] { mDUnitID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXISOCode = runtimeEntityType.AddIndex(
+            var uIX_ISOCode = runtimeEntityType.AddIndex(
                 new[] { iSOCode },
                 name: "UIX_ISOCode",
                 unique: true);

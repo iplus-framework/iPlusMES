@@ -151,7 +151,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OperationLog).GetField("_ACProgramLog", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var operationLogACProgramLog = principalEntityType.AddNavigation("OperationLog_ACProgramLog",
+            var operationLog_ACProgramLog = principalEntityType.AddNavigation("OperationLog_ACProgramLog",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OperationLog>),
@@ -177,7 +177,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OperationLog).GetField("_FacilityCharge", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var operationLogFacilityCharge = principalEntityType.AddNavigation("OperationLog_FacilityCharge",
+            var operationLog_FacilityCharge = principalEntityType.AddNavigation("OperationLog_FacilityCharge",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OperationLog>),
@@ -203,7 +203,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OperationLog).GetField("_RefACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var operationLogRefACClass = principalEntityType.AddNavigation("OperationLog_RefACClass",
+            var operationLog_RefACClass = principalEntityType.AddNavigation("OperationLog_RefACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OperationLog>),

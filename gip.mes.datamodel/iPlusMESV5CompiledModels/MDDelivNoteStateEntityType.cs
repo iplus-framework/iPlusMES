@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDDelivNoteStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDDelivNoteState = runtimeEntityType.AddIndex(
+            var uIX_MDDelivNoteState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDDelivNoteState",
                 unique: true);

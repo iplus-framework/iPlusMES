@@ -68,8 +68,8 @@ namespace gip.mes.datamodel
         {
             get
             {
-                //if (!string.IsNullOrEmpty(TaskName))
-                //    return TaskName;
+                if (!string.IsNullOrEmpty(TaskName))
+                    return TaskName;
 
                 if (MaintOrder != null)
                 {
@@ -86,16 +86,16 @@ namespace gip.mes.datamodel
         {
             base.OnPropertyChanged(property);
 
-            //if (property == nameof(TaskName))
-            //{
-            //    OnPropertyChanged(nameof(MaintTaskName));
-            //}
+            if (property == nameof(TaskName))
+            {
+                OnPropertyChanged(nameof(MaintTaskName));
+            }
         }
 
         public void CopyTaskValues(MaintOrderTask newTask)
         {
             newTask.TaskDescription = TaskDescription;
-            //newTask.TaskName = TaskName;
+            newTask.TaskName = TaskName;
             newTask.PlannedStartDate = PlannedStartDate;
             newTask.PlannedDuration = PlannedDuration;
         }

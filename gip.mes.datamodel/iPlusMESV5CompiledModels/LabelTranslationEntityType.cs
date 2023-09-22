@@ -70,7 +70,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { vBLanguageID });
 
-            var vBLanguageLabelUnique = runtimeEntityType.AddIndex(
+            var vBLanguage_Label_Unique = runtimeEntityType.AddIndex(
                 new[] { labelID, vBLanguageID },
                 name: "VBLanguage_Label_Unique",
                 unique: true);
@@ -93,7 +93,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabelTranslation).GetField("_Label", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labelTranslationLabel = principalEntityType.AddNavigation("LabelTranslation_Label",
+            var labelTranslation_Label = principalEntityType.AddNavigation("LabelTranslation_Label",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabelTranslation>),
@@ -120,7 +120,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabelTranslation).GetField("_VBLanguage", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labelTranslationVBLanguage = principalEntityType.AddNavigation("LabelTranslation_VBLanguage",
+            var labelTranslation_VBLanguage = principalEntityType.AddNavigation("LabelTranslation_VBLanguage",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabelTranslation>),

@@ -63,21 +63,21 @@ namespace gip.mes.datamodel
                 unicode: false);
             fax.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var gEOx = runtimeEntityType.AddProperty(
+            var gEO_x = runtimeEntityType.AddProperty(
                 "GEO_x",
                 typeof(int?),
                 propertyInfo: typeof(CompanyAddress).GetProperty("GEO_x", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyAddress).GetField("_GEO_x", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            gEOx.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            gEO_x.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var gEOy = runtimeEntityType.AddProperty(
+            var gEO_y = runtimeEntityType.AddProperty(
                 "GEO_y",
                 typeof(int?),
                 propertyInfo: typeof(CompanyAddress).GetProperty("GEO_y", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyAddress).GetField("_GEO_y", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            gEOy.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            gEO_y.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
                 "InsertDate",
@@ -270,19 +270,19 @@ namespace gip.mes.datamodel
                 new[] { companyAddressID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyAddressCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyAddress_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_CompanyAddress_CompanyID");
 
-            var nCIFKCompanyAddressMDCountryID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyAddress_MDCountryID = runtimeEntityType.AddIndex(
                 new[] { mDCountryID },
                 name: "NCI_FK_CompanyAddress_MDCountryID");
 
-            var nCIFKCompanyAddressMDCountryLandID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyAddress_MDCountryLandID = runtimeEntityType.AddIndex(
                 new[] { mDCountryLandID },
                 name: "NCI_FK_CompanyAddress_MDCountryLandID");
 
-            var nCIFKCompanyAddressMDDelivTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyAddress_MDDelivTypeID = runtimeEntityType.AddIndex(
                 new[] { mDDelivTypeID },
                 name: "NCI_FK_CompanyAddress_MDDelivTypeID");
 
@@ -304,7 +304,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyAddress).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyAddressCompany = principalEntityType.AddNavigation("CompanyAddress_Company",
+            var companyAddress_Company = principalEntityType.AddNavigation("CompanyAddress_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyAddress>),
@@ -330,7 +330,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyAddress).GetField("_MDCountry", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyAddressMDCountry = principalEntityType.AddNavigation("CompanyAddress_MDCountry",
+            var companyAddress_MDCountry = principalEntityType.AddNavigation("CompanyAddress_MDCountry",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyAddress>),
@@ -356,7 +356,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyAddress).GetField("_MDCountryLand", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyAddressMDCountryLand = principalEntityType.AddNavigation("CompanyAddress_MDCountryLand",
+            var companyAddress_MDCountryLand = principalEntityType.AddNavigation("CompanyAddress_MDCountryLand",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyAddress>),
@@ -383,7 +383,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyAddress).GetField("_MDDelivType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyAddressMDDelivType = principalEntityType.AddNavigation("CompanyAddress_MDDelivType",
+            var companyAddress_MDDelivType = principalEntityType.AddNavigation("CompanyAddress_MDDelivType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyAddress>),

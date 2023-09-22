@@ -110,7 +110,7 @@ namespace gip.mes.datamodel
                 new[] { mDRatingComplaintTypeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var iXMDRatingComplaintType = runtimeEntityType.AddIndex(
+            var iX_MDRatingComplaintType = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "IX_MDRatingComplaintType",
                 unique: true);

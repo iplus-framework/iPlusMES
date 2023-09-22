@@ -53,7 +53,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { facilityPreBookingID });
 
-            var uIXTandTv3MixPointFacilityPreBooking = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointFacilityPreBooking = runtimeEntityType.AddIndex(
                 new[] { tandTv3MixPointID, facilityPreBookingID },
                 name: "UIX_TandTv3MixPointFacilityPreBooking",
                 unique: true);
@@ -76,7 +76,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityPreBooking).GetField("_FacilityPreBooking", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityPreBookingFacilityPreBooking = principalEntityType.AddNavigation("TandTv3MixPointFacilityPreBooking_FacilityPreBooking",
+            var tandTv3MixPointFacilityPreBooking_FacilityPreBooking = principalEntityType.AddNavigation("TandTv3MixPointFacilityPreBooking_FacilityPreBooking",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityPreBooking>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityPreBooking).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointFacilityPreBookingTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacilityPreBooking_TandTv3MixPoint",
+            var tandTv3MixPointFacilityPreBooking_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointFacilityPreBooking_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointFacilityPreBooking>),

@@ -342,11 +342,11 @@ namespace gip.mes.datamodel
                 new[] { partslistStockID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKPartslistStockMDReleaseStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistStock_MDReleaseStateID = runtimeEntityType.AddIndex(
                 new[] { mDReleaseStateID },
                 name: "NCI_FK_PartslistStock_MDReleaseStateID");
 
-            var nCIFKPartslistStockPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_PartslistStock_PartslistID = runtimeEntityType.AddIndex(
                 new[] { partslistID },
                 name: "NCI_FK_PartslistStock_PartslistID");
 
@@ -367,7 +367,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistStock).GetField("_MDReleaseState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistStockMDReleaseState = principalEntityType.AddNavigation("PartslistStock_MDReleaseState",
+            var partslistStock_MDReleaseState = principalEntityType.AddNavigation("PartslistStock_MDReleaseState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistStock>),
@@ -395,7 +395,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PartslistStock).GetField("_Partslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var partslistStockPartslist = principalEntityType.AddNavigation("PartslistStock_Partslist",
+            var partslistStock_Partslist = principalEntityType.AddNavigation("PartslistStock_Partslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PartslistStock>),

@@ -176,15 +176,15 @@ namespace gip.mes.datamodel
                 new[] { labOrderPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKLabOrderPosLabOrderID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrderPos_LabOrderID = runtimeEntityType.AddIndex(
                 new[] { labOrderID },
                 name: "NCI_FK_LabOrderPos_LabOrderID");
 
-            var nCIFKLabOrderPosMDLabOrderPosStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrderPos_MDLabOrderPosStateID = runtimeEntityType.AddIndex(
                 new[] { mDLabOrderPosStateID },
                 name: "NCI_FK_LabOrderPos_MDLabOrderPosStateID");
 
-            var nCIFKLabOrderPosMDLabTagID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrderPos_MDLabTagID = runtimeEntityType.AddIndex(
                 new[] { mDLabTagID },
                 name: "NCI_FK_LabOrderPos_MDLabTagID");
 
@@ -206,7 +206,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrderPos).GetField("_LabOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderPosLabOrder = principalEntityType.AddNavigation("LabOrderPos_LabOrder",
+            var labOrderPos_LabOrder = principalEntityType.AddNavigation("LabOrderPos_LabOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrderPos>),
@@ -232,7 +232,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrderPos).GetField("_MDLabOrderPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderPosMDLabOrderPosState = principalEntityType.AddNavigation("LabOrderPos_MDLabOrderPosState",
+            var labOrderPos_MDLabOrderPosState = principalEntityType.AddNavigation("LabOrderPos_MDLabOrderPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrderPos>),
@@ -259,7 +259,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrderPos).GetField("_MDLabTag", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderPosMDLabTag = principalEntityType.AddNavigation("LabOrderPos_MDLabTag",
+            var labOrderPos_MDLabTag = principalEntityType.AddNavigation("LabOrderPos_MDLabTag",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrderPos>),

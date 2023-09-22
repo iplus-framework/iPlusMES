@@ -76,15 +76,15 @@ namespace gip.mes.datamodel
                 new[] { companyMaterialPickupID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCompanyMaterialPickupCompanyMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialPickup_CompanyMaterialID = runtimeEntityType.AddIndex(
                 new[] { companyMaterialID },
                 name: "NCI_FK_CompanyMaterialPickup_CompanyMaterialID");
 
-            var nCIFKCompanyMaterialPickupInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialPickup_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_CompanyMaterialPickup_InOrderPosID");
 
-            var nCIFKCompanyMaterialPickupOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_CompanyMaterialPickup_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_CompanyMaterialPickup_OutOrderPosID");
 
@@ -107,7 +107,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialPickup).GetField("_CompanyMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialPickupCompanyMaterial = principalEntityType.AddNavigation("CompanyMaterialPickup_CompanyMaterial",
+            var companyMaterialPickup_CompanyMaterial = principalEntityType.AddNavigation("CompanyMaterialPickup_CompanyMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialPickup>),
@@ -133,7 +133,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialPickup).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialPickupInOrderPos = principalEntityType.AddNavigation("CompanyMaterialPickup_InOrderPos",
+            var companyMaterialPickup_InOrderPos = principalEntityType.AddNavigation("CompanyMaterialPickup_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialPickup>),
@@ -159,7 +159,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CompanyMaterialPickup).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var companyMaterialPickupOutOrderPos = principalEntityType.AddNavigation("CompanyMaterialPickup_OutOrderPos",
+            var companyMaterialPickup_OutOrderPos = principalEntityType.AddNavigation("CompanyMaterialPickup_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CompanyMaterialPickup>),

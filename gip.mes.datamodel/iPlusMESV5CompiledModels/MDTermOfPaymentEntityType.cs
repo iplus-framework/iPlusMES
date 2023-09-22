@@ -119,7 +119,7 @@ namespace gip.mes.datamodel
                 new[] { mDTermOfPaymentID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDTermOfPayment = runtimeEntityType.AddIndex(
+            var uIX_MDTermOfPayment = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDTermOfPayment",
                 unique: true);

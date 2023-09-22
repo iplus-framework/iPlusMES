@@ -99,7 +99,7 @@ namespace gip.mes.datamodel
                 new[] { mDSchedulingGroupID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDSchedulingGroup = runtimeEntityType.AddIndex(
+            var uIX_MDSchedulingGroup = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDSchedulingGroup",
                 unique: true);

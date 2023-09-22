@@ -85,6 +85,12 @@ namespace gip.mes.datamodel
                 nullable: true);
             plannedDuration.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var plannedDurationTS = runtimeEntityType.AddProperty(
+                "PlannedDurationTS",
+                typeof(TimeSpan),
+                propertyInfo: typeof(MaintOrderTask).GetProperty("PlannedDurationTS", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            plannedDurationTS.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var plannedStartDate = runtimeEntityType.AddProperty(
                 "PlannedStartDate",
                 typeof(DateTime?),
@@ -111,6 +117,16 @@ namespace gip.mes.datamodel
                 nullable: true,
                 unicode: false);
             taskDescription.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var taskName = runtimeEntityType.AddProperty(
+                "TaskName",
+                typeof(string),
+                propertyInfo: typeof(MaintOrderTask).GetProperty("TaskName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrderTask).GetField("_TaskName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                maxLength: 50,
+                unicode: false);
+            taskName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateDate = runtimeEntityType.AddProperty(
                 "UpdateDate",
@@ -161,7 +177,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderTask).GetField("_MDMaintTaskState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderTaskMDMaintTaskState = principalEntityType.AddNavigation("MaintOrderTask_MDMaintTaskState",
+            var maintOrderTask_MDMaintTaskState = principalEntityType.AddNavigation("MaintOrderTask_MDMaintTaskState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderTask>),
@@ -188,7 +204,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MaintOrderTask).GetField("_MaintOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var maintOrderTaskMaintOrder = principalEntityType.AddNavigation("MaintOrderTask_MaintOrder",
+            var maintOrderTask_MaintOrder = principalEntityType.AddNavigation("MaintOrderTask_MaintOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MaintOrderTask>),

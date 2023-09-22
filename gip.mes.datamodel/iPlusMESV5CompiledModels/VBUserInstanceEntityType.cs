@@ -221,7 +221,7 @@ namespace gip.mes.datamodel
                 new[] { vBUserInstanceID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVBUserInstanceVBUserID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBUserInstance_VBUserID = runtimeEntityType.AddIndex(
                 new[] { vBUserID },
                 name: "NCI_FK_VBUserInstance_VBUserID");
 
@@ -244,7 +244,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBUserInstance).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBUserInstanceVBUser = principalEntityType.AddNavigation("VBUserInstance_VBUser",
+            var vBUserInstance_VBUser = principalEntityType.AddNavigation("VBUserInstance_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBUserInstance>),

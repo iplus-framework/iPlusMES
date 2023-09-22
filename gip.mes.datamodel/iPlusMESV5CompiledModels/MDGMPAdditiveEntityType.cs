@@ -143,15 +143,15 @@ namespace gip.mes.datamodel
                 new[] { mDGMPAdditiveID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDGMPAdditiveMDProcessErrorActionID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDGMPAdditive_MDProcessErrorActionID = runtimeEntityType.AddIndex(
                 new[] { mDProcessErrorActionID },
                 name: "NCI_FK_MDGMPAdditive_MDProcessErrorActionID");
 
-            var nCIFKMDGMPAdditiveMDQuantityUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDGMPAdditive_MDQuantityUnitID = runtimeEntityType.AddIndex(
                 new[] { mDQuantityUnitID },
                 name: "NCI_FK_MDGMPAdditive_MDQuantityUnitID");
 
-            var uIXMDGMPAdditive = runtimeEntityType.AddIndex(
+            var uIX_MDGMPAdditive = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDGMPAdditive",
                 unique: true);
@@ -173,7 +173,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDGMPAdditive).GetField("_MDProcessErrorAction", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDGMPAdditiveMDProcessErrorAction = principalEntityType.AddNavigation("MDGMPAdditive_MDProcessErrorAction",
+            var mDGMPAdditive_MDProcessErrorAction = principalEntityType.AddNavigation("MDGMPAdditive_MDProcessErrorAction",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDGMPAdditive>),
@@ -199,7 +199,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDGMPAdditive).GetField("_MDQuantityUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDGMPAdditiveMDQuantityUnit = principalEntityType.AddNavigation("MDGMPAdditive_MDQuantityUnit",
+            var mDGMPAdditive_MDQuantityUnit = principalEntityType.AddNavigation("MDGMPAdditive_MDQuantityUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDGMPAdditive>),

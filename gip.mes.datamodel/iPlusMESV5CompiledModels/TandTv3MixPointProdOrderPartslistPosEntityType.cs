@@ -53,7 +53,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID });
 
-            var uIXTandTv3MixPointProdOrderPartslistPos = runtimeEntityType.AddIndex(
+            var uIX_TandTv3MixPointProdOrderPartslistPos = runtimeEntityType.AddIndex(
                 new[] { tandTv3MixPointID, prodOrderPartslistPosID },
                 name: "UIX_TandTv3MixPointProdOrderPartslistPos",
                 unique: true);
@@ -76,7 +76,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointProdOrderPartslistPos).GetField("_ProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointProdOrderPartslistPosProdOrderPartslistPos = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos",
+            var tandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointProdOrderPartslistPos>),
@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointProdOrderPartslistPos).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointProdOrderPartslistPosTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint",
+            var tandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointProdOrderPartslistPos>),

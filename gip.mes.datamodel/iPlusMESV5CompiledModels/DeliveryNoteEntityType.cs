@@ -258,31 +258,31 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { delivery2CompanyAddressID });
 
-            var nCIFKDeliveryNoteDeliveryCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNote_DeliveryCompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { deliveryCompanyAddressID },
                 name: "NCI_FK_DeliveryNote_DeliveryCompanyAddressID");
 
-            var nCIFKDeliveryNoteMDDelivNoteStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNote_MDDelivNoteStateID = runtimeEntityType.AddIndex(
                 new[] { mDDelivNoteStateID },
                 name: "NCI_FK_DeliveryNote_MDDelivNoteStateID");
 
-            var nCIFKDeliveryNoteShipperCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNote_ShipperCompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { shipperCompanyAddressID },
                 name: "NCI_FK_DeliveryNote_ShipperCompanyAddressID");
 
-            var nCIFKDeliveryNoteTourplanPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNote_TourplanPosID = runtimeEntityType.AddIndex(
                 new[] { tourplanPosID },
                 name: "NCI_FK_DeliveryNote_TourplanPosID");
 
-            var nCIFKDeliveryNoteVisitorVoucherID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNote_VisitorVoucherID = runtimeEntityType.AddIndex(
                 new[] { visitorVoucherID },
                 name: "NCI_FK_DeliveryNote_VisitorVoucherID");
 
-            var nCIFKDeliveryNoteWeighingID = runtimeEntityType.AddIndex(
+            var nCI_FK_DeliveryNote_WeighingID = runtimeEntityType.AddIndex(
                 new[] { weighingID },
                 name: "NCI_FK_DeliveryNote_WeighingID");
 
-            var uIXDeliveryNoteDeliveryNoteNo = runtimeEntityType.AddIndex(
+            var uIX_DeliveryNote_DeliveryNoteNo = runtimeEntityType.AddIndex(
                 new[] { deliveryNoteNo },
                 name: "UIX_DeliveryNote_DeliveryNoteNo",
                 unique: true);
@@ -304,7 +304,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNote).GetField("_Delivery2CompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNoteDelivery2CompanyAddress = principalEntityType.AddNavigation("DeliveryNote_Delivery2CompanyAddress",
+            var deliveryNote_Delivery2CompanyAddress = principalEntityType.AddNavigation("DeliveryNote_Delivery2CompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNote>),
@@ -331,7 +331,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNote).GetField("_DeliveryCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNoteDeliveryCompanyAddress = principalEntityType.AddNavigation("DeliveryNote_DeliveryCompanyAddress",
+            var deliveryNote_DeliveryCompanyAddress = principalEntityType.AddNavigation("DeliveryNote_DeliveryCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNote>),
@@ -358,7 +358,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNote).GetField("_MDDelivNoteState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNoteMDDelivNoteState = principalEntityType.AddNavigation("DeliveryNote_MDDelivNoteState",
+            var deliveryNote_MDDelivNoteState = principalEntityType.AddNavigation("DeliveryNote_MDDelivNoteState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNote>),
@@ -385,7 +385,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNote).GetField("_ShipperCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNoteShipperCompanyAddress = principalEntityType.AddNavigation("DeliveryNote_ShipperCompanyAddress",
+            var deliveryNote_ShipperCompanyAddress = principalEntityType.AddNavigation("DeliveryNote_ShipperCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNote>),
@@ -411,7 +411,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNote).GetField("_TourplanPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNoteTourplanPos = principalEntityType.AddNavigation("DeliveryNote_TourplanPos",
+            var deliveryNote_TourplanPos = principalEntityType.AddNavigation("DeliveryNote_TourplanPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNote>),
@@ -437,7 +437,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DeliveryNote).GetField("_VisitorVoucher", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var deliveryNoteVisitorVoucher = principalEntityType.AddNavigation("DeliveryNote_VisitorVoucher",
+            var deliveryNote_VisitorVoucher = principalEntityType.AddNavigation("DeliveryNote_VisitorVoucher",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DeliveryNote>),

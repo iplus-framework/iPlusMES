@@ -117,15 +117,15 @@ namespace gip.mes.datamodel
                 new[] { calendarShiftID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKCalendarShiftCalendarID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarShift_CalendarID = runtimeEntityType.AddIndex(
                 new[] { calendarID },
                 name: "NCI_FK_CalendarShift_CalendarID");
 
-            var nCIFKCalendarShiftMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarShift_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_CalendarShift_MDTimeRangeID");
 
-            var nCIFKCalendarShiftVBiACProjectID = runtimeEntityType.AddIndex(
+            var nCI_FK_CalendarShift_VBiACProjectID = runtimeEntityType.AddIndex(
                 new[] { vBiACProjectID },
                 name: "NCI_FK_CalendarShift_VBiACProjectID");
 
@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShift).GetField("_Calendar", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarShiftCalendar = principalEntityType.AddNavigation("CalendarShift_Calendar",
+            var calendarShift_Calendar = principalEntityType.AddNavigation("CalendarShift_Calendar",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarShift>),
@@ -176,7 +176,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShift).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarShiftMDTimeRange = principalEntityType.AddNavigation("CalendarShift_MDTimeRange",
+            var calendarShift_MDTimeRange = principalEntityType.AddNavigation("CalendarShift_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarShift>),
@@ -204,7 +204,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShift).GetField("_VBiACProject", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var calendarShiftVBiACProject = principalEntityType.AddNavigation("CalendarShift_VBiACProject",
+            var calendarShift_VBiACProject = principalEntityType.AddNavigation("CalendarShift_VBiACProject",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<CalendarShift>),

@@ -95,7 +95,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(UserSettings).GetField("_InvoiceCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var userSettingsInvoiceCompanyAddress = principalEntityType.AddNavigation("UserSettings_InvoiceCompanyAddress",
+            var userSettings_InvoiceCompanyAddress = principalEntityType.AddNavigation("UserSettings_InvoiceCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<UserSettings>),
@@ -121,7 +121,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(UserSettings).GetField("_InvoiceCompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var userSettingsInvoiceCompanyPerson = principalEntityType.AddNavigation("UserSettings_InvoiceCompanyPerson",
+            var userSettings_InvoiceCompanyPerson = principalEntityType.AddNavigation("UserSettings_InvoiceCompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<UserSettings>),
@@ -148,7 +148,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(UserSettings).GetField("_TenantCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var userSettingsTenantCompany = principalEntityType.AddNavigation("UserSettings_TenantCompany",
+            var userSettings_TenantCompany = principalEntityType.AddNavigation("UserSettings_TenantCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<UserSettings>),
@@ -175,7 +175,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(UserSettings).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var userSettingsVBUser = principalEntityType.AddNavigation("UserSettings_VBUser",
+            var userSettings_VBUser = principalEntityType.AddNavigation("UserSettings_VBUser",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<UserSettings>),

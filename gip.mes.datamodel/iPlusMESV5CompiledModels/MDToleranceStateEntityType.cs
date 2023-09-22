@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDToleranceStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDToleranceState = runtimeEntityType.AddIndex(
+            var uIX_MDToleranceState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDToleranceState",
                 unique: true);

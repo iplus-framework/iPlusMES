@@ -170,27 +170,27 @@ namespace gip.mes.datamodel
                 new[] { tourplanConfigID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKTourplanConfigMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanConfig_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_TourplanConfig_MaterialID");
 
-            var nCIFKTourplanConfigParentTourplanConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanConfig_ParentTourplanConfigID = runtimeEntityType.AddIndex(
                 new[] { parentTourplanConfigID },
                 name: "NCI_FK_TourplanConfig_ParentTourplanConfigID");
 
-            var nCIFKTourplanConfigTourplanID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanConfig_TourplanID = runtimeEntityType.AddIndex(
                 new[] { tourplanID },
                 name: "NCI_FK_TourplanConfig_TourplanID");
 
-            var nCIFKTourplanConfigVBiACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanConfig_VBiACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
                 name: "NCI_FK_TourplanConfig_VBiACClassID");
 
-            var nCIFKTourplanConfigVBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanConfig_VBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassPropertyRelationID },
                 name: "NCI_FK_TourplanConfig_VBiACClassPropertyRelationID");
 
-            var nCIFKTourplanConfigVBiValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanConfig_VBiValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiValueTypeACClassID },
                 name: "NCI_FK_TourplanConfig_VBiValueTypeACClassID");
 
@@ -211,7 +211,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanConfigMaterial = principalEntityType.AddNavigation("TourplanConfig_Material",
+            var tourplanConfig_Material = principalEntityType.AddNavigation("TourplanConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanConfig>),
@@ -229,7 +229,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("TourplanConfigID") }),
                 principalEntityType);
 
-            var tourplanConfig1ParentTourplanConfig = declaringEntityType.AddNavigation("TourplanConfig1_ParentTourplanConfig",
+            var tourplanConfig1_ParentTourplanConfig = declaringEntityType.AddNavigation("TourplanConfig1_ParentTourplanConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(TourplanConfig),
@@ -237,7 +237,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanConfig).GetField("_TourplanConfig1_ParentTourplanConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanConfigParentTourplanConfig = principalEntityType.AddNavigation("TourplanConfig_ParentTourplanConfig",
+            var tourplanConfig_ParentTourplanConfig = principalEntityType.AddNavigation("TourplanConfig_ParentTourplanConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanConfig>),
@@ -265,7 +265,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanConfig).GetField("_Tourplan", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanConfigTourplan = principalEntityType.AddNavigation("TourplanConfig_Tourplan",
+            var tourplanConfig_Tourplan = principalEntityType.AddNavigation("TourplanConfig_Tourplan",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanConfig>),
@@ -291,7 +291,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanConfigVBiACClass = principalEntityType.AddNavigation("TourplanConfig_VBiACClass",
+            var tourplanConfig_VBiACClass = principalEntityType.AddNavigation("TourplanConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanConfig>),
@@ -317,7 +317,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("TourplanConfig_VBiACClassPropertyRelation",
+            var tourplanConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("TourplanConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanConfig>),
@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanConfigVBiValueTypeACClass = principalEntityType.AddNavigation("TourplanConfig_VBiValueTypeACClass",
+            var tourplanConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("TourplanConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanConfig>),

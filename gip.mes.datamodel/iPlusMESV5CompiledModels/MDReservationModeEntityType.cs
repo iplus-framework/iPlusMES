@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDReservationModeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDReservationMode = runtimeEntityType.AddIndex(
+            var uIX_MDReservationMode = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDReservationMode",
                 unique: true);

@@ -106,11 +106,11 @@ namespace gip.mes.datamodel
                 new[] { mDVisitorCardID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDVisitorCardMDVisitorCardStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDVisitorCard_MDVisitorCardStateID = runtimeEntityType.AddIndex(
                 new[] { mDVisitorCardStateID },
                 name: "NCI_FK_MDVisitorCard_MDVisitorCardStateID");
 
-            var uIXMDVisitorCard = runtimeEntityType.AddIndex(
+            var uIX_MDVisitorCard = runtimeEntityType.AddIndex(
                 new[] { mDVisitorCardNo },
                 name: "UIX_MDVisitorCard",
                 unique: true);
@@ -133,7 +133,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDVisitorCard).GetField("_MDVisitorCardState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDVisitorCardMDVisitorCardState = principalEntityType.AddNavigation("MDVisitorCard_MDVisitorCardState",
+            var mDVisitorCard_MDVisitorCardState = principalEntityType.AddNavigation("MDVisitorCard_MDVisitorCardState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDVisitorCard>),

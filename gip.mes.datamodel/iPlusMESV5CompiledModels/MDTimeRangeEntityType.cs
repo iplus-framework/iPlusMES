@@ -142,11 +142,11 @@ namespace gip.mes.datamodel
                 new[] { mDTimeRangeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDTimeRangeParentMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDTimeRange_ParentMDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { parentMDTimeRangeID },
                 name: "NCI_FK_MDTimeRange_ParentMDTimeRangeID");
 
-            var uIXMDTimeRange = runtimeEntityType.AddIndex(
+            var uIX_MDTimeRange = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDTimeRange",
                 unique: true);
@@ -160,7 +160,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MDTimeRangeID") }),
                 principalEntityType);
 
-            var mDTimeRange1ParentMDTimeRange = declaringEntityType.AddNavigation("MDTimeRange1_ParentMDTimeRange",
+            var mDTimeRange1_ParentMDTimeRange = declaringEntityType.AddNavigation("MDTimeRange1_ParentMDTimeRange",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(MDTimeRange),
@@ -168,7 +168,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDTimeRange).GetField("_MDTimeRange1_ParentMDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDTimeRangeParentMDTimeRange = principalEntityType.AddNavigation("MDTimeRange_ParentMDTimeRange",
+            var mDTimeRange_ParentMDTimeRange = principalEntityType.AddNavigation("MDTimeRange_ParentMDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDTimeRange>),

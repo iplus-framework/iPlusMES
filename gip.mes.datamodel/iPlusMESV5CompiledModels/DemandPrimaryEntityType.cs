@@ -117,15 +117,15 @@ namespace gip.mes.datamodel
                 new[] { demandPrimaryID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKDemandPrimaryCalendarID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandPrimary_CalendarID = runtimeEntityType.AddIndex(
                 new[] { calendarID },
                 name: "NCI_FK_DemandPrimary_CalendarID");
 
-            var nCIFKDemandPrimaryMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_DemandPrimary_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_DemandPrimary_MaterialID");
 
-            var uIXDemandPrimaryDemandPrimaryNo = runtimeEntityType.AddIndex(
+            var uIX_DemandPrimary_DemandPrimaryNo = runtimeEntityType.AddIndex(
                 new[] { demandPrimaryNo },
                 name: "UIX_DemandPrimary_DemandPrimaryNo",
                 unique: true);
@@ -149,7 +149,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandPrimary).GetField("_Calendar", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandPrimaryCalendar = principalEntityType.AddNavigation("DemandPrimary_Calendar",
+            var demandPrimary_Calendar = principalEntityType.AddNavigation("DemandPrimary_Calendar",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandPrimary>),
@@ -177,7 +177,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(DemandPrimary).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var demandPrimaryMaterial = principalEntityType.AddNavigation("DemandPrimary_Material",
+            var demandPrimary_Material = principalEntityType.AddNavigation("DemandPrimary_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<DemandPrimary>),

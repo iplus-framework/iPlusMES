@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDTransportModeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDTransportModeMDKey = runtimeEntityType.AddIndex(
+            var uIX_MDTransportMode_MDKey = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDTransportMode_MDKey",
                 unique: true);

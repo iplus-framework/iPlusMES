@@ -214,39 +214,39 @@ namespace gip.mes.datamodel
                 new[] { inRequestID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKInRequestBillingCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_BillingCompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { billingCompanyAddressID },
                 name: "NCI_FK_InRequest_BillingCompanyAddressID");
 
-            var nCIFKInRequestDeliveryCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_DeliveryCompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { deliveryCompanyAddressID },
                 name: "NCI_FK_InRequest_DeliveryCompanyAddressID");
 
-            var nCIFKInRequestDistributorCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_DistributorCompanyID = runtimeEntityType.AddIndex(
                 new[] { distributorCompanyID },
                 name: "NCI_FK_InRequest_DistributorCompanyID");
 
-            var nCIFKInRequestMDDelivTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_MDDelivTypeID = runtimeEntityType.AddIndex(
                 new[] { mDDelivTypeID },
                 name: "NCI_FK_InRequest_MDDelivTypeID");
 
-            var nCIFKInRequestMDInOrderTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_MDInOrderTypeID = runtimeEntityType.AddIndex(
                 new[] { mDInOrderTypeID },
                 name: "NCI_FK_InRequest_MDInOrderTypeID");
 
-            var nCIFKInRequestMDInRequestStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_MDInRequestStateID = runtimeEntityType.AddIndex(
                 new[] { mDInRequestStateID },
                 name: "NCI_FK_InRequest_MDInRequestStateID");
 
-            var nCIFKInRequestMDTermOfPaymentID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_MDTermOfPaymentID = runtimeEntityType.AddIndex(
                 new[] { mDTermOfPaymentID },
                 name: "NCI_FK_InRequest_MDTermOfPaymentID");
 
-            var nCIFKInRequestMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequest_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_InRequest_MDTimeRangeID");
 
-            var uIXInRequestInRequestNo = runtimeEntityType.AddIndex(
+            var uIX_InRequest_InRequestNo = runtimeEntityType.AddIndex(
                 new[] { inRequestNo },
                 name: "UIX_InRequest_InRequestNo",
                 unique: true);
@@ -269,7 +269,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_BillingCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestBillingCompanyAddress = principalEntityType.AddNavigation("InRequest_BillingCompanyAddress",
+            var inRequest_BillingCompanyAddress = principalEntityType.AddNavigation("InRequest_BillingCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -296,7 +296,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_DeliveryCompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestDeliveryCompanyAddress = principalEntityType.AddNavigation("InRequest_DeliveryCompanyAddress",
+            var inRequest_DeliveryCompanyAddress = principalEntityType.AddNavigation("InRequest_DeliveryCompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -323,7 +323,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_DistributorCompany", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestDistributorCompany = principalEntityType.AddNavigation("InRequest_DistributorCompany",
+            var inRequest_DistributorCompany = principalEntityType.AddNavigation("InRequest_DistributorCompany",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -350,7 +350,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_MDDelivType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestMDDelivType = principalEntityType.AddNavigation("InRequest_MDDelivType",
+            var inRequest_MDDelivType = principalEntityType.AddNavigation("InRequest_MDDelivType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -377,7 +377,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_MDInOrderType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestMDInOrderType = principalEntityType.AddNavigation("InRequest_MDInOrderType",
+            var inRequest_MDInOrderType = principalEntityType.AddNavigation("InRequest_MDInOrderType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -404,7 +404,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_MDInRequestState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestMDInRequestState = principalEntityType.AddNavigation("InRequest_MDInRequestState",
+            var inRequest_MDInRequestState = principalEntityType.AddNavigation("InRequest_MDInRequestState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -430,7 +430,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_MDTermOfPayment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestMDTermOfPayment = principalEntityType.AddNavigation("InRequest_MDTermOfPayment",
+            var inRequest_MDTermOfPayment = principalEntityType.AddNavigation("InRequest_MDTermOfPayment",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),
@@ -456,7 +456,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequest).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestMDTimeRange = principalEntityType.AddNavigation("InRequest_MDTimeRange",
+            var inRequest_MDTimeRange = principalEntityType.AddNavigation("InRequest_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequest>),

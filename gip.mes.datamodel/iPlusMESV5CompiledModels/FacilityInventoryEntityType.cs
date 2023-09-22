@@ -119,7 +119,7 @@ namespace gip.mes.datamodel
             var index0 = runtimeEntityType.AddIndex(
                 new[] { mDFacilityInventoryStateID });
 
-            var uIXFacilityInventory = runtimeEntityType.AddIndex(
+            var uIX_FacilityInventory = runtimeEntityType.AddIndex(
                 new[] { facilityInventoryNo },
                 name: "UIX_FacilityInventory",
                 unique: true);
@@ -141,7 +141,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityInventory).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityInventoryFacility = principalEntityType.AddNavigation("FacilityInventory_Facility",
+            var facilityInventory_Facility = principalEntityType.AddNavigation("FacilityInventory_Facility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityInventory>),
@@ -168,7 +168,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityInventory).GetField("_MDFacilityInventoryState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityInventoryMDFacilityInventoryState = principalEntityType.AddNavigation("FacilityInventory_MDFacilityInventoryState",
+            var facilityInventory_MDFacilityInventoryState = principalEntityType.AddNavigation("FacilityInventory_MDFacilityInventoryState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityInventory>),

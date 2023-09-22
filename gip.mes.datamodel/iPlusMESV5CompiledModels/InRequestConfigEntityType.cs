@@ -170,27 +170,27 @@ namespace gip.mes.datamodel
                 new[] { inRequestConfigID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKInRequestConfigInRequestID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestConfig_InRequestID = runtimeEntityType.AddIndex(
                 new[] { inRequestID },
                 name: "NCI_FK_InRequestConfig_InRequestID");
 
-            var nCIFKInRequestConfigMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestConfig_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_InRequestConfig_MaterialID");
 
-            var nCIFKInRequestConfigParentInRequestConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestConfig_ParentInRequestConfigID = runtimeEntityType.AddIndex(
                 new[] { parentInRequestConfigID },
                 name: "NCI_FK_InRequestConfig_ParentInRequestConfigID");
 
-            var nCIFKInRequestConfigVBiACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestConfig_VBiACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
                 name: "NCI_FK_InRequestConfig_VBiACClassID");
 
-            var nCIFKInRequestConfigVBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestConfig_VBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassPropertyRelationID },
                 name: "NCI_FK_InRequestConfig_VBiACClassPropertyRelationID");
 
-            var nCIFKInRequestConfigVBiValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestConfig_VBiValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiValueTypeACClassID },
                 name: "NCI_FK_InRequestConfig_VBiValueTypeACClassID");
 
@@ -213,7 +213,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestConfig).GetField("_InRequest", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestConfigInRequest = principalEntityType.AddNavigation("InRequestConfig_InRequest",
+            var inRequestConfig_InRequest = principalEntityType.AddNavigation("InRequestConfig_InRequest",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestConfig>),
@@ -239,7 +239,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestConfigMaterial = principalEntityType.AddNavigation("InRequestConfig_Material",
+            var inRequestConfig_Material = principalEntityType.AddNavigation("InRequestConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestConfig>),
@@ -257,7 +257,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("InRequestConfigID") }),
                 principalEntityType);
 
-            var inRequestConfig1ParentInRequestConfig = declaringEntityType.AddNavigation("InRequestConfig1_ParentInRequestConfig",
+            var inRequestConfig1_ParentInRequestConfig = declaringEntityType.AddNavigation("InRequestConfig1_ParentInRequestConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(InRequestConfig),
@@ -265,7 +265,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestConfig).GetField("_InRequestConfig1_ParentInRequestConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestConfigParentInRequestConfig = principalEntityType.AddNavigation("InRequestConfig_ParentInRequestConfig",
+            var inRequestConfig_ParentInRequestConfig = principalEntityType.AddNavigation("InRequestConfig_ParentInRequestConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestConfig>),
@@ -291,7 +291,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestConfigVBiACClass = principalEntityType.AddNavigation("InRequestConfig_VBiACClass",
+            var inRequestConfig_VBiACClass = principalEntityType.AddNavigation("InRequestConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestConfig>),
@@ -317,7 +317,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("InRequestConfig_VBiACClassPropertyRelation",
+            var inRequestConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("InRequestConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestConfig>),
@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestConfigVBiValueTypeACClass = principalEntityType.AddNavigation("InRequestConfig_VBiValueTypeACClass",
+            var inRequestConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("InRequestConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestConfig>),

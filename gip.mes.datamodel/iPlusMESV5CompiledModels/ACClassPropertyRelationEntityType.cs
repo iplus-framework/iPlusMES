@@ -221,19 +221,19 @@ namespace gip.mes.datamodel
                 new[] { aCClassPropertyRelationID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKACClassPropertyRelationSourceACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassPropertyRelation_SourceACClassID = runtimeEntityType.AddIndex(
                 new[] { sourceACClassID },
                 name: "NCI_FK_ACClassPropertyRelation_SourceACClassID");
 
-            var nCIFKACClassPropertyRelationSourceACClassPropertyID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassPropertyRelation_SourceACClassPropertyID = runtimeEntityType.AddIndex(
                 new[] { sourceACClassPropertyID },
                 name: "NCI_FK_ACClassPropertyRelation_SourceACClassPropertyID");
 
-            var nCIFKACClassPropertyRelationTargetACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassPropertyRelation_TargetACClassID = runtimeEntityType.AddIndex(
                 new[] { targetACClassID },
                 name: "NCI_FK_ACClassPropertyRelation_TargetACClassID");
 
-            var nCIFKACClassPropertyRelationTargetACClassPropertyID = runtimeEntityType.AddIndex(
+            var nCI_FK_ACClassPropertyRelation_TargetACClassPropertyID = runtimeEntityType.AddIndex(
                 new[] { targetACClassPropertyID },
                 name: "NCI_FK_ACClassPropertyRelation_TargetACClassPropertyID");
 
@@ -256,7 +256,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassPropertyRelation).GetField("_SourceACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassPropertyRelationSourceACClass = principalEntityType.AddNavigation("ACClassPropertyRelation_SourceACClass",
+            var aCClassPropertyRelation_SourceACClass = principalEntityType.AddNavigation("ACClassPropertyRelation_SourceACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassPropertyRelation>),
@@ -282,7 +282,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassPropertyRelation).GetField("_SourceACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassPropertyRelationSourceACClassProperty = principalEntityType.AddNavigation("ACClassPropertyRelation_SourceACClassProperty",
+            var aCClassPropertyRelation_SourceACClassProperty = principalEntityType.AddNavigation("ACClassPropertyRelation_SourceACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassPropertyRelation>),
@@ -309,7 +309,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassPropertyRelation).GetField("_TargetACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassPropertyRelationTargetACClass = principalEntityType.AddNavigation("ACClassPropertyRelation_TargetACClass",
+            var aCClassPropertyRelation_TargetACClass = principalEntityType.AddNavigation("ACClassPropertyRelation_TargetACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassPropertyRelation>),
@@ -335,7 +335,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassPropertyRelation).GetField("_TargetACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var aCClassPropertyRelationTargetACClassProperty = principalEntityType.AddNavigation("ACClassPropertyRelation_TargetACClassProperty",
+            var aCClassPropertyRelation_TargetACClassProperty = principalEntityType.AddNavigation("ACClassPropertyRelation_TargetACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<ACClassPropertyRelation>),

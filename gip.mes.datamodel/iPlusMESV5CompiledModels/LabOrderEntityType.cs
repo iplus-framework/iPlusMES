@@ -184,39 +184,39 @@ namespace gip.mes.datamodel
                 new[] { labOrderID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKLabOrderBasedOnTemplateID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_BasedOnTemplateID = runtimeEntityType.AddIndex(
                 new[] { basedOnTemplateID },
                 name: "NCI_FK_LabOrder_BasedOnTemplateID");
 
-            var nCIFKLabOrderFacilityLotID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_FacilityLotID = runtimeEntityType.AddIndex(
                 new[] { facilityLotID },
                 name: "NCI_FK_LabOrder_FacilityLotID");
 
-            var nCIFKLabOrderInOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_InOrderPosID = runtimeEntityType.AddIndex(
                 new[] { inOrderPosID },
                 name: "NCI_FK_LabOrder_InOrderPosID");
 
-            var nCIFKLabOrderMDLabOrderStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_MDLabOrderStateID = runtimeEntityType.AddIndex(
                 new[] { mDLabOrderStateID },
                 name: "NCI_FK_LabOrder_MDLabOrderStateID");
 
-            var nCIFKLabOrderMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_LabOrder_MaterialID");
 
-            var nCIFKLabOrderOutOrderPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_OutOrderPosID = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID },
                 name: "NCI_FK_LabOrder_OutOrderPosID");
 
-            var nCIFKLabOrderProdOrderPartslistPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_LabOrder_ProdOrderPartslistPosID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_FK_LabOrder_ProdOrderPartslistPosID");
 
-            var nCILabOrderProdOrderPartslistPosIDOT = runtimeEntityType.AddIndex(
+            var nCI_LabOrder_ProdOrderPartslistPosID_OT = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID },
                 name: "NCI_LabOrder_ProdOrderPartslistPosID_OT");
 
-            var uIXLabOrderLabOrderNo = runtimeEntityType.AddIndex(
+            var uIX_LabOrder_LabOrderNo = runtimeEntityType.AddIndex(
                 new[] { labOrderNo },
                 name: "UIX_LabOrder_LabOrderNo",
                 unique: true);
@@ -230,7 +230,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("LabOrderID") }),
                 principalEntityType);
 
-            var labOrder1BasedOnTemplate = declaringEntityType.AddNavigation("LabOrder1_BasedOnTemplate",
+            var labOrder1_BasedOnTemplate = declaringEntityType.AddNavigation("LabOrder1_BasedOnTemplate",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(LabOrder),
@@ -238,7 +238,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_LabOrder1_BasedOnTemplate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderBasedOnTemplate = principalEntityType.AddNavigation("LabOrder_BasedOnTemplate",
+            var labOrder_BasedOnTemplate = principalEntityType.AddNavigation("LabOrder_BasedOnTemplate",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),
@@ -264,7 +264,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_FacilityLot", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderFacilityLot = principalEntityType.AddNavigation("LabOrder_FacilityLot",
+            var labOrder_FacilityLot = principalEntityType.AddNavigation("LabOrder_FacilityLot",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),
@@ -290,7 +290,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_InOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderInOrderPos = principalEntityType.AddNavigation("LabOrder_InOrderPos",
+            var labOrder_InOrderPos = principalEntityType.AddNavigation("LabOrder_InOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),
@@ -317,7 +317,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_MDLabOrderState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderMDLabOrderState = principalEntityType.AddNavigation("LabOrder_MDLabOrderState",
+            var labOrder_MDLabOrderState = principalEntityType.AddNavigation("LabOrder_MDLabOrderState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),
@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderMaterial = principalEntityType.AddNavigation("LabOrder_Material",
+            var labOrder_Material = principalEntityType.AddNavigation("LabOrder_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),
@@ -370,7 +370,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderOutOrderPos = principalEntityType.AddNavigation("LabOrder_OutOrderPos",
+            var labOrder_OutOrderPos = principalEntityType.AddNavigation("LabOrder_OutOrderPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),
@@ -396,7 +396,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(LabOrder).GetField("_ProdOrderPartslistPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var labOrderProdOrderPartslistPos = principalEntityType.AddNavigation("LabOrder_ProdOrderPartslistPos",
+            var labOrder_ProdOrderPartslistPos = principalEntityType.AddNavigation("LabOrder_ProdOrderPartslistPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<LabOrder>),

@@ -174,6 +174,13 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    Guid? _VBiPAACClassID;
+    public Guid? VBiPAACClassID 
+    {
+        get { return _VBiPAACClassID; }
+        set { SetProperty<Guid?>(ref _VBiPAACClassID, value); }
+    }
+
     private MaintOrder _MaintOrder1_BasedOnMaintOrder;
     public virtual MaintOrder MaintOrder1_BasedOnMaintOrder
     { 
@@ -372,5 +379,25 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ReferenceEntry PickingReference 
     {
         get { return Context.Entry(this).Reference("Picking"); }
+    }
+    
+    private ACClass _VBiPAACClass;
+    public virtual ACClass VBiPAACClass
+    { 
+        get { return LazyLoader.Load(this, ref _VBiPAACClass); } 
+        set { SetProperty<ACClass>(ref _VBiPAACClass, value); }
+    }
+
+    public bool VBiPAACClass_IsLoaded
+    {
+        get
+        {
+            return VBiPAACClass != null;
+        }
+    }
+
+    public virtual ReferenceEntry VBiPAACClassReference 
+    {
+        get { return Context.Entry(this).Reference("VBiPAACClass"); }
     }
     }

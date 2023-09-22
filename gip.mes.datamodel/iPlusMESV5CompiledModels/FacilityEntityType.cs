@@ -392,55 +392,55 @@ namespace gip.mes.datamodel
                 new[] { facilityID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKFacilityCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_Facility_CompanyID");
 
-            var nCIFKFacilityCompanyPersonID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_CompanyPersonID = runtimeEntityType.AddIndex(
                 new[] { companyPersonID },
                 name: "NCI_FK_Facility_CompanyPersonID");
 
-            var nCIFKFacilityIncomingFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_IncomingFacilityID = runtimeEntityType.AddIndex(
                 new[] { incomingFacilityID },
                 name: "NCI_FK_Facility_IncomingFacilityID");
 
-            var nCIFKFacilityLockedFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_LockedFacilityID = runtimeEntityType.AddIndex(
                 new[] { lockedFacilityID },
                 name: "NCI_FK_Facility_LockedFacilityID");
 
-            var nCIFKFacilityMDFacilityTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_MDFacilityTypeID = runtimeEntityType.AddIndex(
                 new[] { mDFacilityTypeID },
                 name: "NCI_FK_Facility_MDFacilityTypeID");
 
-            var nCIFKFacilityMDFacilityVehicleTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_MDFacilityVehicleTypeID = runtimeEntityType.AddIndex(
                 new[] { mDFacilityVehicleTypeID },
                 name: "NCI_FK_Facility_MDFacilityVehicleTypeID");
 
-            var nCIFKFacilityMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_Facility_MDUnitID");
 
-            var nCIFKFacilityMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_Facility_MaterialID");
 
-            var nCIFKFacilityOutgoingFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_OutgoingFacilityID = runtimeEntityType.AddIndex(
                 new[] { outgoingFacilityID },
                 name: "NCI_FK_Facility_OutgoingFacilityID");
 
-            var nCIFKFacilityPartslistID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_PartslistID = runtimeEntityType.AddIndex(
                 new[] { partslistID },
                 name: "NCI_FK_Facility_PartslistID");
 
-            var nCIFKFacilityVBiFacilityACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_VBiFacilityACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiFacilityACClassID },
                 name: "NCI_FK_Facility_VBiFacilityACClassID");
 
-            var nCIFKFacilityVBiStackCalculatorACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_Facility_VBiStackCalculatorACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiStackCalculatorACClassID },
                 name: "NCI_FK_Facility_VBiStackCalculatorACClassID");
 
-            var uIXFacility = runtimeEntityType.AddIndex(
+            var uIX_Facility = runtimeEntityType.AddIndex(
                 new[] { parentFacilityID, facilityNo },
                 name: "UIX_Facility",
                 unique: true);
@@ -462,7 +462,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityCompany = principalEntityType.AddNavigation("Facility_Company",
+            var facility_Company = principalEntityType.AddNavigation("Facility_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -488,7 +488,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_CompanyPerson", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityCompanyPerson = principalEntityType.AddNavigation("Facility_CompanyPerson",
+            var facility_CompanyPerson = principalEntityType.AddNavigation("Facility_CompanyPerson",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -506,7 +506,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),
                 principalEntityType);
 
-            var facility1IncomingFacility = declaringEntityType.AddNavigation("Facility1_IncomingFacility",
+            var facility1_IncomingFacility = declaringEntityType.AddNavigation("Facility1_IncomingFacility",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Facility),
@@ -514,7 +514,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Facility1_IncomingFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityIncomingFacility = principalEntityType.AddNavigation("Facility_IncomingFacility",
+            var facility_IncomingFacility = principalEntityType.AddNavigation("Facility_IncomingFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -532,7 +532,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),
                 principalEntityType);
 
-            var facility1LockedFacility = declaringEntityType.AddNavigation("Facility1_LockedFacility",
+            var facility1_LockedFacility = declaringEntityType.AddNavigation("Facility1_LockedFacility",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Facility),
@@ -540,7 +540,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Facility1_LockedFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityLockedFacility = principalEntityType.AddNavigation("Facility_LockedFacility",
+            var facility_LockedFacility = principalEntityType.AddNavigation("Facility_LockedFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -567,7 +567,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_MDFacilityType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMDFacilityType = principalEntityType.AddNavigation("Facility_MDFacilityType",
+            var facility_MDFacilityType = principalEntityType.AddNavigation("Facility_MDFacilityType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -593,7 +593,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_MDFacilityVehicleType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMDFacilityVehicleType = principalEntityType.AddNavigation("Facility_MDFacilityVehicleType",
+            var facility_MDFacilityVehicleType = principalEntityType.AddNavigation("Facility_MDFacilityVehicleType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -619,7 +619,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMDUnit = principalEntityType.AddNavigation("Facility_MDUnit",
+            var facility_MDUnit = principalEntityType.AddNavigation("Facility_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -645,7 +645,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMaterial = principalEntityType.AddNavigation("Facility_Material",
+            var facility_Material = principalEntityType.AddNavigation("Facility_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -663,7 +663,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),
                 principalEntityType);
 
-            var facility1OutgoingFacility = declaringEntityType.AddNavigation("Facility1_OutgoingFacility",
+            var facility1_OutgoingFacility = declaringEntityType.AddNavigation("Facility1_OutgoingFacility",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Facility),
@@ -671,7 +671,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Facility1_OutgoingFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityOutgoingFacility = principalEntityType.AddNavigation("Facility_OutgoingFacility",
+            var facility_OutgoingFacility = principalEntityType.AddNavigation("Facility_OutgoingFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -689,7 +689,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("FacilityID") }),
                 principalEntityType);
 
-            var facility1ParentFacility = declaringEntityType.AddNavigation("Facility1_ParentFacility",
+            var facility1_ParentFacility = declaringEntityType.AddNavigation("Facility1_ParentFacility",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Facility),
@@ -697,7 +697,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Facility1_ParentFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityParentFacility = principalEntityType.AddNavigation("Facility_ParentFacility",
+            var facility_ParentFacility = principalEntityType.AddNavigation("Facility_ParentFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -723,7 +723,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_Partslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityPartslist = principalEntityType.AddNavigation("Facility_Partslist",
+            var facility_Partslist = principalEntityType.AddNavigation("Facility_Partslist",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -749,7 +749,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_VBiFacilityACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityVBiFacilityACClass = principalEntityType.AddNavigation("Facility_VBiFacilityACClass",
+            var facility_VBiFacilityACClass = principalEntityType.AddNavigation("Facility_VBiFacilityACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),
@@ -775,7 +775,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_VBiStackCalculatorACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityVBiStackCalculatorACClass = principalEntityType.AddNavigation("Facility_VBiStackCalculatorACClass",
+            var facility_VBiStackCalculatorACClass = principalEntityType.AddNavigation("Facility_VBiStackCalculatorACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Facility>),

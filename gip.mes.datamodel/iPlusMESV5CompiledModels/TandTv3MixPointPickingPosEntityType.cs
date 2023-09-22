@@ -74,7 +74,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointPickingPos).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointPickingPosPickingPos = principalEntityType.AddNavigation("TandTv3MixPointPickingPos_PickingPos",
+            var tandTv3MixPointPickingPos_PickingPos = principalEntityType.AddNavigation("TandTv3MixPointPickingPos_PickingPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointPickingPos>),
@@ -101,7 +101,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointPickingPos).GetField("_TandTv3MixPoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tandTv3MixPointPickingPosTandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointPickingPos_TandTv3MixPoint",
+            var tandTv3MixPointPickingPos_TandTv3MixPoint = principalEntityType.AddNavigation("TandTv3MixPointPickingPos_TandTv3MixPoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TandTv3MixPointPickingPos>),

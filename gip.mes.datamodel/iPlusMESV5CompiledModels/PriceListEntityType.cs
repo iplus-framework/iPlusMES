@@ -141,7 +141,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PriceList).GetField("_MDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var priceListMDCurrency = principalEntityType.AddNavigation("PriceList_MDCurrency",
+            var priceList_MDCurrency = principalEntityType.AddNavigation("PriceList_MDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PriceList>),

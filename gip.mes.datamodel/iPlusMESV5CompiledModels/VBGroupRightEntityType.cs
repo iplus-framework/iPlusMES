@@ -81,23 +81,23 @@ namespace gip.mes.datamodel
                 new[] { vBGroupRightID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKVBGroupRightACClassDesignID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBGroupRight_ACClassDesignID = runtimeEntityType.AddIndex(
                 new[] { aCClassDesignID },
                 name: "NCI_FK_VBGroupRight_ACClassDesignID");
 
-            var nCIFKVBGroupRightACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBGroupRight_ACClassID = runtimeEntityType.AddIndex(
                 new[] { aCClassID },
                 name: "NCI_FK_VBGroupRight_ACClassID");
 
-            var nCIFKVBGroupRightACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBGroupRight_ACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { aCClassMethodID },
                 name: "NCI_FK_VBGroupRight_ACClassMethodID");
 
-            var nCIFKVBGroupRightACClassPropertyID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBGroupRight_ACClassPropertyID = runtimeEntityType.AddIndex(
                 new[] { aCClassPropertyID },
                 name: "NCI_FK_VBGroupRight_ACClassPropertyID");
 
-            var nCIFKVBGroupRightVBGroupID = runtimeEntityType.AddIndex(
+            var nCI_FK_VBGroupRight_VBGroupID = runtimeEntityType.AddIndex(
                 new[] { vBGroupID },
                 name: "NCI_FK_VBGroupRight_VBGroupID");
 
@@ -118,7 +118,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBGroupRight).GetField("_ACClassDesign", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBGroupRightACClassDesign = principalEntityType.AddNavigation("VBGroupRight_ACClassDesign",
+            var vBGroupRight_ACClassDesign = principalEntityType.AddNavigation("VBGroupRight_ACClassDesign",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBGroupRight>),
@@ -146,7 +146,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBGroupRight).GetField("_ACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBGroupRightACClass = principalEntityType.AddNavigation("VBGroupRight_ACClass",
+            var vBGroupRight_ACClass = principalEntityType.AddNavigation("VBGroupRight_ACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBGroupRight>),
@@ -172,7 +172,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBGroupRight).GetField("_ACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBGroupRightACClassMethod = principalEntityType.AddNavigation("VBGroupRight_ACClassMethod",
+            var vBGroupRight_ACClassMethod = principalEntityType.AddNavigation("VBGroupRight_ACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBGroupRight>),
@@ -198,7 +198,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBGroupRight).GetField("_ACClassProperty", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBGroupRightACClassProperty = principalEntityType.AddNavigation("VBGroupRight_ACClassProperty",
+            var vBGroupRight_ACClassProperty = principalEntityType.AddNavigation("VBGroupRight_ACClassProperty",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBGroupRight>),
@@ -226,7 +226,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VBGroupRight).GetField("_VBGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var vBGroupRightVBGroup = principalEntityType.AddNavigation("VBGroupRight_VBGroup",
+            var vBGroupRight_VBGroup = principalEntityType.AddNavigation("VBGroupRight_VBGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<VBGroupRight>),

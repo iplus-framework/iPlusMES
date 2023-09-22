@@ -160,7 +160,7 @@ namespace gip.mes.datamodel
                 new[] { mDTourID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDTour = runtimeEntityType.AddIndex(
+            var uIX_MDTour = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDTour",
                 unique: true);

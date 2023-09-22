@@ -140,27 +140,27 @@ namespace gip.mes.datamodel
                 new[] { tourplanPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKTourplanPosCompanyAddressID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanPos_CompanyAddressID = runtimeEntityType.AddIndex(
                 new[] { companyAddressID },
                 name: "NCI_FK_TourplanPos_CompanyAddressID");
 
-            var nCIFKTourplanPosCompanyAddressUnloadingpointID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanPos_CompanyAddressUnloadingpointID = runtimeEntityType.AddIndex(
                 new[] { companyAddressUnloadingpointID },
                 name: "NCI_FK_TourplanPos_CompanyAddressUnloadingpointID");
 
-            var nCIFKTourplanPosCompanyID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanPos_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
                 name: "NCI_FK_TourplanPos_CompanyID");
 
-            var nCIFKTourplanPosMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanPos_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_TourplanPos_MDTimeRangeID");
 
-            var nCIFKTourplanPosMDTourplanPosStateID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanPos_MDTourplanPosStateID = runtimeEntityType.AddIndex(
                 new[] { mDTourplanPosStateID },
                 name: "NCI_FK_TourplanPos_MDTourplanPosStateID");
 
-            var nCIFKTourplanPosTourplanID = runtimeEntityType.AddIndex(
+            var nCI_FK_TourplanPos_TourplanID = runtimeEntityType.AddIndex(
                 new[] { tourplanID },
                 name: "NCI_FK_TourplanPos_TourplanID");
 
@@ -182,7 +182,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanPos).GetField("_CompanyAddress", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanPosCompanyAddress = principalEntityType.AddNavigation("TourplanPos_CompanyAddress",
+            var tourplanPos_CompanyAddress = principalEntityType.AddNavigation("TourplanPos_CompanyAddress",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanPos>),
@@ -208,7 +208,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanPos).GetField("_CompanyAddressUnloadingpoint", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanPosCompanyAddressUnloadingpoint = principalEntityType.AddNavigation("TourplanPos_CompanyAddressUnloadingpoint",
+            var tourplanPos_CompanyAddressUnloadingpoint = principalEntityType.AddNavigation("TourplanPos_CompanyAddressUnloadingpoint",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanPos>),
@@ -235,7 +235,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanPos).GetField("_Company", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanPosCompany = principalEntityType.AddNavigation("TourplanPos_Company",
+            var tourplanPos_Company = principalEntityType.AddNavigation("TourplanPos_Company",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanPos>),
@@ -261,7 +261,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanPos).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanPosMDTimeRange = principalEntityType.AddNavigation("TourplanPos_MDTimeRange",
+            var tourplanPos_MDTimeRange = principalEntityType.AddNavigation("TourplanPos_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanPos>),
@@ -288,7 +288,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanPos).GetField("_MDTourplanPosState", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanPosMDTourplanPosState = principalEntityType.AddNavigation("TourplanPos_MDTourplanPosState",
+            var tourplanPos_MDTourplanPosState = principalEntityType.AddNavigation("TourplanPos_MDTourplanPosState",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanPos>),
@@ -316,7 +316,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TourplanPos).GetField("_Tourplan", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var tourplanPosTourplan = principalEntityType.AddNavigation("TourplanPos_Tourplan",
+            var tourplanPos_Tourplan = principalEntityType.AddNavigation("TourplanPos_Tourplan",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<TourplanPos>),

@@ -396,63 +396,63 @@ namespace gip.mes.datamodel
                 new[] { materialID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMaterialBaseMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_BaseMDUnitID = runtimeEntityType.AddIndex(
                 new[] { baseMDUnitID },
                 name: "NCI_FK_Material_BaseMDUnitID");
 
-            var nCIFKMaterialInFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_InFacilityID = runtimeEntityType.AddIndex(
                 new[] { inFacilityID },
                 name: "NCI_FK_Material_InFacilityID");
 
-            var nCIFKMaterialLabelID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_LabelID = runtimeEntityType.AddIndex(
                 new[] { labelID },
                 name: "NCI_FK_Material_LabelID");
 
-            var nCIFKMaterialMDFacilityManagementTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_MDFacilityManagementTypeID = runtimeEntityType.AddIndex(
                 new[] { mDFacilityManagementTypeID },
                 name: "NCI_FK_Material_MDFacilityManagementTypeID");
 
-            var nCIFKMaterialMDGMPMaterialGroupID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_MDGMPMaterialGroupID = runtimeEntityType.AddIndex(
                 new[] { mDGMPMaterialGroupID },
                 name: "NCI_FK_Material_MDGMPMaterialGroupID");
 
-            var nCIFKMaterialMDInventoryManagementTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_MDInventoryManagementTypeID = runtimeEntityType.AddIndex(
                 new[] { mDInventoryManagementTypeID },
                 name: "NCI_FK_Material_MDInventoryManagementTypeID");
 
-            var nCIFKMaterialMDMaterialGroupID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_MDMaterialGroupID = runtimeEntityType.AddIndex(
                 new[] { mDMaterialGroupID },
                 name: "NCI_FK_Material_MDMaterialGroupID");
 
-            var nCIFKMaterialMDMaterialTypeID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_MDMaterialTypeID = runtimeEntityType.AddIndex(
                 new[] { mDMaterialTypeID },
                 name: "NCI_FK_Material_MDMaterialTypeID");
 
-            var nCIFKMaterialOutFacilityID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_OutFacilityID = runtimeEntityType.AddIndex(
                 new[] { outFacilityID },
                 name: "NCI_FK_Material_OutFacilityID");
 
-            var nCIFKMaterialProductionMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_ProductionMaterialID = runtimeEntityType.AddIndex(
                 new[] { productionMaterialID },
                 name: "NCI_FK_Material_ProductionMaterialID");
 
-            var nCIFKMaterialVBiProgramACClassMethodID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_VBiProgramACClassMethodID = runtimeEntityType.AddIndex(
                 new[] { vBiProgramACClassMethodID },
                 name: "NCI_FK_Material_VBiProgramACClassMethodID");
 
-            var nCIFKMaterialVBiStackCalculatorACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_Material_VBiStackCalculatorACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiStackCalculatorACClassID },
                 name: "NCI_FK_Material_VBiStackCalculatorACClassID");
 
-            var nCILabOrderPosMaterialIDMDMaterialTypeID = runtimeEntityType.AddIndex(
+            var nCI_LabOrderPos_MaterialID_MDMaterialTypeID = runtimeEntityType.AddIndex(
                 new[] { materialID, mDMaterialTypeID },
                 name: "NCI_LabOrderPos_MaterialID_MDMaterialTypeID");
 
-            var nCILabOrderPosMaterialIDMDMaterialTypeIDOT = runtimeEntityType.AddIndex(
+            var nCI_LabOrderPos_MaterialID_MDMaterialTypeID_OT = runtimeEntityType.AddIndex(
                 new[] { materialID, mDMaterialTypeID },
                 name: "NCI_LabOrderPos_MaterialID_MDMaterialTypeID_OT");
 
-            var uIXMaterial = runtimeEntityType.AddIndex(
+            var uIX_Material = runtimeEntityType.AddIndex(
                 new[] { materialNo },
                 name: "UIX_Material",
                 unique: true);
@@ -475,7 +475,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_BaseMDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialBaseMDUnit = principalEntityType.AddNavigation("Material_BaseMDUnit",
+            var material_BaseMDUnit = principalEntityType.AddNavigation("Material_BaseMDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -501,7 +501,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_InFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialInFacility = principalEntityType.AddNavigation("Material_InFacility",
+            var material_InFacility = principalEntityType.AddNavigation("Material_InFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -527,7 +527,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_Label", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialLabel = principalEntityType.AddNavigation("Material_Label",
+            var material_Label = principalEntityType.AddNavigation("Material_Label",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -554,7 +554,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MDFacilityManagementType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialMDFacilityManagementType = principalEntityType.AddNavigation("Material_MDFacilityManagementType",
+            var material_MDFacilityManagementType = principalEntityType.AddNavigation("Material_MDFacilityManagementType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -580,7 +580,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MDGMPMaterialGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialMDGMPMaterialGroup = principalEntityType.AddNavigation("Material_MDGMPMaterialGroup",
+            var material_MDGMPMaterialGroup = principalEntityType.AddNavigation("Material_MDGMPMaterialGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -607,7 +607,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MDInventoryManagementType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialMDInventoryManagementType = principalEntityType.AddNavigation("Material_MDInventoryManagementType",
+            var material_MDInventoryManagementType = principalEntityType.AddNavigation("Material_MDInventoryManagementType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -634,7 +634,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MDMaterialGroup", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialMDMaterialGroup = principalEntityType.AddNavigation("Material_MDMaterialGroup",
+            var material_MDMaterialGroup = principalEntityType.AddNavigation("Material_MDMaterialGroup",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -660,7 +660,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MDMaterialType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialMDMaterialType = principalEntityType.AddNavigation("Material_MDMaterialType",
+            var material_MDMaterialType = principalEntityType.AddNavigation("Material_MDMaterialType",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -686,7 +686,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_OutFacility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialOutFacility = principalEntityType.AddNavigation("Material_OutFacility",
+            var material_OutFacility = principalEntityType.AddNavigation("Material_OutFacility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -704,7 +704,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaterialID") }),
                 principalEntityType);
 
-            var material1ProductionMaterial = declaringEntityType.AddNavigation("Material1_ProductionMaterial",
+            var material1_ProductionMaterial = declaringEntityType.AddNavigation("Material1_ProductionMaterial",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(Material),
@@ -712,7 +712,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_Material1_ProductionMaterial", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialProductionMaterial = principalEntityType.AddNavigation("Material_ProductionMaterial",
+            var material_ProductionMaterial = principalEntityType.AddNavigation("Material_ProductionMaterial",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -738,7 +738,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_VBiProgramACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialVBiProgramACClassMethod = principalEntityType.AddNavigation("Material_VBiProgramACClassMethod",
+            var material_VBiProgramACClassMethod = principalEntityType.AddNavigation("Material_VBiProgramACClassMethod",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),
@@ -764,7 +764,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_VBiStackCalculatorACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var materialVBiStackCalculatorACClass = principalEntityType.AddNavigation("Material_VBiStackCalculatorACClass",
+            var material_VBiStackCalculatorACClass = principalEntityType.AddNavigation("Material_VBiStackCalculatorACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<Material>),

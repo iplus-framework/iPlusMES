@@ -181,27 +181,27 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { vBiACClassWFID });
 
-            var nCIFKOutOrderConfigMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderConfig_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_OutOrderConfig_MaterialID");
 
-            var nCIFKOutOrderConfigOutOrderID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderConfig_OutOrderID = runtimeEntityType.AddIndex(
                 new[] { outOrderID },
                 name: "NCI_FK_OutOrderConfig_OutOrderID");
 
-            var nCIFKOutOrderConfigParentOutOrderConfigID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderConfig_ParentOutOrderConfigID = runtimeEntityType.AddIndex(
                 new[] { parentOutOrderConfigID },
                 name: "NCI_FK_OutOrderConfig_ParentOutOrderConfigID");
 
-            var nCIFKOutOrderConfigVBiACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderConfig_VBiACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
                 name: "NCI_FK_OutOrderConfig_VBiACClassID");
 
-            var nCIFKOutOrderConfigVBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderConfig_VBiACClassPropertyRelationID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassPropertyRelationID },
                 name: "NCI_FK_OutOrderConfig_VBiACClassPropertyRelationID");
 
-            var nCIFKOutOrderConfigVBiValueTypeACClassID = runtimeEntityType.AddIndex(
+            var nCI_FK_OutOrderConfig_VBiValueTypeACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiValueTypeACClassID },
                 name: "NCI_FK_OutOrderConfig_VBiValueTypeACClassID");
 
@@ -222,7 +222,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigMaterial = principalEntityType.AddNavigation("OutOrderConfig_Material",
+            var outOrderConfig_Material = principalEntityType.AddNavigation("OutOrderConfig_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),
@@ -250,7 +250,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_OutOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigOutOrder = principalEntityType.AddNavigation("OutOrderConfig_OutOrder",
+            var outOrderConfig_OutOrder = principalEntityType.AddNavigation("OutOrderConfig_OutOrder",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),
@@ -268,7 +268,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOrderConfigID") }),
                 principalEntityType);
 
-            var outOrderConfig1ParentOutOrderConfig = declaringEntityType.AddNavigation("OutOrderConfig1_ParentOutOrderConfig",
+            var outOrderConfig1_ParentOutOrderConfig = declaringEntityType.AddNavigation("OutOrderConfig1_ParentOutOrderConfig",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(OutOrderConfig),
@@ -276,7 +276,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_OutOrderConfig1_ParentOutOrderConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigParentOutOrderConfig = principalEntityType.AddNavigation("OutOrderConfig_ParentOutOrderConfig",
+            var outOrderConfig_ParentOutOrderConfig = principalEntityType.AddNavigation("OutOrderConfig_ParentOutOrderConfig",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),
@@ -302,7 +302,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_VBiACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigVBiACClass = principalEntityType.AddNavigation("OutOrderConfig_VBiACClass",
+            var outOrderConfig_VBiACClass = principalEntityType.AddNavigation("OutOrderConfig_VBiACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),
@@ -328,7 +328,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_VBiACClassPropertyRelation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigVBiACClassPropertyRelation = principalEntityType.AddNavigation("OutOrderConfig_VBiACClassPropertyRelation",
+            var outOrderConfig_VBiACClassPropertyRelation = principalEntityType.AddNavigation("OutOrderConfig_VBiACClassPropertyRelation",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),
@@ -355,7 +355,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigVBiACClassWF = principalEntityType.AddNavigation("OutOrderConfig_VBiACClassWF",
+            var outOrderConfig_VBiACClassWF = principalEntityType.AddNavigation("OutOrderConfig_VBiACClassWF",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),
@@ -382,7 +382,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOrderConfig).GetField("_VBiValueTypeACClass", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var outOrderConfigVBiValueTypeACClass = principalEntityType.AddNavigation("OutOrderConfig_VBiValueTypeACClass",
+            var outOrderConfig_VBiValueTypeACClass = principalEntityType.AddNavigation("OutOrderConfig_VBiValueTypeACClass",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<OutOrderConfig>),

@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDOutOrderStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDOutOrderState = runtimeEntityType.AddIndex(
+            var uIX_MDOutOrderState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDOutOrderState",
                 unique: true);

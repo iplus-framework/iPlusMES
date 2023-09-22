@@ -116,7 +116,7 @@ namespace gip.mes.datamodel
                 new[] { mDZeroStockStateID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDZeroStockState = runtimeEntityType.AddIndex(
+            var uIX_MDZeroStockState = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDZeroStockState",
                 unique: true);

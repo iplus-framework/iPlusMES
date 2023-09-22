@@ -228,27 +228,27 @@ namespace gip.mes.datamodel
                 new[] { inRequestPosID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKInRequestPosInRequestID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestPos_InRequestID = runtimeEntityType.AddIndex(
                 new[] { inRequestID },
                 name: "NCI_FK_InRequestPos_InRequestID");
 
-            var nCIFKInRequestPosMDCountrySalesTaxID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestPos_MDCountrySalesTaxID = runtimeEntityType.AddIndex(
                 new[] { mDCountrySalesTaxID },
                 name: "NCI_FK_InRequestPos_MDCountrySalesTaxID");
 
-            var nCIFKInRequestPosMDTimeRangeID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestPos_MDTimeRangeID = runtimeEntityType.AddIndex(
                 new[] { mDTimeRangeID },
                 name: "NCI_FK_InRequestPos_MDTimeRangeID");
 
-            var nCIFKInRequestPosMDUnitID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestPos_MDUnitID = runtimeEntityType.AddIndex(
                 new[] { mDUnitID },
                 name: "NCI_FK_InRequestPos_MDUnitID");
 
-            var nCIFKInRequestPosMaterialID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestPos_MaterialID = runtimeEntityType.AddIndex(
                 new[] { materialID },
                 name: "NCI_FK_InRequestPos_MaterialID");
 
-            var nCIFKInRequestPosParentInRequestPosID = runtimeEntityType.AddIndex(
+            var nCI_FK_InRequestPos_ParentInRequestPosID = runtimeEntityType.AddIndex(
                 new[] { parentInRequestPosID },
                 name: "NCI_FK_InRequestPos_ParentInRequestPosID");
 
@@ -271,7 +271,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestPos).GetField("_InRequest", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestPosInRequest = principalEntityType.AddNavigation("InRequestPos_InRequest",
+            var inRequestPos_InRequest = principalEntityType.AddNavigation("InRequestPos_InRequest",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestPos>),
@@ -297,7 +297,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestPos).GetField("_MDCountrySalesTax", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestPosMDCountrySalesTax = principalEntityType.AddNavigation("InRequestPos_MDCountrySalesTax",
+            var inRequestPos_MDCountrySalesTax = principalEntityType.AddNavigation("InRequestPos_MDCountrySalesTax",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestPos>),
@@ -323,7 +323,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestPos).GetField("_MDTimeRange", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestPosMDTimeRange = principalEntityType.AddNavigation("InRequestPos_MDTimeRange",
+            var inRequestPos_MDTimeRange = principalEntityType.AddNavigation("InRequestPos_MDTimeRange",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestPos>),
@@ -349,7 +349,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestPos).GetField("_MDUnit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestPosMDUnit = principalEntityType.AddNavigation("InRequestPos_MDUnit",
+            var inRequestPos_MDUnit = principalEntityType.AddNavigation("InRequestPos_MDUnit",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestPos>),
@@ -376,7 +376,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestPosMaterial = principalEntityType.AddNavigation("InRequestPos_Material",
+            var inRequestPos_Material = principalEntityType.AddNavigation("InRequestPos_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestPos>),
@@ -394,7 +394,7 @@ namespace gip.mes.datamodel
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("InRequestPosID") }),
                 principalEntityType);
 
-            var inRequestPos1ParentInRequestPos = declaringEntityType.AddNavigation("InRequestPos1_ParentInRequestPos",
+            var inRequestPos1_ParentInRequestPos = declaringEntityType.AddNavigation("InRequestPos1_ParentInRequestPos",
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(InRequestPos),
@@ -402,7 +402,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(InRequestPos).GetField("_InRequestPos1_ParentInRequestPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var inRequestPosParentInRequestPos = principalEntityType.AddNavigation("InRequestPos_ParentInRequestPos",
+            var inRequestPos_ParentInRequestPos = principalEntityType.AddNavigation("InRequestPos_ParentInRequestPos",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<InRequestPos>),

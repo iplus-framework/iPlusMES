@@ -123,7 +123,7 @@ namespace gip.mes.datamodel
                 new[] { mDMaterialGroupID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var uIXMDMaterialGroup = runtimeEntityType.AddIndex(
+            var uIX_MDMaterialGroup = runtimeEntityType.AddIndex(
                 new[] { mDKey },
                 name: "UIX_MDMaterialGroup",
                 unique: true);

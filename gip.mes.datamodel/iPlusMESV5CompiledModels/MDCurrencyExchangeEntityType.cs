@@ -111,11 +111,11 @@ namespace gip.mes.datamodel
                 new[] { mDCurrencyExchangeID });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var nCIFKMDCurrencyExchangeMDCurrencyID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDCurrencyExchange_MDCurrencyID = runtimeEntityType.AddIndex(
                 new[] { mDCurrencyID },
                 name: "NCI_FK_MDCurrencyExchange_MDCurrencyID");
 
-            var nCIFKMDCurrencyExchangeToMDCurrencyID = runtimeEntityType.AddIndex(
+            var nCI_FK_MDCurrencyExchange_ToMDCurrencyID = runtimeEntityType.AddIndex(
                 new[] { toMDCurrencyID },
                 name: "NCI_FK_MDCurrencyExchange_ToMDCurrencyID");
 
@@ -138,7 +138,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCurrencyExchange).GetField("_MDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCurrencyExchangeMDCurrency = principalEntityType.AddNavigation("MDCurrencyExchange_MDCurrency",
+            var mDCurrencyExchange_MDCurrency = principalEntityType.AddNavigation("MDCurrencyExchange_MDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCurrencyExchange>),
@@ -165,7 +165,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCurrencyExchange).GetField("_ToMDCurrency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var mDCurrencyExchangeToMDCurrency = principalEntityType.AddNavigation("MDCurrencyExchange_ToMDCurrency",
+            var mDCurrencyExchange_ToMDCurrency = principalEntityType.AddNavigation("MDCurrencyExchange_ToMDCurrency",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<MDCurrencyExchange>),

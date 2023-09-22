@@ -142,7 +142,7 @@ namespace gip.mes.datamodel
             var index = runtimeEntityType.AddIndex(
                 new[] { materialID });
 
-            var uIXFacilityMaterial = runtimeEntityType.AddIndex(
+            var uIX_FacilityMaterial = runtimeEntityType.AddIndex(
                 new[] { facilityID, materialID },
                 name: "UIX_FacilityMaterial",
                 unique: true);
@@ -165,7 +165,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityMaterial).GetField("_Facility", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMaterialFacility = principalEntityType.AddNavigation("FacilityMaterial_Facility",
+            var facilityMaterial_Facility = principalEntityType.AddNavigation("FacilityMaterial_Facility",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityMaterial>),
@@ -192,7 +192,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(FacilityMaterial).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var facilityMaterialMaterial = principalEntityType.AddNavigation("FacilityMaterial_Material",
+            var facilityMaterial_Material = principalEntityType.AddNavigation("FacilityMaterial_Material",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<FacilityMaterial>),
