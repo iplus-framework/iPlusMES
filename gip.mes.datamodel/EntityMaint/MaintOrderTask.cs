@@ -12,19 +12,20 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "MDMaintTaskState", "en{'Status of Work Task'}de{'Aufgabenstatus'}", Const.ContextDatabase + "\\" + MDMaintTaskState.ClassName, "", true)]
     [ACPropertyEntity(3, "TaskDescription", "en{'Task description'}de{'Task description'}", "", "", true)]
     [ACPropertyEntity(4, "TaskName", "en{'Task name'}de{'Task name'}", "", "", true)]
-    [ACPropertyEntity(5, "PlannedStartDate", "en{'Planned start date'}de{'Planned start date'}", "", "", true)]
-    [ACPropertyEntity(6, "PlannedDuration", "en{'PlannedDuration'}de{'PlannedDuration'}", "", "", true)]
-    [ACPropertyEntity(7, "StartDate", "en{'Task commenced on'}de{'Aufgabe begonnen am'}", "", "", true)]
-    [ACPropertyEntity(8, "EndDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
-    [ACPropertyEntity(9, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
-    [ACPropertyEntity(10, "IsRepair", "en{'Is repaired'}de{'Repariert'}", "", "", true)]
+    [ACPropertyEntity(5, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
+    [ACPropertyEntity(6, "PlannedStartDate", "en{'Planned start date'}de{'Planned start date'}", "", "", true)]
+    [ACPropertyEntity(7, "PlannedDuration", "en{'PlannedDuration'}de{'PlannedDuration'}", "", "", true)]
+    [ACPropertyEntity(8, "StartDate", "en{'Task commenced on'}de{'Aufgabe begonnen am'}", "", "", true)]
+    [ACPropertyEntity(9, "EndDate", "en{'Task completed on'}de{'Aufgabe beendet am'}", "", "", true)]
+    [ACPropertyEntity(10, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
+    [ACPropertyEntity(11, "IsRepair", "en{'Is repaired'}de{'Repariert'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioAutomation, Const.QueryPrefix + MaintOrderTask.ClassName, "en{'Maintenance Task'}de{'Wartungsaufgabe'}", typeof(MaintOrderTask), MaintOrderTask.ClassName, Const.EntityInsertDate, Const.EntityInsertDate)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MaintOrderTask>) })]
-    public partial class MaintOrderTask
+    public partial class MaintOrderTask : VBEntityObject
     {
         public const string ClassName = nameof(MaintOrderTask);
 
@@ -35,8 +36,11 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.MDMaintTaskState = dbApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.UnfinishedTask);
 
-            if (parentACObject is MaintOrder)
-                entity.MaintOrder = parentACObject as MaintOrder;
+            MaintOrder mo = parentACObject as MaintOrder;
+            {
+                entity.MaintOrder = mo;
+                entity.Sequence = mo.MaintOrderTask_MaintOrder.Count + 1;
+            }
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
@@ -105,6 +109,14 @@ namespace gip.mes.datamodel
             newTask.TaskName = TaskName;
             newTask.PlannedStartDate = PlannedStartDate;
             newTask.PlannedDuration = PlannedDuration;
+        }
+
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return nameof(MaintOrder) + "\\" + nameof(datamodel.MaintOrder.MaintOrderNo) + "," + nameof(Sequence);
+            }
         }
 
     }
