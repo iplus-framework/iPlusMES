@@ -250,7 +250,8 @@ namespace gip.bso.masterdata
         public void CopyAllToClipboard()
         {
             if (!PreExecute("CopyAllToClipboard")) return;
-            Clipboard.SetText(string.Join(System.Environment.NewLine, DataStringList));
+            //TODO Move to neutral assembly
+            //Clipboard.SetText(string.Join(System.Environment.NewLine, DataStringList));
             PostExecute("CopyAllToClipboard");
         }
 

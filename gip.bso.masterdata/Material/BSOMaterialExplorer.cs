@@ -377,19 +377,19 @@ namespace gip.bso.masterdata
             //Search();
         }
 
-
-        [ACMethodInfo("", "en{'Key event'}de{'Tastatur Ereignis'}", 9999, false)]
-        public void OnKeyEvent(KeyEventArgs e)
-        {
-            IVBContent control = e.Source as IVBContent;
-            if (control != null && control.VBContent == "SearchWord")
-            {
-                if (e.Key == Key.Enter)
-                {
-                    Search();
-                }
-            }
-        }
+        //TODO Different implementation in design
+        //[ACMethodInfo("", "en{'Key event'}de{'Tastatur Ereignis'}", 9999, false)]
+        //public void OnKeyEvent(KeyEventArgs e)
+        //{
+        //    IVBContent control = e.Source as IVBContent;
+        //    if (control != null && control.VBContent == "SearchWord")
+        //    {
+        //        if (e.Key == Key.Enter)
+        //        {
+        //            Search();
+        //        }
+        //    }
+        //}
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
@@ -402,9 +402,9 @@ namespace gip.bso.masterdata
                 case nameof(ClearSearch):
                     ClearSearch();
                     return true;
-                case nameof(OnKeyEvent):
-                    OnKeyEvent((System.Windows.Input.KeyEventArgs)acParameter[0]);
-                    return true;
+                //case nameof(OnKeyEvent):
+                //    OnKeyEvent((System.Windows.Input.KeyEventArgs)acParameter[0]);
+                //    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
