@@ -12,7 +12,7 @@ namespace gip.mes.cmdlet.ControlScript
     /// call same import procedure for .zip file as in CTRL load
     /// </summary>
     [Cmdlet(VerbsCommon.Set, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
-    public class ControlSyncScriptSetCmdlet : Cmdlet, IMsgObserver
+    public class ControlSyncScriptSetCmdlet : Cmdlet
     {
         #region Config
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
@@ -31,7 +31,6 @@ namespace gip.mes.cmdlet.ControlScript
             controlSync.OnMessage += controlSync_OnMessage;
             bool importSuccess = false;
             IResources rootResources = new Resources();
-            rootResources.MsgObserver = this;
             using (ACMonitor.Lock(ACRoot.SRoot.Database.QueryLock_1X000))
             {
                 importSuccess = controlSync.Sync(ACRoot.SRoot, Database.GlobalDatabase, iPlusCmdLetSettings.DLLBinFolder, connectionString);

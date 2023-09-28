@@ -2,6 +2,7 @@
 using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.media;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
@@ -136,6 +137,22 @@ namespace gip.mes.maintenance
         }
 
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
+
+        public override List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem basedOnFilter = new ACFilterItem(Global.FilterTypes.filter, nameof(MaintOrder.MaintOrder1_BasedOnMaintOrder), Global.LogicalOperators.equal, Global.Operators.and, null, true);
+                aCFilterItems.Add(basedOnFilter);
+
+                ACFilterItem maintOrderNoFilter = new ACFilterItem(FilterTypes.filter, nameof(MaintOrder.MaintOrderNo), LogicalOperators.contains, Operators.and, null, true, true);
+                aCFilterItems.Add(maintOrderNoFilter);
+
+                return aCFilterItems;
+            }
+        }
 
         #endregion
 
@@ -520,9 +537,27 @@ namespace gip.mes.maintenance
 
         #endregion
 
+        ACChildItem<BSOMedia> _BSOMedia_Child;
+        [ACPropertyInfo(9999)]
+        [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
+        public ACChildItem<BSOMedia> BSOMedia_Child
+        {
+            get
+            {
+                if (_BSOMedia_Child == null)
+                    _BSOMedia_Child = new ACChildItem<BSOMedia>(this, "BSOMedia_Child");
+                return _BSOMedia_Child;
+            }
+        }
+
         #endregion
 
         #region Methods
+
+        protected override IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
+        {
+            return result.Where(c => c.BasedOnMaintOrderID.HasValue);
+        }
 
         /// <summary>
         /// News this instance.
@@ -952,6 +987,18 @@ namespace gip.mes.maintenance
                 var templ = maintACClass.MaintOrder_MaintACClass.Where(c => c.BasedOnMaintOrderID == null);
                 templates.AddRange(templ);
             }
+        }
+
+        [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999, true)]
+        public void OpenTaskDocumentation()
+        {
+            BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+            ShowDialog(BSOMedia_Child.Value, "MediaDialog");
+        }
+
+        public bool IsEnabledOpenDocumentation()
+        {
+            return SelectedMaintOrderTask != null;
         }
 
         #region Methods => MaintService

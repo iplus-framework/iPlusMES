@@ -15,7 +15,7 @@ using System.Threading;
 namespace gip.bso.test
 {
     [ACClassInfo(Const.PackName_VarioDevelopment, "en{'BSOTest'}de{'BSOTest'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
-    public partial class BSOTest : ACBSOvb, IMsgObserver
+    public partial class BSOTest : ACBSOvb
     {
         #region constants
         public const string BGWorkerMehtod_DoTestWork = @"BGWorkerMehtod_DoTestWork";
@@ -489,12 +489,7 @@ namespace gip.bso.test
             controlSync.OnMessage += controlSync_OnMessage;
             bool importSuccess = false;
             IResources rootResources = new Resources();
-            rootResources.MsgObserver = this;
             importSuccess = controlSync.Sync(ACRoot.SRoot, Database);
-            //using (ACMonitor.Lock(_Database.QueryLock_1X000))
-            //{
-
-            //}
         }
 
         void controlSync_OnMessage(SyncMessage msg)

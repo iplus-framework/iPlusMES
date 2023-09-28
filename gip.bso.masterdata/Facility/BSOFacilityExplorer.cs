@@ -9,7 +9,7 @@ namespace gip.bso.masterdata
 {
     public delegate void RemindSelectedFacility(Facility facility);
 
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerplatz'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
     public class BSOFacilityExplorer : ACBSOvb
     {
         #region c´tors

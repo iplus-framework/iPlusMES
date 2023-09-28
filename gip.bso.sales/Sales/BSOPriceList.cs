@@ -349,15 +349,11 @@ namespace gip.bso.sales.Sales
 
         #region Messages
 
-        #region Messages -> IMsgObserver
-
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
             OnPropertyChanged("MsgList");
         }
-
-        #endregion
 
         #region Messages -> Properties
 

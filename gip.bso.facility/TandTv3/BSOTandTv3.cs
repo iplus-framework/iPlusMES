@@ -1,6 +1,5 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -11,9 +10,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 using TandTv3 = gip.mes.facility.TandTv3;
 
@@ -27,7 +23,7 @@ namespace gip.bso.facility
             new object[] { "TrackingFilter", Global.ParamOption.Optional, typeof(TandTv3FilterTracking) }
        }
    )]
-    public class BSOTandTv3 : ACBSOvbNav, IMsgObserver, IFactoryTandTPointPresenterComponent
+    public class BSOTandTv3 : ACBSOvbNav, IFactoryTandTPointPresenterComponent
     {
         #region constants
         public const string BGWorkerMehtod_DoSearch = @"DoSearch";
@@ -543,15 +539,11 @@ namespace gip.bso.facility
 
         #region Messages
 
-        #region Messages -> IMsgObserver
-
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
             OnPropertyChanged("MsgList");
         }
-
-        #endregion
 
         #region Messages -> Properties
 

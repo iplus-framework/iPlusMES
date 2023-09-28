@@ -18,7 +18,14 @@ namespace gip.mes.maintenance
         {
         }
 
-        private ACQueryDefinition _ACQueryDefinition;
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
+
+            return base.ACDeInit(deleteACClassTask);
+        }
+
+        protected ACQueryDefinition _ACQueryDefinition;
 
         private ACAccessNav<MaintOrder> _AccessPrimary;
         [ACPropertyAccessPrimary(999, "MaintOrder")]
@@ -34,9 +41,15 @@ namespace gip.mes.maintenance
                     navACQueryDefinition.ACSortColumns.Add(new ACSortItem(nameof(MaintOrder.MaintOrderNo), Global.SortDirections.descending, true));
                     navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<MaintOrder>("MaintOrder", this);
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
+        }
+
+        protected virtual IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
+        {
+            return result;   
         }
 
         /// <summary>
@@ -107,23 +120,12 @@ namespace gip.mes.maintenance
             }
         }
 
-        public List<ACFilterItem> NavigationqueryDefaultFilter
+        public virtual List<ACFilterItem> NavigationqueryDefaultFilter
         {
-            get
-            {
-                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
-
-                ACFilterItem basedOnFilter = new ACFilterItem(Global.FilterTypes.filter, nameof(MaintOrder.MaintOrder1_BasedOnMaintOrder), Global.LogicalOperators.equal, Global.Operators.and, null, true);
-                aCFilterItems.Add(basedOnFilter);
-
-                ACFilterItem maintOrderNoFilter = new ACFilterItem(FilterTypes.filter, nameof(MaintOrder.MaintOrderNo), LogicalOperators.contains, Operators.and, null, true, true);
-                aCFilterItems.Add(maintOrderNoFilter);
-
-                return aCFilterItems;
-            }
+            get;
         }
 
-        public int NavigationQueryTakeCount
+        public virtual int NavigationQueryTakeCount
         {
             get
             {
@@ -163,7 +165,7 @@ namespace gip.mes.maintenance
 
         private MaintOrderTask _SelectedMaintOrderTask;
         [ACPropertySelected(9999, "OrderTasks")]
-        public MaintOrderTask SelectedMaintOrderTask
+        public virtual MaintOrderTask SelectedMaintOrderTask
         {
             get => _SelectedMaintOrderTask;
             set
@@ -174,8 +176,6 @@ namespace gip.mes.maintenance
         }
 
         private List<MaintOrderTask> _MaintOrderTaskList;
-
-        public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         [ACPropertyList(9999, "OrderTasks")]
         public List<MaintOrderTask> MaintOrderTaskList
@@ -188,8 +188,7 @@ namespace gip.mes.maintenance
             }
         }
 
-
-
+        public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         #region Methods
 
