@@ -263,6 +263,8 @@
         public const string OrderNo = "en{'Order No.'}de{'Order Nr.'}";
         public const string ProdOrderProgramNo = "en{'Order Number'}de{'Auftragsnummer'}";
         public const string ProdOrderPartslist = "en{'Prod. Order BOM'}de{'Prod.auftrag Stückliste'}";
+        public const string ProductionStart = "en{'Production Start'}de{'Produktionsstart'}";
+        public const string ProductionEnd = "en{'Production End'}de{'Produktionsende'}";
         public const string DepartmentUserName = "en{'Ended by User'}de{'Beendet von Bediener'}";
 
         // Batches
