@@ -228,11 +228,11 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if(_DepartmentUserNames == null)
+                if (_DepartmentUserNames == null)
                 {
                     _DepartmentUserNames = "";
                     List<string> departmentUserNames = new List<string>();
-                    if (ProdOrderPartslist_ProdOrder.Where(c=> !string.IsNullOrEmpty(c.DepartmentUserName)).Any())
+                    if (ProdOrderPartslist_ProdOrder.Where(c => !string.IsNullOrEmpty(c.DepartmentUserName)).Any())
                     {
                         foreach (var item in ProdOrderPartslist_ProdOrder.Where(c => !string.IsNullOrEmpty(c.DepartmentUserName)).OrderBy(c => c.Sequence))
                         {
@@ -242,6 +242,45 @@ namespace gip.mes.datamodel
                     }
                 }
                 return _DepartmentUserNames;
+            }
+        }
+
+        private List<DateTime> _ProductionStartTimes;
+        [ACPropertyInfo(506, nameof(ProductionStartTimes), ConstApp.ProductionStart)]
+        public List<DateTime> ProductionStartTimes
+        {
+            get
+            {
+                if (_ProductionStartTimes == null)
+                {
+                    _ProductionStartTimes =
+                        this
+                        .ProdOrderPartslist_ProdOrder
+                        .Select(c => c.StartDate)
+                        .Where(c => c != null)
+                        .Select(c => c.Value.Date)
+                        .Distinct()
+                        .ToList();
+                }
+                return _ProductionStartTimes;
+            }
+        }
+
+        private string _ProductionStartTimesStr;
+        [ACPropertyInfo(507, nameof(ProductionStartTimesStr), ConstApp.ProductionStart)]
+        public string ProductionStartTimesStr
+        {
+            get
+            {
+                if (_ProductionStartTimesStr == null)
+                {
+                    _ProductionStartTimesStr = "";
+                    if (ProductionStartTimes != null && ProductionStartTimes.Any())
+                    {
+                        _ProductionStartTimesStr = string.Join(",", ProductionStartTimes.Select(c => c.ToString("dd.MM.yyyy")));
+                    }
+                }
+                return _ProductionStartTimesStr;
             }
         }
 

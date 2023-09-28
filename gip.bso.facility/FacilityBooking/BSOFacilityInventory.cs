@@ -2516,15 +2516,12 @@ namespace gip.bso.facility
 
         #region Messages
 
-        #region Messages -> IMsgObserver
-
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
             OnPropertyChanged(nameof(MsgList));
         }
 
-        #endregion
 
         #region Messages -> Properties
 

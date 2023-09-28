@@ -66,8 +66,7 @@ namespace gip.mes.maintenance
 
         #region BSO -> ACProperty
 
-        private bool _IsDocumentationOpen = false;
-
+        private bool _IsImageTabOpen = false;
 
         #region Config
         private ACPropertyConfigValue<string> _CN_BSOProcessControl;
@@ -128,13 +127,18 @@ namespace gip.mes.maintenance
 
         public override IAccessNav AccessNav => AccessPrimary;
 
-        public override MaintOrder SelectedMaintOrder 
-        {
-            get => base.SelectedMaintOrder;
+        public override MaintOrder CurrentMaintOrder 
+        { 
+            get => base.CurrentMaintOrder;
             set
             {
-                base.SelectedMaintOrder = value;
-                MaintOrderTaskListDocu = value.MaintOrderTask_MaintOrder.ToList();
+                base.CurrentMaintOrder = value;
+                if (value != null)
+                {
+                    MaintOrderTaskListDocu = value.MaintOrder1_BasedOnMaintOrder?.MaintOrderTask_MaintOrder.ToList();
+                    if (_IsImageTabOpen)
+                        BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+                }
             }
         }
 
@@ -446,7 +450,7 @@ namespace gip.mes.maintenance
         [ACMethodCommand("MaintOrder", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if (!PreExecute("Delete"))
+            if (!PreExecute(nameof(Delete)))
                 return;
 
             if (AccessPrimary == null)
@@ -492,7 +496,7 @@ namespace gip.mes.maintenance
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMaintOrder);
             SelectedMaintOrder = AccessPrimary.NavList.FirstOrDefault();
 
-            PostExecute("Delete");
+            PostExecute(nameof(Delete));
         }
 
         public bool IsEnabledDelete()
@@ -704,12 +708,19 @@ namespace gip.mes.maintenance
         [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999)]
         public void OpenDocumentation()
         {
-            
+            if (MaintOrderTaskListDocu != null)
+            {
+                if (MaintOrderTaskListDocu.Count > 1)
+                    SelectedMaintOrderTaskDocu = MaintOrderTaskListDocu.FirstOrDefault(c => c.TaskName == SelectedMaintOrderTask.TaskName);
+                else
+                    SelectedMaintOrderTaskDocu = MaintOrderTaskListDocu.FirstOrDefault();
 
-
-
-            BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
-            ShowDialog(this, "MaintOrderTaskDocumentation");
+                if (SelectedMaintOrderTaskDocu != null)
+                {
+                    BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTaskDocu);
+                    ShowDialog(this, "MaintOrderTaskDocumentation");
+                }
+            }
         }
 
         /// <summary>Called inside the GetControlModes-Method to get the Global.ControlModes from derivations.
@@ -774,6 +785,27 @@ namespace gip.mes.maintenance
                 }
             }
             return cm;
+        }
+
+        /// <summary>
+        /// ACAction is called when one IACInteractiveObject (Source) wants to inform another IACInteractiveObject (Target) about an relevant interaction-event.
+        /// </summary>
+        /// <param name="actionArgs">Information about the type of interaction and the source</param>
+        public override void ACAction(ACActionArgs actionArgs)
+        {
+            if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
+            {
+                if (actionArgs.DropObject.VBContent == "*MaintOrderImages")
+                {
+                    BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+                    _IsImageTabOpen = true;
+                }
+                else
+                {
+                    _IsImageTabOpen = false;
+                }
+            }
+            base.ACAction(actionArgs);
         }
 
         #region Navigation

@@ -2046,6 +2046,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="TaskName" Type="varchar" MaxLength="50" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Material">
           <Key>
@@ -19658,7 +19659,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="TandTv3MixPointRelation" EntitySet="TandTv3MixPointRelation" />
           </AssociationSet>
           <EntitySet Name="MaintOrder" EntityType="iPlusMESV4_Model.MaintOrder" />
-          <EntitySet Name="MaintOrderTask" EntityType="iPlusMESV4_Model.MaintOrderTask" />
           <AssociationSet Name="FK_MaintOrder_PAACClassID" Association="iPlusMESV4_Model.FK_MaintOrder_PAACClassID">
             <End Role="ACClass" EntitySet="ACClass" />
             <End Role="MaintOrder" EntitySet="MaintOrder" />
@@ -19695,6 +19695,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="MaintOrder" EntitySet="MaintOrder" />
             <End Role="MaintOrderProperty" EntitySet="MaintOrderProperty" />
           </AssociationSet>
+          <EntitySet Name="MaintOrderTask" EntityType="iPlusMESV4_Model.MaintOrderTask" />
           <AssociationSet Name="FK_MaintOrderTask_MaintOrderID" Association="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID">
             <End Role="MaintOrder" EntitySet="MaintOrder" />
             <End Role="MaintOrderTask" EntitySet="MaintOrderTask" />
@@ -34383,27 +34384,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MaintOrderProperty_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderProperty" />
           <NavigationProperty Name="MaintOrderTask_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderTask" />
         </EntityType>
-        <EntityType Name="MaintOrderTask">
-          <Key>
-            <PropertyRef Name="MaintOrderTaskID" />
-          </Key>
-          <Property Name="MaintOrderTaskID" Type="Guid" Nullable="false" />
-          <Property Name="MaintOrderID" Type="Guid" Nullable="false" />
-          <Property Name="MDMaintTaskStateID" Type="Guid" Nullable="false" />
-          <Property Name="TaskDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="PlannedStartDate" Type="DateTime" Precision="3" />
-          <Property Name="PlannedDuration" Type="Int32" />
-          <Property Name="StartDate" Type="DateTime" Precision="3" />
-          <Property Name="EndDate" Type="DateTime" Precision="3" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="TaskName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrderTask" ToRole="MaintOrder" />
-          <NavigationProperty Name="MDMaintTaskState" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" FromRole="MaintOrderTask" ToRole="MDMaintTaskState" />
-        </EntityType>
         <Association Name="FK_MaintOrder_PAACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
@@ -34512,6 +34492,28 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="MaintOrderTask">
+          <Key>
+            <PropertyRef Name="MaintOrderTaskID" />
+          </Key>
+          <Property Name="MaintOrderTaskID" Type="Guid" Nullable="false" />
+          <Property Name="MaintOrderID" Type="Guid" Nullable="false" />
+          <Property Name="MDMaintTaskStateID" Type="Guid" Nullable="false" />
+          <Property Name="TaskDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="PlannedStartDate" Type="DateTime" Precision="3" />
+          <Property Name="PlannedDuration" Type="Int32" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TaskName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrderTask" ToRole="MaintOrder" />
+          <NavigationProperty Name="MDMaintTaskState" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" FromRole="MaintOrderTask" ToRole="MDMaintTaskState" />
+        </EntityType>
         <Association Name="FK_MaintOrderTask_MaintOrderID">
           <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.MaintOrderTask" Role="MaintOrderTask" Multiplicity="*" />
@@ -39781,6 +39783,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="MaintOrderTask">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.MaintOrderTask">
               <MappingFragment StoreEntitySet="MaintOrderTask">
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
                 <ScalarProperty Name="TaskName" ColumnName="TaskName" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
@@ -40738,7 +40741,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointRelation_SourceTandTv3MixPointID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointRelation_TargetTandTv3MixPointID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrder" Width="1.5" PointX="84.25" PointY="303.75" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderTask" Width="1.5" PointX="86.5" PointY="300.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_PAACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_MaintACClassID" />
@@ -40748,6 +40750,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderAssignment_MaintOrder" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.MaintOrderTask" Width="1.5" PointX="86.5" PointY="300.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrderTask_MDMaintTaskStateID" />
       </Diagram>
