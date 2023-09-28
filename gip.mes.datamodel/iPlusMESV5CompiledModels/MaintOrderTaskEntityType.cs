@@ -100,6 +100,13 @@ namespace gip.mes.datamodel
             plannedStartDate.AddAnnotation("Relational:ColumnType", "datetime");
             plannedStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var sequence = runtimeEntityType.AddProperty(
+                "Sequence",
+                typeof(int),
+                propertyInfo: typeof(MaintOrderTask).GetProperty("Sequence", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaintOrderTask).GetField("_Sequence", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            sequence.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var startDate = runtimeEntityType.AddProperty(
                 "StartDate",
                 typeof(DateTime?),
