@@ -397,14 +397,14 @@ namespace gip2006.variobatch.processapplication
 
                 iOffset = 0;
 
-                var acValue = response.ResultValueList.GetACValue("ActDuration");
+                var acValue = response?.ResultValueList?.GetACValue("ActDuration");
                 if (acValue != null)
                     acValue.Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                acValue = response.ResultValueList.GetACValue("ActTemperature");
+                acValue = response?.ResultValueList?.GetACValue("ActTemperature");
                 if (acValue != null)
-                    response.ResultValueList.GetACValue("ActTemperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);

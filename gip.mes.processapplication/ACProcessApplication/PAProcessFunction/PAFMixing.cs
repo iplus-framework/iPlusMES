@@ -69,6 +69,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
             method.ParameterValueList.Add(new ACValue("DurationPause2", typeof(TimeSpan), 0, Global.ParamOption.Optional));
             paramTranslation.Add("DurationPause2", "en{'Duration Pause 2'}de{'Dauer Pause 2'}");
+            method.ParameterValueList.Add(new ACValue("Temperature", typeof(Double), 0.0, Global.ParamOption.Required));
+            paramTranslation.Add("Temperature", "en{'Temperature'}de{'Temperatur'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, null);
         }
