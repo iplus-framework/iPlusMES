@@ -1117,7 +1117,7 @@ namespace gip.mes.processapplication
 
             if (material != null)
             {
-                WaitingTime.ValueT = GetMaterialWaitingTime(material, parentFacility);
+                WaitingTime.ValueT = GetMaterialWaitingTime(material, facilitySilo, parentFacility);
             }
             else
                 WaitingTime.ValueT = TimeSpan.Zero;
@@ -1237,7 +1237,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual TimeSpan GetMaterialWaitingTime(Material material, Facility facility)
+        public virtual TimeSpan GetMaterialWaitingTime(Material material, Facility silo, Facility parentStore)
         {
             return TimeSpan.Zero;
         }
