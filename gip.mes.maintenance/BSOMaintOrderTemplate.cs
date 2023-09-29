@@ -49,6 +49,11 @@ namespace gip.mes.maintenance
                 _CurrentACComponent = null;
             }
 
+            if (BSOFacilityExplorer_Child != null && BSOFacilityExplorer_Child.Value != null)
+            {
+                BSOFacilityExplorer_Child.Value.PropertyChanged -= FacilityExplorer_PropertyChanged;
+            }
+
             DetachMaintServices();
 
             return base.ACDeInit(deleteACClassTask);
@@ -64,8 +69,16 @@ namespace gip.mes.maintenance
                     CurrentACComponent = (this.SelectionManager as VBBSOSelectionManager).ShowACObjectForSelection;
                 }
             }
+
+            if (BSOFacilityExplorer_Child != null && BSOFacilityExplorer_Child.Value != null)
+            {
+                BSOFacilityExplorer_Child.Value.PropertyChanged += FacilityExplorer_PropertyChanged;
+            }
+
             return base.ACPostInit();
         }
+
+
 
         public const string Const_FacilityExplorer = "BSOFacilityExplorer_Child";
         public const string Const_ComponentSelector = "BSOComponentSelector_Child";
@@ -97,8 +110,6 @@ namespace gip.mes.maintenance
                 return _BSOFacilityExplorer_Child;
             }
         }
-
-
 
         #endregion
 
@@ -548,6 +559,17 @@ namespace gip.mes.maintenance
                 if (_BSOMedia_Child == null)
                     _BSOMedia_Child = new ACChildItem<BSOMedia>(this, "BSOMedia_Child");
                 return _BSOMedia_Child;
+            }
+        }
+
+        private ACBSO _ComponentSelector;
+        public ACBSO ComponentSelector
+        {
+            get
+            {
+                if (_ComponentSelector == null)
+                    _ComponentSelector = GetChildComponent("BSOComponentSelectorMaint") as ACBSO;
+                return _ComponentSelector;
             }
         }
 
@@ -1032,6 +1054,124 @@ namespace gip.mes.maintenance
         }
 
         #endregion
+
+        /// <summary>
+        /// Checks the configured maintenance rules and marks the ACClass with appropriate icon.
+        /// </summary>
+        /// <param name="items">The items for check.</param>
+        /// <param name="recursive">The recursive parameter, define is method check icons recursive or only for top level.</param>
+        /// <summary xml:lang="de">
+        /// 
+        /// </summary>
+        /// <param xml:lang="de" name="items"></param>
+        /// <param xml:lang="de" name="recursive"></param>
+        [ACMethodInfo("", "", 999, true)]
+        public void CheckIcons(ACClassInfoWithItems items, bool recursive = true)
+        {
+            //if (MaintRules.Any())
+            //{
+            //    CheckConfigRuleMarks(items, MaintRules, recursive);
+            //}
+            //else
+            //{
+            //    ClearConfigRuleMarks(items);
+            //}
+        }
+
+        private Global.ConfigIconState CheckConfigRuleMarks(ACClassInfoWithItems items, IEnumerable<MaintACClass> maintconfigs, bool recursive = true)
+        {
+            Global.ConfigIconState iconState = Global.ConfigIconState.NoConfig;
+            //items.IconState = iconState;
+            //IEnumerable<vd.MaintACClass> maintConfigsFilter = null;
+
+            //if (ActivatedRules && !DeactivatedRules)
+            //    maintConfigsFilter = maintconfigs.Where(c => c.IsActive);
+
+            //else if (!ActivatedRules && DeactivatedRules)
+            //    maintConfigsFilter = maintconfigs.Where(c => !c.IsActive);
+
+            //else if (!ActivatedRules && !DeactivatedRules)
+            //{
+            //    ClearConfigRuleMarks(items);
+            //    return Global.ConfigIconState.NoConfig;
+            //}
+
+            //else
+            //    maintConfigsFilter = maintconfigs;
+
+
+            //if (RuleOnComponent && maintConfigsFilter.Any(c => c.VBiACClassID == items.ValueT.ACClassID))
+            //{
+            //    iconState = Global.ConfigIconState.Config;
+            //    items.IconState = iconState;
+            //}
+
+            //else if (InheritedRule && !maintconfigs.Any(c => c.VBiACClassID == items.ValueT.ACClassID && (c.IsActive == ActivatedRules || !c.IsActive == DeactivatedRules)))
+            //{
+            //    foreach (var config in maintConfigsFilter)
+            //    {
+            //        if (items.ValueT.IsDerivedClassFrom(config.ACClass))
+            //        {
+            //            iconState = Global.ConfigIconState.InheritedConfig;
+            //            items.IconState = iconState;
+            //            continue;
+            //        }
+            //    }
+            //}
+
+            //if (recursive)
+            //{
+            //    foreach (ACClassInfoWithItems info in items.Items)
+            //    {
+            //        iconState = CheckConfigRuleMarks(info, maintconfigs);
+            //        if (items.IconState == null || (Global.ConfigIconState)items.IconState == Global.ConfigIconState.NoConfig)
+            //            items.IconState = iconState;
+            //        else if (items.IconState != null && items.IconState is Global.ConfigIconState)
+            //            iconState = (Global.ConfigIconState)items.IconState;
+            //    }
+            //}
+            return iconState;
+        }
+
+        private void ClearConfigRuleMarks(ACClassInfoWithItems items)
+        {
+            items.IconState = Global.ConfigIconState.NoConfig;
+            foreach (ACClassInfoWithItems item in items.Items)
+            {
+                item.IconState = Global.ConfigIconState.NoConfig;
+                ClearConfigRuleMarks(item);
+            }
+        }
+
+        private void RefreshOnSave(bool forceRefresh = false)
+        {
+            //if (_IsRefreshNeeded || forceRefresh)
+            //{
+            //    if (ComponentSelector != null)
+            //    {
+            //        ACClassInfoWithItems root = ComponentSelector.ACUrlCommand("CurrentProjectItemRoot") as ACClassInfoWithItems;
+            //        if (root != null)
+            //        {
+            //            CheckIcons(root);
+            //        }
+            //    }
+            //    _IsRefreshNeeded = false;
+            //}
+        }
+
+        private void FacilityExplorer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BSOFacilityExplorer.SelectedFacility))
+            {
+                //if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
+                //    || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
+                //{
+                //    _ACQueryDefinition.ClearFilter(true);
+                //    _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
+                //        Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
+                //}
+            }
+        }
 
         #endregion
     }
