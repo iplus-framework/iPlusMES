@@ -16,7 +16,6 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Interop;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing

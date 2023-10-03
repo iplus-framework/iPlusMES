@@ -1,6 +1,5 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.layoutengine;
 using gip.core.manager;
 using gip.mes.autocomponent;
 using System;
@@ -10,14 +9,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using gip.mes.datamodel;
 using System.Threading;
 using gip.mes.processapplication;
-using System.Windows.Threading;
 using Microsoft.EntityFrameworkCore;
 using gip.bso.iplus;
+using System.Timers;
 
 namespace gip.bso.manufacturing
 {
@@ -49,9 +47,9 @@ namespace gip.bso.manufacturing
                 _ApplicationQueue.StartWorkerThread();
             }
 
-            _timer = new DispatcherTimer();
-            _timer.Interval = new TimeSpan(0, 0, 1);
-            _timer.Tick += new EventHandler(_timer_Tick);
+            _timer = new System.Timers.Timer();
+            _timer.Interval = 1000;
+            _timer.Elapsed += new System.Timers.ElapsedEventHandler(_timer_Tick);
             _timer.Start();
 
             return result;
@@ -138,7 +136,7 @@ namespace gip.bso.manufacturing
 
             if (_timer != null)
             {
-                _timer.Tick -= _timer_Tick;
+                _timer.Elapsed -= _timer_Tick;
                 _timer.Stop();
                 _timer = null;
             }
@@ -751,7 +749,7 @@ namespace gip.bso.manufacturing
         #endregion
 
 
-        private DispatcherTimer _timer;
+        private System.Timers.Timer _timer;
         /// <summary>
         /// Source Property: 
         /// </summary>

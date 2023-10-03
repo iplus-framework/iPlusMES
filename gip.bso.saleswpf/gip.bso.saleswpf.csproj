@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandlerwpf\gip.core.reporthandlerwpf.csproj" />
+    <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj" />
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
+  </ItemGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
+		<DocumentationFile>
+		</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
+		<DocumentationFile>$(SolutionDir)bin\Release\gip.bso.saleswpf.XML</DocumentationFile>
+		<NoWarn>1591</NoWarn>
+	</PropertyGroup>
+
+</Project>

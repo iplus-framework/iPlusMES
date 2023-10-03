@@ -6,7 +6,6 @@ using System.Linq;
 using System.Collections.Generic;
 using gip.mes.datamodel;
 using gip.mes.autocomponent;
-using gip.core.layoutengine;
 using gip.core.autocomponent;
 using gip.core.media;
 

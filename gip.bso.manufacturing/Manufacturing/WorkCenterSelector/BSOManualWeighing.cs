@@ -13,7 +13,6 @@ using System.Data;
 using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
-using gip.core.layoutengine;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 

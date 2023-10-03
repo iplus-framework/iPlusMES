@@ -23,7 +23,6 @@ using gip.mes.facility;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using static gip.bso.iplus.BSOProcessControl;
-using gip.core.layoutengine;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing

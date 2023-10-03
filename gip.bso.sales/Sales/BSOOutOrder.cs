@@ -1,6 +1,5 @@
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.reporthandlerwpf.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -8,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents;
-using System.Windows.Media;
 
 namespace gip.bso.sales
 {
@@ -2096,9 +2093,22 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Properties => Report
+
+        private ACComponent _BSOOutOrderReportHandler;
+        public ACComponent BSOOutOrderReportHandler
+        {
+            get
+            {
+                return _BSOOutOrderReportHandler;
+            }
+        }
+
+        #endregion
+
         #region Methods => Report
 
-        private void BuildOutOrderPosData(string langCode)
+        public void BuildOutOrderPosData(string langCode)
         {
             if (CurrentOutOrder == null)
                 return;
@@ -2142,75 +2152,13 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            if (printingPhase == ACPrintingPhase.Started)
-            {
-                ReportDocument doc = reportEngine as ReportDocument;
-                if (
-                    doc != null
-                    && doc.ReportData != null
-                    && doc.ReportData.Any(c => c.ACClassDesign != null
-                                               && (c.ACClassDesign.ACIdentifier.EndsWith("De")) || c.ACClassDesign.ACIdentifier.EndsWith("En") || c.ACClassDesign.ACIdentifier.EndsWith("Hr")))
-                {
-                    doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
-                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
-                    string langCode = "de";
-                    if (design != null)
-                    {
-                        if (design.ACIdentifier.EndsWith("Hr"))
-                            langCode = "hr";
-                        if (design.ACIdentifier.EndsWith("En"))
-                            langCode = "en";
-                    }
-                    BuildOutOrderPosData(langCode);
-                }
-            }
-            else
-            {
-                ReportDocument doc = reportEngine as ReportDocument;
-                if (doc != null)
-                {
-                    doc.SetFlowDocObjValue -= Doc_SetFlowDocObjValue;
-                }
-            }
+            ACComponent childBSO = ACUrlCommand("BSOOutOrderReportHandler_Child") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("BSOOutOrderReportHandler_Child", null, new object[] { }) as ACComponent;
+            _BSOOutOrderReportHandler = childBSO;
 
-            base.OnPrintingPhase(reportEngine, printingPhase);
-        }
-
-        private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
-        {
-            OutOrderPos pos = e.ParentDataRow as OutOrderPos;
-            if (pos != null && pos.GroupSum && pos.OutOrderPosID == new Guid())
-            {
-                var inlineCell = e.FlowDocObj as InlineTableCellValue;
-                if (inlineCell != null)
-                {
-                    var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
-                    if (tableCell != null)
-                    {
-                        if (inlineCell.VBContent == "MaterialNo")
-                        {
-                            TableRow tableRow = tableCell.Parent as TableRow;
-                            if (tableRow != null && tableRow.Cells.Count > 6)
-                            {
-                                tableRow.Cells.RemoveAt(2);
-                                tableRow.Cells.RemoveAt(2);
-                                tableRow.Cells.RemoveAt(2);
-                                tableRow.Cells.RemoveAt(2);
-                            }
-                            tableCell.ColumnSpan = 2;
-                        }
-
-                        else if (inlineCell.VBContent == "TotalPricePrinted")
-                        {
-                            tableCell.ColumnSpan = 4;
-                            tableCell.BorderBrush = Brushes.Black;
-                            tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
-                            tableCell.TextAlignment = System.Windows.TextAlignment.Right;
-                        }
-                        tableCell.FontWeight = System.Windows.FontWeights.Bold;
-                    }
-                }
-            }
+            if (BSOOutOrderReportHandler != null)
+                BSOOutOrderReportHandler.OnPrintingPhase(reportEngine, printingPhase);
         }
 
         #endregion

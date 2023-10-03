@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.layoutengine;
 using gip.core.manager;
 using gip.mes.autocomponent;
 using System;

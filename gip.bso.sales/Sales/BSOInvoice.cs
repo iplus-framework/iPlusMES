@@ -1,7 +1,5 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.reporthandlerwpf;
-using gip.core.reporthandlerwpf.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -9,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents;
-using System.Windows.Media;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.sales
@@ -1790,6 +1786,19 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Properties => Report
+
+        private ACComponent _BSOInvoiceReportHandler;
+        public ACComponent BSOInvoiceReportHandler
+        {
+            get
+            {
+                return _BSOInvoiceReportHandler;
+            }
+        }
+
+        #endregion
+
         #region Methods => Report
 
         [ACPropertyInfo(650)]
@@ -1806,7 +1815,7 @@ namespace gip.bso.sales
             set;
         }
 
-        private void BuildInvoicePosData(string langCode)
+        public void BuildInvoicePosData(string langCode)
         {
             if (CurrentInvoice == null)
                 return;
@@ -1851,114 +1860,13 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            if (printingPhase == ACPrintingPhase.Started)
-            {
-                ReportDocument doc = reportEngine as ReportDocument;
-                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null
-                                                                                 && (c.ACClassDesign.ACIdentifier.EndsWith("De")) || c.ACClassDesign.ACIdentifier.EndsWith("En") || c.ACClassDesign.ACIdentifier.EndsWith("Hr")))
-                {
-                    doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
-                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
-                    string langCode = "de";
-                    if (design != null)
-                    {
-                        if (design.ACIdentifier.EndsWith("Hr"))
-                            langCode = "hr";
-                        if (design.ACIdentifier.EndsWith("En"))
-                            langCode = "en";
-                    }
-                    BuildInvoicePosData(langCode);
-                }
-            }
-            else
-            {
-                ReportDocument doc = reportEngine as ReportDocument;
-                if (doc != null)
-                {
-                    doc.SetFlowDocObjValue -= Doc_SetFlowDocObjValue;
-                }
-            }
+            ACComponent childBSO = ACUrlCommand("BSOInvoiceReportHandler_Child") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("BSOInvoiceReportHandler_Child", null, new object[] { }) as ACComponent;
+            _BSOInvoiceReportHandler = childBSO;
 
-            base.OnPrintingPhase(reportEngine, printingPhase);
-        }
-
-        private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
-        {
-            InvoicePos pos = e.ParentDataRow as InvoicePos;
-            if (e.FlowDocObj != null
-                && (e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge"
-                || e.FlowDocObj.VBContent == "CurrentInvoice\\NotIsReverseCharge"))
-            {
-                if (CurrentInvoice != null
-                    && ((!CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge")
-                        || (CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\NotIsReverseCharge")))
-                {
-                    var inlineCell = e.FlowDocObj as InlineContextValue;
-                    if (inlineCell != null)
-                    {
-                        var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
-                        if (tableCell != null)
-                        {
-                            TableRow tableRow = tableCell.Parent as TableRow;
-                            if (tableRow != null)
-                                tableRow.Cells.Remove(tableCell);
-                        }
-                    }
-                }
-            }
-            if (e.FlowDocObj != null 
-                && e.FlowDocObj.VBContent != null 
-                && (   e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\MDCurrencyExchange\\")
-                    || e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\Foreign"))
-                )
-            {
-                if (CurrentInvoice != null && CurrentInvoice.MDCurrencyExchange == null)
-                {
-                    var inlineCell = e.FlowDocObj as InlineContextValue;
-                    if (inlineCell != null)
-                    {
-                        var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
-                        if (tableCell != null)
-                        {
-                            TableRow tableRow = tableCell.Parent as TableRow;
-                            if (tableRow != null)
-                                tableRow.Cells.Remove(tableCell);
-                        }
-                    }
-                }
-            }
-            //if (pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
-            //{
-            //    var inlineCell = e.FlowDocObj as InlineTableCellValue;
-            //    if (inlineCell != null)
-            //    {
-            //        var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
-            //        if (tableCell != null)
-            //        {
-            //            if (inlineCell.VBContent == "MaterialNo")
-            //            {
-            //                TableRow tableRow = tableCell.Parent as TableRow;
-            //                if (tableRow != null && tableRow.Cells.Count > 6)
-            //                {
-            //                    tableRow.Cells.RemoveAt(2);
-            //                    tableRow.Cells.RemoveAt(2);
-            //                    tableRow.Cells.RemoveAt(2);
-            //                    tableRow.Cells.RemoveAt(2);
-            //                }
-            //                tableCell.ColumnSpan = 2;
-            //            }
-
-            //            else if (inlineCell.VBContent == "TotalPricePrinted")
-            //            {
-            //                tableCell.ColumnSpan = 4;
-            //                tableCell.BorderBrush = Brushes.Black;
-            //                tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
-            //                tableCell.TextAlignment = System.Windows.TextAlignment.Right;
-            //            }
-            //            tableCell.FontWeight = System.Windows.FontWeights.Bold;
-            //        }
-            //    }
-            //}
+            if (BSOInvoiceReportHandler != null)
+                BSOInvoiceReportHandler.OnPrintingPhase(reportEngine, printingPhase);
         }
 
         #endregion

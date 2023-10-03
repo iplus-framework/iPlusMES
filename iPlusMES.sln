@@ -156,6 +156,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.wpfservices", "gip.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.core.media", "..\iPlus\gip.core.media\gip.core.media.csproj", "{F9620201-705D-432C-8941-353E9BFFE5E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.saleswpf", "gip.bso.saleswpf\gip.bso.saleswpf.csproj", "{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -517,6 +519,12 @@ Global
 		{F9620201-705D-432C-8941-353E9BFFE5E0}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
 		{F9620201-705D-432C-8941-353E9BFFE5E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9620201-705D-432C-8941-353E9BFFE5E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -594,6 +602,7 @@ Global
 		{61584164-8F67-4175-B42F-E9142C835F6E} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
 		{3DA23C05-F95E-403C-8585-304B182BF005} = {3C7E5EA9-3F24-4077-BD6D-28C8B8B805E3}
 		{F9620201-705D-432C-8941-353E9BFFE5E0} = {067BD0FA-9526-4698-A6B7-EEC70587830B}
+		{BE145DA2-1E9C-44C8-A20C-3E6D4EC4EEF0} = {213CEB9A-795B-48BE-8FB5-86CD2D1AD63F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3D892D3-D698-40B1-927D-CB943150F1E1}
