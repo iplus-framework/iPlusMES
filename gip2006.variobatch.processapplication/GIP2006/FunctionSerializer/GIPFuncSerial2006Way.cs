@@ -9,6 +9,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.core.processapplication;
 using System.Windows;
+using gip.mes.processapplication;
 
 namespace gip2006.variobatch.processapplication
 {
@@ -345,7 +346,13 @@ namespace gip2006.variobatch.processapplication
             if (component == null)
                 return 0;
 
-            if (component is PAEControlModuleBase)
+            PAEControlModuleBase moduleBase = null;
+            PAETransport paeTransport = component as PAETransport;
+            if (paeTransport != null)
+                moduleBase = paeTransport.Motor;
+            if (moduleBase == null)
+                moduleBase = component as PAEControlModuleBase;
+            if (moduleBase != null)
             {
                 GIPConv2006Base conv = component.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base).FirstOrDefault();
                 if (conv != null && conv.AggrNo != null)
@@ -365,11 +372,16 @@ namespace gip2006.variobatch.processapplication
             if (component == null)
                 return 0;
 
-            if (component is PAEControlModuleBase)
+            PAEControlModuleBase moduleBase = null;
+            PAETransport paeTransport = component as PAETransport;
+            if (paeTransport != null)
+                moduleBase = paeTransport.Motor;
+            if (moduleBase == null)
+                moduleBase = component as PAEControlModuleBase;
+            if (moduleBase != null)
             {
-                PAEControlModuleBase moduleBase = component as PAEControlModuleBase;
-                turnOnDelay = (short)moduleBase.TurnOnDelay.ValueT.TotalSeconds;
-                turnOffDelay = (short)moduleBase.TurnOffDelay.ValueT.TotalSeconds;
+                //turnOnDelay = (short)moduleBase.TurnOnDelay.ValueT.TotalSeconds;
+                //turnOffDelay = (short)moduleBase.TurnOffDelay.ValueT.TotalSeconds;
 
                 GIPConv2006Base conv = component.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base).FirstOrDefault();
                 if (conv != null && conv.AggrNo != null)

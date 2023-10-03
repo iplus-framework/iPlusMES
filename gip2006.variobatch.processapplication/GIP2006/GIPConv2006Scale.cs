@@ -455,7 +455,7 @@ namespace gip2006.variobatch.processapplication
         {
             switch (parentProperty.ACIdentifier)
             {
-                case "AllocatedByWay":
+                case nameof(IRoutableModule.AllocatedByWay):
                     AllocatedByWay = parentProperty as IACContainerTNet<Byte>;
                     return true;
                 case "StateUL1":

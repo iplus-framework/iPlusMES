@@ -412,7 +412,7 @@ namespace gip2006.variobatch.processapplication
                 case "FaultState":
                     FaultState = parentProperty as IACContainerTNet<PANotifyState>;
                     return true;
-                case "AllocatedByWay":
+                case nameof(IRoutableModule.AllocatedByWay):
                     AllocatedByWay = parentProperty as IACContainerTNet<BitAccessForAllocatedByWay>;
                     return true;
                 case "OnSiteTurnedOn":
