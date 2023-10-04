@@ -221,6 +221,11 @@ namespace gip2006.variobatch.processapplication
         {
             _Response.ValueUpdatedOnReceival -= Response_PropertyChanged;
             _Request.ValueUpdatedOnReceival -= Request_PropertyChanged;
+
+            if (AllocatedByWay != null)
+                (AllocatedByWay as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
+            AllocatedByWay = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -360,7 +365,7 @@ namespace gip2006.variobatch.processapplication
 
 
         #region Read-Values from PLC
-        public IACContainerTNet<Byte> AllocatedByWay { get; set; }
+        public IACContainerTNet<BitAccessForAllocatedByWay> AllocatedByWay { get; set; }
 
         public IACContainerTNet<PANotifyState> StateUL1 { get; set; }
         public IACContainerTNet<PANotifyState> StateUL2 { get; set; }
@@ -456,7 +461,7 @@ namespace gip2006.variobatch.processapplication
             switch (parentProperty.ACIdentifier)
             {
                 case nameof(IRoutableModule.AllocatedByWay):
-                    AllocatedByWay = parentProperty as IACContainerTNet<Byte>;
+                    AllocatedByWay = parentProperty as IACContainerTNet<BitAccessForAllocatedByWay>;
                     return true;
                 case "StateUL1":
                     StateUL1 = parentProperty as IACContainerTNet<PANotifyState>;
@@ -599,7 +604,7 @@ namespace gip2006.variobatch.processapplication
                 return;
             if ((e.ValueEvent.Sender == EventRaiser.Source) && (e.ValueEvent.EventType == EventTypes.ValueChangedInSource))
             {
-                if (AllocatedByWay != null) AllocatedByWay.ValueT = System.Convert.ToByte(_ResponseValue.Bit14_AllocatedByWay);
+                if (AllocatedByWay != null) AllocatedByWay.ValueT.Bit01_Allocated = _ResponseValue.Bit14_AllocatedByWay;
                 if (StateUL2 != null)
                 {
                     if (_ResponseValue.Bit03_Full)

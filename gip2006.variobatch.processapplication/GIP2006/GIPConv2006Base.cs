@@ -151,7 +151,7 @@ namespace gip2006.variobatch.processapplication
     /// Baseclass for converting State and Types between Standard-Model-Components and DataAccess-/Vendor Model
     /// </summary>
     [ACClassInfo(ConstGIP2006.PackName_VarioGIP2006, "en{'GIPConv2006Base'}de{'GIPConv2006Base'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, false, true)]
-    public abstract class GIPConv2006Base : PAStateConverterBase, IGIPConvComp4MUX
+    public abstract class GIPConv2006Base : PAStateConverterBase, IGIPConvComp4MUX, IRouteItemIDProvider
     {
         #region c'tors
         public GIPConv2006Base(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
@@ -284,6 +284,22 @@ namespace gip2006.variobatch.processapplication
 
         [ACPropertyBindingSource(9999, "", "en{'Aggregate number'}de{'Aggregatnummer'}", "", false, false)]
         public IACContainerTNet<Int16> AggrNo { get; set; }
+
+        public string RouteItemID 
+        {
+            get
+            {
+                return RouteItemIDAsNum != 0 ? RouteItemIDAsNum.ToString() : null;
+            }
+        }
+
+        public int RouteItemIDAsNum 
+        {
+            get
+            {
+                return AggrNo.ValueT;
+            }
+        }
 
         #endregion
 

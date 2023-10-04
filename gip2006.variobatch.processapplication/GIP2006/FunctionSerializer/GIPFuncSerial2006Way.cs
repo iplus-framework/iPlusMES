@@ -346,25 +346,35 @@ namespace gip2006.variobatch.processapplication
             if (component == null)
                 return 0;
 
-            PAEControlModuleBase moduleBase = null;
-            PAETransport paeTransport = component as PAETransport;
-            if (paeTransport != null)
-                moduleBase = paeTransport.Motor;
-            if (moduleBase == null)
-                moduleBase = component as PAEControlModuleBase;
-            if (moduleBase != null)
+            try
             {
-                GIPConv2006Base conv = component.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base).FirstOrDefault();
-                if (conv != null && conv.AggrNo != null)
-                    return conv.AggrNo.ValueT;
+                IRoutableModule routableModule = component as IRoutableModule;
+                return routableModule != null ? (short)routableModule.RouteItemIDAsNum : (short)0;
             }
-            else if (component is PAProcessModule)
-                return (short)(component as PAProcessModule).RouteItemIDAsNum;
+            catch (Exception ex)
+            {
+                this.Messages.LogException(this.GetACUrl(), nameof(GetRouteItemData), ex);
+                return 0;
+            }
 
-            return 0;
+            //PAEControlModuleBase moduleBase = null;
+            //PAETransport paeTransport = component as PAETransport;
+            //if (paeTransport != null)
+            //    moduleBase = paeTransport.Motor;
+            //if (moduleBase == null)
+            //    moduleBase = component as PAEControlModuleBase;
+            //if (moduleBase != null)
+            //{
+            //    GIPConv2006Base conv = component.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base).FirstOrDefault();
+            //    if (conv != null && conv.AggrNo != null)
+            //        return conv.AggrNo.ValueT;
+            //}
+            //else if (component is PAProcessModule)
+            //    return (short)(component as PAProcessModule).RouteItemIDAsNum;
+            //return 0;
         }
 
-        private short GetAggrNo(IACComponent component, out short turnOnDelay, out short turnOffDelay)
+        private short GetRouteItemData(IACComponent component, out short turnOnDelay, out short turnOffDelay)
         {
             turnOnDelay = 0;
             turnOffDelay = 0;
@@ -372,22 +382,39 @@ namespace gip2006.variobatch.processapplication
             if (component == null)
                 return 0;
 
-            PAEControlModuleBase moduleBase = null;
-            PAETransport paeTransport = component as PAETransport;
-            if (paeTransport != null)
-                moduleBase = paeTransport.Motor;
-            if (moduleBase == null)
-                moduleBase = component as PAEControlModuleBase;
-            if (moduleBase != null)
+            try
             {
-                //turnOnDelay = (short)moduleBase.TurnOnDelay.ValueT.TotalSeconds;
-                //turnOffDelay = (short)moduleBase.TurnOffDelay.ValueT.TotalSeconds;
-
-                GIPConv2006Base conv = component.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base).FirstOrDefault();
-                if (conv != null && conv.AggrNo != null)
-                    return conv.AggrNo.ValueT;
+                IRoutableModule routableModule = component as IRoutableModule;
+                PAEControlModuleBase controlModuleBase = routableModule as PAEControlModuleBase;
+                if (controlModuleBase != null)
+                {
+                    turnOffDelay = (short)controlModuleBase.TurnOffDelay.ValueT.TotalSeconds;
+                    turnOnDelay = (short)controlModuleBase.TurnOnDelay.ValueT.TotalSeconds;
+                }
+                return routableModule != null ? (short)routableModule.RouteItemIDAsNum : (short)0;
             }
-            return 0;
+            catch (Exception ex) 
+            {
+                this.Messages.LogException(this.GetACUrl(), nameof(GetRouteItemData), ex);
+                return 0;
+            }
+
+            //PAEControlModuleBase moduleBase = null;
+            //PAETransport paeTransport = component as PAETransport;
+            //if (paeTransport != null)
+            //    moduleBase = paeTransport.Motor;
+            //if (moduleBase == null)
+            //    moduleBase = component as PAEControlModuleBase;
+            //if (moduleBase != null)
+            //{
+            //    //turnOnDelay = (short)moduleBase.TurnOnDelay.ValueT.TotalSeconds;
+            //    //turnOffDelay = (short)moduleBase.TurnOffDelay.ValueT.TotalSeconds;
+
+            //    GIPConv2006Base conv = component.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base).FirstOrDefault();
+            //    if (conv != null && conv.AggrNo != null)
+            //        return conv.AggrNo.ValueT;
+            //}
+            //return 0;
         }
 
         private List<RouteItemModel> GenerateRouteItemsModel(Route route, RouteItem routeSource, IEnumerable<RouteItem> routeTargets)
@@ -405,7 +432,7 @@ namespace gip2006.variobatch.processapplication
 
                 string me = currentComponent.ACUrl;
                 short turnOnDelay = 0, turnOffDelay = 0;
-                short aggrNo = GetAggrNo(currentComponent, out turnOnDelay, out turnOffDelay);
+                short aggrNo = GetRouteItemData(currentComponent, out turnOnDelay, out turnOffDelay);
                 if (aggrNo == 0)
                     return null; //error message
 

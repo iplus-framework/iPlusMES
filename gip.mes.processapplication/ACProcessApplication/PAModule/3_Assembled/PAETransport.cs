@@ -170,6 +170,27 @@ namespace gip.mes.processapplication
         public IACContainerTNet<TimeSpan> DepletingTime { get; set; }
         #endregion
 
+        public string RouteItemID
+        {
+            get
+            {
+                PAEEMotorBase motor = Motor;
+                if (motor != null)
+                    return motor.RouteItemID;
+                return null;
+            }
+        }
+
+        public int RouteItemIDAsNum
+        {
+            get
+            {
+                PAEEMotorBase motor = Motor;
+                if (motor != null)
+                    return motor.RouteItemIDAsNum;
+                return 0;
+            }
+        }
         #endregion
 
         #region Methods, Range: 400
