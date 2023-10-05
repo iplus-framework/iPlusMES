@@ -335,7 +335,7 @@ namespace gip2006.variobatch.processapplication
             {
                 testResult += item.ToString() + System.Environment.NewLine;
             }
-            Clipboard.SetText(testResult);
+            TextCopy.ClipboardService.SetText(testResult);
 
             return sendPackages;
         }

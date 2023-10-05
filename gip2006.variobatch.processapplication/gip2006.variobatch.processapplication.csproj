@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <OutputType>Library</OutputType>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -8,7 +8,7 @@
     <SccProvider>SAK</SccProvider>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>false</UseWPF>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
@@ -20,9 +20,6 @@
     <DocumentationFile>$(SolutionDir)\bin\Release\gip2006.variobatch.processapplication.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System.Windows" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.communication\gip.core.communication.csproj" />

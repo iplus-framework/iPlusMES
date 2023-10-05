@@ -1122,7 +1122,7 @@ namespace gip.mes.processapplication
 
             using (var dbApp = new DatabaseApp())
             {
-                var quants = s_cQry_Quants(dbApp, facilitySilo);
+                var quants = s_cQry_Quants(dbApp, facilitySilo.FacilityID);
                 FacilityCharge fc = quants.FirstOrDefault();
                 if (fc == null)
                 {
@@ -1134,7 +1134,7 @@ namespace gip.mes.processapplication
                 else
                 {
                     StartTime.ValueT = fc.FillingDate.Value;
-                    quants = s_cQry_QuantsReverse(dbApp, facilitySilo);
+                    quants = s_cQry_QuantsReverse(dbApp, facilitySilo.FacilityID);
                     FacilityCharge fcOldest = quants.FirstOrDefault();
                     if (fcOldest == null)
                         FillingDate.ValueT = DateTime.Now;
@@ -1884,18 +1884,18 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
 
-        public static readonly Func<DatabaseApp, Facility, IEnumerable<FacilityCharge>> s_cQry_Quants =
-        EF.CompileQuery<DatabaseApp, Facility, IEnumerable<FacilityCharge>>(
-            (ctx, facility) => from c in ctx.FacilityCharge
-                               where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<FacilityCharge>> s_cQry_Quants =
+        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<FacilityCharge>>(
+            (ctx, facilityID) => from c in ctx.FacilityCharge
+                               where c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue
                                orderby c.FillingDate descending
                                select c
         );
 
-        public static readonly Func<DatabaseApp, Facility, IEnumerable<FacilityCharge>> s_cQry_QuantsReverse =
-        EF.CompileQuery<DatabaseApp, Facility, IEnumerable<FacilityCharge>>(
-            (ctx, facility) => from c in ctx.FacilityCharge
-                               where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
+        public static readonly Func<DatabaseApp, Guid?, IEnumerable<FacilityCharge>> s_cQry_QuantsReverse =
+        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<FacilityCharge>>(
+            (ctx, facilityID) => from c in ctx.FacilityCharge
+                               where c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue
                                orderby c.FillingDate
                                select c
         );
