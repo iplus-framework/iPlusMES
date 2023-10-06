@@ -131,7 +131,7 @@ namespace gip2006.variobatch.processapplication
 
         }
 
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)

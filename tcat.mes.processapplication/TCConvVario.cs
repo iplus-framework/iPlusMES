@@ -74,7 +74,7 @@ namespace tcat.mes.processapplication
             return PAFuncStateConvBase.IsEnabledTransitionDefault(ACState.ValueT, transitionMethod, sender);
         }
 
-        public override MsgWithDetails SendACMethod(PAProcessFunction sender, ACMethod acMethod)
+        public override MsgWithDetails SendACMethod(PAProcessFunction sender, ACMethod acMethod, ACMethod previousParams = null)
         {
             if (Session == null)
                 return new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "SendACMethod()", Message = "Session is null" };
@@ -84,7 +84,7 @@ namespace tcat.mes.processapplication
 
             bool sended = false;
             ACChildInstanceInfo childInfo = new ACChildInstanceInfo(ParentACComponent);
-            object result = this.Session.ACUrlCommand("!SendObject", acMethod, 0, 0, childInfo);
+            object result = this.Session.ACUrlCommand("!SendObject", acMethod, previousParams, 0, 0, 0, childInfo);
             if (result != null)
                 sended = (bool)result;
 

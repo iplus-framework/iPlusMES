@@ -265,7 +265,7 @@ namespace gip2006.variobatch.processapplication
             _StateDBNo = new ACPropertyConfigValue<UInt16>(this, "StateDBNo", 0);
             _CmdDBOffset = new ACPropertyConfigValue<UInt16>(this, "CmdDBOffset", 0);
             _CmdDBNo = new ACPropertyConfigValue<UInt16>(this, "CmdDBNo", 0);
-
+            _RoutingDBOffset = new ACPropertyConfigValue<UInt16?>(this, "RoutingDBOffset", null);
         }
 
         private static bool? _IsConverterDeactivated = null;
@@ -318,10 +318,11 @@ namespace gip2006.variobatch.processapplication
         public override bool ACPostInit()
         {
             // This calls are needed to add entries in Variobatch-Konfiguration
-            UInt16 dbNo = CmdDBNo;
-            UInt16 dbOffset = CmdDBOffset;
-            dbNo = StateDBNo;
-            dbOffset = StateDBOffset;
+            _ = CmdDBNo;
+            _ = CmdDBOffset;
+            _ = StateDBNo;
+            _ = StateDBOffset;
+            _ = RoutingDBOffset;
 
             bool result = base.ACPostInit();
             BindMyProperties();
@@ -518,6 +519,25 @@ namespace gip2006.variobatch.processapplication
             set
             {
                 _StateDBOffset.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<UInt16?> _RoutingDBOffset;
+        /// <summary>
+        /// If value == null, then routing data will not be sent to the plc
+        /// If value = 0, then only routing data will be sent to plc without parameters (= Standalone Routing)
+        /// If value > 0, then parameters will be first transferred and afterwards routing data (e.g. for discharging functions that uses routing)
+        /// </summary>
+        [ACPropertyConfig("en{'Startaddress routing data'}de{'Startadresse Routendaten'}")]
+        public UInt16? RoutingDBOffset
+        {
+            get
+            {
+                return _RoutingDBOffset.ValueT;
+            }
+            set
+            {
+                _RoutingDBOffset.ValueT = value;
             }
         }
 
@@ -850,7 +870,7 @@ namespace gip2006.variobatch.processapplication
             return PAFuncStateConvBase.IsEnabledTransitionDefault(ACState.ValueT, transitionMethod, sender);
         }
 
-        public override MsgWithDetails SendACMethod(PAProcessFunction sender, ACMethod acMethod)
+        public override MsgWithDetails SendACMethod(PAProcessFunction sender, ACMethod acMethod, ACMethod previousParams = null)
         {
             if (Session == null)
             {
@@ -869,7 +889,10 @@ namespace gip2006.variobatch.processapplication
             }
             bool sended = false;
             ACChildInstanceInfo childInfo = new ACChildInstanceInfo(ParentACComponent);
-            object result = this.Session.ACUrlCommand("!SendObject", acMethod, CmdDBNo, CmdDBOffset, childInfo);
+            Int32? routingOffset = null;
+            if (RoutingDBOffset.HasValue)
+                routingOffset = Convert.ToInt32(RoutingDBOffset.Value);
+            object result = this.Session.ACUrlCommand("!SendObject", acMethod, previousParams, Convert.ToInt32(CmdDBNo), Convert.ToInt32(CmdDBOffset), routingOffset, childInfo);
             if (result != null)
                 sended = (bool)result;
 

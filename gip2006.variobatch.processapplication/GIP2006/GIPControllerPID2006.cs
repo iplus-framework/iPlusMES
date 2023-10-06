@@ -568,7 +568,7 @@ namespace gip2006.variobatch.processapplication
             return typeOrACMethodName == _ConverterTypeName;
         }
 
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)
@@ -897,7 +897,7 @@ namespace gip2006.variobatch.processapplication
                 return;
 
             // TODO: Validate Range of Values
-            object sended = this.Session.ACUrlCommand("!SendObject", CData.ValueT, DBNo, DBOffset.Value, null);
+            object sended = this.Session.ACUrlCommand("!SendObject", CData.ValueT, null, DBNo, DBOffset.Value, null, null);
             if (sended == null || !((bool)sended))
             {
                 // TODO: Alarm?

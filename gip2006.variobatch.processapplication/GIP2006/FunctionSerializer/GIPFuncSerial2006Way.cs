@@ -23,7 +23,7 @@ namespace gip2006.variobatch.processapplication
 
         public override bool IsSerializerFor(string typeOrACMethodName)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
@@ -32,7 +32,7 @@ namespace gip2006.variobatch.processapplication
         }
 
         [ACMethodInfo("", "", 999)]
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             //if (s7Session == null || complexObj == null)
@@ -43,7 +43,7 @@ namespace gip2006.variobatch.processapplication
             if (request == null)
                 return false;
 
-            Route route = request.ParameterValueList.FirstOrDefault().Value as Route;
+            Route route = request.ParameterValueList.Where(c => c.ACIdentifier == nameof(Route)).FirstOrDefault()?.Value as Route;
             if (route == null || !route.Any())
                 return false;
 
@@ -330,13 +330,18 @@ namespace gip2006.variobatch.processapplication
                 #endregion  
             }
 
-            //for test
-            string testResult = "";
-            foreach (var item in routeItemsModel)
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
             {
-                testResult += item.ToString() + System.Environment.NewLine;
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var item in routeItemsModel)
+                {
+                    stringBuilder.AppendLine(item.ToString());
+                }
+                this.Messages.LogDebug(this.GetACUrl(), nameof(CreateSendPackages), stringBuilder.ToString());
+                //Clipboard.SetText(testResult);
             }
-            Clipboard.SetText(testResult);
+#endif
 
             return sendPackages;
         }

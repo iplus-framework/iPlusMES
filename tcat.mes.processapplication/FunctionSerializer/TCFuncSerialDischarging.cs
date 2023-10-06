@@ -57,7 +57,7 @@ namespace tcat.mes.processapplication
                 || MethodNameEquals(typeOrACMethodName, "DischargingIntake");
         }
 
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             TCSession session = ParentACComponent as TCSession;
             if (session == null && complexObj == null)
