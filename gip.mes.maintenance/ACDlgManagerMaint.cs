@@ -159,30 +159,30 @@ namespace gip.mes.maintenance
 
         public static bool IsEnabledShowMaintenanceOrderHistory(IACComponent acComponent)
         {
-            //ACComponent _this = acComponent as ACComponent;
-            //if (_this == null)
-            //    return false;
+            ACComponent _this = acComponent as ACComponent;
+            if (_this == null)
+                return false;
 
-            //ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
-            //if (appManager == null)
-            //    return false;
+            ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
+            if (appManager == null)
+                return false;
 
-            //var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
-            //if (maintService == null)
-            //    return false;
+            var maintService = appManager.ACUrlCommand(nameof(ACMaintService)) as ACComponent;
+            if (maintService == null)
+                return false;
 
-            //if (_this.Database is vd.DatabaseApp)
-            //{
-            //    Guid componentClassID = _this.ComponentClass.ACClassID;
-            //    vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+            if (_this.Database is vd.DatabaseApp)
+            {
+                Guid componentClassID = _this.ComponentClass.ACClassID;
+                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
 
-            //    using (ACMonitor.Lock(dbApp.QueryLock_1X000))
-            //    {
-            //        if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
-            //       && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
-            //            return true;
-            //    }
-            //}
+                using (ACMonitor.Lock(dbApp.QueryLock_1X000))
+                {
+                    if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
+                   && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+                        return true;
+                }
+            }
             return false;
         }
 

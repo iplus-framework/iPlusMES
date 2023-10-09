@@ -279,49 +279,6 @@ namespace gip.mes.maintenance
             }
         }
 
-        private core.datamodel.ACClass _CurrentComponentFilter;
-        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
-        public core.datamodel.ACClass CurrentComponentFilter
-        {
-            get
-            {
-                return _CurrentComponentFilter;
-            }
-            set
-            {
-                _CurrentComponentFilter = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentObjectFilter));
-            }
-        }
-
-        private Facility _CurrentFacilityFilter;
-        [ACPropertyInfo(9999, "", "en{'Facility'}de{'Anlage'}")]
-        public Facility CurrentFacilityFilter
-        {
-            get => _CurrentFacilityFilter;
-            set
-            {
-                _CurrentFacilityFilter = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentObjectFilter));
-            }
-        }
-
-        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
-        public string CurrentObjectFilter
-        {
-            get
-            {
-                if (CurrentFacilityFilter != null)
-                    return CurrentFacilityFilter.ACCaption;
-                else if (CurrentComponentFilter != null)
-                    return CurrentComponentFilter.ACUrlComponent;
-
-                return null;
-            }
-        }
-
         private List<Type> _AssignableTypes = new List<Type> { typeof(PAClassAlarmingBase), typeof(ApplicationManager) };
         [ACPropertyInfo(9999)]
         public ACClassInfoWithItems.VisibilityFilters ComponentTypeFilter
@@ -608,103 +565,6 @@ namespace gip.mes.maintenance
             }
         }
 
-        [ACMethodInfo("", "en{'Search'}de{'Suchen'}", 9999)]
-        public void SearchFilter()
-        {
-            CurrentMaintOrder = null;
-
-            //if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter == null)
-            //{
-            //    if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
-            //        || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
-            //    {
-            //        _ACQueryDefinition.ClearFilter(true);
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
-            //    }
-            //}
-            //else if (CurrentMaintOrderStateFilter == null && CurrentComponentFilter != null)
-            //{
-            //    if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "VBiPAACClassID"
-            //        || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentComponentFilter.ACClassID.ToString())
-            //    {
-            //        _ACQueryDefinition.ClearFilter(true);
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
-            //    }
-            //}
-            //else if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter != null)
-            //{
-            //    bool rebuildACQuery = false;
-            //    if (_ACQueryDefinition.ACFilterColumns.Count != 2)
-            //        rebuildACQuery = true;
-            //    else
-            //    {
-            //        ACFilterItem state = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "MDMaintOrderState\\MDMaintOrderStateIndex");
-            //        if (state == null)
-            //            rebuildACQuery = true;
-            //        else if (state.SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
-            //            rebuildACQuery = true;
-            //        if (!rebuildACQuery)
-            //        {
-            //            ACFilterItem acClassID = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "VBiPAACClassID");
-            //            if (acClassID == null)
-            //                rebuildACQuery = true;
-            //            else if (acClassID.SearchWord != CurrentComponentFilter.ACClassID.ToString())
-            //                rebuildACQuery = true;
-            //        }
-            //    }
-            //    if (rebuildACQuery)
-            //    {
-            //        _ACQueryDefinition.ClearFilter(true);
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
-            //    }
-            //}
-            //else
-            //{
-            //    _ACQueryDefinition.ClearFilter(true);
-            //}
-            Search();
-        }
-
-        [ACMethodInfo("", "en{'Choose Object'}de{'Objekt auswählen'}", 9999)]
-        public void ChooseComponent()
-        {
-            if (!IsEnabledChooseComponent())
-                return;
-
-            ShowDialog(this, "MaintOrderEntity");
-
-            BSOFacilityExplorer facilityExpl = FindChildComponents<BSOFacilityExplorer>(c => c is BSOFacilityExplorer).FirstOrDefault();
-            if (facilityExpl != null && facilityExpl.SelectedFacility != null)
-            {
-                CurrentFacilityFilter = facilityExpl.SelectedFacility;
-            }
-            else
-            {
-                BSOComponentSelector compExpl = FindChildComponents<BSOComponentSelector>(c => c is BSOComponentSelector).FirstOrDefault();
-                if (compExpl != null && compExpl.CurrentProjectItemCS != null)
-                {
-                    CurrentComponentFilter = compExpl.CurrentProjectItemCS.ValueT;
-                }
-            }
-        }
-
-        public bool IsEnabledChooseComponent()
-        {
-            return true;
-        }
-
-        [ACMethodInfo("", "", 999)]
-        public void ClearChosenComponent()
-        {
-            CurrentFacilityFilter = null;
-            CurrentComponentFilter = null;
-        }
-
         [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999)]
         public void OpenDocumentation()
         {
@@ -795,7 +655,7 @@ namespace gip.mes.maintenance
         {
             if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
             {
-                if (actionArgs.DropObject.VBContent == "*MaintOrderImages")
+                if (actionArgs.DropObject.VBContent == "*MaintOrderImages" && SelectedMaintOrderTask != null)
                 {
                     BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
                     _IsImageTabOpen = true;

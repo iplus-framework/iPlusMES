@@ -579,7 +579,7 @@ namespace gip.mes.maintenance
 
         protected override IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
         {
-            return result.Where(c => c.BasedOnMaintOrderID.HasValue);
+            return result.Where(c => !c.BasedOnMaintOrderID.HasValue);
         }
 
         /// <summary>
@@ -1172,6 +1172,8 @@ namespace gip.mes.maintenance
                 //}
             }
         }
+
+
 
         #endregion
     }
