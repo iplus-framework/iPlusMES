@@ -800,68 +800,71 @@ namespace gip.mes.maintenance
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "StartMaintenanceTask":
+                case nameof(StartMaintenanceTask):
                     StartMaintenanceTask();
                     return true;
-                case "IsEnabledStartMaintenanceTask":
+                case nameof(IsEnabledStartMaintenanceTask):
                     result = IsEnabledStartMaintenanceTask();
                     return true;
-                case "EndMaintenanceTask":
+                case nameof(EndMaintenanceTask):
                     EndMaintenanceTask();
                     return true;
-                case "IsEnabledEndMaintenanceTask":
+                case nameof(IsEnabledEndMaintenanceTask):
                     result = IsEnabledEndMaintenanceTask();
                     return true;
-                case "ShowMaintenance":
+                case nameof(ShowMaintenance):
                     ShowMaintenance((IACComponent)acParameter[0]);
                     return true;
-                case "ShowMaintenanceHistory":
+                case nameof(ShowMaintenanceHistory):
                     ShowMaintenanceHistory((IACComponent)acParameter[0]);
                     return true;
-                case "ShowMaintenanceWarning":
+                case nameof(ShowMaintenanceWarning):
                     result = ShowMaintenanceWarning((List<gip.mes.maintenance.ACMaintWarning>)acParameter[0]);
                     return true;
-                case "ShowMaintenaceOrder":
+                case nameof(ShowMaintenaceOrder):
                     ShowMaintenaceOrder();
                     return true;
-                case "SearchFilter":
+                case nameof(SearchFilter):
                     SearchFilter();
                     return true;
-                case "ChooseComponent":
+                case nameof(ChooseComponent):
                     ChooseComponent();
                     return true;
-                case "IsEnabledChooseComponent":
+                case nameof(IsEnabledChooseComponent):
                     result = IsEnabledChooseComponent();
                     return true;
-                case "ClearChosenComponent":
+                case nameof(ClearChosenComponent):
                     ClearChosenComponent();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "NavigateToVisualisation":
+                case nameof(NavigateToVisualisation):
                     NavigateToVisualisation();
                     return true;
-                case "IsEnabledNavigateToVisualisation":
+                case nameof(IsEnabledNavigateToVisualisation):
                     result = IsEnabledNavigateToVisualisation();
+                    return true;
+                case nameof(OpenDocumentation):
+                    OpenDocumentation();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
