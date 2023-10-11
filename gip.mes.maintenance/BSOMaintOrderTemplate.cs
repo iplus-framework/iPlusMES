@@ -1019,7 +1019,7 @@ namespace gip.mes.maintenance
             ShowDialog(BSOMedia_Child.Value, "MediaDialog");
         }
 
-        public bool IsEnabledOpenDocumentation()
+        public bool IsEnabledOpenTaskDocumentation()
         {
             return SelectedMaintOrderTask != null;
         }
@@ -1174,6 +1174,64 @@ namespace gip.mes.maintenance
         }
 
 
+
+        #endregion
+
+        #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(NewTemplate):
+                    NewTemplate();
+                    return true;
+                case nameof(IsEnabledNewTemplate):
+                    result = IsEnabledNewTemplate();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(WizzardNext):
+                    WizzardNext();
+                    return true;
+                case nameof(IsEnabledWizzardNext):
+                    result = IsEnabledWizzardNext();
+                    return true;
+                case nameof(WizzardBack):
+                    WizzardBack();
+                    return true;
+                case nameof(IsEnabledWizzardBack):
+                    result = IsEnabledWizzardBack();
+                    return true;
+                case nameof(CloseWindow):
+                    CloseWizzard();
+                    return true;
+                case nameof(AddNewTask):
+                    AddNewTask();
+                    return true;
+                case nameof(RemoveTask):
+                    RemoveTask();
+                    return true;
+                case nameof(OpenTaskDocumentation):
+                    OpenTaskDocumentation();
+                    return true;
+                case nameof(IsEnabledOpenTaskDocumentation):
+                    result = IsEnabledOpenTaskDocumentation();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
 
         #endregion
     }

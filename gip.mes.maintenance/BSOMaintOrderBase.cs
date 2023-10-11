@@ -1,5 +1,6 @@
 ﻿using gip.bso.iplus;
 using gip.bso.masterdata;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -15,6 +16,8 @@ namespace gip.mes.maintenance
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'BSOMaintOrderBase'}de{'BSOMaintOrderBase'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public abstract class BSOMaintOrderBase : ACBSOvbNav
     {
+        #region c'tors
+
         public BSOMaintOrderBase(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
@@ -26,6 +29,10 @@ namespace gip.mes.maintenance
 
             return base.ACDeInit(deleteACClassTask);
         }
+
+        #endregion
+
+        #region Properties
 
         protected ACQueryDefinition _ACQueryDefinition;
 
@@ -47,11 +54,6 @@ namespace gip.mes.maintenance
                 }
                 return _AccessPrimary;
             }
-        }
-
-        protected virtual IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
-        {
-            return result;   
         }
 
         /// <summary>
@@ -235,7 +237,14 @@ namespace gip.mes.maintenance
             }
         }
 
+        #endregion
+
         #region Methods
+
+        protected virtual IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
+        {
+            return result;
+        }
 
         /// <summary>
         /// Saves this instance.
@@ -383,6 +392,50 @@ namespace gip.mes.maintenance
         public void ChooseComponentOK()
         {
             CloseTopDialog();
+        }
+
+        #endregion
+
+        #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(SearchFilter):
+                    SearchFilter();
+                    return true;
+                case nameof(ChooseComponent):
+                    ChooseComponent();
+                    return true;
+                case nameof(IsEnabledChooseComponent):
+                    result = IsEnabledChooseComponent();
+                    return true;
+                case nameof(ClearChosenComponent):
+                    ClearChosenComponent();
+                    return true;
+                case nameof(ChooseComponentOK):
+                    ChooseComponentOK();
+                    return true;
+                    
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
