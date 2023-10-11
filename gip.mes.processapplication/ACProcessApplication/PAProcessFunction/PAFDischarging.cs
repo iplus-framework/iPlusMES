@@ -276,8 +276,15 @@ namespace gip.mes.processapplication
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
                 return msg;
             }
-            Route route = value.ValueT<Route>().Clone() as Route;
-            RouteItem targetRouteItem = route.LastOrDefault();
+            Route originalR = value.ValueT<Route>();
+            if (originalR == null)
+            {
+                MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Route is null." };
+                return msg;
+            }
+            //Route clonedR = originalR.Clone() as Route;
+            //RouteItem targetRouteItem = clonedR.LastOrDefault();
+            RouteItem targetRouteItem = originalR.LastOrDefault();
             if (targetRouteItem == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Last RouteItem is null." };
@@ -288,14 +295,14 @@ namespace gip.mes.processapplication
             {
                 try
                 {
-                    route.AttachTo(db); // Global context
+                    originalR.AttachTo(db); // Global context
 
-                    MsgWithDetails msg = GetACMethodFromConfig(db, route, acMethod);
+                    MsgWithDetails msg = GetACMethodFromConfig(db, originalR, acMethod);
                     if (msg != null)
                         return msg;
 
                     if (IsSimulationOn)
-                        PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
+                        PAEControlModuleBase.ActivateRouteOnSimulation(originalR, false);
                 }
                 catch (Exception e)
                 {
@@ -305,8 +312,11 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    route.Detach(true);
+                    originalR.Detach(true);
                     //targetRouteItem.DetachEntitesFromDbContext();
+                    // Update Route, that Route-serializers can access ACComponent-Properties of RouteItems
+                    //if (!originalR.AreACUrlInfosSet)
+                        //value.Value = clonedR;
                 }
             }
 
@@ -603,6 +613,29 @@ namespace gip.mes.processapplication
         protected override void OnChangingCurrentACMethod(ACMethod currentACMethod, ACMethod newACMethod)
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
+
+            ACValue value = currentACMethod.ParameterValueList.GetACValue("Route");
+            if (value != null)
+            {
+                Route originalR = value.ValueT<Route>();
+                if (originalR != null && !originalR.AreACUrlInfosSet)
+                {
+                    using (var db = new Database())
+                    {
+                        try
+                        {
+                            originalR.AttachTo(db); // Global context
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        finally
+                        {
+                            originalR.Detach(true);
+                        }
+                    }
+                }
+            }
 
             bool unsubscribe = true;
             if (IsMethodChangedFromClient)

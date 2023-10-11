@@ -10,6 +10,7 @@ using gip.core.autocomponent;
 using gip.core.processapplication;
 using System.Windows;
 using gip.mes.processapplication;
+using System.Security.Policy;
 
 namespace gip2006.variobatch.processapplication
 {
@@ -34,6 +35,12 @@ namespace gip2006.variobatch.processapplication
         [ACMethodInfo("", "", 999)]
         public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
+            string message = null;
+            return SendRoute(null, complexObj, prevComplexObj, dbNo, offset, routeOffset, miscParams, out message);
+        }
+
+        public virtual bool SendRoute(ACSessionObjSerializer invoker, object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams, out string message)
+        {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             //if (s7Session == null || complexObj == null)
             //    return false;
@@ -41,21 +48,50 @@ namespace gip2006.variobatch.processapplication
             //    return false;
             ACMethod request = complexObj as ACMethod;
             if (request == null)
+            {
+                message = "ACMethod is null";
                 return false;
+            }
 
             Route route = request.ParameterValueList.Where(c => c.ACIdentifier == nameof(Route)).FirstOrDefault()?.Value as Route;
             if (route == null || !route.Any())
+            {
+                message = "route is empty";
                 return false;
+            }
+
+
+            IACComponent destinationChangeComponent = null;
+            Route previousRoute = null;
+            ACMethod previousRequest = prevComplexObj as ACMethod;
+            if (previousRequest != null)
+            {
+                previousRoute = previousRequest.ParameterValueList.Where(c => c.ACIdentifier == nameof(Route)).FirstOrDefault()?.Value as Route;
+                if (previousRoute != null)
+                {
+                    route.Compare(previousRoute, out destinationChangeComponent);
+                }
+            }
+
 
             int maxPackageSize = 200;
             int maxRouteItems = 49;
-
-            List<byte[]> sendPackages = CreateSendPackages(route, maxRouteItems, maxPackageSize);
+            string errorMsg = null;
+            List<byte[]> sendPackages = CreateSendPackages(route, maxRouteItems, maxPackageSize, out errorMsg, destinationChangeComponent);
             if (sendPackages == null)
+            {
+                if (invoker == null && errorMsg != null)
+                    Messages.LogError(this.GetACUrl(), "SendRoute(10)", errorMsg);
+                message = errorMsg;
                 return false;
+            }
+
 
             if (s7Session.IsConnectionLocalSim)
+            {
+                message = null;
                 return true;
+            }
 
             foreach (byte[] package in sendPackages)
             {
@@ -63,15 +99,20 @@ namespace gip2006.variobatch.processapplication
                 PLC.Result errCode = s7Session.PLCConn.WriteBytes(DataTypeEnum.DataBlock, dbNo, offset, ref pack);
                 offset += pack.Length;
                 if (errCode != null && !errCode.IsSucceeded)
+                {
+                    message = String.Format("PLC Write Error {0}", errCode);
                     return false;
+                }
             }
 
+            message = null;
             return true;
         }
 
-        private List<byte[]> CreateSendPackages(Route route, int maxRouteItems, int maxPackageSize, IACComponent destinationChangeComponent = null)
+        private List<byte[]> CreateSendPackages(Route route, int maxRouteItems, int maxPackageSize, out string errorMessage, IACComponent destinationChangeComponent = null)
         {
             int headerSize = 0, routeItemSize = 0, definedMaxPackSize = maxPackageSize;
+            //errorMessage = null;
 
             #region Header size
             headerSize += gip.core.communication.ISOonTCP.Types.Word.Length; //VARIOBATCH Command
@@ -111,7 +152,10 @@ namespace gip2006.variobatch.processapplication
             #endregion
 
             if (maxPackageSize < headerSize || maxPackageSize < routeItemSize)
+            {
+                errorMessage = String.Format("Maximum package size {0} is lower than headerSize {1} or routeItemSize {2}", maxPackageSize, headerSize, routeItemSize);
                 return null;
+            }
 
             int remaingSize = maxPackageSize - headerSize;
             if (remaingSize < routeItemSize)
@@ -126,46 +170,53 @@ namespace gip2006.variobatch.processapplication
             RouteItem sourceItem = route.GetRouteSource();
             IEnumerable<RouteItem> targetItems = route.GetRouteTargets();
             if (targetItems.Count() > 4)
-                return null;
-
-            short sourceID = GetComponentID(sourceItem.SourceACComponent);
-            if (sourceID == 0)
-                return null;
-
-            short[] targetsID = new short[] { 0, 0, 0, 0 };
-            short tI = 0;
-            foreach (RouteItem rItem in targetItems)
             {
-                targetsID[tI] = GetComponentID(rItem.TargetACComponent);
-                if (tI > 3)
-                    break;
-                tI++;
+                errorMessage = String.Format("Route has too much targets {0}", targetItems.Count());
+                return null;
             }
 
-            if (targetsID[0] == 0)
-                return null;
+            StringBuilder sb = new StringBuilder();
+            short sourceItemID = GetRouteItemID(sourceItem.SourceACComponent);
+            if (sourceItemID <= 0)
+                sb.AppendLine(String.Format("RouteItemID {1} of source {0} is invalid", sourceItem.SourceACComponent.GetACUrl(), sourceItemID));
+
+            short[] targetItemIDs = new short[] { 0, 0, 0, 0 };
+            short i = 0;
+            foreach (RouteItem rItem in targetItems)
+            {
+                targetItemIDs[i] = GetRouteItemID(rItem.TargetACComponent);
+                if (targetItemIDs[i] <= 0)
+                    sb.AppendLine(String.Format("RouteItemID {1} of target {0} is invalid", rItem.TargetACComponent.GetACUrl(), targetItemIDs[i]));
+                if (i > 3)
+                    break;
+                i++;
+            }
 
             short destinationChangeAggrNo = 0;
             if (destinationChangeComponent != null)
-                destinationChangeAggrNo = GetComponentID(destinationChangeComponent);
-
-
-            List<RouteItemModel> routeItemsModel = null;
-            if (route.IsAttached)
             {
-                routeItemsModel = GenerateRouteItemsModel(route, sourceItem, targetItems);
+                destinationChangeAggrNo = GetRouteItemID(destinationChangeComponent);
+                if (destinationChangeAggrNo <= 0)
+                    sb.AppendLine(String.Format("RouteItemID {1} of destination change component {0} is invalid", destinationChangeComponent.GetACUrl(), destinationChangeAggrNo));
             }
-            else
+
+            
+            List<RouteItemModel> routeItemsModel = null;
+            if (!route.AreACUrlInfosSet)
             {
                 using (Database db = new gip.core.datamodel.Database())
                 {
                     route.AttachTo(db);
-                    routeItemsModel = GenerateRouteItemsModel(route, sourceItem, targetItems);
+                    route.Detach(true);
                 }
             }
-
-            if (routeItemsModel == null)
+            
+            bool validModel = GenerateRouteItemsModel(route, sourceItem, targetItems, sb, out routeItemsModel);
+            if (!validModel || sb.Length > 0)
+            {
+                errorMessage = sb.ToString();
                 return null;
+            }
 
             int iOffset = 0;
 
@@ -178,23 +229,23 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
             //Source
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(sourceID), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(sourceItemID), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
             //Target
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetsID[0]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetItemIDs[0]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
             //SecondTarget
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetsID[1]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetItemIDs[1]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
             //Third Target
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetsID[2]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetItemIDs[2]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
             //Fourth Target
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetsID[3]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(targetItemIDs[3]), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
             //Unused = 0
@@ -235,10 +286,13 @@ namespace gip2006.variobatch.processapplication
 
             int emptyRItemModelCount = maxRouteItems - routeItemsModel.Count();
             if (emptyRItemModelCount < 0)
+            {
+                errorMessage = String.Format("Too much items: {2}. Maximum item size is {1}. Oversize is {0}.", emptyRItemModelCount, maxRouteItems, routeItemsModel.Count());
                 return null;
+            }
 
             RouteItemModel emptyModel = new RouteItemModel();
-            for (int i = 0; i < emptyRItemModelCount; i++)
+            for (int j = 0; j < emptyRItemModelCount; j++)
                 routeItemsModel.Add(emptyModel);
 
             int totalOffset = 0;
@@ -343,17 +397,18 @@ namespace gip2006.variobatch.processapplication
             }
 #endif
 
+            errorMessage = null;
             return sendPackages;
         }
 
-        private short GetComponentID(IACComponent component)
+        private short GetRouteItemID(IACComponent component)
         {
             if (component == null)
                 return 0;
 
             try
             {
-                IRoutableModule routableModule = component as IRoutableModule;
+                IRouteItemIDProvider routableModule = component as IRouteItemIDProvider;
                 return routableModule != null ? (short)routableModule.RouteItemIDAsNum : (short)0;
             }
             catch (Exception ex)
@@ -422,70 +477,104 @@ namespace gip2006.variobatch.processapplication
             //return 0;
         }
 
-        private List<RouteItemModel> GenerateRouteItemsModel(Route route, RouteItem routeSource, IEnumerable<RouteItem> routeTargets)
+        private bool GenerateRouteItemsModel(Route route, RouteItem routeSource, IEnumerable<RouteItem> routeTargets, StringBuilder errorStringBuilder, out List<RouteItemModel> result)
         {
-            List<RouteItemModel> result = new List<RouteItemModel>();
+            bool modelValid = true;
+            result = new List<RouteItemModel>();
 
-            var groupedRoutes = route.GroupBy(x => x.TargetACComponent);
+            IEnumerable<IGrouping<IACComponent,RouteItem>> itemsGroupedByTargetComp = route.GroupBy(x => x.TargetACComponent);
 
-            foreach (var rItem in groupedRoutes)
+            foreach (var itemGroup in itemsGroupedByTargetComp)
             {
-                IACComponent currentComponent = rItem.Key;
+                IACComponent currentComponent = itemGroup.Key;
 
                 if (routeTargets.Any(c => c.TargetACComponent.ACUrl == currentComponent.ACUrl))
                     continue;
 
-                string me = currentComponent.ACUrl;
+                string currentACUrl = currentComponent.ACUrl;
                 short turnOnDelay = 0, turnOffDelay = 0;
-                short aggrNo = GetRouteItemData(currentComponent, out turnOnDelay, out turnOffDelay);
-                if (aggrNo == 0)
-                    return null; //error message
-
-                string sourceT = rItem.FirstOrDefault().SourceACComponent.ACUrl;
-                short source = GetComponentID(rItem.FirstOrDefault().SourceACComponent);
-                if (source == 0)
-                    return null; //error message
-
-                int rItemCount = rItem.Count();
-
-                if (rItemCount > 3)
-                    return null; //error message - 3 sources is maximum
-
-                short source2 = 0, source3 = 0;
-                string source2T = "", source3T = "";
-                if (rItemCount > 1)
+                short currentItemID = GetRouteItemData(currentComponent, out turnOnDelay, out turnOffDelay);
+                if (currentItemID <= 0)
                 {
-                    source2T = rItem.ToArray()[1].SourceACComponent.ACUrl;
-                    source2 = GetComponentID(rItem.ToArray()[1].SourceACComponent);
-                    if (rItemCount > 2)
+                    errorStringBuilder.AppendLine(String.Format("A: RouteItemID {1} of {0} is invalid", currentComponent.GetACUrl(), currentItemID));
+                    modelValid = false;
+                }
+
+                IACComponent sourceComponent = itemGroup.FirstOrDefault().SourceACComponent;
+                string sourceACUrl = sourceComponent.GetACUrl();
+                short sourceItemID = GetRouteItemID(sourceComponent);
+                if (sourceItemID <= 0)
+                {
+                    errorStringBuilder.AppendLine(String.Format("B: RouteItemID {1} of source {0} is invalid at {2}", sourceACUrl, sourceItemID, currentACUrl));
+                    modelValid = false;
+                }
+
+                int sourceItemsCount = itemGroup.Count();
+                if (sourceItemsCount > 3)
+                {
+                    // 3 sources is maximum
+                    errorStringBuilder.AppendLine(String.Format("C: Source-Count {1} > 3 at {0}", currentACUrl, sourceItemsCount));
+                    modelValid = false;
+                }
+
+                short source2ItemID = 0, source3ItemID = 0;
+                string source2ACUrl = "", source3ACUrl = "";
+                if (sourceItemsCount > 1)
+                {
+                    source2ACUrl = itemGroup.ToArray()[1].SourceACComponent.ACUrl;
+                    source2ItemID = GetRouteItemID(itemGroup.ToArray()[1].SourceACComponent);
+                    if (source2ItemID <= 0)
                     {
-                        source3T = rItem.ToArray()[2].SourceACComponent.ACUrl; ;
-                        source3 = GetComponentID(rItem.ToArray()[2].SourceACComponent);
+                        errorStringBuilder.AppendLine(String.Format("D: RouteItemID {1} of second source {0} is invalid at {2}", source2ACUrl, source2ItemID, currentACUrl));
+                        modelValid = false;
+                    }
+                    if (sourceItemsCount > 2)
+                    {
+                        source3ACUrl = itemGroup.ToArray()[2].SourceACComponent.ACUrl; ;
+                        source3ItemID = GetRouteItemID(itemGroup.ToArray()[2].SourceACComponent);
+                        if (source3ItemID <= 0)
+                        {
+                            errorStringBuilder.AppendLine(String.Format("E: RouteItemID {1} of third source {0} is invalid at {2}", source3ACUrl, source3ItemID, currentACUrl));
+                            modelValid = false;
+                        }
                     }
                 }
 
-                var nextRouteItems = groupedRoutes.SelectMany(x => x).Where(c => c.SourceACComponent.ACUrl == currentComponent.ACUrl).ToArray();
+                var nextRouteItems = itemsGroupedByTargetComp.SelectMany(x => x)
+                                                             .Where(c => c.SourceACComponent.ACUrl == currentComponent.ACUrl)
+                                                             .ToArray();
                 if (nextRouteItems == null || nextRouteItems.Length == 0)
                     continue;
 
                 if (nextRouteItems.Length > 2)
-                    return null; // error message
+                {
+                    errorStringBuilder.AppendLine(String.Format("F: Item {0} has {1} targets (Max: 2)", currentACUrl, nextRouteItems.Length));
+                    modelValid = false;
+                }
 
-                string targetT, target2T = "";
-                targetT = nextRouteItems[0].TargetACComponent.ACUrl;
-                short target = GetComponentID(nextRouteItems[0].TargetACComponent);
-                if (target == 0)
-                    return null; //error message
+                string targetACUrl, target2ACUrl = "";
+                targetACUrl = nextRouteItems[0].TargetACComponent.ACUrl;
+                short targetItemID = GetRouteItemID(nextRouteItems[0].TargetACComponent);
+                if (targetItemID <= 0)
+                {
+                    errorStringBuilder.AppendLine(String.Format("G: RouteItemID {1} of target {0} is invalid at {2}", targetACUrl, targetItemID, currentACUrl));
+                    modelValid = false;
+                }
 
-                short target2 = 0;
+                short target2ItemID = 0;
                 if (nextRouteItems.Length > 1)
                 {
-                    target2T = nextRouteItems[1].TargetACComponent.ACUrl;
-                    target2 = GetComponentID(nextRouteItems[1].TargetACComponent);
+                    target2ACUrl = nextRouteItems[1].TargetACComponent.ACUrl;
+                    target2ItemID = GetRouteItemID(nextRouteItems[1].TargetACComponent);
+                    if (target2ItemID <= 0)
+                    {
+                        errorStringBuilder.AppendLine(String.Format("H: RouteItemID {1} of second target {0} is invalid at {2}", target2ACUrl, target2ItemID, currentACUrl));
+                        modelValid = false;
+                    }
                 }
 
                 bool isFirstControlModuleInRoute = false, isLastControlModuleInRoute = false;
-                if (rItem.Any(c => c.SourceACComponent.ACUrl == routeSource.SourceACComponent.ACUrl) && currentComponent is PAEControlModuleBase)
+                if (itemGroup.Any(c => c.SourceACComponent.ACUrl == routeSource.SourceACComponent.ACUrl) && currentComponent is PAEControlModuleBase)
                     isFirstControlModuleInRoute = true;
 
                 if (routeTargets.Any(c => c.SourceACComponent.ACUrl == currentComponent.ACUrl && c.SourceACComponent is PAEControlModuleBase))
@@ -493,28 +582,28 @@ namespace gip2006.variobatch.processapplication
 
                 RouteItemModel routeItemModel = new RouteItemModel()
                 {
-                    AggrNo = aggrNo,
+                    AggrNo = currentItemID,
                     AggrType = 1,
-                    Source = source,
-                    SecondSource = source2,
-                    ThirdSource = source3,
-                    Target = target,
-                    SecondTarget = target2,
+                    Source = sourceItemID,
+                    SecondSource = source2ItemID,
+                    ThirdSource = source3ItemID,
+                    Target = targetItemID,
+                    SecondTarget = target2ItemID,
                     IsFirstControlModuleInRouteItemList = isFirstControlModuleInRoute,
                     IsLastControlModuleInRouteItemList = isLastControlModuleInRoute,
                     TurnOnDelay = turnOnDelay,
                     TurnOffDelay = turnOffDelay,
-                    Me = me,
-                    SourceT = sourceT,
-                    Source2T = source2T,
-                    Source3T = source3T,
-                    TargetT = targetT,
-                    Target2T = target2T
+                    Me = currentACUrl,
+                    SourceT = sourceACUrl,
+                    Source2T = source2ACUrl,
+                    Source3T = source3ACUrl,
+                    TargetT = targetACUrl,
+                    Target2T = target2ACUrl
                 };
                 result.Add(routeItemModel);
             }
 
-            return result;
+            return modelValid;
         }
 
         class RouteItemModel
