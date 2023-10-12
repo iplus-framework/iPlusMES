@@ -1428,6 +1428,29 @@ namespace gip.mes.processapplication
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
 
+            ACValue value = currentACMethod.ParameterValueList.GetACValue("Route");
+            if (value != null)
+            {
+                Route originalR = value.ValueT<Route>();
+                if (originalR != null && !originalR.AreACUrlInfosSet)
+                {
+                    using (var db = new Database())
+                    {
+                        try
+                        {
+                            originalR.AttachTo(db); // Global context
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        finally
+                        {
+                            originalR.Detach(true);
+                        }
+                    }
+                }
+            }
+
             bool unsubscribe = true;
             if (IsMethodChangedFromClient 
                 && newACMethod != null 

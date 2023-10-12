@@ -33,6 +33,23 @@ namespace gip2006.variobatch.processapplication
                 return false;
 
             int iOffset = 0;
+            if (routeOffset.HasValue)
+            {
+                GIPFuncSerial2006Way serializer = FindChildComponents<GIPFuncSerial2006Way>(c => c is GIPFuncSerial2006Way).FirstOrDefault();
+                if (serializer == null)
+                    serializer = ParentACComponent.FindChildComponents<GIPFuncSerial2006Way>(c => c is GIPFuncSerial2006Way, null, 1).FirstOrDefault();
+                if (serializer != null)
+                {
+                    string errorMsg = null;
+                    // If route data not sucessful transferred to plc, then wait
+                    if (!serializer.SendRoute(this, complexObj, prevComplexObj, dbNo, offset, routeOffset, miscParams, out errorMsg))
+                    {
+                        WriteAlarm(miscParams, errorMsg);
+                        return false;
+                    }
+                }
+            }
+
             if (!routeOffset.HasValue || routeOffset.Value > offset)
             {
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Source
@@ -147,15 +164,42 @@ namespace gip2006.variobatch.processapplication
                 if (!sended)
                     return false;
             }
-            if (routeOffset.HasValue)
-            {
-                GIPFuncSerial2006Way serializer = FindChildComponents<GIPFuncSerial2006Way>(c => c is GIPFuncSerial2006Way).FirstOrDefault();
-                if (serializer == null)
-                    serializer = ParentACComponent.FindChildComponents<GIPFuncSerial2006Way>(c => c is GIPFuncSerial2006Way, null, 1).FirstOrDefault();
-                if (serializer != null)
-                    return serializer.SendObject(complexObj, prevComplexObj, dbNo, offset, routeOffset, miscParams);
-            }
             return true;
+        }
+
+        protected void WriteAlarm(object miscParams, string message)
+        {
+            bool written = false;
+            ACChildInstanceInfo childInfo = null;
+            IACComponent invokerModule = null;
+            if (miscParams != null)
+            {
+                childInfo = miscParams as ACChildInstanceInfo;
+                if (childInfo != null)
+                {
+                    invokerModule = ACUrlCommand(childInfo.ACUrlParent) as IACComponent;
+                }
+            }
+
+            if (invokerModule != null)
+            {
+                PAProcessModuleVB paModule = invokerModule as PAProcessModuleVB;
+                if (paModule != null)
+                {
+                    PAFDischarging pafDis = paModule.FindChildComponents<PAFDischarging>(c => c is PAFDischarging).FirstOrDefault();
+                    if (pafDis != null)
+                    {
+                        pafDis.FunctionError.ValueT = gip.core.autocomponent.PANotifyState.AlarmOrFault;
+                        pafDis.OnNewAlarmOccurred(pafDis.FunctionError, new Msg(message, this, eMsgLevel.Exception, "PAProcessFunction", "ReSendACMethod", 9010), true);
+                        written = true;
+                    }
+                }
+            }
+            if (!written)
+            {
+                Messages.LogError(this.GetACUrl(), "WriteAlarm", message);
+            }
+            return;
         }
 
         public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
