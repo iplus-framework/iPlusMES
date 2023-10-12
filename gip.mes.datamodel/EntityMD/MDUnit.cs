@@ -227,7 +227,7 @@ namespace gip.mes.datamodel
             List<MDUnit> convertableUnits = this.ConvertableUnits;
             if (!convertableUnits.Any())
             {
-                throw new ArgumentException("Not convertable" + this.MDUnitName + "->" + toMDUnit.MDUnitName);
+                throw new ArgumentException("Not convertable " + this.MDUnitName + "->" + toMDUnit.MDUnitName);
             }
             if (this.SIDimension != GlobalApp.SIDimensions.None)
             {
@@ -238,7 +238,7 @@ namespace gip.mes.datamodel
                     var query = siUnit.MDUnitConversion_MDUnit.Where(c => c.ToMDUnitID == this.MDUnitID);
                     if (!query.Any())
                     {
-                        throw new ArgumentException("Not convertable" + this.MDUnitName + "->" + toMDUnit.MDUnitName);
+                        throw new ArgumentException("Not convertable " + this.MDUnitName + "->" + toMDUnit.MDUnitName);
                     }
                     MDUnitConversion conversionThis = query.First();
                     quantityInSIUnit = quantityThis * conversionThis.Multiplier / conversionThis.Divisor;
@@ -254,7 +254,7 @@ namespace gip.mes.datamodel
                 var query2 = siUnit.MDUnitConversion_MDUnit.Where(c => c.ToMDUnitID == toMDUnit.MDUnitID);
                 if (!query2.Any())
                 {
-                    throw new ArgumentException("Not convertable" + this.MDUnitName + "->" + toMDUnit.MDUnitName);
+                    throw new ArgumentException("Not convertable " + this.MDUnitName + "->" + toMDUnit.MDUnitName);
                 }
                 MDUnitConversion conversionTo = query2.First();
                 double result = quantityInSIUnit * conversionTo.Divisor / conversionTo.Multiplier;
@@ -356,7 +356,7 @@ namespace gip.mes.datamodel
             List<MDUnit> convertableUnits = this.ConvertableUnits;
             if (!convertableUnits.Any())
             {
-                throw new ArgumentException("Not convertable" + this.MDUnitName + "->" + fromMDUnit.MDUnitName);
+                throw new ArgumentException("Not convertable " + this.MDUnitName + "->" + fromMDUnit.MDUnitName);
             }
             if (this.SIDimension != GlobalApp.SIDimensions.None)
             {
@@ -374,14 +374,14 @@ namespace gip.mes.datamodel
                         query = this.MDUnitConversion_MDUnit.Where(c => c.ToMDUnitID == fromMDUnit.SIUnit.MDUnitID);
                         if (!query.Any())
                         {
-                            throw new ArgumentException("Not convertable" + fromMDUnit.MDUnitName + "->" + this.MDUnitName);
+                            throw new ArgumentException("Not convertable " + fromMDUnit.MDUnitName + "->" + this.MDUnitName);
                         }
                         quantityFrom = fromMDUnit.ConvertToUnit(quantityFrom, fromMDUnit.SIUnit);
                         fromMDUnit = fromMDUnit.SIUnit;
                         conversionTo = query.First();
                     }
                     else
-                        throw new ArgumentException("Not convertable" + fromMDUnit.MDUnitName + "->" + this.MDUnitName);
+                        throw new ArgumentException("Not convertable " + fromMDUnit.MDUnitName + "->" + this.MDUnitName);
                 }
                 else
                     conversionTo = query.First();
