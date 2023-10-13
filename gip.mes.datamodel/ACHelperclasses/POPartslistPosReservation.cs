@@ -159,52 +159,22 @@ namespace gip.mes.datamodel
             }
         }
 
-        private Route _CurrentRoute;
+        //private Route _CurrentRoute;
         [ACPropertyInfo(999, "", "en{'Route'}de{'Route'}")]
         public Route CurrentRoute
         {
             get
             {
                 if (SelectedReservation == null)
-                {
-                    _CurrentRoute = null;
                     return null;
-                }
-
-                if (_CurrentRoute != null)
-                    return _CurrentRoute;
-
-                IACEntityProperty entityProperty = SelectedReservation as IACEntityProperty;
-                ACPropertyExt acPropertyExt = entityProperty.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
-                if (acPropertyExt != null && acPropertyExt.Value != null)
-                    _CurrentRoute = acPropertyExt.Value as Route;
-
-                return _CurrentRoute;
+                return SelectedReservation.PredefinedRoute;
             }
             set
             {
                 if (SelectedReservation == null)
                     return;
-
-                IACEntityProperty entityProperty = SelectedReservation as IACEntityProperty;
-                ACPropertyExt acPropertyExt = entityProperty.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
-                if (acPropertyExt == null)
-                {
-                    acPropertyExt = new ACPropertyExt();
-                    acPropertyExt.ACIdentifier = Route.ClassName;
-                    acPropertyExt.ObjectType = typeof(Route);
-                    acPropertyExt.AttachTo(entityProperty.ACProperties);
-                }
-
-                Route savedRoute = acPropertyExt.Value as Route;
-                if (savedRoute == null || !savedRoute.SequenceEqual(value))
-                {
-                    _CurrentRoute = value;
-                    acPropertyExt.Value = value;
-                    entityProperty.ACProperties.Properties.Add(acPropertyExt);
-                    entityProperty.ACProperties.Serialize();
-                }
-                OnPropertyChanged("CurrentRoute");
+                SelectedReservation.PredefinedRoute = value;
+                OnPropertyChanged();
             }
         }
 

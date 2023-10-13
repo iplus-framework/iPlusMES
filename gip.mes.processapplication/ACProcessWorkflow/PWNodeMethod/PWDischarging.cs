@@ -830,7 +830,7 @@ namespace gip.mes.processapplication
                                         OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualWeight);
 
                                         bool exceptionHandled = false;
-                                        var routeItem = CurrentDischargingDest(dbIPlus);
+                                        var routeItem = CurrentDischargingDest(dbIPlus, true);
                                         PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
                                         if (routeItem != null && targetModule != null)
                                         {
@@ -884,7 +884,7 @@ namespace gip.mes.processapplication
                                                 actualWeight = acValueTargetQ.ParamAsDouble;
                                         }
 
-                                        var routeItem = CurrentDischargingDest(dbIPlus);
+                                        var routeItem = CurrentDischargingDest(dbIPlus, true);
                                         PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
                                         if (routeItem != null && targetModule != null)
                                         {
@@ -1196,40 +1196,56 @@ namespace gip.mes.processapplication
         }
 
 
-        protected void DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo, 
-            int searchDepth, 
+        protected void DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo,
+            int searchDepth,
             Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector, 
-            string deSelectionRuleID, object[] deSelParams = null)
+            string deSelectionRuleID, object[] deSelParams = null, Route predefinedRoute = null)
         {
             Route route = null;
-            PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, deSelParams);
+            if (predefinedRoute != null)
+            {
+                if (!predefinedRoute.AreACUrlInfosSet)
+                    predefinedRoute.AttachTo(db);
+                var item = predefinedRoute.GetRouteTarget();
+                if (item != null && item.TargetACComponent == acCompTo)
+                    route = predefinedRoute;
+            }
+            if (route == null)
+                PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, deSelParams);
             if (route != null)
                 route.Detach(true);
             CurrentDischargingRoute = route;
         }
 
-        public virtual RouteItem CurrentDischargingDest(Database db)
+        public virtual RouteItem CurrentDischargingDest(Database db, bool leaveAttached = false)
         {
             if (CurrentDischargingRoute == null)
                 return null;
-            RouteItem item = CurrentDischargingRoute.LastOrDefault();
+            RouteItem item = CurrentDischargingRoute.GetRouteTarget();
+            //RouteItem item = CurrentDischargingRoute.LastOrDefault();
             if (item == null)
                 return null;
+            if (!item.AreACUrlInfosSet)
+            {
+                item.AttachTo(db == null ? this.Root.Database : db);
+                item.Detach(true);
+            }
             RouteItem clone = item.Clone() as RouteItem;
-            if (db != null)
+            if (db != null && leaveAttached)
                 clone.AttachTo(db);
             return clone;
         }
 
         private ACRef<PAMSilo> _CurrentCachedDestinationSilo = null;
-        public PAMSilo CurrentCachedDestinationSilo(Database db = null)
+        public PAMSilo CurrentCachedDestinationSilo(Database db = null, bool leaveAttached = false)
         {
             if (CurrentDischargingRoute == null)
             {
                 _CurrentCachedDestinationSilo = null;
                 return null;
             }
-            var lastItem = CurrentDischargingRoute.LastOrDefault();
+            RouteItem lastItem = CurrentDischargingRoute.GetRouteTarget();
+            //var lastItem = CurrentDischargingRoute.LastOrDefault();
             if (lastItem == null)
             {
                 _CurrentCachedDestinationSilo = null;
@@ -1251,6 +1267,8 @@ namespace gip.mes.processapplication
                     db = gip.core.datamodel.Database.GlobalDatabase;
                 clone.AttachTo(db);
                 component = clone.TargetACComponent;
+                if (!leaveAttached)
+                    clone.Detach(true);
             }
 
             PAMSilo targetSilo = component as PAMSilo;
@@ -1263,19 +1281,14 @@ namespace gip.mes.processapplication
 
         public PAProcessModule TargetPAModule(Database db)
         {
-            RouteItem item = CurrentDischargingDest(null);
+            RouteItem item = CurrentDischargingDest(db, false);
             if (item == null)
                 return null;
             PAProcessModule target = item.TargetACComponent as PAProcessModule;
             if (target != null)
                 return target;
-
-            item = CurrentDischargingDest(db);
-            if (item == null)
-                return null;
-            target = item.TargetACComponent as PAProcessModule;
-            if (target == null && db == null && !item.IsAttached)
-                item.AttachTo(this.Root.Database);
+            if (!item.IsAttached)
+                item.AttachTo(db == null ? this.Root.Database : db);
             item.Detach();
             return item.TargetACComponent as PAProcessModule;
         }

@@ -548,7 +548,10 @@ namespace gip.bso.purchasing
 
             if (routeSelector.RouteResult != null)
             {
-                SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
+                if (routeSelector.RouteResult.Count() > 1)
+                    SelectedTarget.CurrentRoute = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                else
+                    SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
             }
 
         }
@@ -571,11 +574,15 @@ namespace gip.bso.purchasing
             //set flag to true if route is read only
             routeSelector.EditRoutes(SelectedTarget.CurrentRoute, false, true, true);
 
-            if (routeSelector.RouteResult != null)
+            if (routeSelector.RouteResult != null && SelectedTarget.CurrentRoute == null)
             {
-                Route result = routeSelector.RouteResult.FirstOrDefault();
-                if (result != SelectedTarget.CurrentRoute)
-                    SelectedTarget.CurrentRoute = result;
+                if (routeSelector.RouteResult != null)
+                {
+                    if (routeSelector.RouteResult.Count() > 1)
+                        SelectedTarget.CurrentRoute = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                    else
+                        SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
+                }
             }
         }
 

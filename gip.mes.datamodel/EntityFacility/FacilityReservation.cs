@@ -209,6 +209,46 @@ namespace gip.mes.datamodel
         {
             OnPropertyChanged("FacilityACClass");
         }
+
+        //[NotMapped]
+        private Route _PredefinedRoute;
+        //[NotMapped]
+        [ACPropertyInfo(999, "", "en{'Route'}de{'Route'}")]
+        public Route PredefinedRoute
+        {
+            get
+            {
+                if (_PredefinedRoute != null)
+                    return _PredefinedRoute;
+
+                ACPropertyExt acPropertyExt = this.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
+                if (acPropertyExt != null && acPropertyExt.Value != null)
+                    _PredefinedRoute = acPropertyExt.Value as Route;
+
+                return _PredefinedRoute;
+            }
+            set
+            {
+                ACPropertyExt acPropertyExt = this.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
+                if (acPropertyExt == null)
+                {
+                    acPropertyExt = new ACPropertyExt();
+                    acPropertyExt.ACIdentifier = Route.ClassName;
+                    acPropertyExt.ObjectType = typeof(Route);
+                    acPropertyExt.AttachTo(this.ACProperties);
+                }
+
+                Route savedRoute = acPropertyExt.Value as Route;
+                if (savedRoute == null || !savedRoute.SequenceEqual(value))
+                {
+                    _PredefinedRoute = value;
+                    acPropertyExt.Value = value;
+                    this.ACProperties.Properties.Add(acPropertyExt);
+                    this.ACProperties.Serialize();
+                }
+                OnPropertyChanged(nameof(PredefinedRoute));
+            }
+        }
         #endregion
     }
 }

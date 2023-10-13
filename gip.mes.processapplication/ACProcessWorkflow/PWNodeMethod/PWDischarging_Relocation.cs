@@ -81,7 +81,7 @@ namespace gip.mes.processapplication
                 return StartDisResult.CancelDischarging;
             }
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 if (facilityBooking.InwardFacility == null)
                 {
@@ -118,7 +118,7 @@ namespace gip.mes.processapplication
 
             }
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 // Error50109 CurrentDischargingDest() is null because no route couldn't be found for Relocationbooking {0}
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingFBooking(10)", 1020, "Error50109", facilityBooking.FacilityBookingNo);

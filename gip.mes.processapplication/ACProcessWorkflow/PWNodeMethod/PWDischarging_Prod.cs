@@ -87,7 +87,7 @@ namespace gip.mes.processapplication
                     if (connectionToDischarging != null)
                     {
                         FacilityReservation nextDestination = null;
-                        if (CurrentDischargingDest(null) == null)
+                        if (CurrentDischargingDest(dbIPlus, false) == null)
                         {
                             PWGroupVB pwGroup = ParentPWGroup as PWGroupVB;
                             // Prüfe zuerst ob in Leerfahrmodus und prüfe ob es sich um ein endgültiges Ziel handelt
@@ -108,12 +108,12 @@ namespace gip.mes.processapplication
                                                                         || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
                                                             PAProcessModule.SelRuleID_ProcessModule_Deselector, null);
                                     // Falls Route nicht existiert, dann fahre in Standardziel
-                                    if (CurrentDischargingDest(null) == null)
+                                    if (CurrentDischargingDest(dbIPlus, false) == null)
                                         targetSiloACComp = null;
                                 }
                             }
                             // Kein Leerfahrmodus oder keine Route gefunden
-                            if (targetSiloACComp == null || CurrentDischargingDest(null) == null)
+                            if (targetSiloACComp == null || CurrentDischargingDest(dbIPlus, false) == null)
                             {
                                 IList<FacilityReservation> plannedSilos = batchPlan.FacilityReservation_ProdOrderBatchPlan.OrderBy(c => c.Sequence).ToArray();
                                 if (plannedSilos == null || !plannedSilos.Any())
@@ -224,7 +224,7 @@ namespace gip.mes.processapplication
                             }
                         }
 
-                        if (CurrentDischargingDest(null) == null)
+                        if (CurrentDischargingDest(dbIPlus, false) == null)
                         {
                             // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.
                             msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischarging(6)", 1060, "Error50072",
@@ -791,7 +791,7 @@ namespace gip.mes.processapplication
                         return StartDisResult.CycleWait;
                     }
 
-                    if (CurrentDischargingDest(null) == null)
+                    if (CurrentDischargingDest(dbIPlus, false) == null)
                     {
                         // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(3)", 1230, "Error50072",
@@ -965,7 +965,7 @@ namespace gip.mes.processapplication
                                                         || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
                                             PAMSilo.SelRuleID_Silo_Deselector, null);
 
-                    if (CurrentDischargingDest(null) == null)
+                    if (CurrentDischargingDest(dbIPlus, false) == null)
                     {
                         CheckIfAutomaticTargetChangePossible = false;
                         // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.

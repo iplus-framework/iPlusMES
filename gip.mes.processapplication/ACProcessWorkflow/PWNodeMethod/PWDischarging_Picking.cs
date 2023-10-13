@@ -191,7 +191,7 @@ namespace gip.mes.processapplication
                                     (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                                     PAProcessModule.SelRuleID_ProcessModule_Deselector, null);
             // Falls kein direkter Weg gefunden, prüfe über welche gemappte PWGroup weiter transportiert werden kann 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 isLastDischarging = false;
 
@@ -218,7 +218,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(70)", 1070, "Error50072",
@@ -514,7 +514,7 @@ namespace gip.mes.processapplication
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                                         PAProcessModule.SelRuleID_ProcessModule_Deselector, null);
             // Falls kein direkter Weg gefunden, prüfe über welche gemappte PWGroup weiter transportiert werden kann 
-            if (CurrentDischargingDest(null) != null)
+            if (CurrentDischargingDest(db, false) != null)
             {
                 isLastDischarging = false;
                 RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, RoutingService != null && RoutingService.IsProxy,
@@ -540,7 +540,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSiloPicking(70)", 528, "Error50072",

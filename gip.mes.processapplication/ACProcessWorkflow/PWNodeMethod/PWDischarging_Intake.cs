@@ -245,7 +245,7 @@ namespace gip.mes.processapplication
 
             double targetQuantity = 0;
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 var queryPosSameMaterial = dbApp.DeliveryNotePos.Where(c => c.DeliveryNoteID == dnPos.DeliveryNoteID
                     && c.InOrderPosID.HasValue
@@ -314,13 +314,16 @@ namespace gip.mes.processapplication
                 }
 
                 Type typeOfSilo = typeof(PAMSilo);
-                Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+                Guid thisMethodID = ContentACClassWF.ACClassMethodID;              
+                Route predefinedRoute = facReservation.PredefinedRoute;
+                if (predefinedRoute != null)
+                    predefinedRoute = predefinedRoute.Clone() as Route;
                 DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
                                         (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                                 && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                     || !c.BasedOnACClassID.HasValue
                                                     || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                        PAMSilo.SelRuleID_Silo_Deselector, null);
+                                        PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute);
 
                 MDReleaseState.ReleaseStates resultReleaseState = MDReleaseState.ReleaseStates.Free;
                 foreach (DeliveryNotePos notePos in dnPos.DeliveryNote.DeliveryNotePos_DeliveryNote)
@@ -348,7 +351,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 // Error50106 CurrentDischargingDest() is null because no route couldn't be found at DeliveryNote{0}, Line {1}.
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingInDNote(70)", 1060, "Error50106",
@@ -603,14 +606,17 @@ namespace gip.mes.processapplication
             CurrentDischargingRoute = null;
             Type typeOfSilo = typeof(PAMSilo);
             Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+            Route predefinedRoute = facReservation.PredefinedRoute;
+            if (predefinedRoute != null)
+                predefinedRoute = predefinedRoute.Clone() as Route;
             DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
                                     (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                             && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                 || !c.BasedOnACClassID.HasValue
                                                 || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                    PAMSilo.SelRuleID_Silo_Deselector, null);
+                                    PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute);
 
-            if (CurrentDischargingDest(null) == null)
+            if (CurrentDischargingDest(db, false) == null)
             {
                 // Error50106 CurrentDischargingDest() is null because no route couldn't be found at DeliveryNote{0}, Line {1}.
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSiloInNotePos(60)", 1170, "Error50106",
