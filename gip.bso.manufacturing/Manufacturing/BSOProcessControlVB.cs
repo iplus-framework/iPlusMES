@@ -600,13 +600,24 @@ namespace gip.bso.manufacturing
                 // prodOrderPartslistPos is null at planning nodes
                 if (prodOrderPartslistPos == null)
                 {
+                  
                     prodOrderPartslistPos =
                     task
-                    .ACProgram
-                    .ACClassTask_ACProgram
-                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
-                    .Where(c => c.ParentProdOrderPartslistPosID != null)
-                    .FirstOrDefault();
+                        .ACProgram
+                        .ACClassTask_ACProgram
+                        .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                        .Where(c => c.ParentProdOrderPartslistPosID != null)
+                        .FirstOrDefault();
+
+                    if(prodOrderPartslistPos == null)
+                    {
+                        prodOrderPartslistPos =
+                        task
+                           .ACProgram
+                           .ACClassTask_ACProgram
+                           .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                           .FirstOrDefault();
+                    }
                 }
 
                 model.Material = "";

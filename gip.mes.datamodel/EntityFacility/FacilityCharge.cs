@@ -634,7 +634,7 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        [ACPropertyInfo(999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
+        [ACPropertyInfo(9999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
         public string ProdOrderProgramNo
         {
             get
@@ -653,7 +653,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999, "BatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
+        [ACPropertyInfo(9999, "BatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
         public string BatchNo
         {
             get
@@ -669,6 +669,25 @@ namespace gip.mes.datamodel
                         programNo = String.Format("{0} ({1})", pos.ProdOrderBatch.BatchSeqNo, pos.ProdOrderBatch.ProdOrderBatchNo);
                 }
                 return programNo;
+            }
+        }
+
+        [ACPropertyInfo(9999, "", "en{'Prod. order position sequence'}de{'Reihenfolge der PA positionen'}")]
+        public int ProdOrderPosSequence
+        {
+            get
+            {
+                int seq = 1;
+
+                if (IsFinalOutput)
+                {
+                    FacilityBookingCharge fbc = FacilityBookingCharge_InwardFacilityCharge.FirstOrDefault(); 
+                    if (fbc != null && fbc.ProdOrderPartslistPos != null)
+                    {
+                        seq = fbc.ProdOrderPartslistPos.Sequence;
+                    }
+                }
+                return seq;
             }
         }
 
