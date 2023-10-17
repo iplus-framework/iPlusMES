@@ -38,10 +38,19 @@ namespace gip.mes.facility
                 _DoseAlternativeMat = doseAlternativeMat;
             }
 
-            public QrySilosResult(IEnumerable<IGrouping<Guid, FacilityCharge>> groupedSilos, IPartslistPos doseAlternativeMat = null)
+            //public QrySilosResult(IEnumerable<IGrouping<Guid, FacilityCharge>> groupedSilos, IPartslistPos doseAlternativeMat = null)
+            //{
+            //    _FoundSilos = groupedSilos != null && groupedSilos.Any() ? groupedSilos.Select(c => c.FirstOrDefault().Facility).ToList() : new List<Facility>();
+            //    _GroupedStoreIDsWithQuants = groupedSilos;
+            //    _DoseAlternativeMat = doseAlternativeMat;
+            //}
+
+            public QrySilosResult(IEnumerable<FacilityCharge> foundQuants, IPartslistPos doseAlternativeMat = null)
             {
-                _FoundSilos = groupedSilos != null && groupedSilos.Any() ? groupedSilos.Select(c => c.FirstOrDefault().Facility).ToList() : new List<Facility>();
-                _GroupedStoresWithQuants = groupedSilos;
+                _GroupedStoresWithQuants = foundQuants != null && foundQuants.Any() ? foundQuants.GroupBy(c => c.Facility) : null;
+                _FoundSilos = _GroupedStoresWithQuants != null ? _GroupedStoresWithQuants.Select(c => c.Key).ToList() : new List<Facility>();
+                //_FoundSilos = groupedSilos != null && groupedSilos.Any() ? groupedSilos.Select(c => c.FirstOrDefault().Facility).ToList() : new List<Facility>();
+                //_GroupedStoreIDsWithQuants = groupedSilos;
                 _DoseAlternativeMat = doseAlternativeMat;
             }
 
@@ -54,8 +63,17 @@ namespace gip.mes.facility
                 }
             }
 
-            private IEnumerable<IGrouping<Guid, FacilityCharge>> _GroupedStoresWithQuants;
-            public IEnumerable<IGrouping<Guid, FacilityCharge>> GroupedStoresWithQuants
+            //private IEnumerable<IGrouping<Guid, FacilityCharge>> _GroupedStoreIDsWithQuants;
+            //public IEnumerable<IGrouping<Guid, FacilityCharge>> GroupedStoreIDsWithQuants
+            //{
+            //    get
+            //    {
+            //        return _GroupedStoreIDsWithQuants;
+            //    }
+            //}
+
+            private IEnumerable<IGrouping<Facility, FacilityCharge>> _GroupedStoresWithQuants;
+            public IEnumerable<IGrouping<Facility, FacilityCharge>> GroupedStoresWithQuants
             {
                 get
                 {
@@ -114,8 +132,8 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PlSilosWithMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithMaterialTime =
+        CompiledQuery.Compile<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
@@ -133,7 +151,7 @@ namespace gip.mes.facility
                                                                            && (    (c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
                                                                                 || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                                     .OrderBy(c => c.FillingDate)
-                                                                    .GroupBy(c => c.FacilityID)
+                                                                    //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -193,8 +211,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PlSilosWithIntermediateMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithIntermediateMaterialTime =
+        CompiledQuery.Compile<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
@@ -214,7 +232,7 @@ namespace gip.mes.facility
                                                                            && ((c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
                                                                                 || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                                     .OrderBy(c => c.FillingDate)
-                                                                    .GroupBy(c => c.FacilityID)
+                                                                    //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -282,8 +300,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PlSilosWithMaterial =
-        CompiledQuery.Compile<DatabaseApp, PartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithMaterial =
+        CompiledQuery.Compile<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -300,7 +318,7 @@ namespace gip.mes.facility
                                                           || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .GroupBy(c => c.FacilityID)
+                                               //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -352,8 +370,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PlSilosWithIntermediateMaterial =
-        CompiledQuery.Compile<DatabaseApp, PartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithIntermediateMaterial =
+        CompiledQuery.Compile<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -372,7 +390,7 @@ namespace gip.mes.facility
                                                          || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .GroupBy(c => c.FacilityID)
+                                               //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -436,8 +454,8 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosWithMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithMaterialTime =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                             .Include("Facility.FacilityStock_Facility")
                                                                             .Where(c => c.NotAvailable == false
@@ -455,7 +473,7 @@ namespace gip.mes.facility
                                                                                         && (   (c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
                                                                                             || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                                            .OrderBy(c => c.FillingDate)
-                                                                           .GroupBy(c => c.FacilityID)
+                                                                           //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -515,8 +533,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosWithIntermediateMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithIntermediateMaterialTime =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
@@ -539,7 +557,7 @@ namespace gip.mes.facility
                                                                            && (  (c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
                                                                                || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                                     .OrderBy(c => c.FillingDate)
-                                                                    .GroupBy(c => c.FacilityID)
+                                                                    //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -603,8 +621,8 @@ namespace gip.mes.facility
         /// AND must pe produced form the same order in a previous stage
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosFromPrevStageTime =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevStageTime =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue
@@ -630,7 +648,7 @@ namespace gip.mes.facility
                                                                                 || (c.InwardFacilityCharge.FillingDate.HasValue && c.InwardFacilityCharge.FillingDate <= filterTimeOlderThan)))
                                                                     .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                                     .Select(c => c.InwardFacilityCharge)
-                                                                    .GroupBy(c => c.FacilityID)
+                                                                    //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -692,8 +710,8 @@ namespace gip.mes.facility
         /// AND must pe produced form the same order in a previous stage
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosFromPrevIntermediateTime =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevIntermediateTime =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
@@ -709,7 +727,7 @@ namespace gip.mes.facility
                                                                                 || (c.InwardFacilityCharge.FillingDate.HasValue && c.InwardFacilityCharge.FillingDate <= filterTimeOlderThan)))
                                                                     .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                                     .Select(c => c.InwardFacilityCharge)
-                                                                    .GroupBy(c => c.FacilityID)
+                                                                    //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos which 
@@ -771,8 +789,8 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_SilosFromLotsOfPrevStageTime =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_SilosFromLotsOfPrevStageTime =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) =>
             ctx
             .FacilityBookingCharge
@@ -811,7 +829,7 @@ namespace gip.mes.facility
                     )
             .OrderBy(c => c.InwardFacilityCharge.FillingDate)
             .Select(c => c.InwardFacilityCharge)
-            .GroupBy(c => c.FacilityID)
+            //.GroupBy(c => c.FacilityID)
         );
 
         /// <summary>
@@ -872,8 +890,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosWithMaterial =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithMaterial =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -890,7 +908,7 @@ namespace gip.mes.facility
                                                           || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .GroupBy(c => c.FacilityID)
+                                               //.GroupBy(c => c.FacilityID)
                                                //.Select(c => c.Facility)
         );
         /// <summary>
@@ -943,8 +961,8 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosWithIntermediateMaterial =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithIntermediateMaterial =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
@@ -965,7 +983,7 @@ namespace gip.mes.facility
                                                          || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .GroupBy(c => c.FacilityID)
+                                               //.GroupBy(c => c.FacilityID)
                                                //.Select(c => c.Facility)
         );
         /// <summary>
@@ -1025,8 +1043,8 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosFromPrevStage =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevStage =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
@@ -1047,7 +1065,7 @@ namespace gip.mes.facility
                                                           || !checkOutwardEnabled))
                                                .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                .Select(c => c.InwardFacilityCharge)
-                                               .GroupBy(c => c.FacilityID)
+                                               //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -1099,8 +1117,8 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_PoSilosFromPrevIntermediate =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevIntermediate =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
@@ -1115,7 +1133,7 @@ namespace gip.mes.facility
                                                           || !checkOutwardEnabled))
                                                .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                .Select(c => c.InwardFacilityCharge)
-                                               .GroupBy(c => c.FacilityID)
+                                               //.GroupBy(c => c.FacilityID)
         );
         /// <summary>
         /// Queries Silos 
@@ -1168,8 +1186,8 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>> s_cQry_SilosFromLotsOfPrevStage =
-        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<IGrouping<Guid, FacilityCharge>>>(
+        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_SilosFromLotsOfPrevStage =
+        CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) =>
             ctx
             .FacilityBookingCharge
@@ -1208,7 +1226,7 @@ namespace gip.mes.facility
                     )
             .OrderBy(c => c.InwardFacilityCharge.FillingDate)
             .Select(c => c.InwardFacilityCharge)
-            .GroupBy(c => c.FacilityID)
+            //.GroupBy(c => c.FacilityID)
         );
 
         /// <summary>

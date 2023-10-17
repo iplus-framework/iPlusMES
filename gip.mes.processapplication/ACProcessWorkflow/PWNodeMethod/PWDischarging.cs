@@ -1225,9 +1225,9 @@ namespace gip.mes.processapplication
             //RouteItem item = CurrentDischargingRoute.LastOrDefault();
             if (item == null)
                 return null;
-            if (!item.AreACUrlInfosSet)
+            if (!item.AreACUrlInfosSet && db != null && db != core.datamodel.Database.GlobalDatabase)
             {
-                item.AttachTo(db == null ? this.Root.Database : db);
+                item.AttachTo(db);
                 item.Detach(true);
             }
             RouteItem clone = item.Clone() as RouteItem;
@@ -1261,10 +1261,8 @@ namespace gip.mes.processapplication
 
             RouteItem clone = lastItem.Clone() as RouteItem;
             IACComponent component = clone.TargetACComponent;
-            if (component == null)
+            if (component == null && db != null && db != core.datamodel.Database.GlobalDatabase)
             {
-                if (db == null)
-                    db = gip.core.datamodel.Database.GlobalDatabase;
                 clone.AttachTo(db);
                 component = clone.TargetACComponent;
                 if (!leaveAttached)
