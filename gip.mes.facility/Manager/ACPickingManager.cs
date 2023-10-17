@@ -1876,7 +1876,8 @@ namespace gip.mes.facility
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
-                                                      && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)
+                                                      && ((c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
+                                                          || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                .OrderBy(c => c.FillingDate)
                                                .Select(c => c.Facility)
         );
