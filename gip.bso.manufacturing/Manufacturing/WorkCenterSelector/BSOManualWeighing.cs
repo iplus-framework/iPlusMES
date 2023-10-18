@@ -3016,9 +3016,11 @@ namespace gip.bso.manufacturing
                         //Question50083: The number of repetitions is set to {0}. Are you sure that you want dose {0} times?
                         if (Messages.Question(this, "Question50083", Global.MsgResult.No, false, SingleDosNumberOfRepetitions) == Global.MsgResult.Yes)
                         {
-                            for (int i = 0; i < SingleDosNumberOfRepetitions; i++)
+                            RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true, PARole.ValidationBehaviour.Strict, false);
+
+                            for (int i = 1; i < SingleDosNumberOfRepetitions; i++)
                             {
-                                RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true);
+                                RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true, PARole.ValidationBehaviour.Strict, true);
                             }
 
                             runOnce = false;

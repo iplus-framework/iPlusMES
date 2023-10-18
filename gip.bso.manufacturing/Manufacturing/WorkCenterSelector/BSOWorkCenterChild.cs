@@ -30,6 +30,8 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
+        public const string Const_ACClassWFID = "PickingACClassWFID";
+
         #endregion
 
         #region Properties
@@ -164,7 +166,7 @@ namespace gip.bso.manufacturing
         #region Methods => Start workflow picking
 
         public bool RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
-                                bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict)
+                                bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict, bool onlyPreparePicking = false)
         {
             bool wfRunsBatches = false;
             ACComponent appManager = null;
@@ -240,6 +242,18 @@ namespace gip.bso.manufacturing
                 Messages.Msg(msgDetails);
                 ClearBookingData();
                 return false;
+            }
+
+            if (onlyPreparePicking)
+            {
+                PickingConfig pConfig = PickingConfig.NewACObject(dbApp, picking);
+                pConfig.KeyACUrl = Const_ACClassWFID;
+                pConfig.VBiValueTypeACClassID = dbApp.ContextIPlus.GetACType(typeof(string)).ACClassID;
+                pConfig.XMLConfig = workflow.ACClassWFID.ToString();
+
+                dbApp.ACSaveChanges();
+
+                return true;
             }
 
             processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo), picking.PickingNo);

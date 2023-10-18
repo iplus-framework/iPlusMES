@@ -138,6 +138,8 @@ namespace gip.mes.processapplication
                 _MDSchedulingGroup = null;
             }
 
+            StartedAnyPickingWF.ValueT = false;
+
             bool result = base.ACDeInit(deleteACClassTask);
             return result;
         }
@@ -162,6 +164,8 @@ namespace gip.mes.processapplication
                 _MDSchedulingGroupLoaded = false;
                 _MDSchedulingGroup = null;
             }
+
+            StartedAnyPickingWF.ValueT = false;
 
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }

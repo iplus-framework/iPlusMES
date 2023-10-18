@@ -4,6 +4,8 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using System.Runtime.InteropServices.ComTypes;
+using System.Collections.Generic;
 
 namespace gip.mes.processapplication
 {
@@ -56,6 +58,15 @@ namespace gip.mes.processapplication
                 }
             }
         }
+
+        [ACPropertyBindingSource(9999, "", "en{'Has started any picking workflow'}de{'Has started any picking workflow'}", "", false, true)]
+        public IACContainerTNet<bool> StartedAnyPickingWF
+        {
+            get;
+            set;
+                
+        }
+
         #endregion
 
         #region Methods
@@ -82,7 +93,10 @@ namespace gip.mes.processapplication
                 return StartNextBatchResult.WaitForNextEvent;
 
             if (WillReadAndStartNextBatchCompleteNode_Picking(20))
+            {
+                StartNextPickingWF(detachedPicking);
                 return StartNextBatchResult.Done;
+            }
 
             using (Database dbiPlus = new Database())
             using (DatabaseApp dbApp = new DatabaseApp())
@@ -109,7 +123,7 @@ namespace gip.mes.processapplication
                 if (validationSuccess)
                 {
                     //if (ProdOrderManager.SetBatchPlanValidated(dbApp, currentProdOrderPartslist) > 0)
-                        //dbApp.ACSaveChanges();
+                    //dbApp.ACSaveChanges();
                 }
 
 
@@ -117,34 +131,35 @@ namespace gip.mes.processapplication
                 //var queryOrderRelatedPickingLines = picking.PickingPos_Picking.Where(c => c.InOrderPosID.HasValue || c.OutOrderPosID.HasValue || c.PickingPosProdOrderPartslistPos_PickingPos.Any());
                 //if (queryOrderRelatedPickingLines.Any())
                 //{
+                pickingPos = picking.PickingPos_Picking
+                    .Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
+                    .OrderBy(c => c.Sequence)
+                    .FirstOrDefault();
+                if (pickingPos == null)
+                {
                     pickingPos = picking.PickingPos_Picking
-                        .Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
-                        .OrderBy(c => c.Sequence)
-                        .FirstOrDefault();
-                    if (pickingPos == null)
-                    {
-                        pickingPos = picking.PickingPos_Picking
-                        .Where(c => c.MDDelivPosLoadStateID.HasValue && c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
-                        .OrderBy(c => c.Sequence)
-                        .FirstOrDefault();
-                    }
-                    if (pickingPos == null)
-                    {
-                        return StartNextBatchResult.Done;
-                    }
-                    nextPos = pickingPos;
-                    if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID != null)
-                    {
-                        var queryProject = dbApp.ACClass.Where(c => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID).Select(c => c.ACProjectID);
-                        if (queryProject.Any())
-                            startNextBatchAtProjectID1 = queryProject.FirstOrDefault();
-                    }
-                    if (pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID != null)
-                    {
-                        var queryProject = dbApp.ACClass.Where(c => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID).Select(c => c.ACProjectID);
-                        if (queryProject.Any())
-                            startNextBatchAtProjectID2 = queryProject.FirstOrDefault();
-                    }
+                    .Where(c => c.MDDelivPosLoadStateID.HasValue && c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
+                    .OrderBy(c => c.Sequence)
+                    .FirstOrDefault();
+                }
+                if (pickingPos == null)
+                {
+                    StartNextPickingWF(detachedPicking);
+                    return StartNextBatchResult.Done;
+                }
+                nextPos = pickingPos;
+                if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID != null)
+                {
+                    var queryProject = dbApp.ACClass.Where(c => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID).Select(c => c.ACProjectID);
+                    if (queryProject.Any())
+                        startNextBatchAtProjectID1 = queryProject.FirstOrDefault();
+                }
+                if (pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID != null)
+                {
+                    var queryProject = dbApp.ACClass.Where(c => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID).Select(c => c.ACProjectID);
+                    if (queryProject.Any())
+                        startNextBatchAtProjectID2 = queryProject.FirstOrDefault();
+                }
                 //}
                 //else
                 //{
@@ -173,6 +188,76 @@ namespace gip.mes.processapplication
                     return true;
             }
             return false;
+        }
+
+        protected virtual void StartNextPickingWF(Picking detachedPicking)
+        {
+            if (StartedAnyPickingWF.ValueT)
+                return;
+
+            try
+            {
+                using (Database dbiPlus = new Database())
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    IEnumerable<Picking> possiblePickings = dbApp.Picking.Where(c => c.PickingStateIndex == (short)PickingStateEnum.New
+                                                                                 && c.ACClassMethodID == detachedPicking.ACClassMethodID
+                                                                                 && c.InsertDate > detachedPicking.InsertDate
+                                                                                 && c.PickingConfig_Picking.Any());
+
+                    if (possiblePickings.Any() && ContentACClassWF != null)
+                    {
+                        Picking nextPicking = possiblePickings.Where(c => c.PickingConfig_Picking.Any(x => x.XMLConfig == ContentACClassWF.ACClassWFID.ToString()))
+                                                              .OrderBy(c => c.InsertDate)
+                                                              .FirstOrDefault();
+
+                        if (nextPicking != null)
+                        {
+                            core.datamodel.ACClassMethod acClassMethod = nextPicking.ACClassMethod.FromIPlusContext<core.datamodel.ACClassMethod>(dbiPlus);
+
+                            ACMethod acMethod = ApplicationManager.NewACMethod(acClassMethod.ACIdentifier);
+                            if (acMethod == null)
+                                return;
+                            string secondaryKey = Root.NoManager.GetNewNo(dbiPlus, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
+                            gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(dbiPlus, null, secondaryKey);
+                            program.ProgramACClassMethod = acClassMethod;
+                            program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
+                            dbiPlus.ACProgram.AddObject(program);
+                            if (dbiPlus.ACSaveChanges() == null)
+                            {
+                                ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
+                                if (paramProgram == null)
+                                    acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
+                                else
+                                    paramProgram.Value = program.ACProgramID;
+
+                                ACValue acValue = acMethod.ParameterValueList.GetACValue(Picking.ClassName);
+                                if (acValue == null)
+                                    acMethod.ParameterValueList.Add(new ACValue(Picking.ClassName, typeof(Guid), nextPicking.PickingID));
+                                else
+                                    acValue.Value = nextPicking.PickingID;
+
+                                ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
+                                if (paramACClassWF == null)
+                                    acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), ContentACClassWF.ACClassWFID));
+                                else
+                                    paramACClassWF.Value = ContentACClassWF.ACClassWFID;
+
+                                nextPicking.PickingStateIndex = (short)PickingStateEnum.InProcess;
+                                dbApp.ACSaveChanges();
+
+                                ApplicationManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
+
+                                StartedAnyPickingWF.ValueT = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(StartNextPickingWF), e);
+            }
         }
 
         #endregion
