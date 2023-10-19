@@ -1142,7 +1142,9 @@ namespace gip.mes.processapplication
                         FillingDate.ValueT = DateTime.Now;
                     else
                         FillingDate.ValueT = fcOldest.FillingDate.Value;
-                    string poNo = fc.ProdOrderProgramNo;
+                    string poNo = "";
+                    if (fc.Material != null && fc.Material.IsLotManaged)
+                        poNo = fc.ProdOrderProgramNo;
                     OrderInfo.ValueT = poNo;
                 }
             }
@@ -1888,18 +1890,16 @@ namespace gip.mes.processapplication
 
         public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_Quants =
         CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
-            (ctx, facility) => from c in ctx.FacilityCharge
-                               where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
-                               orderby c.FillingDate descending
-                               select c
+            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+                                                .OrderByDescending(c => c.FillingDate)
         );
 
         public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
         CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
-            (ctx, facility) => from c in ctx.FacilityCharge
-                               where c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue
-                               orderby c.FillingDate
-                               select c
+            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+                                                .OrderBy(c => c.FillingDate)
         );
         #endregion
 
