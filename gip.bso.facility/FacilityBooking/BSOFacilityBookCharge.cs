@@ -569,7 +569,10 @@ namespace gip.bso.facility
                             AccessFacilityLot.NavList.Add(value.FacilityLot);
                             OnPropertyChanged(nameof(FacilityLotList));
                         }
-                        AccessPrimary.Current.PropertyChanged-= CurrentFacilityCharge_PropertyChanged;
+                        if(AccessPrimary.Current != null)
+                        {
+                            AccessPrimary.Current.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
+                        }
                     }
 
                     AccessPrimary.CurrentNavObject = value;
