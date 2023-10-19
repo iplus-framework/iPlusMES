@@ -69,8 +69,6 @@ namespace gip.bso.facility
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            if (CurrentFacilityCharge != null)
-                CurrentFacilityCharge.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
 
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
@@ -561,48 +559,52 @@ namespace gip.bso.facility
                     return;
                 if (AccessPrimary.CurrentNavObject != value)
                 {
-                    if (CurrentFacilityCharge != null)
-                        CurrentFacilityCharge.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
+
+                    RefreshFilterFacilityLotAccess();
+
+                    if (value !=null && value.FacilityLot != null)
+                    {
+                        if (!AccessFacilityLot.NavList.Any(c => c.FacilityLotID == value.FacilityLotID))
+                        {
+                            AccessFacilityLot.NavList.Add(value.FacilityLot);
+                            OnPropertyChanged(nameof(FacilityLotList));
+                        }
+                        AccessPrimary.Current.PropertyChanged-= CurrentFacilityCharge_PropertyChanged;
+                    }
 
                     AccessPrimary.CurrentNavObject = value;
 
-                    if (value != null)
+                    if(AccessPrimary.Current != null)
                     {
-                        value.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
-                        value.PropertyChanged += CurrentFacilityCharge_PropertyChanged;
+                        AccessPrimary.Current.PropertyChanged += CurrentFacilityCharge_PropertyChanged;
                     }
 
-                    OnPropertyChanged_CurrentFacilityCharge();
                     OnPropertyChanged(nameof(CurrentFacilityCharge));
                     OnPropertyChanged(nameof(ContractualPartnerList));
-                    OnPropertyChanged(nameof(ContractualPartnerList));
                     OnPropertyChanged(nameof(StorageUnitTestList));
-                    RefreshFilterFacilityLotAccess();
+                    OnPropertyChanged(nameof(CurrentFacilityLot));
                     ClearBookingData();
+                    OnPropertyChanged();
                 }
             }
         }
 
-        public virtual void OnPropertyChanged_CurrentFacilityCharge()
-        {
-        }
 
         void CurrentFacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "MaterialID")
+            if (e.PropertyName == nameof(FacilityCharge.MaterialID))
             {
-                OnPropertyChanged("StorageUnitTestList");
-                OnPropertyChanged("ContractualPartnerList");
-                RefreshFilterFacilityLotAccess();
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(StorageUnitTestList));
+                OnPropertyChanged(nameof(ContractualPartnerList));
+                if(CurrentFacilityCharge.MDUnit == null)
+                {
+                    CurrentFacilityCharge.MDUnit = CurrentFacilityCharge.Material.BaseMDUnit;
+                }
             }
-            if (e.PropertyName == "FacilityLotID")
+
+            if(new string[] { nameof(FacilityCharge.MaterialID), nameof(FacilityCharge.FacilityID), nameof(FacilityCharge.FacilityLotID) }.Contains(e.PropertyName))
             {
-                OnPropertyChanged("CurrentFacilityCharge");
-            }
-            if (e.PropertyName == "FacilityID")
-            {
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
         }
 
@@ -630,7 +632,7 @@ namespace gip.bso.facility
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(791, "FacilityChargeLotList")]
+        [ACPropertyAccess(791, nameof(FacilityLot))]
         public ACAccessNav<FacilityLot> AccessFacilityLot
         {
             get
@@ -641,7 +643,6 @@ namespace gip.bso.facility
                     _AccessFacilityLot = navACQueryDefinition.NewAccessNav<FacilityLot>(Const.QueryPrefix + FacilityLot.ClassName, this);
                     _AccessFacilityLot.AutoSaveOnNavigation = false;
                     _AccessFacilityLot.NavSearch();
-                    //RefreshFilterFacilityLotAccess();
                 }
                 return _AccessFacilityLot;
             }
@@ -659,7 +660,7 @@ namespace gip.bso.facility
             if (acAccess == _AccessFacilityLot)
             {
                 _AccessFacilityLot.NavSearch();
-                OnPropertyChanged("FacilityChargeLotList");
+                OnPropertyChanged(nameof(FacilityLotList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -670,8 +671,8 @@ namespace gip.bso.facility
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
-        [ACPropertyList(711, "FacilityChargeLotList")]
-        public IEnumerable<FacilityLot> FacilityChargeLotList
+        [ACPropertyList(711, nameof(FacilityLot))]
+        public IEnumerable<FacilityLot> FacilityLotList
         {
             get
             {
@@ -681,13 +682,31 @@ namespace gip.bso.facility
             }
         }
 
+        [ACPropertyCurrent(712, nameof(FacilityLot))]
+        public FacilityLot CurrentFacilityLot
+        {
+            get
+            {
+                if(CurrentFacilityCharge == null)
+                    return null;    
+                return CurrentFacilityCharge.FacilityLot;
+            }
+            set
+            {
+                if(CurrentFacilityCharge != null && CurrentFacilityCharge.FacilityLot != value)
+                {
+                    CurrentFacilityCharge.FacilityLot = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public virtual void RefreshFilterFacilityLotAccess()
         {
             if (_AccessFacilityLot != null)
                 _AccessFacilityLot.NavSearch();
-            OnPropertyChanged("FacilityChargeLotList");
+            OnPropertyChanged(nameof(FacilityLotList));
         }
-
 
         #endregion
 
@@ -1064,6 +1083,13 @@ namespace gip.bso.facility
                         return Global.ControlModes.Disabled;
                     }
                     break;
+                case nameof(CurrentFacilityLot):
+                    if (IsFacilityChargeWithFacilityBooking)
+                    {
+                        return Global.ControlModes.Disabled;
+                    }
+                    break;
+
             }
 
             if (!String.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith("CurrentBookParam"))
@@ -1890,12 +1916,9 @@ namespace gip.bso.facility
             {
                 FacilityLot lot = dlgResult.ReturnValue as FacilityLot;
                 CurrentFacilityCharge.Material.FacilityLot_Material.Add(lot);
-                //OnPropertyChanged("CurrentFacilityCharge");
-                //RefreshFilterFacilityLotAccess();
                 _AccessFacilityLot.NavList.Add(lot);
-                CurrentFacilityCharge.FacilityLot = lot;
-                OnPropertyChanged("FacilityChargeLotList");
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(FacilityLotList));
+                CurrentFacilityLot = lot;
             }
             if (childBSO != null)
                 childBSO.Stop();
