@@ -574,6 +574,8 @@ namespace gip.bso.manufacturing
                         )
                     )
                 )
+                .OrderBy(c => c.ACProgram.ProgramNo)
+                .ThenByDescending(c => c.InsertDate)
                 .ToArray();
         }
 
