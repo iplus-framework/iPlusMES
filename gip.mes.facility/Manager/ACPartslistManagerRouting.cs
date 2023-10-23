@@ -89,6 +89,31 @@ namespace gip.mes.facility
                     return _DoseAlternativeMat;
                 }
             }
+
+            public List<Facility> ApplyLotReservationFilter(ProdOrderPartslistPosRelation poRelation)
+            {
+                IList<Facility> possibleSilos = null;
+                IEnumerable<Guid> reservedLots = null;
+                if (poRelation.SourceProdOrderPartslistPos != null && poRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+                {
+                    reservedLots = poRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos
+                        .Where(c => c.FacilityLotID.HasValue)
+                        .Select(c => c.FacilityLotID.Value)
+                        .ToArray();
+                }
+                if (reservedLots != null && reservedLots.Any() && GroupedStoresWithQuants != null)
+                {
+                    possibleSilos = GroupedStoresWithQuants
+                        .Where(c => c.Where(d => d.FacilityLotID.HasValue && reservedLots.Contains(d.FacilityLotID.Value)).Any())
+                        .Select(c => c.Key)
+                        .ToList();
+                }
+                else
+                    possibleSilos = FoundSilos;
+                if (possibleSilos != null)
+                    return possibleSilos.Distinct().ToList();
+                return new List<Facility>();
+            }
         }
         #endregion
 
@@ -1386,11 +1411,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                //IEnumerable<Guid> reservedLots = poRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos
-                //    .Where(c => c.FacilityLotID.HasValue)
-                //    .Select(c => c.FacilityLotID.Value)
-                //    .ToArray();
-                //facilityQuery.GroupedStoresWithQuants.Where(c => c.Where(d => d.FacilityLotID.HasValue && reservedLots.Contains(d.FacilityLotID.Value)).Any());
+                possibleSilos = ApplyLotReservationFilter(facilityQuery, poRelation);
             }
             else
             {
@@ -1416,14 +1437,15 @@ namespace gip.mes.facility
                         facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
                     }
                 }
+                possibleSilos = facilityQuery.FoundSilos;
             }
 
             if (onlyContainer)
             {
                 if (searchMode != SearchMode.AllSilos)
                 {
-                    possibleSilos = facilityQuery.FoundSilos
-                                    .ToList()
+                    possibleSilos = possibleSilos
+                                    //.ToList()
                                     .Distinct()
                                     .Where(c => !c.QryHasBlockedQuants.Any())
                                     .ToList();
@@ -1433,8 +1455,8 @@ namespace gip.mes.facility
             }
             else
             {
-                possibleSilos = facilityQuery.FoundSilos
-                                .ToList()
+                possibleSilos = possibleSilos
+                                //.ToList()
                                 .Distinct()
                                 .Where(c =>   (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
                                            || (!c.QryHasBlockedQuants.Any()) )
@@ -1473,6 +1495,7 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
                         }
                     }
+                    possibleSilos = ApplyLotReservationFilter(facilityQuery, poRelation);
 
                     if (onlyContainer)
                     {
@@ -1531,6 +1554,8 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
+                    possibleSilos = ApplyLotReservationFilter(facilityQuery, poRelation);
+
                     if (onlyContainer)
                     {
                         possibleSilos = facilityQuery.FoundSilos
@@ -1603,6 +1628,14 @@ namespace gip.mes.facility
             }
 
             return possibleSilos;
+        }
+
+
+        protected virtual List<Facility> ApplyLotReservationFilter(QrySilosResult qrySilosResult, ProdOrderPartslistPosRelation poRelation)
+        {
+            if (qrySilosResult == null)
+                return new List<Facility>();
+            return qrySilosResult.ApplyLotReservationFilter(poRelation);
         }
 
         public virtual IEnumerable<Route> GetRoutes(IPartslistPosRelation relation,

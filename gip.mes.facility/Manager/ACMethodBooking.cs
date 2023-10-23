@@ -2343,10 +2343,13 @@ namespace gip.mes.facility
             {
                 if (acValue.Option == Global.ParamOption.Required)
                 {
-                    subResult = IACObjectReflectionExtension.CheckPropertyMinMax(vbControl.VBContentPropertyInfo, acValue.Value, null, acValue.ObjectFullType, false,
-                                                                    vbControl.VBContentPropertyInfo.MinLength, vbControl.VBContentPropertyInfo.MaxLength,
-                                                                    vbControl.VBContentPropertyInfo.MinValue, vbControl.VBContentPropertyInfo.MaxValue,
-                                                                    gip.core.datamodel.Database.GlobalDatabase);
+                    if (vbControl.VBContentPropertyInfo != null)
+                    {
+                        subResult = IACObjectReflectionExtension.CheckPropertyMinMax(vbControl.VBContentPropertyInfo, acValue.Value, null, acValue.ObjectFullType, false,
+                                                                        vbControl.VBContentPropertyInfo.MinLength, vbControl.VBContentPropertyInfo.MaxLength,
+                                                                        vbControl.VBContentPropertyInfo.MinValue, vbControl.VBContentPropertyInfo.MaxValue,
+                                                                        gip.core.datamodel.Database.GlobalDatabase);
+                    }
                 }
                 else if (acValue.Option == Global.ParamOption.Optional)
                 {
