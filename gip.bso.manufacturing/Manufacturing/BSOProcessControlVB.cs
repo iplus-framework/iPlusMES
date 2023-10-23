@@ -602,7 +602,7 @@ namespace gip.bso.manufacturing
                 // prodOrderPartslistPos is null at planning nodes
                 if (prodOrderPartslistPos == null)
                 {
-                  
+
                     prodOrderPartslistPos =
                     task
                         .ACProgram
@@ -611,7 +611,7 @@ namespace gip.bso.manufacturing
                         .Where(c => c.ParentProdOrderPartslistPosID != null)
                         .FirstOrDefault();
 
-                    if(prodOrderPartslistPos == null)
+                    if (prodOrderPartslistPos == null)
                     {
                         prodOrderPartslistPos =
                         task
@@ -639,6 +639,11 @@ namespace gip.bso.manufacturing
                     .ACClassTask_ACProgram
                     .SelectMany(c => c.PickingPos_ACClassTask)
                     .FirstOrDefault();
+
+                    if (pickingPos == null)
+                    {
+                        pickingPos = databaseApp.ACClassTask.Where(c => c.ACProgramID == task.ACProgramID).SelectMany(c => c.PickingPos_ACClassTask).FirstOrDefault();
+                    }
                     if (pickingPos != null)
                     {
                         model.ProgramNo = pickingPos.Picking.PickingNo;
