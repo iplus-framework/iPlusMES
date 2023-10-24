@@ -22,6 +22,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(11, ProdOrderPartslistPosRelation.ClassName, "en{'Bill of Materials Pos.'}de{'Stücklistenunterposition'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName, "", true)]
     [ACPropertyEntity(12, "ReservationStateIndex", "en{'State'}de{'Status'}", typeof(GlobalApp.ReservationState), Const.ContextDatabase + "\\ReservationStateList", "", true)]
     [ACPropertyEntity(13, "Sequence", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
+    [ACPropertyEntity(14, PickingPos.ClassName, "en{'Picking Line'}de{'Kommissionierposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName, "", true)]
+    [ACPropertyEntity(15, nameof(FacilityReservation.ReservedQuantityUOM), ConstApp.ReservedQuantity, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
