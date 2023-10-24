@@ -98,6 +98,7 @@
         public const string InwardQuantity = "en{'Inward Quantity'}de{'Zugangsmenge'}";
         public const string InwardTargetQuantity = "en{'Target Inward Qty.'}de{'Zugangsmenge Soll'}";
         public const string ReservedInwardQuantity = "en{'Reserved Inward Qty.'}de{'Reservierte Zugangsmenge'}";
+        public const string ReservedQuantity = "en{'Reserved Qty.'}de{'Reservierte Menge'}";
 
         public const string OutwardQuantity = "en{'Outward Quantity'}de{'Abgangsmenge'}";
         public const string OutwardTargetQuantity = "en{'Target Outward Qty.'}de{'Abgangsmenge Soll'}";
