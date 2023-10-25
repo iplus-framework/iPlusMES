@@ -2768,6 +2768,10 @@ namespace gip.bso.manufacturing
 
         private void LoadNewFacilityReservation(FacilityReservationModel facilityReservationModel)
         {
+            if(_FacilityReservationList == null)
+            {
+                _FacilityReservationList = new List<FacilityReservationModel>();
+            }
             FacilityReservationList.Add(facilityReservationModel);
             OnPropertyChanged(nameof(FacilityReservationList));
             SelectedFacilityReservation = facilityReservationModel;
@@ -2785,7 +2789,11 @@ namespace gip.bso.manufacturing
                 return;
 
             BSOFacilityMaterialOverview bso = ACUrlCommand($"\\{nameof(Businessobjects)}\\#{nameof(BSOFacilityMaterialOverview)}", false) as BSOFacilityMaterialOverview;
-            string[] lotNos = FacilityReservationList.Select(c => c.LotNo).ToArray();
+            string[] lotNos = new string[] { };
+            if(FacilityReservationList != null)
+            {
+                lotNos = FacilityReservationList.Select(c => c.LotNo).ToArray();
+            }
             VBDialogResult dialogResult = bso.ShowLotDlg(SelectedProdOrderPartslistPos.Material.MaterialNo, lotNos);
             if (dialogResult.SelectedCommand == eMsgButton.OK)
             {
