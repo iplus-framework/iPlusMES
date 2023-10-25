@@ -64,6 +64,8 @@
     <Compile Include="Manufacturing\BSOOperationView.cs" />
     <Compile Include="Manufacturing\BSOPropertyLogPresenterVB.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOPickingByMaterial.cs" />
+    <Compile Include="Model\FacilityReservationModel.cs" />
+    <Compile Include="Model\FacilityReservationModelBase.cs" />
     <Compile Include="Model\OperationLogParam.cs" />
     <Compile Include="Model\OperationLogView.cs" />
     <Compile Include="Model\TimeFilterTypeEnum.cs" />

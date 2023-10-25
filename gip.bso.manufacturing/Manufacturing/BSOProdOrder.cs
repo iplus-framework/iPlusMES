@@ -1,3 +1,4 @@
+using gip.bso.facility;
 using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -37,7 +38,7 @@ namespace gip.bso.manufacturing
         public BSOProdOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _UseBackGroundWorker = new ACPropertyConfigValue<bool>(this, nameof(UseBackGroundWorker), false);
         }
 
         /// <summary>
@@ -74,6 +75,8 @@ namespace gip.bso.manufacturing
                 SelectedPOPosTimeFilterMode = POPosTimeFilterModeList?.FirstOrDefault();
                 Search();
             }
+
+            _ = UseBackGroundWorker;
 
             return true;
         }
@@ -152,6 +155,24 @@ namespace gip.bso.manufacturing
             _BSOPartslistExplorer_Child = null;
             _AccessFilterPlanningMR = null;
             return baseResult;
+        }
+
+        #endregion
+
+        #region Configuration
+
+        private ACPropertyConfigValue<bool> _UseBackGroundWorker;
+        [ACPropertyConfig("en{'Use Background Worker'}de{'Use Background Worker'}")]
+        public bool UseBackGroundWorker
+        {
+            get
+            {
+                return _UseBackGroundWorker.ValueT;
+            }
+            set
+            {
+                _UseBackGroundWorker.ValueT = value;
+            }
         }
 
         #endregion
@@ -2009,6 +2030,28 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged("SelectedComponentBasedOnPlPos");
                     OnPropertyChanged("ComponentBasedOnPlPosList");
 
+                    _FacilityReservationList = null;
+                    if (_SelectedProdOrderPartslistPos != null)
+                    {
+                        if (_SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+                        {
+                            if (UseBackGroundWorker)
+                            {
+                                BackgroundWorker.RunWorkerAsync(nameof(LoadFacilityReservationList));
+                                ShowDialog(this, DesignNameProgressBar);
+                            }
+                            else
+                            {
+                                LoadFacilityReservationList(null);
+                            }
+                        }
+                        else
+                        {
+                            _FacilityReservationList = null;
+                            OnPropertyChanged(nameof(FacilityReservationList));
+                            SelectedFacilityReservation = null;
+                        }
+                    }
                 }
             }
         }
@@ -2456,7 +2499,7 @@ namespace gip.bso.manufacturing
                     SelectedProdOrderPartslistPos = _ProdOrderPartslistPosList.FirstOrDefault();
             }
 
-            OnPropertyChanged("ProdOrderPartslistPosList");
+            OnPropertyChanged(nameof(ProdOrderPartslistPosList));
         }
 
         private void OutwardRootPosItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -2540,6 +2583,274 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged("SelectedInputMaterial");
                 }
             }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region FacilityReservation
+
+        #region FacilityReservation -> Properties
+
+        private FacilityReservationModel _SelectedFacilityReservation;
+        /// <summary>
+        /// Selected property for FacilityChargeSumMaterialHelper
+        /// </summary>
+        /// <value>The selected FacilityReservation</value>
+        [ACPropertySelected(9999, nameof(FacilityReservation), "en{'TODO: FacilityReservation'}de{'TODO: FacilityReservation'}")]
+        public FacilityReservationModel SelectedFacilityReservation
+        {
+            get
+            {
+                return _SelectedFacilityReservation;
+            }
+            set
+            {
+                if (_SelectedFacilityReservation != value)
+                {
+                    _SelectedFacilityReservation = value;
+                    OnPropertyChanged(nameof(SelectedFacilityReservation));
+                }
+            }
+        }
+
+
+        private List<FacilityReservationModel> _FacilityReservationList;
+        /// <summary>
+        /// List property for FacilityChargeSumMaterialHelper
+        /// </summary>
+        /// <value>The FacilityReservation list</value>
+        [ACPropertyList(9999, nameof(FacilityReservation))]
+        public List<FacilityReservationModel> FacilityReservationList
+        {
+            get
+            {
+                return _FacilityReservationList;
+            }
+        }
+
+        private FacilityReservationModel GetFacilityReservationModel(FacilityReservation facilityReservation)
+        {
+            FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
+            facilityReservationModel.MaterialNo = facilityReservation.Material.MaterialNo;
+            facilityReservationModel.MaterialName = facilityReservation.Material.MaterialName1;
+            facilityReservationModel.LotNo = facilityReservation.FacilityLot.LotNo;
+            facilityReservationModel.FacilityReservation = facilityReservation;
+            facilityReservationModel.ReservedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
+            facilityReservationModel.OriginalReservedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
+            return facilityReservationModel;
+        }
+
+        #endregion
+
+        #region FacilityReservation -> Methods
+
+        private void LoadFacilityReservationModelQuantity(FacilityReservationModelBase facilityReservationModelBase)
+        {
+            SelectedFacilityReservation.CopyFrom(facilityReservationModelBase);
+            OnPropertyChanged(nameof(SelectedFacilityReservation));
+            if (SelectedFacilityReservation.FreeQuantityNegative)
+            {
+                Root.Messages.Warning(this, "Warning50069", false, SelectedFacilityReservation.LotNo);
+            }
+        }
+
+        private FacilityReservationModelBase CalcFacilityReservationModelQuantity(DatabaseApp databaseApp, FacilityReservationModel model, bool calculateReservedQuantity)
+        {
+            FacilityReservationModelBase reservationModelBase = new FacilityReservationModelBase();
+            reservationModelBase.TotalReservedQuantity =
+                databaseApp
+                .FacilityReservation
+                .Where(FacilityReservation.ProdOrderComponentReservations(model.MaterialNo, model.LotNo))
+                .Select(c => c.ReservedQuantityUOM ?? 0)
+                .DefaultIfEmpty()
+                .Sum();
+
+            reservationModelBase.UsedQuantity =
+                databaseApp
+                .FacilityReservation
+                .Where(FacilityReservation.ProdOrderComponentReservations(model.MaterialNo, model.LotNo))
+                .Select(c => c.ProdOrderPartslistPos)
+                .SelectMany(c => c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation)
+                .Select(c => c.OutwardQuantity)
+                .Sum();
+
+            reservationModelBase.FreeQuantity =
+                databaseApp
+                .FacilityCharge
+                .Where(c =>
+                        c.Material != null
+                        && c.Material.MaterialNo == model.MaterialNo
+                        && c.FacilityLot != null
+                        && c.FacilityLot.LotNo == model.LotNo
+                    )
+                .AsEnumerable()
+                .Select(c => c.AvailableQuantity)
+                .DefaultIfEmpty()
+                .Sum();
+
+            reservationModelBase.FreeQuantity = reservationModelBase.FreeQuantity - reservationModelBase.TotalReservedQuantity + reservationModelBase.UsedQuantity + (calculateReservedQuantity ? model.ReservedQuantity : 0);
+            return reservationModelBase;
+        }
+
+        private void LoadFacilityReservationList(List<FacilityReservationModel> reservationModels)
+        {
+            if (reservationModels == null)
+            {
+                reservationModels = GetFacilityReservationList();
+            }
+            _FacilityReservationList = reservationModels;
+            OnPropertyChanged(nameof(FacilityReservationList));
+            SelectedFacilityReservation = _FacilityReservationList.FirstOrDefault();
+        }
+
+        private List<FacilityReservationModel> GetFacilityReservationList()
+        {
+            List<FacilityReservationModel> reservations = new List<FacilityReservationModel>();
+            if (SelectedProdOrderPartslistPos != null)
+            {
+                if (SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+                {
+                    List<FacilityReservation> facilityReservations =
+                        SelectedProdOrderPartslistPos
+                        .FacilityReservation_ProdOrderPartslistPos
+                        .Where(c => c.FacilityLot != null)
+                        .ToList();
+
+                    foreach (FacilityReservation facilityReservation in facilityReservations)
+                    {
+                        FacilityReservationModel facilityReservationModel = GetFacilityReservationModel(facilityReservation);
+                        FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(DatabaseApp, facilityReservationModel, false);
+                        facilityReservationModel.CopyFrom(modelBase);
+                        facilityReservationModel.PropertyChanged += FacilityReservationModel_PropertyChanged;
+                        reservations.Add(facilityReservationModel);
+                    }
+                }
+            }
+            reservations = reservations.OrderBy(c => c.LotNo).ToList();
+            return reservations;
+        }
+
+        private void AlertNegativeReservationQuantity(string lotNo)
+        {
+            Root.Messages.Warning(this, "Warning50069", false, lotNo);
+        }
+
+        private void FacilityReservationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(FacilityReservationModel.ReservedQuantity))
+            {
+                OnPropertyChanged(nameof(SelectedFacilityReservation));
+            }
+        }
+
+        private FacilityReservationModel GetNewFacilityReservation(FacilityLot facilityLot)
+        {
+            string secondaryKey = ACRoot.SRoot.NoManager.GetNewNo(DatabaseApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
+            FacilityReservation facilityReservation = FacilityReservation.NewACObject(DatabaseApp, SelectedProdOrderPartslistPos, secondaryKey);
+            facilityReservation.Material = SelectedProdOrderPartslistPos.Material;
+            facilityReservation.FacilityLot = facilityLot;
+            SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Add(facilityReservation);
+
+            FacilityReservationModel facilityReservationModel = GetFacilityReservationModel(facilityReservation);
+            facilityReservationModel.ReservedQuantity = SelectedProdOrderPartslistPos.TargetQuantityUOM - SelectedProdOrderPartslistPos.ActualQuantityUOM;
+            if (facilityReservationModel.ReservedQuantity < 0)
+            {
+                facilityReservationModel.ReservedQuantity = 0;
+            }
+            FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(DatabaseApp, facilityReservationModel, true);
+            facilityReservationModel.CopyFrom(modelBase);
+            facilityReservationModel.PropertyChanged += FacilityReservationModel_PropertyChanged;
+            return facilityReservationModel;
+        }
+
+        private void LoadNewFacilityReservation(FacilityReservationModel facilityReservationModel)
+        {
+            FacilityReservationList.Add(facilityReservationModel);
+            OnPropertyChanged(nameof(FacilityReservationList));
+            SelectedFacilityReservation = facilityReservationModel;
+            facilityLotForNewReservation = null;
+        }
+
+        FacilityLot facilityLotForNewReservation = null;
+        /// <summary>
+        /// Source Property: MethodName
+        /// </summary>
+        [ACMethodInfo(nameof(AddFaciltiyReservation), Const.Add, 999)]
+        public void AddFaciltiyReservation()
+        {
+            if (!IsEnabledAddFaciltiyReservation())
+                return;
+
+            BSOFacilityMaterialOverview bso = ACUrlCommand($"\\{nameof(Businessobjects)}\\#{nameof(BSOFacilityMaterialOverview)}", false) as BSOFacilityMaterialOverview;
+            string[] lotNos = FacilityReservationList.Select(c => c.LotNo).ToArray();
+            VBDialogResult dialogResult = bso.ShowLotDlg(SelectedProdOrderPartslistPos.Material.MaterialNo, lotNos);
+            if (dialogResult.SelectedCommand == eMsgButton.OK)
+            {
+                facilityLotForNewReservation = dialogResult.ReturnValue as FacilityLot;
+                if (UseBackGroundWorker)
+                {
+                    BackgroundWorker.RunWorkerAsync(nameof(LoadNewFacilityReservation));
+                    ShowDialog(this, DesignNameProgressBar);
+                }
+                else
+                {
+                    FacilityReservationModel facilityReservationModel = GetNewFacilityReservation(facilityLotForNewReservation);
+                    LoadNewFacilityReservation(facilityReservationModel);
+                }
+
+            }
+        }
+
+        public bool IsEnabledAddFaciltiyReservation()
+        {
+            return SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.Material != null;
+        }
+
+        /// <summary>
+        /// Source Property: MethodName
+        /// </summary>
+        [ACMethodInfo(nameof(RemoveFacilityReservation), Const.Remove, 999)]
+        public void RemoveFacilityReservation()
+        {
+            if (!IsEnabledRemoveFacilityReservation())
+                return;
+
+            SelectedFacilityReservation.FacilityReservation.DeleteACObject(DatabaseApp, false);
+            SelectedFacilityReservation.PropertyChanged -= FacilityReservationModel_PropertyChanged;
+            FacilityReservationList.Remove(SelectedFacilityReservation);
+            OnPropertyChanged(nameof(FacilityReservationList));
+            SelectedFacilityReservation = FacilityReservationList.FirstOrDefault();
+        }
+
+        public bool IsEnabledRemoveFacilityReservation()
+        {
+            return SelectedFacilityReservation != null;
+        }
+
+        [ACMethodInfo(nameof(RemoveFacilityReservation), Const.Recalculate, 999)]
+        public void RecalcFacilityReservationQuantityies()
+        {
+            if (!IsEnabledRecalcFacilityReservationQuantityies())
+                return;
+
+            if (UseBackGroundWorker)
+            {
+                BackgroundWorker.RunWorkerAsync(nameof(CalcFacilityReservationModelQuantity));
+                ShowDialog(this, DesignNameProgressBar);
+            }
+            else
+            {
+                FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(DatabaseApp, SelectedFacilityReservation, SelectedFacilityReservation.FacilityReservation.EntityState == EntityState.Added);
+                LoadFacilityReservationModelQuantity(modelBase);
+            }
+        }
+
+        public bool IsEnabledRecalcFacilityReservationQuantityies()
+        {
+            return SelectedFacilityReservation != null;
         }
 
         #endregion
@@ -3871,7 +4182,7 @@ namespace gip.bso.manufacturing
                                                                       .FirstOrDefault();
 
                 core.datamodel.ACProgramLog tempProgramLog = programLog;
-                for (int i=0; i < 200; i++)
+                for (int i = 0; i < 200; i++)
                 {
                     if (tempProgramLog == null)
                         break;
@@ -5232,7 +5543,15 @@ namespace gip.bso.manufacturing
                     ProdOrder[] prodOrders = ProdOrderList.Where(c => c.IsSelected).ToArray();
                     e.Result = DoRecalcAllQuantitiesForSelected(DatabaseApp, prodOrders);
                     break;
-
+                case nameof(LoadFacilityReservationList):
+                    e.Result = GetFacilityReservationList();
+                    break;
+                case nameof(LoadNewFacilityReservation):
+                    e.Result = GetNewFacilityReservation(facilityLotForNewReservation);
+                    break;
+                case nameof(CalcFacilityReservationModelQuantity):
+                    e.Result = CalcFacilityReservationModelQuantity(DatabaseApp, SelectedFacilityReservation, SelectedFacilityReservation.FacilityReservation.EntityState == EntityState.Added);
+                    break;
             }
         }
 
@@ -5280,7 +5599,18 @@ namespace gip.bso.manufacturing
                             SendMessage(resultMsg);
                         }
                         break;
-
+                    case nameof(LoadFacilityReservationList):
+                        List<FacilityReservationModel> reservationModels = e.Result as List<FacilityReservationModel>;
+                        LoadFacilityReservationList(reservationModels);
+                        break;
+                    case nameof(LoadNewFacilityReservation):
+                        FacilityReservationModel facilityReservationModel = e.Result as FacilityReservationModel;
+                        LoadNewFacilityReservation(facilityReservationModel);
+                        break;
+                    case nameof(CalcFacilityReservationModelQuantity):
+                        FacilityReservationModelBase modelBase = e.Result as FacilityReservationModelBase;
+                        LoadFacilityReservationModelQuantity(modelBase);
+                        break;
                 }
             }
         }
@@ -5288,7 +5618,6 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region BackgroundWorker -> DoMehtods
-
 
         private MsgWithDetails RecalcAllQuantities(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
         {
@@ -5315,6 +5644,7 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
     }
 
 }
