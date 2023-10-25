@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.Objects;
 using System.Linq;
+using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.facility
 {
@@ -1403,7 +1404,7 @@ namespace gip.mes.facility
             }
 
 
-            IList<Facility> possibleSilos = null;
+            QrySilosResult possibleSilos = null;
             core.datamodel.ACClass compClass = pos.ToFacility.FacilityACClass;
 
             IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, null);
@@ -1729,7 +1730,7 @@ namespace gip.mes.facility
                                 gip.core.datamodel.ACClass currentProcessModule,
                                 ACPartslistManager.SearchMode searchMode,
                                 DateTime? filterTimeOlderThan,
-                                out IList<Facility> possibleSilos,
+                                out QrySilosResult possibleSilos,
                                 Guid? ignoreFacilityID,
                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                 ACValueList projSpecificParams = null,
@@ -1741,13 +1742,13 @@ namespace gip.mes.facility
             }
 
             possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer);
-            if (possibleSilos == null || !possibleSilos.Any())
+            if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
                 return null;
 
             RoutingResult result = null;
             if (searchMode == ACPartslistManager.SearchMode.OnlyEnabledOldestSilo)
             {
-                Facility oldestSilo = possibleSilos.FirstOrDefault();
+                Facility oldestSilo = possibleSilos.FilteredResult.FirstOrDefault().StorageBin;
                 if (oldestSilo == null)
                     return null;
                 if (!oldestSilo.VBiFacilityACClassID.HasValue)
@@ -1768,8 +1769,8 @@ namespace gip.mes.facility
             else
             {
                 // 2. Suche Routen zu dieser Waage die von den vorgeschlagenen Silos aus führen
-                var acClassIDsOfPossibleSilos = possibleSilos.Where(c => c.VBiFacilityACClassID.HasValue).Select(c => c.VBiFacilityACClassID.Value);
-                IEnumerable<string> possibleSilosACUrl = possibleSilos.Where(c => c.FacilityACClass != null).Select(x => x.FacilityACClass.GetACUrlComponent());
+                var acClassIDsOfPossibleSilos = possibleSilos.FilteredResult.Where(c => c.StorageBin.VBiFacilityACClassID.HasValue).Select(c => c.StorageBin.VBiFacilityACClassID.Value);
+                IEnumerable<string> possibleSilosACUrl = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityACClass != null).Select(x => x.StorageBin.FacilityACClass.GetACUrlComponent());
 
                 result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
                                         currentProcessModule, possibleSilosACUrl, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },
@@ -1786,7 +1787,7 @@ namespace gip.mes.facility
             return result.Routes;
         }
 
-        public virtual IList<Facility> FindSilos(PickingPos pickingPos,
+        public virtual QrySilosResult FindSilos(PickingPos pickingPos,
                                 DatabaseApp dbApp, Database dbIPlus,
                                 ACPartslistManager.SearchMode searchMode,
                                 DateTime? filterTimeOlderThan,
@@ -1795,7 +1796,6 @@ namespace gip.mes.facility
                                 ACValueList projSpecificParams = null,
                                 bool onlyContainer = true)
         {
-            IList<Facility> possibleSilos = null;
             Material material = pickingPos.Material;
 
             // 1. Suche freie Silos, mit dem zu dosierenden Material + die Freigegeben sind + die keine gesperrte Chargen haben
@@ -1815,24 +1815,22 @@ namespace gip.mes.facility
 
             if (onlyContainer)
             {
-                possibleSilos = facilityQuery.FoundSilos
-                                .ToList()
-                                .Distinct()
-                                .Where(c => !c.QryHasBlockedQuants.Any())
-                                .ToList();
+                facilityQuery.ApplyBlockedQuantsFilter();
+                //possibleSilos = facilityQuery.FoundSilos
+                //                .Where(c => !c.QryHasBlockedQuants.Any())
+                //                .ToList();
             }
             else
             {
-                possibleSilos = facilityQuery.FoundSilos
-                                .ToList()
-                                .Distinct()
-                                .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
-                                           || (!c.QryHasBlockedQuants.Any()))
-                                .ToList();
+                facilityQuery.ApplyFreeQuantsInBinFilter();
+                //possibleSilos = facilityQuery.FoundSilos
+                //                .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
+                //                           || (!c.QryHasBlockedQuants.Any()))
+                //                .ToList();
             }
-            ACPartslistManager.RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
+            facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
 
-            return possibleSilos;
+            return facilityQuery;
         }
 
         /// <summary>
@@ -1849,9 +1847,9 @@ namespace gip.mes.facility
             {
                 Material material = pickingPos?.Material;
                 if (material == null)
-                    return new ACPartslistManager.QrySilosResult(new List<Facility>());
+                    return new ACPartslistManager.QrySilosResult();
 
-                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterial(ctx, material, checkOutwardEnabled, onlyContainer).ToArray().Distinct().ToList());
+                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterial(ctx, material, checkOutwardEnabled, onlyContainer).ToArray());
             }
             catch (Exception ec)
             {
@@ -1861,7 +1859,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithMaterial(110)", msg);
 
-                return new ACPartslistManager.QrySilosResult(new List<Facility>());
+                return new ACPartslistManager.QrySilosResult();
             }
         }
 
@@ -1876,9 +1874,9 @@ namespace gip.mes.facility
             {
                 Material material = pickingPos?.Material;
                 if (material == null)
-                    return new ACPartslistManager.QrySilosResult(new List<Facility>());
+                    return new ACPartslistManager.QrySilosResult();
 
-                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterialTime(ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer).ToArray().Distinct().ToList());
+                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterialTime(ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer).ToArray());
             }
             catch (Exception ec)
             {
@@ -1888,7 +1886,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithMaterial(110)", msg);
 
-                return new ACPartslistManager.QrySilosResult(new List<Facility>());
+                return new ACPartslistManager.QrySilosResult();
             }
         }
 
@@ -1896,10 +1894,13 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterial =
-        CompiledQuery.Compile<DatabaseApp, Material, bool, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, Material, bool, bool, IQueryable<FacilityCharge>> s_cQry_PickingSilosWithMaterial =
+        CompiledQuery.Compile<DatabaseApp, Material, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
+                                                .Include("MDReleaseState")
+                                                .Include("FacilityLot.MDReleaseState")
+                                                .Include("Facility.MDFacilityType")
                                                 .Where(c => c.NotAvailable == false
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -1914,17 +1915,20 @@ namespace gip.mes.facility
                                                           || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               .Select(c => c.Facility)
+                                               //.Select(c => c.Facility)
         );
 
         /// <summary>
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>>(
+        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IQueryable<FacilityCharge>> s_cQry_PickingSilosWithMaterialTime =
+        CompiledQuery.Compile<DatabaseApp, Material, bool, DateTime, bool, IQueryable<FacilityCharge>>(
             (ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
+                                                .Include("MDReleaseState")
+                                                .Include("FacilityLot.MDReleaseState")
+                                                .Include("Facility.MDFacilityType")
                                                 .Where(c => c.NotAvailable == false
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -1940,7 +1944,7 @@ namespace gip.mes.facility
                                                       && ((c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
                                                           || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                .OrderBy(c => c.FillingDate)
-                                               .Select(c => c.Facility)
+                                               //.Select(c => c.Facility)
         );
 
         #endregion

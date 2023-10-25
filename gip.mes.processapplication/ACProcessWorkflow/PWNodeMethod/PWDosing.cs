@@ -8,6 +8,8 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.core.processapplication;
 using System.Xml;
+using static gip.mes.facility.ACPartslistManager;
+using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 
 namespace gip.mes.processapplication
 {
@@ -1666,7 +1668,7 @@ namespace gip.mes.processapplication
                                                 DatabaseApp dbApp, Database dbIPlus,
                                                 RouteQueryParams queryParams,
                                                 PAProcessModule useIfNotAccessedProcessModule,
-                                                out IList<Facility> possibleSilos)
+                                                out QrySilosResult possibleSilos)
         {
             if (ParentPWGroup == null || PartslistManager == null)
                 throw new NullReferenceException("ParentPWGroup || PartslistManager  is null");
@@ -1686,8 +1688,8 @@ namespace gip.mes.processapplication
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
                                         queryParams.ExclusionList);
-            if (possibleSilos != null && possibleSilos.Any())
-                possibleSilos = ApplyPriorizationRules(possibleSilos);
+            if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                ApplyPriorizationRules(possibleSilos);
             return routes;
         }
 
@@ -1695,7 +1697,7 @@ namespace gip.mes.processapplication
                                                     DatabaseApp dbApp, Database dbIPlus,
                                                     RouteQueryParams queryParams,
                                                     PAProcessModule useIfNotAccessedProcessModule,
-                                                    out IList<Facility> possibleSilos)
+                                                    out QrySilosResult possibleSilos)
         {
             if (ParentPWGroup == null || PickingManager == null)
                 throw new NullReferenceException("ParentPWGroup || PickingManager  is null");
@@ -1713,18 +1715,20 @@ namespace gip.mes.processapplication
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
                                         queryParams.ExclusionList);
-            if (possibleSilos != null && possibleSilos.Any())
-                possibleSilos = ApplyPriorizationRules(possibleSilos);
+            if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                ApplyPriorizationRules(possibleSilos);
             return routes;
         }
 
-        protected virtual IList<Facility> ApplyPriorizationRules(IList<Facility> possibleSilos)
+        protected virtual void ApplyPriorizationRules(QrySilosResult possibleSilos)
         {
-            if (String.IsNullOrEmpty(FacilityNoSort))
-                return possibleSilos;
+            if (String.IsNullOrEmpty(FacilityNoSort)
+                || possibleSilos.FilteredResult == null 
+                || !possibleSilos.FilteredResult.Any())
+                return;
             string[] facilitySortRules = FacilityNoSort.Split(';');
             if (facilitySortRules == null || !facilitySortRules.Any())
-                return possibleSilos;
+                return;
             List<Facility> priorizedList = new List<Facility>();
             List<Facility> posterizedList = new List<Facility>();
             int insertIndex = 0;
@@ -1733,31 +1737,30 @@ namespace gip.mes.processapplication
                 string rule = entry.Trim();
                 if (string.IsNullOrEmpty(rule))
                     continue;
-                Facility facility;
+                FacilitySumByLots facility;
                 if (rule[0] == '!')
                 {
                     rule = rule.Substring(1);
                     if (String.IsNullOrEmpty(rule))
                         continue;
-                    facility = possibleSilos.Where(c => c.FacilityNo == rule).FirstOrDefault();
+                    facility = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityNo == rule).FirstOrDefault();
                     if (facility != null)
                     {
-                        possibleSilos.Remove(facility);
-                        possibleSilos.Add(facility);
+                        possibleSilos.FilteredResult.Remove(facility);
+                        possibleSilos.FilteredResult.Add(facility);
                     }
                 }
                 else
                 {
-                    facility = possibleSilos.Where(c => c.FacilityNo == rule).FirstOrDefault();
+                    facility = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityNo == rule).FirstOrDefault();
                     if (facility != null)
                     {
-                        possibleSilos.Remove(facility);
-                        possibleSilos.Insert(insertIndex, facility);
+                        possibleSilos.FilteredResult.Remove(facility);
+                        possibleSilos.FilteredResult.Insert(insertIndex, facility);
                         insertIndex++;
                     }
                 }
             }
-            return possibleSilos;
         }
 
         public virtual RouteItem CurrentDosingSource(Database db)
