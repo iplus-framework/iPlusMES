@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 
 namespace gip.mes.facility
 {
@@ -32,45 +33,55 @@ namespace gip.mes.facility
         #region Result
         public class QrySilosResult
         {
-            public QrySilosResult(IList<Facility> foundSilos, IPartslistPos doseAlternativeMat = null)
+            public QrySilosResult()
             {
-                _FoundSilos = foundSilos;
-                _DoseAlternativeMat = doseAlternativeMat;
             }
-
-            //public QrySilosResult(IEnumerable<IGrouping<Guid, FacilityCharge>> groupedSilos, IPartslistPos doseAlternativeMat = null)
-            //{
-            //    _FoundSilos = groupedSilos != null && groupedSilos.Any() ? groupedSilos.Select(c => c.FirstOrDefault().Facility).ToList() : new List<Facility>();
-            //    _GroupedStoreIDsWithQuants = groupedSilos;
-            //    _DoseAlternativeMat = doseAlternativeMat;
-            //}
 
             public QrySilosResult(IEnumerable<FacilityCharge> foundQuants, IPartslistPos doseAlternativeMat = null)
             {
-                _GroupedStoresWithQuants = foundQuants != null && foundQuants.Any() ? foundQuants.GroupBy(c => c.Facility) : null;
-                _FoundSilos = _GroupedStoresWithQuants != null ? _GroupedStoresWithQuants.Select(c => c.Key).ToList() : new List<Facility>();
-                //_FoundSilos = groupedSilos != null && groupedSilos.Any() ? groupedSilos.Select(c => c.FirstOrDefault().Facility).ToList() : new List<Facility>();
-                //_GroupedStoreIDsWithQuants = groupedSilos;
+                _GroupedStoresWithQuants = foundQuants != null && foundQuants.Any() ? foundQuants.Distinct().GroupBy(c => c.Facility) : null;
+                if (_GroupedStoresWithQuants != null)
+                    _FilteredResult = _GroupedStoresWithQuants.Select(c => new FacilitySumByLots() { StorageBin = c.Key, FacilityCharges = c.ToList() }).ToList();
                 _DoseAlternativeMat = doseAlternativeMat;
             }
 
-            private IList<Facility> _FoundSilos;
-            public IList<Facility> FoundSilos
+            public IEnumerable<Facility> FoundSilos
             {
                 get
                 {
-                    return _FoundSilos;
+                    return FilteredResult.Select(c => c.StorageBin);
                 }
             }
 
-            //private IEnumerable<IGrouping<Guid, FacilityCharge>> _GroupedStoreIDsWithQuants;
-            //public IEnumerable<IGrouping<Guid, FacilityCharge>> GroupedStoreIDsWithQuants
-            //{
-            //    get
-            //    {
-            //        return _GroupedStoreIDsWithQuants;
-            //    }
-            //}
+            private List<FacilitySumByLots> _FilteredResult;
+            public List<FacilitySumByLots> FilteredResult
+            {
+                get
+                {
+                    if (_FilteredResult == null)
+                        _FilteredResult = new List<FacilitySumByLots>();
+                    return _FilteredResult;
+                }
+                set
+                {
+                    _FilteredResult = value;
+                }
+            }
+
+            public class FacilitySumByLots
+            {
+                public Facility StorageBin { get; internal set; }
+                
+                public double Stock
+                {
+                    get
+                    {
+                        return FacilityCharges != null ? FacilityCharges.Sum(c => c.StockQuantityUOM) : 0.0;
+                    }
+                }
+
+                public List<FacilityCharge> FacilityCharges { get; set; }
+            }
 
             private IEnumerable<IGrouping<Facility, FacilityCharge>> _GroupedStoresWithQuants;
             public IEnumerable<IGrouping<Facility, FacilityCharge>> GroupedStoresWithQuants
@@ -90,9 +101,27 @@ namespace gip.mes.facility
                 }
             }
 
-            public List<Facility> ApplyLotReservationFilter(ProdOrderPartslistPosRelation poRelation)
+            public void ApplyBlockedQuantsFilter()
             {
-                IList<Facility> possibleSilos = null;
+                if (_FilteredResult == null || !_FilteredResult.Any())
+                    return;
+                _FilteredResult = _FilteredResult.Where(f => !f.FacilityCharges.Where(fc => Facility.FuncHasBlockedQuants(fc)).Any())
+                                                    .ToList();
+            }
+
+            public void ApplyFreeQuantsInBinFilter()
+            {
+                if (_FilteredResult == null || !_FilteredResult.Any())
+                    return;
+                _FilteredResult = _FilteredResult.Where(f =>   (f.StorageBin.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && f.FacilityCharges.Where(fc => Facility.FuncHasFreeQuants(fc)).Any())
+                                                            || !f.FacilityCharges.Where(fc => Facility.FuncHasBlockedQuants(fc)).Any())
+                                                    .ToList();
+            }
+
+            public void ApplyLotReservationFilter(ProdOrderPartslistPosRelation poRelation)
+            {
+                if (_FilteredResult == null || !_FilteredResult.Any())
+                    return;
                 IEnumerable<Guid> reservedLots = null;
                 if (poRelation.SourceProdOrderPartslistPos != null && poRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
                 {
@@ -103,17 +132,37 @@ namespace gip.mes.facility
                 }
                 if (reservedLots != null && reservedLots.Any() && GroupedStoresWithQuants != null)
                 {
-                    possibleSilos = GroupedStoresWithQuants
-                        .Where(c => c.Where(d => d.FacilityLotID.HasValue && reservedLots.Contains(d.FacilityLotID.Value)).Any())
-                        .Select(c => c.Key)
+                    _FilteredResult = _FilteredResult
+                        .Where(c => c.FacilityCharges.Where(d => d.FacilityLotID.HasValue && reservedLots.Contains(d.FacilityLotID.Value)).Any())
                         .ToList();
                 }
-                else
-                    possibleSilos = FoundSilos;
-                if (possibleSilos != null)
-                    return possibleSilos.Distinct().ToList();
-                return new List<Facility>();
             }
+
+            public void RemoveFacility(Guid? ignoreFacilityID, IEnumerable<gip.core.datamodel.ACClass> exclusionList)
+            {
+                if (_FilteredResult == null || !_FilteredResult.Any())
+                    return;
+                if (ignoreFacilityID.HasValue)
+                {
+                    FacilitySumByLots facilityToRemove = _FilteredResult.Where(c => c.StorageBin.FacilityID == ignoreFacilityID.Value).FirstOrDefault();
+                    if (facilityToRemove != null)
+                    {
+                        _FilteredResult.Remove(facilityToRemove);
+                    }
+                }
+                if (exclusionList != null)
+                {
+                    foreach (gip.core.datamodel.ACClass silo2Exlude in exclusionList)
+                    {
+                        FacilitySumByLots facilityToRemove = _FilteredResult.Where(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID == silo2Exlude.ACClassID).FirstOrDefault();
+                        if (facilityToRemove != null)
+                        {
+                            _FilteredResult.Remove(facilityToRemove);
+                        }
+                    }
+                }
+            }
+
         }
         #endregion
 
@@ -161,6 +210,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
+                                                                    .Include("MDReleaseState")
+                                                                    .Include("FacilityLot.MDReleaseState")
+                                                                    .Include("Facility.MDFacilityType")
                                                                     .Where(c => c.NotAvailable == false
                                                                            && ( (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               ||(!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -197,13 +249,6 @@ namespace gip.mes.facility
                 if (!searchForAlternativeMaterials)
                 {
                     return new QrySilosResult(s_cQry_PlSilosWithMaterialTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
-                    // Additional filter, which checks if Silo contains quants above which is oldern than filterDate
-                    //foreach (Facility facility in facilityList.ToArray())
-                    //{
-                    //    FacilityCharge fc = CoffeeSilo.s_cQry_PlQuants(ctx, facility).FirstOrDefault();
-                    //    if (fc == null || fc.FillingDate > filterTimeOlderThan)
-                    //        facilityList.Remove(facility);
-                    //}
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
@@ -216,7 +261,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -226,7 +271,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithMaterialTime", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -240,6 +285,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
+                                                                    .Include("MDReleaseState")
+                                                                    .Include("FacilityLot.MDReleaseState")
+                                                                    .Include("Facility.MDFacilityType")
                                                                     .Where(c => c.NotAvailable == false
                                                                            && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -279,13 +327,6 @@ namespace gip.mes.facility
                 if (!searchForAlternativeMaterials)
                 {
                     return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterialTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
-                    // Additional filter, which checks if Silo contains quants above which is oldern than filterDate
-                    //foreach (Facility facility in facilityList.ToArray())
-                    //{
-                    //    FacilityCharge fc = CoffeeSilo.s_cQry_PlQuants(ctx, facility).FirstOrDefault();
-                    //    if (fc == null || fc.FillingDate > degassingTime)
-                    //        facilityList.Remove(facility);
-                    //}
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
@@ -298,7 +339,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -308,7 +349,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "StartWithIntermediateMaterialTime", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -329,6 +370,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
+                                                .Include("MDReleaseState")
+                                                .Include("FacilityLot.MDReleaseState")
+                                                .Include("Facility.MDFacilityType")
                                                 .Where(c => c.NotAvailable == false
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -374,7 +418,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -384,7 +428,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithMaterial", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -399,6 +443,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
+                                                .Include("MDReleaseState")
+                                                .Include("FacilityLot.MDReleaseState")
+                                                .Include("Facility.MDFacilityType")
                                                 .Where(c => c.NotAvailable == false
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -448,7 +495,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -458,7 +505,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithIntermediateMaterial", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -483,6 +530,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                             .Include("Facility.FacilityStock_Facility")
+                                                                            .Include("MDReleaseState")
+                                                                            .Include("FacilityLot.MDReleaseState")
+                                                                            .Include("Facility.MDFacilityType")
                                                                             .Where(c => c.NotAvailable == false
                                                                                        && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -538,7 +588,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -548,7 +598,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithMaterialTime", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -562,6 +612,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
+                                                                    .Include("MDReleaseState")
+                                                                    .Include("FacilityLot.MDReleaseState")
+                                                                    .Include("Facility.MDFacilityType")
                                                                     .Where(c => c.NotAvailable == false
                                                                            && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -623,7 +676,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -633,7 +686,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithIntermediateMaterialTime", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -650,6 +703,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
+                                                                    .Include("InwardFacilityCharge.MDReleaseState")
+                                                                    .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
+                                                                    .Include("InwardFacility.MDFacilityType")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue
                                                                             && pos.SourceProdOrderPartslistID.HasValue
                                                                             && pos.MaterialID.HasValue
@@ -714,7 +770,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -724,7 +780,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosFromPrevStageTime", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -739,6 +795,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
+                                                                    .Include("InwardFacilityCharge.MDReleaseState")
+                                                                    .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
+                                                                    .Include("InwardFacility.MDFacilityType")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
                                                                             && c.InwardFacilityID.HasValue
                                                                             && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
@@ -793,7 +852,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -803,7 +862,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosFromPrevIntermediateTime", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
         #endregion
@@ -820,6 +879,9 @@ namespace gip.mes.facility
             ctx
             .FacilityBookingCharge
             .Include("InwardFacility.FacilityStock_Facility")
+            .Include("InwardFacilityCharge.MDReleaseState")
+            .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
+            .Include("InwardFacility.MDFacilityType")
             .Where(c =>
                         c.ProdOrderPartslistPosID.HasValue
                         && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
@@ -888,7 +950,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -898,7 +960,7 @@ namespace gip.mes.facility
 
                 Messages.LogException(nameof(ACPartslistManager), nameof(SilosFromLotsOfPrevStage), msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -919,6 +981,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
+                                                .Include("MDReleaseState")
+                                                .Include("FacilityLot.MDReleaseState")
+                                                .Include("Facility.MDFacilityType")
                                                 .Where(c => c.NotAvailable == false
                                                         && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -965,7 +1030,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -975,7 +1040,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithMaterial(10)", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -990,6 +1055,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
+                                                .Include("MDReleaseState")
+                                                .Include("FacilityLot.MDReleaseState")
+                                                .Include("Facility.MDFacilityType")
                                                 .Where(c => c.NotAvailable == false
                                                         && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
@@ -1046,7 +1114,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -1056,7 +1124,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosWithIntermediateMaterial(10)", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -1072,6 +1140,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
+                                                .Include("InwardFacilityCharge.MDReleaseState")
+                                                .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
+                                                .Include("InwardFacility.MDFacilityType")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
                                                     && c.InwardFacilityID.HasValue
                                                     && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
@@ -1122,7 +1193,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -1132,7 +1203,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosFromPrevStage", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -1146,6 +1217,9 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
+                                                .Include("InwardFacilityCharge.MDReleaseState")
+                                                .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
+                                                .Include("InwardFacility.MDFacilityType")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
                                                     && c.InwardFacilityID.HasValue
                                                     && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
@@ -1190,7 +1264,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -1200,7 +1274,7 @@ namespace gip.mes.facility
 
                 Messages.LogException("ACPartslistManager", "SilosFromPrevIntermediate", msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
         #endregion
@@ -1217,6 +1291,9 @@ namespace gip.mes.facility
             ctx
             .FacilityBookingCharge
             .Include("InwardFacility.FacilityStock_Facility")
+            .Include("InwardFacilityCharge.MDReleaseState")
+            .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
+            .Include("InwardFacility.MDFacilityType")
             .Where(c =>
                         c.ProdOrderPartslistPosID.HasValue
                         && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
@@ -1286,7 +1363,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
             catch (Exception ec)
             {
@@ -1296,7 +1373,7 @@ namespace gip.mes.facility
 
                 Messages.LogException(nameof(ACPartslistManager), nameof(SilosFromLotsOfPrevStage), msg);
 
-                return new QrySilosResult(new List<Facility>());
+                return new QrySilosResult();
             }
         }
 
@@ -1310,32 +1387,32 @@ namespace gip.mes.facility
         #endregion
 
         #region Methods
-        public static void RemoveFacility(Guid? ignoreFacilityID, IEnumerable<gip.core.datamodel.ACClass> exclusionList, IList<Facility> possibleSilos)
-        {
-            if (possibleSilos == null || !possibleSilos.Any())
-                return;
-            if (ignoreFacilityID.HasValue)
-            {
-                Facility facilityToRemove = possibleSilos.Where(c => c.FacilityID == ignoreFacilityID.Value).FirstOrDefault();
-                if (facilityToRemove != null)
-                {
-                    possibleSilos.Remove(facilityToRemove);
-                }
-            }
-            if (exclusionList != null)
-            {
-                foreach (gip.core.datamodel.ACClass silo2Exlude in exclusionList)
-                {
-                    Facility facilityToRemove = possibleSilos.Where(c => c.VBiFacilityACClassID.HasValue  && c.VBiFacilityACClassID == silo2Exlude.ACClassID).FirstOrDefault();
-                    if (facilityToRemove != null)
-                    {
-                        possibleSilos.Remove(facilityToRemove);
-                    }
-                }
-            }
-        }
+        //public static void RemoveFacility(Guid? ignoreFacilityID, IEnumerable<gip.core.datamodel.ACClass> exclusionList, IList<Facility> possibleSilos)
+        //{
+        //    if (possibleSilos == null || !possibleSilos.Any())
+        //        return;
+        //    if (ignoreFacilityID.HasValue)
+        //    {
+        //        Facility facilityToRemove = possibleSilos.Where(c => c.FacilityID == ignoreFacilityID.Value).FirstOrDefault();
+        //        if (facilityToRemove != null)
+        //        {
+        //            possibleSilos.Remove(facilityToRemove);
+        //        }
+        //    }
+        //    if (exclusionList != null)
+        //    {
+        //        foreach (gip.core.datamodel.ACClass silo2Exlude in exclusionList)
+        //        {
+        //            Facility facilityToRemove = possibleSilos.Where(c => c.VBiFacilityACClassID.HasValue  && c.VBiFacilityACClassID == silo2Exlude.ACClassID).FirstOrDefault();
+        //            if (facilityToRemove != null)
+        //            {
+        //                possibleSilos.Remove(facilityToRemove);
+        //            }
+        //        }
+        //    }
+        //}
 
-        public virtual IList<Facility> FindSilos(IPartslistPosRelation relation,
+        public virtual QrySilosResult FindSilos(IPartslistPosRelation relation,
                                                 DatabaseApp dbApp, Database dbIPlus,
                                                 SearchMode searchMode,
                                                 DateTime? filterTimeOlderThan,
@@ -1344,7 +1421,6 @@ namespace gip.mes.facility
                                                 ACValueList projSpecificParams = null,
                                                 bool onlyContainer = true)
         {
-            IList<Facility> possibleSilos = null;
             PartslistPosRelation plRelation = null;
             ProdOrderPartslistPosRelation poRelation = relation as ProdOrderPartslistPosRelation;
             if (poRelation == null)
@@ -1411,7 +1487,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                possibleSilos = ApplyLotReservationFilter(facilityQuery, poRelation);
+                ApplyLotReservationFilter(facilityQuery, poRelation);
             }
             else
             {
@@ -1437,34 +1513,19 @@ namespace gip.mes.facility
                         facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
                     }
                 }
-                possibleSilos = facilityQuery.FoundSilos;
             }
 
             if (onlyContainer)
             {
                 if (searchMode != SearchMode.AllSilos)
-                {
-                    possibleSilos = possibleSilos
-                                    //.ToList()
-                                    .Distinct()
-                                    .Where(c => !c.QryHasBlockedQuants.Any())
-                                    .ToList();
-                }
-                else
-                    possibleSilos = facilityQuery.FoundSilos.ToList().Distinct().ToList();
+                    facilityQuery.ApplyBlockedQuantsFilter();
             }
             else
-            {
-                possibleSilos = possibleSilos
-                                //.ToList()
-                                .Distinct()
-                                .Where(c =>   (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
-                                           || (!c.QryHasBlockedQuants.Any()) )
-                                .ToList();
-            }
-            RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
-            if (possibleSilos.Any())
-                return possibleSilos;
+                facilityQuery.ApplyFreeQuantsInBinFilter();
+
+            facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+            if (facilityQuery.FilteredResult != null && facilityQuery.FilteredResult.Any())
+                return facilityQuery;
 
             // 2. Suche nach Material das von einem anderen Auftrag produziert worden ist, wenn es keine Silos gibt
             if (poRelation != null)
@@ -1495,28 +1556,15 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
                         }
                     }
-                    possibleSilos = ApplyLotReservationFilter(facilityQuery, poRelation);
+                    ApplyLotReservationFilter(facilityQuery, poRelation);
 
                     if (onlyContainer)
-                    {
-                        possibleSilos = facilityQuery.FoundSilos
-                                        .ToList()
-                                        .Distinct()
-                                        .Where(c => !c.QryHasBlockedQuants.Any())
-                                        .ToList();
-                    }
+                        facilityQuery.ApplyBlockedQuantsFilter();
                     else
-                    {
-                        possibleSilos = facilityQuery.FoundSilos
-                                        .ToList()
-                                        .Distinct()
-                                        .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
-                                                   || (!c.QryHasBlockedQuants.Any()))
-                                        .ToList();
-                    }
-                    RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
-                    if (possibleSilos.Any())
-                        return possibleSilos;
+                        facilityQuery.ApplyFreeQuantsInBinFilter();
+                    facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                    if (facilityQuery.FilteredResult == null || !facilityQuery.FilteredResult.Any())
+                        return facilityQuery;
                 }
                 // Falls kein Alternativmaterial gepflegt, gebe leeres resultat zurück
                 else if (!poRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
@@ -1554,28 +1602,15 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
-                    possibleSilos = ApplyLotReservationFilter(facilityQuery, poRelation);
+                    ApplyLotReservationFilter(facilityQuery, poRelation);
 
                     if (onlyContainer)
-                    {
-                        possibleSilos = facilityQuery.FoundSilos
-                                        .ToList()
-                                        .Distinct()
-                                        .Where(c => !c.QryHasBlockedQuants.Any())
-                                        .ToList();
-                    }
+                        facilityQuery.ApplyBlockedQuantsFilter();
                     else
-                    {
-                        possibleSilos = facilityQuery.FoundSilos
-                                        .ToList()
-                                        .Distinct()
-                                        .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
-                                                   || (!c.QryHasBlockedQuants.Any()))
-                                        .ToList();
-                    }
+                        facilityQuery.ApplyFreeQuantsInBinFilter();
 
-                    RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
-                    return possibleSilos;
+                    facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                    return facilityQuery;
                 }
             }
             else
@@ -1604,38 +1639,26 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
+                    ApplyLotReservationFilter(facilityQuery, poRelation);
 
                     if (onlyContainer)
-                    {
-                        possibleSilos = facilityQuery.FoundSilos
-                                        .ToList()
-                                        .Distinct()
-                                        .Where(c => !c.QryHasBlockedQuants.Any())
-                                        .ToList();
-                    }
+                        facilityQuery.ApplyBlockedQuantsFilter();
                     else
-                    {
-                        possibleSilos = facilityQuery.FoundSilos
-                                        .ToList()
-                                        .Distinct()
-                                        .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
-                                                   || (!c.QryHasBlockedQuants.Any()))
-                                        .ToList();
-                    }
-                    RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
-                    return possibleSilos;
+                        facilityQuery.ApplyFreeQuantsInBinFilter();
+                    facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                    return facilityQuery;
                 }
             }
 
-            return possibleSilos;
+            return facilityQuery == null ? new QrySilosResult() : facilityQuery;
         }
 
 
-        protected virtual List<Facility> ApplyLotReservationFilter(QrySilosResult qrySilosResult, ProdOrderPartslistPosRelation poRelation)
+        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, ProdOrderPartslistPosRelation poRelation)
         {
             if (qrySilosResult == null)
-                return new List<Facility>();
-            return qrySilosResult.ApplyLotReservationFilter(poRelation);
+                return;
+            qrySilosResult.ApplyLotReservationFilter(poRelation);
         }
 
         public virtual IEnumerable<Route> GetRoutes(IPartslistPosRelation relation,
@@ -1643,7 +1666,7 @@ namespace gip.mes.facility
                                                 gip.core.datamodel.ACClass scaleACClass,
                                                 SearchMode searchMode,
                                                 DateTime? filterTimeOlderThan,
-                                                out IList<Facility> possibleSilos,
+                                                out QrySilosResult possibleSilos,
                                                 Guid? ignoreFacilityID,
                                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                                 ACValueList projSpecificParams = null,
@@ -1655,22 +1678,22 @@ namespace gip.mes.facility
             }
 
             possibleSilos = FindSilos(relation, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer);
-            if (possibleSilos == null || !possibleSilos.Any())
+            if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
                 return null;
 
             RoutingResult result = null;
             if (searchMode == SearchMode.OnlyEnabledOldestSilo)
             {
-                Facility oldestSilo = possibleSilos.FirstOrDefault();
+                FacilitySumByLots oldestSilo = possibleSilos.FilteredResult.FirstOrDefault();
                 if (oldestSilo == null)
                     return null;
-                if (!oldestSilo.VBiFacilityACClassID.HasValue)
+                if (!oldestSilo.StorageBin.VBiFacilityACClassID.HasValue)
                     return null;
-                var oldestSiloClass = oldestSilo.GetFacilityACClass(dbIPlus);
+                var oldestSiloClass = oldestSilo.StorageBin.GetFacilityACClass(dbIPlus);
 
                 result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
                                         scaleACClass, oldestSiloClass, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.StorageBin.VBiFacilityACClassID == c.ACClassID,
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
                                         0,true, true, false, false, 10);
                 if (result.Routes == null || !result.Routes.Any())
@@ -1682,8 +1705,8 @@ namespace gip.mes.facility
             else
             {
                 // 2. Suche Routen zu dieser Waage die von den vorgeschlagenen Silos aus führen
-                var acClassIDsOfPossibleSilos = possibleSilos.Where(c => c.VBiFacilityACClassID.HasValue).Select(c => c.VBiFacilityACClassID.Value);
-                IEnumerable<string> possibleSilosACUrl = possibleSilos.Where(c => c.FacilityACClass != null).Select(x => x.FacilityACClass.GetACUrlComponent());
+                var acClassIDsOfPossibleSilos = possibleSilos.FilteredResult.Where(c => c.StorageBin.VBiFacilityACClassID.HasValue).Select(c => c.StorageBin.VBiFacilityACClassID.Value);
+                IEnumerable<string> possibleSilosACUrl = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityACClass != null).Select(x => x.StorageBin.FacilityACClass.GetACUrlComponent());
 
                 result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
                                         scaleACClass, possibleSilosACUrl, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },

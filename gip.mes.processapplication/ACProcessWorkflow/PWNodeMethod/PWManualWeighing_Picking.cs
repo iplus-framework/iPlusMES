@@ -423,7 +423,7 @@ namespace gip.mes.processapplication
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
-            IList<Facility> facilities;
+            facility.ACPartslistManager.QrySilosResult facilities;
 
             core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
             IEnumerable<Route> routes = PickingManager.GetRoutes(pickingPos, dbApp, dbApp.ContextIPlus,
@@ -436,7 +436,7 @@ namespace gip.mes.processapplication
                                         null,
                                         false);                                                        
 
-            if (routes == null || facilities == null)
+            if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
                 return new List<Facility>();
 
             var routeList = routes.ToList();
@@ -471,9 +471,9 @@ namespace gip.mes.processapplication
                         RouteItem source = currRoute.GetRouteSource();
                         if (source != null)
                         {
-                            Facility facilityToAdd = facilities.FirstOrDefault(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == source.SourceGuid);
+                            facility.ACPartslistManager.QrySilosResult.FacilitySumByLots facilityToAdd = facilities.FilteredResult.FirstOrDefault(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID == source.SourceGuid);
                             if (facilityToAdd != null)
-                                routableFacilities.Add(facilityToAdd);
+                                routableFacilities.Add(facilityToAdd.StorageBin);
                         }
                     }
                 }

@@ -159,7 +159,7 @@ namespace gip.mes.processapplication
                     gip.core.datamodel.ACClass scaleACClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
 
                     RoutingResult rResult = null;
-                    IList<Facility> possibleSilos = null;
+                    facility.ACPartslistManager.QrySilosResult possibleSilos = null;
                     IEnumerable<Route> routes = null;
 
                     if (pickingPos.FromFacility == null)
@@ -180,13 +180,13 @@ namespace gip.mes.processapplication
 
                     Route dosingRoute = null;
 
-                    if (pickingPos.FromFacility == null && possibleSilos != null)
+                    if (pickingPos.FromFacility == null && possibleSilos != null && possibleSilos.FilteredResult != null)
                     {
-                        foreach (var prioSilo in possibleSilos)
+                        foreach (var prioSilo in possibleSilos.FilteredResult)
                         {
-                            if (!prioSilo.VBiFacilityACClassID.HasValue)
+                            if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue)
                                 continue;
-                            dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
+                            dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
                             if (dosingRoute != null)
                                 break;
                         }
@@ -597,14 +597,14 @@ namespace gip.mes.processapplication
                         return CachedEmptySiloHandlingOption.Value;
                     }
 
-                    IList<Facility> possibleSilos;
+                    facility.ACPartslistManager.QrySilosResult possibleSilos;
                     RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                         null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
                     IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     if (routes == null || !routes.Any())
                     {
-                        if (AutoChangeScale && possibleSilos != null && possibleSilos.Any())
+                        if (AutoChangeScale && possibleSilos != null && possibleSilos.FilteredResult  != null && possibleSilos.FilteredResult.Any())
                         {
                             var parallelActiveDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
                                     && c != this
@@ -616,7 +616,7 @@ namespace gip.mes.processapplication
                             {
                                 foreach (var otherDosing in parallelActiveDosings)
                                 {
-                                    IList<Facility> alternativeSilos;
+                                    facility.ACPartslistManager.QrySilosResult alternativeSilos;
                                     RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                         null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);

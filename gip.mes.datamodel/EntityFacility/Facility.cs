@@ -837,6 +837,12 @@ namespace gip.mes.datamodel
             }
         }
 
+        public static Func<FacilityCharge, bool> FuncHasBlockedQuants =
+            c => c.NotAvailable == false
+               && (c.MDReleaseStateID.HasValue && c.MDReleaseState.MDReleaseStateIndex >= (short)MDReleaseState.ReleaseStates.Locked)
+                   || (c.FacilityLotID.HasValue && c.FacilityLot.MDReleaseStateID.HasValue && c.FacilityLot.MDReleaseState.MDReleaseStateIndex >= (short)MDReleaseState.ReleaseStates.Locked);
+
+
         public IQueryable<FacilityCharge> QryHasFreeQuants
         {
             get
@@ -847,6 +853,11 @@ namespace gip.mes.datamodel
                                                             && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree));
             }
         }
+
+        public static Func<FacilityCharge, bool> FuncHasFreeQuants =
+            c => c.NotAvailable == false
+                && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
+                && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree);
 
         [ACPropertyInfo(45, "", "en{'Available Space'}de{'Verfügbarer Platz'}")]
         public double AvailableSpace
