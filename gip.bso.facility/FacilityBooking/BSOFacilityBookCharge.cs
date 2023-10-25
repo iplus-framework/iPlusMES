@@ -22,7 +22,6 @@ using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace gip.bso.facility
 {
@@ -582,6 +581,7 @@ namespace gip.bso.facility
                         AccessPrimary.Current.PropertyChanged += CurrentFacilityCharge_PropertyChanged;
                     }
 
+                    OnPropertyChanged_CurrentFacilityCharge();
                     OnPropertyChanged(nameof(CurrentFacilityCharge));
                     OnPropertyChanged(nameof(ContractualPartnerList));
                     OnPropertyChanged(nameof(StorageUnitTestList));
@@ -592,8 +592,7 @@ namespace gip.bso.facility
             }
         }
 
-
-        void CurrentFacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        public virtual void CurrentFacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(FacilityCharge.MaterialID))
             {
@@ -609,6 +608,10 @@ namespace gip.bso.facility
             {
                 OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
+        }
+
+        public virtual void OnPropertyChanged_CurrentFacilityCharge()
+        {
         }
 
         /// <summary>
