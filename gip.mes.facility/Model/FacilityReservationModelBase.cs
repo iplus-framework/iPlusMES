@@ -1,16 +1,17 @@
-﻿
-
-using gip.core.datamodel;
+﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System.ComponentModel;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'FacilityReservationModelBase'}de{'FacilityReservationModelBase'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class FacilityReservationModelBase : INotifyPropertyChanged
     {
+        [ACPropertyInfo(1, "IsSelected", ConstApp.Select)]
+        public bool IsSelected { get; set; }
+
         private double _TotalReservedQuantity;
-        [ACPropertyInfo(1, "", ConstApp.BlockedQuantity)]
+        [ACPropertyInfo(2, "", ConstApp.BlockedQuantity)]
         public double TotalReservedQuantity
         {
             get
@@ -28,7 +29,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _UsedQuantity;
-        [ACPropertyInfo(2, "", "en{'Used quantity'}de{'Used quantity'}")]
+        [ACPropertyInfo(3, "", "en{'Used quantity'}de{'Used quantity'}")]
         public double UsedQuantity
         {
             get
@@ -46,7 +47,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _FreeQuantity;
-        [ACPropertyInfo(3, "", ConstApp.FreeQuantity)]
+        [ACPropertyInfo(4, "", ConstApp.FreeQuantity)]
         public double FreeQuantity
         {
             get

@@ -1,23 +1,20 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
-using System.ComponentModel;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'FacilityReservationModel'}de{'FacilityReservationModel'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class FacilityReservationModel : FacilityReservationModelBase
     {
         #region Material & Lot
 
-        [ACPropertyInfo(1, "", ConstApp.MaterialNo)]
-        public string MaterialNo { get; set; }
 
-        [ACPropertyInfo(2, "", ConstApp.MaterialName1)]
-        public string MaterialName { get; set; }
+        [ACPropertyInfo(1, "", ConstApp.Material)]
+        public Material Material { get; set; }
 
-        [ACPropertyInfo(3, "", ConstApp.LotNo)]
-        public string LotNo { get; set; }
+        [ACPropertyInfo(2, "", ConstApp.LotNo)]
+        public FacilityLot FacilityLot { get; set; }
 
         #endregion
 
@@ -78,20 +75,10 @@ namespace gip.bso.manufacturing
             IsRecalculated = true;
         }
 
-
         public FacilityReservation FacilityReservation { get; set; }
 
-        #region INotifyPropertyChanged
+        [ACPropertyInfo(5, "", "en{'Oldest charge date'}de{'Ältestes Quant-Datum'}")]
+        public DateTime? OldestFacilityChargeDate { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
     }
 }
