@@ -434,7 +434,8 @@ namespace gip.mes.processapplication
                                         null,
                                         null,
                                         null,
-                                        false);                                                        
+                                        false,
+                                        ReservationMode);                                                        
 
             if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
                 return new List<Facility>();

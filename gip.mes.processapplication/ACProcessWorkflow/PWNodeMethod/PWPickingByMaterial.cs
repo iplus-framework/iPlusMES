@@ -152,7 +152,8 @@ namespace gip.mes.processapplication
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    false);
+                                                                    false,
+                                                                    0);
 
             if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
                 return new List<Facility>();

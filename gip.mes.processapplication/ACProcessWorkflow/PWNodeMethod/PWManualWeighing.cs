@@ -75,6 +75,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
 
+            method.ParameterValueList.Add(new ACValue("ReservationMode", typeof(short), (short)0, Global.ParamOption.Optional));
+            paramTranslation.Add("ReservationMode", "en{'Allow other lots if reservation'}de{'Erlaube andere Lose bei Reservierungen'}");
+
             method.ParameterValueList.Add(new ACValue("ReworkMaterialNo", typeof(string), "", Global.ParamOption.Optional));
             paramTranslation.Add("ReworkMaterialNo", "en{'Material number for rework'}de{'Materialnummer für Nacharbeit'}");
 
@@ -512,6 +515,23 @@ namespace gip.mes.processapplication
                         return acValue.ParamAsBoolean;
                 }
                 return false;
+            }
+        }
+
+        public short ReservationMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReservationMode");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
+                    }
+                }
+                return 0;
             }
         }
 
@@ -2519,7 +2539,8 @@ namespace gip.mes.processapplication
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    false);
+                                                                    false,
+                                                                    ReservationMode);
 
             if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
                 return new List<Facility>();

@@ -5,6 +5,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using static gip.mes.datamodel.MDReservationMode;
 
 namespace gip.mes.processapplication
 {
@@ -166,7 +167,7 @@ namespace gip.mes.processapplication
                     {
                         RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                                                             OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                                                            null, null, ExcludedSilos);
+                                                                            null, null, ExcludedSilos, ReservationMode);
                         routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     }
                     else
@@ -600,7 +601,7 @@ namespace gip.mes.processapplication
                     facility.ACPartslistManager.QrySilosResult possibleSilos;
                     RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
+                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos, ReservationMode);
                     IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     if (routes == null || !routes.Any())
                     {
@@ -619,7 +620,7 @@ namespace gip.mes.processapplication
                                     facility.ACPartslistManager.QrySilosResult alternativeSilos;
                                     RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
+                                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos, ReservationMode);
                                     IEnumerable<Route> alternativeRoutes = otherDosing.GetRoutes(pickingPos, dbApp, dbIPlus, queryParams2, null, out alternativeSilos);
                                     if (alternativeRoutes != null && alternativeRoutes.Any())
                                     {

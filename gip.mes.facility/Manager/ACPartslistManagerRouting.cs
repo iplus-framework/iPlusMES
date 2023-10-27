@@ -41,7 +41,7 @@ namespace gip.mes.facility
             {
                 _GroupedStoresWithQuants = foundQuants != null && foundQuants.Any() ? foundQuants.Distinct().GroupBy(c => c.Facility) : null;
                 if (_GroupedStoresWithQuants != null)
-                    _FilteredResult = _GroupedStoresWithQuants.Select(c => new FacilitySumByLots() { StorageBin = c.Key, FacilityCharges = c.ToList() }).ToList();
+                    _FilteredResult = _GroupedStoresWithQuants.Select(c => new FacilitySumByLots() { StorageBin = c.Key, FacilityCharges = c.Select(d => new FacilityChargeInfo() { Quant = d }).ToList() }).ToList();
                 _DoseAlternativeMat = doseAlternativeMat;
             }
 
@@ -68,19 +68,70 @@ namespace gip.mes.facility
                 }
             }
 
+            public class FacilityChargeInfo
+            {
+                public FacilityCharge Quant { get; set; }
+                public bool IsReservedLot { get; set; }
+            }
+
             public class FacilitySumByLots
             {
                 public Facility StorageBin { get; internal set; }
-                
+
+                private double? _StockOfReservations = null;
+                public double? StockOfReservations
+                {
+                    get
+                    {
+                        if (_StockOfReservations == null && _StockFree == null)
+                            Sum();
+                        return _StockOfReservations;
+                    }
+                }
+
+                private double? _StockFree = null;
+                public double? StockFree
+                {
+                    get
+                    {
+                        if (_StockOfReservations == null && _StockFree == null)
+                            Sum();
+                        return _StockFree;
+                    }
+                }              
+
                 public double Stock
                 {
                     get
                     {
-                        return FacilityCharges != null ? FacilityCharges.Sum(c => c.StockQuantityUOM) : 0.0;
+                        return (StockOfReservations.HasValue ? StockOfReservations.Value : 0.0) + (StockFree.HasValue ? StockFree.Value : 0.0);
                     }
                 }
 
-                public List<FacilityCharge> FacilityCharges { get; set; }
+                public List<FacilityChargeInfo> FacilityCharges { get; set; }
+
+                private void Sum()
+                {
+                    if (FacilityCharges == null)
+                        return;
+                    _StockOfReservations = null;
+                    _StockFree = null;
+                    foreach (FacilityChargeInfo fcInfo in FacilityCharges)
+                    {
+                        if (fcInfo.IsReservedLot)
+                        {
+                            if (!_StockOfReservations.HasValue)
+                                _StockOfReservations = 0.0;
+                            _StockOfReservations += fcInfo.Quant.StockQuantityUOM;
+                        }
+                        else
+                        {
+                            if (!_StockFree.HasValue)
+                                _StockFree = 0.0;
+                            _StockFree += fcInfo.Quant.StockQuantityUOM;
+                        }
+                    }
+                }
             }
 
             private IEnumerable<IGrouping<Facility, FacilityCharge>> _GroupedStoresWithQuants;
@@ -92,7 +143,7 @@ namespace gip.mes.facility
                 }
             }
 
-            public IPartslistPos _DoseAlternativeMat;
+            private IPartslistPos _DoseAlternativeMat;
             public IPartslistPos DoseAlternativeMat
             {
                 get
@@ -101,11 +152,21 @@ namespace gip.mes.facility
                 }
             }
 
+            private bool _HasLotReservations;
+            public bool HasLotReservations
+            {
+                get
+                {
+                    return _HasLotReservations;
+                }
+            }
+
+
             public void ApplyBlockedQuantsFilter()
             {
                 if (_FilteredResult == null || !_FilteredResult.Any())
                     return;
-                _FilteredResult = _FilteredResult.Where(f => !f.FacilityCharges.Where(fc => Facility.FuncHasBlockedQuants(fc)).Any())
+                _FilteredResult = _FilteredResult.Where(f => !f.FacilityCharges.Where(fc => Facility.FuncHasBlockedQuants(fc.Quant)).Any())
                                                     .ToList();
             }
 
@@ -113,12 +174,12 @@ namespace gip.mes.facility
             {
                 if (_FilteredResult == null || !_FilteredResult.Any())
                     return;
-                _FilteredResult = _FilteredResult.Where(f =>   (f.StorageBin.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && f.FacilityCharges.Where(fc => Facility.FuncHasFreeQuants(fc)).Any())
-                                                            || !f.FacilityCharges.Where(fc => Facility.FuncHasBlockedQuants(fc)).Any())
+                _FilteredResult = _FilteredResult.Where(f =>   (f.StorageBin.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && f.FacilityCharges.Where(fc => Facility.FuncHasFreeQuants(fc.Quant)).Any())
+                                                            || !f.FacilityCharges.Where(fc => Facility.FuncHasBlockedQuants(fc.Quant)).Any())
                                                     .ToList();
             }
 
-            public void ApplyLotReservationFilter(ProdOrderPartslistPosRelation poRelation)
+            public void ApplyLotReservationFilter(ProdOrderPartslistPosRelation poRelation, short reservationMode)
             {
                 if (_FilteredResult == null || !_FilteredResult.Any())
                     return;
@@ -130,11 +191,33 @@ namespace gip.mes.facility
                         .Select(c => c.FacilityLotID.Value)
                         .ToArray();
                 }
-                if (reservedLots != null && reservedLots.Any() && GroupedStoresWithQuants != null)
+                if (reservedLots != null && reservedLots.Any())
                 {
-                    _FilteredResult = _FilteredResult
-                        .Where(c => c.FacilityCharges.Where(d => d.FacilityLotID.HasValue && reservedLots.Contains(d.FacilityLotID.Value)).Any())
-                        .ToList();
+                    _HasLotReservations = true;
+                    if (_FilteredResult != null && _FilteredResult.Any())
+                    {
+                        _FilteredResult.ForEach(c => c.FacilityCharges.ForEach(d => d.IsReservedLot = d.Quant.FacilityLotID.HasValue && reservedLots.Contains(d.Quant.FacilityLotID.Value)));
+                        // Sort List first by silos with reserved Lots then append the rest
+                        if (reservationMode == 1)
+                        {
+                            List<FacilitySumByLots> binsWithReservedLots = _FilteredResult
+                                .Where(c => c.StockOfReservations.HasValue)
+                                .ToList();
+                            foreach (var bin in _FilteredResult)
+                            {
+                                if (!bin.StockOfReservations.HasValue)
+                                    binsWithReservedLots.Add(bin);
+                            }
+                            _FilteredResult = binsWithReservedLots;
+                        }
+                        // Select only that have reserved lots
+                        else
+                        {
+                            _FilteredResult = _FilteredResult
+                                .Where(c => c.FacilityCharges.Where(d => d.IsReservedLot).Any())
+                                .ToList();
+                        }
+                    }
                 }
             }
 
@@ -1345,7 +1428,8 @@ namespace gip.mes.facility
                                                 Guid? ignoreFacilityID,
                                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                                 ACValueList projSpecificParams = null,
-                                                bool onlyContainer = true)
+                                                bool onlyContainer = true,
+                                                short reservationMode = 0)
         {
             PartslistPosRelation plRelation = null;
             ProdOrderPartslistPosRelation poRelation = relation as ProdOrderPartslistPosRelation;
@@ -1413,7 +1497,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                ApplyLotReservationFilter(facilityQuery, poRelation);
+                ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
             }
             else
             {
@@ -1482,7 +1566,7 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
                         }
                     }
-                    ApplyLotReservationFilter(facilityQuery, poRelation);
+                    ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
 
                     if (onlyContainer)
                         facilityQuery.ApplyBlockedQuantsFilter();
@@ -1528,7 +1612,7 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
-                    ApplyLotReservationFilter(facilityQuery, poRelation);
+                    ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
 
                     if (onlyContainer)
                         facilityQuery.ApplyBlockedQuantsFilter();
@@ -1565,7 +1649,7 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
-                    ApplyLotReservationFilter(facilityQuery, poRelation);
+                    ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
 
                     if (onlyContainer)
                         facilityQuery.ApplyBlockedQuantsFilter();
@@ -1580,11 +1664,11 @@ namespace gip.mes.facility
         }
 
 
-        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, ProdOrderPartslistPosRelation poRelation)
+        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, ProdOrderPartslistPosRelation poRelation, short reservationMode)
         {
             if (qrySilosResult == null)
                 return;
-            qrySilosResult.ApplyLotReservationFilter(poRelation);
+            qrySilosResult.ApplyLotReservationFilter(poRelation, reservationMode);
         }
 
         public virtual IEnumerable<Route> GetRoutes(IPartslistPosRelation relation,
@@ -1596,7 +1680,8 @@ namespace gip.mes.facility
                                                 Guid? ignoreFacilityID,
                                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                                 ACValueList projSpecificParams = null,
-                                                bool onlyContainer = true)
+                                                bool onlyContainer = true,
+                                                short reservationMode = 0)
         {
             if (scaleACClass == null)
             {

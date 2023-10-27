@@ -1734,14 +1734,15 @@ namespace gip.mes.facility
                                 Guid? ignoreFacilityID,
                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                 ACValueList projSpecificParams = null,
-                                bool onlyContainer = true)
+                                bool onlyContainer = true,
+                                short reservationMode = 0)
         {
             if (currentProcessModule == null)
             {
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
-            possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer);
+            possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode);
             if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
                 return null;
 
@@ -1794,7 +1795,8 @@ namespace gip.mes.facility
                                 Guid? ignoreFacilityID,
                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                 ACValueList projSpecificParams = null,
-                                bool onlyContainer = true)
+                                bool onlyContainer = true,
+                                short reservationMode = 0)
         {
             Material material = pickingPos.Material;
 
