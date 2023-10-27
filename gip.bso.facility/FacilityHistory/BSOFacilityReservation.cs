@@ -18,6 +18,10 @@ namespace gip.bso.facility
     public class BSOFacilityReservation : ACBSOvb
     {
 
+        #region const
+        public double Const_ZeroQuantityCheckFactor = 0.01;
+        #endregion
+
         #region ctor's
         public BSOFacilityReservation(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
@@ -75,7 +79,8 @@ namespace gip.bso.facility
                             ProdOrderPartslistPos pos = _FacilityReservationOwner as ProdOrderPartslistPos;
                             Material = pos.Material;
                             FacilityReservationCollection = pos.FacilityReservation_ProdOrderPartslistPos;
-                            NeededQuantity = pos.TargetQuantityUOM - pos.ActualQuantityUOM;
+                            TargetQuantityUOM = pos.TargetQuantityUOM;
+                            NeededQuantityUOM = pos.TargetQuantityUOM - pos.ActualQuantityUOM;
                         }
                     }
                     OnPropertyChanged();
@@ -88,8 +93,9 @@ namespace gip.bso.facility
 
         public EntityCollection<FacilityReservation> FacilityReservationCollection { get; set; }
 
-        public double NeededQuantity { get; set; }
-        public double MissingQuantity { get; set; }
+        public double TargetQuantityUOM { get; set; }
+        public double NeededQuantityUOM { get; set; }
+        public double MissingQuantityUOM { get; set; }
 
         #endregion
 
@@ -167,14 +173,14 @@ namespace gip.bso.facility
         {
             if (!IsEnabledAddFaciltiyReservation())
                 return;
-            MissingQuantity = GetMissingQuantity(NeededQuantity, _FacilityReservationList);
-            if (NeededQuantity <= 0)
+            MissingQuantityUOM = GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
+            if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50604 Production component realise complete quantity!
                 // Produktionskomponente in kompletter Stückzahl realisieren!
                 Messages.Error(this, "Error50604");
             }
-            else if (MissingQuantity <= 0.001)
+            else if (IsNegligibleQuantity(TargetQuantityUOM, MissingQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50601 Sufficient quantity has already been reserved
                 // Es ist bereits eine ausreichende Menge reserviert
@@ -429,7 +435,7 @@ namespace gip.bso.facility
             if (!IsEnabledShowLotDlgOk())
                 return;
 
-            if (FacilityLotList.Any(c => c.FreeQuantityNegative))
+            if (FacilityLotList.Any(c => c.IsSelected && c.FreeQuantityNegative))
             {
                 // Error50602 A quantity greater than available is reserved for the following lots: {0}
                 // Eine größere Menge als verfügbar ist für die folgenden Lose reserviert: {0}
@@ -439,16 +445,26 @@ namespace gip.bso.facility
             }
             else
             {
-                double reservedQuantity = FacilityLotList.Where(c => c.IsSelected && c.ReservedQuantity > 0).Sum(c => c.ReservedQuantity);
-                if (MissingQuantity < reservedQuantity)
+                double reservedQuantity = 
+                    FacilityLotList
+                    .Where(c => c.IsSelected && c.ReservedQuantity > 0)
+                    .Sum(c => c.ReservedQuantity);
+                if (MissingQuantityUOM < reservedQuantity)
                 {
                     // Error50603 A larger quantity than required has been reserved! Reserved quantity {0}; Quantity required: {1}
                     // Es wurde eine größere Menge als benötigt reserviert! Reservierte Menge {0}; Erforderliche Menge: {1}
-                    Messages.Error(this, "Error50603", false, reservedQuantity, MissingQuantity);
+                    Messages.Error(this, "Error50603", false, reservedQuantity, MissingQuantityUOM);
                 }
                 else
                 {
-                    List<FacilityReservationModel> inputModels = FacilityLotList.Where(c => c.IsSelected && c.ReservedQuantity > 0).ToList();
+                    List<FacilityReservationModel> inputModels = 
+                        FacilityLotList
+                        .Where(c => 
+                            c.IsSelected 
+                            && !IsNegligibleQuantity(TargetQuantityUOM, c.ReservedQuantity, Const_ZeroQuantityCheckFactor)
+                            )
+                        .ToList();
+
                     List<FacilityReservationModel> outputModels = new List<FacilityReservationModel>();
 
                     foreach (FacilityReservationModel model in inputModels)
@@ -511,7 +527,7 @@ namespace gip.bso.facility
             {
                 facilityReservation.IsSelected = false;
             }
-            _FacilityLotList = DoDistributeQuantity(_FacilityLotList, MissingQuantity);
+            _FacilityLotList = DoDistributeQuantity(_FacilityLotList, MissingQuantityUOM);
             OnPropertyChanged(nameof(FacilityLotList));
         }
 
@@ -576,7 +592,7 @@ namespace gip.bso.facility
                 facilityReservation.CopyFrom(modelBase);
             }
 
-            facilityReservations = DoDistributeQuantity(facilityReservations, MissingQuantity);
+            facilityReservations = DoDistributeQuantity(facilityReservations, MissingQuantityUOM);
 
             return facilityReservations;
         }
@@ -591,26 +607,28 @@ namespace gip.bso.facility
             double restQuantity = quantity;
             foreach (FacilityReservationModel facilityReservation in facilityReservations)
             {
-                if (restQuantity <= 0)
+                if (IsNegligibleQuantity(quantity, restQuantity, Const_ZeroQuantityCheckFactor))
                 {
                     break;
                 }
-
-                if (restQuantity >= facilityReservation.FreeQuantity)
+                if(facilityReservation.FreeQuantity > 0 && !IsNegligibleQuantity(quantity, facilityReservation.FreeQuantity, Const_ZeroQuantityCheckFactor))
                 {
-                    facilityReservation.ReservedQuantity = facilityReservation.FreeQuantity;
-                    facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
-                    facilityReservation.FreeQuantity = 0;
-                    restQuantity -= facilityReservation.ReservedQuantity;
+                    if (restQuantity >= facilityReservation.FreeQuantity)
+                    {
+                        facilityReservation.ReservedQuantity = facilityReservation.FreeQuantity;
+                        facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
+                        facilityReservation.FreeQuantity = 0;
+                        restQuantity -= facilityReservation.ReservedQuantity;
+                    }
+                    else
+                    {
+                        facilityReservation.ReservedQuantity = restQuantity;
+                        facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
+                        facilityReservation.FreeQuantity -= restQuantity;
+                        restQuantity = 0;
+                    }
+                    facilityReservation.IsSelected = true;
                 }
-                else
-                {
-                    facilityReservation.ReservedQuantity = restQuantity;
-                    facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
-                    facilityReservation.FreeQuantity -= restQuantity;
-                    restQuantity = 0;
-                }
-                facilityReservation.IsSelected = true;
             }
             return facilityReservations;
         }
@@ -764,6 +782,13 @@ namespace gip.bso.facility
             OnPropertyChanged(nameof(MsgList));
         }
 
+        #endregion
+
+        #region Helper methods
+        public bool IsNegligibleQuantity(double referentQuantity, double testedQuantity, double factor)
+        {
+            return (testedQuantity / referentQuantity) < factor;
+        }
         #endregion
     }
 }
