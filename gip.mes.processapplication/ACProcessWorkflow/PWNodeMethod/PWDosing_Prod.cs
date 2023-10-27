@@ -149,14 +149,14 @@ namespace gip.mes.processapplication
                                 if (acMethod == null)
                                     return true;
 
-                                facility.ACPartslistManager.QrySilosResult possibleSilos;
+                                ACPartslistManager.QrySilosResult possibleSilos;
 
                                 PAProcessModule module = ParentPWGroup.AccessedProcessModule != null ? ParentPWGroup.AccessedProcessModule : ParentPWGroup.FirstAvailableProcessModule;
                                 if (module == null && ParentPWGroup.ProcessModuleList != null) // If all occupied, then use first that is generally possible 
                                     module = ParentPWGroup.ProcessModuleList.FirstOrDefault();
                                 RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                     OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                    null, null, ExcludedSilos);
+                                    null, null, ExcludedSilos, ReservationMode);
                                 IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, module, out possibleSilos);
 
                                 // #SKIPMALZERS
@@ -165,8 +165,8 @@ namespace gip.mes.processapplication
                                 if (   (routes == null || !routes.Any())
                                     && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
                                 {
-                                    RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos);
-                                    facility.ACPartslistManager.QrySilosResult possibleSilos2;
+                                    RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                    ACPartslistManager.QrySilosResult possibleSilos2;
                                     IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, module, out possibleSilos2);
                                     if (routes2 != null && routes2.Any())
                                     {
@@ -449,14 +449,18 @@ namespace gip.mes.processapplication
                             }
 
                             MDProdOrderPartslistPosState posState;
-                            facility.ACPartslistManager.QrySilosResult possibleSilos;
+                            ACPartslistManager.QrySilosResult possibleSilos;
                             IEnumerable<IPWNodeReceiveMaterial> parallelDosingWFs = GetParallelDosingWFs(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
                             IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos = GetAllExcludedSilos(parallelDosingWFs);
 
                             RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                 OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                null, null, allExcludedSilos);
+                                null, null, allExcludedSilos, ReservationMode);
                             IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+                            
+                            double correctedDosingWeight = dosingWeight;
+                            Route preferredDosingRoute = null, alternativeDosingRoute = null;
+                            ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility = null, alternativeDosingFacility = null, preferredDosingFacilityNotRoutableHere = null;
 
                             if (routes != null && routes.Any())
                             {
@@ -491,10 +495,17 @@ namespace gip.mes.processapplication
                                 }
 
                                 routes = routesList;
+                                PriorizeSilosAndGetRoute(possibleSilos, routes, dosingWeight, out correctedDosingWeight, out preferredDosingRoute, out preferredDosingFacility, out alternativeDosingRoute, out alternativeDosingFacility, out preferredDosingFacilityNotRoutableHere);
                             }
 
-                            if (routes == null || !routes.Any())
+                            // Wenn keine Route gefunden zu dieser Waage gefunden wurde
+                            // oder wenn aufgrund von Reservierungen nicht das richtige Silo gefunden wurde
+                            // prüfe ob auf anderen Dosierschritte eine Dosierung möglich wäre
+                            if (   (routes == null || !routes.Any())
+                                || preferredDosingRoute == null)
                             {
+                                bool isOnlyTestForFindingBetterSiloWithReservedLots = routes != null && routes.Any() && preferredDosingRoute == null;
+
                                 bool hasOtherStartableDosingNodes = false;
                                 // Falls Komponente überspringbar und es weitere Dosierschritte gibt, die diese Komponente dosieren könnten, und vom gleichen Dosierschritttyp sind,
                                 // dann gehe zur nächsten Komponente 
@@ -538,20 +549,14 @@ namespace gip.mes.processapplication
                                 //    }
                                 //}
 
-                                //if (   otherDosingNodes != null 
-                                //    && otherDosingNodes.Any() 
-                                //    && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.Any())))
+                                double correctedDosingWeight2 = 0.0;
+                                Route preferredDosingRoute2 = null, alternativeDosingRoute2 = null;
+                                ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility2 = null, alternativeDosingFacility2 = null, preferredDosingFacilityNotRoutableHere2 = null;
+
                                 if (   parallelDosingWFs != null 
                                     && parallelDosingWFs.Any()
                                     && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())))
                                 {
-                                    //List<IPWNodeReceiveMaterial> otherDosingWFs = this.RootPW.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial
-                                    //                                                            && (c as IPWNodeReceiveMaterial).ContentACClassWF != null
-                                    //                                                            && otherDosingNodes.Contains((c as IPWNodeReceiveMaterial).ContentACClassWF.ACClassWFID)
-                                    //                                                            && (   (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0 
-                                    //                                                                || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null 
-                                    //                                                                    && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
-                                    //                                                            /*&& (c.CurrentACState == PABaseState.SMIdle || c.CurrentACState == PABaseState.SMBreakPoint)*/);
                                     List<IPWNodeReceiveMaterial> otherDosingWFs = parallelDosingWFs.Where(c => (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0
                                                                                                             || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null
                                                                                                                 && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
@@ -577,86 +582,204 @@ namespace gip.mes.processapplication
                                     // Therefore it has to be determined which Processmodules will be mapped and then checked if the can dose from one of this possible silos
                                     // if not, then this Dosing node should not be completed, because the dosing has to happen here first.
                                     hasOtherStartableDosingNodes = otherDosingWFs.Any();
-                                    if (hasOtherStartableDosingNodes && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
+                                    if (!isOnlyTestForFindingBetterSiloWithReservedLots && hasOtherStartableDosingNodes && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
                                     {
-                                        RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos);
-                                        facility.ACPartslistManager.QrySilosResult possibleSilos2;
+                                        RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                        ACPartslistManager.QrySilosResult possibleSilos2;
                                         IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, null, out possibleSilos2);
                                         if (routes2 != null && routes2.Any())
+                                        {
                                             hasOtherStartableDosingNodes = false;
+                                        }
+                                        //if (routes2 != null && routes2.Any())
+                                        //{
+                                        //    if (isOnlyTestForFindingBetterSiloWithReservedLots)
+                                        //    {
+                                        //        PriorizeSilosAndGetRoute(possibleSilos2, routes2, dosingWeight, out correctedDosingWeight2, out preferredDosingRoute2, out preferredDosingFacility2, out alternativeDosingRoute2, out alternativeDosingFacility2, out preferredDosingFacilityNotRoutableHere2);
+                                        //        // If better Silo found on other scale, then continue
+                                        //        if (preferredDosingFacilityNotRoutableHere2 != null
+                                        //            && preferredDosingFacilityNotRoutableHere2 != preferredDosingFacilityNotRoutableHere)
+                                        //        {
+                                        //            hasOtherStartableDosingNodes = false;
+                                        //        }
+                                        //    }
+                                        //    hasOtherStartableDosingNodes = false;
+                                        //}
+                                        //else if (isOnlyTestForFindingBetterSiloWithReservedLots)
+                                        //    hasOtherStartableDosingNodes = false;
+
                                     }
                                 }
 
-                                // Versuche nächste Komponente, wenn es noch andere Dosierschritte gibt
                                 if (hasOtherStartableDosingNodes)
                                 {
-                                    queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos);
-                                    routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
-                                    if (routes != null && routes.Any())
-                                        isAnyCompDosableFromAnyRoutableSilo = true;
-                                    hasOpenDosings = true;
-                                    continue;
-                                }
-
-                                // TODO: Was passiert wenn noch eine Komponente kommt, muss skaliert werden?
-                                if (NoSourceFoundForDosing.ValueT == 0)
-                                {
-                                    // Warning50005: No Silo/Tank/Container found for component {0}
-                                    msg = new Msg(this, eMsgLevel.Warning, PWClassName, "StartNextProdComponent(6)", 1060, "Warning50005",
-                                                    relation.SourceProdOrderPartslistPos.Material.MaterialName1);
-
-                                    NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
-                                    NoSourceFoundForDosing.ValueT = 1;
-                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                }
-                                else if (NoSourceFoundForDosing.ValueT == 2)
-                                {
-                                    posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
-                                    if (posState == null)
+                                    bool continueToNextComp = false;
+                                    queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                    ACPartslistManager.QrySilosResult possibleSilos2;
+                                    IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos2);
+                                    if (routes2 != null && routes2.Any())
                                     {
-                                        // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
-                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(7)", 1070, "Error50062",
-                                                        intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                        intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                        intermediateChildPos.BookingMaterial.MaterialName1);
+                                        continueToNextComp = true;
+                                        if (isOnlyTestForFindingBetterSiloWithReservedLots)
+                                        {
+                                            PriorizeSilosAndGetRoute(possibleSilos2, routes2, dosingWeight, out correctedDosingWeight2, out preferredDosingRoute2, out preferredDosingFacility2, out alternativeDosingRoute2, out alternativeDosingFacility2, out preferredDosingFacilityNotRoutableHere2);
+                                            continueToNextComp = false;
+                                            // If better Silo found on other scale, then continue dosing on other sale
+                                            if (   preferredDosingRoute2 == null 
+                                                && preferredDosingFacilityNotRoutableHere2 != null
+                                                && preferredDosingFacilityNotRoutableHere2 == preferredDosingFacilityNotRoutableHere)
+                                            {
+                                                continueToNextComp = true;
+                                                isAnyCompDosableFromAnyRoutableSilo = true;
+                                            }
+                                            // This is the case, when a Silo is blocked on this scale that would have the right reserved lots
+                                            // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
+                                            else if (preferredDosingRoute2 != null)
+                                            {
+                                                continueToNextComp = false;
+                                            }
+                                            // This is the case, when a Silo is blocked on another scale that would have the right reserved lots
+                                            // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
+                                            else if (   preferredDosingFacilityNotRoutableHere2 != null
+                                                     && preferredDosingFacilityNotRoutableHere2 != preferredDosingFacilityNotRoutableHere)
+                                            {
+                                                continueToNextComp = false;
+                                            }
+                                        }
+                                        else
+                                            isAnyCompDosableFromAnyRoutableSilo = true;
+                                    }
+                                    // Versuche nächste Komponente vorerst zu dosieren, weil es andere Dosierschritte gibt welche die Dosierung übernehmen könnten
+                                    if (continueToNextComp)
+                                    {
+                                        hasOpenDosings = true;
+                                        continue;
+                                    }
+                                }
 
+
+                                if (routes == null || !routes.Any())
+                                {
+                                    // TODO: Was passiert wenn noch eine Komponente kommt, muss skaliert werden?
+                                    if (NoSourceFoundForDosing.ValueT == 0)
+                                    {
+                                        // Warning50005: No Silo/Tank/Container found for component {0}
+                                        msg = new Msg(this, eMsgLevel.Warning, PWClassName, "StartNextProdComponent(6)", 1060, "Warning50005",
+                                                        relation.SourceProdOrderPartslistPos.Material.MaterialName1);
+
+                                        NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
+                                        NoSourceFoundForDosing.ValueT = 1;
                                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                        return StartNextCompResult.CycleWait;
                                     }
-                                    relation.MDProdOrderPartslistPosState = posState;
-                                    dbApp.ACSaveChanges();
-                                    hasOpenDosings = true;
-                                    continue; // Gehe zur nächsten Komponente
-                                }
+                                    else if (NoSourceFoundForDosing.ValueT == 2)
+                                    {
+                                        posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
+                                        if (posState == null)
+                                        {
+                                            // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(7)", 1070, "Error50062",
+                                                            intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                            intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                                            intermediateChildPos.BookingMaterial.MaterialName1);
 
-                                HandleNoSourceFoundForDosing(relation, dbApp, dbIPlus, queryParams, possibleSilos);
-                                return StartNextCompResult.CycleWait;
+                                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                                Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                            return StartNextCompResult.CycleWait;
+                                        }
+                                        relation.MDProdOrderPartslistPosState = posState;
+                                        dbApp.ACSaveChanges();
+                                        hasOpenDosings = true;
+                                        continue; // Gehe zur nächsten Komponente
+                                    }
+
+                                    HandleNoSourceFoundForDosing(relation, dbApp, dbIPlus, queryParams, possibleSilos);
+                                    return StartNextCompResult.CycleWait;
+                                }
                             }
                             else if (NoSourceFoundForDosing.ValueT == 1)
                             {
                                 NoSourceFoundForDosing.ValueT = 0;
                                 AcknowledgeAlarms();
                             }
-                            
+
                             // 3. Finde die Route mit der höchsten Siloprioriät
-                            Route dosingRoute = null;
-                            if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                            //Route dosingRoute = null, firstDosingRoute = null;
+                            //ACPartslistManager.QrySilosResult.FacilitySumByLots facilitySum = null, firstFacilitySum = null;
+                            //if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                            //{
+                            //    bool reservationBasedSearch = possibleSilos.FilteredResult.Where(c => c.StockOfReservations.HasValue).Any();
+
+                            //    foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
+                            //    {
+                            //        if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue)
+                            //            continue;
+                            //        dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
+                            //        if (dosingRoute != null)
+                            //        {
+                            //            firstDosingRoute = dosingRoute;
+                            //            firstFacilitySum = prioSilo;
+                            //            if (reservationBasedSearch)
+                            //            {
+                            //                // Reduce quantity to available stock of Lots
+                            //                if (prioSilo.StockOfReservations.HasValue)
+                            //                {
+                            //                    if (prioSilo.StockOfReservations.Value <= 0.0)
+                            //                    {
+                            //                        // If material from other lots, than dosing is not allowed from this silo
+                            //                        if (prioSilo.StockFree.HasValue)
+                            //                            continue;
+                            //                        // No other lots in silo, then try to empty silo completely
+                            //                        else
+                            //                        {
+                            //                            //dosingWeight = dosingWeight;
+                            //                            facilitySum = prioSilo;
+                            //                            break;
+                            //                        }
+                            //                    }
+                            //                    else
+                            //                    {
+                            //                        // If foreign lots are in this silo, then reduce dosing weight to remaining stock of reserved lots
+                            //                        if (prioSilo.StockOfReservations.Value < dosingWeight
+                            //                            && prioSilo.StockFree.HasValue)
+                            //                            dosingWeight = prioSilo.StockOfReservations.Value;
+                            //                        // else try to dose the target weight or try to empty silo
+                            //                        facilitySum = prioSilo;
+                            //                        break;
+                            //                    }
+                            //                }
+                            //            }
+                            //            else
+                            //            {
+                            //                facilitySum = prioSilo;
+                            //                break;
+                            //            }
+                            //        }
+                            //    }
+
+                            //    // If no Silo found and usage of other lots allowed, then use first Silo
+                            //    if (dosingRoute == null && ReservationMode == 1)
+                            //    {
+                            //        dosingRoute = firstDosingRoute;
+                            //        facilitySum = firstFacilitySum;
+                            //    }
+                            //}
+
+                            //If no Silo found and usage of other lots allowed, then use first Silo
+                            if (preferredDosingRoute == null && ReservationMode == 1)
                             {
-                                foreach (var prioSilo in possibleSilos.FilteredResult)
-                                {
-                                    if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue)
-                                        continue;
-                                    dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
-                                    if (dosingRoute != null)
-                                        break;
-                                }
+                                preferredDosingRoute = alternativeDosingRoute;
+                                preferredDosingFacility = alternativeDosingFacility;
                             }
+
+                            Route dosingRoute = preferredDosingRoute;
+
                             if (dosingRoute == null || double.IsNaN(relation.RemainingDosingWeight))
                             {
+                                //if (possibleSilos.HasLotReservations)
+
                                 if (NoSourceFoundForDosing.ValueT == 0 && dosingRoute == null)
                                 {
                                     NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
@@ -776,7 +899,7 @@ namespace gip.mes.processapplication
                             acMethod["PLPosRelation"] = relation.ProdOrderPartslistPosRelationID;
                             acMethod["Route"] = dosingRoute != null ? dosingRoute.Clone() as Route : null;
                             acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
-                            acMethod["TargetQuantity"] = Math.Abs(dosingWeight);
+                            acMethod["TargetQuantity"] = Math.Abs(correctedDosingWeight);
                             acMethod[Material.ClassName] = relation.SourceProdOrderPartslistPos.Material.MaterialName1;
                             if (relation.SourceProdOrderPartslistPos.Material.Density > 0.00001)
                                 acMethod["Density"] = relation.SourceProdOrderPartslistPos.Material.Density;
@@ -897,8 +1020,8 @@ namespace gip.mes.processapplication
                                 {
                                     foreach (var activeDosing in queryActiveDosings)
                                     {
-                                        facility.ACPartslistManager.QrySilosResult possibleSilos;
-                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos);
+                                        ACPartslistManager.QrySilosResult possibleSilos;
+                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
                                         var routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                                         if (routes != null && routes.Any())
                                             isAnyCompDosableFromAnyRoutableSilo = true;
@@ -940,6 +1063,110 @@ namespace gip.mes.processapplication
                 }
             }
         }
+
+        protected void PriorizeSilosAndGetRoute(ACPartslistManager.QrySilosResult possibleSilos, IEnumerable<Route> routes,
+            double dosingWeight, out double correctedDosingWeight,
+            out Route preferredDosingRoute, out ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility,
+            out Route alternativeDosingRoute, out ACPartslistManager.QrySilosResult.FacilitySumByLots alternativeDosingFacility,
+            out ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacilityNotRoutableHere)
+        {
+            correctedDosingWeight = Math.Abs(dosingWeight);
+            preferredDosingRoute = null;
+            preferredDosingFacility = null;
+            alternativeDosingRoute = null;
+            alternativeDosingFacility = null;
+            preferredDosingFacilityNotRoutableHere = null;
+            if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any() || routes == null)
+                return;
+
+            bool reservationBasedSearch = possibleSilos.FilteredResult.Where(c => c.StockOfReservations.HasValue).Any();
+
+            foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
+            {
+                if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue)
+                    continue;
+                Route dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
+                if (dosingRoute != null)
+                {
+                    if (alternativeDosingRoute == null)
+                    {
+                        alternativeDosingRoute = preferredDosingRoute;
+                        alternativeDosingFacility = prioSilo;
+                    }
+                    if (reservationBasedSearch)
+                    {
+                        // Reduce quantity to available stock of Lots
+                        if (prioSilo.StockOfReservations.HasValue)
+                        {
+                            if (prioSilo.StockOfReservations.Value <= 0.0)
+                            {
+                                // If material from other lots, than dosing is not allowed from this silo
+                                if (prioSilo.StockFree.HasValue)
+                                    continue;
+                                // No other lots in silo, then try to empty silo completely
+                                else
+                                {
+                                    //correctedDosingWeight = correctedDosingWeight;
+                                    preferredDosingFacility = prioSilo;
+                                    preferredDosingRoute = dosingRoute;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                // If foreign lots are in this silo, then reduce dosing weight to remaining stock of reserved lots
+                                if (prioSilo.StockOfReservations.Value < correctedDosingWeight
+                                    && prioSilo.StockFree.HasValue)
+                                    correctedDosingWeight = prioSilo.StockOfReservations.Value;
+                                // else try to dose the target weight or try to empty silo
+                                preferredDosingFacility = prioSilo;
+                                preferredDosingRoute = dosingRoute;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        preferredDosingFacility = prioSilo;
+                        preferredDosingRoute = dosingRoute;
+                        break;
+                    }
+                }
+                else if (preferredDosingFacilityNotRoutableHere == null)
+                {
+                    if (reservationBasedSearch)
+                    {
+                        // Reduce quantity to available stock of Lots
+                        if (prioSilo.StockOfReservations.HasValue)
+                        {
+                            if (prioSilo.StockOfReservations.Value <= 0.0)
+                            {
+                                // No other lots in silo, then try to empty silo completely
+                                if (!prioSilo.StockFree.HasValue)
+                                    preferredDosingFacilityNotRoutableHere = prioSilo;
+                            }
+                            else
+                            {
+                                preferredDosingFacilityNotRoutableHere = prioSilo;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                        preferredDosingFacilityNotRoutableHere = prioSilo;
+                }
+            }
+
+            correctedDosingWeight *= -1;
+
+            // If no Silo found and usage of other lots allowed, then use first Silo
+            //if (preferredDosingRoute == null && ReservationMode == 1)
+            //{
+            //    preferredDosingRoute = alternativeDosingRoute;
+            //    preferredDosingFacility = alternativeDosingFacility;
+            //}
+        }
+
 
         protected virtual ProdOrderPartslistPosRelation[] OnSortOpenDosings(ProdOrderPartslistPosRelation[] queryOpenDosings, Database dbIPlus, DatabaseApp dbApp)
         {
@@ -1157,10 +1384,10 @@ namespace gip.mes.processapplication
                         return CachedEmptySiloHandlingOption.Value;
                     }
 
-                    facility.ACPartslistManager.QrySilosResult possibleSilos;
+                    ACPartslistManager.QrySilosResult possibleSilos;
                     RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
+                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos, ReservationMode);
                     IEnumerable<Route> routes = GetRoutes(dosingPosRelation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     if (routes == null || !routes.Any())
                     {
@@ -1176,10 +1403,10 @@ namespace gip.mes.processapplication
                             {
                                 foreach (var otherDosing in parallelActiveDosings)
                                 {
-                                    facility.ACPartslistManager.QrySilosResult alternativeSilos;
+                                    ACPartslistManager.QrySilosResult alternativeSilos;
                                     RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
+                                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos, ReservationMode);
                                     IEnumerable<Route> alternativeRoutes = otherDosing.GetRoutes(dosingPosRelation, dbApp, dbIPlus, queryParams2, null, out alternativeSilos);
                                     if (alternativeRoutes != null && alternativeRoutes.Any())
                                     {
@@ -1950,7 +2177,7 @@ namespace gip.mes.processapplication
         protected virtual void HandleNoSourceFoundForDosing(ProdOrderPartslistPosRelation relation,
                                         DatabaseApp dbApp, Database dbIPlus,
                                         RouteQueryParams queryParams,
-                                        facility.ACPartslistManager.QrySilosResult possibleSilos)
+                                        ACPartslistManager.QrySilosResult possibleSilos)
         {
         }
     }

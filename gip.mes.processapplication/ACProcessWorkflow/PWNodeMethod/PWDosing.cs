@@ -44,6 +44,7 @@ namespace gip.mes.processapplication
         }
     }
 
+
     /// <summary>
     /// Class that is responsible for processing input-materials that are associated with an intermediate product. 
     /// The intermediate prduct, in turn, is linked through the material workflow to one or more workflow nodes that are from this PWDosing class. 
@@ -74,6 +75,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("ComponentsSeqTo", "en{'Components to Seq.-No.'}de{'Komponenten BIS Seq.-Nr.'}");
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after Dosing'}de{'Restliche Komponenten anpassen'}");
+            method.ParameterValueList.Add(new ACValue("ReservationMode", typeof(short), (short)0, Global.ParamOption.Optional));
+            paramTranslation.Add("ReservationMode", "en{'Allow other lots if reservation'}de{'Erlaube andere Lose bei Reservierungen'}");
             method.ParameterValueList.Add(new ACValue("ManuallyChangeSource", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ManuallyChangeSource", "en{'Manually change source'}de{'Manueller Quellenwechsel'}");
             method.ParameterValueList.Add(new ACValue("MinDosQuantity", typeof(double), 0.0, Global.ParamOption.Optional));
@@ -565,6 +568,24 @@ namespace gip.mes.processapplication
                     }
                 }
                 return false;
+            }
+        }
+
+
+        public short ReservationMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReservationMode");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
+                    }
+                }
+                return 0;
             }
         }
 
@@ -1633,13 +1654,15 @@ namespace gip.mes.processapplication
                 ACPartslistManager.SearchMode searchMode,
                 DateTime? filterTimeOlderThan,
                 Guid? ignoreFacilityID,
-                IEnumerable<gip.core.datamodel.ACClass> exclusionList)
+                IEnumerable<gip.core.datamodel.ACClass> exclusionList,
+                short reservationMode)
             {
                 _Purpose = purpose;
                 SearchMode = searchMode;
                 FilterTimeOlderThan = filterTimeOlderThan;
                 IgnoreFacilityID = ignoreFacilityID;
                 ExclusionList = exclusionList;
+                ReservationMode = reservationMode;
             }
             #endregion
 
@@ -1657,6 +1680,7 @@ namespace gip.mes.processapplication
             public DateTime? FilterTimeOlderThan { get; set; }
             public Guid? IgnoreFacilityID { get; set; }
             public IEnumerable<gip.core.datamodel.ACClass> ExclusionList { get; set; }
+            public short ReservationMode { get; set; }
             #endregion
 
             #region Result
@@ -1687,7 +1711,10 @@ namespace gip.mes.processapplication
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
-                                        queryParams.ExclusionList);
+                                        queryParams.ExclusionList,
+                                        null,
+                                        true,
+                                        queryParams.ReservationMode);
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
             return routes;
@@ -1714,7 +1741,10 @@ namespace gip.mes.processapplication
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
-                                        queryParams.ExclusionList);
+                                        queryParams.ExclusionList,
+                                        null,
+                                        true,
+                                        queryParams.ReservationMode);
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
             return routes;
