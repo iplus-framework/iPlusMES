@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace gip.mes.facility
@@ -64,6 +65,8 @@ namespace gip.mes.facility
                 }
             }
         }
+
+        public Dictionary<string, double> OriginalValues { get; set; }
 
         public bool FreeQuantityNegative
         {

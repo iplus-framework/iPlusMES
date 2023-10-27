@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Objects.DataClasses;
 using System.Linq;
+using System.Windows;
 using static gip.mes.datamodel.MDReservationMode;
 
 namespace gip.bso.facility
@@ -445,7 +446,7 @@ namespace gip.bso.facility
             }
             else
             {
-                double reservedQuantity = 
+                double reservedQuantity =
                     FacilityLotList
                     .Where(c => c.IsSelected && c.ReservedQuantity > 0)
                     .Sum(c => c.ReservedQuantity);
@@ -457,10 +458,10 @@ namespace gip.bso.facility
                 }
                 else
                 {
-                    List<FacilityReservationModel> inputModels = 
+                    List<FacilityReservationModel> inputModels =
                         FacilityLotList
-                        .Where(c => 
-                            c.IsSelected 
+                        .Where(c =>
+                            c.IsSelected
                             && !IsNegligibleQuantity(TargetQuantityUOM, c.ReservedQuantity, Const_ZeroQuantityCheckFactor)
                             )
                         .ToList();
@@ -481,7 +482,7 @@ namespace gip.bso.facility
                         }
                         _FacilityReservationList.AddRange(outputModels);
                         OnPropertyChanged(nameof(FacilityReservationList));
-                        
+
                     }
                     SelectedFacilityLot = null;
                     _FacilityLotList = null;
@@ -527,7 +528,7 @@ namespace gip.bso.facility
             {
                 facilityReservation.IsSelected = false;
             }
-            _FacilityLotList = DoDistributeQuantity(_FacilityLotList, MissingQuantityUOM);
+            _FacilityLotList = DoDistributeQuantity(_FacilityLotList, MissingQuantityUOM, true);
             OnPropertyChanged(nameof(FacilityLotList));
         }
 
@@ -575,6 +576,8 @@ namespace gip.bso.facility
                         facilityReservation = GetFacilityReservationModel(material, facilityCharge.FacilityLot);
                         facilityReservations.Add(facilityReservation);
                     }
+
+                    // Charge date
                     DateTime? chargeDate = GetFacilityChargeDate(facilityCharge);
                     if (chargeDate != null)
                     {
@@ -583,13 +586,32 @@ namespace gip.bso.facility
                             facilityReservation.OldestFacilityChargeDate = chargeDate;
                         }
                     }
+
+                    // FacilityNo list
+                    if(facilityReservation.FacilityNoList == null)
+                    {
+                        facilityReservation.FacilityNoList = new List<string>();
+                    }
+                    if (!facilityReservation.FacilityNoList.Contains(facilityCharge.Facility.FacilityNo))
+                    {
+                        facilityReservation.FacilityNoList.Add(facilityCharge.Facility.FacilityNo);
+                    }
                 }
             }
 
             foreach (FacilityReservationModel facilityReservation in facilityReservations)
             {
+                // Calculate values
                 FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(databaseApp, facilityReservation, false);
                 facilityReservation.CopyFrom(modelBase);
+
+                // save original values
+                facilityReservation.OriginalValues = new Dictionary<string, double>
+                {
+                    { nameof(FacilityReservationModel.TotalReservedQuantity), facilityReservation.TotalReservedQuantity },
+                    { nameof(FacilityReservationModel.UsedQuantity), facilityReservation.UsedQuantity },
+                    { nameof(FacilityReservationModel.FreeQuantity), facilityReservation.FreeQuantity }
+                };
             }
 
             facilityReservations = DoDistributeQuantity(facilityReservations, MissingQuantityUOM);
@@ -597,8 +619,33 @@ namespace gip.bso.facility
             return facilityReservations;
         }
 
-        public List<FacilityReservationModel> DoDistributeQuantity(List<FacilityReservationModel> facilityReservations, double quantity)
+        public List<FacilityReservationModel> DoDistributeQuantity(List<FacilityReservationModel> facilityReservations, double quantity, bool clearOldQuantity = false)
         {
+            if (clearOldQuantity)
+            {
+                foreach(FacilityReservationModel facilityReservation in facilityReservations)
+                {
+                    facilityReservation._ReservedQuantity = 0;
+                    if(facilityReservation.OriginalValues != null)
+                    {
+                        foreach (KeyValuePair<string, double> originalValue in facilityReservation.OriginalValues)
+                        {
+                            switch(originalValue.Key)
+                            {
+                                case nameof(FacilityReservationModel.TotalReservedQuantity):
+                                    facilityReservation.TotalReservedQuantity = originalValue.Value;
+                                    break;
+                                case nameof(FacilityReservationModel.UsedQuantity):
+                                    facilityReservation.UsedQuantity = originalValue.Value;
+                                    break;
+                                case nameof(FacilityReservationModel.FreeQuantity):
+                                    facilityReservation.FreeQuantity = originalValue.Value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
             facilityReservations =
                 facilityReservations
                 .OrderBy(c => c.OldestFacilityChargeDate)
@@ -611,18 +658,18 @@ namespace gip.bso.facility
                 {
                     break;
                 }
-                if(facilityReservation.FreeQuantity > 0 && !IsNegligibleQuantity(quantity, facilityReservation.FreeQuantity, Const_ZeroQuantityCheckFactor))
+                if (facilityReservation.FreeQuantity > 0 && !IsNegligibleQuantity(quantity, facilityReservation.FreeQuantity, Const_ZeroQuantityCheckFactor))
                 {
                     if (restQuantity >= facilityReservation.FreeQuantity)
                     {
-                        facilityReservation.ReservedQuantity = facilityReservation.FreeQuantity;
+                        facilityReservation._ReservedQuantity = facilityReservation.FreeQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
                         facilityReservation.FreeQuantity = 0;
                         restQuantity -= facilityReservation.ReservedQuantity;
                     }
                     else
                     {
-                        facilityReservation.ReservedQuantity = restQuantity;
+                        facilityReservation._ReservedQuantity = restQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
                         facilityReservation.FreeQuantity -= restQuantity;
                         restQuantity = 0;
