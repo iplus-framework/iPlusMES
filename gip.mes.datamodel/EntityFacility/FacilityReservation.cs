@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Transactions;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
     // FacilityReservation (ReservArtPlatz)
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Reservation'}de{'Reservierung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "FacilityReservationNo", "en{'FacilityReservationNo'}de{'de-FacilityReservationNo'}", "", "", true)]
     [ACPropertyEntity(2, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
     [ACPropertyEntity(3, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]

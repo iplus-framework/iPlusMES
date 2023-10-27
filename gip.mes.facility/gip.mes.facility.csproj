@@ -58,6 +58,7 @@
     <Compile Include="Helperclasses\MsgBooking.cs" />
     <Compile Include="Manager\ACFacilityOEEManager.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
+    <Compile Include="Manager\RemoteFacilityManagerInfo.cs" />
     <Compile Include="Manager\RemoteMaterialForwarder.cs" />
     <Compile Include="Manager\RemoteFacilityManager.cs" />
     <Compile Include="Manager\ACNoProviderInvoice.cs" />
@@ -125,6 +126,8 @@
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPos.cs" />
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
     <Compile Include="Model\ActualSalesTax.cs" />
+    <Compile Include="Model\FacilityReservationModel.cs" />
+    <Compile Include="Model\FacilityReservationModelBase.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
     <Compile Include="Model\PartslistValidationInfo.cs" />

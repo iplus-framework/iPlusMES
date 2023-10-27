@@ -194,6 +194,7 @@
         public const string FacilityMDSchedulingGroup = "en{'Storage Bin Scheduling Group'}de{'Lagerplatz Scheduling Group'}";
         public const string FacilityNo = "en{'Storage Bin No.'}de{'Lagerplatznummer'}";
         public const string FacilityStock = "en{'Stock'}de{'Lagerbestand'}";
+        public const string FacilityReservation = "en{'Reservation'}de{'Reservierung'}";
 
         public const string Material = "en{'Material'}de{'Material'}";
         public const string MaterialNo = "en{'Material No.'}de{'Material-Nr.'}";
