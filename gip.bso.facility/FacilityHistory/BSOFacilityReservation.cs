@@ -164,7 +164,6 @@ namespace gip.bso.facility
 
         #region FacilityReservation -> Methods -> ACMehtods
 
-        FacilityLot facilityLotForNewReservation = null;
         /// <summary>
         /// Source Property: MethodName
         /// </summary>
@@ -693,7 +692,6 @@ namespace gip.bso.facility
             CloseWindow(this, DesignNameProgressBar);
             ACBackgroundWorker worker = sender as ACBackgroundWorker;
             string command = worker.EventArgs.Argument.ToString();
-            MsgWithDetails resultMsg = null;
             ClearMessages();
             if (e.Cancelled)
             {
