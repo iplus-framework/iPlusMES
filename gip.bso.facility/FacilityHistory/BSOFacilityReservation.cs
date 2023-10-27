@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Objects.DataClasses;
 using System.Linq;
-using static gip.mes.datamodel.MDReservationMode;
 
 namespace gip.bso.facility
 {
@@ -95,7 +94,59 @@ namespace gip.bso.facility
 
         public double TargetQuantityUOM { get; set; }
         public double NeededQuantityUOM { get; set; }
-        public double MissingQuantityUOM { get; set; }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private double _ForReservationQuantityUOM;
+        [ACPropertyInfo(999, nameof(ForReservationQuantityUOM), "en{'Quantity for reservation'}de{'Menge zur Reservierung'}")]
+        public double ForReservationQuantityUOM
+        {
+            get
+            {
+                return _ForReservationQuantityUOM;
+            }
+            set
+            {
+                if (_ForReservationQuantityUOM != value)
+                {
+                    _ForReservationQuantityUOM = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private double _EditorReserverdQuantityUOM;
+        [ACPropertyInfo(999, nameof(EditorReserverdQuantity), "en{'Quantity for reservation'}de{'Menge zur Reservierung'}")]
+        public double EditorReserverdQuantity
+        {
+            get
+            {
+                return _EditorReserverdQuantityUOM;
+            }
+            set
+            {
+                if (_EditorReserverdQuantityUOM != value)
+                {
+                    _EditorReserverdQuantityUOM = value;
+                    OnPropertyChanged(nameof(EditorReserverdQuantity));
+                    OnPropertyChanged(nameof(DiffReservationQuantityUOM));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(DiffReservationQuantityUOM), "en{'Diff'}de{'Unterschied'}")]
+        public double DiffReservationQuantityUOM
+        {
+            get
+            {
+                return ForReservationQuantityUOM - EditorReserverdQuantity;
+            }
+        }
+
 
         #endregion
 
@@ -172,14 +223,14 @@ namespace gip.bso.facility
         {
             if (!IsEnabledAddFaciltiyReservation())
                 return;
-            MissingQuantityUOM = GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
+            ForReservationQuantityUOM = GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
             if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50604 Production component realise complete quantity!
                 // Produktionskomponente in kompletter Stückzahl realisieren!
                 Messages.Error(this, "Error50604");
             }
-            else if (IsNegligibleQuantity(TargetQuantityUOM, MissingQuantityUOM, Const_ZeroQuantityCheckFactor))
+            else if (IsNegligibleQuantity(TargetQuantityUOM, ForReservationQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50601 Sufficient quantity has already been reserved
                 // Es ist bereits eine ausreichende Menge reserviert
@@ -348,7 +399,10 @@ namespace gip.bso.facility
             switch (e.PropertyName)
             {
                 case nameof(FacilityReservationModel.ReservedQuantity):
-                    OnPropertyChanged(nameof(SelectedFacilityReservation));
+                    EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.ReservedQuantity).DefaultIfEmpty().Sum();
+                    break;
+                case nameof(FacilityReservationModel.IsSelected):
+                    EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.ReservedQuantity).DefaultIfEmpty().Sum();
                     break;
             }
         }
@@ -444,22 +498,22 @@ namespace gip.bso.facility
             }
             else
             {
-                double reservedQuantity = 
+                double reservedQuantity =
                     FacilityLotList
                     .Where(c => c.IsSelected && c.ReservedQuantity > 0)
                     .Sum(c => c.ReservedQuantity);
-                if (MissingQuantityUOM < reservedQuantity)
+                if (ForReservationQuantityUOM < reservedQuantity)
                 {
                     // Error50603 A larger quantity than required has been reserved! Reserved quantity {0}; Quantity required: {1}
                     // Es wurde eine größere Menge als benötigt reserviert! Reservierte Menge {0}; Erforderliche Menge: {1}
-                    Messages.Error(this, "Error50603", false, reservedQuantity, MissingQuantityUOM);
+                    Messages.Error(this, "Error50603", false, reservedQuantity, ForReservationQuantityUOM);
                 }
                 else
                 {
-                    List<FacilityReservationModel> inputModels = 
+                    List<FacilityReservationModel> inputModels =
                         FacilityLotList
-                        .Where(c => 
-                            c.IsSelected 
+                        .Where(c =>
+                            c.IsSelected
                             && !IsNegligibleQuantity(TargetQuantityUOM, c.ReservedQuantity, Const_ZeroQuantityCheckFactor)
                             )
                         .ToList();
@@ -480,7 +534,7 @@ namespace gip.bso.facility
                         }
                         _FacilityReservationList.AddRange(outputModels);
                         OnPropertyChanged(nameof(FacilityReservationList));
-                        
+
                     }
                     SelectedFacilityLot = null;
                     _FacilityLotList = null;
@@ -526,7 +580,7 @@ namespace gip.bso.facility
             {
                 facilityReservation.IsSelected = false;
             }
-            _FacilityLotList = DoDistributeQuantity(_FacilityLotList, MissingQuantityUOM);
+            _FacilityLotList = DoDistributeQuantity(_FacilityLotList, ForReservationQuantityUOM, true);
             OnPropertyChanged(nameof(FacilityLotList));
         }
 
@@ -574,6 +628,8 @@ namespace gip.bso.facility
                         facilityReservation = GetFacilityReservationModel(material, facilityCharge.FacilityLot);
                         facilityReservations.Add(facilityReservation);
                     }
+
+                    // Charge date
                     DateTime? chargeDate = GetFacilityChargeDate(facilityCharge);
                     if (chargeDate != null)
                     {
@@ -582,22 +638,68 @@ namespace gip.bso.facility
                             facilityReservation.OldestFacilityChargeDate = chargeDate;
                         }
                     }
+
+                    // FacilityNo list
+                    if (facilityReservation.FacilityNoList == null)
+                    {
+                        facilityReservation.FacilityNoList = new List<string>();
+                    }
+                    if (!facilityReservation.FacilityNoList.Contains(facilityCharge.Facility.FacilityNo))
+                    {
+                        facilityReservation.FacilityNoList.Add(facilityCharge.Facility.FacilityNo);
+                    }
                 }
             }
 
             foreach (FacilityReservationModel facilityReservation in facilityReservations)
             {
+                // Calculate values
                 FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(databaseApp, facilityReservation, false);
                 facilityReservation.CopyFrom(modelBase);
+
+                // save original values
+                facilityReservation.OriginalValues = new Dictionary<string, double>
+                {
+                    { nameof(FacilityReservationModel.TotalReservedQuantity), facilityReservation.TotalReservedQuantity },
+                    { nameof(FacilityReservationModel.UsedQuantity), facilityReservation.UsedQuantity },
+                    { nameof(FacilityReservationModel.FreeQuantity), facilityReservation.FreeQuantity }
+                };
             }
 
-            facilityReservations = DoDistributeQuantity(facilityReservations, MissingQuantityUOM);
+            facilityReservations = DoDistributeQuantity(facilityReservations, ForReservationQuantityUOM);
+
+            EditorReserverdQuantity = facilityReservations.Where(c => c.IsSelected).Select(c => c.ReservedQuantity).DefaultIfEmpty().Sum();
 
             return facilityReservations;
         }
 
-        public List<FacilityReservationModel> DoDistributeQuantity(List<FacilityReservationModel> facilityReservations, double quantity)
+        public List<FacilityReservationModel> DoDistributeQuantity(List<FacilityReservationModel> facilityReservations, double quantity, bool clearOldQuantity = false)
         {
+            if (clearOldQuantity)
+            {
+                foreach (FacilityReservationModel facilityReservation in facilityReservations)
+                {
+                    facilityReservation._ReservedQuantity = 0;
+                    if (facilityReservation.OriginalValues != null)
+                    {
+                        foreach (KeyValuePair<string, double> originalValue in facilityReservation.OriginalValues)
+                        {
+                            switch (originalValue.Key)
+                            {
+                                case nameof(FacilityReservationModel.TotalReservedQuantity):
+                                    facilityReservation.TotalReservedQuantity = originalValue.Value;
+                                    break;
+                                case nameof(FacilityReservationModel.UsedQuantity):
+                                    facilityReservation.UsedQuantity = originalValue.Value;
+                                    break;
+                                case nameof(FacilityReservationModel.FreeQuantity):
+                                    facilityReservation.FreeQuantity = originalValue.Value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
             facilityReservations =
                 facilityReservations
                 .OrderBy(c => c.OldestFacilityChargeDate)
@@ -610,18 +712,18 @@ namespace gip.bso.facility
                 {
                     break;
                 }
-                if(facilityReservation.FreeQuantity > 0 && !IsNegligibleQuantity(quantity, facilityReservation.FreeQuantity, Const_ZeroQuantityCheckFactor))
+                if (facilityReservation.FreeQuantity > 0 && !IsNegligibleQuantity(quantity, facilityReservation.FreeQuantity, Const_ZeroQuantityCheckFactor))
                 {
                     if (restQuantity >= facilityReservation.FreeQuantity)
                     {
-                        facilityReservation.ReservedQuantity = facilityReservation.FreeQuantity;
+                        facilityReservation._ReservedQuantity = facilityReservation.FreeQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
                         facilityReservation.FreeQuantity = 0;
                         restQuantity -= facilityReservation.ReservedQuantity;
                     }
                     else
                     {
-                        facilityReservation.ReservedQuantity = restQuantity;
+                        facilityReservation._ReservedQuantity = restQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
                         facilityReservation.FreeQuantity -= restQuantity;
                         restQuantity = 0;

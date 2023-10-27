@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace gip.mes.facility
@@ -7,8 +8,23 @@ namespace gip.mes.facility
     [ACClassInfo(Const.PackName_VarioFacility, "en{'FacilityReservationModelBase'}de{'FacilityReservationModelBase'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class FacilityReservationModelBase : INotifyPropertyChanged
     {
+        private bool _IsSelected;
         [ACPropertyInfo(1, "IsSelected", ConstApp.Select)]
-        public bool IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if(_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
 
         private double _TotalReservedQuantity;
         [ACPropertyInfo(2, "", ConstApp.BlockedQuantity)]
@@ -64,6 +80,8 @@ namespace gip.mes.facility
                 }
             }
         }
+
+        public Dictionary<string, double> OriginalValues { get; set; }
 
         public bool FreeQuantityNegative
         {
