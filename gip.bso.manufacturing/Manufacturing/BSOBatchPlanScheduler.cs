@@ -2756,6 +2756,7 @@ namespace gip.bso.manufacturing
             PAScheduleForPWNode updateNode = new PAScheduleForPWNode();
             updateNode.CopyFrom(SelectedScheduleForPWNode, true);
             updateNode.StartMode = (vd.BatchPlanStartModeEnum)SelectedFilterBatchPlanStartMode.Value;
+            updateNode.UpdateName = Root.CurrentInvokingUser.Initials;
             var result = BatchPlanScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { updateNode });
             if (result != null)
             {

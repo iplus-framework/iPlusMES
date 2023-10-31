@@ -255,7 +255,7 @@ namespace gip.mes.processapplication
                                                                             && (c.PartialActualCount.HasValue || c.PartialTargetCount == c.PartialTargetCount)).FirstOrDefault();
                                     if (nextBatchPlan != null)
                                     {
-                                        PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist != null 
+                                        PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist != null
                                                                                                                             && c.CurrentProdOrderPartslist.ProdOrderPartslistID == nextBatchPlan.ProdOrderPartslistID)
                                                                                                                     .FirstOrDefault();
                                         if (activeInstanceForBatchplan == null)
@@ -291,7 +291,7 @@ namespace gip.mes.processapplication
 
                         foreach (ProdOrderBatchPlan startableBatchPlan in startableBatchPlans)
                         {
-                            PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist != null 
+                            PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist != null
                                                                                                                 && c.CurrentProdOrderPartslist.ProdOrderPartslistID == startableBatchPlan.ProdOrderPartslistID)
                                                                                                         .FirstOrDefault();
                             //if (!startableBatchPlan.IsValidated)
@@ -439,7 +439,7 @@ namespace gip.mes.processapplication
                 OnNewAlarmOccurred(SchedulesForPWNodes, msg);
                 return msg;
             }
-            if (   item.StartMode != changedScheduleNode.StartMode
+            if (item.StartMode != changedScheduleNode.StartMode
                 || item.RefreshCounter != changedScheduleNode.RefreshCounter)
             {
                 using (ACMonitor.Lock(_20015_LockValue))
@@ -447,8 +447,11 @@ namespace gip.mes.processapplication
                     item.UpdateAndMaintainRefreshCounter(changedScheduleNode);
                     if (item.StartMode != changedScheduleNode.StartMode)
                     {
-                        Messages.LogDebug(this.GetACUrl(), "UpdateScheduleFromClient(10)", String.Format("Startmode changed from {0} to {1} at {2}", 
-                                                                item.StartMode, changedScheduleNode.StartMode, item.MDSchedulingGroup != null ? item.MDSchedulingGroup.MDSchedulingGroupName : item.MDSchedulingGroupID.ToString()));
+                        string schedulingGroupName = item.MDSchedulingGroup != null ? item.MDSchedulingGroup.MDSchedulingGroupName : item.MDSchedulingGroupID.ToString();
+                        string modeChangeMessage = $"Startmode changed from {item.StartMode} to {changedScheduleNode.StartMode} at {schedulingGroupName} by {changedScheduleNode.UpdateName}";
+                        Messages.LogDebug(
+                            this.GetACUrl(),
+                            "UpdateScheduleFromClient(10)", modeChangeMessage);
                         item.StartMode = changedScheduleNode.StartMode;
                     }
                     item.UpdateName = changedScheduleNode.UpdateName;
