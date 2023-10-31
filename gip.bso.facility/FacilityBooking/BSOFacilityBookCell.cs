@@ -939,7 +939,7 @@ namespace gip.bso.facility
             if (CurrentFacility.Partslist != null)
             {
                 CurrentBookParamInwardMovement.InwardPartslist = CurrentFacility.Partslist;
-                CurrentBookParamInwardMovement.InwardMaterial = CurrentFacility.Material;
+                CurrentBookParamInwardMovement.InwardMaterial = CurrentFacility.Material?.Material1_ProductionMaterial != null ? CurrentFacility.Material.Material1_ProductionMaterial : CurrentFacility.Material;
             }
 
             if (IsPhysicalTransportPossible)
@@ -1085,7 +1085,7 @@ namespace gip.bso.facility
             if (CurrentFacility.Partslist != null)
             {
                 CurrentBookParamOutwardMovement.OutwardPartslist = CurrentFacility.Partslist;
-                CurrentBookParamOutwardMovement.OutwardMaterial = CurrentFacility.Material;
+                CurrentBookParamOutwardMovement.OutwardMaterial = CurrentFacility.Material?.Material1_ProductionMaterial != null ? CurrentFacility.Material.Material1_ProductionMaterial : CurrentFacility.Material;
             }
 
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamOutwardMovement, this.DatabaseApp) as ACMethodEventArgs;

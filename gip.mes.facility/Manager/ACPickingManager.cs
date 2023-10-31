@@ -1814,6 +1814,7 @@ namespace gip.mes.facility
                     facilityQuery = SilosWithMaterial(dbApp, pickingPos, searchMode != ACPartslistManager.SearchMode.AllSilos, projSpecificParams, onlyContainer);
                 }
             }
+            ApplyLotReservationFilter(facilityQuery, pickingPos, reservationMode);
 
             if (onlyContainer)
             {
@@ -1949,6 +1950,13 @@ namespace gip.mes.facility
                                                //.Select(c => c.Facility)
         );
 
+
+        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, PickingPos pickingPos, short reservationMode)
+        {
+            if (qrySilosResult == null)
+                return;
+            qrySilosResult.ApplyLotReservationFilter(pickingPos, reservationMode);
+        }
         #endregion
 
     }

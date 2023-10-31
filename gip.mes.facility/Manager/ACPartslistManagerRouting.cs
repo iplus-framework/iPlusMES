@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using static gip.mes.datamodel.MDReservationMode;
 
 namespace gip.mes.facility
 {
@@ -263,6 +264,52 @@ namespace gip.mes.facility
                     }
                 }
             }
+
+            public void ApplyLotReservationFilter(PickingPos pickingPos, short reservationMode)
+            {
+                if (_FilteredResult == null || !_FilteredResult.Any())
+                    return;
+                if (pickingPos.FacilityReservation_PickingPos.Any())
+                {
+                    _ReservationInfos = pickingPos.FacilityReservation_PickingPos
+                        .Where(c => c.FacilityLotID.HasValue)
+                        .Select(c => new ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM })
+                        .ToArray();
+                }
+                BuildFilteredResultFromReservationInfo(reservationMode);
+            }
+
+            private void BuildFilteredResultFromReservationInfo(short reservationMode)
+            {
+                if (_ReservationInfos == null || !_ReservationInfos.Any())
+                    return;
+                Guid[] reservedLots = _ReservationInfos.Select(c => c.FacilityLotID).ToArray();
+                _HasLotReservations = true;
+                if (_FilteredResult == null || !_FilteredResult.Any())
+                    return;
+                _FilteredResult.ForEach(c => c.FacilityCharges.ForEach(d => d.IsReservedLot = d.Quant.FacilityLotID.HasValue && reservedLots.Contains(d.Quant.FacilityLotID.Value)));
+                // Sort List first by silos with reserved Lots then append the rest
+                if (reservationMode == 1)
+                {
+                    List<FacilitySumByLots> binsWithReservedLots = _FilteredResult
+                        .Where(c => c.StockOfReservations.HasValue)
+                        .ToList();
+                    foreach (var bin in _FilteredResult)
+                    {
+                        if (!bin.StockOfReservations.HasValue)
+                            binsWithReservedLots.Add(bin);
+                    }
+                    _FilteredResult = binsWithReservedLots;
+                }
+                // Select only that have reserved lots
+                else
+                {
+                    _FilteredResult = _FilteredResult
+                        .Where(c => c.FacilityCharges.Where(d => d.IsReservedLot).Any())
+                        .ToList();
+                }
+            }
+
             #endregion
         }
         #endregion

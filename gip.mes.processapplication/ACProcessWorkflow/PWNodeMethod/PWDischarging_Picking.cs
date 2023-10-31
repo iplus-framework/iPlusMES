@@ -249,7 +249,7 @@ namespace gip.mes.processapplication
                 && pickingPos.ToFacility.MDFacilityType != null
                 && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
-                pickingPos.ToFacility.Material = pickingPos.Material;
+                pickingPos.ToFacility.Material = pickingPos.Material.Material1_ProductionMaterial != null ? pickingPos.Material.Material1_ProductionMaterial : pickingPos.Material;
                 dbApp.ACSaveChanges();
             }
 
@@ -571,7 +571,7 @@ namespace gip.mes.processapplication
                 && pickingPos.ToFacility.MDFacilityType != null
                 && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
-                pickingPos.ToFacility.Material = pickingPos.Material;
+                pickingPos.ToFacility.Material = pickingPos.Material.Material1_ProductionMaterial != null ? pickingPos.Material.Material1_ProductionMaterial : pickingPos.Material;
                 dbApp.ACSaveChanges();
             }
 
@@ -655,7 +655,7 @@ namespace gip.mes.processapplication
                         && pickingPos.ToFacility.Material == null
                         && pickingPos.ToFacility.MDFacilityType != null
                         && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                        pickingPos.ToFacility.Material = pickingPos.Material;
+                        pickingPos.ToFacility.Material = pickingPos.Material.Material1_ProductionMaterial != null ? pickingPos.Material.Material1_ProductionMaterial : pickingPos.Material;
                     MsgWithDetails msg2 = dbApp.ACSaveChanges();
                     if (msg2 != null)
                     {

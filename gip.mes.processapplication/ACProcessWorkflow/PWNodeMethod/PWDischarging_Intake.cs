@@ -346,7 +346,7 @@ namespace gip.mes.processapplication
                         destinationSilo.OutwardEnabled = false;
                     if (destinationSilo.MDFacilityType != null
                         && destinationSilo.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                        destinationSilo.Material = dnPos.Material;
+                        destinationSilo.Material = dnPos.Material.Material1_ProductionMaterial != null ? dnPos.Material.Material1_ProductionMaterial : dnPos.Material;
                     db.ACSaveChanges();
                 }
             }
@@ -731,7 +731,7 @@ namespace gip.mes.processapplication
                 if (!destinationSilo.MaterialID.HasValue
                     && destinationSilo.MDFacilityType != null
                     && destinationSilo.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                    destinationSilo.Material = dnPos.Material;
+                    destinationSilo.Material = dnPos.Material.Material1_ProductionMaterial != null ? dnPos.Material.Material1_ProductionMaterial : dnPos.Material;
                 if (actualWeight > 0)
                 {
                     DoInwardBooking(actualWeight, dbApp, previousDischargingRoute.LastOrDefault(), dnPos, null, false);

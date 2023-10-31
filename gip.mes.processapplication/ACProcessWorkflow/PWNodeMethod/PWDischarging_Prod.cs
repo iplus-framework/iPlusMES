@@ -213,7 +213,7 @@ namespace gip.mes.processapplication
                                     && nextDestination.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                                 {
                                     if (!nextDestination.Facility.MaterialID.HasValue)
-                                        nextDestination.Facility.Material = batchPlan.ProdOrderPartslistPos.BookingMaterial;
+                                        nextDestination.Facility.Material = batchPlan.ProdOrderPartslistPos.BookingMaterial?.Material1_ProductionMaterial != null ? batchPlan.ProdOrderPartslistPos.BookingMaterial.Material1_ProductionMaterial : batchPlan.ProdOrderPartslistPos.BookingMaterial;
                                     if (!batchPlan.ProdOrderPartslistPos.IsFinalMixure
                                         && (!nextDestination.Facility.PartslistID.HasValue
                                             || nextDestination.Facility.PartslistID != batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.PartslistID))
@@ -1100,7 +1100,7 @@ namespace gip.mes.processapplication
                             && plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         {
                             if (!plannedSilo.Facility.MaterialID.HasValue)
-                                plannedSilo.Facility.Material = currentBatchPos.BookingMaterial;
+                                plannedSilo.Facility.Material = currentBatchPos.BookingMaterial?.Material1_ProductionMaterial != null ? currentBatchPos.BookingMaterial.Material1_ProductionMaterial : currentBatchPos.BookingMaterial;
                             if (!currentBatchPos.IsFinalMixureBatch
                                 &&  ( !plannedSilo.Facility.PartslistID.HasValue
                                     || plannedSilo.Facility.PartslistID != currentBatchPos.ProdOrderPartslist.PartslistID))

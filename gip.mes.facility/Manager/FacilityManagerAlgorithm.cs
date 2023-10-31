@@ -1640,7 +1640,7 @@ namespace gip.mes.facility
                         return bookingResult;
                 }
 
-                BP.OutwardFacility.Material = BP.InwardMaterial;
+                BP.OutwardFacility.Material = BP.InwardMaterial?.Material1_ProductionMaterial != null ? BP.InwardMaterial.Material1_ProductionMaterial : BP.InwardMaterial;
                 BP.OutwardFacility.Partslist = BP.InwardPartslist;
             }
             // Falls Abgang oder Zugang:

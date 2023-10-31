@@ -2222,7 +2222,7 @@ namespace gip.mes.facility
                         }
                     }
 
-                    facility.Material = material;
+                    facility.Material = material.Material1_ProductionMaterial != null ? material.Material1_ProductionMaterial : material;
                     facility.Partslist = Partslist;
                 }
                 // Falls Belegung gleich
@@ -2275,7 +2275,7 @@ namespace gip.mes.facility
                         return Global.ACMethodResultState.Notpossible;
                     }
                     facility.Partslist = Partslist;
-                    facility.Material = material;
+                    facility.Material = material.Material1_ProductionMaterial != null ? material.Material1_ProductionMaterial : material;
                 }
             }
 
