@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-<ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
+    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
       <Project>{763EA3DC-3FB4-4D74-A252-A6A8811F0461}</Project>
       <Name>gip.bso.iplus</Name>
     </ProjectReference>

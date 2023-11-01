@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using System.Reflection;
 using gip.core.layoutengine.Helperclasses;
 using System.Runtime.CompilerServices;
+using System.Windows.Media.Animation;
 
 namespace gip.mes.client.mobile
 {
@@ -35,6 +36,9 @@ namespace gip.mes.client.mobile
             // Fractal
             _FractalImagePresenter = new FractalImagePresenter(this);
             _FractalImagePresenter.Generator.Completed += new EventHandler<FractalImageCompletedEventArgs>(Generator_Completed);
+
+            MainMenu.Margin = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
+            HamburgerButton.Click += (sender, e) => ToggleMenu();
 
             InitConnectionInfo();
         }
@@ -79,7 +83,7 @@ namespace gip.mes.client.mobile
                 CreateMenu(mainMenu.Items, MainMenu.Items);
 
             InitAppCommands();
-            InitMainDockManager();
+            InitFrameControl();
         }
 
 
@@ -150,7 +154,6 @@ namespace gip.mes.client.mobile
                         _FullscreenContent = tabItem.Content;
                         tabItem.Content = null;
                         this.Content = _FullscreenContent;
-                        (this.Content as FrameworkElement).LayoutTransform = SubMainDockPanel.LayoutTransform;
                         this.WindowStyle = System.Windows.WindowStyle.None;
                         this.WindowState = System.Windows.WindowState.Maximized;
                         _InFullscreen = true;
@@ -194,7 +197,7 @@ namespace gip.mes.client.mobile
                     continue;
                 }
 
-                VBMenuItem menuItem = new VBMenuItem(ContextACObject, acMenuItem);
+                VBMenuItemMobile menuItem = new VBMenuItemMobile(ContextACObject, acMenuItem);
                 items.Add(menuItem);
                 if (acMenuItem.Items != null && acMenuItem.Items.Count > 0)
                 {
@@ -202,10 +205,60 @@ namespace gip.mes.client.mobile
                 }
             }
         }
-#endregion
 
+        private bool isMenuOpen = false;
 
-#region Layout
+        private void ToggleMenu()
+        {
+            ThicknessAnimation animation = new ThicknessAnimation
+            {
+                Duration = TimeSpan.FromSeconds(0.3)
+            };
+
+            if (!isMenuOpen)
+            {
+                animation.From = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
+                animation.To = new Thickness(0, 0, 0, 0);
+                MainMenu.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                animation.From = new Thickness(0, 0, 0, 0);
+                animation.To = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
+                animation.Completed += (s, e) =>
+                {
+                    MainMenu.Visibility = Visibility.Hidden;
+                    MainMenu.Margin = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
+                };
+            }
+
+            MainMenu.BeginAnimation(FrameworkElement.MarginProperty, animation);
+
+            isMenuOpen = !isMenuOpen;
+        }
+        #endregion
+
+        #region Navigation
+
+        private void FrameGoBack_Click(object sender, RoutedEventArgs e)
+        {
+            if (VBFrameControl.CanGoBack)
+            {
+                VBFrameControl.GoBack();
+            }
+        }
+
+        private void FrameGoFoward_Click(object sender, RoutedEventArgs e)
+        {
+            if (VBFrameControl.CanGoForward)
+            {
+                VBFrameControl.GoForward();
+            }
+        }
+
+        #endregion
+
+        #region Layout
         VBDesign _RootVBDesign = null;
 
         VBDockingManager DockingManager
@@ -218,30 +271,23 @@ namespace gip.mes.client.mobile
             }
         }
 
-        VBFrameControl _VBFrameControl;
         VBFrameControl VBFrameControl
         { 
             get
             {
-                if (_VBFrameControl == null)
-                {
-                    _VBFrameControl = new VBFrameControl();
-                    return _VBFrameControl;
-                }
-                else
-                {
-                    return _VBFrameControl;
-                }
+                if (_RootVBDesign == null)
+                    return null;
+                return _RootVBDesign.Content as VBFrameControl;
             } 
         }
 
-        private void InitMainDockManager()
+        private void InitFrameControl()
         {
             if (_RootVBDesign != null)
                 return;
             if (ACRoot.SRoot.Businessobjects != null)
             {
-                ACClassDesign acClassDesign = ACRoot.SRoot.Businessobjects.GetDesign(Global.ACKinds.DSDesignLayout, Global.ACUsages.DUMain);
+                ACClassDesign acClassDesign = ACRoot.SRoot.Businessobjects.GetDesign(Global.ACKinds.DSDesignLayout, Global.ACUsages.DUMainMobile);
                 if (acClassDesign != null)
                 {
                     _RootVBDesign = new VBDesign();
@@ -266,9 +312,9 @@ namespace gip.mes.client.mobile
             }
             _RootVBDesign.Margin = new Thickness(0, 0, -5, 0);
             _RootVBDesign.Loaded += new RoutedEventHandler(RootVBDesign_Loaded);
-            SubMainDockPanel.Children.Add(_RootVBDesign);
-            //VBFrameControl.ChangeFrameContent(_RootVBDesign);
-            //MainFrame.NavigationService.Navigate(_RootVBDesign);
+            MainDockPanel.Children.Add(_RootVBDesign);
+            //VBFrameControl.Navigate(_RootVBDesign);
+            //MainFrame.Navigate(_RootVBDesign);
             foreach (ACComponent childComp in ACRoot.SRoot.ACComponentChilds)
             {
                 if (childComp is ApplicationManagerProxy || childComp is ACComponentManager)
@@ -337,13 +383,13 @@ namespace gip.mes.client.mobile
 
         void RootVBDesign_Loaded(object sender, RoutedEventArgs e)
         {
-            if ((_RootVBDesign.Content == null) || !(_RootVBDesign.Content is VBDockingManager))
+            if ((_RootVBDesign.Content == null) || !(_RootVBDesign.Content is VBFrameControl))
             {
-                _RootVBDesign.Content = new VBDockingManager();
-                DockingManager.Name = "mainDockingManager";
+                _RootVBDesign.Content = new VBFrameControl();
+                VBFrameControl.Name = "mainFrameControl";
             }
-            DockingManager.IsBSOManager = true;
-            DockingManager.InitBusinessobjectsAtStartup();
+            //DockingManager.IsBSOManager = true;
+            //DockingManager.InitBusinessobjectsAtStartup();
             if (!_startingFullScreen && ACRoot.SRoot.Fullscreen)
             {
                 StartInFullScreen();
@@ -377,9 +423,6 @@ namespace gip.mes.client.mobile
 
         public void StartBusinessobjectByACCommand(ACCommand acCommand)
         {
-            if (DockingManager == null)
-                return;
-
             bool ribbonVisibilityOff = false;
             string caption = "";
             ACMenuItem menuItem = acCommand as ACMenuItem;
@@ -390,7 +433,6 @@ namespace gip.mes.client.mobile
             }
 
             VBFrameControl.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, ribbonVisibilityOff);
-            DockingManager.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, ribbonVisibilityOff);
         }
 
         public void StartBusinessobject(string acUrl, ACValueList parameterList, string acCaption = "")
@@ -969,7 +1011,7 @@ namespace gip.mes.client.mobile
                     _FullscreenContent = tabItem.Content;
                     tabItem.Content = null;
                     this.Content = _FullscreenContent;
-                    (this.Content as FrameworkElement).LayoutTransform = SubMainDockPanel.LayoutTransform;
+                    //(this.Content as FrameworkElement).LayoutTransform = SubMainDockPanel.LayoutTransform;
                     (this.Content as FrameworkElement).PreviewTouchDown += new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchDown);
                     (this.Content as FrameworkElement).PreviewTouchMove += new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchMove);
                     (this.Content as FrameworkElement).PreviewTouchUp += new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchUp);

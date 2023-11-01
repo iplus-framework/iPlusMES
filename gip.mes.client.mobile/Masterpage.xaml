@@ -4,26 +4,60 @@
     xmlns:local="clr-namespace:gip.mes.client.mobile"
     xmlns:vb="clr-namespace:gip.core.layoutengine;assembly=gip.core.layoutengine"
     xmlns:dm="clr-namespace:gip.core.datamodel;assembly=gip.core.datamodel"
-    Title="VarioBatch" Height="1280" Width="720" MaxHeight="2560" MaxWidth="1440" MinHeight="800" MinWidth="480" Loaded="Window_Loaded" Closing="Window_Closing" Icon="/gip.mes.client.mobile;component/Images/iPlusIconDesktop.ico" WindowState="Normal">
+    Title="VarioBatch" Height="800" Width="480" MaxHeight="2560" MaxWidth="1440" MinHeight="800" MinWidth="480" Loaded="Window_Loaded" Closing="Window_Closing" Icon="/gip.mes.client.mobile;component/Images/iPlusIconDesktop.ico" WindowState="Normal">
     <Window.Resources>
         <ResourceDictionary>
         </ResourceDictionary>
     </Window.Resources>
 
-
-
     <vb:VBDockPanel x:Name="MainDockPanel" IsBackgroundPanel="True" LastChildFill="True">
         <vb:VBDockPanel.Background>
             <ImageBrush x:Name="image" Stretch="Fill"/>
         </vb:VBDockPanel.Background>
-        <vb:VBFrameControl DockPanel.Dock="Top" Name="MainFrame" NavigationUIVisibility="Visible" JournalOwnership="OwnsJournal" Height="600">
-        </vb:VBFrameControl>
-        <vb:VBMenu x:Name="MainMenu" vb:VBDockPanel.Dock="Top" BorderThickness="0" Height="32"/>
-        <Grid x:Name="StatusDockPanel" vb:VBDockPanel.Dock="Bottom">
+
+        <vb:VBGrid vb:VBDockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+
+            <vb:VBButton x:Name="HamburgerButton" Height="50" Width="50" HorizontalAlignment="Left">
+                <Grid Height="30">
+                    <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                </Grid>
+            </vb:VBButton>
+
+            <vb:VBButton x:Name="FrameGoBack" Click="FrameGoBack_Click" Height="50" Width="50" HorizontalAlignment="Right" Grid.Column="2">
+                <Viewbox Width="20" Height="20">
+                    <Path Data="M7,2 L2,10 L7,18 M2,10 L18,10" Stroke="White" StrokeThickness="2" />
+                </Viewbox>
+            </vb:VBButton>
+            
+            <vb:VBButton x:Name="FrameGoFoward" Click="FrameGoFoward_Click" Height="50" Width="50" HorizontalAlignment="Right" Grid.Column="3">
+                <Viewbox Width="20" Height="20">
+                    <Path Data="M13,2 L18,10 L13,18 M18,10 L2,10" Stroke="White" StrokeThickness="2" />
+                </Viewbox>
+            </vb:VBButton>
+        </vb:VBGrid>
+        
+
+        <vb:VBMenu x:Name="MainMenu" vb:VBDockPanel.Dock="Left" HorizontalAlignment="Left" BorderThickness="0" Height="auto" Panel.ZIndex="1" Visibility="Collapsed">
+            <vb:VBMenu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </vb:VBMenu.ItemsPanel>
+        </vb:VBMenu>
+
+         <Grid x:Name="StatusDockPanel" vb:VBDockPanel.Dock="Bottom" Height="56">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="250"></ColumnDefinition>
+                <ColumnDefinition Width="300"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <vb:VBStatusBar x:Name="PageStatusBar" Grid.Column="0" Height="56">
                 <vb:VBStatusBarItem>
@@ -31,8 +65,8 @@
                 </vb:VBStatusBarItem>
                 <vb:VBStatusBarItem x:Name="StatusBarZoom">
                     <vb:VBSlider x:Name="sldZoom" Width="100" Minimum="50" Maximum="200" Value="100" 
-                                       LargeChange="20" SmallChange="5" Cursor="Hand"
-                                       Ticks="60,70,80,90,100,110,120,130,140,150,175,200" TickPlacement="BottomRight" IsSnapToTickEnabled="True">
+                        LargeChange="20" SmallChange="5" Cursor="Hand"
+                        Ticks="60,70,80,90,100,110,120,130,140,150,175,200" TickPlacement="BottomRight" IsSnapToTickEnabled="True">
                     </vb:VBSlider>
                 </vb:VBStatusBarItem>
                 <vb:VBStatusBarItem>
@@ -71,7 +105,7 @@
                             </Style.Triggers>
                         </Style>
                     </vb:VBStatusBarItem.Style>
-                    <Viewbox Width="24" Height="24" Margin="0,2,0,0">
+                    <Viewbox Width="54" Height="44" Margin="0,2,0,0">
                         <Canvas x:Name="Ebene_1" Width="24" Height="24" Canvas.Left="0" Canvas.Top="0">
                             <Path x:Name="Dreieck" Width="24" Height="21.0526" Canvas.Left="-1.84774e-006" Canvas.Top="1.47372" Stretch="Fill" Data="F1 M 12,2.47372L 0.999998,21.5263L 23,21.5263L 12,2.47372 Z " StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round">
                                 <Path.Stroke>
@@ -126,21 +160,6 @@
             </vb:VBStatusBar>
         </Grid>
 
-        <!-- Tab Control -->
-        <vb:VBDockPanel x:Name="SubMainDockPanel"  IsBackgroundPanel="True" LastChildFill="True" Margin="0" PreviewTouchDown="SubMainDockPanel_PreviewTouchDown" PreviewTouchMove="SubMainDockPanel_PreviewTouchMove" PreviewTouchUp="SubMainDockPanel_PreviewTouchUp">
-            <vb:VBDockPanel.LayoutTransform>
-                <TransformGroup>
-                    <ScaleTransform ScaleX="0.01" ScaleY="0.01"/>
-                    <ScaleTransform>
-                        <ScaleTransform.ScaleX>
-                            <Binding ElementName="sldZoom" Path="Value" Mode="OneWay"/>
-                        </ScaleTransform.ScaleX>
-                        <ScaleTransform.ScaleY>
-                            <Binding ElementName="sldZoom" Path="Value" Mode="OneWay"/>
-                        </ScaleTransform.ScaleY>
-                    </ScaleTransform>
-                </TransformGroup>
-            </vb:VBDockPanel.LayoutTransform>
-        </vb:VBDockPanel>
+        <!--Tab Control--> 
     </vb:VBDockPanel>
 </Window>

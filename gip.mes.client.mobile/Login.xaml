@@ -93,10 +93,10 @@
                 </Border>
 
                 <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="1" Name="label1" FontSize="24" Margin="10,0,0,5">User</vbcontrols:VBTextBlock>
-                <vbcontrols:VBTextBox VerticalAlignment="Bottom" Height="35" Grid.Row="2" Name="TextboxUser" ShowCaption="False" />
+                <vbcontrols:VBTextBox VerticalAlignment="Bottom" Height="35" Grid.Row="2" FontSize="24" Name="TextboxUser" ShowCaption="False" />
 
                 <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="3" Name="label2" FontSize="24" Margin="10,0,0,5">Password</vbcontrols:VBTextBlock>
-                <vbcontrols:VBPasswordBox VerticalAlignment="Bottom" Height="35" Grid.Row="4" Name="TextboxPassword" ShowCaption="False" />
+                <vbcontrols:VBPasswordBox VerticalAlignment="Bottom" Height="35" Grid.Row="4" FontSize="24" Name="TextboxPassword" ShowCaption="False" />
 
                 <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="5" Name="label3" FontSize="24" Margin="10,5,0,10" HorizontalAlignment="Center">Style</vbcontrols:VBTextBlock>
                 <vbcontrols:VBComboBox VerticalAlignment="Bottom" Height="25" Grid.Row="6" Name="selTheme" ShowCaption="False" IsEditable="False" />
