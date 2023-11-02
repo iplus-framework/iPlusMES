@@ -17,6 +17,10 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(7, "BaseMDUnit", "en{'Base Unit of Measure UOM'}de{'Basismengeneinheit'}", Const.ContextDatabase + "\\SourcePartslistPos\\Material\\MDUnitList", "", true)]
     [ACPropertyEntity(8, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(9, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
+    [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
+    [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
+    [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
+    [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistPosRelation.ClassName, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", typeof(PartslistPosRelation), PartslistPosRelation.ClassName, "", PartslistPosRelation.ClassName + "ID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistPosRelation>) })]
     public partial class PartslistPosRelation : IPartslistPosRelation
