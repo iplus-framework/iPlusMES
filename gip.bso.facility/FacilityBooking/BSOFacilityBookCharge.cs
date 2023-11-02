@@ -1682,8 +1682,13 @@ namespace gip.bso.facility
 
         public bool BookAvailableFacilityCharge(bool withRefresh)
         {
+            FacilityBookingCharge fbc = CurrentFacilityCharge?.FacilityBookingCharge_InwardFacilityCharge
+                                                              .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                              .OrderByDescending(c => c.InsertDate)
+                                                              .FirstOrDefault();
+
             //Question50097: Do you want to restore a last stock?
-            if (Messages.Question(this, "Question50098") == Global.MsgResult.Yes)
+            if (fbc != null && Messages.Question(this, "Question50098") == Global.MsgResult.Yes)
             {
                 CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable);
             }
