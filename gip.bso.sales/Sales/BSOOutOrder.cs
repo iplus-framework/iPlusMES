@@ -68,6 +68,11 @@ namespace gip.bso.sales
             //IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
             //SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
 
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
+            }
+
             return true;
         }
 
@@ -117,9 +122,38 @@ namespace gip.bso.sales
                 _AccessFilterMaterial = null;
             }
 
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityRservation_ReservationChanged;
+            }
 
             return result;
 
+        }
+
+        private void BSOFacilityRservation_ReservationChanged()
+        {
+            if (CurrentOutOrderPos != null)
+            {
+                CurrentOutOrderPos.OnEntityPropertyChanged(nameof(Material));
+            }
+        }
+
+        #endregion
+
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
+        public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservation_Child == null)
+                    _BSOFacilityReservation_Child = new ACChildItem<BSOFacilityReservation>(this, nameof(BSOFacilityReservation_Child));
+                return _BSOFacilityReservation_Child;
+            }
         }
 
         #endregion
@@ -500,6 +534,11 @@ namespace gip.bso.sales
                     OnPropertyChanged("MDUnitList");
                     OnPropertyChanged("CompanyMaterialPickupList");
                     OnPropertyChanged("AvailableCompMaterialList");
+
+                    if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+                    {
+                        BSOFacilityReservation_Child.Value.FacilityReservationOwner = value;
+                    }
                 }
             }
         }
@@ -1491,9 +1530,15 @@ namespace gip.bso.sales
                 return result;
             switch (vbControl.VBContent)
             {
-                case "CurrentOutOrder\\MDOutOrderType":
+                case nameof(CurrentOutOrder) + "\\" + nameof(MDOutOrderType):
                     {
                         if (OutOrderPosList != null && OutOrderPosList.Any())
+                            return Global.ControlModes.Disabled;
+                        break;
+                    }
+                case nameof(CurrentOutOrderPos) + "\\" + nameof(Material):
+                    {
+                        if (CurrentOutOrderPos != null && CurrentOutOrderPos.FacilityReservation_OutOrderPos.Any())
                             return Global.ControlModes.Disabled;
                         break;
                     }

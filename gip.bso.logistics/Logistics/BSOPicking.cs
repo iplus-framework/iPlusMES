@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.Objects;
-using System.Globalization;
 using System.Linq;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
@@ -102,6 +101,11 @@ namespace gip.bso.logistics
                     InitParams();
 
                 Search(false);
+            }
+
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
             }
 
             return true;
@@ -256,6 +260,12 @@ namespace gip.bso.logistics
             _IsInward = false;
             _QuantDialogMaterial = null;
 
+
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityRservation_ReservationChanged;
+            }
+
             return b;
         }
 
@@ -268,6 +278,15 @@ namespace gip.bso.logistics
                 clone._SelectedFacilityBookingCharge = this._SelectedFacilityBookingCharge;
             }
             return clone;
+        }
+
+
+        private void BSOFacilityRservation_ReservationChanged()
+        {
+            if(CurrentPickingPos != null)
+            {
+                CurrentPickingPos.OnEntityPropertyChanged(nameof(PickingPos.PickingMaterial));
+            }
         }
 
         #endregion
@@ -284,6 +303,20 @@ namespace gip.bso.logistics
                 if (_BSOFacilityExplorer_Child == null)
                     _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
                 return _BSOFacilityExplorer_Child;
+            }
+        }
+
+
+        ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
+        public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservation_Child == null)
+                    _BSOFacilityReservation_Child = new ACChildItem<BSOFacilityReservation>(this, nameof(BSOFacilityReservation_Child));
+                return _BSOFacilityReservation_Child;
             }
         }
 
@@ -1133,6 +1166,11 @@ namespace gip.bso.logistics
                         CurrentPickingPos.PropertyChanged += CurrentPickingPos_PropertyChanged;
 
                     CurrentMDUnit = CurrentPickingPos?.MDUnit;
+
+                    if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+                    {
+                        BSOFacilityReservation_Child.Value.FacilityReservationOwner = value;
+                    }
                 }
             }
         }
@@ -1142,9 +1180,7 @@ namespace gip.bso.logistics
             switch (e.PropertyName)
             {
                 case nameof(CurrentPickingPos.PickingMaterialID):
-                    {
-                        OnPropertyChanged(nameof(MDUnitList));
-                    }
+                    OnPropertyChanged(nameof(MDUnitList));
                     break;
             }
         }
@@ -2124,8 +2160,15 @@ namespace gip.bso.logistics
                         }
                         break;
                     }
-                case "CurrentPickingPos\\PickingQuantityUOM":
                 case "CurrentPickingPos\\PickingMaterial":
+                    if (CurrentPickingPos == null
+                       || CurrentPickingPos.InOrderPosID.HasValue
+                       || CurrentPickingPos.OutOrderPosID.HasValue
+                       || CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any()
+                       || CurrentPickingPos.FacilityReservation_PickingPos.Any())
+                        return Global.ControlModes.Disabled;
+                    break;
+                case "CurrentPickingPos\\PickingQuantityUOM":
                 case "CurrentPickingPos\\TargetQuantity":
                 case "CurrentPickingPos\\TargetQuantityUOM":
                     if (CurrentPickingPos == null

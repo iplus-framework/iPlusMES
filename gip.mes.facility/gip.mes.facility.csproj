@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BSO\BSOFacilityReservation.cs" />
     <Compile Include="BSO\TargetEqualityComparer.cs" />
     <Compile Include="BSO\VBBSOModulesSelector.cs" />
     <Compile Include="Helperclasses\FacilityChargeList.cs" />
@@ -329,6 +330,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-10-26 10-41_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-11-08 10-34_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

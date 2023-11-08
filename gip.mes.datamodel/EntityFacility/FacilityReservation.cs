@@ -261,6 +261,27 @@ namespace gip.mes.datamodel
                     && c.ProdOrderPartslistPos != null
                     && c.ProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot;
         }
+
+        public static Func<FacilityReservation, bool> PickingPosReservations(string materialNo, string lotNo)
+        {
+            return c =>
+                    c.Material != null
+                    && c.Material.MaterialNo == materialNo
+                    && c.FacilityLot != null
+                    && c.FacilityLot.LotNo == lotNo
+                    && c.PickingPos != null;
+        }
+
+        public static Func<FacilityReservation, bool> OutOrderPosReservations(string materialNo, string lotNo)
+        {
+            return c =>
+                    c.Material != null
+                    && c.Material.MaterialNo == materialNo
+                    && c.FacilityLot != null
+                    && c.FacilityLot.LotNo == lotNo
+                    && c.OutOrderPos != null;
+        }
+
         #endregion
     }
 }

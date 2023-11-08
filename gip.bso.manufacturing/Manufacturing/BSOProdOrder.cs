@@ -74,10 +74,15 @@ namespace gip.bso.manufacturing
                 Search();
             }
 
+            if(BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
+            }
 
             return true;
         }
 
+        
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
@@ -151,7 +156,18 @@ namespace gip.bso.manufacturing
             }
             _BSOPartslistExplorer_Child = null;
             _AccessFilterPlanningMR = null;
+
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityRservation_ReservationChanged;
+            }
+
             return baseResult;
+        }
+
+        private void BSOFacilityRservation_ReservationChanged()
+        {
+            OnPropertyChanged(nameof(SelectedInputMaterial));
         }
 
         #endregion
@@ -718,6 +734,15 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
+
+            if(!string.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith(nameof(SelectedInputMaterial)))
+            {
+                if(SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+                {
+                    return Global.ControlModes.Disabled;
+                }
+            }
+
             return result;
         }
 
