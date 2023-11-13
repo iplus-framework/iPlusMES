@@ -1240,7 +1240,8 @@ namespace gip.bso.manufacturing
 
             if (routeSelector.RouteResult != null)
             {
-                SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
+                Route route = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                SelectedTarget.CurrentRoute = route;
             }
             else
             {
@@ -1268,9 +1269,9 @@ namespace gip.bso.manufacturing
 
             if (routeSelector.RouteResult != null)
             {
-                Route result = routeSelector.RouteResult.FirstOrDefault();
-                if (result != SelectedTarget.CurrentRoute)
-                    SelectedTarget.CurrentRoute = result;
+                Route route = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                if (route != SelectedTarget.CurrentRoute)
+                    SelectedTarget.CurrentRoute = route;
             }
         }
 

@@ -148,7 +148,7 @@ namespace gip.mes.facility
                                     sourceModule, C_SiloClass, RouteDirections.Forwards, new object[] { },
                                     (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                                     null,
-                                    0, true, true, false, false, 3);
+                                    0, true, true, false, false, 3, false, false, true);
             if (result.Routes == null || !result.Routes.Any())
                 return null;
             if (!result.IsDbResult)
