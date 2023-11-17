@@ -21,7 +21,8 @@ namespace gip.mes.processapplication
             new object[] {PWProcessFunction.C_InvocationCount, Global.ParamOption.Optional, typeof(int)},
             new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {Picking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
-            new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid)}
+            new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {core.datamodel.ACClassWF.ClassName, Global.ParamOption.Optional, typeof(Guid)}
         }
     )]
 

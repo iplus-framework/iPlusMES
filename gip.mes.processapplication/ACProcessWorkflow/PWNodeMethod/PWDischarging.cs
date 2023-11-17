@@ -860,7 +860,9 @@ namespace gip.mes.processapplication
                                             {
                                                 foreach (var pwDosing in previousDosings)
                                                 {
-                                                    if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp))
+                                                    if (   (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp) && IsProduction)
+                                                        || (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging) && IsTransport)
+                                                        )
                                                         pwDosing.ResetDosingsAfterInterDischarging(dbApp);
                                                     else
                                                         pwDosing.SetDosingsCompletedAfterDischarging(dbApp);

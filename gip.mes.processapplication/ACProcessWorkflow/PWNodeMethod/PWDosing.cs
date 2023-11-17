@@ -304,6 +304,13 @@ namespace gip.mes.processapplication
             {
                 if (IsProduction)
                     return HasAnyMaterialToProcessProd;
+                else if (IsTransport)
+                {
+                    PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                    if (pwMethodTransport != null && pwMethodTransport.CurrentPicking != null)
+                        return HasAnyMaterialToProcessPicking;
+                }
+
 
                 return true;
             }

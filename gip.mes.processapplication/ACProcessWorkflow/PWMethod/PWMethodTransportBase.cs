@@ -18,7 +18,8 @@ namespace gip.mes.processapplication
             new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid) },
-            new object[] {PWMethodVBBase.IsLastBatchParamName, Global.ParamOption.Optional, typeof(Int16) }
+            new object[] {PWMethodVBBase.IsLastBatchParamName, Global.ParamOption.Optional, typeof(Int16) },
+            new object[] {core.datamodel.ACClassWF.ClassName, Global.ParamOption.Optional, typeof(Guid)}
         }
     )]
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWMethodTransportBase'}de{'PWMethodTransportBase'}", Global.ACKinds.TPWMethod, Global.ACStorableTypes.Optional, true, true, "", "PWMethodTransportBase", 20)]
@@ -180,6 +181,18 @@ namespace gip.mes.processapplication
             }
         }
 
+        public Guid? DesignatedProcessNodeACClassWFID
+        {
+            get
+            {
+                ACValue acclassWF = CurrentACMethod?.ValueT?.ParameterValueList.GetACValue(core.datamodel.ACClassWF.ClassName);
+                if (acclassWF != null && acclassWF.Value != null && ContentACClassWF != null)
+                {
+                    return acclassWF.ParamAsGuid;
+                }
+                return null;
+            }
+        }
         #endregion
 
         #region Methods

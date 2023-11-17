@@ -3742,6 +3742,16 @@ namespace gip.bso.logistics
                             acValuePPos.Value = CurrentPicking.PickingID;
                     }
 
+                    gip.core.datamodel.ACClassWF allowedWFNode = SelectedPWNodeProcessWorkflow;
+                    if (allowedWFNode != null)
+                    {
+                        ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
+                        if (paramACClassWF == null)
+                            acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), allowedWFNode.ACClassWFID));
+                        else
+                            paramACClassWF.Value = allowedWFNode.ACClassWFID;
+                    }
+
                     pAppManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
 
                     //IACPointAsyncRMI rmiInvocationPoint = pAppManager.GetPoint(Const.TaskInvocationPoint) as IACPointAsyncRMI;
@@ -3775,7 +3785,27 @@ namespace gip.bso.logistics
                 || !PickingPosList.Any()
                 || PickingManager == null)
                 return false;
+
+            if (ProcessWorkflowPresenter != null)
+                return SelectedPWNodeProcessWorkflow != null;
+
             return true;
+        }
+
+
+        protected gip.core.datamodel.ACClassWF SelectedPWNodeProcessWorkflow
+        {
+            get
+            {
+                if (   ProcessWorkflowPresenter == null
+                    || ProcessWorkflowPresenter.SelectedWFNode == null
+                    || ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF == null
+                    || ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.PWACClass == null)
+                    return null;
+                if (typeof(PWNodeProcessWorkflow).IsAssignableFrom(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.PWACClass.ObjectType))
+                    return ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF;
+                return null;
+            }
         }
 
         protected IACComponent _SelectedAppManager;

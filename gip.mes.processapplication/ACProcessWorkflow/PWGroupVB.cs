@@ -6,6 +6,9 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using System.Xml;
+using gip.mes.facility;
+using static gip.mes.datamodel.MDReservationMode;
+using static gip.mes.processapplication.PWDosing;
 
 namespace gip.mes.processapplication
 
@@ -637,7 +640,8 @@ namespace gip.mes.processapplication
             }
             if (pickingPos != null && pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID.HasValue)
             {
-                bool hasGroupDosings = this.FindChildComponents<PWDosing>(c => c is PWDosing).Any();
+                List<PWDosing> pwDosings = this.FindChildComponents<PWDosing>(c => c is PWDosing);
+                bool hasGroupDosings = pwDosings.Any();
                 Guid[] targets = new Guid[] { pickingPos.ToFacility.VBiFacilityACClassID.Value };
                 var lastTargest = LastTargets;
                 if (lastTargest == null
@@ -670,13 +674,39 @@ namespace gip.mes.processapplication
                                             0,true, true, false, false);
                         if (rResult.Routes != null && rResult.Routes.Any())
                         {
-                            if (hasGroupDosings && pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+                            if (hasGroupDosings)
                             {
-                                rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                                            module, SelRuleID_ReachableSource, RouteDirections.Backwards, new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value },
-                                                            (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value,
-                                                            (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType))), 
-                                                            0, true, true, false, false);
+                                if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+                                {
+                                    rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
+                                                                module, SelRuleID_ReachableSource, RouteDirections.Backwards, new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value },
+                                                                (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value,
+                                                                (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType))),
+                                                                0, true, true, false, false);
+                                }
+                                else if (pickingPos.FromFacility == null)
+                                {
+                                    var pwDosing = pwDosings.FirstOrDefault();
+                                    if (pwDosing != null)
+                                    {
+                                        facility.ACPartslistManager.QrySilosResult possibleSilos = null;
+                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
+                                                        pwDosing.OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                        null, null, pwDosing.ExcludedSilos, pwDosing.ReservationMode);
+                                        IEnumerable<Route> routes = pwDosing.GetRoutes(pickingPos, dbApp, db, queryParams, module, out possibleSilos);
+                                        if (possibleSilos != null && possibleSilos.FoundSilos != null && possibleSilos.FoundSilos.Any())
+                                        {
+                                            foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
+                                            {
+                                                if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue
+                                                    || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
+                                                    continue;
+                                                rResult = new RoutingResult(routes, false, null, null);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             if (rResult.Routes != null && rResult.Routes.Any())
                                 LastCalculatedRouteablePMList.Add(module);
@@ -898,6 +928,18 @@ namespace gip.mes.processapplication
                 _SkipGroup = false;
 
             return _SkipGroup.Value;
+        }
+
+        public bool HasAnyMaterialToProcess
+        {
+            get
+            {
+                var relevantPWNodes = FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial).ToArray();
+                if (relevantPWNodes.Any())
+                    return relevantPWNodes.Any(c => c.HasAnyMaterialToProcess);
+                else
+                    return false;
+            }
         }
 
         public bool IsExtraDisTargetEntered(out string acUrlExtraDisDest)

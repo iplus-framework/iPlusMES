@@ -1617,7 +1617,7 @@ namespace gip.mes.processapplication
                 this.FillLevelScale.ValueT = 0;
             else
             {
-                fillLevel_dm = fillLevel_dm * 0.1; // m => dm
+                fillLevel_dm = fillLevel_dm * 0.1; // cm => dm
                 this.FillLevelScale.ValueT = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingWeight), new double[] { fillLevel_dm }, DictDimensions);
             }
         }

@@ -98,6 +98,9 @@ namespace gip.mes.processapplication
                 return StartNextBatchResult.Done;
             }
 
+            if (IsThisDesignatedProcessNode.HasValue && !IsThisDesignatedProcessNode.Value)
+                return StartNextBatchResult.Done;
+
             using (Database dbiPlus = new Database())
             using (DatabaseApp dbApp = new DatabaseApp())
             {
@@ -178,6 +181,17 @@ namespace gip.mes.processapplication
 
         protected virtual bool WillReadAndStartNextBatchCompleteNode_Picking(short invokeID)
         {
+            //PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+            //Guid? designatedProcessNodeACClassWFID = pwMethodTransport?.DesignatedProcessNodeACClassWFID;
+            //if (pwMethodTransport != null && designatedProcessNodeACClassWFID.HasValue && ContentACClassWF != null)
+            //{
+            //    if (ContentACClassWF.ACClassWFID != designatedProcessNodeACClassWFID.Value)
+            //        return true;
+            //    if (invokeID >= 20 && BatchSizeLoss && CurrentACState >= ACStateEnum.SMRunning && this.IterationCount.ValueT > 0)
+            //        return true;
+            //}
+            //return false;
+
             PWMethodSingleDosing singleDosing = ParentPWMethod<PWMethodSingleDosing>();
             Guid? selectedSingleDosingACClassWFID = singleDosing?.SelectedSingleDosingACClassWFID;
             if (singleDosing != null && selectedSingleDosingACClassWFID.HasValue && ContentACClassWF != null)
@@ -188,6 +202,20 @@ namespace gip.mes.processapplication
                     return true;
             }
             return false;
+        }
+
+        protected bool? IsThisDesignatedProcessNode
+        {
+            get
+            {
+                PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                if (pwMethodTransport == null || ContentACClassWF == null)
+                    return false;
+                Guid? designatedProcessNodeACClassWFID = pwMethodTransport.DesignatedProcessNodeACClassWFID;
+                if (!designatedProcessNodeACClassWFID.HasValue)
+                    return null;
+                return ContentACClassWF.ACClassWFID == designatedProcessNodeACClassWFID.Value;
+            }
         }
 
         protected virtual void StartNextPickingWF(Picking detachedPicking)

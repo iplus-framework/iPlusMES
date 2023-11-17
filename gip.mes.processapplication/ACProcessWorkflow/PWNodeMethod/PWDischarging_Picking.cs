@@ -144,7 +144,9 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
 
-            if (pickingPos.ToFacility.Material != null && pickingPos.Material != pickingPos.ToFacility.Material)
+            if (     pickingPos.ToFacility.Material != null 
+                && !(    pickingPos.Material == pickingPos.ToFacility.Material
+                      || pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID == pickingPos.ToFacility.Material.MaterialID))
             {
                 // Error50087: Material {0} on Silo {1} doesn't match Material {2} at Commssioningorder {3}!
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(40)", 1040, "Error50087",

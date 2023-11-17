@@ -60,7 +60,7 @@ namespace gip.mes.facility
 
             public class FacilitySumByLots
             {
-                public Facility StorageBin { get; internal set; }
+                public Facility StorageBin { get; set; }
 
                 private double? _StockOfReservations = null;
                 public double? StockOfReservations

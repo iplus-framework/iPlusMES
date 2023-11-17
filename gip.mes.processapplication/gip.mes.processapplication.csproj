@@ -112,6 +112,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAMTank.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWLoadingLoop.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosingSkip.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Picking.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeLoop.cs" />
