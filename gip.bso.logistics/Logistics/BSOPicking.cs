@@ -1244,11 +1244,11 @@ namespace gip.bso.logistics
                     return null;
                 if (CurrentPickingPos.Material != null)
                     return CurrentPickingPos.Material.MDUnitList;
-                if (CurrentInOrderPos.Material != null)
+                if (CurrentInOrderPos != null && CurrentInOrderPos.Material != null)
                     return CurrentInOrderPos.Material.MDUnitList;
-                if (CurrentOutOrderPos.Material != null)
+                if (CurrentOutOrderPos != null && CurrentOutOrderPos.Material != null)
                     return CurrentOutOrderPos.Material.MDUnitList;
-                if (CurrentProdOrderPartslistPos.Material != null)
+                if (CurrentProdOrderPartslistPos != null && CurrentProdOrderPartslistPos.Material != null)
                     return CurrentProdOrderPartslistPos.Material.MDUnitList;
                 return null;
             }

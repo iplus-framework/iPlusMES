@@ -675,7 +675,7 @@ namespace gip.mes.processapplication
         public virtual StartDisResult StartDischarging(PAProcessModule module)
         {
             // TODO Handle Methods for In- / Out- and Relocation-Methods
-            if (!IsProduction && !IsIntake && !IsRelocation)
+            if (!IsProduction && !IsIntake && !IsRelocation && !IsLoading)
                 return StartDisResult.CancelDischarging;
 
             // Falls Produktionsauftrag

@@ -1204,7 +1204,8 @@ namespace gip.mes.processapplication
             }
 
             var targetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
-            if (targetQ != null)
+            var swtValue = acMethod.ParameterValueList.GetACValue("SWTWeight");
+            if (targetQ != null && (swtValue == null || swtValue.ParamAsDouble < 0.0001))
             {
                 double targetQuantity = targetQ.ParamAsDouble;
                 var scale = ParentACComponent as IPAMContScale;
@@ -1892,6 +1893,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("AdjustmentFlowRate", "en{'Adjustment FlowRate'}de{'Dosierstufe in Nachdosierung'}");
             method.ParameterValueList.Add(new ACValue("EndlessDosing", typeof(bool), (bool)false, Global.ParamOption.Optional));
             paramTranslation.Add("EndlessDosing", "en{'Endless dosing'}de{'Endlose Dosierung'}");
+            method.ParameterValueList.Add(new ACValue("SWTWeight", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
+            paramTranslation.Add("SWTWeight", "en{'SWT tip weight'}de{'SWT Kippgewicht'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActualQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Optional));

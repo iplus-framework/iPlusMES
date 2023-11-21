@@ -7,6 +7,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.facility.ACPartslistManager.QrySilosResult;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -128,12 +129,12 @@ namespace gip.mes.processapplication
                             RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                                                                 OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                                                                 null, null, ExcludedSilos, ReservationMode);
-                            routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+                            routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, module, out possibleSilos);
                         }
                         else
                         {
                             rResult = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                            scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_Silo_Deselector, new object[] { },
+                                            scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_SiloDirect, new object[] { },
                                             (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
                                             (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
                                             0, true, true, false, false, 10);
@@ -212,7 +213,8 @@ namespace gip.mes.processapplication
                 return StartNextCompResult.Done;
             var pwGroup = ParentPWGroup;
             // Nur einmal starten erlaubt:
-            if (!RepeatDosingForPicking
+            if (   !RepeatDosingForPicking
+                && !DoseAllPosFromPicking
                 && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
                 return StartNextCompResult.Done;
 
@@ -274,9 +276,10 @@ namespace gip.mes.processapplication
 
                     IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                     ScaleBoundaries scaleBoundaries = null;
+                    PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
                     if (scale != null)
                         scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, null, null, null, null, null, null, null);
-                    if (scaleBoundaries != null)
+                    if (scaleBoundaries != null && !IsAutomaticContinousWeighing)
                     {
                         double? remainingWeight = null;
                         if (scaleBoundaries.RemainingWeightCapacity.HasValue)
@@ -329,7 +332,7 @@ namespace gip.mes.processapplication
                     else
                     {
                         rResult = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_Silo_Deselector, new object[] { },
+                                        scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_SiloDirect, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
                                         0, true, true, false, false, 10);
@@ -354,6 +357,8 @@ namespace gip.mes.processapplication
                         }
                         if (dosingRoute == null)
                         {
+                            if (ComponentsSkippable)
+                                continue;
                             if (NoSourceFoundForDosing.ValueT == 0)
                             {
                                 NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
@@ -573,6 +578,12 @@ namespace gip.mes.processapplication
                     acMethod["Route"] = dosingRoute != null ? dosingRoute.Clone() as Route : null;
                     acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
                     acMethod["TargetQuantity"] = targetWeight;
+                    if (IsAutomaticContinousWeighing && totalizingScale != null)
+                    {
+                        var acValue = acMethod.ParameterValueList.GetACValue("SWTWeight");
+                        if (acValue != null)
+                            acValue.Value = totalizingScale.SWTTipWeight;
+                    }
                     acMethod[Material.ClassName] = pickingPos.Material.MaterialName1;
                     if (pickingPos.Material.Density > 0.00001)
                         acMethod["Density"] = pickingPos.Material.Density;

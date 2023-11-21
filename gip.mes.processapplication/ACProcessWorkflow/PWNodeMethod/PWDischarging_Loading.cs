@@ -16,7 +16,7 @@ namespace gip.mes.processapplication
         {
             if (!IsLoading)
                 return StartDisResult.CancelDischarging;
-            var pwMethod = ParentPWMethod<PWMethodIntake>();
+            var pwMethod = ParentPWMethod<PWMethodLoading>();
             ACMethod acMethod = pwMethod.CurrentACMethod.ValueT;
             if (acMethod == null || pwMethod == null)
                 return StartDisResult.CancelDischarging;

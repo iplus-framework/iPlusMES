@@ -117,6 +117,7 @@
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Picking.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeLoop.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWPickingByMaterial.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosingDisBypass.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkInOutOperation.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskOnHold.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\ScaleBoundaries.cs" />
@@ -320,6 +321,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2023-10-02 09-16_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2023-11-21 17-15_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

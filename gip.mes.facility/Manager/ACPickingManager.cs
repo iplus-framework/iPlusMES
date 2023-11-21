@@ -1735,7 +1735,8 @@ namespace gip.mes.facility
                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                 ACValueList projSpecificParams = null,
                                 bool onlyContainer = true,
-                                short reservationMode = 0)
+                                short reservationMode = 0,
+                                string selectionRuleID = "PAMSilo.Deselector")
         {
             if (currentProcessModule == null)
             {
@@ -1757,7 +1758,7 @@ namespace gip.mes.facility
                 var oldestSiloClass = oldestSilo.GetFacilityACClass(dbIPlus);
 
                 result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        currentProcessModule, oldestSiloClass, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },
+                                        currentProcessModule, oldestSiloClass, RouteDirections.Backwards, selectionRuleID, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
                                         0, true, true, false, false, 10);
@@ -1774,7 +1775,7 @@ namespace gip.mes.facility
                 IEnumerable<string> possibleSilosACUrl = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityACClass != null).Select(x => x.StorageBin.FacilityACClass.GetACUrlComponent());
 
                 result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        currentProcessModule, possibleSilosACUrl, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },
+                                        currentProcessModule, possibleSilosACUrl, RouteDirections.Backwards, selectionRuleID, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
                                         0, true, true, false, false, 10);

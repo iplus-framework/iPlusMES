@@ -81,6 +81,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("ManuallyChangeSource", "en{'Manually change source'}de{'Manueller Quellenwechsel'}");
             method.ParameterValueList.Add(new ACValue("MinDosQuantity", typeof(double), 0.0, Global.ParamOption.Optional));
             paramTranslation.Add("MinDosQuantity", "en{'Minimum dosing quantity'}de{'Minimale Dosiermenge'}");
+            method.ParameterValueList.Add(new ACValue("SWTOn", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("SWTOn", "en{'SWT On'}de{'SWT An'}");
             method.ParameterValueList.Add(new ACValue("OldestSilo", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OldestSilo", "en{'Dosing from oldest Silo only'}de{'Nur aus ältestem Silo dosieren'}");
             method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(bool), false, Global.ParamOption.Optional));
@@ -490,9 +492,33 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool IsAutomaticContinousWeighing
+        {
+            get
+            {
+                PAEScaleTotalizing scale = TotalizingScaleIfSWT;
+                if (scale == null)
+                    return false;
+                return scale.SWTTipWeight >= 0.0001;
+            }
+        }
+
+        private PAEScaleTotalizing TotalizingScaleIfSWT
+        {
+            get
+            {
+                if (!SWTOn)
+                    return null;
+                IPAMContScale pamScale = this.ParentPWGroup.AccessedProcessModule as IPAMContScale;
+                if (pamScale == null)
+                    return null;
+                return pamScale.Scale as PAEScaleTotalizing;
+            }
+        }
+
         #endregion
 
-        #region PWMethodBase
+            #region PWMethodBase
         public PWMethodVBBase ParentPWMethodVBBase
         {
             get
@@ -744,6 +770,24 @@ namespace gip.mes.processapplication
                 if (!minDosQuantity.HasValue)
                     minDosQuantity = 0.000001;
                 return minDosQuantity.Value;
+            }
+        }
+
+
+        public bool SWTOn
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("SWTOn");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
             }
         }
 
@@ -1721,7 +1765,8 @@ namespace gip.mes.processapplication
                                         queryParams.ExclusionList,
                                         null,
                                         true,
-                                        queryParams.ReservationMode);
+                                        queryParams.ReservationMode,
+                                        PAMSilo.SelRuleID_SiloDirect);
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
             return routes;
@@ -1731,7 +1776,8 @@ namespace gip.mes.processapplication
                                                     DatabaseApp dbApp, Database dbIPlus,
                                                     RouteQueryParams queryParams,
                                                     PAProcessModule useIfNotAccessedProcessModule,
-                                                    out QrySilosResult possibleSilos)
+                                                    out QrySilosResult possibleSilos,
+                                                    string selectionRuleID = PAMSilo.SelRuleID_SiloDirect)
         {
             if (ParentPWGroup == null || PickingManager == null)
                 throw new NullReferenceException("ParentPWGroup || PickingManager  is null");
@@ -1751,7 +1797,8 @@ namespace gip.mes.processapplication
                                         queryParams.ExclusionList,
                                         null,
                                         true,
-                                        queryParams.ReservationMode);
+                                        queryParams.ReservationMode,
+                                        selectionRuleID);
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
             return routes;

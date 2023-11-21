@@ -356,9 +356,10 @@ namespace gip.mes.processapplication
                             bool interDischargingNeeded = false;
                             IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                             ScaleBoundaries scaleBoundaries = null;
+                            gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
                             if (scale != null)
                                 scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, queryOpenDosings, intermediateChildPos, intermediatePosition, matWFConnection, batch, batchPlan, endBatchPos);
-                            if (scaleBoundaries != null)
+                            if (scaleBoundaries != null && !IsAutomaticContinousWeighing)
                             {
                                 double? remainingWeight = null;
                                 if (scaleBoundaries.RemainingWeightCapacity.HasValue)
@@ -900,6 +901,12 @@ namespace gip.mes.processapplication
                             acMethod["Route"] = dosingRoute != null ? dosingRoute.Clone() as Route : null;
                             acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
                             acMethod["TargetQuantity"] = Math.Abs(correctedDosingWeight);
+                            if (IsAutomaticContinousWeighing && totalizingScale != null)
+                            {
+                                var acValue = acMethod.ParameterValueList.GetACValue("SWTWeight");
+                                if (acValue != null)
+                                    acValue.Value = totalizingScale.SWTTipWeight;
+                            }
                             acMethod[Material.ClassName] = relation.SourceProdOrderPartslistPos.Material.MaterialName1;
                             if (relation.SourceProdOrderPartslistPos.Material.Density > 0.00001)
                                 acMethod["Density"] = relation.SourceProdOrderPartslistPos.Material.Density;
