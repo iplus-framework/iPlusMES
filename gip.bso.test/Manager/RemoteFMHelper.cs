@@ -156,6 +156,16 @@ namespace gip.bso.test
         {
             FacilityCharge localFC = null;
 
+            // sync material
+            Material localMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialID == changedRemoteFC.MaterialID);
+            if (localMaterial == null)
+            {
+                localMaterial = Material.NewACObject(dbLocal, null);
+                localMaterial.MaterialID = changedRemoteFC.MaterialID;
+                localMaterial.CopyFrom(changedRemoteFC.Material, false);
+                dbLocal.Material.AddObject(localMaterial);
+            }
+
             // Search charge with same ID
             localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
 
@@ -303,7 +313,7 @@ namespace gip.bso.test
                 if (localPos.ToFacility == null && remotePos.PickingMaterialID != null)
                 {
                     PickingPos samplePickingPos = dbLocal.PickingPos.Where(c => c.PickingMaterialID != null && c.PickingMaterialID == remotePos.PickingMaterialID && c.ToFacilityID != null).FirstOrDefault();
-                    if(samplePickingPos != null)
+                    if (samplePickingPos != null)
                     {
                         localPos.ToFacility = samplePickingPos.ToFacility;
                     }
