@@ -16,7 +16,7 @@ namespace gip.mes.processapplication
     /// The workflow node can also be linked to an intermediate product in a material workflow. 
     /// PWDischarging is used for fully automatic production. 
     /// It calls the PAFDischarging process function asynchronously to delegate the real-time critical tasks to a PLC controller. 
-    /// Manufactured, received or relocated quantities are posted via warehouse management (ACFacilityManager). 
+    /// Manufactured, received or relocated quantities are posted via warehouse management (ACFacilityMan ager). 
     /// It can work with different data contexts (production and picking orders or delivery notes).
     /// </summary>
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
