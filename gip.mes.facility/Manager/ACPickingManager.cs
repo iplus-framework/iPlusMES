@@ -1685,22 +1685,16 @@ namespace gip.mes.facility
 
         #region MirrorPicking
 
-        public virtual Guid MirroredPickingResolvePickingID(Picking from)
-        {
-            return Guid.NewGuid();
-        }
-
-        public virtual string MirroredPickingResolvePickingNo(Picking from, string formatNewNo = Picking.FormatNewNo)
+        public virtual string OnGetNewNoForMirroredPicking(Picking from, string formatNewNo = Picking.FormatNewNo)
         {
             return Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, formatNewNo, this);
         }
 
         public virtual Picking MirrorPicking(DatabaseApp databaseApp, Picking from, string formatNewNo = Picking.FormatNewNo)
         {
-            string secondaryKey = MirroredPickingResolvePickingNo(from, formatNewNo);
+            string secondaryKey = OnGetNewNoForMirroredPicking(from, formatNewNo);
             Picking mirroredPicking = Picking.NewACObject(databaseApp, null, secondaryKey);
             mirroredPicking.CopyFrom(from, true);
-            mirroredPicking.PickingID = MirroredPickingResolvePickingID(mirroredPicking);
             mirroredPicking.MirroredFromPickingID = from.PickingID;
             PickingPos[] positions = from.PickingPos_Picking.ToArray();
             foreach (PickingPos fromPos in positions)
@@ -1717,6 +1711,65 @@ namespace gip.mes.facility
         {
             mirroredPos.ToFacility = fromPos.FromFacility;
             mirroredPos.FromFacility = fromPos.ToFacility;
+        }
+
+        public virtual string OnGetNewNoForSupplyPicking(Picking from, List<Picking> mirroredPickings, int storedMirroredPickingsCount, string formatNewNo = Picking.FormatNoForSupply)
+        {
+            int newSequence = mirroredPickings.Count + storedMirroredPickingsCount + 1;
+            return String.Format(formatNewNo, from.PickingNo, newSequence);
+        }
+
+        public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, Picking from, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForSupply)
+        {
+            int storedMirroredPickingsCount = databaseApp.Picking.Where(c => c.MirroredFromPickingID == from.PickingID).Count();
+
+            if (!separatePickingForEachPos.HasValue)
+            {
+                if (from.ACClassMethod != null)
+                    separatePickingForEachPos = from.ACClassMethod.ContinueByError;
+                else
+                    separatePickingForEachPos = false;
+            }
+
+            MDPickingType pickingType =  databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
+            MDDelivPosLoadState loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(databaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
+
+            List<Picking> mirroredPickings = new List<Picking>();
+            Picking mirroredPicking = null;
+            PickingPos[] positions = from.PickingPos_Picking.ToArray();
+            foreach (PickingPos fromPos in positions)
+            {
+                if (mirroredPicking == null || separatePickingForEachPos.Value)
+                {
+                    string secondaryKey = OnGetNewNoForSupplyPicking(from, mirroredPickings, storedMirroredPickingsCount, formatNewNo);
+                    mirroredPicking = Picking.NewACObject(databaseApp, null, secondaryKey);
+                    // Assign related Wokflow for supply
+                    mirroredPicking.CopyFrom(from, true);
+                    if (pickingType != null)
+                        mirroredPicking.MDPickingType = pickingType;
+                    if (from.ACClassMethod != null && from.ACClassMethod.ACClassMethod1_ParentACClassMethod != null)
+                        mirroredPicking.ACClassMethod = from.ACClassMethod.ACClassMethod1_ParentACClassMethod;
+                    mirroredPicking.MirroredFromPickingID = from.PickingID;
+                    mirroredPickings.Add(mirroredPicking);
+                }
+
+                PickingPos mirroredPos = PickingPos.NewACObject(databaseApp, mirroredPicking);
+                mirroredPos.CopyFrom(fromPos, true, false);
+                mirroredPos.ToFacility = fromPos.FromFacility;
+                mirroredPos.FromFacility = null;
+                mirroredPos.MDDelivPosLoadState = loadState;
+                foreach (FacilityReservation reservation in fromPos.FacilityReservation_PickingPos.ToArray())
+                {
+                    string secondaryKey = Root.NoManager.GetNewNo(databaseApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
+                    FacilityReservation mirroredReservation = FacilityReservation.NewACObject(databaseApp, mirroredPos, secondaryKey);
+                    mirroredReservation.CopyFrom(reservation, true);
+                    mirroredReservation.PickingPos = mirroredPos;
+
+                    mirroredPos.FacilityReservation_PickingPos.Add(mirroredReservation);
+                }
+                mirroredPicking.PickingPos_Picking.Add(mirroredPos);
+            }
+            return mirroredPickings;
         }
 
         #endregion

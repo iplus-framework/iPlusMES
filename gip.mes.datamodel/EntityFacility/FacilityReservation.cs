@@ -61,10 +61,41 @@ namespace gip.mes.datamodel
                 InOrderPos parentPos = parentACObject as InOrderPos;
                 entity.InOrderPos = parentPos;
             }
+            else if (parentACObject != null && parentACObject is PickingPos)
+            {
+                PickingPos pickingPos = parentACObject as PickingPos;
+                entity.PickingPos = pickingPos;
+            }
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 
+        public void CopyFrom(FacilityReservation from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                OutOrderPosID = from.OutOrderPosID;
+                InOrderPosID = from.InOrderPosID;
+                ProdOrderPartslistPosID = from.ProdOrderPartslistPosID;
+                ProdOrderBatchPlanID = from.ProdOrderBatchPlanID;
+                ProdOrderPartslistPosRelationID = from.ProdOrderPartslistPosRelationID;
+                InOrderPosID = from.InOrderPosID;
+                PickingPosID = from.PickingPosID;
+                MaterialID = from.MaterialID;
+                FacilityLotID = from.FacilityLotID;
+                FacilityChargeID = from.FacilityChargeID;
+                FacilityID = from.FacilityID;
+                VBiACClassID = from.VBiACClassID;
+            }
+
+            ReservedQuantityUOM = from.ReservedQuantityUOM;
+            Sequence = from.Sequence;
+            XMLConfig = from.XMLConfig;
+            InsertName = from.InsertName;
+            InsertDate = from.InsertDate;
+            UpdateName = from.UpdateName;
+            UpdateDate = from.UpdateDate;
+        }
         #endregion
 
         #region IACUrl Member

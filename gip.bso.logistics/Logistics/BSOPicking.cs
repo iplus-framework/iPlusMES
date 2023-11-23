@@ -2642,7 +2642,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Source Property: MirrorPicking
         /// </summary>
-        [ACMethodInfo("MirrorPicking", "en{'Mirror picking'}de{'Kommissionierung spiegeln'}", 999)]
+        [ACMethodInfo("MirrorPicking", "en{'Mirror picking'}de{'Kommissionierung spiegeln'}", 100)]
         public void MirrorPicking()
         {
             if (!IsEnabledMirrorPicking())
@@ -2659,6 +2659,40 @@ namespace gip.bso.logistics
             return CurrentPicking != null && CurrentPicking.PickingPos_Picking.Any();
         }
 
+
+        [ACMethodInfo("MirrorPicking", "en{'Create pickings for supply'}de{'Erstelle Bereitstellungsaufträge'}", 101)]
+        public virtual void GenerateSubPickingsForSupply()
+        {
+            if (!IsEnabledGenerateSubPickingsForSupply())
+                return;
+            Picking mirroredPicking = null;
+            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, CurrentPicking);
+            if (mirroredPickings != null && mirroredPickings.Any())
+            {
+                foreach (var picking in mirroredPickings)
+                {
+                    if (mirroredPicking == null)
+                        mirroredPicking = picking;
+                    AccessPrimary.NavList.Add(picking);
+                }
+            }
+            OnPropertyChanged(nameof(PickingList));
+            if (mirroredPicking != null)
+            {
+                CurrentPicking = mirroredPicking;
+                SelectedPicking = mirroredPicking;
+            }
+        }
+
+        public virtual bool IsEnabledGenerateSubPickingsForSupply()
+        {
+            return CurrentPicking != null
+                && CurrentPicking.PickingState < PickingStateEnum.Finished
+                && CurrentPicking.MDPickingType?.PickingType != PickingType.AutomaticRelocation
+                && CurrentPicking.MDPickingType?.PickingType != PickingType.InternalRelocation
+                && CurrentPicking.MDPickingType?.PickingType != PickingType.Receipt
+                && CurrentPicking.MDPickingType?.PickingType != PickingType.ReceiptVehicle;
+        }
 
         #endregion
 
@@ -4215,6 +4249,12 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledMirrorPicking):
                     result = IsEnabledMirrorPicking();
+                    return true;
+                case nameof(GenerateSubPickingsForSupply):
+                    GenerateSubPickingsForSupply();
+                    return true;
+                case nameof(IsEnabledGenerateSubPickingsForSupply):
+                    result = IsEnabledGenerateSubPickingsForSupply();
                     return true;
                 case nameof(UnassignPickingPos):
                     UnassignPickingPos();
