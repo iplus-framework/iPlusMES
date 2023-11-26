@@ -18,6 +18,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(12, InOrderPos.ClassName, "en{'Orderline (Goods issue)'}de{'Wareneingangsposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
     [ACPropertyEntity(13, PickingPos.ClassName, "en{'Commissioningline'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName, "", true)]
     [ACPropertyEntity(14, LabOrderPos.ClassName, "en{'Lab order line'}de{'Laborauftrag Position'}", Const.ContextDatabase + "\\" + LabOrderPos.ClassName, "", true)]
+    [ACPropertyEntity(15, VisitorVoucher.ClassName, "en{'Visitor voucher'}de{'Besucherbeleg'}", Const.ContextDatabase + "\\" + VisitorVoucher.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(9999, "WeighingTotalXML", "en{'Serialized Weighingdata'}de{'Serialisierte Wägedaten'}", "", "", false)]
