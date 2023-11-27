@@ -19,6 +19,8 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.mes.facility;
+using System.Data.Objects;
+using System.Data;
 
 namespace gip.bso.logistics
 {
@@ -760,6 +762,80 @@ namespace gip.bso.logistics
                     }
                 }
                 OnPropertyChanged("FindVisitorCardNo");
+            }
+        }
+
+        #endregion
+
+        #region Weighing
+        private core.datamodel.ACClass _SelectedScale;
+        [ACPropertySelected(611, "Scales", "en{'Vehicle scale'}de{'Fahrzeugwaage'}")]
+        public core.datamodel.ACClass SelectedScale
+        {
+            get
+            {
+                return _SelectedScale;
+            }
+            set
+            {
+                if (_SelectedScale != value)
+                {
+                    _SelectedScale = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<core.datamodel.ACClass> _ScalesList;
+        [ACPropertyList(610, "Scales")]
+        public List<core.datamodel.ACClass> ScalesList
+        {
+            get
+            {
+                if (_ScalesList != null)
+                    return _ScalesList;
+                _ScalesList = core.datamodel.Database.s_cQry_FindInstancesOfClass(DatabaseApp.ContextIPlus, "PAEScaleCalibratable").ToList();
+                return _ScalesList;
+            }
+            set
+            {
+                _ScalesList = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        Weighing _SelectedWeighing;
+        [ACPropertySelected(658, "Weighings")]
+        public Weighing SelectedWeighing
+        {
+            get
+            {
+                return _SelectedWeighing;
+            }
+            set
+            {
+                if (_SelectedWeighing != value)
+                {
+                    _SelectedWeighing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [ACPropertyList(659, "Weighings")]
+        public IEnumerable<Weighing> WeighingList
+        {
+            get
+            {
+                if (this.SelectedVisitorVoucher == null)
+                    return null;
+                //if (this.SelectedVisitorVoucher != null
+                //        && this.SelectedVisitorVoucher.EntityState != EntityState.Added
+                //        && this.SelectedVisitorVoucher.EntityState != EntityState.Detached)
+                //    this.SelectedVisitorVoucher.WeighingID;
+                //return SelectedOutwardPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.OrderBy(c => c.FacilityBookingNo).ToList();
+                return null;
             }
         }
 

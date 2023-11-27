@@ -118,11 +118,11 @@ namespace gip.bso.masterdata
                                 if (filterItem.SearchWord == fcTypeLocation.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
                                     countFoundCorrect++;
                             }
-                            else if (filterItem.PropertyName == "Facility1_ParentFacility")
-                            {
-                                if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
-                                    countFoundCorrect++;
-                            }
+                            //else if (filterItem.PropertyName == "Facility1_ParentFacility")
+                            //{
+                            //    if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
+                            //        countFoundCorrect++;
+                            //}
                         }
                         if (countFoundCorrect < 2)
                             rebuildACQueryDef = true;
@@ -135,7 +135,7 @@ namespace gip.bso.masterdata
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.or, "", true));
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, fcTypeLocation.ToString(), true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Facility1_ParentFacility", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
+                        //navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Facility1_ParentFacility", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
                         navACQueryDefinition.SaveConfig(true);
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Facility>("Vehicle", this);

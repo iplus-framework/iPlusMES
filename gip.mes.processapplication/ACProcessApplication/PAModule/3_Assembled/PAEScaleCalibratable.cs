@@ -33,7 +33,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case "RegisterAlibiWeight":
-                    RegisterAlibiWeight();
+                    result = RegisterAlibiWeight();
                     return true;
                 case Const.IsEnabledPrefix + "RegisterAlibiWeight":
                     result = IsEnabledRegisterAlibiWeight();
@@ -59,16 +59,13 @@ namespace gip.mes.processapplication
         }
 
 
-        [ACMethodInteraction("", "en{'Register alibi weight'}de{'Register alibi weight'}", 450, true)]
-        public void RegisterAlibiWeight()
+        [ACMethodInteraction("", "en{'Register alibi weight'}de{'Registriere Gewicht'}", 450, true)]
+        public Msg RegisterAlibiWeight()
         {
             Msg msg = OnRegisterAlibiWeight(null);
             if (msg != null)
-            {
-                //TODO: alarm
-                return;
-            }
-            SaveAlibiWeighing(null);
+                return msg;
+            return SaveAlibiWeighing(null);
         }
 
         public bool IsEnabledRegisterAlibiWeight()
@@ -89,7 +86,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public virtual Guid? SaveAlibiWeighing(IACObject parentPos)
+        public virtual Msg SaveAlibiWeighing(IACObject parentPos)
         {
             Msg msg = null;
 
@@ -100,8 +97,7 @@ namespace gip.mes.processapplication
                 StateScale.ValueT = core.autocomponent.PANotifyState.AlarmOrFault;
                 if (IsAlarmActive(StateScale, msg.Message) == null)
                     Messages.LogMessageMsg(msg);
-
-                return null;
+                return msg;
             }
 
             using (Database db = new Database())
@@ -114,17 +110,20 @@ namespace gip.mes.processapplication
                 dbApp.Weighing.AddObject(weighing);
 
                 msg = dbApp.ACSaveChanges();
-                if(msg != null)
+                if (msg != null)
                 {
                     dbApp.ACUndoChanges();
                     OnNewAlarmOccurred(StateScale, msg);
                     StateScale.ValueT = core.autocomponent.PANotifyState.AlarmOrFault;
                     if (IsAlarmActive(StateScale, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
-                    return null;
+                    return msg;
                 }
-                return weighing.WeighingID;
+                msg = new Msg(eMsgLevel.Default, "");
+                msg.MsgId = weighing.WeighingID;
             }
+
+            return msg;
         }
     }
 }

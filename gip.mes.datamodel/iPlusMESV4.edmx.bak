@@ -4799,9 +4799,10 @@
           <Property Name="InOrderPosID" Type="uniqueidentifier" />
           <Property Name="PickingPosID" Type="uniqueidentifier" />
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
+          <Property Name="VisitorVoucherID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4822,7 +4823,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a p
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4834,7 +4835,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4858,7 +4859,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4882,7 +4883,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4907,7 +4908,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4936,7 +4937,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4966,7 +4967,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5016,7 +5017,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5036,7 +5037,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' doe
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5050,7 +5051,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5072,7 +5073,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5096,7 +5097,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not hav
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5109,7 +5110,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a pr
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -13510,6 +13511,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Weighing_VisitorVoucherID">
+          <End Role="VisitorVoucher" Type="Self.VisitorVoucher" Multiplicity="0..1" />
+          <End Role="Weighing" Type="Self.Weighing" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VisitorVoucher">
+              <PropertyRef Name="VisitorVoucherID" />
+            </Principal>
+            <Dependent Role="Weighing">
+              <PropertyRef Name="VisitorVoucherID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="PreviousPartslistID_PartslistID">
           <End Role="Partslist" Type="Self.Partslist" Multiplicity="0..1" />
           <End Role="Partslist1" Type="Self.Partslist" Multiplicity="*" />
@@ -16713,6 +16726,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="PickingPos" EntitySet="PickingPos" />
             <End Role="Weighing" EntitySet="Weighing" />
           </AssociationSet>
+          <AssociationSet Name="FK_Weighing_VisitorVoucherID" Association="Self.FK_Weighing_VisitorVoucherID">
+            <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
+            <End Role="Weighing" EntitySet="Weighing" />
+          </AssociationSet>
           <AssociationSet Name="PreviousPartslistID_PartslistID" Association="Self.PreviousPartslistID_PartslistID">
             <End Role="Partslist" EntitySet="Partslist" />
             <End Role="Partslist1" EntitySet="Partslist" />
@@ -19729,6 +19746,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="PartslistPos" EntitySet="PartslistPos" />
             <End Role="PartslistPosRelation" EntitySet="PartslistPosRelation" />
           </AssociationSet>
+          <AssociationSet Name="FK_Weighing_VisitorVoucherID" Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID">
+            <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
+            <End Role="Weighing" EntitySet="Weighing" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -22464,7 +22485,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="TargetMaterial" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_Material" FromRole="MaterialWFRelation" ToRole="Material" />
           <NavigationProperty Name="SourceMaterial" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_Material1" FromRole="MaterialWFRelation" ToRole="Material" />
           <NavigationProperty Name="MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_MaterialWF" FromRole="MaterialWFRelation" ToRole="MaterialWF" />
-          <NavigationProperty Name="PartslistPosRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" FromRole="MaterialWFRelation" ToRole="PartslistPosRelation" />
+          <NavigationProperty Name="PartslistPosRelation_MaterialWFRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" FromRole="MaterialWFRelation" ToRole="PartslistPosRelation" />
         </EntityType>
         <EntityType Name="MDBalancingMode">
           <Key>
@@ -25190,6 +25211,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Visitor" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorID" FromRole="VisitorVoucher" ToRole="Visitor" />
           <NavigationProperty Name="TrailerFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" FromRole="VisitorVoucher" ToRole="Facility" />
           <NavigationProperty Name="VehicleFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" FromRole="VisitorVoucher" ToRole="Facility" />
+          <NavigationProperty Name="Weighing" Relationship="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" FromRole="VisitorVoucher" ToRole="Weighing" />
         </EntityType>
         <EntityType Name="Weighing">
           <Key>
@@ -25214,6 +25236,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="LabOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_LabOrderPosID" FromRole="Weighing" ToRole="LabOrderPos" />
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="Weighing" ToRole="OutOrderPos" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_Weighing_PickingPosID" FromRole="Weighing" ToRole="PickingPos" />
+          <Property Name="VisitorVoucherID" Type="Guid" />
+          <NavigationProperty Name="VisitorVoucher" Relationship="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" FromRole="Weighing" ToRole="VisitorVoucher" />
         </EntityType>
         <Association Name="FK_ACChangeLog_ACClass">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="1" />
@@ -31749,7 +31773,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -32723,8 +32747,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PartslistPos1_ParentPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistPosSplit_PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
           <NavigationProperty Name="ProdOrderPartslistPos_BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="PartslistPosRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
-          <NavigationProperty Name="PartslistPosRelation1" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
+          <NavigationProperty Name="PartslistPosRelation_TargetPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
+          <NavigationProperty Name="PartslistPosRelation_SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
         </EntityType>
         <Association Name="FK_PartslistPos_MaterialID">
           <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
@@ -34544,8 +34568,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MaterialWFRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" FromRole="PartslistPosRelation" ToRole="MaterialWFRelation" />
-          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPos1" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
+          <NavigationProperty Name="TargetPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
+          <NavigationProperty Name="SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
         </EntityType>
         <Association Name="FK_PartslistPosRelation_MaterialWFRelation">
           <End Type="iPlusMESV4_Model.MaterialWFRelation" Role="MaterialWFRelation" Multiplicity="0..1" />
@@ -34580,6 +34604,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="PartslistPosRelation">
               <PropertyRef Name="SourcePartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Weighing_VisitorVoucherID">
+          <End Type="iPlusMESV4_Model.VisitorVoucher" Role="VisitorVoucher" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Weighing" Role="Weighing" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VisitorVoucher">
+              <PropertyRef Name="VisitorVoucherID" />
+            </Principal>
+            <Dependent Role="Weighing">
+              <PropertyRef Name="VisitorVoucherID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -39104,6 +39140,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="Weighing">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Weighing">
               <MappingFragment StoreEntitySet="Weighing">
+                <ScalarProperty Name="VisitorVoucherID" ColumnName="VisitorVoucherID" />
                 <ScalarProperty Name="LabOrderPosID" ColumnName="LabOrderPosID" />
                 <ScalarProperty Name="PickingPosID" ColumnName="PickingPosID" />
                 <ScalarProperty Name="InOrderPosID" ColumnName="InOrderPosID" />
@@ -40805,6 +40842,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" />
       </Diagram>
     </Diagrams>
   </Designer>
