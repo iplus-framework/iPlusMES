@@ -66,7 +66,8 @@
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEPump.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAESamplePiLightBox.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAESampleMagazine.cs" />
-    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScaleCalibratable.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScaleTotalizingMES.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScaleCalibratableMES.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScrew.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAETransport.cs" />
     <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />

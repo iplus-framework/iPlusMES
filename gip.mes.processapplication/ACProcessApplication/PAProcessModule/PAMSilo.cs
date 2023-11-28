@@ -600,19 +600,6 @@ namespace gip.mes.processapplication
             }
         }
 
-        public bool IsSimulationOn
-        {
-            get
-            {
-                if (ACOperationMode != ACOperationModes.Live)
-                    return true;
-                if (ApplicationManager == null)
-                    return false;
-                return ApplicationManager.IsSimulationOn;
-            }
-        }
-
-
         #endregion
 
 

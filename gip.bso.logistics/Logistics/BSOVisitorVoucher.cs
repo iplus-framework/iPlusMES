@@ -823,20 +823,33 @@ namespace gip.bso.logistics
             }
         }
 
+        IEnumerable<Weighing> _WeighingList = null;
+
         [ACPropertyList(659, "Weighings")]
         public IEnumerable<Weighing> WeighingList
         {
             get
             {
-                if (this.SelectedVisitorVoucher == null)
+                if (   this.SelectedVisitorVoucher == null
+                    || this.SelectedVisitorVoucher.EntityState == EntityState.Added
+                    || this.SelectedVisitorVoucher.EntityState == EntityState.Detached)
                     return null;
-                //if (this.SelectedVisitorVoucher != null
-                //        && this.SelectedVisitorVoucher.EntityState != EntityState.Added
-                //        && this.SelectedVisitorVoucher.EntityState != EntityState.Detached)
-                //    this.SelectedVisitorVoucher.WeighingID;
-                //return SelectedOutwardPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.OrderBy(c => c.FacilityBookingNo).ToList();
-                return null;
+                if (_WeighingList != null)
+                    return _WeighingList;
+                _WeighingList = SelectedVisitorVoucher.Weighing_VisitorVoucher.OrderBy(c => c.StartDate).ToList();
+                return _WeighingList;
             }
+        }
+
+        protected void RefreshWeighingList(bool forceRefresh = false)
+        {
+            if (forceRefresh && SelectedVisitorVoucher !=  null)
+            {
+                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoLoad();
+                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoRefresh();
+            }
+            _WeighingList = null;
+            OnPropertyChanged(nameof(WeighingList));
         }
 
         #endregion
@@ -912,6 +925,7 @@ namespace gip.bso.logistics
             LoadEntity<VisitorVoucher>(requery, () => SelectedVisitorVoucher, () => CurrentVisitorVoucher, c => CurrentVisitorVoucher = c,
                         DatabaseApp.VisitorVoucher
                         .Include(c => c.DeliveryNote_VisitorVoucher)
+                        .Include(c => c.Weighing_VisitorVoucher)
                         .Where(c => c.VisitorVoucherID == SelectedVisitorVoucher.VisitorVoucherID));
             if (CurrentVisitorVoucher != null)
             {
@@ -1237,8 +1251,44 @@ namespace gip.bso.logistics
 
             RefreshUnAssignedPickingList(forceQueryFromDb);
             OnPropertyChanged("PickingList");
+
+            RefreshWeighingList();
         }
 
+        #endregion
+
+        #region Weighing
+        [ACMethodInfo("Dialog", "en{'Register Weight'}de{'Registriere Gewicht'}", (short)500)]
+        public void RegisterWeight()
+        {
+            if (!IsEnabledRegisterWeight())
+                return;
+            string acUrl = SelectedScale.GetACUrlComponent();
+            if (String.IsNullOrEmpty(acUrl))
+                return;
+            ACComponent scaleComp = Root.ACUrlCommand(acUrl) as ACComponent;
+            if (scaleComp == null || scaleComp.ConnectionState == ACObjectConnectionState.DisConnected)
+            {
+                // TODO Message
+                Messages.Error(this, "No connection", true);
+                return;
+            }
+            Msg result = scaleComp.ACUrlCommand("!RegisterAlibiWeightEntity", new PAOrderInfoEntry() { EntityName = nameof(VisitorVoucher), EntityID = CurrentVisitorVoucher.VisitorVoucherID }) as Msg;
+            if (result == null)
+                return;
+            if (result.MessageLevel > eMsgLevel.Info)
+            {
+                Messages.Msg(result);
+                return;
+            }
+
+            RefreshWeighingList(true);
+        }
+
+        public bool IsEnabledRegisterWeight()
+        {
+            return SelectedScale != null;
+        }
         #endregion
 
         #endregion
@@ -1250,107 +1300,113 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "IsEnabledSearch":
+                case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
-                case "NewInDeliveryNote":
+                case nameof(NewInDeliveryNote):
                     NewInDeliveryNote();
                     return true;
-                case "IsEnabledNewInDeliveryNote":
+                case nameof(IsEnabledNewInDeliveryNote):
                     result = IsEnabledNewInDeliveryNote();
                     return true;
-                case "NewOutDeliveryNote":
+                case nameof(NewOutDeliveryNote):
                     NewOutDeliveryNote();
                     return true;
-                case "IsEnabledNewOutDeliveryNote":
+                case nameof(IsEnabledNewOutDeliveryNote):
                     result = IsEnabledNewOutDeliveryNote();
                     return true;
-                case "NewVisitor":
+                case nameof(NewVisitor):
                     NewVisitor();
                     return true;
-                case "IsEnabledNewVisitor":
+                case nameof(IsEnabledNewVisitor):
                     result = IsEnabledNewVisitor();
                     return true;
-                case "CheckIn":
+                case nameof(CheckIn):
                     CheckIn();
                     return true;
-                case "IsEnabledCheckIn":
+                case nameof(IsEnabledCheckIn):
                     result = IsEnabledCheckIn();
                     return true;
-                case "CheckOut":
+                case nameof(CheckOut):
                     CheckOut();
                     return true;
-                case "IsEnabledCheckOut":
+                case nameof(IsEnabledCheckOut):
                     result = IsEnabledCheckOut();
                     return true;
-                case "AssignDeliveryNote":
+                case nameof(AssignDeliveryNote):
                     AssignDeliveryNote();
                     return true;
-                case "IsEnabledAssignDeliveryNote":
+                case nameof(IsEnabledAssignDeliveryNote):
                     result = IsEnabledAssignDeliveryNote();
                     return true;
-                case "UnassignDeliveryNote":
+                case nameof(UnassignDeliveryNote):
                     UnassignDeliveryNote();
                     return true;
-                case "IsEnabledUnassignDeliveryNote":
+                case nameof(IsEnabledUnassignDeliveryNote):
                     result = IsEnabledUnassignDeliveryNote();
                     return true;
-                case "AssignTourplan":
+                case nameof(AssignTourplan):
                     AssignTourplan();
                     return true;
-                case "IsEnabledAssignTourplan":
+                case nameof(IsEnabledAssignTourplan):
                     result = IsEnabledAssignTourplan();
                     return true;
-                case "UnassignTourplan":
+                case nameof(UnassignTourplan):
                     UnassignTourplan();
                     return true;
-                case "IsEnabledUnassignTourplan":
+                case nameof(IsEnabledUnassignTourplan):
                     result = IsEnabledUnassignTourplan();
                     return true;
-                case "AssignPicking":
+                case nameof(AssignPicking):
                     AssignPicking();
                     return true;
-                case "IsEnabledAssignPicking":
+                case nameof(IsEnabledAssignPicking):
                     result = IsEnabledAssignPicking();
                     return true;
-                case "UnassignPicking":
+                case nameof(UnassignPicking):
                     UnassignPicking();
                     return true;
-                case "IsEnabledUnassignPicking":
+                case nameof(IsEnabledUnassignPicking):
                     result = IsEnabledUnassignPicking();
+                    return true;
+                case nameof(RegisterWeight):
+                    RegisterWeight();
+                    return true;
+                case nameof(IsEnabledRegisterWeight):
+                    result = IsEnabledRegisterWeight();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

@@ -806,18 +806,6 @@ namespace gip2006.variobatch.processapplication
         #endregion
 
         #region internal
-        public bool IsSimulationOn
-        {
-            get
-            {
-                if (ACOperationMode != ACOperationModes.Live)
-                    return true;
-                if (ApplicationManager == null)
-                    return false;
-                return ApplicationManager.IsSimulationOn;
-            }
-        }
-
         public bool IsReadyForSending
         {
             get

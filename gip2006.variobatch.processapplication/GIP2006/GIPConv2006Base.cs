@@ -318,18 +318,6 @@ namespace gip2006.variobatch.processapplication
         #endregion
 
         #region Read-Values from PLC
-        public bool IsSimulationOn
-        {
-            get
-            {
-                if (ACOperationMode != ACOperationModes.Live)
-                    return true;
-                if (ApplicationManager == null)
-                    return false;
-                return ApplicationManager.IsSimulationOn;
-            }
-        }
-
         public bool HasConnectedSession
         {
             get

@@ -127,7 +127,7 @@ namespace gip.mes.processapplication
             //if(ScaleCalibratable == null)
             //    return new Msg("ScaleCalibratable is null!", this, eMsgLevel.Error, ClassName, "RegisterSampleWeight(10)", 88);
 
-            //Guid? weighingID = ScaleCalibratable.OnRegisterAlibiWeight(null);
+            //Guid? weighingID = ScaleCalibratable.OnRegisterAlibiWeight();
 
             //if(!weighingID.HasValue)
             //    return new Msg("Problem with register alibi weight. Please ensure that scale is stillstand or check the alarms!", this, eMsgLevel.Error, ClassName, "RegisterSampleWeight(20)", 93);
@@ -138,7 +138,7 @@ namespace gip.mes.processapplication
             double actualWeight = 0.0;
             if (calibScale != null)
             {
-                Msg msg = calibScale.OnRegisterAlibiWeight(null);
+                Msg msg = calibScale.OnRegisterAlibiWeight();
                 if (msg != null)
                 {
                     OnNewAlarmOccurred(FunctionError, msg.Message);
