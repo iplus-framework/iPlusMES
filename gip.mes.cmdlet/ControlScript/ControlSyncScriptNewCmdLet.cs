@@ -50,16 +50,22 @@ namespace gip.mes.cmdlet.ControlScript
         public bool IsExportACClassConfig { get; private set; }
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public bool IsExportACClassMessage { get; private set; }
+        public bool IsExportACClassMessage { get; private set; } = true;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public bool IsExportACClassText { get; private set; }
+        public bool IsExportACClassText { get; private set; } = true;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public bool IsExportACClassDesign { get; private set; }
+        public bool IsExportACClassDesign { get; private set; } = true;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public DateTime? ExportFromTime { get; set; }
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public SwitchParameter FromToday
+        {
+            get; set;
+        }
 
         #endregion
 
@@ -100,10 +106,15 @@ namespace gip.mes.cmdlet.ControlScript
             exportCommand.IsExportACClassMessage = IsExportACClassMessage;
             exportCommand.IsExportACClassText = IsExportACClassText;
             exportCommand.IsExportACClassDesign = IsExportACClassDesign;
-            if (ExportFromTime != null)
+            if (ExportFromTime != null || FromToday.IsPresent)
             {
+                DateTime dateTime = DateTime.Now.Date;
+                if (ExportFromTime != null)
+                {
+                    dateTime = ExportFromTime.Value;
+                }
                 exportCommand.UseExportFromTime = true;
-                exportCommand.ExportFromTime = ExportFromTime.Value;
+                exportCommand.ExportFromTime = dateTime;
             }
         }
     }
