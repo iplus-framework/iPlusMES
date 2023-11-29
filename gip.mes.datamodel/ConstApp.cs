@@ -117,10 +117,13 @@
         public const string OptStockQuantity = "en{'Opt.Stock Quantity'}de{'Opt.Lagermenge'}";
 
         public const string TotalQuantity = "en{'Total Quantity'}de{'Gesamtmenge'}";
+        public const string TotalReservedQuantity = "en{'Total Reserved Quantity'}de{'Gesamte reservierte Menge'}";
         public const string BlockedQuantity = "en{'Blocked Quantity'}de{'Gesperrte Menge'}";
         public const string AbsoluteBlockedQuantity = "en{'Absolute Blocked Quantity'}de{'Absolut gesperrte Menge'}";
         public const string FreeQuantity = "en{'Free Quantity'}de{'Freie Menge'}";
         public const string NewPlannedStock = "en{'New Planned Stock'}de{'Neuer Planbestand'}";
+        public const string AssignedQuantity = "en{'Assigned Quantity'}de{'Zugewiesene Menge'}";
+        public const string TotalAssignedQuantity = "en{'Total Assigned Quantity'}de{'Gesamte zugewiesene Menge'}";
 
         public const string DayInward = "en{'Day Inward Qty.'}de{'Tageszugang'}";
         public const string DayInwardAmb = "en{'Day Inward Qty Ambient'}de{'Tageszugang ambient'}";

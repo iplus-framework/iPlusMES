@@ -27,7 +27,7 @@ namespace gip.mes.facility
         }
 
         private double _TotalReservedQuantity;
-        [ACPropertyInfo(2, "", ConstApp.BlockedQuantity)]
+        [ACPropertyInfo(2, "", ConstApp.TotalReservedQuantity)]
         public double TotalReservedQuantity
         {
             get

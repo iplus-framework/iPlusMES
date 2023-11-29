@@ -69,13 +69,16 @@ namespace gip.mes.facility
             }
             set
             {
-                if(_FacilityReservationOwner != null)
+                if (_FacilityReservationOwner != null)
                 {
                     INotifyPropertyChanged notifyPropertyChanged = _FacilityReservationOwner as INotifyPropertyChanged;
                     notifyPropertyChanged.PropertyChanged -= _FacilityReservationOwner_OnPropertyChanged;
                 }
                 if (_FacilityReservationOwner != value)
                 {
+                    _FacilityReservationList = null;
+                    OnPropertyChanged(nameof(FacilityReservationList));
+
                     Material = null;
                     FacilityReservationCollection = null;
                     _FacilityReservationOwner = value;
@@ -139,7 +142,7 @@ namespace gip.mes.facility
         }
 
         private double _EditorReserverdQuantityUOM;
-        [ACPropertyInfo(999, nameof(EditorReserverdQuantity), "en{'Quantity for reservation'}de{'Menge zur Reservierung'}")]
+        [ACPropertyInfo(999, nameof(EditorReserverdQuantity), ConstApp.TotalAssignedQuantity)]
         public double EditorReserverdQuantity
         {
             get
@@ -218,7 +221,7 @@ namespace gip.mes.facility
             facilityReservationModel.Material = facilityReservation.Material;
             facilityReservationModel.FacilityLot = facilityReservation.FacilityLot;
             facilityReservationModel.FacilityReservation = facilityReservation;
-            facilityReservationModel.ReservedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
+            facilityReservationModel.AssignedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
             facilityReservationModel.OriginalReservedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
             return facilityReservationModel;
         }
@@ -267,7 +270,7 @@ namespace gip.mes.facility
 
         public bool IsEnabledAddFaciltiyReservation()
         {
-            return 
+            return
                 FacilityReservationOwner != null
                 && Material != null;
         }
@@ -286,9 +289,9 @@ namespace gip.mes.facility
             FacilityReservationList.Remove(SelectedFacilityReservation);
             OnPropertyChanged(nameof(FacilityReservationList));
             SelectedFacilityReservation = FacilityReservationList.FirstOrDefault();
-            if(SelectedFacilityReservation ==null)
+            if (SelectedFacilityReservation == null)
             {
-                if(OnReservationChanged != null)
+                if (OnReservationChanged != null)
                 {
                     OnReservationChanged();
                 }
@@ -365,7 +368,7 @@ namespace gip.mes.facility
                     .Select(c => c.OutwardQuantity)
                     .Sum();
                 }
-                else if(FacilityReservationOwner is PickingPos)
+                else if (FacilityReservationOwner is PickingPos)
                 {
                     reservationModelBase.TotalReservedQuantity =
                     databaseApp
@@ -384,7 +387,7 @@ namespace gip.mes.facility
                     .Select(c => c.OutwardQuantity)
                     .Sum();
                 }
-                else if(FacilityReservationOwner is OutOrderPos)
+                else if (FacilityReservationOwner is OutOrderPos)
                 {
                     reservationModelBase.TotalReservedQuantity =
                    databaseApp
@@ -418,7 +421,7 @@ namespace gip.mes.facility
                     .DefaultIfEmpty()
                     .Sum();
 
-                reservationModelBase.FreeQuantity = reservationModelBase.FreeQuantity - reservationModelBase.TotalReservedQuantity + reservationModelBase.UsedQuantity + (calculateReservedQuantity ? model.ReservedQuantity : 0);
+                reservationModelBase.FreeQuantity = reservationModelBase.FreeQuantity - reservationModelBase.TotalReservedQuantity + reservationModelBase.UsedQuantity + (calculateReservedQuantity ? model.AssignedQuantity : 0);
 
             }
             return reservationModelBase;
@@ -431,7 +434,7 @@ namespace gip.mes.facility
             {
                 if (reservationModels != null)
                 {
-                    missingQuantity = missingQuantity - reservationModels.Sum(c => c.ReservedQuantity);
+                    missingQuantity = missingQuantity - reservationModels.Sum(c => c.AssignedQuantity);
                 }
             }
             return missingQuantity;
@@ -475,13 +478,36 @@ namespace gip.mes.facility
 
         private void FacilityReservationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            FacilityReservationModel item = sender as FacilityReservationModel;
             switch (e.PropertyName)
             {
-                case nameof(FacilityReservationModel.ReservedQuantity):
-                    EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.ReservedQuantity).DefaultIfEmpty().Sum();
+                case nameof(FacilityReservationModel.AssignedQuantity):
+                    EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
                     break;
                 case nameof(FacilityReservationModel.IsSelected):
-                    EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.ReservedQuantity).DefaultIfEmpty().Sum();
+                    if(item.IsSelected)
+                    {
+                        if(DiffReservationQuantityUOM > 0)
+                        {
+                            if (item.FreeQuantity >= DiffReservationQuantityUOM)
+                            {
+                                item.AssignedQuantity = DiffReservationQuantityUOM;
+                            }
+                            else
+                            {
+                                item.AssignedQuantity = item.FreeQuantity;
+                            }
+                        }
+                        else
+                        {
+                            item.AssignedQuantity = 0;
+                        }
+                    }
+                    else
+                    {
+                        item.AssignedQuantity = 0;
+                    }
+                    EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
                     break;
             }
         }
@@ -511,7 +537,7 @@ namespace gip.mes.facility
 
             facilityReservation.Material = facilityReservationModel.Material;
             facilityReservation.FacilityLot = facilityReservationModel.FacilityLot;
-            facilityReservation.ReservedQuantityUOM = facilityReservationModel.ReservedQuantity;
+            facilityReservation.ReservedQuantityUOM = facilityReservationModel.AssignedQuantity;
             facilityReservationModel.FacilityReservation = facilityReservation;
 
             return facilityReservationModel;
@@ -591,8 +617,8 @@ namespace gip.mes.facility
             {
                 double reservedQuantity =
                     FacilityLotList
-                    .Where(c => c.IsSelected && c.ReservedQuantity > 0)
-                    .Sum(c => c.ReservedQuantity);
+                    .Where(c => c.IsSelected && c.AssignedQuantity > 0)
+                    .Sum(c => c.AssignedQuantity);
                 if (ForReservationQuantityUOM < reservedQuantity)
                 {
                     // Error50603 A larger quantity than required has been reserved! Reserved quantity {0}; Quantity required: {1}
@@ -605,7 +631,7 @@ namespace gip.mes.facility
                         FacilityLotList
                         .Where(c =>
                             c.IsSelected
-                            && !IsNegligibleQuantity(TargetQuantityUOM, c.ReservedQuantity, Const_ZeroQuantityCheckFactor)
+                            && !IsNegligibleQuantity(TargetQuantityUOM, c.AssignedQuantity, Const_ZeroQuantityCheckFactor)
                             )
                         .ToList();
 
@@ -638,7 +664,9 @@ namespace gip.mes.facility
         {
             return
                 FacilityLotList != null
-                && FacilityLotList.Any();
+                && FacilityLotList.Any()
+                && FacilityLotList.Any(c => c.IsSelected)
+                && EditorReserverdQuantity > 0;
         }
 
         /// <summary>
@@ -759,7 +787,7 @@ namespace gip.mes.facility
 
             facilityReservations = DoDistributeQuantity(facilityReservations, ForReservationQuantityUOM);
 
-            EditorReserverdQuantity = facilityReservations.Where(c => c.IsSelected).Select(c => c.ReservedQuantity).DefaultIfEmpty().Sum();
+            EditorReserverdQuantity = facilityReservations.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
 
             return facilityReservations;
         }
@@ -770,7 +798,7 @@ namespace gip.mes.facility
             {
                 foreach (FacilityReservationModel facilityReservation in facilityReservations)
                 {
-                    facilityReservation._ReservedQuantity = 0;
+                    facilityReservation._AssignedQuantity = 0;
                     if (facilityReservation.OriginalValues != null)
                     {
                         foreach (KeyValuePair<string, double> originalValue in facilityReservation.OriginalValues)
@@ -807,15 +835,15 @@ namespace gip.mes.facility
                 {
                     if (restQuantity >= facilityReservation.FreeQuantity)
                     {
-                        facilityReservation._ReservedQuantity = facilityReservation.FreeQuantity;
-                        facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
+                        facilityReservation._AssignedQuantity = facilityReservation.FreeQuantity;
+                        facilityReservation.TotalReservedQuantity += facilityReservation.AssignedQuantity;
                         facilityReservation.FreeQuantity = 0;
-                        restQuantity -= facilityReservation.ReservedQuantity;
+                        restQuantity -= facilityReservation.AssignedQuantity;
                     }
                     else
                     {
-                        facilityReservation._ReservedQuantity = restQuantity;
-                        facilityReservation.TotalReservedQuantity += facilityReservation.ReservedQuantity;
+                        facilityReservation._AssignedQuantity = restQuantity;
+                        facilityReservation.TotalReservedQuantity += facilityReservation.AssignedQuantity;
                         facilityReservation.FreeQuantity -= restQuantity;
                         restQuantity = 0;
                     }
@@ -905,7 +933,7 @@ namespace gip.mes.facility
                     case nameof(AddFaciltiyReservation):
                         List<FacilityReservationModel> reservations = e.Result as List<FacilityReservationModel>;
                         DoFinishLoadFacilityLotList(reservations);
-                        if(OnReservationChanged != null)
+                        if (OnReservationChanged != null)
                         {
                             OnReservationChanged();
                         }

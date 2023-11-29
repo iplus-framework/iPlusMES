@@ -332,7 +332,7 @@
     <None Include="VBControlScripts\2022-10-26 10-41_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2023-11-08 15-07_aagincic.zip">
+    <None Include="VBControlScripts\2023-11-29 21-40_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
