@@ -282,32 +282,32 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Query
-        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(string materialNo, string lotNo)
+        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(Guid materialID, string lotNo)
         {
             return c=>
                     c.Material != null
-                    && c.Material.MaterialNo == materialNo
+                    && c.MaterialID == materialID
                     && c.FacilityLot != null
                     && c.FacilityLot.LotNo == lotNo
                     && c.ProdOrderPartslistPos != null
                     && c.ProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot;
         }
 
-        public static Func<FacilityReservation, bool> PickingPosReservations(string materialNo, string lotNo)
+        public static Func<FacilityReservation, bool> PickingPosReservations(Guid materialID, string lotNo)
         {
             return c =>
                     c.Material != null
-                    && c.Material.MaterialNo == materialNo
+                    && c.MaterialID == materialID
                     && c.FacilityLot != null
                     && c.FacilityLot.LotNo == lotNo
                     && c.PickingPos != null;
         }
 
-        public static Func<FacilityReservation, bool> OutOrderPosReservations(string materialNo, string lotNo)
+        public static Func<FacilityReservation, bool> OutOrderPosReservations(Guid materialID, string lotNo)
         {
             return c =>
                     c.Material != null
-                    && c.Material.MaterialNo == materialNo
+                    && c.MaterialID == materialID
                     && c.FacilityLot != null
                     && c.FacilityLot.LotNo == lotNo
                     && c.OutOrderPos != null;
