@@ -354,7 +354,7 @@ namespace gip.mes.facility
                     reservationModelBase.TotalReservedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
                     .Select(c => c.ReservedQuantityUOM ?? 0)
                     .DefaultIfEmpty()
                     .Sum();
@@ -362,7 +362,7 @@ namespace gip.mes.facility
                     reservationModelBase.UsedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
                     .Select(c => c.ProdOrderPartslistPos)
                     .SelectMany(c => c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
                     .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation)
@@ -374,7 +374,7 @@ namespace gip.mes.facility
                     reservationModelBase.TotalReservedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
                     .Select(c => c.ReservedQuantityUOM ?? 0)
                     .DefaultIfEmpty()
                     .Sum();
@@ -382,7 +382,7 @@ namespace gip.mes.facility
                     reservationModelBase.UsedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
                     .Select(c => c.PickingPos)
                     .SelectMany(c => c.FacilityBookingCharge_PickingPos)
                     .Select(c => c.OutwardQuantity)
@@ -393,7 +393,7 @@ namespace gip.mes.facility
                     reservationModelBase.TotalReservedQuantity =
                    databaseApp
                    .FacilityReservation
-                   .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
+                   .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
                    .Select(c => c.ReservedQuantityUOM ?? 0)
                    .DefaultIfEmpty()
                    .Sum();
@@ -401,7 +401,7 @@ namespace gip.mes.facility
                     reservationModelBase.UsedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
                     .Select(c => c.OutOrderPos)
                     .SelectMany(c => c.FacilityBookingCharge_OutOrderPos)
                     .Select(c => c.OutwardQuantity)

@@ -282,37 +282,37 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Query
-        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(string materialNo, string lotNo)
+        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(Guid materialID, Guid lotID)
         {
             return c=>
                     !c.VBiACClassID.HasValue
-                    && c.Material != null
-                    && c.Material.MaterialNo == materialNo
-                    && c.FacilityLot != null
-                    && c.FacilityLot.LotNo == lotNo
+                    && c.MaterialID.HasValue
+                    && c.MaterialID == materialID
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
                     && c.ProdOrderPartslistPos != null
                     && c.ProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot;
         }
 
-        public static Func<FacilityReservation, bool> PickingPosReservations(string materialNo, string lotNo)
+        public static Func<FacilityReservation, bool> PickingPosReservations(Guid materialID, Guid lotID)
         {
             return c =>
                     !c.VBiACClassID.HasValue
-                    && c.Material != null
-                    && c.Material.MaterialNo == materialNo
-                    && c.FacilityLot != null
-                    && c.FacilityLot.LotNo == lotNo
+                    && c.MaterialID.HasValue
+                    && c.MaterialID == materialID
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
                     && c.PickingPos != null;
         }
 
-        public static Func<FacilityReservation, bool> OutOrderPosReservations(string materialNo, string lotNo)
+        public static Func<FacilityReservation, bool> OutOrderPosReservations(Guid materialID, Guid lotID)
         {
             return c =>
                     !c.VBiACClassID.HasValue
-                    && c.Material != null
-                    && c.Material.MaterialNo == materialNo
-                    && c.FacilityLot != null
-                    && c.FacilityLot.LotNo == lotNo
+                    && c.MaterialID.HasValue
+                    && c.MaterialID == materialID
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
                     && c.OutOrderPos != null;
         }
 
