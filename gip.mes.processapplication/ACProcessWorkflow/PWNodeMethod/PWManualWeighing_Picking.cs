@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.processapplication
 {
@@ -408,41 +409,45 @@ namespace gip.mes.processapplication
 
         private IEnumerable<FacilityCharge> GetFacilityChargesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos)
         {
-            Guid[] facilities = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos).Select(c => c.FacilityID).ToArray();
-
-            if (ACFacilityManager == null)
+            QrySilosResult qrySilosResult = null;
+            IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> result = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos, out qrySilosResult).ToArray();
+            if (result == null || !result.Any())
                 return null;
+            return result.SelectMany(c => c.FacilityCharges.Where(d => !qrySilosResult.HasLotReservations || d.IsReservedLot).Select(d => d.Quant)).ToArray();
 
-            return ACFacilityManager.ManualWeighingFacilityChargeListQuery(dbApp, facilities, pickingPos.Material.MaterialID);
+            //if (ACFacilityManager == null)
+            //return null;
+
+            //return ACFacilityManager.ManualWeighingFacilityChargeListQuery(dbApp, facilities, pickingPos.Material.MaterialID);
         }
 
-        public IEnumerable<Facility> GetAvailableFacilitiesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos)
+        public IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> GetAvailableFacilitiesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos, out QrySilosResult qrySilosResult)
         {
             if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PickingManager == null)
             {
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
-            facility.ACPartslistManager.QrySilosResult facilities;
+            qrySilosResult = null;
 
             core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
             IEnumerable<Route> routes = PickingManager.GetRoutes(pickingPos, dbApp, dbApp.ContextIPlus,
                                         accessAClass,
                                         ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                         null,
-                                        out facilities,
+                                        out qrySilosResult,
                                         null,
                                         null,
                                         null,
                                         false,
                                         ReservationMode);                                                        
 
-            if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
-                return new List<Facility>();
+            if (routes == null || qrySilosResult == null || qrySilosResult.FilteredResult == null || !qrySilosResult.FilteredResult.Any())
+                return new List<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots>();
 
             var routeList = routes.ToList();
 
-            List<Facility> routableFacilities = new List<Facility>();
+            List<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> routableFacilities = new List<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots>();
 
             PAFManualWeighing manWeigh = CurrentExecutingFunction<PAFManualWeighing>();
             if (manWeigh == null)
@@ -472,9 +477,9 @@ namespace gip.mes.processapplication
                         RouteItem source = currRoute.GetRouteSource();
                         if (source != null)
                         {
-                            facility.ACPartslistManager.QrySilosResult.FacilitySumByLots facilityToAdd = facilities.FilteredResult.FirstOrDefault(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID == source.SourceGuid);
+                            facility.ACPartslistManager.QrySilosResult.FacilitySumByLots facilityToAdd = qrySilosResult.FilteredResult.FirstOrDefault(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID == source.SourceGuid);
                             if (facilityToAdd != null)
-                                routableFacilities.Add(facilityToAdd.StorageBin);
+                                routableFacilities.Add(facilityToAdd);
                         }
                     }
                 }
@@ -482,7 +487,7 @@ namespace gip.mes.processapplication
 
             if (!IncludeContainerStores)
             {
-                routableFacilities = routableFacilities.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).ToList();
+                routableFacilities = routableFacilities.Where(c => c.StorageBin.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).ToList();
             }
 
             return routableFacilities;
@@ -768,8 +773,11 @@ namespace gip.mes.processapplication
                             else if (facilityPreBooking != null)
                             {
                                 bookingParam.IgnoreIsEnabled = true;
-                                ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
-                                if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                ACMethodEventArgs resultBooking = null;
+                                bool canExecutePosting = CanExecutePosting(bookingParam);
+                                if (canExecutePosting)
+                                    resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
+                                if (resultBooking != null && (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible))
                                 {
                                     msg = new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(60)", 2045);
                                     ActivateProcessAlarm(msg, false);
@@ -777,7 +785,7 @@ namespace gip.mes.processapplication
                                 }
                                 else
                                 {
-                                    if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
+                                    if (resultBooking != null && (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings()))
                                     {
                                         collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
                                         msg = new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(70)", 2053);
@@ -785,16 +793,20 @@ namespace gip.mes.processapplication
                                         changePosState = false;
                                     }
                                     changePosState = true;
-                                    if (bookingParam.ValidMessage.IsSucceded())
+                                    if (   (resultBooking == null && !canExecutePosting) 
+                                        || bookingParam.ValidMessage.IsSucceded())
                                     {
-                                        facilityPreBooking.DeleteACObject(dbApp, true);
-                                        pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
-                                        msg = dbApp.ACSaveChangesWithRetry();
-                                        if (msg != null)
+                                        if (canExecutePosting)
                                         {
-                                            collectedMessages.AddDetailMessage(msg);
-                                            msg = new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(80)", 2065);
-                                            ActivateProcessAlarmWithLog(msg, false);
+                                            facilityPreBooking.DeleteACObject(dbApp, true);
+                                            pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
+                                            msg = dbApp.ACSaveChangesWithRetry();
+                                            if (msg != null)
+                                            {
+                                                collectedMessages.AddDetailMessage(msg);
+                                                msg = new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(80)", 2065);
+                                                ActivateProcessAlarmWithLog(msg, false);
+                                            }
                                         }
 
                                         //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - changePosState value: " + changePosState.ToString());
@@ -861,5 +873,9 @@ namespace gip.mes.processapplication
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
         }
 
+        public virtual bool CanExecutePosting(ACMethodBooking bookingParam)
+        {
+            return true;
+        }
     }
 }

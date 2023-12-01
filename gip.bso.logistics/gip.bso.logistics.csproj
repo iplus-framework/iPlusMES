@@ -62,6 +62,7 @@
     <Compile Include="BingMaps\BSOBingMaps.cs" />
     <Compile Include="BingMaps\Direction.cs" />
     <Compile Include="BingMaps\MapInteractivity.cs" />
+    <Compile Include="Logistics\BSOPickingTargetSelector.cs" />
     <Compile Include="Logistics\BSOPicking.cs" />
     <Compile Include="Logistics\BSOPickingWorkplace.cs" />
     <Compile Include="Logistics\BSOTourBingMaps.cs" />
@@ -251,6 +252,10 @@
     <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj">
       <Project>{52DC947D-677D-42CA-BCA6-153A4E027272}</Project>
       <Name>gip.mes.facility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
+      <Project>{d1320fb8-333d-4072-880d-bd5137933d2f}</Project>
+      <Name>gip.mes.processapplication</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

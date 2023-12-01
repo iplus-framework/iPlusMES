@@ -104,6 +104,14 @@ namespace gip.mes.processapplication
                 }
             }
 
+            if (!loop.HasValue)
+            {
+                receiveMat = FindPredecessors<IPWNodeReceiveMaterial>(true, c => c is IPWNodeReceiveMaterial, null, 10).FirstOrDefault();
+                if (receiveMat != null)
+                    loop = receiveMat.HasAnyMaterialToProcess;
+            }
+
+
             if (loop.HasValue && loop.Value && _PreviousLoopTime.HasValue)
             {
                 if ((DateTime.Now - _PreviousLoopTime.Value).TotalSeconds < 2)

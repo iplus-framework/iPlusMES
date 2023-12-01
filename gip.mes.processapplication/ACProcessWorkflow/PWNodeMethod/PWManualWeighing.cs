@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Xml;
+using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.processapplication
 {
@@ -2503,8 +2504,11 @@ namespace gip.mes.processapplication
                     PickingPos pickingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == PLPosRelation);
                     if (pickingPos != null)
                     {
-                        IEnumerable<Facility> facilities = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos);
-                        return new ACValueList(facilities.Select(c => new ACValue("ID", c.FacilityID)).ToArray());
+                        QrySilosResult qrySilosResult = null;
+                        IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> result = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos, out qrySilosResult);
+                        if (result == null || !result.Any())
+                            return new ACValueList();
+                        return new ACValueList(result.Select(c => new ACValue("ID", c.StorageBin.FacilityID)).ToArray());
                     }
                 }
             }
@@ -3059,9 +3063,9 @@ namespace gip.mes.processapplication
 
             double? dosingWeight = weighingComponent?.TargetWeight;
 
+            bool interDischargingNeeded = false;
             if (AutoInterDis && weighingComponent != null && IsProduction)
             {
-                bool interDischargingNeeded = false;
                 ProdOrderPartslistPosRelation relation = weighingComponent.PLPosRelation;
                 if (relation != null)
                 {
@@ -3099,7 +3103,10 @@ namespace gip.mes.processapplication
                                 {
                                     // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
                                     // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && dosingWeight > scaleBoundaries.MaxWeightCapacity)
+                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 
+                                        && dosingWeight > scaleBoundaries.MaxWeightCapacity 
+                                        && (   !scaleBoundaries.MinDosingWeight.HasValue 
+                                            || remainingWeight.Value > scaleBoundaries.MinDosingWeight.Value))
                                     {
                                         // Fall A.1:
                                         interDischargingNeeded = true;
@@ -3256,6 +3263,9 @@ namespace gip.mes.processapplication
             }
 
             UpdateCurrentACMethod();
+
+            if (interDischargingNeeded && AutoInterDis)
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
 
             _LastOpenMaterial = CurrentOpenMaterial;
             ExecuteMethod(nameof(OnACMethodSended), acMethod, true, responsibleFunc);
