@@ -714,7 +714,7 @@ namespace gip.bso.logistics
                 return result;
             switch (vbControl.VBContent)
             {
-                case nameof(StartBatchPlan):
+                case nameof(StartWorkflow):
                     result = Global.ControlModes.Enabled;
                     //if (ExternProdOrderPartslist != null)
                     //    result = Global.ControlModes.Hidden;
@@ -729,9 +729,10 @@ namespace gip.bso.logistics
         // Static, if more instances active
         private static bool _IsStartingBatchPlan = false;
         [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
-        public void StartBatchPlan()
+        public void StartWorkflow()
         {
-            if (!IsEnabledStartBatchPlan()) return;
+            if (!IsEnabledStartWorkflow()) 
+                return;
             _IsStartingBatchPlan = true;
             try
             {
@@ -785,7 +786,7 @@ namespace gip.bso.logistics
             }
         }
 
-        public bool IsEnabledStartBatchPlan()
+        public bool IsEnabledStartWorkflow()
         {
             return false;
                 //SelectedBatchPlanForIntermediate != null &&
@@ -1039,8 +1040,11 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case nameof(StartBatchPlan):
-                    StartBatchPlan();
+                case nameof(StartWorkflow):
+                    StartWorkflow();
+                    return true;
+                case nameof(IsEnabledStartWorkflow):
+                    result = IsEnabledStartWorkflow();
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

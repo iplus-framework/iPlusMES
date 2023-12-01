@@ -1281,6 +1281,9 @@ namespace gip.bso.manufacturing
                 case nameof(StartBatchPlan):
                     StartBatchPlan();
                     return true;
+                case nameof(IsEnabledStartBatchPlan):
+                    result = IsEnabledStartBatchPlan();
+                    return true;
                 case nameof(DialogOK):
                     DialogOK();
                     return true;

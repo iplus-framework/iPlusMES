@@ -285,7 +285,8 @@ namespace gip.mes.datamodel
         public static Func<FacilityReservation, bool> ProdOrderComponentReservations(string materialNo, string lotNo)
         {
             return c=>
-                    c.Material != null
+                    !c.VBiACClassID.HasValue
+                    && c.Material != null
                     && c.Material.MaterialNo == materialNo
                     && c.FacilityLot != null
                     && c.FacilityLot.LotNo == lotNo
@@ -296,7 +297,8 @@ namespace gip.mes.datamodel
         public static Func<FacilityReservation, bool> PickingPosReservations(string materialNo, string lotNo)
         {
             return c =>
-                    c.Material != null
+                    !c.VBiACClassID.HasValue
+                    && c.Material != null
                     && c.Material.MaterialNo == materialNo
                     && c.FacilityLot != null
                     && c.FacilityLot.LotNo == lotNo
@@ -306,7 +308,8 @@ namespace gip.mes.datamodel
         public static Func<FacilityReservation, bool> OutOrderPosReservations(string materialNo, string lotNo)
         {
             return c =>
-                    c.Material != null
+                    !c.VBiACClassID.HasValue
+                    && c.Material != null
                     && c.Material.MaterialNo == materialNo
                     && c.FacilityLot != null
                     && c.FacilityLot.LotNo == lotNo
