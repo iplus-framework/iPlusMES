@@ -86,6 +86,7 @@ namespace gip.mes.facility
                     {
                         SetupMaterial(_FacilityReservationOwner);
                         SetupTargetQuantity(_FacilityReservationOwner);
+                        SetupFacilityReservationCollection(_FacilityReservationOwner);
 
                         if (_FacilityReservationOwner != null)
                         {
@@ -106,6 +107,7 @@ namespace gip.mes.facility
             {
                 case nameof(ProdOrderPartslistPos.Material):
                     SetupMaterial(aCObjectEntity);
+                    DeleteReservationsOnMaterialChange();
                     break;
                 case nameof(ProdOrderPartslistPos.TargetQuantityUOM):
                     SetupTargetQuantity(aCObjectEntity);
@@ -115,7 +117,7 @@ namespace gip.mes.facility
 
         public Material Material { get; set; }
 
-        public EntityCollection<FacilityReservation> FacilityReservationCollection { get; set; }
+        public IEnumerable<FacilityReservation> FacilityReservationCollection { get; set; }
 
         public double TargetQuantityUOM { get; set; }
         public double NeededQuantityUOM { get; set; }
@@ -347,13 +349,12 @@ namespace gip.mes.facility
             if (FacilityReservationOwner != null)
             {
 
-
                 if (FacilityReservationOwner is ProdOrderPartslistPos)
                 {
                     reservationModelBase.TotalReservedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialNo, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
                     .Select(c => c.ReservedQuantityUOM ?? 0)
                     .DefaultIfEmpty()
                     .Sum();
@@ -361,7 +362,7 @@ namespace gip.mes.facility
                     reservationModelBase.UsedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialNo, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
                     .Select(c => c.ProdOrderPartslistPos)
                     .SelectMany(c => c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
                     .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation)
@@ -373,7 +374,7 @@ namespace gip.mes.facility
                     reservationModelBase.TotalReservedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialNo, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
                     .Select(c => c.ReservedQuantityUOM ?? 0)
                     .DefaultIfEmpty()
                     .Sum();
@@ -381,7 +382,7 @@ namespace gip.mes.facility
                     reservationModelBase.UsedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialNo, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
                     .Select(c => c.PickingPos)
                     .SelectMany(c => c.FacilityBookingCharge_PickingPos)
                     .Select(c => c.OutwardQuantity)
@@ -392,7 +393,7 @@ namespace gip.mes.facility
                     reservationModelBase.TotalReservedQuantity =
                    databaseApp
                    .FacilityReservation
-                   .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialNo, model.FacilityLot.LotNo))
+                   .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
                    .Select(c => c.ReservedQuantityUOM ?? 0)
                    .DefaultIfEmpty()
                    .Sum();
@@ -400,7 +401,7 @@ namespace gip.mes.facility
                     reservationModelBase.UsedQuantity =
                     databaseApp
                     .FacilityReservation
-                    .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialNo, model.FacilityLot.LotNo))
+                    .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.LotNo))
                     .Select(c => c.OutOrderPos)
                     .SelectMany(c => c.FacilityBookingCharge_OutOrderPos)
                     .Select(c => c.OutwardQuantity)
@@ -1009,6 +1010,12 @@ namespace gip.mes.facility
 
         #region Helper methods
 
+        /// <summary>
+        /// Used in case
+        /// - change related IACObject or 
+        /// - change Material of related IACObject
+        /// </summary>
+        /// <param name="aCObjectEntity"></param>
         private void SetupMaterial(IACObjectEntity aCObjectEntity)
         {
             if (aCObjectEntity is ProdOrderPartslistPos)
@@ -1028,34 +1035,72 @@ namespace gip.mes.facility
             }
         }
 
+        private void DeleteReservationsOnMaterialChange()
+        {
+            if(FacilityReservationList != null && FacilityReservationList.Any())
+            {
+                foreach(FacilityReservationModel item in FacilityReservationList)
+                {
+                    item.FacilityReservation.DeleteACObject(DatabaseApp, false);
+                }
+
+                _FacilityReservationList = null;
+                OnPropertyChanged(nameof(FacilityReservationList));
+            }
+        }
+
+        /// <summary>
+        /// Used in case
+        /// - change related IACObject or 
+        /// - change TargetQuantityUOM of related IACObject
+        /// </summary>
+        /// <param name="aCObjectEntity"></param>
         private void SetupTargetQuantity(IACObjectEntity aCObjectEntity)
         {
             if (aCObjectEntity is ProdOrderPartslistPos)
             {
                 ProdOrderPartslistPos pos = aCObjectEntity as ProdOrderPartslistPos;
-                FacilityReservationCollection = pos.FacilityReservation_ProdOrderPartslistPos;
                 TargetQuantityUOM = pos.TargetQuantityUOM;
                 NeededQuantityUOM = pos.TargetQuantityUOM - pos.ActualQuantityUOM;
             }
             else if (aCObjectEntity is PickingPos)
             {
                 PickingPos pickingPos = aCObjectEntity as PickingPos;
-                FacilityReservationCollection = pickingPos.FacilityReservation_PickingPos;
                 TargetQuantityUOM = pickingPos.TargetQuantityUOM;
                 NeededQuantityUOM = pickingPos.TargetQuantityUOM - pickingPos.ActualQuantityUOM;
             }
             else if (aCObjectEntity is OutOrderPos)
             {
                 OutOrderPos outOrderPos = aCObjectEntity as OutOrderPos;
-                FacilityReservationCollection = outOrderPos.FacilityReservation_OutOrderPos;
                 TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
                 NeededQuantityUOM = outOrderPos.TargetQuantityUOM - outOrderPos.ActualQuantityUOM;
             }
         }
+
+        private void SetupFacilityReservationCollection(IACObjectEntity aCObjectEntity)
+        {
+            if (aCObjectEntity is ProdOrderPartslistPos)
+            {
+                ProdOrderPartslistPos pos = aCObjectEntity as ProdOrderPartslistPos;
+                FacilityReservationCollection = pos.FacilityReservation_ProdOrderPartslistPos.Where(c=>c.VBiACClassID == null && c.MaterialID != null);
+            }
+            else if (aCObjectEntity is PickingPos)
+            {
+                PickingPos pickingPos = aCObjectEntity as PickingPos;
+                FacilityReservationCollection = pickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID == null && c.MaterialID != null);
+            }
+            else if (aCObjectEntity is OutOrderPos)
+            {
+                OutOrderPos outOrderPos = aCObjectEntity as OutOrderPos;
+                FacilityReservationCollection = outOrderPos.FacilityReservation_OutOrderPos.Where(c => c.VBiACClassID == null && c.MaterialID != null);
+            }
+        }
+
         public bool IsNegligibleQuantity(double referentQuantity, double testedQuantity, double factor)
         {
             return (testedQuantity / referentQuantity) < factor;
         }
+
         #endregion
     }
 }
