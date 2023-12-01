@@ -44,31 +44,31 @@ namespace gip.mes.facility
 
         #region Quantities
 
-        public double _ReservedQuantity;
-        [ACPropertyInfo(4, "", ConstApp.ReservedQuantity)]
-        public double ReservedQuantity
+        public double _AssignedQuantity;
+        [ACPropertyInfo(4, "", ConstApp.AssignedQuantity)]
+        public double AssignedQuantity
         {
             get
             {
-                return _ReservedQuantity;
+                return _AssignedQuantity;
             }
             set
             {
-                if (_ReservedQuantity != value)
+                if (_AssignedQuantity != value)
                 {
-                    double difference = value - _ReservedQuantity;
+                    double difference = value - _AssignedQuantity;
                     FreeQuantity = FreeQuantity - difference;
                     TotalReservedQuantity = TotalReservedQuantity + difference;
-                    _ReservedQuantity = value;
+                    _AssignedQuantity = value;
                     if (FacilityReservation != null)
                     {
-                        if (Math.Abs((FacilityReservation.ReservedQuantityUOM ?? 0) - _ReservedQuantity) > double.Epsilon)
+                        if (Math.Abs((FacilityReservation.ReservedQuantityUOM ?? 0) - _AssignedQuantity) > double.Epsilon)
                         {
-                            FacilityReservation.ReservedQuantityUOM = _ReservedQuantity;
+                            FacilityReservation.ReservedQuantityUOM = _AssignedQuantity;
                         }
                         IsRecalculated = false;
                     }
-                    OnPropertyChanged(nameof(ReservedQuantity));
+                    OnPropertyChanged(nameof(AssignedQuantity));
                 }
             }
         }

@@ -106,7 +106,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACClassDesign _DefaultMaterialIcon;
-        internal ACClassDesign DefaultMaterialIcon
+        public ACClassDesign DefaultMaterialIcon
         {
             get
             {
@@ -824,6 +824,7 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected ACClass _TempSelectedSingleDosTargetStorage;
         protected ACClass _SelectedSingleDosTargetStorage;
 
         [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Destination'}de{'Ziel'}")]
@@ -2928,14 +2929,17 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            if (SingleDosTargetStorageList.Count() > 1 && SelectedSingleDosTargetStorage == null)
+            if (SingleDosTargetStorageList.Count() > 1)
             {
-                //todo Select dosing target
+                ShowDialog(this, "TargetStorageDialog");
             }
             else
             {
                 SelectedSingleDosTargetStorage = SingleDosTargetStorageList.FirstOrDefault();
             }
+
+            if (SelectedSingleDosTargetStorage == null)
+                return;
 
             using (Database db = new core.datamodel.Database())
             using (vd.DatabaseApp dbApp = new vd.DatabaseApp(db))
@@ -3047,6 +3051,15 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSingleDosingStart()
         {
             return SelectedSingleDosingItem != null && SingleDosTargetQuantity > 0.0001;
+        }
+
+        [ACMethodInfo("", "en{'Select'}de{'Select'}", 661, true)]
+        public virtual void SelectTargetStorage()
+        {
+            _TempSelectedSingleDosTargetStorage = SelectedSingleDosTargetStorage;
+            this.CloseTopDialog();
+            SelectedSingleDosTargetStorage = _TempSelectedSingleDosTargetStorage;
+            _TempSelectedSingleDosTargetStorage = null;
         }
 
         public virtual MsgWithDetails ValidateSingleDosingStart(ACComponent currentProcessModule)
