@@ -15,35 +15,56 @@
             <ImageBrush x:Name="image" Stretch="Fill"/>
         </vb:VBDockPanel.Background>
 
-        <vb:VBGrid vb:VBDockPanel.Dock="Top">
+        <Grid vb:VBDockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition MinWidth="450" Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-
-            <vb:VBButton x:Name="HamburgerButton" Height="50" Width="50" HorizontalAlignment="Left">
-                <Grid Height="30">
-                    <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                </Grid>
-            </vb:VBButton>
-
-            <vb:VBButton x:Name="FrameGoBack" Click="FrameGoBack_Click" Height="50" Width="50" HorizontalAlignment="Right" Grid.Column="2">
-                <Viewbox Width="20" Height="20">
-                    <Path Data="M7,2 L2,10 L7,18 M2,10 L18,10" Stroke="White" StrokeThickness="2" />
-                </Viewbox>
-            </vb:VBButton>
             
-            <vb:VBButton x:Name="FrameGoFoward" Click="FrameGoFoward_Click" Height="50" Width="50" HorizontalAlignment="Right" Grid.Column="3">
-                <Viewbox Width="20" Height="20">
-                    <Path Data="M13,2 L18,10 L13,18 M18,10 L2,10" Stroke="White" StrokeThickness="2" />
-                </Viewbox>
-            </vb:VBButton>
-        </vb:VBGrid>
-        
+            <vb:VBStatusBar Grid.ColumnSpan="3">
+                <vb:VBStatusBarItem Grid.Column="0">
+                    <vb:VBButton x:Name="HamburgerButton" Height="50" Width="50">
+                        <Grid Height="30">
+                            <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle Width="30" Height="5" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                        </Grid>
+                    </vb:VBButton>
+                </vb:VBStatusBarItem>
+
+                <vb:VBStatusBarItem Grid.Column="1" HorizontalAlignment="Center">
+                    <vb:VBTextBlock x:Name="Title" FontSize="25" HorizontalAlignment="Center" TextAlignment="Center"></vb:VBTextBlock>
+                </vb:VBStatusBarItem>
+
+                <Grid Grid.Column="2" HorizontalAlignment="Right">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <vb:VBStatusBarItem Grid.Column="0">
+                        <vb:VBButton x:Name="FrameGoBack" Click="FrameGoBack_Click" Height="50" Width="50">
+                            <Viewbox Width="20" Height="20">
+                                <Path Data="M7,2 L2,10 L7,18 M2,10 L18,10" Stroke="White" StrokeThickness="2" />
+                            </Viewbox>
+                        </vb:VBButton>
+                    </vb:VBStatusBarItem>
+
+                    <vb:VBStatusBarItem Grid.Column="1">
+                        <vb:VBButton x:Name="FrameGoFoward" Click="FrameGoFoward_Click" Height="50" Width="50">
+                            <Viewbox Width="20" Height="20">
+                                <Path Data="M13,2 L18,10 L13,18 M18,10 L2,10" Stroke="White" StrokeThickness="2" />
+                            </Viewbox>
+                        </vb:VBButton>
+                    </vb:VBStatusBarItem>
+                </Grid>
+                
+            </vb:VBStatusBar>
+        </Grid>
+
+
+
 
         <vb:VBMenu x:Name="MainMenu" vb:VBDockPanel.Dock="Left" HorizontalAlignment="Left" BorderThickness="0" Height="auto" Panel.ZIndex="1" Visibility="Collapsed">
             <vb:VBMenu.ItemsPanel>
@@ -53,7 +74,15 @@
             </vb:VBMenu.ItemsPanel>
         </vb:VBMenu>
 
-         <Grid x:Name="StatusDockPanel" vb:VBDockPanel.Dock="Bottom" Height="56">
+        <vb:VBMenu x:Name="Submenu" vb:VBDockPanel.Dock="Left" HorizontalAlignment="Left" BorderThickness="0" Height="auto" Panel.ZIndex="2" Visibility="Collapsed">
+            <vb:VBMenu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </vb:VBMenu.ItemsPanel>
+        </vb:VBMenu>
+
+        <Grid x:Name="StatusDockPanel" vb:VBDockPanel.Dock="Bottom" Height="56">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>

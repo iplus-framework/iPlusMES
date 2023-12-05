@@ -365,7 +365,7 @@ namespace gip.mes.facility
                                                                            && ( (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               ||(!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (   (!onlyContainer 
-                                                                                    && (   (pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                                    && (   (pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                                         || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                                                || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                                     && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -439,7 +439,7 @@ namespace gip.mes.facility
                                                                            && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (  (!onlyContainer
-                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                                         || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                                                || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                                     && ((pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -523,7 +523,7 @@ namespace gip.mes.facility
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (   (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                           || (  onlyContainer &&  c.Facility.MaterialID.HasValue
                                                                 && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -595,7 +595,7 @@ namespace gip.mes.facility
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (( !onlyContainer
-                                                            && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                            && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                 || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                          || (onlyContainer && c.Facility.MaterialID.HasValue
                                                              && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -681,7 +681,7 @@ namespace gip.mes.facility
                                                                                        && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                                        && (   (!onlyContainer
-                                                                                                && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                                                            || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                                                 && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -755,7 +755,7 @@ namespace gip.mes.facility
                                                                            && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (   (!onlyContainer
-                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                                         || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                                                 || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                                     && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -1098,7 +1098,7 @@ namespace gip.mes.facility
                                                         && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && (    (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                 && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
@@ -1170,7 +1170,7 @@ namespace gip.mes.facility
                                                         && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && (    (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
+                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                 && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)

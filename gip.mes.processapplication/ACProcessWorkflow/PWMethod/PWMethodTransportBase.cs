@@ -361,7 +361,8 @@ namespace gip.mes.processapplication
                 int expectedConfigStoresCount = 0;
 
                 List<IACConfigStore> pickingOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetPickingConfigStoreOfflineList(ContentTask.ACClassTaskID, CurrentPicking.PickingID,
-                                                                                                                                      out expectedConfigStoresCount, out errorMessage);                if (pickingOfflineList != null)
+                                                                                                                                      out expectedConfigStoresCount, out errorMessage);                
+                if (pickingOfflineList != null)
                 {
                     mandatoryConfigStores.AddRange(pickingOfflineList);
                 }

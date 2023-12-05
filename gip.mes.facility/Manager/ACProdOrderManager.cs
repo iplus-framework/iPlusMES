@@ -1459,11 +1459,12 @@ namespace gip.mes.facility
                                 if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
                                     continue;
                                 bool ifMaterialMatch =
-                                        unselFacility != null &&
-                                        unselFacility.Material != null &&
-                                        (
-                                            intermediatePos.BookingMaterial != null &&
-                                            unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID
+                                        unselFacility != null
+                                        && unselFacility.Material != null
+                                        && (
+                                               intermediatePos.BookingMaterial != null
+                                            && (  (unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID)
+                                                ||(intermediatePos.BookingMaterial.ProductionMaterialID.HasValue && intermediatePos.BookingMaterial.ProductionMaterialID.Value == unselFacility.MaterialID))
                                          );
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
@@ -1491,8 +1492,7 @@ namespace gip.mes.facility
                 configStores.Add(prodOrderPartslist);
             if (partslist != null)
                 configStores.Add(partslist);
-            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
-            MaterialWFConnection matWFConnection = poManager.GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
+            MaterialWFConnection matWFConnection = GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
             configStores.Add(matWFConnection.MaterialWFACClassMethod);
             configStores.Add(currentACClassWF.ACClassMethod);
             if (currentACClassWF.RefPAACClassMethod != null)

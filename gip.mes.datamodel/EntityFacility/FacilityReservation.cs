@@ -282,34 +282,37 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Query
-        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(Guid materialID, string lotNo)
+        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(Guid materialID, Guid lotID)
         {
             return c=>
-                    c.Material != null
+                    !c.VBiACClassID.HasValue
+                    && c.MaterialID.HasValue
                     && c.MaterialID == materialID
-                    && c.FacilityLot != null
-                    && c.FacilityLot.LotNo == lotNo
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
                     && c.ProdOrderPartslistPos != null
                     && c.ProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot;
         }
 
-        public static Func<FacilityReservation, bool> PickingPosReservations(Guid materialID, string lotNo)
+        public static Func<FacilityReservation, bool> PickingPosReservations(Guid materialID, Guid lotID)
         {
             return c =>
-                    c.Material != null
+                    !c.VBiACClassID.HasValue
+                    && c.MaterialID.HasValue
                     && c.MaterialID == materialID
-                    && c.FacilityLot != null
-                    && c.FacilityLot.LotNo == lotNo
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
                     && c.PickingPos != null;
         }
 
-        public static Func<FacilityReservation, bool> OutOrderPosReservations(Guid materialID, string lotNo)
+        public static Func<FacilityReservation, bool> OutOrderPosReservations(Guid materialID, Guid lotID)
         {
             return c =>
-                    c.Material != null
+                    !c.VBiACClassID.HasValue
+                    && c.MaterialID.HasValue
                     && c.MaterialID == materialID
-                    && c.FacilityLot != null
-                    && c.FacilityLot.LotNo == lotNo
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
                     && c.OutOrderPos != null;
         }
 

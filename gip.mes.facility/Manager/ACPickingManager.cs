@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Common;
 using System.Data.Objects;
 using System.Linq;
@@ -1962,8 +1963,8 @@ namespace gip.mes.facility
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
-                                                                && ((material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID)
-                                                                    || (!material.ProductionMaterialID.HasValue && c.MaterialID == material.MaterialID)))
+                                                                && (   (material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
+                                                                    || (c.MaterialID == material.MaterialID)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                 && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
                                                                     || (!material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.MaterialID)))
@@ -1990,8 +1991,8 @@ namespace gip.mes.facility
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
-                                                                && ((material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID)
-                                                                    || (!material.ProductionMaterialID.HasValue && c.MaterialID == material.MaterialID)))
+                                                                && (   (material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
+                                                                    || (c.MaterialID == material.MaterialID)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                 && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
                                                                     || (!material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.MaterialID)))
@@ -2013,6 +2014,225 @@ namespace gip.mes.facility
         }
         #endregion
 
+        #region Target-Selection
+        public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
+            Picking picking, PickingPos pickingPos, string configACUrl,
+            bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation)
+        {
+            BindingList<POPartslistPosReservation> reservationCollection = new BindingList<POPartslistPosReservation>();
+            MaterialWFACClassMethod materialWFACClassMethod = null;
+            gip.core.datamodel.ACClassWF acClassWFDischarging = GetACClassWFDischarging(databaseApp, picking, vbACClassWF, pickingPos, out materialWFACClassMethod);
+
+            if (acClassWFDischarging != null && materialWFACClassMethod != null)
+            {
+                List<Route> routes = new List<Route>();
+                foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
+                {
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, databaseApp.ContextIPlus, true,
+                                        instance, "Storage", RouteDirections.Forwards, new object[] { },
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                                        null,
+                                        0, true, true, false, false, 0, false, false, true);
+                    if (rResult.Routes != null && rResult.Routes.Any())
+                        routes.AddRange(rResult.Routes);
+                }
+
+                #region Filter routes if is selected    ShowCellsInRoute
+                bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
+                if (checkShowCellsInRoute)
+                {
+                    core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
+                    List<IACConfigStore> mandatoryConfigStores =
+                    GetCurrentConfigStores(
+                        aCClassWF,
+                        vbACClassWF,
+                        materialWFACClassMethod.MaterialWFID,
+                        picking
+                    );
+
+                    int priorityLevel = 0;
+                    IACConfig allowedInstancesOnRouteConfig =
+                        configManager.GetConfiguration(
+                            mandatoryConfigStores,
+                            configACUrl + "\\",
+                            acClassWFDischarging.ACClassWF1_ParentACClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString(),
+                            null,
+                            out priorityLevel);
+                    if (allowedInstancesOnRouteConfig != null)
+                    {
+                        List<RuleValue> allowedInstancesRuleValueList = RulesCommand.ReadIACConfig(allowedInstancesOnRouteConfig);
+                        List<string> classes = allowedInstancesRuleValueList.SelectMany(c => c.ACClassACUrl).Distinct().ToList();
+                        if (classes.Any())
+                        {
+                            routes = routes.Where(c => c.Items.Select(x => x.Source.GetACUrl()).Intersect(classes).Any()).ToList();
+                        }
+                    }
+                }
+                #endregion
+
+                var availableModules = routes.Select(c => c.LastOrDefault())
+                    .Distinct(new TargetEqualityComparer())
+                    .OrderBy(c => c.Target.ACIdentifier);
+                if (availableModules.Any())
+                {
+                    FacilityReservation[] selectedModules = new FacilityReservation[] { };
+                    if (
+                            pickingPos.EntityState != System.Data.EntityState.Added
+                            && !pickingPos.FacilityReservation_PickingPos.Any(c => c.VBiACClassID.HasValue && c.EntityState != System.Data.EntityState.Unchanged)
+                        )
+                    {
+                        pickingPos.FacilityReservation_PickingPos.AutoRefresh();
+                        selectedModules = pickingPos
+                            .FacilityReservation_PickingPos
+                            .CreateSourceQuery()
+                            .Include(c => c.Facility)
+                            .Include(c => c.Facility.Material)
+                            .Where(c => c.VBiACClassID.HasValue)
+                            .AutoMergeOption()
+                            .ToArray();
+                    }
+                    else
+                    {
+                        selectedModules = pickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).ToArray();
+                    }
+
+
+                    if (availableModules != null)
+                    {
+                        List<Guid> notSelected = new List<Guid>();
+                        foreach (var routeItem in availableModules)
+                        {
+                            //FacilityReservation selectedModule = selectedModules.Where(c => c.VBiACClassID == acClass.ACClassID).FirstOrDefault();
+                            //if (selectedModule == null)
+                            notSelected.Add(routeItem.Target.ACClassID);
+                        }
+                        var queryUnselFacilities =
+                            databaseApp
+                            .Facility
+                            .Include(c => c.Material)
+                            .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))
+                            .AutoMergeOption()
+                            .ToArray();
+
+                        foreach (var routeItem in availableModules)
+                        {
+                            //if (OnFilterTarget(routeItem))
+                            //    continue;
+                            Facility unselFacility = null;
+                            FacilityReservation selectedReservationForModule = selectedModules.Where(c => c.VBiACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                            if (selectedReservationForModule == null)
+                            {
+                                if (showSelectedCells)
+                                    continue;
+                                unselFacility = queryUnselFacilities.Where(c => c.VBiFacilityACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                                if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
+                                    continue;
+                                bool ifMaterialMatch =
+                                        unselFacility != null
+                                        && unselFacility.Material != null
+                                        && (
+                                                pickingPos.Material != null
+                                            && (   (unselFacility.MaterialID == pickingPos.Material.MaterialID)
+                                                || (pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID.Value == unselFacility.MaterialID))
+                                         );
+                                if (showSameMaterialCells && !ifMaterialMatch)
+                                    continue;
+                            }
+                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, pickingPos, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
+                        }
+                    }
+
+                    // select first if only one is present
+                    if (preselectFirstReservation
+                        && ((pickingPos.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
+                            || ((pickingPos.EntityState == System.Data.EntityState.Unchanged || pickingPos.EntityState == System.Data.EntityState.Modified)
+                                    && reservationCollection.Count() == 1
+                                    && !reservationCollection.Any(c => c.IsChecked))))
+                        reservationCollection[0].IsChecked = true;
+                }
+            }
+            return reservationCollection;
+        }
+
+        public List<IACConfigStore> GetCurrentConfigStores(gip.core.datamodel.ACClassWF currentACClassWF, gip.mes.datamodel.ACClassWF vbCurrentACClassWF, Guid? materialWFID, Picking picking)
+        {
+            List<IACConfigStore> configStores = new List<IACConfigStore>();
+            if (picking != null)
+                configStores.Add(picking);
+            MaterialWFConnection matWFConnection = GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
+            configStores.Add(matWFConnection.MaterialWFACClassMethod);
+            configStores.Add(currentACClassWF.ACClassMethod);
+            if (currentACClassWF.RefPAACClassMethod != null)
+                configStores.Add(currentACClassWF.RefPAACClassMethod);
+            return configStores;
+        }
+
+        public MaterialWFConnection GetMaterialWFConnection(gip.mes.datamodel.ACClassWF aCClassWF, Guid? materialWFID)
+        {
+            return
+                aCClassWF
+                .MaterialWFConnection_ACClassWF
+                .Where(c => c.MaterialWFACClassMethod.MaterialWFID == materialWFID)
+                .FirstOrDefault();
+        }
+
+        public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, Picking picking, gip.mes.datamodel.ACClassWF vbACClassWF, PickingPos pickingPos, out MaterialWFACClassMethod materialWFACClassMethod)
+        {
+            materialWFACClassMethod = null;
+
+            Material pickingIntermediateMaterial = databaseApp.Material.Where(c => c.MDMaterialType != null && c.MDMaterialType.MDMaterialTypeIndex == (short)MDMaterialGroup.MaterialGroupTypes.Picking).FirstOrDefault();
+            if (pickingIntermediateMaterial == null)
+                return null;
+
+            materialWFACClassMethod = vbACClassWF.ACClassMethod.MaterialWFACClassMethod_ACClassMethod.FirstOrDefault();
+            if (materialWFACClassMethod == null)
+                return null;
+            Guid materialWFACClassMethodID = materialWFACClassMethod.MaterialWFACClassMethodID;
+
+            gip.core.datamodel.ACClass acClassOfPWDischarging = null;
+            gip.core.datamodel.ACClassWF acClassWFDischarging = null;
+
+            var matWFConnections = databaseApp.MaterialWFConnection.Where(c => c.MaterialID == pickingIntermediateMaterial.MaterialID
+                                        && c.MaterialWFACClassMethodID == materialWFACClassMethodID);
+
+            if (!matWFConnections.Any())
+            {
+                // TODO: Show Message
+                return null;
+            }
+
+            foreach (MaterialWFConnection matWFConnection in matWFConnections)
+            {
+                acClassWFDischarging = matWFConnection.ACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
+                if (acClassWFDischarging == null)
+                {
+                    continue;
+                }
+
+                acClassOfPWDischarging = acClassWFDischarging.PWACClass;
+                if (acClassOfPWDischarging == null)
+                {
+                    acClassWFDischarging = null;
+                    // TODO: Show Message
+                    continue;
+                }
+
+                Type typeOfDis = acClassOfPWDischarging.ObjectType;
+                if (!typeof(IPWNodeDeliverMaterial).IsAssignableFrom(typeOfDis)
+                    || acClassWFDischarging.ACClassMethodID != vbACClassWF.RefPAACClassMethodID)
+                {
+                    acClassOfPWDischarging = null;
+                    acClassWFDischarging = null;
+                    // TODO: Show Message
+                    continue;
+                }
+                break;
+            }
+
+            return acClassWFDischarging;
+        }
+
+        #endregion
     }
 }
 

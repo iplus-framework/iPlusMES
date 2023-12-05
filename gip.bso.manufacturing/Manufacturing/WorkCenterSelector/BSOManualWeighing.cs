@@ -3182,7 +3182,7 @@ namespace gip.bso.manufacturing
             return InInterdischargingQ.HasValue ? false : true;
         }
 
-        [ACMethodInfo("", "en{'Interdischarge'}de{'Interdischarge'}", 696, true)]
+        [ACMethodInfo("", "en{'Interdischarge'}de{'Ja -> Zwischenentleeren'}", 696, true)]
         public virtual void Interdischarge()
         {
             IACComponentPWNode currentPWNode = ComponentPWNodeLocked;

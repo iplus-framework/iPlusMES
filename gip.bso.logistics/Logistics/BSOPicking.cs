@@ -1871,7 +1871,11 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (CurrentPickingPos == null || CurrentPicking == null)
+                if (   CurrentPickingPos == null 
+                    || CurrentPicking == null 
+                    || CurrentPickingPos.EntityState == EntityState.Added 
+                    || CurrentPickingPos.EntityState == EntityState.Deleted 
+                    || CurrentPickingPos.EntityState == EntityState.Detached)
                     return null;
                 if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                   || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle) && CurrentPickingPos.InOrderPos != null)
