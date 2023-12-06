@@ -1000,6 +1000,12 @@ namespace gip.mes.maintenance
                     }
 
                 }
+
+                if (!templates.Any())
+                {
+                    AccessPrimary.ToNavList(templates);
+                    OnPropertyChanged(nameof(MaintOrderList));
+                }
             }
         }
 
