@@ -683,7 +683,8 @@ namespace gip.mes.maintenance
                     if (compSel != null && compSel.CurrentProjectItemCS != null)
                     {
                         mes.datamodel.ACClass tempACClass = compSel.CurrentProjectItemCS.ValueT.FromAppContext<mes.datamodel.ACClass>(DatabaseApp);
-                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, CurrentMaintOrder.TempACClass);
+                        CurrentMaintOrder.TempACClass = compSel.CurrentProjectItemCS.ValueT;
+                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
                     }    
                 }
 
