@@ -588,6 +588,7 @@ namespace gip.mes.processapplication
                                         RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
                                         ACPartslistManager.QrySilosResult possibleSilos2;
                                         IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, null, out possibleSilos2);
+                                        // If there are other blocked Silos on this scale:
                                         if (routes2 != null && routes2.Any())
                                         {
                                             hasOtherStartableDosingNodes = false;
@@ -618,6 +619,7 @@ namespace gip.mes.processapplication
                                     queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
                                     ACPartslistManager.QrySilosResult possibleSilos2;
                                     IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos2);
+                                    // If there are other blocked Silos on this scale:
                                     if (routes2 != null && routes2.Any())
                                     {
                                         continueToNextComp = true;
@@ -626,7 +628,7 @@ namespace gip.mes.processapplication
                                             PriorizeSilosAndGetRoute(possibleSilos2, routes2, dosingWeight, out correctedDosingWeight2, out preferredDosingRoute2, out preferredDosingFacility2, out alternativeDosingRoute2, out alternativeDosingFacility2, out preferredDosingFacilityNotRoutableHere2);
                                             continueToNextComp = false;
                                             // If better Silo found on other scale, then continue dosing on other sale
-                                            if (   preferredDosingRoute2 == null 
+                                            if (preferredDosingRoute2 == null
                                                 && preferredDosingFacilityNotRoutableHere2 != null
                                                 && preferredDosingFacilityNotRoutableHere2 == preferredDosingFacilityNotRoutableHere)
                                             {
@@ -641,7 +643,7 @@ namespace gip.mes.processapplication
                                             }
                                             // This is the case, when a Silo is blocked on another scale that would have the right reserved lots
                                             // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
-                                            else if (   preferredDosingFacilityNotRoutableHere2 != null
+                                            else if (preferredDosingFacilityNotRoutableHere2 != null
                                                      && preferredDosingFacilityNotRoutableHere2 != preferredDosingFacilityNotRoutableHere)
                                             {
                                                 continueToNextComp = false;
@@ -650,6 +652,8 @@ namespace gip.mes.processapplication
                                         else
                                             isAnyCompDosableFromAnyRoutableSilo = true;
                                     }
+                                    else if (possibleSilos2 != null && possibleSilos2.FoundSilos.Any())
+                                        continueToNextComp = true;
                                     // Versuche nächste Komponente vorerst zu dosieren, weil es andere Dosierschritte gibt welche die Dosierung übernehmen könnten
                                     if (continueToNextComp)
                                     {

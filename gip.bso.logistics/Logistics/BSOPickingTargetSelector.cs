@@ -727,13 +727,13 @@ namespace gip.bso.logistics
         #endregion
 
         // Static, if more instances active
-        private static bool _IsStartingBatchPlan = false;
+        //private static bool _IsStartingBatchPlan = false;
         [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
         public void StartWorkflow()
         {
             if (!IsEnabledStartWorkflow()) 
                 return;
-            _IsStartingBatchPlan = true;
+            //_IsStartingBatchPlan = true;
             try
             {
 
@@ -782,7 +782,7 @@ namespace gip.bso.logistics
             }
             finally
             {
-                _IsStartingBatchPlan = false;
+                //_IsStartingBatchPlan = false;
             }
         }
 

@@ -318,7 +318,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region FacilityMaterial and OEE
-        [ACMethodInfo("", "en{'Add'}de{'Neu'}", 700)]
+        [ACMethodCommand("", "en{'Add'}de{'Neu'}", 700)]
         public void AddFacilityMaterial()
         {
             if (!IsEnabledAddFacilityMaterial())
@@ -342,7 +342,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: DeleteFacility
         /// </summary>
-        [ACMethodInfo("", "en{'Delete'}de{'Löschen'}", 701)]
+        [ACMethodCommand("", "en{'Delete'}de{'Löschen'}", 701)]
         public void DeleteFacilityMaterial()
         {
             if (!IsEnabledDeleteFacilityMaterial())
@@ -362,7 +362,7 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodInfo("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703)]
+        [ACMethodCommand("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703)]
         public void GenerateTestOEEData()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -381,7 +381,7 @@ namespace gip.bso.masterdata
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-        [ACMethodInfo("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704)]
+        [ACMethodCommand("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704)]
         public void DeleteTestOEEData()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -399,7 +399,7 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodInfo("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705)]
+        [ACMethodCommand("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705)]
         public void RecalcThroughputAverage()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -415,7 +415,7 @@ namespace gip.bso.masterdata
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-        [ACMethodInfo("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706)]
+        [ACMethodCommand("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706)]
         public void RecalcThroughputAndOEE()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
