@@ -291,6 +291,7 @@ namespace gip.mes.maintenance
 
         #region Public
 
+        //TODO: Add maint order manually (report problem)
         [ACMethodInfo("", "en{'New maint order manually'}de{'New maint order manually'}", 999, true)]
         public void SetNewMaintOrderManual(string acComponentACUrl)
         {
@@ -1038,7 +1039,7 @@ namespace gip.mes.maintenance
             if (serviceInstance == null)
                 return;
 
-            if (!(bool)serviceInstance.ACUrlCommand("DlgManagerMaint!ShowMaintenaceDialog", acComponent, _this.GetValue("ComponentsWarningList")))
+            if (!(bool)serviceInstance.ACUrlCommand("DlgManagerMaint!ShowMaintenaceDialog", acComponent, _this.GetValue(nameof(ComponentsWarningList))))
             {
                 if (_this.ACIdentifier == ClassName)
                     _this.ACUrlCommand("IsMaintenanceWarning", false);
