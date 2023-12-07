@@ -8,6 +8,7 @@ using gip.core.autocomponent;
 using gip.bso.iplus;
 using gip.bso.masterdata;
 using gip.core.media;
+using System.Diagnostics.Eventing.Reader;
 
 namespace gip.mes.maintenance
 {
@@ -138,6 +139,12 @@ namespace gip.mes.maintenance
                     MaintOrderTaskListDocu = value.MaintOrder1_BasedOnMaintOrder?.MaintOrderTask_MaintOrder.ToList();
                     if (_IsImageTabOpen)
                         BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+
+                    MaintOrderPropertyList = value.MaintOrderProperty_MaintOrder.ToList();
+                }
+                else
+                {
+                    MaintOrderPropertyList = null;
                 }
             }
         }
