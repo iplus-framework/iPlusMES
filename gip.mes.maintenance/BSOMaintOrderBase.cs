@@ -27,12 +27,46 @@ namespace gip.mes.maintenance
         {
             _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            return base.ACDeInit(deleteACClassTask);
+            bool done = base.ACDeInit(deleteACClassTask);
+            //if (done && _BSODatabase != null)
+            //{
+            //    ACObjectContextManager.DisposeAndRemove(_BSODatabase);
+            //    _BSODatabase = null;
+            //}
+
+            //if (done && _DatabaseApp != null)
+            //{
+            //    ACObjectContextManager.DisposeAndRemove(_DatabaseApp);
+            //    _DatabaseApp = null;
+            //}
+
+            return done;
         }
 
         #endregion
 
         #region Properties
+        //private Database _BSODatabase = null;
+        //public override IACEntityObjectContext Database
+        //{
+        //    get
+        //    {
+        //        if (_BSODatabase == null)
+        //            _BSODatabase = ACObjectContextManager.GetOrCreateContext<Database>(this.GetACUrl());
+        //        return _BSODatabase;
+        //    }
+        //}
+
+        //private DatabaseApp _DatabaseApp;
+        //public override DatabaseApp DatabaseApp
+        //{
+        //    get
+        //    {
+        //        if (_DatabaseApp == null)
+        //            _DatabaseApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>(this.GetACUrl(),"", Database.ContextIPlus);
+        //        return _DatabaseApp;
+        //    }
+        //}
 
         protected ACQueryDefinition _ACQueryDefinition;
 
@@ -105,7 +139,12 @@ namespace gip.mes.maintenance
                 {
                     MaintOrderTaskList = null;
                     MaintOrderAssignmentList = null;
+                    SelectedMaintOrderTask = null;
                 }
+
+                if (InitState == ACInitState.Destructed)
+                    return;
+
                 OnPropertyChanged();
             }
         }

@@ -15,7 +15,7 @@ using static gip.core.datamodel.Global;
 
 namespace gip.mes.maintenance
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance templates'}de{'Wartungsvorlagen'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaintOrder.ClassName)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance plan'}de{'Wartungsplan'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaintOrder.ClassName)]
     public class BSOMaintOrderTemplate : BSOMaintOrderBase
     {
         #region c'tors
@@ -77,8 +77,6 @@ namespace gip.mes.maintenance
 
             return base.ACPostInit();
         }
-
-
 
         public const string Const_FacilityExplorer = "BSOFacilityExplorer_Child";
         public const string Const_ComponentSelector = "BSOComponentSelector_Child";
@@ -282,6 +280,30 @@ namespace gip.mes.maintenance
             }
         }
         #endregion
+
+        public override MaintOrder CurrentMaintOrder 
+        { 
+            get => base.CurrentMaintOrder;
+            set
+            {
+                base.CurrentMaintOrder = value;
+
+                if (value != null)
+                {
+                    MaintACClassPropertyList = value.MaintACClass?.MaintACClassProperty_MaintACClass
+                                                                  .Where(c => c.IsActive)
+                                                                  .Select(c => new MaintACClassPropertyWrapper() { MaintACClassProperty = c, ACClassProperty = c.ACClassProperty })
+                                                                  .ToList();
+
+                    SearchProperties();
+                }
+                else
+                {
+                    MaintACClassPropertyList = null;
+                    ACClassPropertyList = null;
+                }
+            }
+        }
 
         private MaintenanceWizzardStepsEnum _CurrentWizzardStep;
         [ACPropertyInfo(9999)]
@@ -618,8 +640,9 @@ namespace gip.mes.maintenance
                 tempACClass = (CurrentACComponent?.ACType as core.datamodel.ACClass)?.FromAppContext<mes.datamodel.ACClass>(DatabaseApp);
             }
 
-            //CurrentMaintOrder.TempACClass = tempACClass;
+            //CurrentMaintOrder.TempACClass = tempACClass.FromIPlusContext<core.datamodel.ACClass>(Database.ContextIPlus);
             CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
+            SearchProperties();
 
             CurrentWizzardStep = MaintenanceWizzardStepsEnum.TimeEvent;
 
@@ -683,11 +706,12 @@ namespace gip.mes.maintenance
                     if (compSel != null && compSel.CurrentProjectItemCS != null)
                     {
                         mes.datamodel.ACClass tempACClass = compSel.CurrentProjectItemCS.ValueT.FromAppContext<mes.datamodel.ACClass>(DatabaseApp);
-                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, CurrentMaintOrder.TempACClass);
+                        //CurrentMaintOrder.TempACClass = compSel.CurrentProjectItemCS.ValueT;
+                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
                     }    
                 }
 
-                if (CurrentMaintOrder != null && CurrentMaintOrder.TempACClass == null && CurrentMaintOrder.Facility == null)
+                if (CurrentMaintOrder != null && CurrentMaintOrder.MaintACClass == null && CurrentMaintOrder.Facility == null)
                     return;
 
                 SearchProperties();
@@ -818,14 +842,16 @@ namespace gip.mes.maintenance
         [ACMethodInfo("", "en{'Search'}de{'Suchen'}", 999)]
         public void SearchProperties()
         {
-            core.datamodel.ACClass tempACClass = CurrentMaintOrder.TempACClass;
+            core.datamodel.ACClass tempACClass = CurrentMaintOrder.MaintACClass?.VBiACClass.FromIPlusContext<core.datamodel.ACClass>(Database.ContextIPlus);
             if (tempACClass != null)
                 ACClassPropertyList = FindACClassProperties(tempACClass);
+            else
+                ACClassPropertyList = null;
         }
 
         public bool IsEnabledSearchProperties()
         {
-            if (CurrentMaintOrder != null && CurrentMaintOrder.TempACClass != null)
+            if (CurrentMaintOrder != null && CurrentMaintOrder.MaintACClass != null)
                 return true;
 
             return false;
@@ -998,6 +1024,13 @@ namespace gip.mes.maintenance
                         return;
                     }
 
+                }
+
+                if (!templates.Any())
+                {
+                    AccessPrimary.ToNavList(templates);
+                    OnPropertyChanged(nameof(MaintOrderList));
+                    CurrentMaintOrder = null;
                 }
             }
         }

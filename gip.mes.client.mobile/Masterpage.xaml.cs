@@ -17,6 +17,7 @@ using System.Reflection;
 using gip.core.layoutengine.Helperclasses;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Animation;
+using System.Windows.Navigation;
 
 namespace gip.mes.client.mobile
 {
@@ -38,7 +39,8 @@ namespace gip.mes.client.mobile
             _FractalImagePresenter.Generator.Completed += new EventHandler<FractalImageCompletedEventArgs>(Generator_Completed);
 
             MainMenu.Margin = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
-            HamburgerButton.Click += (sender, e) => ToggleMenu();
+
+            HamburgerButton.Click += (sender, e) => ToggleMenuVisibility();
 
             InitConnectionInfo();
         }
@@ -86,6 +88,30 @@ namespace gip.mes.client.mobile
             InitFrameControl();
         }
 
+        private void ToggleMenuVisibility()
+        {
+            if (Submenu.Visibility == Visibility.Visible)
+            {
+                switchActiveMenuItems(MainMenu);
+                Submenu.ToggleMenu();
+            }
+            else
+            {
+                MainMenu.ToggleMenu();
+            }
+        }
+
+        private void switchActiveMenuItems(VBMenu activeMenu)
+        {
+            foreach (VBMenuItemMobile menuItem in activeMenu.Items)
+            {
+                if (menuItem.subMenuExpanded)
+                {
+                    menuItem.SwitchActiveMenu();
+                    menuItem.subMenuExpanded = false;
+                }
+            }
+        }
 
 
         private void InitAppCommands()
@@ -201,58 +227,39 @@ namespace gip.mes.client.mobile
                 items.Add(menuItem);
                 if (acMenuItem.Items != null && acMenuItem.Items.Count > 0)
                 {
-                    CreateMenu(acMenuItem.Items, menuItem.Items);
+                    submenuList.Add(menuItem.CreateSubmenu(Submenu ,acMenuItem.Items));
                 }
             }
         }
 
-        private bool isMenuOpen = false;
-
-        private void ToggleMenu()
-        {
-            ThicknessAnimation animation = new ThicknessAnimation
-            {
-                Duration = TimeSpan.FromSeconds(0.3)
-            };
-
-            if (!isMenuOpen)
-            {
-                animation.From = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
-                animation.To = new Thickness(0, 0, 0, 0);
-                MainMenu.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                animation.From = new Thickness(0, 0, 0, 0);
-                animation.To = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
-                animation.Completed += (s, e) =>
-                {
-                    MainMenu.Visibility = Visibility.Hidden;
-                    MainMenu.Margin = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
-                };
-            }
-
-            MainMenu.BeginAnimation(FrameworkElement.MarginProperty, animation);
-
-            isMenuOpen = !isMenuOpen;
-        }
+        public List<VBMenu> submenuList = new List<VBMenu>();
         #endregion
 
         #region Navigation
 
         private void FrameGoBack_Click(object sender, RoutedEventArgs e)
         {
-            if (VBFrameControl.CanGoBack)
+            if (VBFrameControl.MainContent.CanGoBack)
             {
-                VBFrameControl.GoBack();
+                VBFrameControl.MainContent.GoBack();
+                foreach (JournalEntry entry in VBFrameControl.MainContent.BackStack)
+                {
+                    Title.Text = entry.Name;
+                    break;
+                }
             }
         }
 
         private void FrameGoFoward_Click(object sender, RoutedEventArgs e)
         {
-            if (VBFrameControl.CanGoForward)
+            if (VBFrameControl.MainContent.CanGoForward)
             {
-                VBFrameControl.GoForward();
+                VBFrameControl.MainContent.GoForward();
+                foreach (JournalEntry entry in VBFrameControl.MainContent.ForwardStack)
+                {
+                    Title.Text = entry.Name;
+                    break;
+                }
             }
         }
 
@@ -425,14 +432,17 @@ namespace gip.mes.client.mobile
         {
             bool ribbonVisibilityOff = false;
             string caption = "";
+            string title = "";
             ACMenuItem menuItem = acCommand as ACMenuItem;
             if (menuItem != null)
             {
                 ribbonVisibilityOff = menuItem.RibbonOff;
                 caption = menuItem.UseACCaption ? menuItem.ACCaption : "";
+                title = menuItem.ACCaption;
+                Title.Text = menuItem.ACCaption;
             }
-
-            VBFrameControl.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, ribbonVisibilityOff);
+            VBFrameControl.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, title, ribbonVisibilityOff);
+            ToggleMenuVisibility();
         }
 
         public void StartBusinessobject(string acUrl, ACValueList parameterList, string acCaption = "")

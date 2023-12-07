@@ -68,7 +68,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #region Private Classes
 
         /// <summary>
@@ -175,9 +174,7 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #region Properties
-
 
         #region Warning
         [ACPropertyBindingSource()]
@@ -218,7 +215,6 @@ namespace gip.mes.maintenance
         public IACContainerTNet<PANotifyState> MaintAlarm { get; set; }
         #endregion
 
-
         #region Maintenance Configuration Cache
 
         [ACPropertyBindingSource(210, "Error", "en{'On new maintenance order alarm'}de{'On new maintenance order alarm'}", "", false, false)]
@@ -256,9 +252,7 @@ namespace gip.mes.maintenance
         private bool _CacheRebuilded = false;
         #endregion
 
-
         #endregion
-
 
         #region Methods
 
@@ -295,8 +289,6 @@ namespace gip.mes.maintenance
         }
         #endregion
 
-
-
         #region Public
 
         [ACMethodInfo("", "en{'New maint order manually'}de{'New maint order manually'}", 999, true)]
@@ -323,7 +315,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #region Cache building
 
         private void ApplicationManager_ProjectWorkCycle(object sender, EventArgs e)
@@ -340,7 +331,6 @@ namespace gip.mes.maintenance
         {
             try
             {
-                
                 _CacheRebuilded = false;
                 // 1. Rebuild the static shared Rule-Cache
                 lock (_LockAllMaintainableTypes)
@@ -588,7 +578,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #region Periodical checks
 
         protected override void RunJob(DateTime now, DateTime lastRun, DateTime nextRun)
@@ -596,7 +585,8 @@ namespace gip.mes.maintenance
             base.RunJob(now, lastRun, nextRun);
             if (!_CacheRebuilded)
                 return;
-            ThreadPool.QueueUserWorkItem((object state) => PeriodicalCheck());
+            //ThreadPool.QueueUserWorkItem((object state) => PeriodicalCheck());
+            ApplicationManager.ApplicationQueue.Add(() => PeriodicalCheck());
         }
 
         private void PeriodicalCheck()
@@ -614,70 +604,76 @@ namespace gip.mes.maintenance
             {
                 lock (_LockAllMaintainableTypes)
                 {
-                    var openMaintenanceOrders = dbApp.MaintOrder
-                                                    .Where(c => c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted
-                                                             && c.BasedOnMaintOrderID != null)
-                                                    .ToArray();
-
-                    var openMaintenanceOrdersComp = openMaintenanceOrders.Where(c => c.VBiPAACClassID.HasValue).ToDictionary(c => c.VBiPAACClassID);
-                    var openMaintenanceOrdersFacility = openMaintenanceOrders.Where(c => c.FacilityID.HasValue).ToDictionary(c => c.FacilityID);
-                 
-
-                    foreach (MaintainableInstance maintInstance in _MaintainableInstancesTime.Values)
+                    try
                     {
-                        MaintOrder maintOrder = null;
+                        var openMaintenanceOrders = dbApp.MaintOrder
+                                                        .Where(c => c.MDMaintOrderState.MDMaintOrderStateIndex < (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted
+                                                                 && c.BasedOnMaintOrderID != null)
+                                                        .ToArray();
 
-                        if (maintInstance.Instance != null)
+                        var openMaintenanceOrdersComp = openMaintenanceOrders.Where(c => c.VBiPAACClassID.HasValue).ToDictionary(c => c.VBiPAACClassID);
+                        var openMaintenanceOrdersFacility = openMaintenanceOrders.Where(c => c.FacilityID.HasValue).ToDictionary(c => c.FacilityID);
+
+
+                        foreach (MaintainableInstance maintInstance in _MaintainableInstancesTime.Values)
                         {
-                            if (openMaintenanceOrdersComp.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
-                                continue;
+                            MaintOrder maintOrder = null;
 
-                            maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
-                                                         .OrderByDescending(x => x.UpdateDate)
-                                                         .FirstOrDefault();
-                        }
-                        else if (maintInstance.FacilityInstance != null)
-                        {
-                            if (openMaintenanceOrdersFacility.TryGetValue(maintInstance.FacilityInstance.FacilityID, out maintOrder))
-                                continue;
-
-                            maintOrder = dbApp.MaintOrder.Where(c => c.FacilityID == maintInstance.FacilityInstance.FacilityID)
-                                                         .OrderByDescending(x => x.UpdateDate)
-                                                         .FirstOrDefault();
-                        }
-
-                        if (maintOrder == null)
-                        {
-                            if (maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.HasValue
-                                && DateTime.Now > maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm)
+                            if (maintInstance.Instance != null)
                             {
-                                SetNewMaintOrder(maintInstance, dbApp);
+                                if (openMaintenanceOrdersComp.TryGetValue(maintInstance.Instance.ComponentClass.ACClassID, out maintOrder))
+                                    continue;
+
+                                maintOrder = dbApp.MaintOrder.Where(c => c.VBiPAACClassID == maintInstance.Instance.ComponentClass.ACClassID)
+                                                             .OrderByDescending(x => x.UpdateDate)
+                                                             .FirstOrDefault();
                             }
-                            else if (maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.HasValue
-                                && maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.HasValue
-                                && DateTime.Now >= maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.Value)))
+                            else if (maintInstance.FacilityInstance != null)
                             {
-                                SetMaintenanceWarning(maintInstance.Instance, maintInstance.FacilityInstance, maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.Value);
+                                if (openMaintenanceOrdersFacility.TryGetValue(maintInstance.FacilityInstance.FacilityID, out maintOrder))
+                                    continue;
+
+                                maintOrder = dbApp.MaintOrder.Where(c => c.FacilityID == maintInstance.FacilityInstance.FacilityID)
+                                                             .OrderByDescending(x => x.UpdateDate)
+                                                             .FirstOrDefault();
+                            }
+
+                            if (maintOrder == null)
+                            {
+                                if (maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.HasValue
+                                    && DateTime.Now > maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm)
+                                {
+                                    SetNewMaintOrder(maintInstance, dbApp);
+                                }
+                                else if (maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.HasValue
+                                    && maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.HasValue
+                                    && DateTime.Now >= maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.Value)))
+                                {
+                                    SetMaintenanceWarning(maintInstance.Instance, maintInstance.FacilityInstance, maintInstance.MaintInfo.MaintOrderTemplate.NextMaintTerm.Value);
+                                }
+                            }
+                            else if (maintOrder != null && maintOrder.EndDate.HasValue && maintInstance.MaintInfo.MaintOrderTemplate != null
+                                                                                       && maintInstance.MaintInfo.MaintOrderTemplate.MaintInterval.HasValue)
+                            {
+                                DateTime? nextTerm = maintOrder.EndDate + TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.MaintInterval.Value);
+                                if (nextTerm != null && DateTime.Now >= nextTerm.Value)
+                                {
+                                    SetNewMaintOrder(maintInstance, dbApp);
+                                }
+                                else if (maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.HasValue && nextTerm != null && DateTime.Now >= nextTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.Value)))
+                                    SetMaintenanceWarning(maintInstance.Instance, maintInstance.FacilityInstance, nextTerm.Value);
                             }
                         }
-                        else if (maintOrder != null && maintOrder.EndDate.HasValue && maintInstance.MaintInfo.MaintOrderTemplate != null 
-                                                                                   && maintInstance.MaintInfo.MaintOrderTemplate.MaintInterval.HasValue)
-                        {
-                            DateTime? nextTerm = maintOrder.EndDate + TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.MaintInterval.Value);
-                            if (nextTerm != null && DateTime.Now >= nextTerm.Value)
-                            {
-                                SetNewMaintOrder(maintInstance, dbApp);
-                            }
-                            else if (maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.HasValue && nextTerm != null && DateTime.Now >= nextTerm.Value.Subtract(TimeSpan.FromDays(maintInstance.MaintInfo.MaintOrderTemplate.WarningDiff.Value)))
-                                SetMaintenanceWarning(maintInstance.Instance, maintInstance.FacilityInstance, nextTerm.Value);
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Messages.LogException(this.GetACUrl(), nameof(PeriodicalCheck), e);
                     }
                 }
             }
         }
 
         #endregion
-
 
         #region Eventdriven checks
 
@@ -750,10 +746,15 @@ namespace gip.mes.maintenance
                     return;
             }
 
-            ThreadPool.QueueUserWorkItem((object state) =>
+            ApplicationManager.ApplicationQueue.Add(() =>
             {
                 CheckPropertyValue(e, configProp);
             });
+
+            //ThreadPool.QueueUserWorkItem((object state) =>
+            //{
+            //    CheckPropertyValue(e, configProp);
+            //});
         }
 
         private void CheckPropertyValue(ACPropertyNetSendEventArgs eventArgs, MaintACClassProperty configProp)
@@ -801,7 +802,6 @@ namespace gip.mes.maintenance
         }
 
         #endregion
-
 
         #region Maintenance Order
 
@@ -931,7 +931,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #region Warning
 
         /// <summary>
@@ -1026,7 +1025,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #region User-Interaction
 
         [ACMethodInteractionClient("", "en{'Show maintenance'}de{'Show maintenance'}", 999, true)]
@@ -1049,8 +1047,6 @@ namespace gip.mes.maintenance
 
         #endregion
 
-
         #endregion
     }
-
 }
