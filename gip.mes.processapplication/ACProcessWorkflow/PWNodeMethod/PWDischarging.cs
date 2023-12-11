@@ -1215,7 +1215,10 @@ namespace gip.mes.processapplication
             if (route == null)
                 PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, deSelParams);
             if (route != null)
+            {
                 route.Detach(true);
+                route.IsPredefinedRoute = predefinedRoute != null && route == predefinedRoute;
+            }
             CurrentDischargingRoute = route;
         }
 

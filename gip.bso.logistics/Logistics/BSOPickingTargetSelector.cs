@@ -989,7 +989,7 @@ namespace gip.bso.logistics
 
             if (routeSelector.RouteResult != null)
             {
-                Route route = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                Route route = Route.MergeRoutes(routeSelector.RouteResult);
                 SelectedTarget.CurrentRoute = route;
             }
             else
@@ -1018,7 +1018,7 @@ namespace gip.bso.logistics
 
             if (routeSelector.RouteResult != null)
             {
-                Route route = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                Route route = Route.MergeRoutes(routeSelector.RouteResult);
                 if (route != SelectedTarget.CurrentRoute)
                     SelectedTarget.CurrentRoute = route;
             }
