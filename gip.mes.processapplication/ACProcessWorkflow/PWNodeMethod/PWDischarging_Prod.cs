@@ -8,6 +8,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
 using System.Reflection.Emit;
+using System.Net;
 
 namespace gip.mes.processapplication
 {
@@ -360,6 +361,7 @@ namespace gip.mes.processapplication
                             return StartDisResult.CycleWait;
                         }
                         UpdateCurrentACMethod();
+                        RememberWeightOnRunDischarging(true);
 
                         CheckIfAutomaticTargetChangePossible = null;
                         MsgWithDetails msg2 = dbApp.ACSaveChanges();
@@ -1001,6 +1003,8 @@ namespace gip.mes.processapplication
                         return StartDisResult.CycleWait;
                     }
 
+                    double? disChargedWeight = GetDischargedWeight(true);
+
                     bool isNewACMethod = false;
                     CheckIfAutomaticTargetChangePossible = null;
                     ACMethod acMethod = null;
@@ -1094,6 +1098,12 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
+                        if (disChargedWeight.HasValue)
+                        {
+                            DoInwardBooking(disChargedWeight.Value, dbApp, previousDischargingRoute.LastOrDefault(), fullSiloReservation.Facility, currentBatchPos, null, false);
+                            RememberWeightOnRunDischarging(false);
+                        }
+
                         plannedSilo.ReservationState = GlobalApp.ReservationState.Active;
                         // Falls Zielsilo nicht belegt
                         if (plannedSilo.Facility != null 
@@ -1112,6 +1122,8 @@ namespace gip.mes.processapplication
                         NoTargetWait = null;
                         this.TaskSubscriptionPoint.Persist(false);
                         ExecuteMethod(nameof(OnACMethodSended), acMethod, false, dbApp, batchPlan, currentBatchPos, targetContainer, discharging);
+                        if (discharging.CurrentACState == ACStateEnum.SMPaused)
+                            discharging.Resume();
                         OnSwitchedToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, plannedSilo);
                     }
                 }
@@ -1229,6 +1241,11 @@ namespace gip.mes.processapplication
             }
         }
 
+        public virtual bool CanExecutePosting(ACMethodBooking bookingParam, ProdOrderPartslistPos currentBatchPos)
+        {
+            return true;
+        }
+
         public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Facility inwardFacility, ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
@@ -1339,30 +1356,37 @@ namespace gip.mes.processapplication
                     else if (facilityPreBooking != null)
                     {
                         bookingParam.IgnoreIsEnabled = true;
-                        ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
-                        if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                        ACMethodEventArgs resultBooking = null;
+                        bool canExecutePosting = CanExecutePosting(bookingParam, currentBatchPos);
+                        if (canExecutePosting)
+                            resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
+                        if (resultBooking != null && (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible))
                         {
                             collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
                             OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1380), true);
                         }
                         else
                         {
-                            if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
+                            if (resultBooking != null && (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings()))
                             {
                                 OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1370), true);
                                 Messages.LogError(this.GetACUrl(), "DoInwardBooking(7)", bookingParam.ValidMessage.InnerMessage);
                             }
 
-                            if (bookingParam.ValidMessage.IsSucceded())
+                            if (  (resultBooking == null && !canExecutePosting)
+                                || bookingParam.ValidMessage.IsSucceded())
                             {
-                                facilityPreBooking.DeleteACObject(dbApp, true);
-                                currentBatchPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
-                                OnDoInwardBookingSucceeded(actualWeight, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
+                                if (canExecutePosting)
+                                {
+                                    facilityPreBooking.DeleteACObject(dbApp, true);
+                                    currentBatchPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
+                                    OnDoInwardBookingSucceeded(actualWeight, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
 
-                                //batchPos.RecalcActualQuantity();
-                                //batchPos.TopParentPartslistPos.RecalcActualQuantity();
-                                // Aktualisiere Abrufemenge mit Istmenge, weil sonst ein erneuter Start nicht mehr möglich ist:
-                                //batchPos.TopParentPartslistPos.CalledUpQuantity = batchPos.TopParentPartslistPos.ActualQuantity;
+                                    //batchPos.RecalcActualQuantity();
+                                    //batchPos.TopParentPartslistPos.RecalcActualQuantity();
+                                    // Aktualisiere Abrufemenge mit Istmenge, weil sonst ein erneuter Start nicht mehr möglich ist:
+                                    //batchPos.TopParentPartslistPos.CalledUpQuantity = batchPos.TopParentPartslistPos.ActualQuantity;
+                                }
                             }
                             else
                             {

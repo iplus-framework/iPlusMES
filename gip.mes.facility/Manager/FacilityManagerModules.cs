@@ -285,6 +285,26 @@ namespace gip.mes.facility
             return null;
         }
 
+        public virtual IList<FacilityReservation> GetSelectedTargets(PickingPos pickingPos)
+        {
+            if (pickingPos == null || pickingPos.Material == null)
+                return null;
+            try
+            {
+                if (!pickingPos.FacilityReservation_PickingPos.Any())
+                    return null;
+                return pickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).OrderBy(c => c.Sequence).ToArray();
+            }
+            catch (Exception ec)
+            {
+                string msg = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msg += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException("FacilityManager", "GetSelectedTargets", msg);
+            }
+            return null;
+        }
 
         #endregion
 

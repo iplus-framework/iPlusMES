@@ -152,7 +152,7 @@ namespace gip.mes.datamodel
             set
             {
                 _SelectedReservation = value;
-                OnPropertyChanged("SelectedReservation");
+                OnPropertyChanged(nameof(SelectedReservation));
                 OnPropertyChanged("IsChecked");
 
             }
@@ -235,24 +235,18 @@ namespace gip.mes.datamodel
                             ParentReservation.FacilityReservation_ParentFacilityReservation.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
                         FacilityReservation tempReservation = ParentReservation.FacilityReservation_ParentFacilityReservation.ToArray().Where(c => c == SelectedReservation).FirstOrDefault();
                         if (tempReservation != null)
                         {
-                            //foreach (FacilityReservation childReservation in tempReservation.FacilityReservation_ParentFacilityReservation.ToArray())
-                            //{
-                            //    tempReservation.FacilityReservation_ParentFacilityReservation.Remove(childReservation);
-                            //    tempReservation.DeleteACObject(ParentBatchPlan.GetObjectContext(), true);
-                            //}
-
                             ParentReservation.FacilityReservation_ParentFacilityReservation.Remove(tempReservation);
                             tempReservation.DeleteACObject(ParentReservation.GetObjectContext(), true);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                 }
                 else if (ParentPos != null)
@@ -271,7 +265,7 @@ namespace gip.mes.datamodel
                             ParentPos.FacilityReservation_ProdOrderPartslistPos.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
@@ -288,7 +282,7 @@ namespace gip.mes.datamodel
                             tempReservation.DeleteACObject(ParentPos.GetObjectContext(), true);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                 }
                 else if (ParentBatchPlan != null)
@@ -307,7 +301,7 @@ namespace gip.mes.datamodel
                             ParentBatchPlan.FacilityReservation_ProdOrderBatchPlan.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
@@ -324,7 +318,7 @@ namespace gip.mes.datamodel
                             tempReservation.DeleteACObject(ParentBatchPlan.GetObjectContext(), true);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                 }
                 else if (ParentDeliveryNotePos != null)
@@ -345,7 +339,7 @@ namespace gip.mes.datamodel
                                 ParentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.Add(tempReservation);
                             }
                             _SelectedReservation = tempReservation;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                         else if (!value && SelectedReservation != null)
                         {
@@ -362,7 +356,7 @@ namespace gip.mes.datamodel
                                 tempReservation.DeleteACObject(ParentDeliveryNotePos.GetObjectContext(), true);
                             }
                             _SelectedReservation = null;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                     }
                     else if (ParentDeliveryNotePos.OutOrderPos != null)
@@ -381,7 +375,7 @@ namespace gip.mes.datamodel
                                 ParentDeliveryNotePos.OutOrderPos.FacilityReservation_OutOrderPos.Add(tempReservation);
                             }
                             _SelectedReservation = tempReservation;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                         else if (!value && SelectedReservation != null)
                         {
@@ -398,15 +392,17 @@ namespace gip.mes.datamodel
                                 tempReservation.DeleteACObject(ParentDeliveryNotePos.GetObjectContext(), true);
                             }
                             _SelectedReservation = null;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                     }
                 }
                 else if (ParentPickingPos != null)
                 {
+                    List<FacilityReservation> reservationList = null;
                     if (value && SelectedReservation == null)
                     {
-                        FacilityReservation tempReservation = ParentPickingPos.FacilityReservation_PickingPos.ToArray().Where(c => c.VBiACClassID == Module.ACClassID).FirstOrDefault();
+                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.ToArray().OrderBy(c => c.Sequence).ToList();
+                        FacilityReservation tempReservation = reservationList.Where(c => c.VBiACClassID == Module.ACClassID).FirstOrDefault();
                         if (tempReservation == null)
                         {
                             DatabaseApp dbApp = ParentPickingPos.GetObjectContext() as DatabaseApp;
@@ -416,13 +412,15 @@ namespace gip.mes.datamodel
                             tempReservation.Facility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == Module.ACClassID).FirstOrDefault();
                             tempReservation.PickingPos = ParentPickingPos;
                             ParentPickingPos.FacilityReservation_PickingPos.Add(tempReservation);
+                            reservationList.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
-                        FacilityReservation tempReservation = ParentPickingPos.FacilityReservation_PickingPos.ToArray().Where(c => c == SelectedReservation).FirstOrDefault();
+                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.ToArray().OrderBy(c => c.Sequence).ToList();
+                        FacilityReservation tempReservation = reservationList.Where(c => c == SelectedReservation).FirstOrDefault();
                         if (tempReservation != null)
                         {
                             foreach (FacilityReservation childReservation in tempReservation.FacilityReservation_ParentFacilityReservation.ToArray())
@@ -433,9 +431,23 @@ namespace gip.mes.datamodel
 
                             ParentPickingPos.FacilityReservation_PickingPos.Remove(tempReservation);
                             tempReservation.DeleteACObject(ParentPickingPos.GetObjectContext(), true);
+                            reservationList.Remove(tempReservation);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
+                    }
+                    if (reservationList != null)
+                    {
+                        bool changeDestination = true;
+                        var toFacility = ParentPickingPos.ToFacility;
+                        if (toFacility != null)
+                            changeDestination = !reservationList.Where(c => c.Facility == toFacility).Any();
+                        if (changeDestination)
+                            ParentPickingPos.ToFacility = reservationList.FirstOrDefault()?.Facility;
+                    }
+                    else
+                    {
+                        ParentPickingPos.ToFacility = null;
                     }
                 }
                 OnPropertyChanged("IsChecked");

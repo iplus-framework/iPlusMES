@@ -774,7 +774,7 @@ namespace gip.mes.processapplication
                             {
                                 bookingParam.IgnoreIsEnabled = true;
                                 ACMethodEventArgs resultBooking = null;
-                                bool canExecutePosting = CanExecutePosting(bookingParam);
+                                bool canExecutePosting = CanExecutePosting(bookingParam, pickingPos);
                                 if (canExecutePosting)
                                     resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
                                 if (resultBooking != null && (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible))
@@ -873,7 +873,7 @@ namespace gip.mes.processapplication
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
         }
 
-        public virtual bool CanExecutePosting(ACMethodBooking bookingParam)
+        public virtual bool CanExecutePosting(ACMethodBooking bookingParam, PickingPos pickingPos)
         {
             return true;
         }

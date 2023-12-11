@@ -29,13 +29,13 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
-        public PAEScaleGravimetric Scale
-        {
-            get
-            {
-                return FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric, null, 1).FirstOrDefault();
-            }
-        }
+        //public PAEScaleGravimetric Scale
+        //{
+        //    get
+        //    {
+        //        return FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric, null, 1).FirstOrDefault();
+        //    }
+        //}
         #endregion
 
     }

@@ -268,6 +268,11 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Booking
+        public virtual bool CanExecutePosting(ACMethodBooking bookingParam, FacilityBooking fb)
+        {
+            return true;
+        }
+
         public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, FacilityBooking fb, ACEventArgs e, bool isDischargingEnd)
         {
             // TDOO: Implement Standard-Behaviour for Relocation

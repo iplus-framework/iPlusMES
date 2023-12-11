@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Xml;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -810,11 +811,8 @@ namespace gip.mes.processapplication
                         CheckIfAutomaticTargetChangePossible = null;
                         if (discharging != null)
                         {
-                            double actualWeight = 0;
-                            var acValue = e.GetACValue("ActualQuantity");
-                            if (acValue != null)
-                                actualWeight = acValue.ParamAsDouble;
-                            //short simulationWeight = (short)acMethod["Source"];
+                            double? disChargedWeight = GetDischargedWeight(false, taskEntry, eM);
+                            double actualWeight = disChargedWeight.HasValue ? disChargedWeight.Value : 0;
 
                             if (OnTaskCallbackCanExecutePostings(sender, e, wrapObject, discharging, acMethod))
                             {
@@ -1416,6 +1414,95 @@ namespace gip.mes.processapplication
                 return ParentPWGroup.GetPAOrderInfo();
             }
             return null;
+        }
+        #endregion
+
+
+        #region Weighing
+        public PAEScaleGravimetric GravimetricScale
+        {
+            get
+            {
+                IPAMContScale pamScale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
+                if (pamScale == null)
+                {
+                    if (IsTransport)
+                    {
+                        PWDischarging otherActivePWDis = RootPW.FindChildComponents<PWDischarging>(c => c is PWDischarging
+                                                                    && c != this
+                                                                    && (c as PWDischarging).CurrentACState > ACStateEnum.SMIdle
+                                                                    && (c as PWDischarging).ParentPWGroup != null
+                                                                    && (c as PWDischarging).ParentPWGroup.AccessedProcessModule is IPAMContScale)
+                            .FirstOrDefault();
+                        if (otherActivePWDis != null)
+                            pamScale = otherActivePWDis.ParentPWGroup.AccessedProcessModule as IPAMContScale;
+                    }
+                }
+                return pamScale?.Scale;
+            }
+        }
+
+        protected virtual double? GetDischargedWeight(bool getDefaultValueIfSim, IACTask taskEntry = null, ACMethodEventArgs eM = null)
+        {
+            double? disChargedWeight = null;
+            if (taskEntry != null && eM != null)
+            {
+                var acValue = eM.GetACValue("ActualQuantity");
+                if (acValue != null)
+                {
+                    disChargedWeight = acValue.ParamAsDouble;
+                    if (Math.Abs(disChargedWeight.Value) <= double.Epsilon)
+                        disChargedWeight = null;
+                }
+            }
+            if (disChargedWeight.HasValue)
+                return disChargedWeight;
+
+            PAEScaleGravimetric scale = GravimetricScale;
+            PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
+            if (scale != null)
+            {
+                totalizingScale = scale as PAEScaleTotalizing;
+                if (totalizingScale != null)
+                    disChargedWeight = totalizingScale.TotalActualWeight.ValueT;
+                else
+                    // Negative Weighing
+                    disChargedWeight = scale.StoredWeightForPosting.ValueT - scale.ActualWeight.ValueT;
+            }
+            if ((!disChargedWeight.HasValue || Math.Abs(disChargedWeight.Value) <= double.Epsilon))
+            {
+                if (IsSimulationOn)
+                {
+                    if (getDefaultValueIfSim)
+                        disChargedWeight = 0.001;
+                }
+                else
+                {
+                    PAFDischarging discharging = ParentPWGroup != null && taskEntry != null ? ParentPWGroup.GetExecutingFunction<PAFDischarging>(taskEntry.RequestID) : CurrentExecutingFunction;
+                    if (discharging != null)
+                    {
+                        ACMethod acMethod;
+                        MsgWithDetails msgError;
+                        PAProcessFunction.CompleteResult result = discharging.ReceiveACMethodResult(out acMethod, out msgError);
+                        if (result == PAProcessFunction.CompleteResult.Succeeded && acMethod != null)
+                        {
+                            var acValue = acMethod.ResultValueList.GetACValue("ActualQuantity");
+                            if (acValue != null)
+                                disChargedWeight = acValue.ParamAsDouble;
+                        }
+                    }
+                    if (getDefaultValueIfSim && IsSimulationOn && (!disChargedWeight.HasValue || Math.Abs(disChargedWeight.Value) <= double.Epsilon))
+                        disChargedWeight = 0.001;
+                }
+            }
+            return disChargedWeight;
+        }
+
+        protected virtual void RememberWeightOnRunDischarging(bool isNewStart)
+        {
+            PAEScaleGravimetric scale = GravimetricScale;
+            if (scale != null && !(scale is PAEScaleTotalizing))
+                scale.StoredWeightForPosting.ValueT = isNewStart ? 0.0 : scale.ActualWeight.ValueT;
         }
         #endregion
 

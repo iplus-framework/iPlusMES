@@ -728,7 +728,7 @@ namespace gip.bso.logistics
 
         // Static, if more instances active
         //private static bool _IsStartingBatchPlan = false;
-        [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
+        [ACMethodCommand("", "en{'Start Workflow'}de{'Starte Workflow'}", (short)MISort.Start)]
         public void StartWorkflow()
         {
             if (!IsEnabledStartWorkflow()) 
