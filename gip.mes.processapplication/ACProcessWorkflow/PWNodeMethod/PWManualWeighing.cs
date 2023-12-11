@@ -97,6 +97,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("DiffWeighing", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("DiffWeighing", "en{'Difference weighing'}de{'Differenzwägung'}");
 
+            method.ParameterValueList.Add(new ACValue("EachPosSeparated", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleifer verwiegen'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWManualWeighing), HandleExecuteACMethod_PWManualWeighing);
@@ -629,6 +632,21 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool EachPosSeparated
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("EachPosSeparated");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
         #endregion
 
         #region Properties => Materials, Relations and FacilityCharge
@@ -763,7 +781,7 @@ namespace gip.mes.processapplication
             set;
         }
 
-        public bool HasAnyMaterialToProcess
+        public bool HasAnyMaterialToProcessProd
         {
             get
             {
@@ -802,6 +820,24 @@ namespace gip.mes.processapplication
                             return false;
                     }
                 }
+
+                return true;
+            }
+        }
+
+        public bool HasAnyMaterialToProcess
+        {
+            get
+            {
+                if (IsProduction)
+                    return HasAnyMaterialToProcessProd;
+                else if (IsTransport)
+                {
+                    PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                    if (pwMethodTransport != null && pwMethodTransport.CurrentPicking != null)
+                        return HasAnyMaterialToProcessPicking;
+                }
+
 
                 return true;
             }

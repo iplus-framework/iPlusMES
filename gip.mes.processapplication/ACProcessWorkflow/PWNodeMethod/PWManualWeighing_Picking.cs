@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static gip.mes.facility.ACPartslistManager;
+using static gip.mes.processapplication.PWDosing;
 
 namespace gip.mes.processapplication
 {
@@ -23,6 +24,65 @@ namespace gip.mes.processapplication
                 return pwMethodTransport != null ? pwMethodTransport.PickingManager : null;
             }
         }
+
+        public bool HasAnyMaterialToProcessPicking
+        {
+            get
+            {
+                PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                if (pwMethodTransport == null || pwMethodTransport.CurrentPicking == null)
+                    return false;
+
+                PAProcessModule module = ParentPWGroup.AccessedProcessModule != null ? ParentPWGroup.AccessedProcessModule : ParentPWGroup.FirstAvailableProcessModule;
+                if (module == null && ParentPWGroup.ProcessModuleList != null) // If all occupied, then use first that is generally possible 
+                    module = ParentPWGroup.ProcessModuleList.FirstOrDefault();
+                if (module == null)
+                    return false;
+
+
+                using (var dbIPlus = new Database())
+                using (var dbApp = new DatabaseApp(dbIPlus))
+                {
+                    Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
+                    if (picking == null)
+                        return false;
+                    PickingPos pickingPosFromPWMethod = null;
+                    if (pwMethodTransport.CurrentPickingPos != null)
+                        pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
+
+                    PickingPos[] openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
+                                    //.Include(c => c.FromFacility.FacilityCharge_Facility)
+                                    .Where(c => c.PickingID == picking.PickingID
+                                            && c.MDDelivPosLoadStateID.HasValue
+                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                                || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                    .OrderBy(c => c.Sequence)
+                                    .ToArray();
+
+                    if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && openPickings != null && openPickings.Any())
+                    {
+                        openPickings = openPickings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                                   .OrderBy(c => c.Sequence)
+                                                   .ToArray();
+                    }
+
+                    if (openPickings != null && openPickings.Any())
+                        return true;
+
+
+                    //if (!DoseAllPosFromPicking)
+                    //{
+                    //    if (pickingPosFromPWMethod == null)
+                    //        openPickings = openPickings.Take(1).ToArray();
+                    //    else
+                    //        openPickings = new PickingPos[] { pickingPosFromPWMethod };
+                    //}
+                }
+
+                return false;
+            }
+        }
+
 
         public virtual StartNextCompResult StartManualWeighingPicking(PAProcessModule module)
         {
@@ -53,12 +113,23 @@ namespace gip.mes.processapplication
                     if (picking == null)
                         return StartNextCompResult.Done;
 
-                    PickingPos[] openPickings = picking.PickingPos_Picking
+                    IEnumerable<PickingPos> query = picking.PickingPos_Picking
                                                         .Where(c => c.MDDelivPosLoadStateID.HasValue
                                                                 && c.TargetQuantityUOM > 0.00001
                                                                 && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
                                                                  || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
-                                                        .OrderBy(c => c.Sequence).ToArray();
+                                                        .OrderBy(c => c.Sequence);
+                    if (EachPosSeparated)
+                        query = query.Take(1);
+                    PickingPos[] openPickings = query.ToArray();
+
+                    //EachPosSeparated
+                    //PickingPos[] openPickings = picking.PickingPos_Picking
+                    //                                    .Where(c => c.MDDelivPosLoadStateID.HasValue
+                    //                                            && c.TargetQuantityUOM > 0.00001
+                    //                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                    //                                             || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                    //                                    .OrderBy(c => c.Sequence).ToArray();
 
                     if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && openPickings != null && openPickings.Any())
                         openPickings = openPickings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
