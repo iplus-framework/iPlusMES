@@ -88,7 +88,7 @@ namespace gip.mes.maintenance
                 childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return returnValue;
-            if (!(bool)childBSO.ACUrlCommand("!ShowMaintenanceWarning", warningComponentsList))
+            if (!(bool)childBSO.ExecuteMethod(nameof(BSOMaintOrder.ShowMaintenanceWarning), warningComponentsList))
                 return returnValue = false;
             childBSO.Stop();
             return returnValue;
@@ -106,7 +106,7 @@ namespace gip.mes.maintenance
                 childBSO = _this.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ExecuteMethod("ShowMaintenance", _this);
+            childBSO.ExecuteMethod(nameof(BSOMaintOrder.ShowMaintenance), _this);
             childBSO.Stop();
             return;
         }
@@ -152,7 +152,7 @@ namespace gip.mes.maintenance
                 childBSO = _this.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowMaintenanceHistory", _this);
+            childBSO.ACUrlCommand(nameof(BSOMaintOrder.ShowMaintenanceHistory), _this);
             childBSO.Stop();
             return;
         }
@@ -200,25 +200,9 @@ namespace gip.mes.maintenance
 
                 var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
                 if (maintService != null)
-                    maintService.ACUrlCommand("!SetNewMaintOrderManual", _this.GetACUrl());
+                    maintService.ExecuteMethod(nameof(ACMaintService.SetNewMaintOrderManual), _this.GetACUrl());
 
                 return;
-
-            // TODO Ivan: This must happen on Serverside: See Example at BSOMAintConfig.ApplyChanges()
-
-            //ACMaintService acMaintService = appManager.FindChildComponents<ACMaintService>(4).FirstOrDefault();
-            //if (acMaintService == null)
-            //    return;
-
-            //vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
-            //vd.MaintACClass maintConfig = FindMaintConfiguration(_this.ACType as ACClass, dbApp.MaintACClass.ToList());
-            //if (maintConfig == null)
-            //    return;
-
-
-            //acMaintService.SetNewMaintOrder(maintConfig.MaintACClassID, _this, dbApp);
-            //}
-            //return;
         }
 
         public static bool IsEnabledGenerateNewMaintenanceOrder(IACComponent acComponent)

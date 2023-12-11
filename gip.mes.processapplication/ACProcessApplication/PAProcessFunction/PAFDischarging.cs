@@ -291,6 +291,9 @@ namespace gip.mes.processapplication
                 return msg;
             }
 
+            if (originalR.IsPredefinedRoute)
+                RoutingService.ExecuteMethod(nameof(ACRoutingService.OnRouteUsed), originalR);
+
             using (var db = new Database())
             {
                 try

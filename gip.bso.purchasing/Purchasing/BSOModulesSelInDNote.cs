@@ -549,7 +549,7 @@ namespace gip.bso.purchasing
             if (routeSelector.RouteResult != null)
             {
                 if (routeSelector.RouteResult.Count() > 1)
-                    SelectedTarget.CurrentRoute = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                    SelectedTarget.CurrentRoute = Route.MergeRoutes(routeSelector.RouteResult);
                 else
                     SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
             }
@@ -579,7 +579,7 @@ namespace gip.bso.purchasing
                 if (routeSelector.RouteResult != null)
                 {
                     if (routeSelector.RouteResult.Count() > 1)
-                        SelectedTarget.CurrentRoute = Route.MergeRoutesWithoutDuplicates(routeSelector.RouteResult);
+                        SelectedTarget.CurrentRoute = Route.MergeRoutes(routeSelector.RouteResult);
                     else
                         SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
                 }
