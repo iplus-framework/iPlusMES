@@ -736,43 +736,98 @@ namespace gip.bso.logistics
             //_IsStartingBatchPlan = true;
             try
             {
-
                 if (!StartBatchPlanValidation())
                     return;
 
-                //gip.core.datamodel.ACClassMethod acClassMethod = CurrentACClassMethod;
-                //gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
+                gip.core.datamodel.ACClassMethod acClassMethod = CurrentACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>(this.Database.ContextIPlus);
+                if (acClassMethod == null)
+                    return;
+                gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
 
-                //AppManagersList = this.Root.FindChildComponents(project.RootClass, 1);
-                //if (AppManagersList.Count > 1)
-                //{
-                //    DialogResult = null;
-                //    ShowDialog(this, "SelectAppManager");
-                //    if (DialogResult == null || DialogResult.SelectedCommand != eMsgButton.OK)
-                //        return;
-                //}
-                //else
-                //    SelectedAppManager = AppManagersList.FirstOrDefault();
+                AppManagersList = this.Root.FindChildComponents(project.RootClass, 1);
+                if (AppManagersList.Count > 1)
+                {
+                    DialogResult = null;
+                    ShowDialog(this, "SelectAppManager");
+                    if (DialogResult == null || DialogResult.SelectedCommand != eMsgButton.OK)
+                        return;
+                }
+                else
+                    SelectedAppManager = AppManagersList.FirstOrDefault();
 
-                //ACComponent pAppManager = SelectedAppManager as ACComponent;
-                //if (pAppManager == null)
-                //    return;
-                //if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
-                //{
-                //    // TODO: Message
-                //    return;
-                //}
+                ACComponent pAppManager = SelectedAppManager as ACComponent;
+                if (pAppManager == null)
+                    return;
+                if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
+                {
+                    // TODO: Message
+                    return;
+                }
 
-                //ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
-                //poManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, SelectedBatchPlanForIntermediate, CurrentPicking, SelectedIntermediate, true);
+                var acProgramIDs = this.DatabaseApp.OrderLog.Where(c => c.PickingPosID.HasValue
+                                                    && c.PickingPos.PickingID == CurrentPicking.PickingID)
+                                         .Select(c => c.VBiACProgramLog.ACProgramID)
+                                         .Distinct()
+                                         .ToArray();
 
-                //OnPropertyChanged("CurrentProdOrderPartslist");
-                //OnPropertyChanged("SelectedIntermediate");
-                //OnPropertyChanged("SelectedBatchPlanForIntermediate");
-                //bool succ = ACSaveChanges();
-                //if (!succ)
-                //    return;
-                //poManager.StartBatchPlan(DatabaseApp, pAppManager, CurrentPicking, SelectedIntermediate, acClassMethod);
+                if (acProgramIDs != null && acProgramIDs.Any())
+                {
+                    ChildInstanceInfoSearchParam searchParam = new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, ACProgramIDs = acProgramIDs };
+                    var childInstanceInfos = pAppManager.GetChildInstanceInfo(1, searchParam);
+                    if (childInstanceInfos != null && childInstanceInfos.Any())
+                    {
+                        //var childInstanceInfo = childInstanceInfos.FirstOrDefault();
+                        //string acUrlComand = String.Format("{0}\\{1}!{2}", childInstanceInfo.ACUrlParent, childInstanceInfo.ACIdentifier, PWMethodTransportBase.ReloadBPAndResumeACIdentifier);
+                        //pAppManager.ACUrlCommand(acUrlComand);
+                        return;
+                    }
+                }
+
+                ACMethod acMethod = pAppManager.NewACMethod(acClassMethod.ACIdentifier);
+                if (acMethod == null)
+                    return;
+
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
+                gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(this.Database.ContextIPlus, null, secondaryKey);
+                program.ProgramACClassMethod = acClassMethod;
+                program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
+                this.Database.ContextIPlus.ACProgram.AddObject(program);
+                //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
+                if (ACSaveChanges())
+                {
+                    ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
+                    if (paramProgram == null)
+                        acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
+                    else
+                        paramProgram.Value = program.ACProgramID;
+
+                    if (this.CurrentPicking != null)
+                    {
+                        ACValue acValuePPos = acMethod.ParameterValueList.GetACValue(Picking.ClassName);
+                        if (acValuePPos == null)
+                            acMethod.ParameterValueList.Add(new ACValue(Picking.ClassName, typeof(Guid), CurrentPicking.PickingID));
+                        else
+                            acValuePPos.Value = CurrentPicking.PickingID;
+                    }
+
+                    gip.core.datamodel.ACClassWF allowedWFNode = CurrentACClassWF; // SelectedPWNodeProcessWorkflow;
+                    if (allowedWFNode != null)
+                    {
+                        ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
+                        if (paramACClassWF == null)
+                            acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), allowedWFNode.ACClassWFID));
+                        else
+                            paramACClassWF.Value = allowedWFNode.ACClassWFID;
+                    }
+
+                    pAppManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
+
+                    //IACPointAsyncRMI rmiInvocationPoint = pAppManager.GetPoint(Const.TaskInvocationPoint) as IACPointAsyncRMI;
+                    //if (rmiInvocationPoint != null)
+                    //rmiInvocationPoint.AddTask(acMethod, this);
+
+                }
+
             }
             catch (Exception e)
             {
@@ -788,13 +843,17 @@ namespace gip.bso.logistics
 
         public bool IsEnabledStartWorkflow()
         {
-            return false;
-                //SelectedBatchPlanForIntermediate != null &&
-                //CurrentPicking != null &&
-                //SelectedIntermediate != null &&
-                //CurrentACClassMethod != null &&
-                //SelectedBatchPlanForIntermediate.PlanState < GlobalApp.BatchPlanState.AutoStart &&
-                //ACProdOrderManager.IsEnabledStartBatchPlan(SelectedBatchPlanForIntermediate, CurrentPicking, SelectedIntermediate);
+            if (this.CurrentPicking == null
+                || CurrentACClassMethod == null
+                || this.CurrentPicking.PickingState >= PickingStateEnum.InProcess
+                || PickingBSO == null
+                || PickingBSO.PickingPosList == null
+                || !PickingBSO.PickingPosList.Any()
+                || !PickingBSO.PickingPosList.Where(c => c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any()
+                || PickingManager == null
+                || CurrentACClassWF == null)
+                return false;
+            return true;
         }
 
         public bool StartBatchPlanValidation()
@@ -816,50 +875,41 @@ namespace gip.bso.logistics
         public MsgWithDetails StartBatchValidation(DatabaseApp databaseApp, Picking picking, List<IACConfigStore> configStores)
         {
             MsgWithDetails msg = null;
-            //ACPartslistManager plManager = ACPartslistManager.GetServiceInstance(this);
-            //ACMatReqManager matReqManager = ACMatReqManager.GetServiceInstance(this);
-            //ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
+            if (PickingManager == null)
+                return new MsgWithDetails();
 
-            //if (plManager != null)
-            //{
-            //    using (var dbIPlus = new Database())
-            //    {
-            //        msg = poManager.ValidateStart(databaseApp, dbIPlus, this, prodOrderPartslist,
-            //                                                    configStores,
-            //                                                    PARole.ValidationBehaviour.Strict,
-            //                                                    plManager, matReqManager);
 
-            //        if (msg != null)
-            //        {
-            //            if (!msg.IsSucceded())
-            //            {
-            //                if (String.IsNullOrEmpty(msg.Message))
-            //                {
-            //                    // Der Auftrag kann nicht gestartet werden weil:
-            //                    msg.Message = Root.Environment.TranslateMessage(this, "Question50027");
-            //                }
-            //                Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
-            //            }
-            //            else if (msg.HasWarnings())
-            //            {
-            //                if (String.IsNullOrEmpty(msg.Message))
-            //                {
-            //                    //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
-            //                    msg.Message = Root.Environment.TranslateMessage(this, "Question50028");
-            //                }
-            //                var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
-            //                if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
-            //                    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "txtWarningsAreNotAllowed") });
-            //            }
-            //        }
+            using (var dbIPlus = new Database())
+            {
+                msg = this.PickingManager.ValidateStart(databaseApp, dbIPlus, CurrentPicking,
+                                                            configStores,
+                                                            PARole.ValidationBehaviour.Strict);
 
-            //        if (msg.IsSucceded())
-            //        {
-            //            if (poManager.SetBatchPlanValidated(databaseApp, prodOrderPartslist) > 0)
-            //                ACSaveChanges();
-            //        }
-            //    }
-            //}
+                if (msg != null)
+                {
+                    if (!msg.IsSucceded())
+                    {
+                        if (String.IsNullOrEmpty(msg.Message))
+                        {
+                            // Der Auftrag kann nicht gestartet werden weil:
+                            msg.Message = Root.Environment.TranslateMessage(this, "Question50027");
+                        }
+                        Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                    }
+                    else if (msg.HasWarnings())
+                    {
+                        if (String.IsNullOrEmpty(msg.Message))
+                        {
+                            //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
+                            msg.Message = Root.Environment.TranslateMessage(this, "Question50028");
+                        }
+                        var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                        if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
+                            msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "txtWarningsAreNotAllowed") });
+                    }
+                }
+
+            }
 
             return msg;
         }

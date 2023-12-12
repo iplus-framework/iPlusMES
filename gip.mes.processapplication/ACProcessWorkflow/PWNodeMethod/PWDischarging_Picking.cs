@@ -950,8 +950,15 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Booking
-        public virtual bool CanExecutePosting(ACMethodBooking bookingParam, PickingPos pickingPos)
+        public virtual bool CanExecutePosting(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd, ACMethodBooking bookingParam)
         {
+            if (bookingParam == null)
+            {
+                // If there are any PWDosings od PWManualWeighings, then Relocationbooking is already done
+                PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                return   pwMethodTransport != null
+                     && !pwMethodTransport.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial).Any();
+            }
             return true;
         }
 
@@ -959,12 +966,12 @@ namespace gip.mes.processapplication
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
-            PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
-            if (actualWeight > 0.000001 
+            if (   actualWeight > 0.000001 
                 && pickingPos != null
-                && pwMethodTransport != null && !pwMethodTransport.FindChildComponents<PWDosing>(c => c is PWDosing).Any() 
-                && ACFacilityManager != null && PickingManager != null
-                && !NoPostingOnRelocation)
+                && ACFacilityManager != null 
+                && PickingManager != null
+                && !NoPostingOnRelocation
+                && CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, null))
             {
                 if (pickingPos.Material == null)
                 {
@@ -1002,7 +1009,7 @@ namespace gip.mes.processapplication
                     {
                         bookingParam.IgnoreIsEnabled = true;
                         ACMethodEventArgs resultBooking = null;
-                        bool canExecutePosting = CanExecutePosting(bookingParam, pickingPos);
+                        bool canExecutePosting = CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, bookingParam);
                         if (canExecutePosting)
                             resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
                         if (resultBooking != null && (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible))
