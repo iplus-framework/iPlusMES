@@ -647,6 +647,7 @@ namespace gip.bso.manufacturing
                 _SelectedFacilityCharge = value;
 
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ShowAllQuants));
 
                 if (value != null)
                     ShowSelectFacilityLotInfo = false;
@@ -719,7 +720,6 @@ namespace gip.bso.manufacturing
             protected set;
         }
 
-        //TODO: take it in one query from db
         protected ObservableCollection<FacilityChargeItem> _FacilityChargeList;
         [ACPropertyList(629, "FacilityCharge")]
         public virtual ObservableCollection<FacilityChargeItem> FacilityChargeList
@@ -781,6 +781,26 @@ namespace gip.bso.manufacturing
             set
             {
                 _ShowScaleGross = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _ShowAllQuants;
+        [ACPropertyInfo(630, "", "en{'All quants'}de{'Alle Quants'}", "", true)]
+        public bool ShowAllQuants
+        {
+            get => _ShowAllQuants;
+            set
+            {
+                if (_ShowAllQuants != value)
+                {
+                    _ShowAllQuants = value;
+                    ParentBSOWCS.ApplicationQueue.Add(() =>
+                    {
+                        _FacilityChargeList = null;
+                        FacilityChargeList = FillFacilityChargeList();
+                    });
+                }
                 OnPropertyChanged();
             }
         }
@@ -2779,15 +2799,36 @@ namespace gip.bso.manufacturing
                             {
                                 Guid? materialID = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.MaterialID;
                                 if (materialID.HasValue)
-                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
+                                {
+                                    IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                    if (!ShowAllQuants)
+                                    {
+                                        ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
+                                        silosResult.ApplyLotReservationFilter(SelectedWeighingMaterial.PosRelation, 0);
+                                        if (silosResult.HasLotReservations)
+                                            quants = silosResult.FilteredResult.SelectMany(c => c.FacilityCharges.Where(p => p.IsReservedLot).Select(x => x.Quant));
+                                    }
+
+                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(quants.Select(s => new FacilityChargeItem(s, TargetWeight)));
+                                }
                             }
                             else if (SelectedWeighingMaterial.PickingPosition != null)
                             {
                                 Guid? materialID = SelectedWeighingMaterial?.PickingPosition?.Material?.MaterialID;
                                 if (materialID.HasValue)
-                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
-                            }
+                                {
+                                    IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                    if (!ShowAllQuants)
+                                    {
+                                        ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
+                                        silosResult.ApplyLotReservationFilter(SelectedWeighingMaterial.PickingPosition, 0);
+                                        if (silosResult.HasLotReservations)
+                                            quants = silosResult.FilteredResult.SelectMany(c => c.FacilityCharges.Where(p => p.IsReservedLot).Select(x => x.Quant));
+                                    }
 
+                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(quants.Select(s => new FacilityChargeItem(s, TargetWeight)));
+                                }
+                            }
                         }
 
                         if (_FacilityChargeList != null)
@@ -3122,6 +3163,12 @@ namespace gip.bso.manufacturing
                 case nameof(CurrentScaleObject):
                     {
                         if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
+                            return Global.ControlModes.Disabled;
+                        return Global.ControlModes.Enabled;
+                    }
+                case nameof(ShowAllQuants):
+                    {
+                        if (SelectedFacilityCharge != null)
                             return Global.ControlModes.Disabled;
                         return Global.ControlModes.Enabled;
                     }

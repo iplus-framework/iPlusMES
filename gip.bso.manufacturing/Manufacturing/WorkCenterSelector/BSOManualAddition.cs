@@ -43,10 +43,10 @@ namespace gip.bso.manufacturing
             get => base.ScaleRealWeight; 
             set
             {
-                _ScaleRealWeight = value;
-                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, ScaleAddActualWeight);
-                OnPropertyChanged(nameof(ScaleActualWeight));
-                OnPropertyChanged(nameof(ScaleDifferenceWeight));
+                //_ScaleRealWeight = value;
+                //ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, ScaleAddActualWeight);
+                //OnPropertyChanged(nameof(ScaleActualWeight));
+                //OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 
