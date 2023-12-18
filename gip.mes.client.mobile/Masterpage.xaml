@@ -89,26 +89,12 @@
                 <ColumnDefinition Width="300"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <vb:VBStatusBar x:Name="PageStatusBar" Grid.Column="0" Height="56">
-                <vb:VBStatusBarItem>
-                    <vb:VBTextBlock MouseRightButtonDown="CustomVBTextBlock_MouseRightButtonDown">Zoom %</vb:VBTextBlock>
-                </vb:VBStatusBarItem>
                 <vb:VBStatusBarItem x:Name="StatusBarZoom">
-                    <vb:VBSlider x:Name="sldZoom" Width="100" Minimum="50" Maximum="200" Value="100" 
-                        LargeChange="20" SmallChange="5" Cursor="Hand"
-                        Ticks="60,70,80,90,100,110,120,130,140,150,175,200" TickPlacement="BottomRight" IsSnapToTickEnabled="True">
-                    </vb:VBSlider>
-                </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem>
-                    <vb:VBTextBlock Text="{Binding ElementName=sldZoom,Path=Value}">
-                    </vb:VBTextBlock>
+                    <vb:VBButton x:Name="MessagesButton" Width="150" Height="40" Padding="5,0" BorderThickness="1" Margin="5,0,0,0" IsEnabled="False" Click="MessagesButton_Click">
+                        <TextBlock Text="Messages" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </vb:VBButton>
                 </vb:VBStatusBarItem>
                 <vb:VBStatusBarItem x:Name="StatusBarInfoMessage"></vb:VBStatusBarItem>
-                <vb:VBStatusBarItem Padding="5,0,0,0">
-                    <vb:VBControlSelectionIcon x:Name="FreezeScreenIcon" Click="FreezeScreenIcon_Click"></vb:VBControlSelectionIcon>
-                </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem Padding="5,0,0,0">
-                    <vb:VBControlSelectionIcon x:Name="EditVBDesignIcon" Click="EditVBDesignIcon_Click" IconType="1"></vb:VBControlSelectionIcon>
-                </vb:VBStatusBarItem>
                 <vb:VBStatusBarItem Padding="5,0,0,0" MouseDoubleClick="WarningIcon_MouseDoubleClick" x:Name="WarningIcon">
                     <vb:VBStatusBarItem.Style>
                         <Style TargetType="vb:VBStatusBarItem">
@@ -170,6 +156,13 @@
                         </Canvas>
                     </Viewbox>
                 </vb:VBStatusBarItem>
+                <vb:VBStatusBarItem Padding="5,0,0,0">
+                    <vb:VBControlSelectionIcon x:Name="FreezeScreenIcon" Click="FreezeScreenIcon_Click"></vb:VBControlSelectionIcon>
+                </vb:VBStatusBarItem>
+                <vb:VBStatusBarItem Padding="5,0,0,0">
+                    <vb:VBControlSelectionIcon x:Name="EditVBDesignIcon" Click="EditVBDesignIcon_Click" IconType="1"></vb:VBControlSelectionIcon>
+                </vb:VBStatusBarItem>
+
             </vb:VBStatusBar>
             <vb:VBStatusBar x:Name="MidStatusBar" Grid.Column="1" Height="56">
             </vb:VBStatusBar>
