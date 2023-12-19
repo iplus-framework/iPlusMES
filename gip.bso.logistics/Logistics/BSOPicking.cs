@@ -18,6 +18,7 @@ using gip.core.manager;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -988,11 +989,13 @@ namespace gip.bso.logistics
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Current = value;
+
                 if (ProcessWorkflowList != null && ProcessWorkflowList.Any() && value != null && value.ACClassMethodID != null)
-                    SelectedProcessWorkflow =
-                        ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == CurrentPicking.ACClassMethodID);
+                    SelectedProcessWorkflow = ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == CurrentPicking.ACClassMethodID);
                 else
                     SelectedProcessWorkflow = null;
+                CurrentProcessWorkflow = SelectedProcessWorkflow;
+
                 OnPropertyChanged(nameof(CurrentPicking));
                 if (value != null && _InLoad)
                     value.PickingPos_Picking.AutoRefresh(this.DatabaseApp);
@@ -4421,6 +4424,18 @@ namespace gip.bso.logistics
             }
         }
 
+        private gipCoreData.ACClassMethod _CurrentProcessWorkflow;
+        [ACPropertySelected(628, "", "en{'Process Workflow'}de{'Prozess-Workflow'}")]
+        public gipCoreData.ACClassMethod CurrentProcessWorkflow
+        {
+            get => _CurrentProcessWorkflow;
+            set
+            {
+                _CurrentProcessWorkflow = value;
+                OnPropertyChanged();
+            }
+        }
+
         private gipCoreData.ACClassMethod _SelectedProcessWorkflow;
         /// <summary>
         /// Selected property for ACClassMethod
@@ -4440,10 +4455,10 @@ namespace gip.bso.logistics
                     _SelectedProcessWorkflow = value;
                     if (ProcessWorkflowPresenter != null)
                     {
-                        if (_SelectedProcessWorkflow == null)
-                            this.ProcessWorkflowPresenter.Load(null);
-                        else
-                            this.ProcessWorkflowPresenter.Load(_SelectedProcessWorkflow);
+                        gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ? 
+                                                           CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
+                                                           null;
+                        ProcessWorkflowPresenter.Load(method);
                     }
                     OnPropertyChanged(nameof(SelectedProcessWorkflow));
                 }
@@ -4468,31 +4483,48 @@ namespace gip.bso.logistics
 
         private List<gipCoreData.ACClassMethod> LoadProcessWorkflowList()
         {
-            if (!ProcessWorkflowShowAllWorkflows)
+            string pwClassNameOfRoot = nameof(PWMethodTransportBase);
+               
+            List<gipCoreData.ACClassMethod> tempList = DatabaseApp.ContextIPlus.ACClassMethod
+                                                                  .Where(c => c.ACKindIndex == (Int16)Global.ACKinds.MSWorkflow 
+                                                                           && c.ACClassWF_ACClassMethod
+                                                                               .Any(wf => !wf.ParentACClassWFID.HasValue 
+                                                                                       && (wf.PWACClass.ACIdentifier == pwClassNameOfRoot
+                                                                                       || (wf.PWACClass.BasedOnACClassID.HasValue 
+                                                                                       && (wf.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot
+                                                                                       || (wf.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue 
+                                                                                        && wf.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot))))
+                                                                                       && !wf.ACClassMethod.IsSubMethod))
+                                                                  .ToArray()
+                                                                  .OrderBy(c => c.ACCaption)
+                                                                  .ThenBy(c => c.ACIdentifier)
+                                                                  .ToList();
+
+            MDMaterialGroup pickingGroup = DatabaseApp.MDMaterialGroup.FirstOrDefault(c => c.MDMaterialGroupIndex == (short)MDMaterialGroup.MaterialGroupTypes.Picking);
+
+            MaterialWF materialWf = DatabaseApp.MaterialWF.Include(c => c.MaterialWFACClassMethod_MaterialWF)
+                                                          .FirstOrDefault(c => c.MaterialWFRelation_MaterialWF
+                                                                                .Any(x => x.SourceMaterial.MDMaterialGroupID == pickingGroup.MDMaterialGroupID
+                                                                                       || x.TargetMaterial.MDMaterialGroupID == pickingGroup.MDMaterialGroupID));
+
+            if (materialWf != null)
             {
-                string pwClassNameOfRoot = "PWMethodTransportBase";
-                return
-                DatabaseApp
-                .ContextIPlus
-                .ACClassMethod
-                .Where(c => c.ACKindIndex == (Int16)Global.ACKinds.MSWorkflow &&
-                    c.ACClassWF_ACClassMethod
-                        .Any(wf => !wf.ParentACClassWFID.HasValue
-                            && (wf.PWACClass.ACIdentifier == pwClassNameOfRoot
-                                || (wf.PWACClass.BasedOnACClassID.HasValue
-                                    && (wf.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot
-                                        || (wf.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && wf.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot))))
-                            && !wf.ACClassMethod.IsSubMethod))
-                .OrderBy(c => c.ACIdentifier)
-                .ToList();
+                List<Guid> relatedACClassMethods = materialWf.MaterialWFACClassMethod_MaterialWF.OrderBy(x => x.ACClassMethod.ACCaption)
+                                                                                                .ThenBy(x => x.ACClassMethod.ACIdentifier)
+                                                                                                .Select(c => c.ACClassMethodID).ToList();
+                if (relatedACClassMethods.Any())
+                {
+                    tempList = tempList.OrderBy(c =>
+                                        {
+                                            int index = relatedACClassMethods.IndexOf(c.ACClassMethodID);
+                                            if (index == -1)
+                                                index = tempList.IndexOf(c) + 10000;
+                                            return index;
+                                        }).ToList();
+                }
             }
-            else
-                return DatabaseApp
-                    .ContextIPlus
-                    .ACClassMethod
-                    .Where(c => c.ACKindIndex == (Int16)Global.ACKinds.MSWorkflow)
-                    .OrderBy(c => c.ACIdentifier)
-                    .ToList();
+
+            return tempList;
         }
 
         #endregion
@@ -4503,15 +4535,38 @@ namespace gip.bso.logistics
         [ACMethodInteraction("ProcessWorkflow", "en{'Add'}de{'Hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow")]
         public void ProcessWorkflowAssign()
         {
-            if (!IsEnabledProcessWorkflowAssign()) return;
-            CurrentPicking.ACClassMethod = SelectedProcessWorkflow.FromAppContext<gip.mes.datamodel.ACClassMethod>(DatabaseApp);
-            OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
-            OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
+            if (!IsEnabledProcessWorkflowAssign()) 
+                return;
+
+            ShowDialog(this, "SelectWorkflowDialog");
         }
 
         public bool IsEnabledProcessWorkflowAssign()
         {
-            return SelectedProcessWorkflow != null && CurrentPicking != null;
+            return CurrentPicking != null;
+        }
+
+        [ACMethodInteraction("ProcessWorkflow", "en{'Add'}de{'Hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow")]
+        public void ProcessWorkflowAssignOk()
+        {
+            CurrentPicking.ACClassMethod = SelectedProcessWorkflow.FromAppContext<gip.mes.datamodel.ACClassMethod>(DatabaseApp);
+            CurrentProcessWorkflow = SelectedProcessWorkflow;
+            OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
+            OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
+
+            if (ProcessWorkflowPresenter != null)
+            {
+                gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ?
+                                                   CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
+                                                   null;
+                ProcessWorkflowPresenter.Load(method);
+            }
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledProcessWorkflowAssignOk()
+        {
+            return SelectedProcessWorkflow != null;
         }
 
         [ACMethodInteraction("ProcessWorkflow", "en{'Remove'}de{'Entfernen'}", (short)MISort.Delete, true, "CurrentProcessWorkflow")]
@@ -4520,7 +4575,12 @@ namespace gip.bso.logistics
             if (!IsEnabledProcessWorkflowCancel()) return;
             CurrentPicking.ACClassMethod = null;
             CurrentPicking.ACClassMethodID = null;
+
+            if (CurrentProcessWorkflow != SelectedProcessWorkflow)
+                SelectedProcessWorkflow = CurrentProcessWorkflow;
+
             SelectedProcessWorkflow = null;
+            CurrentProcessWorkflow = null;
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
         }

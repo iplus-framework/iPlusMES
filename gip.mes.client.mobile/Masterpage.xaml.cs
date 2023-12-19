@@ -18,6 +18,7 @@ using gip.core.layoutengine.Helperclasses;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
+using System.Data.Entity.Infrastructure;
 
 namespace gip.mes.client.mobile
 {
@@ -33,7 +34,7 @@ namespace gip.mes.client.mobile
 
             // Refresh restore bounds from previous window opening
             WindowStateHandleSettings windowStateHandleSettings = WindowStateHandleSettings.Factory();
-            this.sldZoom.Value = windowStateHandleSettings.Zoom;
+            //this.sldZoom.Value = windowStateHandleSettings.Zoom;
             // Fractal
             _FractalImagePresenter = new FractalImagePresenter(this);
             _FractalImagePresenter.Generator.Completed += new EventHandler<FractalImageCompletedEventArgs>(Generator_Completed);
@@ -92,7 +93,7 @@ namespace gip.mes.client.mobile
         {
             if (Submenu.Visibility == Visibility.Visible)
             {
-                switchActiveMenuItems(MainMenu);
+                MainMenu.SwitchActiveMenuItems();
                 Submenu.ToggleMenu();
             }
             else
@@ -100,19 +101,6 @@ namespace gip.mes.client.mobile
                 MainMenu.ToggleMenu();
             }
         }
-
-        private void switchActiveMenuItems(VBMenu activeMenu)
-        {
-            foreach (VBMenuItemMobile menuItem in activeMenu.Items)
-            {
-                if (menuItem.subMenuExpanded)
-                {
-                    menuItem.SwitchActiveMenu();
-                    menuItem.subMenuExpanded = false;
-                }
-            }
-        }
-
 
         private void InitAppCommands()
         {
@@ -149,7 +137,7 @@ namespace gip.mes.client.mobile
             Hide();
             
             // Save restore bounds for the next time this window is opened
-            WindowStateHandle.Save(this, (int)this.sldZoom.Value);
+            //WindowStateHandle.Save(this, (int)this.sldZoom.Value);
             Properties.Settings.Default.Save();
 
             ACRoot.SRoot.ACDeInit();
@@ -239,13 +227,24 @@ namespace gip.mes.client.mobile
 
         private void FrameGoBack_Click(object sender, RoutedEventArgs e)
         {
-            if (VBFrameControl.MainContent.CanGoBack)
+            if (VBFrameControl.MainContent != null)
             {
-                VBFrameControl.MainContent.GoBack();
-                foreach (JournalEntry entry in VBFrameControl.MainContent.BackStack)
+                if (VBFrameControl.MainContent.CanGoBack)
                 {
-                    Title.Text = entry.Name;
-                    break;
+                    VBFrameControl.MainContent.NavigationService.GoBack();
+                    foreach (JournalEntry entry in VBFrameControl.MainContent.BackStack)
+                    {
+                        Title.Text = entry.Name;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (VBFrameControl.MainContent.Content != null)
+                    {
+                        Title.Text = null;
+                        VBFrameControl.ClearContent();
+                    }
                 }
             }
         }
@@ -379,11 +378,13 @@ namespace gip.mes.client.mobile
             if (hasAlarms)
             {
                 WarningIcon.Visibility = System.Windows.Visibility.Visible;
+                MessagesButton.IsEnabled = true;
                 WarningIcon.ToolTip = alarmInfo.ToString();
             }
             else
             {
                 WarningIcon.Visibility = System.Windows.Visibility.Collapsed;
+                MessagesButton.IsEnabled = false;
                 WarningIcon.ToolTip = null;
             }
         }
@@ -554,11 +555,14 @@ namespace gip.mes.client.mobile
             }
             else
             {
-                if (DockingManager == null)
+                if (VBFrameControl == null)
                     return;
                 ACComponent channelManager = (ACComponent)ACRoot.SRoot.ACUrlCommand("?\\Communications\\WCFClientManager");
                 if (channelManager != null)
-                    DockingManager.ShowDialog(channelManager, "ConnectionInfo", "", false);
+                {
+                    Title.Text = "ConnectionInfo";
+                    VBFrameControl.ShowDialog(channelManager, "ConnectionInfo", "", false);
+                }
             }
         }
 
@@ -572,11 +576,14 @@ namespace gip.mes.client.mobile
             }
             else
             {
-                if (DockingManager == null)
+                if (VBFrameControl == null)
                     return;
                 ACComponent serviceHost = (ACComponent)ACRoot.SRoot.ACUrlCommand("?\\Communications\\WCFServiceManager");
                 if (serviceHost != null)
-                    DockingManager.ShowDialog(serviceHost, "ConnectionInfo", "", false);
+                {
+                    Title.Text = "ConnectionInfo";
+                    VBFrameControl.ShowDialog(serviceHost, "ConnectionInfo", "", false);
+                }
             }
         }
 
@@ -978,7 +985,7 @@ namespace gip.mes.client.mobile
 
         public double Zoom
         {
-            get { return this.sldZoom.Value; }
+            get { return 0; }
         }
 
         private bool _startingFullScreen = false;
@@ -1077,40 +1084,40 @@ namespace gip.mes.client.mobile
             TouchPoint tp = e.GetTouchPoint(null);
 
             Point lastPoint = _LastPositionDict[e.TouchDevice.Id];
-            if (_LastPositionDict.Count == 2) // Zwei Finger Eingabe
-            {
-                // hole rechten oberen Finger
-                if (_LastPositionDict.First().Value.X > _LastPositionDict.Last().Value.X
-                    && _LastPositionDict.First().Value.Y < _LastPositionDict.Last().Value.Y
-                    && _LastPositionDict.First().Value == lastPoint)
-                {
-                    // Vergrößerung
-                    if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
-                    }
-                    // Verkleinerung
-                    if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
-                    }
-                }
-                else if (_LastPositionDict.Last().Value.X > _LastPositionDict.First().Value.X
-                    && _LastPositionDict.Last().Value.Y < _LastPositionDict.First().Value.Y
-                    && _LastPositionDict.Last().Value == lastPoint)
-                {
-                    // Vergrößerung
-                    if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
-                    }
-                    // Verkleinerung
-                    if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
-                    }
-                }
-            }
+            //if (_LastPositionDict.Count == 2) // Zwei Finger Eingabe
+            //{
+            //    // hole rechten oberen Finger
+            //    if (_LastPositionDict.First().Value.X > _LastPositionDict.Last().Value.X
+            //        && _LastPositionDict.First().Value.Y < _LastPositionDict.Last().Value.Y
+            //        && _LastPositionDict.First().Value == lastPoint)
+            //    {
+            //        // Vergrößerung
+            //        if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
+            //        }
+            //        // Verkleinerung
+            //        if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
+            //        }
+            //    }
+            //    else if (_LastPositionDict.Last().Value.X > _LastPositionDict.First().Value.X
+            //        && _LastPositionDict.Last().Value.Y < _LastPositionDict.First().Value.Y
+            //        && _LastPositionDict.Last().Value == lastPoint)
+            //    {
+            //        // Vergrößerung
+            //        if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
+            //        }
+            //        // Verkleinerung
+            //        if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
+            //        }
+            //    }
+            //}
             _LastPositionDict[e.TouchDevice.Id] = tp.Position;
         }
 
@@ -1137,40 +1144,40 @@ namespace gip.mes.client.mobile
             TouchPoint tp = e.GetTouchPoint(null);
 
             Point lastPoint = _LastPositionFullscreenDict[e.TouchDevice.Id];
-            if (_LastPositionFullscreenDict.Count == 2) // Zwei Finger Eingabe
-            {
-                // hole rechten oberen Finger
-                if (_LastPositionFullscreenDict.First().Value.X > _LastPositionFullscreenDict.Last().Value.X
-                    && _LastPositionFullscreenDict.First().Value.Y < _LastPositionFullscreenDict.Last().Value.Y
-                    && _LastPositionFullscreenDict.First().Value == lastPoint)
-                {
-                    // Vergrößerung
-                    if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
-                    }
-                    // Verkleinerung
-                    if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
-                    }
-                }
-                else if (_LastPositionFullscreenDict.Last().Value.X > _LastPositionFullscreenDict.First().Value.X
-                    && _LastPositionFullscreenDict.Last().Value.Y < _LastPositionFullscreenDict.First().Value.Y
-                    && _LastPositionFullscreenDict.Last().Value == lastPoint)
-                {
-                    // Vergrößerung
-                    if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
-                    }
-                    // Verkleinerung
-                    if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
-                    {
-                        sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
-                    }
-                }
-            }
+            //if (_LastPositionFullscreenDict.Count == 2) // Zwei Finger Eingabe
+            //{
+            //    // hole rechten oberen Finger
+            //    if (_LastPositionFullscreenDict.First().Value.X > _LastPositionFullscreenDict.Last().Value.X
+            //        && _LastPositionFullscreenDict.First().Value.Y < _LastPositionFullscreenDict.Last().Value.Y
+            //        && _LastPositionFullscreenDict.First().Value == lastPoint)
+            //    {
+            //        // Vergrößerung
+            //        if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
+            //        }
+            //        // Verkleinerung
+            //        if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
+            //        }
+            //    }
+            //    else if (_LastPositionFullscreenDict.Last().Value.X > _LastPositionFullscreenDict.First().Value.X
+            //        && _LastPositionFullscreenDict.Last().Value.Y < _LastPositionFullscreenDict.First().Value.Y
+            //        && _LastPositionFullscreenDict.Last().Value == lastPoint)
+            //    {
+            //        // Vergrößerung
+            //        if (Convert.ToInt32(lastPoint.X) < Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) > Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value += Convert.ToInt32(tp.Position.X) - Convert.ToInt32(lastPoint.X);
+            //        }
+            //        // Verkleinerung
+            //        if (Convert.ToInt32(lastPoint.X) > Convert.ToInt32(tp.Position.X) && Convert.ToInt32(lastPoint.Y) < Convert.ToInt32(tp.Position.Y))
+            //        {
+            //            sldZoom.Value -= Convert.ToInt32(lastPoint.X) - Convert.ToInt32(tp.Position.X);
+            //        }
+            //    }
+            //}
             _LastPositionFullscreenDict[e.TouchDevice.Id] = tp.Position;
         }
 
@@ -1186,6 +1193,22 @@ namespace gip.mes.client.mobile
 #endregion
 
         private void WarningIcon_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            bool isNewComponent = false;
+            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.FindChildComponents<bso.iplus.BSOAlarmExplorer>(c => c is bso.iplus.BSOAlarmExplorer, null, 1).FirstOrDefault();
+            if (bsoAlarmExplorer == null)
+            {
+                bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null);
+                isNewComponent = true;
+            }
+            if (bsoAlarmExplorer != null)
+                bsoAlarmExplorer.ACUrlCommand("!ShowAlarmExplorer");
+
+            if (isNewComponent && bsoAlarmExplorer != null)
+                bsoAlarmExplorer.Stop();
+        }
+
+        private void MessagesButton_Click(object sender, RoutedEventArgs e)
         {
             bool isNewComponent = false;
             IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.FindChildComponents<bso.iplus.BSOAlarmExplorer>(c => c is bso.iplus.BSOAlarmExplorer, null, 1).FirstOrDefault();
