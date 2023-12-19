@@ -1244,13 +1244,13 @@ namespace gip.bso.logistics
         public void RefreshLists(bool forceQueryFromDb = false)
         {
             RefreshUnAssignedDeliveryNoteList(forceQueryFromDb);
-            OnPropertyChanged("DeliveryNoteList");
+            OnPropertyChanged(nameof(DeliveryNoteList));
 
             RefreshUnAssignedTourplanList(forceQueryFromDb);
-            OnPropertyChanged("TourplanList");
+            OnPropertyChanged(nameof(TourplanList));
 
             RefreshUnAssignedPickingList(forceQueryFromDb);
-            OnPropertyChanged("PickingList");
+            OnPropertyChanged(nameof(PickingList));
 
             RefreshWeighingList();
         }

@@ -1222,8 +1222,14 @@ namespace gip.bso.logistics
             }
             set
             {
+                bool changed = _SelectedPickingPos != value;
                 _SelectedPickingPos = value;
-                OnPropertyChanged(nameof(SelectedPickingPos));
+                if (changed)
+                {
+                    OnPropertyChanged(nameof(SelectedPickingPos));
+                    RefreshWeighingList();
+                }
+
                 CurrentPickingPos = value;
             }
         }
@@ -1999,7 +2005,7 @@ namespace gip.bso.logistics
         }
 
         protected ACRef<ACPickingManager> _PickingManager = null;
-        protected ACPickingManager PickingManager
+        public ACPickingManager PickingManager
         {
             get
             {
@@ -2010,7 +2016,7 @@ namespace gip.bso.logistics
         }
 
         protected ACRef<ACComponent> _ACFacilityManager = null;
-        protected FacilityManager ACFacilityManager
+        public FacilityManager ACFacilityManager
         {
             get
             {
@@ -3508,7 +3514,7 @@ namespace gip.bso.logistics
         #endregion
 
         #region Message
-        private void UpdateBSOMsg()
+        protected virtual void UpdateBSOMsg()
         {
             if (CurrentACMethodBooking == null)
                 return;
@@ -4359,6 +4365,12 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledFinishOrder):
                     result = IsEnabledFinishOrder();
+                    return true;
+                case nameof(RegisterWeight):
+                    RegisterWeight();
+                    return true;
+                case nameof(IsEnabledRegisterWeight):
+                    result = IsEnabledRegisterWeight();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
