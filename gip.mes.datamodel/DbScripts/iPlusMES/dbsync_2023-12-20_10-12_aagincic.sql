@@ -1,4 +1,4 @@
-﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpRecalcActualQuantity')
+IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpRecalcActualQuantity')
 	BEGIN
 		DROP  procedure  dbo.[udpRecalcActualQuantity]
 	END

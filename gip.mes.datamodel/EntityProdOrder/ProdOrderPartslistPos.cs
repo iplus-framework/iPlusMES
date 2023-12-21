@@ -840,6 +840,7 @@ namespace gip.mes.datamodel
             DatabaseApp dbApp = null;
             var sumsPerUnitID = this.FacilityBookingCharge_ProdOrderPartslistPos
                                         .CreateSourceQuery()
+                                        .Where(c => c.FacilityBookingTypeIndex != (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
                                         .GroupBy(c => c.MDUnitID)
                                         .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
                                         .ToArray();
