@@ -3031,6 +3031,12 @@ namespace gip.bso.logistics
                 return;
             if (!PreExecute("DeleteFacilityPreBooking"))
                 return;
+            DeleteFacilityPreBooking(CurrentFacilityPreBooking);
+
+        }
+
+        public void DeleteFacilityPreBooking(FacilityPreBooking CurrentFacilityPreBooking)
+        {
             Msg msg = CurrentFacilityPreBooking.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
@@ -3067,93 +3073,115 @@ namespace gip.bso.logistics
             if (!IsEnabledBookCurrentACMethodBooking())
                 return;
 
-            if (CurrentPickingPos.OutOrderPos != null)
+            BookACMethodBooking(CurrentPickingPos, CurrentACMethodBooking, CurrentFacilityPreBooking, SetQuantToZeroMode.CheckIfZeroAskUser);
+            PostExecute(nameof(BookCurrentACMethodBooking));
+        }
+
+        public enum SetQuantToZeroMode
+        {
+            Off = 0,
+            CheckIfZeroAskUser = 1,
+            Force = 2
+        }
+
+        public virtual bool BookACMethodBooking(PickingPos currentPickingPos, ACMethodBooking currentACMethodBooking, FacilityPreBooking currentFacilityPreBooking, SetQuantToZeroMode autoSetQuantToZero)
+        {
+            if (currentPickingPos.OutOrderPos != null)
             {
-                if (CurrentACMethodBooking.OutOrderPos != CurrentPickingPos.OutOrderPos)
-                    CurrentACMethodBooking.OutOrderPos = CurrentPickingPos.OutOrderPos;
-                if (CurrentPickingPos.OutOrderPos.OutOrder.CPartnerCompany != null && CurrentACMethodBooking.CPartnerCompany != CurrentPickingPos.OutOrderPos.OutOrder.CPartnerCompany)
-                    CurrentACMethodBooking.CPartnerCompany = CurrentPickingPos.OutOrderPos.OutOrder.CPartnerCompany;
+                if (currentACMethodBooking.OutOrderPos != currentPickingPos.OutOrderPos)
+                    currentACMethodBooking.OutOrderPos = currentPickingPos.OutOrderPos;
+                if (currentPickingPos.OutOrderPos.OutOrder.CPartnerCompany != null && currentACMethodBooking.CPartnerCompany != currentPickingPos.OutOrderPos.OutOrder.CPartnerCompany)
+                    currentACMethodBooking.CPartnerCompany = currentPickingPos.OutOrderPos.OutOrder.CPartnerCompany;
             }
-            else if (CurrentPickingPos.InOrderPos != null)
+            else if (currentPickingPos.InOrderPos != null)
             {
-                if (CurrentACMethodBooking.InOrderPos != CurrentPickingPos.InOrderPos)
-                    CurrentACMethodBooking.InOrderPos = CurrentPickingPos.InOrderPos;
-                if (CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany != null && CurrentACMethodBooking.CPartnerCompany != CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany)
-                    CurrentACMethodBooking.CPartnerCompany = CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany;
-            }
-
-            if (CurrentACMethodBooking.FacilityBooking != null)
-            {
-                if (CurrentACMethodBooking.FacilityBooking.OutOrderPos != CurrentACMethodBooking.OutOrderPos)
-                    CurrentACMethodBooking.FacilityBooking.OutOrderPos = CurrentACMethodBooking.OutOrderPos;
-
-                if (CurrentACMethodBooking.FacilityBooking.InOrderPos != CurrentACMethodBooking.InOrderPos)
-                    CurrentACMethodBooking.FacilityBooking.InOrderPos = CurrentACMethodBooking.InOrderPos;
-
-                if (CurrentACMethodBooking.FacilityBooking.PickingPos != CurrentACMethodBooking.PickingPos)
-                    CurrentACMethodBooking.FacilityBooking.PickingPos = CurrentACMethodBooking.PickingPos;
-
-                if (CurrentACMethodBooking.FacilityBooking.InwardMaterial != CurrentACMethodBooking.InwardMaterial)
-                    CurrentACMethodBooking.FacilityBooking.InwardMaterial = CurrentACMethodBooking.InwardMaterial;
-
-                if (CurrentACMethodBooking.FacilityBooking.OutwardMaterial != CurrentACMethodBooking.OutwardMaterial)
-                    CurrentACMethodBooking.FacilityBooking.OutwardMaterial = CurrentACMethodBooking.OutwardMaterial;
-
-                if (CurrentACMethodBooking.FacilityBooking.OutwardFacility != CurrentACMethodBooking.OutwardFacility)
-                    CurrentACMethodBooking.FacilityBooking.OutwardFacility = CurrentACMethodBooking.OutwardFacility;
-
-                if (CurrentACMethodBooking.FacilityBooking.InwardFacility != CurrentACMethodBooking.InwardFacility)
-                    CurrentACMethodBooking.FacilityBooking.InwardFacility = CurrentACMethodBooking.InwardFacility;
+                if (currentACMethodBooking.InOrderPos != currentPickingPos.InOrderPos)
+                    currentACMethodBooking.InOrderPos = currentPickingPos.InOrderPos;
+                if (currentPickingPos.InOrderPos.InOrder.CPartnerCompany != null && currentACMethodBooking.CPartnerCompany != currentPickingPos.InOrderPos.InOrder.CPartnerCompany)
+                    currentACMethodBooking.CPartnerCompany = currentPickingPos.InOrderPos.InOrder.CPartnerCompany;
             }
 
-            OnValidateBookingParams();
+            if (currentACMethodBooking.FacilityBooking != null)
+            {
+                if (currentACMethodBooking.FacilityBooking.OutOrderPos != currentACMethodBooking.OutOrderPos)
+                    currentACMethodBooking.FacilityBooking.OutOrderPos = currentACMethodBooking.OutOrderPos;
 
-            bool isCancellation = CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
+                if (currentACMethodBooking.FacilityBooking.InOrderPos != currentACMethodBooking.InOrderPos)
+                    currentACMethodBooking.FacilityBooking.InOrderPos = currentACMethodBooking.InOrderPos;
+
+                if (currentACMethodBooking.FacilityBooking.PickingPos != currentACMethodBooking.PickingPos)
+                    currentACMethodBooking.FacilityBooking.PickingPos = currentACMethodBooking.PickingPos;
+
+                if (currentACMethodBooking.FacilityBooking.InwardMaterial != currentACMethodBooking.InwardMaterial)
+                    currentACMethodBooking.FacilityBooking.InwardMaterial = currentACMethodBooking.InwardMaterial;
+
+                if (currentACMethodBooking.FacilityBooking.OutwardMaterial != currentACMethodBooking.OutwardMaterial)
+                    currentACMethodBooking.FacilityBooking.OutwardMaterial = currentACMethodBooking.OutwardMaterial;
+
+                if (currentACMethodBooking.FacilityBooking.OutwardFacility != currentACMethodBooking.OutwardFacility)
+                    currentACMethodBooking.FacilityBooking.OutwardFacility = currentACMethodBooking.OutwardFacility;
+
+                if (currentACMethodBooking.FacilityBooking.InwardFacility != currentACMethodBooking.InwardFacility)
+                    currentACMethodBooking.FacilityBooking.InwardFacility = currentACMethodBooking.InwardFacility;
+            }
+
+            OnValidateBookingParams(currentACMethodBooking);
+
+            bool isCancellation = currentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || currentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 
             Save();
             if (DatabaseApp.IsChanged)
-                return;
+                return false;
             if (!PreExecute(nameof(BookCurrentACMethodBooking)))
-                return;
+                return false;
 
-            CurrentACMethodBooking.AutoRefresh = true;
-            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
-            if (!CurrentACMethodBooking.ValidMessage.IsSucceded() || CurrentACMethodBooking.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentACMethodBooking.ValidMessage);
+            currentACMethodBooking.AutoRefresh = true;
+            ACMethodEventArgs result = ACFacilityManager.BookFacility(currentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
+            if (!currentACMethodBooking.ValidMessage.IsSucceded() || currentACMethodBooking.ValidMessage.HasWarnings())
+            {
+                Messages.Msg(currentACMethodBooking.ValidMessage);
+                return false;
+            }
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
                 Messages.Msg(result.ValidMessage);
                 OnPropertyChanged(nameof(FacilityBookingList));
+                return false;
             }
             else
             {
                 double changedQuantity = 0;
                 FacilityCharge outwardFC = null;
 
-                if (CurrentACMethodBooking != null)
+                if (currentACMethodBooking != null)
                 {
-                    if (CurrentACMethodBooking.OutwardQuantity.HasValue)
-                        changedQuantity = CurrentACMethodBooking.OutwardQuantity.Value;
-                    else if (CurrentACMethodBooking.InwardQuantity.HasValue)
-                        changedQuantity = CurrentACMethodBooking.InwardQuantity.Value;
+                    if (currentACMethodBooking.OutwardQuantity.HasValue)
+                        changedQuantity = currentACMethodBooking.OutwardQuantity.Value;
+                    else if (currentACMethodBooking.InwardQuantity.HasValue)
+                        changedQuantity = currentACMethodBooking.InwardQuantity.Value;
 
-                    outwardFC = CurrentACMethodBooking.OutwardFacilityCharge;
+                    outwardFC = currentACMethodBooking.OutwardFacilityCharge;
                 }
 
-                DeleteFacilityPreBooking();
+                DeleteFacilityPreBooking(currentFacilityPreBooking);
                 OnPropertyChanged(nameof(FacilityBookingList));
-                ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, isCancellation, true);
+                ACFacilityManager.RecalcAfterPosting(DatabaseApp, currentPickingPos, changedQuantity, isCancellation, true);
                 Save();
 
-                Msg msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
-                if (msg != null)
+                Msg msg = null;
+                if (autoSetQuantToZero == SetQuantToZeroMode.CheckIfZeroAskUser)
+                    msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
+                if (autoSetQuantToZero == SetQuantToZeroMode.Force || msg != null)
                 {
-                    if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                    MsgResult msgResult = MsgResult.No;
+                    if (msg != null)
+                        msgResult= Messages.Question(this, msg.Message, MsgResult.No, true);
+                    if (autoSetQuantToZero == SetQuantToZeroMode.Force || msgResult == MsgResult.Yes)
                     {
                         if (ACFacilityManager == null)
-                            return;
+                            return false;
 
                         ACMethodBooking fbtZeroBooking = PickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, DatabaseApp);
                         ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
@@ -3165,21 +3193,22 @@ namespace gip.bso.logistics
                         ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
                         if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                         {
-                            //return fbtZeroBooking.ValidMessage;
+                            Messages.Msg(currentACMethodBooking.ValidMessage);
+                            return false;
                         }
                         else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                         {
                             if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                 result.ValidMessage.Message = result.ResultState.ToString();
-
-                            //return result.ValidMessage;
+                            Messages.Msg(result.ValidMessage);
+                            return false;
                         }
                     }
                 }
             }
-
-            PostExecute(nameof(BookCurrentACMethodBooking));
+            return true;
         }
+
 
         public bool IsEnabledBookCurrentACMethodBooking()
         {
@@ -3188,7 +3217,7 @@ namespace gip.bso.logistics
             bool bRetVal = false;
             if (CurrentACMethodBooking != null)
             {
-                OnValidateBookingParams();
+                OnValidateBookingParams(CurrentACMethodBooking);
                 bRetVal = CurrentACMethodBooking.IsEnabled();
             }
             else
@@ -3197,19 +3226,19 @@ namespace gip.bso.logistics
             return bRetVal;
         }
 
-        protected virtual void OnValidateBookingParams()
+        protected virtual void OnValidateBookingParams(ACMethodBooking currentACMethodBooking)
         {
-            if (CurrentACMethodBooking == null)
+            if (currentACMethodBooking == null)
                 return;
-            if (CurrentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement
-                || CurrentACMethodBooking.BookingType > GlobalApp.FacilityBookingType.PickingOutwardCancel)
+            if (currentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement
+                || currentACMethodBooking.BookingType > GlobalApp.FacilityBookingType.PickingOutwardCancel)
             {
-                if (CurrentACMethodBooking.InwardQuantity.HasValue && !CurrentACMethodBooking.OutwardQuantity.HasValue)
-                    CurrentACMethodBooking.OutwardQuantity = CurrentACMethodBooking.InwardQuantity;
-                else if (!CurrentACMethodBooking.InwardQuantity.HasValue && CurrentACMethodBooking.OutwardQuantity.HasValue)
-                    CurrentACMethodBooking.InwardQuantity = CurrentACMethodBooking.OutwardQuantity;
-                else if (CurrentACMethodBooking.InwardQuantity != CurrentACMethodBooking.OutwardQuantity)
-                    CurrentACMethodBooking.InwardQuantity = CurrentACMethodBooking.OutwardQuantity;
+                if (currentACMethodBooking.InwardQuantity.HasValue && !currentACMethodBooking.OutwardQuantity.HasValue)
+                    currentACMethodBooking.OutwardQuantity = currentACMethodBooking.InwardQuantity;
+                else if (!currentACMethodBooking.InwardQuantity.HasValue && currentACMethodBooking.OutwardQuantity.HasValue)
+                    currentACMethodBooking.InwardQuantity = currentACMethodBooking.OutwardQuantity;
+                else if (currentACMethodBooking.InwardQuantity != currentACMethodBooking.OutwardQuantity)
+                    currentACMethodBooking.InwardQuantity = currentACMethodBooking.OutwardQuantity;
             }
         }
 
