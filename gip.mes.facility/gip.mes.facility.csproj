@@ -183,6 +183,7 @@
     <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommand.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommandModeEnum.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\KeepEqualBatchSizes.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest2.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\PartslistConfigExtract.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\WizardSchedulerPartslist.cs" />
