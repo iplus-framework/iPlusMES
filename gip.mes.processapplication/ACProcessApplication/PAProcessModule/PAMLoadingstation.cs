@@ -85,7 +85,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public IACContainerTNet<double> FillVolume { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IACContainerTNet<double> FillVolume { get; set; }
 
         #endregion
 
