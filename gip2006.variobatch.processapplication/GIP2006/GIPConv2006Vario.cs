@@ -727,11 +727,10 @@ namespace gip2006.variobatch.processapplication
                             else
                             {
                                 ConversionAlarm.ValueT = PANotifyState.AlarmOrFault;
-
                                 //Error:50172: The current state -{0}- in PLC is not in sync with current state -{1}- in iPlus
                                 Msg msg = new Msg(this, eMsgLevel.Error, "", "GIPConv2006Vario.GetNextACState()", 1000, "Error50172", stateInPLC, ACState.ValueT);
-
-                                Messages.LogException(this.GetACUrl(), "GIPConv2006Vario.GetNextACState()", msg.Message);
+                                if (IsAlarmActive(ConversionAlarm, msg.Message) == null)
+                                    Messages.LogError(this.GetACUrl(), "GIPConv2006Vario.GetNextACState()", msg.Message);
                                 OnNewAlarmOccurred(ConversionAlarm, msg, true);
 
                                 // TODO: Sicherstellen, dass beide PLC-Variablen eine aktuellen Stand haben

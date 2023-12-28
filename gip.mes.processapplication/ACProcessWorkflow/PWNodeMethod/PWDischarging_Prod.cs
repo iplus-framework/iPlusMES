@@ -1330,7 +1330,15 @@ namespace gip.mes.processapplication
 
                     FacilityPreBooking facilityPreBooking = ParentPWMethod<PWMethodProduction>().ProdOrderManager.NewInwardFacilityPreBooking(ParentPWMethod<PWMethodProduction>().ACFacilityManager, dbApp, currentBatchPos);
                     ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                    bookingParam.InwardQuantity = currentBatchPos.BookingMaterial.ConvertBaseWeightToBaseUnit(actualWeight);
+                    try
+                    {
+                        bookingParam.InwardQuantity = currentBatchPos.BookingMaterial.ConvertBaseWeightToBaseUnit(actualWeight);
+                    }
+                    catch (ArgumentException) 
+                    {
+                        if (currentBatchPos.BookingMaterial.BaseMDUnit.SIDimension != GlobalApp.SIDimensions.Mass)
+                            bookingParam.InwardQuantity = actualWeight;
+                    }
                     bookingParam.InwardFacility = inwardFacility;
                     bookingParam.InwardFacilityLot = facilityLot;
                     bool isFinalMixture = currentBatchPos.IsFinalMixureBatch;
