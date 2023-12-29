@@ -607,7 +607,9 @@ namespace gip.bso.manufacturing
                         {
                             var fc = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == SelectedWeighingMaterial.QuantInWeighing.Value);
                             if (fc != null)
+                            {
                                 SelectedFacilityCharge = fc;
+                            }
                         }
                         else if (AutoSelectLot)
                         {
@@ -1779,6 +1781,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50291: Initialization error: The reference to the property {1} in Workflownode {0} is null.
                 // Initialisierungsfehler: Die Referenz zur Eigenschaft {1} von Workflowknoten {0} ist null.
+                Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode), "Weighing component info is null");
                 Messages.Error(this, "Error50291", false, pwNode?.ACUrl, "CurrentWeighingComponentInfo");
                 return;
             }
@@ -1809,6 +1812,8 @@ namespace gip.bso.manufacturing
                     message = string.Format("ManualWeighingModel(Setup model): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
                 else
                     message = string.Format("ManualWeighingModel(Setup model): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
+
+                Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode), message);
                 Messages.Error(this, message, true);
             }
 
@@ -2401,6 +2406,8 @@ namespace gip.bso.manufacturing
                             {
                                 var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
                                 SelectedFacilityCharge = fcItem;
+                                Thread.Sleep(500);
+                                OnPropertyChanged(nameof(SelectedFacilityCharge));
                             }
 
                             break;
@@ -2466,6 +2473,8 @@ namespace gip.bso.manufacturing
 
                                     var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
                                     SelectedFacilityCharge = fcItem;
+                                    Thread.Sleep(500);
+                                    OnPropertyChanged(nameof(SelectedFacilityCharge));
                                 }
                             }
                             break;
@@ -2755,91 +2764,7 @@ namespace gip.bso.manufacturing
         {
             try
             {
-                IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
-
-                if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
-                {
-                    Guid posID = Guid.Empty;
-                    if (SelectedWeighingMaterial != null)
-                    {
-                        if (SelectedWeighingMaterial.PosRelation != null)
-                            posID = SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID;
-                        else if (SelectedWeighingMaterial.PickingPosition != null)
-                            posID = SelectedWeighingMaterial.PickingPosition.PickingPosID;
-                    }
-
-                    if (posID == Guid.Empty)
-                        return _FacilityChargeList;
-
-                    ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
-                                                                            posID) as ACValueList;
-
-                    var facilityIDs = facilities?.Select(c => c.ParamAsGuid).ToArray();
-                    if (facilityIDs == null)
-                        return null;
-
-                    using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
-                    {
-                        //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
-
-                        if (_ACFacilityManager == null)
-                        {
-                            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
-                            if (_ACFacilityManager == null)
-                            {
-                                //Error50432: The facility manager is null.
-                                Messages.Error(this, "Error50432");
-                            }
-                        }
-
-
-                        if (SelectedWeighingMaterial != null)
-                        {
-                            if (SelectedWeighingMaterial.PosRelation != null)
-                            {
-                                Guid? materialID = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.MaterialID;
-                                if (materialID.HasValue)
-                                {
-                                    IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
-                                    if (!ShowAllQuants)
-                                    {
-                                        ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
-                                        silosResult.ApplyLotReservationFilter(SelectedWeighingMaterial.PosRelation, 0);
-                                        if (silosResult.HasLotReservations)
-                                            quants = silosResult.FilteredResult.SelectMany(c => c.FacilityCharges.Where(p => p.IsReservedLot).Select(x => x.Quant));
-                                    }
-
-                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(quants.Select(s => new FacilityChargeItem(s, TargetWeight)));
-                                }
-                            }
-                            else if (SelectedWeighingMaterial.PickingPosition != null)
-                            {
-                                Guid? materialID = SelectedWeighingMaterial?.PickingPosition?.Material?.MaterialID;
-                                if (materialID.HasValue)
-                                {
-                                    IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
-                                    if (!ShowAllQuants)
-                                    {
-                                        ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
-                                        silosResult.ApplyLotReservationFilter(SelectedWeighingMaterial.PickingPosition, 0);
-                                        if (silosResult.HasLotReservations)
-                                            quants = silosResult.FilteredResult.SelectMany(c => c.FacilityCharges.Where(p => p.IsReservedLot).Select(x => x.Quant));
-                                    }
-
-                                    _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(quants.Select(s => new FacilityChargeItem(s, TargetWeight)));
-                                }
-                            }
-                        }
-
-                        if (_FacilityChargeList != null)
-                            FacilityChargeListCount = _FacilityChargeList.Count();
-                    }
-                }
-
-                if (_FacilityChargeList == null)
-                    return null;
-
-                return _FacilityChargeList;
+                return FillFacilityChargeListInternal();
             }
             catch (Exception e)
             {
@@ -2849,10 +2774,117 @@ namespace gip.bso.manufacturing
                 else
                     message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
-                Messages.Error(this, message, true);
+                Messages.LogError(this.GetACUrl(), nameof(FillFacilityChargeList), message);
+            }
+
+            try
+            {
+                return FillFacilityChargeListInternal();
+            }
+            catch (Exception e)
+            {
+                string message = null;
+                if (e.InnerException != null)
+                    message = string.Format("ManualWeighingModel(FacilityChargeList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
+                else
+                    message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
+
+                Messages.LogError(this.GetACUrl(), nameof(FillFacilityChargeList), message);
+                Messages.Error(this, "Load quants problem, please check the log file!");
             }
             return null;
         }
+
+        protected virtual ObservableCollection<FacilityChargeItem> FillFacilityChargeListInternal()
+        {
+            IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+
+            if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
+            {
+                Guid posID = Guid.Empty;
+                if (SelectedWeighingMaterial != null)
+                {
+                    if (SelectedWeighingMaterial.PosRelation != null)
+                        posID = SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID;
+                    else if (SelectedWeighingMaterial.PickingPosition != null)
+                        posID = SelectedWeighingMaterial.PickingPosition.PickingPosID;
+                }
+
+                if (posID == Guid.Empty)
+                    return _FacilityChargeList;
+
+                ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
+                                                                        posID) as ACValueList;
+
+                var facilityIDs = facilities?.Select(c => c.ParamAsGuid).ToArray();
+                if (facilityIDs == null)
+                    return null;
+
+                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                {
+                    //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
+
+                    if (_ACFacilityManager == null)
+                    {
+                        _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+                        if (_ACFacilityManager == null)
+                        {
+                            //Error50432: The facility manager is null.
+                            Messages.Error(this, "Error50432");
+                        }
+                    }
+
+
+                    if (SelectedWeighingMaterial != null)
+                    {
+                        if (SelectedWeighingMaterial.PosRelation != null)
+                        {
+                            Guid? materialID = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.MaterialID;
+                            if (materialID.HasValue)
+                            {
+                                IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                if (!ShowAllQuants)
+                                {
+                                    ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
+                                    silosResult.ApplyLotReservationFilter(SelectedWeighingMaterial.PosRelation, 0);
+                                    if (silosResult.HasLotReservations)
+                                        quants = silosResult.FilteredResult.SelectMany(c => c.FacilityCharges.Where(p => p.IsReservedLot).Select(x => x.Quant));
+                                }
+
+                                _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(quants.Select(s => new FacilityChargeItem(s, TargetWeight)));
+                            }
+                        }
+                        else if (SelectedWeighingMaterial.PickingPosition != null)
+                        {
+                            Guid? materialID = SelectedWeighingMaterial?.PickingPosition?.Material?.MaterialID;
+                            if (materialID.HasValue)
+                            {
+                                IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                if (!ShowAllQuants)
+                                {
+                                    ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
+                                    silosResult.ApplyLotReservationFilter(SelectedWeighingMaterial.PickingPosition, 0);
+                                    if (silosResult.HasLotReservations)
+                                        quants = silosResult.FilteredResult.SelectMany(c => c.FacilityCharges.Where(p => p.IsReservedLot).Select(x => x.Quant));
+                                }
+
+                                _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(quants.Select(s => new FacilityChargeItem(s, TargetWeight)));
+                            }
+                        }
+                    }
+
+                    if (_FacilityChargeList != null)
+                        FacilityChargeListCount = _FacilityChargeList.Count();
+                }
+            }
+
+            if (_FacilityChargeList == null)
+                return null;
+
+            return _FacilityChargeList;
+        }
+
+
 
         #endregion
 
