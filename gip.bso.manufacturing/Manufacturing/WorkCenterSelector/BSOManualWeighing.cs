@@ -15,6 +15,7 @@ using System.Threading;
 using gip.mes.facility;
 using gip.core.layoutengine;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
 
 namespace gip.bso.manufacturing
 {
@@ -2347,6 +2348,8 @@ namespace gip.bso.manufacturing
                 TargetWeight = 0;
                 ScaleBckgrState = ScaleBackgroundState.Weighing;
             }
+
+            CorrectManualWeighingItems();
         }
 
         private void HandleWeighingComponentInfo(WeighingComponentInfo compInfo)
@@ -2884,7 +2887,62 @@ namespace gip.bso.manufacturing
             return _FacilityChargeList;
         }
 
+        private void CorrectManualWeighingItems()
+        {
+            var componentPWNode = ComponentPWNodeLocked;
 
+            if (componentPWNode == null)
+                return;
+
+            if (WeighingMaterialList == null)
+            {
+                try
+                {
+                    WeighingMaterialList = GetWeighingMaterials(componentPWNode, DatabaseApp, DefaultMaterialIcon);
+                    Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "WeighingMaterialList is corrected!");
+                }
+                catch (Exception e)
+                {
+                    string message;
+                    if (e.InnerException != null)
+                        message = string.Format("ManualWeighingModel(Setup model): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
+                    else
+                        message = string.Format("ManualWeighingModel(Setup model): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
+
+                    Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode), message);
+                    Messages.Error(this, message, true);
+
+                    return;
+                }
+            }
+
+            WeighingComponentInfo compInfo = _WeighingComponentInfo?.ValueT;
+            if (compInfo != null)
+            {
+                if (SelectedWeighingMaterial == null)
+                {
+                    if (compInfo.PLPosRelation != Guid.Empty)
+                    {
+                        SelectedWeighingMaterial = WeighingMaterialList.FirstOrDefault(c => c.PosRelation != null && c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                        Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "SelectedWeighinMaterial is corrected!");
+                    }
+                    else if (compInfo.PickingPos != Guid.Empty)
+                    {
+                        SelectedWeighingMaterial = WeighingMaterialList.FirstOrDefault(c => c.PickingPosition != null && c.PickingPosition.PickingPosID == compInfo.PickingPos);
+                        Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "SelectedWeighinMaterial is corrected! (Picking)");
+                    }
+                }
+
+                if (SelectedWeighingMaterial != null && SelectedFacilityCharge == null)
+                {
+                    if (compInfo.FacilityCharge.HasValue)
+                    {
+                        SelectedFacilityCharge = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge.Value);
+                        Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "SelectedFacilityCharge is corrected!");
+                    }
+                }
+            }
+        }
 
         #endregion
 
