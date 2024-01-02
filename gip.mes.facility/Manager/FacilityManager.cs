@@ -504,6 +504,12 @@ namespace gip.mes.facility
             }
         }
 
+
+        protected virtual bool OnValidatePostingBehaviour(ACMethodBooking acMethodBooking, FacilityBookingCharge fbc)
+        {
+            return true;
+        }
+
         #region FacilityCharge
 
         private static ACMethodWrapper CreateVirtualMovementFacilityChargeMethod(string AcIdentifier, GlobalApp.FacilityBookingType BookingType)
