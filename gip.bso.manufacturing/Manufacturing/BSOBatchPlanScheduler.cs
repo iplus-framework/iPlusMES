@@ -173,10 +173,6 @@ namespace gip.bso.manufacturing
             if (_ProdOrderManager == null)
                 throw new Exception("ProdOrderManager not configured");
 
-            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
-            if (_PickingManager == null)
-                throw new Exception("PickingManager not configured");
-
             _SchedulingForecastManager = SchedulingForecastManager.ACRefToServiceInstance(this);
             if (_SchedulingForecastManager == null)
                 throw new Exception("SchedulingForecastManager not configured");
@@ -220,10 +216,6 @@ namespace gip.bso.manufacturing
             if (_ProdOrderManager != null)
                 ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
-
-            if (_PickingManager != null)
-                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
-            _PickingManager = null;
 
             if (_SchedulingForecastManager != null)
                 SchedulingForecastManager.DetachACRefFromServiceInstance(this, _SchedulingForecastManager);
@@ -496,17 +488,6 @@ namespace gip.bso.manufacturing
                 if (_ProdOrderManager == null)
                     return null;
                 return _ProdOrderManager.ValueT;
-            }
-        }
-
-        protected ACRef<ACPickingManager> _PickingManager = null;
-        protected ACPickingManager PickingManager
-        {
-            get
-            {
-                if (_PickingManager == null)
-                    return null;
-                return _PickingManager.ValueT;
             }
         }
 

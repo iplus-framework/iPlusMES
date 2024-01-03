@@ -67,16 +67,13 @@ namespace gip.mes.processapplication
         #region Precompiled Queries
         protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<Picking>> s_cQry_ReadyPickingsForPWNode =
         CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<Picking>>(
-                (ctx, mdSchedulingGroupID, appDefManagerID) => ctx.FacilityReservation
-                                    .Where(c => c.PickingPosID.HasValue
-                                                && c.PickingPos.Picking.ACClassMethodID.HasValue
-                                                //&& c.VBiACClassID.HasValue
-                                                && c.PickingPos.Picking.PickingStateIndex == (short)PickingStateEnum.WFReadyToStart
-                                                && c.PickingPos.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
-                                                && c.PickingPos.Picking.VBiACClassWFID.HasValue
-                                                && c.PickingPos.Picking.VBiACClassWF.ACClassMethod.ACClassID == appDefManagerID
-                                                && c.PickingPos.Picking.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == mdSchedulingGroupID))
-                                    .Select(c => c.PickingPos.Picking)
+                (ctx, mdSchedulingGroupID, appDefManagerID) => ctx.Picking
+                                    .Where(c => c.ACClassMethodID.HasValue
+                                                && c.PickingStateIndex == (short)PickingStateEnum.WFReadyToStart
+                                                && c.PickingPos_Picking.Any(x => x.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
+                                                && c.VBiACClassWFID.HasValue
+                                                && c.VBiACClassWF.ACClassMethod.ACClassID == appDefManagerID
+                                                && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == mdSchedulingGroupID))
                                     .OrderBy(c => c.ScheduledOrder ?? 0)
             );
 
@@ -165,10 +162,7 @@ namespace gip.mes.processapplication
                     {
                         aCClassMethod = dbApp.ContextIPlus.ACClassMethod.Where(c => c.ACClassMethodID == acclassMethodID).FirstOrDefault();
                     }
-                    startablePicking.PickingState = PickingStateEnum.WFActive;
-                    saveMessage = dbApp.ACSaveChanges();
-                    //if (saveMessage == null)
-                        //saveMessage = PickingManager.StartPicking(this.ApplicationManager, dbApp, aCClassMethod, startablePicking.VBiACClassWF, startablePicking, false);
+                    saveMessage = PickingManager.StartPicking(this.ApplicationManager, dbApp, aCClassMethod, startablePicking.VBiACClassWF, startablePicking, false);
                 }
 
                 if (saveMessage != null)

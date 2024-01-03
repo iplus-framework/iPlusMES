@@ -196,8 +196,6 @@ namespace gip.mes.processapplication
                     {
                         aCClassMethod = dbApp.ContextIPlus.ACClassMethod.Where(c => c.ACClassMethodID == acclassMethodID).FirstOrDefault();
                     }
-                    startableBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
-                    saveMessage = dbApp.ACSaveChanges();
                     if (saveMessage == null)
                         saveMessage = ProdOrderManager.StartBatchPlan(this.ApplicationManager, dbApp, aCClassMethod, startableBatchPlan.VBiACClassWF, startableBatchPlan, false);
                 }

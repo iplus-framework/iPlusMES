@@ -12,47 +12,51 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'FacilityReservationView'}de{'FacilityReservationView'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class POPartslistPosReservation : ACObjectItemWCheckBox
     {
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderPartslistPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderPartslistPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentPos = parentPos;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderBatchPlan parentBatchPlan, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderBatchPlan parentBatchPlan, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentBatchPlan = parentBatchPlan;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, DeliveryNotePos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, DeliveryNotePos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentDeliveryNotePos = parentPos;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, PickingPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, PickingPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentPickingPos = parentPos;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
@@ -73,6 +77,16 @@ namespace gip.mes.datamodel
             get
             {
                 return _WorkflowNode;
+            }
+        }
+
+        gip.core.datamodel.ACClassWF _PlanningNode;
+        [ACPropertyInfo(9999, "", "en{'Workflownode'}de{'Workflowknoten'}")]
+        public gip.core.datamodel.ACClassWF PlanningNode
+        {
+            get
+            {
+                return _PlanningNode;
             }
         }
 
@@ -412,7 +426,7 @@ namespace gip.mes.datamodel
                             tempReservation.Facility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == Module.ACClassID).FirstOrDefault();
                             tempReservation.PickingPos = ParentPickingPos;
                             ParentPickingPos.FacilityReservation_PickingPos.Add(tempReservation);
-                            ParentPickingPos.Picking.VBiACClassWFID = WorkflowNode.ACClassWFID;
+                            ParentPickingPos.Picking.VBiACClassWFID = PlanningNode?.ACClassWFID;
                             reservationList.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;

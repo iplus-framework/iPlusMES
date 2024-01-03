@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Data.Objects;
@@ -92,6 +93,59 @@ namespace gip.mes.facility
         CompiledQuery.Compile<DatabaseApp, IQueryable<MDOutOrderPosState>>(
             (ctx) => from c in ctx.MDOutOrderPosState where c.MDOutOrderPosStateIndex == (Int16)MDOutOrderPosState.OutOrderPosStates.Completed select c
         );
+
+        #region Batch -> Select batch
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>> s_cQry_PickingForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>>(
+            (ctx, mdSchedulingGroupID, greaterEqualState, lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) =>
+                                    ctx.Picking
+                                    .Include("PickingPos_Picking.PickingMaterial")
+                                    .Include("PickingPos_Picking.OutOrderPos.Material")
+                                    .Include("PickingPos_Picking.InOrderPos.Material")
+                                    .Include("PickingPos_Picking.ToFacility")
+                                    .Include("PickingPos_Picking.FromFacility")
+                                    .Where(c => (mdSchedulingGroupID == null || (c.VBiACClassWF != null && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty))))
+                                            && (   c.PickingStateIndex >= greaterEqualState
+                                                || c.PickingStateIndex <= lessEqualState)
+                                            && (string.IsNullOrEmpty(pickingNo) || c.PickingNo.Contains(pickingNo))
+                                            && (
+                                                    string.IsNullOrEmpty(materialNo)
+                                                    || (c.PickingPos_Picking.Any(x => x.PickingMaterial != null && x.PickingMaterial.MaterialNo.Contains(materialNo)))
+                                                )
+                                            && (filterStartTime == null
+                                                 || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
+                                                 || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
+                                                )
+                                            && (filterEndTime == null
+                                                 || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
+                                                 || (c.ScheduledEndDate == null && c.ScheduledStartDate != null && c.ScheduledStartDate <= filterEndTime)
+                                                 || (c.ScheduledEndDate == null && c.ScheduledStartDate == null && c.UpdateDate <= filterEndTime)
+                                                )
+                                          )
+                                    .OrderBy(c => c.ScheduledOrder ?? 0)
+                                    .ThenBy(c => c.InsertDate)
+        );
+
+
+        public ObjectQuery<Picking> GetScheduledPickings(
+            DatabaseApp databaseApp,
+            Guid? mdSchedulingGroupID,
+            PickingStateEnum greaterEqualState,
+            PickingStateEnum lessEqualState,
+            DateTime? filterStartTime,
+            DateTime? filterEndTime,
+            string pickingNo,
+            string materialNo)
+        {
+            ObjectQuery<Picking> query = s_cQry_PickingForPWNode(databaseApp, mdSchedulingGroupID, (short)greaterEqualState,
+                (short)lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) as ObjectQuery<Picking>;
+            query.MergeOption = MergeOption.OverwriteChanges;
+            return query;
+        }
+
+
+        #endregion
+
         #endregion
 
         #region Properties
@@ -2025,6 +2079,7 @@ namespace gip.mes.facility
 
             if (acClassWFDischarging != null && materialWFACClassMethod != null)
             {
+                core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                 List<Route> routes = new List<Route>();
                 foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
                 {
@@ -2041,7 +2096,6 @@ namespace gip.mes.facility
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
                 {
-                    core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                     List<IACConfigStore> mandatoryConfigStores =
                     GetCurrentConfigStores(
                         aCClassWF,
@@ -2138,7 +2192,7 @@ namespace gip.mes.facility
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                             }
-                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, pickingPos, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
+                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, pickingPos, null, selectedReservationForModule, unselFacility, acClassWFDischarging, aCClassWF));
                         }
                     }
 
@@ -2232,6 +2286,84 @@ namespace gip.mes.facility
             return acClassWFDischarging;
         }
 
+        #endregion
+
+        #region Start Workflow
+        public MsgWithDetails StartPicking(ACComponent appManager, DatabaseApp databaseApp,
+                                            gip.core.datamodel.ACClassMethod acClassMethod, gip.mes.datamodel.ACClassWF vbACClassWf, Picking picking,
+                                            bool checkIfWorkflowIsRunning = true)
+        {
+            gip.core.datamodel.ACClassWF acClassWf = null;
+            if (vbACClassWf != null)
+                acClassWf = vbACClassWf.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
+            return StartPicking(databaseApp, appManager, picking, acClassMethod, acClassWf, checkIfWorkflowIsRunning);
+        }
+
+        public MsgWithDetails StartPicking(DatabaseApp databaseApp, ACComponent appManager,
+                                            Picking picking, gip.core.datamodel.ACClassMethod acClassMethod, gip.core.datamodel.ACClassWF acClassWf = null,
+                                            bool checkIfWorkflowIsRunning = true)
+        {
+            if (checkIfWorkflowIsRunning)
+            {
+                var acProgramIDs = databaseApp.OrderLog.Where(c => c.PickingPosID.HasValue
+                                                    && c.PickingPos.PickingID == picking.PickingID)
+                                         .Select(c => c.VBiACProgramLog.ACProgramID)
+                                         .Distinct()
+                                         .ToArray();
+
+                if (acProgramIDs != null && acProgramIDs.Any())
+                {
+                    ChildInstanceInfoSearchParam searchParam = new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, ACProgramIDs = acProgramIDs };
+                    var childInstanceInfos = appManager.GetChildInstanceInfo(1, searchParam);
+                    if (childInstanceInfos != null && childInstanceInfos.Any())
+                    {
+                        //var childInstanceInfo = childInstanceInfos.FirstOrDefault();
+                        //string acUrlComand = String.Format("{0}\\{1}!{2}", childInstanceInfo.ACUrlParent, childInstanceInfo.ACIdentifier, PWMethodTransportBase.ReloadBPAndResumeACIdentifier);
+                        //pAppManager.ACUrlCommand(acUrlComand);
+                        return null;
+                    }
+                }
+            }
+
+
+            ACMethod acMethod = appManager.NewACMethod(acClassMethod.ACIdentifier);
+            if (acMethod == null)
+                return null;
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
+            gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(databaseApp.ContextIPlus, null, secondaryKey);
+            program.ProgramACClassMethod = acClassMethod;
+            program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
+            databaseApp.ContextIPlus.ACProgram.AddObject(program);
+            //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
+            picking.PickingState = PickingStateEnum.WFActive;
+            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+            if (saveMsg == null)
+            {
+                ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
+                if (paramProgram == null)
+                    acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
+                else
+                    paramProgram.Value = program.ACProgramID;
+
+                ACValue acValuePPos = acMethod.ParameterValueList.GetACValue(Picking.ClassName);
+                if (acValuePPos == null)
+                    acMethod.ParameterValueList.Add(new ACValue(Picking.ClassName, typeof(Guid), picking.PickingID));
+                else
+                    acValuePPos.Value = picking.PickingID;
+
+                if (acClassWf != null)
+                {
+                    ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
+                    if (paramACClassWF == null)
+                        acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), acClassWf.ACClassWFID));
+                    else
+                        paramACClassWF.Value = acClassWf.ACClassWFID;
+                }
+
+                appManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
+            }
+            return saveMsg;
+        }
         #endregion
     }
 }

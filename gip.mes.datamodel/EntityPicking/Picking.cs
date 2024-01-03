@@ -33,7 +33,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Picking>) })]
-    public partial class Picking : IACConfigStore
+    public partial class Picking : IACConfigStore, IScheduledOrder
     {
         public const string ClassName = "Picking";
         public const string NoColumnName = "PickingNo";
@@ -157,6 +157,24 @@ namespace gip.mes.datamodel
                     }
                 }
                 return _IplusVBiACClassWF;
+            }
+        }
+
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
             }
         }
         #endregion

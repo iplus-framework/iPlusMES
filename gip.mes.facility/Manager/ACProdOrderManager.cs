@@ -1369,10 +1369,10 @@ namespace gip.mes.facility
                 }
 
                 #region Filter routes if is selected    ShowCellsInRoute
+                core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
                 {
-                    core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                     List<IACConfigStore> mandatoryConfigStores =
                     GetCurrentConfigStores(
                         aCClassWF,
@@ -1469,7 +1469,7 @@ namespace gip.mes.facility
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                             }
-                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, batchPlan, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
+                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, batchPlan, null, selectedReservationForModule, unselFacility, acClassWFDischarging, aCClassWF));
                         }
                     }
 
