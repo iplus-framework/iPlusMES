@@ -845,7 +845,7 @@ namespace gip.bso.logistics
         {
             if (this.CurrentPicking == null
                 || CurrentACClassMethod == null
-                || this.CurrentPicking.PickingState >= PickingStateEnum.InProcess
+                || this.CurrentPicking.PickingState > PickingStateEnum.InProcess
                 || PickingBSO == null
                 || PickingBSO.PickingPosList == null
                 || !PickingBSO.PickingPosList.Any()

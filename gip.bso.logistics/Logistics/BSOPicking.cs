@@ -3856,7 +3856,7 @@ namespace gip.bso.logistics
         {
             if (this.CurrentPicking == null
                 || CurrentPicking.ACClassMethod == null
-                || this.CurrentPicking.PickingState >= PickingStateEnum.InProcess
+                || this.CurrentPicking.PickingState > PickingStateEnum.InProcess
                 || PickingPosList == null
                 || !PickingPosList.Any()
                 || !PickingPosList.Where(c => c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any()

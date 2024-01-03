@@ -412,6 +412,7 @@ namespace gip.mes.datamodel
                             tempReservation.Facility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == Module.ACClassID).FirstOrDefault();
                             tempReservation.PickingPos = ParentPickingPos;
                             ParentPickingPos.FacilityReservation_PickingPos.Add(tempReservation);
+                            ParentPickingPos.Picking.VBiACClassWFID = WorkflowNode.ACClassWFID;
                             reservationList.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;

@@ -271,7 +271,7 @@ namespace gip.mes.processapplication
                                 else
                                     paramACClassWF.Value = ContentACClassWF.ACClassWFID;
 
-                                nextPicking.PickingStateIndex = (short)PickingStateEnum.InProcess;
+                                nextPicking.PickingStateIndex = (short)PickingStateEnum.WFActive;
                                 dbApp.ACSaveChanges();
 
                                 ApplicationManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);

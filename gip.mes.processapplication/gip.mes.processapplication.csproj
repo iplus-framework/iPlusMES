@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ACProcessApplication\IPAFSwitchable.cs" />
+    <Compile Include="ACProcessApplication\PAWorkflowSchedulerBase.cs" />
     <Compile Include="ACProcessApplication\PABatchPlanScheduler.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEChainConveyor.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEConveyorBelt.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSampleWeighing.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSampleWeighingLoop.cs" />
     <Compile Include="BSO\ACClassTaskModel.cs" />
+    <Compile Include="BSO\BSOWorkflowSchedulerBase.cs" />
     <Compile Include="Manager\DischargingItemManager.cs" />
     <Compile Include="Manager\DischargingItemNoValidator.cs" />
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
@@ -192,6 +194,8 @@
     <Compile Include="Model\PAScheduleForPWNode.cs" />
     <Compile Include="Model\SingleDosingItem.cs" />
     <Compile Include="Model\StartNextCompResult.cs" />
+    <Compile Include="ACProcessApplication\PAPickingScheduler.cs" />
+    <Compile Include="Model\UserRuleItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

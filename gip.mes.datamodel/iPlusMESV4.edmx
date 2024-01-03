@@ -3929,6 +3929,12 @@
           <Property Name="DeliveryCompanyAddressID" Type="uniqueidentifier" />
           <Property Name="MirroredFromPickingID" Type="uniqueidentifier" />
           <Property Name="Comment2" Type="varchar(max)" />
+          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
+          <Property Name="ScheduledOrder" Type="int" />
+          <Property Name="ScheduledStartDate" Type="datetime" />
+          <Property Name="ScheduledEndDate" Type="datetime" />
+          <Property Name="CalculatedStartDate" Type="datetime" />
+          <Property Name="CalculatedEndDate" Type="datetime" />
         </EntityType>
         <EntityType Name="PickingConfig">
           <Key>
@@ -11485,6 +11491,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Picking_ACClassWFID">
+          <End Role="ACClassWF" Type="Self.ACClassWF" Multiplicity="0..1" />
+          <End Role="Picking" Type="Self.Picking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassWF">
+              <PropertyRef Name="ACClassWFID" />
+            </Principal>
+            <Dependent Role="Picking">
+              <PropertyRef Name="VBiACClassWFID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Picking_DeliveryCompanyAddressID">
           <End Role="CompanyAddress" Type="Self.CompanyAddress" Multiplicity="0..1" />
           <End Role="Picking" Type="Self.Picking" Multiplicity="*" />
@@ -16066,6 +16084,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <End Role="ACClassMethod" EntitySet="ACClassMethod" />
             <End Role="Picking" EntitySet="Picking" />
           </AssociationSet>
+          <AssociationSet Name="FK_Picking_ACClassWFID" Association="Self.FK_Picking_ACClassWFID">
+            <End Role="ACClassWF" EntitySet="ACClassWF" />
+            <End Role="Picking" EntitySet="Picking" />
+          </AssociationSet>
           <AssociationSet Name="FK_Picking_DeliveryCompanyAddressID" Association="Self.FK_Picking_DeliveryCompanyAddressID">
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="Picking" EntitySet="Picking" />
@@ -19751,6 +19773,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
             <End Role="Weighing" EntitySet="Weighing" />
           </AssociationSet>
+          <AssociationSet Name="FK_Picking_ACClassWFID" Association="iPlusMESV4_Model.FK_Picking_ACClassWFID">
+            <End Role="ACClassWF" EntitySet="ACClassWF" />
+            <End Role="Picking" EntitySet="Picking" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -20285,6 +20311,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ProdOrderBatchPlan_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" FromRole="ACClassWF" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslistConfig_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassWFID" FromRole="ACClassWF" ToRole="ProdOrderPartslistConfig" />
           <NavigationProperty Name="ACClassTask_ContentACClassWF" Relationship="iPlusMESV4_Model.FK_ACClassTask_ContentACClassWFID" FromRole="ACClassWF" ToRole="ACClassTask" />
+          <NavigationProperty Name="Picking_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_Picking_ACClassWFID" FromRole="ACClassWF" ToRole="Picking" />
         </EntityType>
         <EntityType Name="ACClassWFEdge">
           <Key>
@@ -24305,6 +24332,13 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PickingConfig_Picking" Relationship="iPlusMESV4_Model.FK_PickingConfig_PickingID" FromRole="Picking" ToRole="PickingConfig" />
           <NavigationProperty Name="PickingPos_Picking" Relationship="iPlusMESV4_Model.FK_PickingPos_PickingID" FromRole="Picking" ToRole="PickingPos" />
           <NavigationProperty Name="MaintOrder_Picking" Relationship="iPlusMESV4_Model.FK_MaintOrder_PickingID" FromRole="Picking" ToRole="MaintOrder" />
+          <Property Name="VBiACClassWFID" Type="Guid" />
+          <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_Picking_ACClassWFID" FromRole="Picking" ToRole="ACClassWF" />
+          <Property Name="ScheduledOrder" Type="Int32" />
+          <Property Name="ScheduledStartDate" Type="DateTime" Precision="3" />
+          <Property Name="ScheduledEndDate" Type="DateTime" Precision="3" />
+          <Property Name="CalculatedStartDate" Type="DateTime" Precision="3" />
+          <Property Name="CalculatedEndDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="PickingConfig">
           <Key>
@@ -34620,6 +34654,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Picking_ACClassWFID">
+          <End Type="iPlusMESV4_Model.ACClassWF" Role="ACClassWF" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Picking" Role="Picking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassWF">
+              <PropertyRef Name="ACClassWFID" />
+            </Principal>
+            <Dependent Role="Picking">
+              <PropertyRef Name="VBiACClassWFID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -38339,6 +38385,12 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="Picking">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Picking">
               <MappingFragment StoreEntitySet="Picking">
+                <ScalarProperty Name="CalculatedEndDate" ColumnName="CalculatedEndDate" />
+                <ScalarProperty Name="CalculatedStartDate" ColumnName="CalculatedStartDate" />
+                <ScalarProperty Name="ScheduledEndDate" ColumnName="ScheduledEndDate" />
+                <ScalarProperty Name="ScheduledStartDate" ColumnName="ScheduledStartDate" />
+                <ScalarProperty Name="ScheduledOrder" ColumnName="ScheduledOrder" />
+                <ScalarProperty Name="VBiACClassWFID" ColumnName="VBiACClassWFID" />
                 <ScalarProperty Name="Comment2" ColumnName="Comment2" />
                 <ScalarProperty Name="MirroredFromPickingID" ColumnName="MirroredFromPickingID" />
                 <ScalarProperty Name="DeliveryCompanyAddressID" ColumnName="DeliveryCompanyAddressID" />
@@ -40844,6 +40896,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_ACClassWFID" />
       </Diagram>
     </Diagrams>
   </Designer>

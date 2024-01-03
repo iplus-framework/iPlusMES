@@ -18,6 +18,11 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(10, MDPickingType.ClassName, "en{'Picking type'}de{'Kommissionierung Typ'}", Const.ContextDatabase + "\\" + MDPickingType.ClassName, "", true)]
     [ACPropertyEntity(11, "DeliveryCompanyAddress", "en{'Delivery Address'}de{'Lieferadresse'}", Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
     [ACPropertyEntity(12, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(16, "ScheduledOrder", "en{'Scheduled Order'}de{'Reihenfolge Plan'}", "", "", true)]
+    [ACPropertyEntity(17, "ScheduledStartDate", "en{'Planned Start Date'}de{'Geplante Startzeit'}", "", "", true)]
+    [ACPropertyEntity(18, "ScheduledEndDate", "en{'Planned End Date'}de{'Geplante Endezeit'}", "", "", true)]
+    [ACPropertyEntity(19, "CalculatedStartDate", "en{'Calculated Start Date'}de{'Berechnete Startzeit'}", "", "", true)]
+    [ACPropertyEntity(20, "CalculatedEndDate", "en{'Calculated End Date'}de{'Berechnete Endezeit'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -135,6 +140,25 @@ namespace gip.mes.datamodel
             }
         }
 
+        private gip.core.datamodel.ACClassWF _IplusVBiACClassWF;
+        [ACPropertyInfo(9999)]
+        public gip.core.datamodel.ACClassWF IplusVBiACClassWF
+        {
+            get
+            {
+                if (VBiACClassWFID == null || VBiACClassWFID == Guid.Empty)
+                    return null;
+                if (this._IplusVBiACClassWF == null)
+                {
+                    DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                    using (ACMonitor.Lock(dbApp.ContextIPlus.QueryLock_1X000))
+                    {
+                        _IplusVBiACClassWF = dbApp.ContextIPlus.ACClassWF.Where(c => c.ACClassWFID == VBiACClassWFID).FirstOrDefault();
+                    }
+                }
+                return _IplusVBiACClassWF;
+            }
+        }
         #endregion
 
         #region IACConfigStore
