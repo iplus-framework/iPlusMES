@@ -49,6 +49,8 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _AllowPostingOnIntermediate = new ACPropertyConfigValue<bool>(this, nameof(AllowPostingOnIntermediate), false);
+
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
@@ -74,7 +76,7 @@ namespace gip.bso.manufacturing
                 Search();
             }
 
-            if(BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
             }
@@ -82,7 +84,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        
+
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
@@ -163,6 +165,13 @@ namespace gip.bso.manufacturing
             }
 
             return baseResult;
+        }
+
+        public override bool ACPostInit()
+        {
+            bool postInitBase = base.ACPostInit();
+            _ = AllowPostingOnIntermediate;
+            return postInitBase;
         }
 
         private void BSOFacilityRservation_ReservationChanged()
@@ -259,6 +268,24 @@ namespace gip.bso.manufacturing
                 if (_BSOFacilityReservation_Child == null)
                     _BSOFacilityReservation_Child = new ACChildItem<BSOFacilityReservation>(this, nameof(BSOFacilityReservation_Child));
                 return _BSOFacilityReservation_Child;
+            }
+        }
+
+        #endregion
+
+        #region Configuration
+
+        private ACPropertyConfigValue<bool> _AllowPostingOnIntermediate;
+        [ACPropertyConfig("en{'Allow posting on Intermediate'}de{'Buchung auf Zwischenprodukt erlaubt'}")]
+        public bool AllowPostingOnIntermediate
+        {
+            get
+            {
+                return _AllowPostingOnIntermediate.ValueT;
+            }
+            set
+            {
+                _AllowPostingOnIntermediate.ValueT = value;
             }
         }
 
@@ -735,9 +762,9 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if(!string.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith(nameof(SelectedInputMaterial)))
+            if (!string.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith(nameof(SelectedInputMaterial)))
             {
-                if(SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+                if (SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
                 {
                     return Global.ControlModes.Disabled;
                 }
