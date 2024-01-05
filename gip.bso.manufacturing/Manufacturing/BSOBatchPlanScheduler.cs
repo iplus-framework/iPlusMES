@@ -4327,7 +4327,7 @@ namespace gip.bso.manufacturing
             foreach (PAScheduleForPWNode schedule in ScheduleForPWNodeList)
             {
                 BatchPlanTimelineItem treeViewItem = new BatchPlanTimelineItem();
-                treeViewItem._ACCaption = schedule.ACCaption;
+                treeViewItem.ACCaption = schedule.ACCaption;
                 treeViewItem.DisplayOrder = displayOrder;
                 treeViewItem.TimelineItemType = BatchPlanTimelineItem.BatchPlanTimelineItemType.ContainerItem;
 
@@ -4347,7 +4347,7 @@ namespace gip.bso.manufacturing
                 foreach (ProdOrderBatchPlan batchPlan in batchPlans)
                 {
                     BatchPlanTimelineItem item = new BatchPlanTimelineItem();
-                    item._ACCaption = string.Format(@"[{0}] {1} ({2} {3})",
+                    item.ACCaption = string.Format(@"[{0}] {1} ({2} {3})",
                         batchPlan.ProdOrderPartslist.ProdOrder.ProgramNo,
                         batchPlan.ProdOrderPartslist.Partslist.Material.MaterialName1,
                         batchPlan.TotalSize,

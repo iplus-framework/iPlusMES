@@ -702,6 +702,23 @@ namespace gip.bso.facility
             }
         }
 
+        public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (paOrderInfo != null)
+            {
+                PAOrderInfoEntry entry = paOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
+                CurrentFacilityCharge =
+                    DatabaseApp
+                    .FacilityCharge
+                    .Include(c => c.Facility)
+                    .Include(c => c.FacilityLot)
+                    .Include(c => c.Material)
+                    .FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
+                return null;
+            }
+            return new Msg() { MessageLevel = eMsgLevel.Error, Message = "" };
+        }
+
         #region BSO->ACMethod Filter ExpirationDate
 
         /// <summary>
@@ -797,6 +814,14 @@ namespace gip.bso.facility
         #endregion
 
         #region FacilityBooking(Charge)Overview methods -> Executive methods overrides
+
+        public override PAOrderInfo GetOrderInfo()
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            if (SelectedFacilityCharge != null)
+                pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
+            return pAOrderInfo;
+        }
 
         public override bool IsEnabledRefreshMovements()
         {

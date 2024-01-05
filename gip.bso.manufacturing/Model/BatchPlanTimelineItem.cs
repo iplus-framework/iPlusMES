@@ -116,7 +116,7 @@ namespace gip.bso.manufacturing
         /// <value>The Unique Identifier as string</value>
         public string ACIdentifier { get; set; }
 
-        internal string _ACCaption;
+        private string _ACCaption;
 
         ///// <summary>
         ///// The PropertyChanged event.
@@ -129,6 +129,7 @@ namespace gip.bso.manufacturing
         public string ACCaption
         {
             get => _ACCaption;
+            set => _ACCaption = value;
         }
 
         /// <summary>

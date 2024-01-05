@@ -10,11 +10,9 @@ using System.Data;
 
 namespace gip.bso.logistics
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Order BOM Plan'}de{'Auftrag Stückliste Plan'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
-    public class PickingPlanWrapper : INotifyPropertyChanged, IScheduledOrder
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking order Plan'}de{'Kommisionierauftrag Plan'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
+    public class PickingPlanWrapper : EntityBase, IScheduledOrder
     {
-
-
         private static ACValueItemList _PickingStateList;
         [ACPropertyInfo(9999)]
         public static ACValueItemList PickingStateList
@@ -32,18 +30,12 @@ namespace gip.bso.logistics
             Picking = picking;
         }
 
-        #region event
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
-
+        private Picking _Picking;
         [ACPropertyInfo(1, "", "en{'Picking Order'}de{'Kommissionierauftrag'}")]
         public Picking Picking
         {
-            get;
-            set;
+            get { return _Picking; }
+            set { SetProperty<Picking>(ref _Picking, value); }
         }
 
         Material _Material;
@@ -91,6 +83,57 @@ namespace gip.bso.logistics
                 if (Material == null)
                     return null;
                 return AltMaterialUnit != null ? AltMaterialUnit.ToMDUnit : Material.BaseMDUnit;
+            }
+        }
+
+        List<PickingPlanPosWrapper> _Lines;
+        [ACPropertyList(10, "Lines", "en{'Lines'}de{'Positionen'}")]
+        public IEnumerable<PickingPlanPosWrapper> Lines
+        {
+            get
+            {
+                if (_Lines == null)
+                    BuildLines();
+                return _Lines;
+            }
+        }
+
+        protected virtual void BuildLines()
+        {
+            _Lines = new List<PickingPlanPosWrapper>();
+            foreach (PickingPos pos in Picking.PickingPos_Picking)
+            {
+                _Lines.Add(OnCreateNewPosWrapper(pos));
+            }
+        }
+
+
+        protected virtual PickingPlanPosWrapper OnCreateNewPosWrapper(PickingPos pos)
+        {
+            return new PickingPlanPosWrapper(pos);
+        }
+
+        private string _ReservationInfo;
+        [ACPropertyInfo(4, "", "en{'Reservation'}de{'Reservierung'}")]
+        public string ReservationInfo
+        {
+            get
+            {
+                if (_ReservationInfo != null)
+                    return _ReservationInfo;
+                StringBuilder sb = new StringBuilder();
+                foreach (PickingPos pickingPos in Picking.PickingPos_Picking)
+                {
+                    foreach (FacilityReservation reservation in pickingPos.FacilityReservation_PickingPos)
+                    {
+                        if (reservation.FacilityLot != null)
+                        {
+                            sb.AppendLine(String.Format("{0} ({1}) {2}", reservation.FacilityLot.LotNo, reservation.FacilityLot.ExternLotNo, reservation.FacilityLot.Comment));
+                        }
+                    }
+                }
+                _ReservationInfo = sb.ToString();
+                return _ReservationInfo;
             }
         }
 
@@ -292,12 +335,189 @@ namespace gip.bso.logistics
 
 
         #endregion
+    }
 
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking line'}de{'Kommissionierposition'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
+    public class PickingPlanPosWrapper : EntityBase
+    {
+        public PickingPlanPosWrapper(PickingPos pickingPos)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PickingPos = pickingPos;
+        }
+
+        private PickingPos _PickingPos;
+        [ACPropertyInfo(1, "", "en{'Picking line'}de{'Kommissionierposition'}")]
+        public PickingPos PickingPos
+        {
+            get { return _PickingPos; }
+            set { SetProperty<PickingPos>(ref _PickingPos, value); }
+        }
+
+        List<PickingPlanReservWrapper> _Reservations;
+        [ACPropertyList(10, "Lines", "en{'Reservations'}de{'Reservierungen'}")]
+        public IEnumerable<PickingPlanReservWrapper> Reservations
+        {
+            get
+            {
+                if (_Reservations == null)
+                    BuildReservations();
+                return _Reservations;
+            }
+        }
+
+        List<PickingPlanTargetWrapper> _Targets;
+        [ACPropertyList(10, "Lines", "en{'Destinations'}de{'Ziele'}")]
+        public IEnumerable<PickingPlanTargetWrapper> Targets
+        {
+            get
+            {
+                if (_Targets == null)
+                    BuildReservations();
+                return _Targets;
+            }
+        }
+
+        protected virtual void BuildReservations()
+        {
+            _Reservations = new List<PickingPlanReservWrapper>();
+            _Targets = new List<PickingPlanTargetWrapper>();
+            foreach (FacilityReservation reservation in PickingPos.FacilityReservation_PickingPos)
+            {
+                if (!reservation.VBiACClassID.HasValue && reservation.FacilityLot != null)
+                    _Reservations.Add(OnCreateNewReservWrapper(reservation));
+                else if (reservation.VBiACClassID.HasValue && reservation.Facility != null)
+                    _Targets.Add(OnCreateNewTargetWrapper(reservation));
+            }
+        }
+
+        protected virtual PickingPlanReservWrapper OnCreateNewReservWrapper(FacilityReservation reservation)
+        {
+            return new PickingPlanReservWrapper(reservation);
+        }
+
+        protected virtual PickingPlanTargetWrapper OnCreateNewTargetWrapper(FacilityReservation reservation)
+        {
+            return new PickingPlanTargetWrapper(reservation);
         }
     }
+
+
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Reservation'}de{'Reservierung'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
+    public class PickingPlanReservWrapper : EntityBase
+    {
+        public PickingPlanReservWrapper(FacilityReservation reservation)
+        {
+            Reservation = reservation;
+        }
+
+        private FacilityReservation _Reservation;
+        [ACPropertyInfo(1, "", "en{'Reservation'}de{'Reservierung'}")]
+        public FacilityReservation Reservation
+        {
+            get { return _Reservation; }
+            set { SetProperty<FacilityReservation>(ref _Reservation, value); }
+        }
+
+        private PickingPlanLotWrapper _Lot;
+        [ACPropertyInfo(2, "", "en{'Lot'}de{'Los'}")]
+        public PickingPlanLotWrapper Lot
+        {
+            get
+            {
+                if (_Lot == null)
+                    _Lot = OnCreateLot();
+                return _Lot;
+            }
+        }
+
+        protected virtual PickingPlanLotWrapper OnCreateLot() 
+        {
+            return new PickingPlanLotWrapper(Reservation.FacilityLot);
+        }
+    }
+
+
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Lot'}de{'Los'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
+    public class PickingPlanLotWrapper : EntityBase
+    {
+        public PickingPlanLotWrapper(FacilityLot lot)
+        {
+            Lot = lot;
+        }
+
+        private FacilityLot _Lot;
+        [ACPropertyInfo(1, "", "en{'Lot'}de{'Los'}")]
+        public FacilityLot Lot
+        {
+            get { return _Lot; }
+            set { SetProperty<FacilityLot>(ref _Lot, value); }
+        }
+
+        [ACPropertyInfo(50, "", "en{'ExtString1'}de{'ExtString1'}")]
+        public virtual string ExtString1
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(51, "", "en{'ExtString2'}de{'ExtString2'}")]
+        public virtual string ExtString2
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(52, "", "en{'ExtString3'}de{'ExtString3'}")]
+        public virtual string ExtString3
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(53, "", "en{'ExtString4'}de{'ExtString4'}")]
+        public virtual string ExtString4
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(54, "", "en{'ExtString5'}de{'ExtString5'}")]
+        public virtual string ExtString5
+        {
+            get
+            {
+                return null;
+            }
+        }
+    }
+
+
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Destination'}de{'Ziele'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
+    public class PickingPlanTargetWrapper : EntityBase
+    {
+        public PickingPlanTargetWrapper(FacilityReservation reservation)
+        {
+            Reservation = reservation;
+        }
+
+        private FacilityReservation _Reservation;
+        [ACPropertyInfo(1, "", "en{'Reservation'}de{'Reservierung'}")]
+        public FacilityReservation Reservation
+        {
+            get { return _Reservation; }
+            set { SetProperty<FacilityReservation>(ref _Reservation, value); }
+        }
+    }
+
 }
 
 

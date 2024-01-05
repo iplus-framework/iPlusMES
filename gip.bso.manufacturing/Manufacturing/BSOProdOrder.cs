@@ -74,7 +74,7 @@ namespace gip.bso.manufacturing
                 Search();
             }
 
-            if(BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
             }
@@ -1540,6 +1540,42 @@ namespace gip.bso.manufacturing
             PostExecute("Load");
         }
 
+        public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (paOrderInfo == null)
+                return base.FilterByOrderInfo(paOrderInfo);
+            
+            if (AccessPrimary == null || paOrderInfo == null)
+                return new Msg(eMsgLevel.Error, "(AccessPrimary == null || paOrderInfo == null)");
+
+            string orderNo = "";
+            Guid prodOrderPartslistID = Guid.Empty;
+            Guid intermPosID = Guid.Empty;
+            Guid intermBatchPosID = Guid.Empty;
+            Guid? facilityBookingID = null;
+            Guid? facilityPreBookingID = null;
+            Guid? planningMRID = null;
+
+            ProdOrderPartslistPosRelation relation = null;
+            ProdOrderBatch batch = null;
+            ProdOrderPartslistPos partslistPos = null;
+            ProdOrderPartslist poPartslist = null;
+            FacilityBooking facilityBooking = null;
+            FacilityPreBooking facilityPreBooking = null;
+            PlanningMR planningMR = null;
+
+            if (!ReadEntitiesFromOrderInfo(paOrderInfo, out orderNo, out prodOrderPartslistID, out intermPosID, out intermBatchPosID, out facilityPreBookingID, out facilityBookingID, out planningMRID,
+                out relation, out batch,
+                out partslistPos, out poPartslist,
+                out facilityBooking, out facilityPreBooking,
+                out planningMR))
+                return new Msg(eMsgLevel.Error, "Data not found");
+
+            if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
+                return new Msg(eMsgLevel.Error, "Order not filtered");
+
+            return null;
+        }
         #endregion
 
         #endregion
@@ -4186,8 +4222,239 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
         public void ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
         {
-            if (AccessPrimary == null)
+            if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
                 return;
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+            _IsEnabledACProgram = true;
+        }
+
+        //private bool InShowDialogOrderInfo = false;
+
+        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            string orderNo = "";
+            Guid prodOrderPartslistID = Guid.Empty;
+            Guid intermPosID = Guid.Empty;
+            Guid intermBatchPosID = Guid.Empty;
+            Guid? facilityBookingID = null;
+            Guid? facilityPreBookingID = null;
+            Guid? planningMRID = null;
+
+            ProdOrderPartslistPosRelation relation = null;
+            ProdOrderBatch batch = null;
+            ProdOrderPartslistPos partslistPos = null;
+            ProdOrderPartslist poPartslist = null;
+            FacilityBooking facilityBooking = null;
+            FacilityPreBooking facilityPreBooking = null;
+            PlanningMR planningMR = null;
+
+            if (!ReadEntitiesFromOrderInfo(paOrderInfo, out orderNo, out prodOrderPartslistID, out intermPosID, out intermBatchPosID, out facilityPreBookingID, out facilityBookingID, out planningMRID,
+                out relation, out batch,
+                out partslistPos, out poPartslist,
+                out facilityBooking, out facilityPreBooking,
+                out planningMR))
+                return;
+
+            ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID);
+            //InShowDialogOrderInfo = false;
+        }
+
+        protected bool ReadEntitiesFromOrderInfo(PAOrderInfo paOrderInfo, 
+            out string orderNo, out Guid prodOrderPartslistID, out Guid intermPosID, out Guid intermBatchPosID, 
+            out Guid? facilityPreBookingID, out Guid? facilityBookingID, out Guid? planningMRID,
+            out ProdOrderPartslistPosRelation relation, out ProdOrderBatch batch, 
+            out ProdOrderPartslistPos partslistPos, out ProdOrderPartslist poPartslist,
+            out FacilityBooking facilityBooking, out FacilityPreBooking facilityPreBooking,
+            out PlanningMR planningMR)
+        {
+            orderNo = "";
+            prodOrderPartslistID = Guid.Empty;
+            intermPosID = Guid.Empty;
+            intermBatchPosID = Guid.Empty;
+            facilityBookingID = null;
+            facilityPreBookingID = null;
+            planningMRID = null;
+
+            //InShowDialogOrderInfo = true;
+            // Falls Produktionsauftrag
+            relation = null;
+            batch = null;
+            partslistPos = null;
+            poPartslist = null;
+            facilityBooking = null;
+            facilityPreBooking = null;
+            planningMR = null;
+
+            if (paOrderInfo == null)
+                return false;
+
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == ProdOrderPartslistPosRelation.ClassName)
+                {
+                    relation = this.DatabaseApp.ProdOrderPartslistPosRelation
+                        .Include(c => c.TargetProdOrderPartslistPos)
+                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist)
+                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
+                        .Where(c => c.ProdOrderPartslistPosRelationID == entry.EntityID)
+                        .FirstOrDefault();
+                    break;
+                }
+                else if (entry.EntityName == ProdOrderBatch.ClassName)
+                {
+                    batch = this.DatabaseApp.ProdOrderBatch
+                        .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                        .Include(c => c.ProdOrderPartslist)
+                        .Include(c => c.ProdOrderPartslist.ProdOrder)
+                        .Where(c => c.ProdOrderBatchID == entry.EntityID).FirstOrDefault();
+                }
+                else if (entry.EntityName == ProdOrderPartslistPos.ClassName)
+                {
+                    partslistPos = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == entry.EntityID);
+                }
+                else if (entry.EntityName == OrderLog.ClassName)
+                {
+                    _IsEnabledACProgram = false;
+                    OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == entry.EntityID);
+                    if (currentOrderLog == null || (currentOrderLog.ProdOrderPartslistPos == null && currentOrderLog.ProdOrderPartslistPosRelation == null))
+                        return false;
+                    relation = currentOrderLog.ProdOrderPartslistPosRelation;
+                    partslistPos = currentOrderLog.ProdOrderPartslistPos;
+                }
+                else if (entry.EntityName == ProdOrderPartslist.ClassName)
+                {
+                    poPartslist = this.DatabaseApp.ProdOrderPartslist
+                        .Where(c => c.ProdOrderPartslistID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+                else if (entry.EntityName == FacilityBooking.ClassName)
+                {
+                    facilityBooking = DatabaseApp.FacilityBooking.FirstOrDefault(c => c.FacilityBookingID == entry.EntityID);
+                }
+                else if (entry.EntityName == FacilityPreBooking.ClassName)
+                {
+                    facilityPreBooking = DatabaseApp.FacilityPreBooking.FirstOrDefault(c => c.FacilityPreBookingID == entry.EntityID);
+                }
+                else if (entry.EntityName == PlanningMR.ClassName)
+                {
+                    planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == entry.EntityID);
+                }
+            }
+
+            if (batch == null && relation == null && partslistPos == null && poPartslist == null)
+                return false;
+
+            if (planningMR != null)
+                planningMRID = planningMR.PlanningMRID;
+
+            if (facilityBooking != null)
+            {
+                if (facilityBooking.ProdOrderPartslistPosRelationID != null)
+                {
+                    orderNo = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                    else
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                }
+                else if (facilityBooking.ProdOrderPartslistPosID != null)
+                {
+                    orderNo = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                    else
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                }
+                facilityBookingID = facilityBooking.FacilityBookingID;
+            }
+            else if (facilityPreBooking != null)
+            {
+                if (facilityPreBooking.ProdOrderPartslistPosRelationID != null)
+                {
+                    orderNo = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                    else
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                }
+                else if (facilityPreBooking.ProdOrderPartslistPosID != null)
+                {
+                    orderNo = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                    else
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                }
+                facilityPreBookingID = facilityPreBooking.FacilityPreBookingID;
+            }
+            else if (relation != null)
+            {
+                intermBatchPosID = relation.TargetProdOrderPartslistPos.ProdOrderPartslistPosID;
+                intermPosID = relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue ? relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
+                prodOrderPartslistID = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistID;
+                orderNo = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+            }
+            else if (batch != null)
+            {
+                var poPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
+                if (poPos != null)
+                {
+                    intermBatchPosID = poPos.ProdOrderPartslistPosID;
+                    intermPosID = poPos.ParentProdOrderPartslistPosID.HasValue ? poPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
+                }
+                prodOrderPartslistID = batch.ProdOrderPartslist.ProdOrderPartslistID;
+                orderNo = batch.ProdOrderPartslist.ProdOrder.ProgramNo;
+            }
+            else
+            {
+                if (partslistPos != null)
+                {
+                    poPartslist = partslistPos.ProdOrderPartslist;
+                    intermPosID = partslistPos.ProdOrderPartslistPosID;
+                }
+                orderNo = poPartslist.ProdOrder.ProgramNo;
+                prodOrderPartslistID = poPartslist.ProdOrderPartslistID;
+            }
+            return true;
+        }
+
+        public bool SetFilterFromOrderInfoIDs(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
+        {
+            if (AccessPrimary == null)
+                return false;
             //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
             ACFilterItem filterItem = null;
             var query = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "ProgramNo");
@@ -4292,194 +4559,9 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
-            _IsEnabledACProgram = true;
+            return true;
         }
 
-        //private bool InShowDialogOrderInfo = false;
-
-        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
-        {
-            if (AccessPrimary == null || paOrderInfo == null)
-                return;
-
-            //InShowDialogOrderInfo = true;
-            // Falls Produktionsauftrag
-            ProdOrderPartslistPosRelation relation = null;
-            ProdOrderBatch batch = null;
-            ProdOrderPartslistPos partslistPos = null;
-            ProdOrderPartslist poPartslist = null;
-            FacilityBooking facilityBooking = null;
-            FacilityPreBooking facilityPreBooking = null;
-            PlanningMR planningMR = null;
-
-            foreach (var entry in paOrderInfo.Entities)
-            {
-                if (entry.EntityName == ProdOrderPartslistPosRelation.ClassName)
-                {
-                    relation = this.DatabaseApp.ProdOrderPartslistPosRelation
-                        .Include(c => c.TargetProdOrderPartslistPos)
-                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist)
-                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
-                        .Where(c => c.ProdOrderPartslistPosRelationID == entry.EntityID)
-                        .FirstOrDefault();
-                    break;
-                }
-                else if (entry.EntityName == ProdOrderBatch.ClassName)
-                {
-                    batch = this.DatabaseApp.ProdOrderBatch
-                        .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
-                        .Include(c => c.ProdOrderPartslist)
-                        .Include(c => c.ProdOrderPartslist.ProdOrder)
-                        .Where(c => c.ProdOrderBatchID == entry.EntityID).FirstOrDefault();
-                }
-                else if (entry.EntityName == ProdOrderPartslistPos.ClassName)
-                {
-                    partslistPos = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == entry.EntityID);
-                }
-                else if (entry.EntityName == OrderLog.ClassName)
-                {
-                    _IsEnabledACProgram = false;
-                    OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == entry.EntityID);
-                    if (currentOrderLog == null || (currentOrderLog.ProdOrderPartslistPos == null && currentOrderLog.ProdOrderPartslistPosRelation == null))
-                        return;
-                    relation = currentOrderLog.ProdOrderPartslistPosRelation;
-                    partslistPos = currentOrderLog.ProdOrderPartslistPos;
-                }
-                else if (entry.EntityName == ProdOrderPartslist.ClassName)
-                {
-                    poPartslist = this.DatabaseApp.ProdOrderPartslist
-                        .Where(c => c.ProdOrderPartslistID == entry.EntityID)
-                        .FirstOrDefault();
-                }
-                else if (entry.EntityName == FacilityBooking.ClassName)
-                {
-                    facilityBooking = DatabaseApp.FacilityBooking.FirstOrDefault(c => c.FacilityBookingID == entry.EntityID);
-                }
-                else if (entry.EntityName == FacilityPreBooking.ClassName)
-                {
-                    facilityPreBooking = DatabaseApp.FacilityPreBooking.FirstOrDefault(c => c.FacilityPreBookingID == entry.EntityID);
-                }
-                else if (entry.EntityName == PlanningMR.ClassName)
-                {
-                    planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == entry.EntityID);
-                }
-            }
-
-            if (batch == null && relation == null && partslistPos == null && poPartslist == null)
-                return;
-
-            string orderNo = "";
-            Guid prodOrderPartslistID = Guid.Empty;
-            Guid intermPosID = Guid.Empty;
-            Guid intermBatchPosID = Guid.Empty;
-            Guid? facilityBookingID = null;
-            Guid? facilityPreBookingID = null;
-            Guid? planningMRID = null;
-            if (planningMR != null)
-                planningMRID = planningMR.PlanningMRID;
-
-            if (facilityBooking != null)
-            {
-                if (facilityBooking.ProdOrderPartslistPosRelationID != null)
-                {
-                    orderNo = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                    else
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                }
-                else if (facilityBooking.ProdOrderPartslistPosID != null)
-                {
-                    orderNo = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                    else
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                }
-                facilityBookingID = facilityBooking.FacilityBookingID;
-            }
-            else if (facilityPreBooking != null)
-            {
-                if (facilityPreBooking.ProdOrderPartslistPosRelationID != null)
-                {
-                    orderNo = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                    else
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                }
-                else if (facilityPreBooking.ProdOrderPartslistPosID != null)
-                {
-                    orderNo = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                    else
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                }
-                facilityPreBookingID = facilityPreBooking.FacilityPreBookingID;
-            }
-            else if (relation != null)
-            {
-                intermBatchPosID = relation.TargetProdOrderPartslistPos.ProdOrderPartslistPosID;
-                intermPosID = relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue ? relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
-                prodOrderPartslistID = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistID;
-                orderNo = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-            }
-            else if (batch != null)
-            {
-                var poPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
-                if (poPos != null)
-                {
-                    intermBatchPosID = poPos.ProdOrderPartslistPosID;
-                    intermPosID = poPos.ParentProdOrderPartslistPosID.HasValue ? poPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
-                }
-                prodOrderPartslistID = batch.ProdOrderPartslist.ProdOrderPartslistID;
-                orderNo = batch.ProdOrderPartslist.ProdOrder.ProgramNo;
-            }
-            else
-            {
-                if (partslistPos != null)
-                {
-                    poPartslist = partslistPos.ProdOrderPartslist;
-                    intermPosID = partslistPos.ProdOrderPartslistPosID;
-                }
-                orderNo = poPartslist.ProdOrder.ProgramNo;
-                prodOrderPartslistID = poPartslist.ProdOrderPartslistID;
-            }
-            ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID);
-            //InShowDialogOrderInfo = false;
-        }
 
         [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
         public void DialogOK()

@@ -21,7 +21,7 @@ using gip.core.media;
 
 namespace gip.bso.logistics
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.Picking.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking scheduler'}de{'Kommission Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.Picking.ClassName)]
     public class BSOPickingScheduler : BSOWorkflowSchedulerBase
     {
         #region const
@@ -464,7 +464,7 @@ namespace gip.bso.logistics
             }
         }
 
-        private bool _IsRefreshingBatchPlan = false;
+        //private bool _IsRefreshingBatchPlan = false;
         private ObservableCollection<PickingPlanWrapper> GetPickingList(Guid? mdSchedulingGroupID)
         {
             if (!mdSchedulingGroupID.HasValue)
@@ -475,7 +475,7 @@ namespace gip.bso.logistics
             ObservableCollection<PickingPlanWrapper> scheduledPickings = null;
             try
             {
-                _IsRefreshingBatchPlan = true;
+                //_IsRefreshingBatchPlan = true;
                 scheduledPickings = new ObservableCollection<PickingPlanWrapper>(
                     PickingManager
                     .GetScheduledPickings(
@@ -488,7 +488,7 @@ namespace gip.bso.logistics
                         FilterPickingProgramNo,
                         FilterPickingMaterialNo)
                     .AsEnumerable()
-                    .Select(c => new PickingPlanWrapper(c)));
+                    .Select(c => CreateNewPickingPlanWrapper(c)));
             }
             catch (Exception ex)
             {
@@ -497,7 +497,7 @@ namespace gip.bso.logistics
             }
             finally
             {
-                _IsRefreshingBatchPlan = false;
+                //_IsRefreshingBatchPlan = false;
             }
             if (scheduledPickings != null)
             {
@@ -511,6 +511,11 @@ namespace gip.bso.logistics
                 }
             }
             return scheduledPickings;
+        }
+
+        protected virtual PickingPlanWrapper CreateNewPickingPlanWrapper(Picking picking)
+        {
+            return new PickingPlanWrapper(picking);
         }
 
         #endregion
@@ -1933,8 +1938,8 @@ namespace gip.bso.logistics
 
             if (vbControl != null && !string.IsNullOrEmpty(vbControl.VBContent))
             {
-                switch (vbControl.VBContent)
-                {
+                //switch (vbControl.VBContent)
+                //{
                     //case "SelectedPicking\\ScheduledStartDate":
                     //case "SelectedPicking\\ScheduledEndDate":
                     //    if (SelectedPicking != null
@@ -1961,7 +1966,7 @@ namespace gip.bso.logistics
                     //    if (!filterOrderEndTimeIsEnabled)
                     //        result = Global.ControlModes.EnabledWrong;
                     //    break;
-                }
+                //}
             }
             return result;
         }

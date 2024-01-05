@@ -93,7 +93,7 @@ namespace gip.mes.processapplication
                 {
                     try
                     {
-                        _GroupIndexFrom = (short)PAWorkflowScheduler.ComponentClass[nameof(PAWorkflowSchedulerBase.GroupIndexFrom)];
+                        _GroupIndexFrom = (short)PAWorkflowScheduler[nameof(PAWorkflowSchedulerBase.GroupIndexFrom)];
                     }
                     catch (Exception) 
                     { 
@@ -116,7 +116,7 @@ namespace gip.mes.processapplication
                 {
                     try
                     {
-                        _GroupIndexTo = (short)PAWorkflowScheduler.ComponentClass[nameof(PAWorkflowSchedulerBase.GroupIndexTo)];
+                        _GroupIndexTo = (short)PAWorkflowScheduler[nameof(PAWorkflowSchedulerBase.GroupIndexTo)];
                     }
                     catch (Exception)
                     {
