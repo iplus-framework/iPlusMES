@@ -51,11 +51,9 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                CurrentEndBatchPosKey = null;
-                IntermediateChildPosKey = null;
-            }
+            CurrentEndBatchPosKey = null;
+            IntermediateChildPosKey = null;
+            
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -131,11 +129,24 @@ namespace gip.mes.processapplication
 
         #region Properties -> Pos
 
+        private EntityKey _CurrentEndBatchPosKey;
         [ACPropertyInfo(999)]
         public EntityKey CurrentEndBatchPosKey
         {
-            get;
-            set;
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _CurrentEndBatchPosKey;
+                }
+            }
+            set
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _CurrentEndBatchPosKey = value;
+                }
+            }
         }
 
         private EntityKey _IntermediateChildPosKey;
@@ -143,11 +154,17 @@ namespace gip.mes.processapplication
         {
             get
             {
-                return _IntermediateChildPosKey;
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _IntermediateChildPosKey;
+                }
             }
             set
             {
-                _IntermediateChildPosKey = value;
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _IntermediateChildPosKey = value;
+                }
             }
         }
 
@@ -852,6 +869,34 @@ namespace gip.mes.processapplication
         }
 
         #endregion
+
+        #endregion
+
+
+        #region Reset
+
+        public override void Reset()
+        {
+            CurrentEndBatchPosKey = null;
+            IntermediateChildPosKey = null;
+
+            base.Reset();
+        }
+
+        public override bool IsEnabledReset()
+        {
+            //if (this.TaskSubscriptionPoint.ConnectionList.Any())
+            //return false;
+            return base.IsEnabledReset();
+        }
+
+        public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        {
+            CurrentEndBatchPosKey = null;
+            IntermediateChildPosKey = null;
+
+            base.Recycle(content, parentACObject, parameter, acIdentifier);
+        }
 
         #endregion
 
