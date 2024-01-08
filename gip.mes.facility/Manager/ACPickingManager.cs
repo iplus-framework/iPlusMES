@@ -106,6 +106,8 @@ namespace gip.mes.facility
                                     .Include("PickingPos_Picking.FromFacility")
                                     .Include("PickingPos_Picking.FacilityReservation_PickingPos.FacilityLot")
                                     .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility")
+                                    .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.Material")
+                                    .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.FacilityStock_Facility")
                                     .Where(c => (mdSchedulingGroupID == null || (c.VBiACClassWF != null && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty))))
                                             && (   c.PickingStateIndex >= greaterEqualState
                                                 || c.PickingStateIndex <= lessEqualState)

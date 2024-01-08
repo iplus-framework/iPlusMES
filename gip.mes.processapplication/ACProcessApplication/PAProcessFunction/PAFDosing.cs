@@ -1326,7 +1326,7 @@ namespace gip.mes.processapplication
                     actualQuantity = (double)acMethod.ResultValueList["ActualQuantity"];
                     double newVolume = (actualQuantity * 1000) / densityACValue.ParamAsDouble;
                     IACPropertyNetTarget fillVolumeProp = container.FillVolume as IACPropertyNetTarget;
-                    if (fillVolumeProp == null || fillVolumeProp.Source == null)
+                    if (fillVolumeProp != null && fillVolumeProp.Source == null)
                         container.FillVolume.ValueT += newVolume;
                 }
             }

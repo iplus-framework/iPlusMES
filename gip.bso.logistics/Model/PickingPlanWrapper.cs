@@ -101,7 +101,7 @@ namespace gip.bso.logistics
         protected virtual void BuildLines()
         {
             _Lines = new List<PickingPlanPosWrapper>();
-            foreach (PickingPos pos in Picking.PickingPos_Picking)
+            foreach (PickingPos pos in Picking.PickingPos_Picking.OrderBy(c => c.Sequence))
             {
                 _Lines.Add(OnCreateNewPosWrapper(pos));
             }
@@ -122,14 +122,13 @@ namespace gip.bso.logistics
                 if (_ReservationInfo != null)
                     return _ReservationInfo;
                 StringBuilder sb = new StringBuilder();
-                foreach (PickingPos pickingPos in Picking.PickingPos_Picking)
+                foreach (PickingPos pickingPos in Picking.PickingPos_Picking.OrderBy(c => c.Sequence))
                 {
-                    foreach (FacilityReservation reservation in pickingPos.FacilityReservation_PickingPos)
+                    foreach (FacilityReservation reservation in pickingPos.FacilityReservation_PickingPos
+                        .Where(c => c.FacilityLot != null)
+                        .OrderBy(c => c.FacilityLot.ExternLotNo))
                     {
-                        if (reservation.FacilityLot != null)
-                        {
-                            sb.AppendLine(String.Format("{0} ({1}) {2}", reservation.FacilityLot.LotNo, reservation.FacilityLot.ExternLotNo, reservation.FacilityLot.Comment));
-                        }
+                        sb.AppendLine(String.Format("{0} ({1}) {2}", reservation.FacilityLot.LotNo, reservation.FacilityLot.ExternLotNo, reservation.FacilityLot.Comment));
                     }
                 }
                 _ReservationInfo = sb.ToString();
@@ -389,6 +388,11 @@ namespace gip.bso.logistics
                 else if (reservation.VBiACClassID.HasValue && reservation.Facility != null)
                     _Targets.Add(OnCreateNewTargetWrapper(reservation));
             }
+
+            if (_Reservations.Any())
+                _Reservations = _Reservations.OrderBy(c => c.Lot.Lot.LotNo).ToList();
+            if (_Targets.Any())
+                _Targets = _Targets.OrderBy(c => c.Reservation.Facility.FacilityNo).ToList();
         }
 
         protected virtual PickingPlanReservWrapper OnCreateNewReservWrapper(FacilityReservation reservation)
@@ -492,6 +496,69 @@ namespace gip.bso.logistics
 
         [ACPropertyInfo(54, "", "en{'ExtString5'}de{'ExtString5'}")]
         public virtual string ExtString5
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(55, "", "en{'ExtString6'}de{'ExtString6'}")]
+        public virtual string ExtString6
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(56, "", "en{'ExtString7'}de{'ExtString7'}")]
+        public virtual string ExtString7
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(57, "", "en{'ExtString8'}de{'ExtString8'}")]
+        public virtual string ExtString8
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(58, "", "en{'ExtString9'}de{'ExtString9'}")]
+        public virtual string ExtString9
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(60, "", "en{'ExtDouble1'}de{'ExtDouble1'}")]
+        public virtual double? ExtDouble1
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(61, "", "en{'ExtDouble2'}de{'ExtDouble2'}")]
+        public virtual double? ExtDouble2
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(62, "", "en{'ExtDouble3'}de{'ExtDouble3'}")]
+        public virtual double? ExtDouble3
         {
             get
             {
