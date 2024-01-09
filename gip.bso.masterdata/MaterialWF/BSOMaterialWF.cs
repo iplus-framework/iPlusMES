@@ -1235,7 +1235,7 @@ namespace gip.bso.masterdata
                 return result;
             switch (vbControl.VBContent)
             {
-                case "CurrentMaterialWFNo":
+                case nameof(CurrentMaterialWFNo):
                     {
                         if (VBDesignerMaterialWF == null || !VBDesignerMaterialWF.IsDesignMode)
                             return Global.ControlModes.Disabled;
@@ -1303,7 +1303,7 @@ namespace gip.bso.masterdata
         {
             if (e != null && e.PropertyName == "IsDesignMode")
             {
-                OnPropertyChanged("CurrentMaterialWFNo");
+                OnPropertyChanged(nameof(CurrentMaterialWFNo));
             }
         }
 
