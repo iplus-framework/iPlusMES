@@ -3436,6 +3436,17 @@ namespace gip.mes.processapplication
                                         isWeighingInTol = false;
                                     }
 
+                                    if (!isWeighingInTol)
+                                    {
+                                        ACValue skipTolCheckValue = parentACMethod.ParameterValueList.GetACValue("SkipToleranceCheck");
+                                        if (skipTolCheckValue != null)
+                                        {
+                                            bool skipToleranceCheck = skipTolCheckValue.ParamAsBoolean;
+                                            if (skipToleranceCheck)
+                                                isWeighingInTol = true;
+                                        }
+                                    }
+
                                     if (AutoInterDis && currentOpenMaterial != null)
                                     {
                                         using (DatabaseApp dbApp = new DatabaseApp())
