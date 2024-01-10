@@ -105,13 +105,9 @@ namespace gip.mes.processapplication
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 Picking picking = detachedPicking.FromAppContext<Picking>(dbApp);
-                bool validationSuccess = true;
                 var mandantoryConfigStores = MandatoryConfigStores;
                 if (!ValidateExpectedConfigStores())
-                {
-                    validationSuccess = false;
                     return StartNextBatchResult.CycleWait;
-                }
 
                 MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, mandantoryConfigStores, ValidationBehaviour);
                 if (msg2 != null)
@@ -119,59 +115,70 @@ namespace gip.mes.processapplication
                     if (!msg2.IsSucceded())
                     {
                         OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1010), true);
-                        validationSuccess = false;
                         return StartNextBatchResult.CycleWait;
                     }
                 }
-                if (validationSuccess)
-                {
-                    //if (ProdOrderManager.SetBatchPlanValidated(dbApp, currentProdOrderPartslist) > 0)
-                    //dbApp.ACSaveChanges();
-                }
 
 
-                PickingPos pickingPos = null;
-                //var queryOrderRelatedPickingLines = picking.PickingPos_Picking.Where(c => c.InOrderPosID.HasValue || c.OutOrderPosID.HasValue || c.PickingPosProdOrderPartslistPos_PickingPos.Any());
-                //if (queryOrderRelatedPickingLines.Any())
-                //{
-                pickingPos = picking.PickingPos_Picking
-                    .Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
-                    .OrderBy(c => c.Sequence)
-                    .FirstOrDefault();
-                if (pickingPos == null)
+                bool allCompleted = true;
+                PickingPos pFirstReadyToLoad = null;
+                PickingPos pFirstLoadingActive = null;
+                foreach (PickingPos p in picking.PickingPos_Picking.OrderBy(c => c.Sequence))
                 {
-                    pickingPos = picking.PickingPos_Picking
-                    .Where(c => c.MDDelivPosLoadStateID.HasValue && c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
-                    .OrderBy(c => c.Sequence)
-                    .FirstOrDefault();
+                    if (p.MDDelivPosLoadState == null || p.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.NewCreated)
+                        allCompleted = false;
+                    else
+                    {
+                        if (pFirstReadyToLoad == null && p.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
+                        {
+                            pFirstReadyToLoad = p;
+                            allCompleted = false;
+                        }
+                        else if (pFirstLoadingActive == null && p.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
+                        {
+                            pFirstLoadingActive = p;
+                            allCompleted = false;
+                        }
+                    }
+                    if (allCompleted == false && pFirstReadyToLoad != null && pFirstLoadingActive != null)
+                        break;
                 }
-                if (pickingPos == null)
+
+                if (allCompleted)
+                {
+                    picking.PickingState = PickingStateEnum.Finished;
+                    dbApp.ACSaveChanges();
+                }
+                else if (pFirstReadyToLoad != null)
+                    nextPos = pFirstReadyToLoad;
+                else if (pFirstLoadingActive != null)
+                    nextPos = pFirstLoadingActive;
+
+                if (nextPos == null)
                 {
                     StartNextPickingWF(detachedPicking);
                     return StartNextBatchResult.Done;
                 }
-                nextPos = pickingPos;
-                if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID != null)
+                if (nextPos.FromFacility != null && nextPos.FromFacility.VBiFacilityACClassID != null)
                 {
-                    var queryProject = dbApp.ACClass.Where(c => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID).Select(c => c.ACProjectID);
-                    if (queryProject.Any())
-                        startNextBatchAtProjectID1 = queryProject.FirstOrDefault();
+                    Guid? classID = nextPos.FromFacility.VBiFacilityACClassID;
+                    if (classID.HasValue)
+                    {
+                        var queryProject = dbApp.ACClass.Where(c => c.ACClassID == classID.Value).Select(c => c.ACProjectID);
+                        if (queryProject.Any())
+                            startNextBatchAtProjectID1 = queryProject.FirstOrDefault();
+                    }
                 }
-                if (pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID != null)
+                if (nextPos.ToFacility != null && nextPos.ToFacility.VBiFacilityACClassID != null)
                 {
-                    var queryProject = dbApp.ACClass.Where(c => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID).Select(c => c.ACProjectID);
-                    if (queryProject.Any())
-                        startNextBatchAtProjectID2 = queryProject.FirstOrDefault();
+                    Guid? classID = nextPos.ToFacility.VBiFacilityACClassID;
+                    if (classID.HasValue)
+                    {
+                        var queryProject = dbApp.ACClass.Where(c => c.ACClassID == classID.Value).Select(c => c.ACProjectID);
+                        if (queryProject.Any())
+                            startNextBatchAtProjectID2 = queryProject.FirstOrDefault();
+                    }
                 }
-                //}
-                //else
-                //{
-                //    message = "No order related lines found";
-                //    if (IsAlarmActive(ProcessAlarm, message) == null)
-                //        Messages.LogError(this.GetACUrl(), "StartDischargingPicking(2)", message);
-                //    OnNewAlarmOccurred(ProcessAlarm, message, true);
-                //    return StartNextBatchResult.Done;
-                //}
 
                 if (WillReadAndStartNextBatchCompleteNode_Picking(30))
                     return StartNextBatchResult.Done;
@@ -242,42 +249,47 @@ namespace gip.mes.processapplication
                         if (nextPicking != null)
                         {
                             core.datamodel.ACClassMethod acClassMethod = nextPicking.ACClassMethod.FromIPlusContext<core.datamodel.ACClassMethod>(dbiPlus);
-
-                            ACMethod acMethod = ApplicationManager.NewACMethod(acClassMethod.ACIdentifier);
-                            if (acMethod == null)
-                                return;
-                            string secondaryKey = Root.NoManager.GetNewNo(dbiPlus, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
-                            gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(dbiPlus, null, secondaryKey);
-                            program.ProgramACClassMethod = acClassMethod;
-                            program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-                            dbiPlus.ACProgram.AddObject(program);
-                            if (dbiPlus.ACSaveChanges() == null)
+                            MsgWithDetails saveMsg = this.PickingManager.StartPicking(dbApp, ApplicationManager, nextPicking, acClassMethod, ContentACClassWF, false);
+                            if (saveMsg == null)
                             {
-                                ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
-                                if (paramProgram == null)
-                                    acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
-                                else
-                                    paramProgram.Value = program.ACProgramID;
-
-                                ACValue acValue = acMethod.ParameterValueList.GetACValue(Picking.ClassName);
-                                if (acValue == null)
-                                    acMethod.ParameterValueList.Add(new ACValue(Picking.ClassName, typeof(Guid), nextPicking.PickingID));
-                                else
-                                    acValue.Value = nextPicking.PickingID;
-
-                                ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
-                                if (paramACClassWF == null)
-                                    acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), ContentACClassWF.ACClassWFID));
-                                else
-                                    paramACClassWF.Value = ContentACClassWF.ACClassWFID;
-
-                                nextPicking.PickingStateIndex = (short)PickingStateEnum.WFActive;
-                                dbApp.ACSaveChanges();
-
-                                ApplicationManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
-
                                 StartedAnyPickingWF.ValueT = true;
                             }
+
+                            //ACMethod acMethod = ApplicationManager.NewACMethod(acClassMethod.ACIdentifier);
+                            //if (acMethod == null)
+                            //    return;
+                            //string secondaryKey = Root.NoManager.GetNewNo(dbiPlus, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
+                            //gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(dbiPlus, null, secondaryKey);
+                            //program.ProgramACClassMethod = acClassMethod;
+                            //program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
+                            //dbiPlus.ACProgram.AddObject(program);
+                            //if (dbiPlus.ACSaveChanges() == null)
+                            //{
+                            //    ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
+                            //    if (paramProgram == null)
+                            //        acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
+                            //    else
+                            //        paramProgram.Value = program.ACProgramID;
+
+                            //    ACValue acValue = acMethod.ParameterValueList.GetACValue(Picking.ClassName);
+                            //    if (acValue == null)
+                            //        acMethod.ParameterValueList.Add(new ACValue(Picking.ClassName, typeof(Guid), nextPicking.PickingID));
+                            //    else
+                            //        acValue.Value = nextPicking.PickingID;
+
+                            //    ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
+                            //    if (paramACClassWF == null)
+                            //        acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), ContentACClassWF.ACClassWFID));
+                            //    else
+                            //        paramACClassWF.Value = ContentACClassWF.ACClassWFID;
+
+                            //    nextPicking.PickingStateIndex = (short)PickingStateEnum.WFActive;
+                            //    dbApp.ACSaveChanges();
+
+                            //    ApplicationManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
+
+                            //    StartedAnyPickingWF.ValueT = true;
+                            //}
                         }
                     }
                 }

@@ -1312,7 +1312,7 @@ namespace gip.mes.processapplication
                 }
 
                 // Falls dosiert
-                if (actualWeight > 0.00001 && IsProduction)
+                if ((actualWeight < -0.00001 || actualWeight > 0.00001) && IsProduction)
                 {
                     // 1. Bereite Buchung vor
                     FacilityLot facilityLot = null;

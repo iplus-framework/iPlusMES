@@ -433,7 +433,7 @@ namespace gip.mes.processapplication
                         Msg msg = null;
                         var availableFC = GetFacilityChargesForMaterialPicking(dbApp, pickingPos);
                         if (!AutoSelectLot)
-                            return availableFC.Any();
+                            return availableFC != null && availableFC.Any();
 
                         if (mat.IsLotManaged)
                         {

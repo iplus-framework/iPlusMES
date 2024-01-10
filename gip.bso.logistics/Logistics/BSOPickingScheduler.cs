@@ -18,6 +18,7 @@ using vd = gip.mes.datamodel;
 using System.Xml;
 using System.Data;
 using gip.core.media;
+using System.Windows.Interop;
 
 namespace gip.bso.logistics
 {
@@ -471,7 +472,7 @@ namespace gip.bso.logistics
                 return new ObservableCollection<PickingPlanWrapper>();
 
             PickingStateEnum lessEqualState = PickingStateEnum.InProcess;
-            vd.PickingStateEnum greaterEqualState = PickingStateEnum.WFActive;
+            vd.PickingStateEnum greaterEqualState = PickingStateEnum.WFReadyToStart;
             ObservableCollection<PickingPlanWrapper> scheduledPickings = null;
             try
             {
@@ -1181,6 +1182,7 @@ namespace gip.bso.logistics
                     EntityName = Picking.ClassName
                 });
                 service.ShowDialogOrder(this, info);
+                Load(true);
             }
         }
 
@@ -1317,90 +1319,79 @@ namespace gip.bso.logistics
         public bool IsEnabledSetBatchStateReadyToStart()
         {
             return PickingList != null
-                && PickingList.Any(c => c.IsSelected && c.PickingState < PickingStateEnum.WFReadyToStart);
+                && PickingList.Any(c => c.IsSelected && c.PickingState <= PickingStateEnum.InProcess);
         }
 
         private void SetReadyToStart(PickingPlanWrapper[] batchPlans)
         {
-            MsgWithDetails msgWithDetails = new MsgWithDetails();
-            foreach (PickingPlanWrapper picking in batchPlans)
+            bool? setReadyToLoad = null;
+            using (var dbIPlus = new Database())
             {
-                // TODO:
-                bool isBatchReadyToStart = true; // picking.FacilityReservation_Picking.Any() && (batchPlan.ProdOrderPartslist != null && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
-                //if (!isBatchReadyToStart)
-                //{
-                //    // Error50559
-                //    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
-                //    //  9   New 8401    NADJEV SIR ZA BUREK 1   0            
-                //    Msg msg = new Msg(this, eMsgLevel.Error, "BSOPickingScheduler", "SetBatchStateReadyToStart()", 3184, "Error50559",
-                //        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
-                //        batchPlan.BatchTargetCount, batchPlan.BatchSize);
-                //    msgWithDetails.AddDetailMessage(msg);
-                //}
-
-                //if (ValidateBeforeStart)
-                //{
-                //    if (isBatchReadyToStart)
-                //    {
-                //        // check duplicate components
-                //        bool haveManyDuplicateComponents =
-                //            batchPlan
-                //            .ProdOrderPartslist
-                //            .ProdOrderPartslistPos_ProdOrderPartslist
-                //            .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
-                //            .GroupBy(c => c.Material.MaterialNo)
-                //            .Where(c => c.Count() > 1)
-                //            .Count() > 1;
-
-                //        if (haveManyDuplicateComponents)
-                //        {
-                //            // Warning50060
-                //            // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
-                //            // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
-                //            Global.MsgResult msgResult = Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
-                //            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
-                //        }
-                //    }
-
-                //    if (isBatchReadyToStart)
-                //    {
-                //        bool notExpectedPosQuantities = NotExpectedPosQuantities(batchPlan);
-                //        if (notExpectedPosQuantities)
-                //        {
-                //            // Warning50061
-                //            // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
-                //            // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
-                //            Global.MsgResult msgResult = Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
-                //            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
-                //        }
-                //    }
-
-                //    if (isBatchReadyToStart)
-                //    {
-                //        bool notExpectedComponentSum = NotExpectedComponentSum(batchPlan);
-                //        if (notExpectedComponentSum)
-                //        {
-                //            // Warning50062
-                //            // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
-                //            // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
-                //            Global.MsgResult msgResult = Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
-                //            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
-                //        }
-                //    }
-                //}
-
-
-                if (isBatchReadyToStart)
+                MDDelivPosLoadState loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(this.DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
+                MsgWithDetails msgWithDetails = new MsgWithDetails();
+                foreach (PickingPlanWrapper picking in batchPlans)
                 {
+                    if (picking.PickingState > PickingStateEnum.InProcess)
+                        continue;
+
+                    Msg msg = null;
+                    foreach (PickingPlanPosWrapper pickingPos in picking.Lines)
+                    {
+                        if (pickingPos.PickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.NewCreated)
+                        {
+                            if (!setReadyToLoad.HasValue)
+                            {
+                                //Question50104: There are lines that are not set ready to start. Would you like to set all of them to ready to start?
+                                Global.MsgResult msgResult = Messages.Question(this, "Question50104", Global.MsgResult.Yes);
+                                setReadyToLoad = msgResult == Global.MsgResult.Yes;
+                            }
+                            if (setReadyToLoad.Value)
+                                pickingPos.PickingPos.MDDelivPosLoadState = loadState;
+                        }
+                    }
+
+                    if (!picking.Lines.Where(c => c.PickingPos.MDDelivPosLoadState.DelivPosLoadState <= MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any())
+                    {
+                        // Info50093:The picking order {0} at position {1} no longer has any lines that can be started. Check whether the picking order can be completed or put a line in a ready-to-start state.
+                        msg = new Msg(this, eMsgLevel.Info, "BSOPickingScheduler", "SetBatchStateReadyToStart()", 1000, "Info50093", picking.PickingNo, picking.ScheduledOrder);
+                        msgWithDetails.AddDetailMessage(msg);
+                        continue;
+                    }
+
+                    List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { picking.Picking };
+                    msg = this.PickingManager.ValidateStart(this.DatabaseApp, dbIPlus, picking.Picking,
+                                            listOfSelectedStores,
+                                            PARole.ValidationBehaviour.Strict);
+                    if (msg != null)
+                    {
+                        if (!msg.IsSucceded())
+                        {
+                            // Error50609: The picking order {0} at position {1} is not startable
+                            if (String.IsNullOrEmpty(msg.Message))
+                                msg.Message = Root.Environment.TranslateMessage(this, "Error50609", picking.PickingNo, picking.ScheduledOrder);
+                            msgWithDetails.AddDetailMessage(msg);
+                            continue;
+                        }
+                        else if (msg.HasWarnings())
+                        {
+                            // Warning50069 The picking order {0} at position {1} has warnings. Would you still like to start the job?
+                            if (String.IsNullOrEmpty(msg.Message))
+                                msg.Message = Root.Environment.TranslateMessage(this, "Warning50069", picking.PickingNo, picking.ScheduledOrder);
+                            var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                            if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
+                                continue;
+                        }
+                    }
+
                     picking.PickingState = vd.PickingStateEnum.WFReadyToStart;
                 }
-            }
 
-            if (msgWithDetails.MsgDetails.Any())
-            {
-                Messages.Msg(msgWithDetails);
+                if (msgWithDetails.MsgDetails.Any())
+                {
+                    Messages.Msg(msgWithDetails);
+                }
+                Save();
             }
-            Save();
             OnPropertyChanged(nameof(PickingList));
         }
 

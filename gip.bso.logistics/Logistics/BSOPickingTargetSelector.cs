@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
 using System.Data.Objects;
+using System.Windows.Interop;
 
 namespace gip.bso.logistics
 {
@@ -764,70 +765,12 @@ namespace gip.bso.logistics
                     return;
                 }
 
-                var acProgramIDs = this.DatabaseApp.OrderLog.Where(c => c.PickingPosID.HasValue
-                                                    && c.PickingPos.PickingID == CurrentPicking.PickingID)
-                                         .Select(c => c.VBiACProgramLog.ACProgramID)
-                                         .Distinct()
-                                         .ToArray();
-
-                if (acProgramIDs != null && acProgramIDs.Any())
+                MsgWithDetails msg = this.PickingManager.StartPicking(this.DatabaseApp, pAppManager, CurrentPicking, acClassMethod, CurrentACClassWF, true);
+                if (msg != null)
                 {
-                    ChildInstanceInfoSearchParam searchParam = new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, ACProgramIDs = acProgramIDs };
-                    var childInstanceInfos = pAppManager.GetChildInstanceInfo(1, searchParam);
-                    if (childInstanceInfos != null && childInstanceInfos.Any())
-                    {
-                        //var childInstanceInfo = childInstanceInfos.FirstOrDefault();
-                        //string acUrlComand = String.Format("{0}\\{1}!{2}", childInstanceInfo.ACUrlParent, childInstanceInfo.ACIdentifier, PWMethodTransportBase.ReloadBPAndResumeACIdentifier);
-                        //pAppManager.ACUrlCommand(acUrlComand);
-                        return;
-                    }
-                }
-
-                ACMethod acMethod = pAppManager.NewACMethod(acClassMethod.ACIdentifier);
-                if (acMethod == null)
+                    Messages.Msg(msg);
                     return;
-
-                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
-                gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(this.Database.ContextIPlus, null, secondaryKey);
-                program.ProgramACClassMethod = acClassMethod;
-                program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-                this.Database.ContextIPlus.ACProgram.AddObject(program);
-                //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
-                if (ACSaveChanges())
-                {
-                    ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
-                    if (paramProgram == null)
-                        acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
-                    else
-                        paramProgram.Value = program.ACProgramID;
-
-                    if (this.CurrentPicking != null)
-                    {
-                        ACValue acValuePPos = acMethod.ParameterValueList.GetACValue(Picking.ClassName);
-                        if (acValuePPos == null)
-                            acMethod.ParameterValueList.Add(new ACValue(Picking.ClassName, typeof(Guid), CurrentPicking.PickingID));
-                        else
-                            acValuePPos.Value = CurrentPicking.PickingID;
-                    }
-
-                    gip.core.datamodel.ACClassWF allowedWFNode = CurrentACClassWF; // SelectedPWNodeProcessWorkflow;
-                    if (allowedWFNode != null)
-                    {
-                        ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACClassWF.ClassName);
-                        if (paramACClassWF == null)
-                            acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACClassWF.ClassName, typeof(Guid), allowedWFNode.ACClassWFID));
-                        else
-                            paramACClassWF.Value = allowedWFNode.ACClassWFID;
-                    }
-
-                    pAppManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
-
-                    //IACPointAsyncRMI rmiInvocationPoint = pAppManager.GetPoint(Const.TaskInvocationPoint) as IACPointAsyncRMI;
-                    //if (rmiInvocationPoint != null)
-                    //rmiInvocationPoint.AddTask(acMethod, this);
-
                 }
-
             }
             catch (Exception e)
             {
