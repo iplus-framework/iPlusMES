@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace gip2006.variobatch.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Serializer for Cooling'}de{'Serialisierer für Kühlen'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
-    public class GIPFuncSerial2006Cooling : ACSessionObjSerializer
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Serializer for Drying'}de{'Serialisierer für Mischen'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
+    public class GIPFuncSerial2006Drying : ACSessionObjSerializer
     {
-        public GIPFuncSerial2006Cooling(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        public GIPFuncSerial2006Drying(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
 
         public override bool IsSerializerFor(string typeOrACMethodName)
         {
-            return MethodNameEquals(typeOrACMethodName, "Cooling");
+            return MethodNameEquals(typeOrACMethodName, "Drying");
         }
 
         public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
@@ -34,13 +34,10 @@ namespace gip2006.variobatch.processapplication
                 return false;
 
             int iOffset = 0;
-
+            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeight
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Temperature
-            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // FlowTemperature
-            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // HoldTemperature
-            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // HoldTime
-            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeightSwitchOn
-            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Tare 0:Off    1:On
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Duration
+            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Pressure
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
             if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -51,33 +48,35 @@ namespace gip2006.variobatch.processapplication
             if (s7Session.HashCodeValidation == HashCodeValidationEnum.Head || s7Session.HashCodeValidation == HashCodeValidationEnum.Head_WithRead)
                 iOffset += gip.core.communication.ISOonTCP.Types.DInt.Length;
 
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("Temperature")),
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeight")),
                 0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("FlowTemperature")),
+
+            ACValue acValueLeaveOn = request.ParameterValueList.GetACValue("LeaveOn");
+
+            double temperature = request.ParameterValueList.GetDouble("Temperature");
+            if (acValueLeaveOn != null && acValueLeaveOn.ParamAsBoolean)
+                temperature = temperature * -1;
+
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(temperature),
                 0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("HoldTemperature")),
-                0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
-            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
-
-            double totalSec = request.ParameterValueList.GetTimeSpan("HoldTime").TotalSeconds;
+            double totalSec = 0;
+            totalSec = request.ParameterValueList.GetTimeSpan("Duration").TotalSeconds;
             if (totalSec > Int16.MaxValue)
                 totalSec = Int16.MaxValue;
+            if (acValueLeaveOn != null && acValueLeaveOn.ParamAsBoolean)
+                totalSec = totalSec * -1;
+
             Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
                 0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeightSwitchOn")),
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("Pressure")),
                 0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
-
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("Tare")),
-                0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
-            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
-
             OnSendObjectAppend(request, dbNo, offset, miscParams, ref sendPackage1, ref iOffset);
 
             return this.SendObjectToPLC(s7Session, request, sendPackage1, dbNo, offset, iOffset);
@@ -110,17 +109,17 @@ namespace gip2006.variobatch.processapplication
                 readParameter = (bool)paramArr[1];
             }
 
+
             if (readParameter)
             {
                 int iOffset = 0;
                 if (s7Session.HashCodeValidation == HashCodeValidationEnum.Head || s7Session.HashCodeValidation == HashCodeValidationEnum.Head_WithRead)
                     iOffset += gip.core.communication.ISOonTCP.Types.DInt.Length;
 
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeight
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Temperature
-                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // FlowTemperature
-                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // HoldTemperature
-                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // HoldTime
-                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeightSwitchOn
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Duration
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Pressure
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
@@ -134,34 +133,39 @@ namespace gip2006.variobatch.processapplication
                 if (s7Session.HashCodeValidation == HashCodeValidationEnum.Head || s7Session.HashCodeValidation == HashCodeValidationEnum.Head_WithRead)
                     iOffset += gip.core.communication.ISOonTCP.Types.DInt.Length;
 
-                response.ParameterValueList.GetACValue("Temperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                response.ParameterValueList.GetACValue("MinWeight").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
-                response.ParameterValueList.GetACValue("FlowTemperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                double temperature = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                ACValue acValueLeaveOn = response.ParameterValueList.GetACValue("LeaveOn");
+                if (acValueLeaveOn != null && acValueLeaveOn.ParamAsBoolean)
+                    temperature = temperature * -1;
+                response.ParameterValueList.GetACValue("Temperature").Value = temperature;
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
-                response.ParameterValueList.GetACValue("HoldTemperature").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
-                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
-                
-                response.ParameterValueList.GetACValue("HoldTime").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                short duration = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
+                if (duration < 0)
+                    duration = (short)(duration * -1);
+                response.ParameterValueList.GetACValue("Duration").Value = TimeSpan.FromSeconds(duration);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                response.ParameterValueList.GetACValue("MinWeightSwitchOn").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                response.ParameterValueList.GetACValue("Pressure").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
-
-                response.ParameterValueList.GetACValue("Tare").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
-                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
-
             }
             else
             {
                 int iOffset = 0;
-                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ReachedTemperature
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // ActDuration
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ActTemperature
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // WeightStart
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // WeightEnd
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // WeightDiff
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Rate
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
-
+                
                 byte[] readPackage1 = new byte[iOffset];
 
                 PLC.Result errCode = s7Session.PLCConn.ReadBytes(DataTypeEnum.DataBlock, dbNo, offset, iOffset, out readPackage1);
@@ -170,9 +174,34 @@ namespace gip2006.variobatch.processapplication
 
                 iOffset = 0;
 
-                ACValue acValue = response.ResultValueList.GetACValue("ReachedTemperature");
+                var acValue = response?.ResultValueList?.GetACValue("ActDuration");
                 if (acValue != null)
-                    response.ResultValueList.GetACValue("ReachedTemperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                    acValue.Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                acValue = response?.ResultValueList?.GetACValue("ActTemperature");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                acValue = response?.ResultValueList?.GetACValue("WeightStart");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                acValue = response?.ResultValueList?.GetACValue("WeightEnd");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                acValue = response?.ResultValueList?.GetACValue("WeightDiff");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                acValue = response?.ResultValueList?.GetACValue("Rate");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);

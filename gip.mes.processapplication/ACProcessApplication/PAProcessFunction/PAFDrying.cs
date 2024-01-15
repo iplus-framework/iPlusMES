@@ -8,7 +8,7 @@ using gip.core.autocomponent;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Drying'}de{'Trocknen'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWDrying.PWClassName, true)]
-    public class PAFDrying : PAProcessFunction
+    public class PAFDrying : PAProcessFunction, IPAFSwitchable
     {
        
         #region Constructors
@@ -49,8 +49,33 @@ namespace gip.mes.processapplication
         protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
         {
             ACMethod method = new ACMethod(acIdentifier);
+            Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            method.ParameterValueList.Add(new ACValue("SwitchOff", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("SwitchOff", "en{'Switch off'}de{'Ausschalten'}");
+            method.ParameterValueList.Add(new ACValue("LeaveOn", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("LeaveOn", "en{'Drying switched on'}de{'Trocknung eingeschaltet lassen'}");
+            method.ParameterValueList.Add(new ACValue("MinWeight", typeof(Double), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
+            method.ParameterValueList.Add(new ACValue("Temperature", typeof(Double), 0.0, Global.ParamOption.Required));
+            paramTranslation.Add("Temperature", "en{'Temperature'}de{'Temperatur'}");
+            method.ParameterValueList.Add(new ACValue("Duration", typeof(TimeSpan), 0, Global.ParamOption.Required));
+            paramTranslation.Add("Duration", "en{'Duration'}de{'Dauer'}");
+            method.ParameterValueList.Add(new ACValue("Pressure", typeof(Double), 0.0, Global.ParamOption.Required));
+            paramTranslation.Add("Pressure", "en{'Pressure'}de{'Druck'}");
 
-            //Method.ParameterValueList.Add(new ACValue("Temperature", typeof(Double), 0.0, Global.ParamOption.Required));
+            Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
+            method.ResultValueList.Add(new ACValue("ActDuration", typeof(TimeSpan), 0, Global.ParamOption.Required));
+            resultTranslation.Add("ActDuration", "en{'Duration'}de{'Dauer'}");
+            method.ResultValueList.Add(new ACValue("ActTemperature", typeof(Double), 0.0, Global.ParamOption.Required));
+            resultTranslation.Add("ActTemperature", "en{'Temperature'}de{'Temperatur'}");
+            method.ParameterValueList.Add(new ACValue("WeightStart", typeof(Double), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("WeightStart", "en{'Weight on Start'}de{'Gewicht bei Start'}");
+            method.ParameterValueList.Add(new ACValue("WeightEnd", typeof(Double), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("WeightEnd", "en{'Weight on End'}de{'Gewicht am Ende'}");
+            method.ParameterValueList.Add(new ACValue("WeightDiff", typeof(Double), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("WeightDiff", "en{'Loss humidity'}de{'Feuchtigkeitsverlust'}");
+            method.ParameterValueList.Add(new ACValue("Rate", typeof(Double), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("Rate", "en{'Drying rate [kg/min]'}de{'Trockungsrate [kg/min]'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass);
         }
