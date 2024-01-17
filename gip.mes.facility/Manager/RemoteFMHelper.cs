@@ -1,15 +1,17 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
-using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace gip.bso.test
+namespace gip.mes.facility
 {
+
+    /// <summary>
+    /// TODO: @aagincic: Will be deleted after some comparasion with RemoteFacilityManager
+    /// </summary>
     public class RemoteFMHelper
     {
-
         public void SynchronizeFacility(IACComponent component, IMessages messages, FacilityManager facilityManager, ACPickingManager pickingManager, string remoteConnString, RemoteStorePostingData remoteStorePosting, bool syncRemoteStore = true, bool LoggingOn = true)
         {
             try
@@ -152,6 +154,54 @@ namespace gip.bso.test
             }
         }
 
+        public RemoteStorePostingData GetRemoteStorePostingData(string pickingNo, string remoteConnString)
+        {
+            RemoteStorePostingData remoteStorePostingData = null;
+
+            Picking picking = null;
+
+            using (DatabaseApp remoteDbApp = new DatabaseApp(remoteConnString))
+            {
+                picking = remoteDbApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
+                if (picking != null)
+                {
+                    remoteStorePostingData = new RemoteStorePostingData();
+                    Guid[] faciltiyBookingIDs = picking.PickingPos_Picking.SelectMany(c => c.FacilityBooking_PickingPos).Select(c => c.FacilityBookingID).ToArray();
+                    Guid facilityID = Guid.Empty;
+                    foreach (PickingPos pickingPos in picking.PickingPos_Picking.ToArray())
+                    {
+                        if (pickingPos.FromFacility != null)
+                        {
+                            facilityID = pickingPos.FromFacility.FacilityID;
+                            break;
+                        }
+                        if (pickingPos.ToFacility != null)
+                        {
+                            facilityID = pickingPos.ToFacility.FacilityID;
+                            break;
+                        }
+                    }
+
+                    remoteStorePostingData.FBIds.Add(
+                        new RSPDEntry()
+                        {
+                            EntityType = nameof(Picking),
+                            KeyId = picking.PickingID
+                        });
+
+                    foreach (Guid id in faciltiyBookingIDs)
+                    {
+                        remoteStorePostingData.FBIds.Add(
+                        new RSPDEntry()
+                        {
+                            EntityType = nameof(FacilityBooking),
+                            KeyId = id
+                        });
+                    }
+                }
+            }
+            return remoteStorePostingData;
+        }
         private void SynchronizeFacilityCharge(DatabaseApp dbLocal, IMessages messages, FacilityCharge changedRemoteFC)
         {
             FacilityCharge localFC = null;
