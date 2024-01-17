@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using gip.mes.facility;
+using System.Runtime.InteropServices;
 
 namespace gip.bso.facility
 {
@@ -188,18 +189,23 @@ namespace gip.bso.facility
             }
         }
 
+        private List<FacilityLot> _FacilityLotList;
+
         /// <summary>
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
         [ACPropertyList(603, FacilityLot.ClassName)]
-        public IEnumerable<FacilityLot> FacilityLotList
+        public List<FacilityLot> FacilityLotList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _FacilityLotList;
+            }
+            set
+            {
+                _FacilityLotList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -384,9 +390,13 @@ namespace gip.bso.facility
             // If BSO should be opened als a Dialog for gerenating a new lot, then don't run Nav-Search
             if (ACIdentifier.StartsWith(ConstApp.BSOFacilityLot_ChildName) && InitState != ACInitState.Initialized)
                 return;
+            _FacilityLotList = null;
             if (AccessPrimary != null)
+            {
                 AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityLotList");
+                _FacilityLotList = AccessPrimary.NavList.ToList();
+            }
+            OnPropertyChanged(nameof(FacilityLotList));
         }
 
 

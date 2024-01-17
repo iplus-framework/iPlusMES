@@ -291,6 +291,7 @@
         public const string PlanningMR = "en{'Template schedules'}de{'Vorlagepläne'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
+        public const string Reset = "en{'Reset'}de{'Zurücksetzen'}";
         public const string Select = "en{'Select'}de{'Auswahl'}";
         public const string SelectAll = "en{'Select all'}de{'Alles auswählen'}";
         public const string PickingType = "en{'Picking type'}de{'Kommissionierung Typ'}";
