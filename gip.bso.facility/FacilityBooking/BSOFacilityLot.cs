@@ -163,7 +163,7 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentFacilityLot");
+                OnPropertyChanged();
             }
         }
 
@@ -185,7 +185,7 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedFacilityLot");
+                OnPropertyChanged();
             }
         }
 
