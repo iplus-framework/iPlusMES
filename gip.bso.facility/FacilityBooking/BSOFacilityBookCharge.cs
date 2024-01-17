@@ -958,13 +958,14 @@ namespace gip.bso.facility
         {
             if (AccessPrimary == null)
                 return;
-            AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+
             _FacilityChargeList = null;
             if (AccessPrimary != null)
             {
-                AccessPrimary.NavSearch(DatabaseApp);
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
                 _FacilityChargeList = AccessPrimary.NavList.ToList();
             }
+
             OnPropertyChanged(nameof(FacilityChargeList));
         }
 
