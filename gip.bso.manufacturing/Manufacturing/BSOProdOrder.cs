@@ -1082,18 +1082,22 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private List<ProdOrder> _ProdOrderList;
         /// <summary>
         /// Gets the production order list.
         /// </summary>
         /// <value>The production order list.</value>
         [ACPropertyList(602, ProdOrder.ClassName)]
-        public IEnumerable<ProdOrder> ProdOrderList
+        public List<ProdOrder> ProdOrderList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _ProdOrderList;
+            }
+            set
+            {
+                _ProdOrderList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1507,7 +1511,16 @@ namespace gip.bso.manufacturing
             if (AccessPrimary == null)
                 return;
             LoadFilterOutputMaterialList();
-            AccessPrimary.NavSearch(DatabaseApp);
+
+            _ProdOrderList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _ProdOrderList = AccessPrimary.NavList.ToList();
+            }
+
+            OnPropertyChanged(nameof(ProdOrderList));
+
             if (selectedProdOrder != null)
                 SelectedProdOrder = selectedProdOrder;
             PreselectedClear();
