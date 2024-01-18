@@ -417,18 +417,22 @@ namespace gip.bso.facility
             }
         }
 
+        private List<FacilityCharge> _FacilityChargeList;
         /// <summary>
         /// Gets the facility charge list.
         /// </summary>
         /// <value>The facility charge list.</value>
         [ACPropertyList(803, FacilityCharge.ClassName)]
-        public IEnumerable<FacilityCharge> FacilityChargeList
+        public List<FacilityCharge> FacilityChargeList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _FacilityChargeList;
+            }
+            set
+            {
+                _FacilityChargeList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -669,8 +673,15 @@ namespace gip.bso.facility
         {
             if (AccessPrimary == null)
                 return;
-            AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityChargeList");
+
+            _FacilityChargeList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _FacilityChargeList = AccessPrimary.NavList.ToList();
+            }
+
+            OnPropertyChanged(nameof(FacilityChargeList));
         }
 
         private bool _SearchFacilityChargeListInProgress;

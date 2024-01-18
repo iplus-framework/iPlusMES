@@ -240,19 +240,22 @@ namespace gip.bso.facility
             RefreshFacilityChargeSumLocationHelperList();
         }
 
-
+        private List<FacilityLot> _FacilityLotList;
         /// <summary>
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
         [ACPropertyList(803, FacilityLot.ClassName)]
-        public IEnumerable<FacilityLot> FacilityLotList
+        public List<FacilityLot> FacilityLotList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _FacilityLotList;
+            }
+            set
+            {
+                _FacilityLotList = value;
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -618,8 +621,15 @@ namespace gip.bso.facility
         {
             if (AccessPrimary == null)
                 return;
-            AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityLotList");
+
+            _FacilityLotList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _FacilityLotList = AccessPrimary.NavList.ToList();
+            }
+
+            OnPropertyChanged(nameof(FacilityLotList));
         }
 
         IQueryable<FacilityLot> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityLot> result)

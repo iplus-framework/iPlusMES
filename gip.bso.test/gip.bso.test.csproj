@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="BSOTest.cs" />
     <Compile Include="BSOTest_RemoteFM.cs" />
-    <Compile Include="Manager\RemoteFMHelper.cs" />
     <Compile Include="Model\RemoteFacilityModel.cs" />
     <Compile Include="VXBSOMethodTest.cs" />
     <Compile Include="VXBSOFacilityTest.cs" />
@@ -103,7 +102,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Manager\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

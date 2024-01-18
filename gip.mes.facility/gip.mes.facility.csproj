@@ -60,6 +60,7 @@
     <Compile Include="Manager\ACFacilityOEEManager.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
     <Compile Include="Manager\RemoteFacilityManagerInfo.cs" />
+    <Compile Include="Manager\RemoteFMHelper.cs" />
     <Compile Include="Manager\RemoteMaterialForwarder.cs" />
     <Compile Include="Manager\RemoteFacilityManager.cs" />
     <Compile Include="Manager\ACNoProviderInvoice.cs" />

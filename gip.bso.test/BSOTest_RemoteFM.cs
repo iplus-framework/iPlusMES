@@ -5,8 +5,6 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.bso.test
 {
@@ -98,6 +96,8 @@ namespace gip.bso.test
 
         #region Methods
 
+        #region Methods -> ACMethods
+
         [ACMethodInfo("AddRemoteFM", "en{'Add RemoteFM'}de{'Add RemoteFM'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void AddRemoteFM()
         {
@@ -128,7 +128,7 @@ namespace gip.bso.test
             if (!IsEnabledReciveRemotePickingLocal())
                 return;
             RemoteFMHelper fm = new RemoteFMHelper();
-            RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
+            RemoteStorePostingData remoteStorePostingData = fm.GetRemoteStorePostingData(RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
             fm.SynchronizeFacility(this, Messages,ACFacilityManager, PickingManager, SelectedRemoteFacilityManagerInfo.RemoteConnString, remoteStorePostingData);
         }
 
@@ -136,6 +136,10 @@ namespace gip.bso.test
         {
             return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
         }
+
+        #endregion
+
+        #region Methods -> Helper methods
 
         private List<RemoteFacilityModel> LoadRemoteFacilityManagerInfoList()
         {
@@ -166,7 +170,9 @@ namespace gip.bso.test
 
         private void CallRemoteFacilityManagerForPicking(ACComponent remoteFacilityManager, string pickingNo, string remoteConnString)
         {
-            RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(pickingNo, remoteConnString);
+            RemoteFMHelper fm = new RemoteFMHelper();
+
+            RemoteStorePostingData remoteStorePostingData = fm.GetRemoteStorePostingData(pickingNo, remoteConnString);
 
             if (remoteStorePostingData != null)
             {
@@ -174,54 +180,9 @@ namespace gip.bso.test
             }
         }
 
-        private RemoteStorePostingData GetRemoteStorePostingData(string pickingNo, string remoteConnString)
-        {
-            RemoteStorePostingData remoteStorePostingData = null;
+        
 
-            Picking picking = null;
-
-            using (DatabaseApp remoteDbApp = new DatabaseApp(remoteConnString))
-            {
-                picking = remoteDbApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
-                if (picking != null)
-                {
-                    remoteStorePostingData = new RemoteStorePostingData();
-                    Guid[] faciltiyBookingIDs = picking.PickingPos_Picking.SelectMany(c => c.FacilityBooking_PickingPos).Select(c => c.FacilityBookingID).ToArray();
-                    Guid facilityID = Guid.Empty;
-                    foreach (PickingPos pickingPos in picking.PickingPos_Picking.ToArray())
-                    {
-                        if (pickingPos.FromFacility != null)
-                        {
-                            facilityID = pickingPos.FromFacility.FacilityID;
-                            break;
-                        }
-                        if (pickingPos.ToFacility != null)
-                        {
-                            facilityID = pickingPos.ToFacility.FacilityID;
-                            break;
-                        }
-                    }
-
-                    remoteStorePostingData.FBIds.Add(
-                        new RSPDEntry()
-                        {
-                            EntityType = nameof(Picking),
-                            KeyId = picking.PickingID
-                        });
-
-                    foreach (Guid id in faciltiyBookingIDs)
-                    {
-                        remoteStorePostingData.FBIds.Add(
-                        new RSPDEntry()
-                        {
-                            EntityType = nameof(FacilityBooking),
-                            KeyId = id
-                        });
-                    }
-                }
-            }
-            return remoteStorePostingData;
-        }
+        #endregion
 
         #endregion
 
