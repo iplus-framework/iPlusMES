@@ -63,6 +63,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(36, nameof(SkipPrintQuestion), "en{'Skip print question'}de{'Druckfrage überspringen'}")]
     [ACPropertyEntity(36, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(37, "PostingBehaviourIndex", "en{'Posting behaviour'}de{'Buchungsverhalten'}", typeof(PostingBehaviourEnum), Const.ContextDatabase + "\\PostingBehaviourEnumList", "", true)]
+    [ACPropertyEntity(38, "ClassCode", "en{'Classification code'}de{'Klassifizierungscode'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
     [ACPropertyEntity(38, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]

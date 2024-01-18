@@ -146,7 +146,10 @@ namespace gip.mes.processapplication
 
                 if (allCompleted)
                 {
-                    picking.PickingState = PickingStateEnum.Finished;
+                    if (EndProdOrderPartslistMode > EndPListMode.DoNothing)
+                        picking.PickingState = PickingStateEnum.Finished;
+                    else
+                        picking.PickingState = PickingStateEnum.InProcess;
                     dbApp.ACSaveChanges();
                 }
                 else if (pFirstReadyToLoad != null)

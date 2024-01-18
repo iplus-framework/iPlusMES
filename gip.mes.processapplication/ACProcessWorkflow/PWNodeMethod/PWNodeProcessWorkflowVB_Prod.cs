@@ -668,7 +668,7 @@ namespace gip.mes.processapplication
                 ProdOrderBatchPlan nextBatchPlanToStart = batchPlans.FirstOrDefault(c => c.PlanState == GlobalApp.BatchPlanState.Created);
                 if (nextBatchPlanToStart == null)
                     return;
-                PABatchPlanScheduler scheduler = GetScheduler();
+                PAWorkflowSchedulerBase scheduler = GetScheduler();
                 if (scheduler != null
                     && nextBatchPlanToStart.VBiACClassWF != null
                     && nextBatchPlanToStart.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())

@@ -263,6 +263,26 @@ namespace gip.mes.processapplication
                 }
             }
         }
+
+        public bool IsSchedulerFor(PWNodeProcessWorkflowVB pwNode)
+        {
+            if (pwNode == null || pwNode.ContentACClassWF == null)
+                return false;
+            MDSchedulingGroup mdGroup = pwNode.MDSchedulingGroup;
+            if (mdGroup == null)
+                return false;
+            return IsSchedulerFor(mdGroup.MDSchedulingGroupID);
+        }
+
+        public bool IsSchedulerFor(Guid mdSchedulingGroupID)
+        {
+            if (SchedulesForPWNodes == null)
+                return false;
+            PAScheduleForPWNodeList list = SchedulesForPWNodes.ValueT;
+            if (list == null)
+                return false;
+            return list.Any(c => c.MDSchedulingGroupID == mdSchedulingGroupID);
+        }
         #endregion
 
         #region Client-Methods

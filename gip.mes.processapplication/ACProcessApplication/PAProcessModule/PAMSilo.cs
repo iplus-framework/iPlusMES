@@ -458,24 +458,26 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(403, "ACConfig", "en{'Waiting time'}de{'Wartezeit'}", "", false, true)]
         public IACContainerTNet<TimeSpan> WaitingTime { get; set; }
 
-        [ACPropertyBindingSource(703, "ACConfig", "en{'Remaining time'}de{'Restzeit'}", "", false, false)]
+        [ACPropertyBindingSource(404, "ACConfig", "en{'Remaining time'}de{'Restzeit'}", "", false, false)]
         public IACContainerTNet<TimeSpan> RemainingTime { get; set; }
 
-        [ACPropertyBindingSource(704, "ACConfig", "en{'Elapsed time'}de{'Abgelaufene Zeit'}", "", false, false)]
+        [ACPropertyBindingSource(405, "ACConfig", "en{'Elapsed time'}de{'Abgelaufene Zeit'}", "", false, false)]
         public IACContainerTNet<TimeSpan> ElapsedTime { get; set; }
 
-        [ACPropertyBindingSource(705, "ACConfig", "en{'Is waiting'}de{'Wartet'}", "", false, false)]
+        [ACPropertyBindingSource(406, "ACConfig", "en{'Is waiting'}de{'Wartet'}", "", false, false)]
         public IACContainerTNet<bool> IsWaiting { get; set; }
 
-        [ACPropertyBindingSource(708, "ACConfig", "en{'Priority'}de{'Priorisierung'}", "", false, false)]
+        [ACPropertyBindingSource(407, "ACConfig", "en{'Priority'}de{'Priorisierung'}", "", false, false)]
         public IACContainerTNet<int> Priority { get; set; }
 
-        [ACPropertyBindingSource(710, "ACConfig", "en{'Order group'}de{'Auftragsgruppe'}", "", false, false)]
+        [ACPropertyBindingSource(408, "ACConfig", "en{'Order group'}de{'Auftragsgruppe'}", "", false, false)]
         public IACContainerTNet<int> OrderGroup { get; set; }
 
-        [ACPropertyBindingSource(711, "ACConfig", "en{'Priority per order'}de{'Priorisierung pro Auftrag'}", "", false, false)]
+        [ACPropertyBindingSource(409, "ACConfig", "en{'Priority per order'}de{'Priorisierung pro Auftrag'}", "", false, false)]
         public IACContainerTNet<int> PriorityPerOrderGroup { get; set; }
 
+        [ACPropertyBindingSource(410, "ACConfig", "en{'Classification code'}de{'Klassifizierungscode'}", "", false, false)]
+        public IACContainerTNet<short> ClassCode { get; set; }
 
         [ACPropertyBindingSource(440, "Configuration", "en{'Facility'}de{'Lagerplatz'}", "", true, false)]
         public IACContainerTNet<ACRef<Facility>> Facility { get; set; }
@@ -756,6 +758,7 @@ namespace gip.mes.processapplication
                     InwardEnabled.ValueT = facilitySilo.InwardEnabled;
                     bool informDosings = OutwardEnabled.ValueT != facilitySilo.OutwardEnabled;
                     OutwardEnabled.ValueT = facilitySilo.OutwardEnabled;
+                    ClassCode.ValueT = facilitySilo.ClassCode;
                     OnRefreshFacility(facilitySilo, preventBroadcast, fbID);
                     if (informDosings && this.Root.Initialized)
                     {

@@ -52,6 +52,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("IgnorePredecessors", "en{'Ignore predecessor groups'}de{'Ignoriere Vorgangsgruppen'}");
             method.ParameterValueList.Add(new ACValue("LossCorrectionFactor", typeof(double?), null, Global.ParamOption.Optional));
             paramTranslation.Add("LossCorrectionFactor", "en{'Loss correction factor 0 = bill of material factor, n=%'}de{'Verlustfaktor 0 = Rezept Faktor, n=%'}");
+            method.ParameterValueList.Add(new ACValue("ClassCode", typeof(short), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("ClassCode", "en{'Classification allowed destinations'}de{'Klassifizierung erlaubte Ziele'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);

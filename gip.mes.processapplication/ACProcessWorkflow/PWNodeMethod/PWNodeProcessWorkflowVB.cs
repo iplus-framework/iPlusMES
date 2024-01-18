@@ -981,17 +981,23 @@ namespace gip.mes.processapplication
 
         protected void InformSchedulerOnStateChange()
         {
-            PABatchPlanScheduler scheduler = GetScheduler();
+            PAWorkflowSchedulerBase scheduler = GetScheduler();
             if (scheduler != null)
                 scheduler.OnACStateChangedOfPWNode(this);
         }
 
-        protected PABatchPlanScheduler GetScheduler()
+        protected PAWorkflowSchedulerBase GetScheduler()
         {
             var appManager = this.ApplicationManager;
             if (appManager == null)
                 return null;
-            return appManager.FindChildComponents<PABatchPlanScheduler>(c => c is PABatchPlanScheduler, null, 1).FirstOrDefault();
+            var schedulers = appManager.FindChildComponents<PAWorkflowSchedulerBase>(c => c is PAWorkflowSchedulerBase, null, 1);
+            if (schedulers == null || !schedulers.Any())
+                return null;
+            PAWorkflowSchedulerBase scheduler = schedulers.Where(c => c.IsSchedulerFor(this)).FirstOrDefault();
+            if (scheduler != null)
+                return scheduler;
+            return schedulers.FirstOrDefault();
         }
         #endregion
 

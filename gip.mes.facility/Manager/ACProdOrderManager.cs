@@ -1368,7 +1368,8 @@ namespace gip.mes.facility
                         routes.AddRange(rResult.Routes);
                 }
 
-                #region Filter routes if is selected    ShowCellsInRoute
+                short? destinationFilterClassCode = null;
+                #region Filter routes if is selected  (ShowCellsInRoute)
                 core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
@@ -1398,6 +1399,17 @@ namespace gip.mes.facility
                         {
                             routes = routes.Where(c => c.Items.Select(x => x.Source.GetACUrl()).Intersect(classes).Any()).ToList();
                         }
+                    }
+
+                    IACConfig configClassCode = configManager.GetConfiguration(
+                            mandatoryConfigStores,
+                            configACUrl + "\\",
+                            acClassWFDischarging.ConfigACUrl + ACUrlHelper.Delimiter_DirSeperator + ACStateConst.SMStarting + ACUrlHelper.Delimiter_DirSeperator + nameof(Facility.ClassCode),
+                            null,
+                            out priorityLevel);
+                    if (configClassCode != null)
+                    {
+                        destinationFilterClassCode = (short) configClassCode.Value;
                     }
                 }
                 #endregion
@@ -1468,6 +1480,12 @@ namespace gip.mes.facility
                                          );
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
+                                if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
+                                {
+                                    uint bitCmpResult = ((uint)unselFacility.ClassCode) & ((uint)destinationFilterClassCode.Value);
+                                    if (bitCmpResult == 0)
+                                        continue;
+                                }
                             }
                             reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, batchPlan, null, selectedReservationForModule, unselFacility, acClassWFDischarging, aCClassWF));
                         }
