@@ -353,6 +353,29 @@ namespace gip.mes.processapplication
                             if (!relation.SourceProdOrderPartslistPos.Material.UsageACProgram)
                                 continue;
                             double dosingWeight = relation.RemainingDosingWeight;
+                            if (AdaptToTargetQ)
+                            {
+                                var completedPos = dbApp.ProdOrderPartslistPosRelation.Where(c => c.SourceProdOrderPartslistPosID == relation.SourceProdOrderPartslistPosID
+                                                                                && c.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID
+                                                                                && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
+                                    .Select(c => new { TargetQ = c.TargetQuantityUOM, ActualQ = c.ActualQuantityUOM })
+                                    .ToArray();
+                                double targetSum = 0;
+                                double actualSum = 0;
+                                foreach (var c in completedPos)
+                                {
+                                    targetSum += c.TargetQ;
+                                    actualSum += c.ActualQ;
+                                }
+                                if (targetSum > double.Epsilon && actualSum > double.Epsilon)
+                                {
+                                    double restTargetQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - targetSum;
+                                    double restActualQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - actualSum;
+                                    double correctionFactor = restActualQ / restTargetQ;
+                                    dosingWeight = dosingWeight * correctionFactor;
+                                }
+                            }
+
                             bool interDischargingNeeded = false;
                             IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                             ScaleBoundaries scaleBoundaries = null;

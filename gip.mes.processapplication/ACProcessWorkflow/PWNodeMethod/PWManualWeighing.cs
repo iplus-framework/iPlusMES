@@ -98,7 +98,7 @@ namespace gip.mes.processapplication
             paramTranslation.Add("DiffWeighing", "en{'Difference weighing'}de{'Differenzwägung'}");
 
             method.ParameterValueList.Add(new ACValue("EachPosSeparated", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleifer verwiegen'}");
+            paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleife verwiegen'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);

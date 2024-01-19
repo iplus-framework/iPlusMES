@@ -20,13 +20,15 @@ namespace gip.mes.processapplication
         #region c´tors
         static PWEmptyingModeQuestion()
         {
-            ACMethod method;
-            method = new ACMethod(ACStateConst.SMStarting);
-            Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
-            method.ParameterValueList.Add(new ACValue("ForceElseEvent", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("ForceElseEvent", "en{'Force ELSE-Event'}de{'Immer SONST-Ereignis auslösen'}");
-            var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWEmptyingModeQuestion), paramTranslation, null);
-            ACMethod.RegisterVirtualMethod(typeof(PWEmptyingModeQuestion), ACStateConst.SMStarting, wrapper);
+            List<ACMethodWrapper> wrappers = ACMethod.OverrideFromBase(typeof(PWEmptyingModeQuestion), ACStateConst.SMStarting);
+            if (wrappers != null)
+            {
+                foreach (ACMethodWrapper wrapper in wrappers)
+                {
+                    wrapper.Method.ParameterValueList.Add(new ACValue("ForceElseEvent", typeof(bool), false, Global.ParamOption.Required));
+                    wrapper.ParameterTranslation.Add("ForceElseEvent", "en{'Force ELSE-Event'}de{'Immer SONST-Ereignis auslösen'}");
+                }
+            }
             RegisterExecuteHandler(typeof(PWEmptyingModeQuestion), HandleExecuteACMethod_PWEmptyingModeQuestion);
         }
 

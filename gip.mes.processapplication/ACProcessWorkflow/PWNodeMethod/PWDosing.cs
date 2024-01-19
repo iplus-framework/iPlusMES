@@ -83,6 +83,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("MinDosQuantity", "en{'Minimum dosing quantity'}de{'Minimale Dosiermenge'}");
             method.ParameterValueList.Add(new ACValue("SWTOn", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("SWTOn", "en{'SWT On'}de{'SWT An'}");
+            method.ParameterValueList.Add(new ACValue("AdaptToTargetQ", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AdaptToTargetQ", "en{'Adapt to total remaining target quantity'}de{'Anpassung an Gesamtrestsollwert'}");
             method.ParameterValueList.Add(new ACValue("OldestSilo", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OldestSilo", "en{'Dosing from oldest Silo only'}de{'Nur aus ältestem Silo dosieren'}");
             method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(bool), false, Global.ParamOption.Optional));
@@ -791,6 +793,22 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool AdaptToTargetQ
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("AdaptToTargetQ");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
 
         public Int32 ComponentsSeqFrom
         {

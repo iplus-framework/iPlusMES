@@ -454,6 +454,25 @@ namespace gip.mes.processapplication
                 acValue.Value = (Int16)1;
             }
 
+            acValue = acMethod.ParameterValueList.GetACValue("Source");
+            if (acValue != null
+                && acValue.ParamAsInt16 == (Int16)0
+                && pickingPos.FromFacility != null
+                && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+            {
+                var acClass = pickingPos.FromFacility.FacilityACClass;
+                if (acClass != null)
+                {
+                    IRouteItemIDProvider routeItemIDProvider = ACUrlCommand(acClass.ACUrlComponent) as IRouteItemIDProvider;
+                    if (routeItemIDProvider != null)
+                    {
+                        Int32 itemId = routeItemIDProvider.RouteItemIDAsNum;
+                        if (itemId < Int16.MaxValue && itemId > Int16.MinValue)
+                            acValue.Value = (Int16)routeItemIDProvider.RouteItemIDAsNum;
+                    }
+                }
+            }
+
             NoTargetWait = null;
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 return StartDisResult.CycleWait;
@@ -861,6 +880,25 @@ namespace gip.mes.processapplication
                     || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
             {
                 acValue.Value = (Int16)1;
+            }
+
+            acValue = acMethod.ParameterValueList.GetACValue("Source");
+            if (acValue != null 
+                && acValue.ParamAsInt16 == (Int16)0 
+                && pickingPos.FromFacility != null 
+                && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+            {
+                var acClass = pickingPos.FromFacility.FacilityACClass;
+                if (acClass != null)
+                {
+                    IRouteItemIDProvider routeItemIDProvider = ACUrlCommand(acClass.ACUrlComponent) as IRouteItemIDProvider;
+                    if (routeItemIDProvider != null)
+                    {
+                        Int32 itemId = routeItemIDProvider.RouteItemIDAsNum;
+                        if (itemId < Int16.MaxValue && itemId > Int16.MinValue)
+                            acValue.Value = (Int16)routeItemIDProvider.RouteItemIDAsNum;
+                    }
+                }
             }
 
             if (isNewACMethod)
