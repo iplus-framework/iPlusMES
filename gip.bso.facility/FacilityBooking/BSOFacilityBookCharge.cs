@@ -116,7 +116,7 @@ namespace gip.bso.facility
                 if (_ExpirationDateDayPeriod.ValueT != value)
                 {
                     _ExpirationDateDayPeriod.ValueT = value;
-                    OnPropertyChanged(nameof(ExpirationDateDayPeriod));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -162,14 +162,14 @@ namespace gip.bso.facility
                     if (String.IsNullOrEmpty(tmp))
                         return;
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CNotAvailableProperty, "");
-                    OnPropertyChanged("ShowNotAvailable");
+                    OnPropertyChanged();
                     return;
                 }
                 if (String.IsNullOrEmpty(tmp)
                     || AccessPrimary.NavACQueryDefinition.GetSearchValue<bool>(_CNotAvailableProperty) != value)
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<bool>(_CNotAvailableProperty, value.Value);
-                    OnPropertyChanged("ShowNotAvailable");
+                    OnPropertyChanged();
                     return;
                 }
             }
@@ -192,7 +192,7 @@ namespace gip.bso.facility
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CMaterialNoProperty, value);
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CMaterialNameProperty, value);
-                    OnPropertyChanged("FilterMaterial");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -213,14 +213,14 @@ namespace gip.bso.facility
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CFacilityNoProperty, value);
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CFacilityNameProperty, value);
-                    OnPropertyChanged("FilterFacility");
+                    OnPropertyChanged();
                 }
             }
         }
 
 
         public const string _CLotNoProperty = FacilityLot.ClassName + "\\LotNo";
-        [ACPropertyInfo(715, "Filter", "en{'Lot'}de{'Los'}")]
+        [ACPropertyInfo(715, "Filter", ConstApp.LotNo)]
         public string FilterLot
         {
             get
@@ -233,7 +233,26 @@ namespace gip.bso.facility
                 if (tmp != value)
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CLotNoProperty, value);
-                    OnPropertyChanged("FilterLot");
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public const string _CExternLotNoProperty = FacilityLot.ClassName + "\\ExternLotNo";
+        [ACPropertyInfo(715, "Filter", ConstApp.ExternLotNo)]
+        public string FilterExternLot
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(_CExternLotNoProperty);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(_CExternLotNoProperty);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CExternLotNoProperty, value);
+                    OnPropertyChanged();
                 }
             }
         }
@@ -251,7 +270,7 @@ namespace gip.bso.facility
                 if (tmp != value)
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<double>(nameof(FacilityCharge.StockQuantityUOM), value);
-                    OnPropertyChanged("FilterLot");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -269,7 +288,7 @@ namespace gip.bso.facility
                 if (tmp != value)
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<DateTime?>(nameof(FacilityCharge.ExpirationDate), value);
-                    OnPropertyChanged(nameof(FilterExpirationDate));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -314,7 +333,7 @@ namespace gip.bso.facility
             protected set
             {
                 _ActBookingParam = value;
-                OnPropertyChanged("CurrentBookParam");
+                OnPropertyChanged();
             }
         }
 
@@ -332,7 +351,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamInwardMovement = value;
-                OnPropertyChanged("CurrentBookParamInwardMovement");
+                OnPropertyChanged();
             }
         }
 
@@ -350,7 +369,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamOutwardMovement = value;
-                OnPropertyChanged("CurrentBookParamOutwardMovement");
+                OnPropertyChanged();
             }
         }
 
@@ -368,7 +387,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamRelocation = value;
-                OnPropertyChanged("CurrentBookParamRelocation");
+                OnPropertyChanged();
             }
         }
 
@@ -386,7 +405,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamReleaseAndLock = value;
-                OnPropertyChanged("CurrentBookParamReleaseAndLock");
+                OnPropertyChanged();
             }
         }
 
@@ -404,7 +423,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamNotAvailable = value;
-                OnPropertyChanged("CurrentBookParamNotAvailable");
+                OnPropertyChanged();
             }
         }
 
@@ -422,7 +441,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamReassignMat = value;
-                OnPropertyChanged("CurrentBookParamReassignMat");
+                OnPropertyChanged();
             }
         }
 
@@ -440,7 +459,7 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamSplit = value;
-                OnPropertyChanged("CurrentBookParamSplit");
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -495,6 +514,7 @@ namespace gip.bso.facility
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
 
                     new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CExternLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
                     new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.StockQuantityUOM), Global.LogicalOperators.lessThan, Global.Operators.and, "", true),
 
                     new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.ExpirationDate), Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, null, true)
@@ -535,7 +555,7 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedFacilityCharge");
+                OnPropertyChanged();
             }
         }
 
@@ -762,7 +782,7 @@ namespace gip.bso.facility
             set
             {
                 _BSOMsg = value;
-                OnPropertyChanged("BSOMsg");
+                OnPropertyChanged();
             }
         }
 
@@ -975,7 +995,7 @@ namespace gip.bso.facility
         {
             _SearchFacilityChargeListInProgress = true;
             AccessNav.NavSearch(MergeOption.OverwriteChanges);
-            OnPropertyChanged("FacilityChargeList");
+            OnPropertyChanged(nameof(FacilityChargeList));
             _SearchFacilityChargeListInProgress = false;
         }
 
@@ -1367,7 +1387,7 @@ namespace gip.bso.facility
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
                 CurrentBookParamRelocation.InwardFacility = facility;
-                OnPropertyChanged("CurrentBookParamRelocation");
+                OnPropertyChanged(nameof(CurrentBookParamRelocation));
             }
         }
 
@@ -1672,7 +1692,7 @@ namespace gip.bso.facility
                 Save();
             }
             AccessNav.NavSearch();
-            OnPropertyChanged("FacilityChargeList");
+            OnPropertyChanged(nameof(FacilityChargeList));
         }
 
         public bool IsEnabledNotAvailableFacilityChargeAll()
@@ -1723,7 +1743,7 @@ namespace gip.bso.facility
                 if (withRefresh)
                 {
                     AccessNav.NavSearch();
-                    OnPropertyChanged("FacilityChargeList");
+                    OnPropertyChanged(nameof(FacilityChargeList));
                 }
                 return true;
             }
@@ -1771,7 +1791,7 @@ namespace gip.bso.facility
                 }
             }
             AccessNav.NavSearch();
-            OnPropertyChanged("FacilityChargeList");
+            OnPropertyChanged(nameof(FacilityChargeList));
         }
 
         public bool IsEnabledAvailableFacilityChargeAll()
@@ -2079,6 +2099,7 @@ namespace gip.bso.facility
                 || name == nameof(FilterMaterial)
                 || name == nameof(FilterFacility)
                 || name == nameof(FilterLot)
+                || name == nameof(FilterExternLot)
                 || name == nameof(FilterExpirationDate))
             {
                 Search();

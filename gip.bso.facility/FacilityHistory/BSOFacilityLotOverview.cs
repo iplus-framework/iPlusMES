@@ -115,6 +115,69 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Properties
+
+        #region Properties -> Filter
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo)]
+        public string FilterLotNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.LotNo));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo)]
+        public string FilterExternLotNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.ExternLotNo));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        // Material\MaterialNo
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo)]
+        public string FilterMaterialNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>($"{nameof(Material)}\\{nameof(Material.MaterialNo)}");
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue($"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #endregion
+
         #region BSO->ACProperty
 
         #region BSO->ACPropertyPrimary->FacilityLot
@@ -154,7 +217,9 @@ namespace gip.bso.facility
             {
                 return new List<ACFilterItem>()
                 {
-                    new ACFilterItem(Global.FilterTypes.filter, "LotNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, $"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, Global.Operators.and, null, true, true)
                 };
             }
         }
@@ -215,7 +280,7 @@ namespace gip.bso.facility
                 if (BSOTandTFastView_Child != null && BSOTandTFastView_Child.Value != null && BSOTandTFastView_Child.Value.FilterFacilityLot != value)
                     BSOTandTFastView_Child.Value.SetFaciltiyLot(value);
 
-                OnPropertyChanged("CurrentFacilityLot");
+                OnPropertyChanged();
                 CleanMovements();
                 RefreshRelatedData();
             }
@@ -224,13 +289,16 @@ namespace gip.bso.facility
         public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
-            if (name == "ShowNotAvailable")
+
+            if (name == nameof(ShowNotAvailable)
+                || name == nameof(FilterMaterialNo)
+                || name == nameof(FilterExternLotNo)
+                || name == nameof(FilterLotNo))
             {
                 Search();
                 RefreshRelatedData();
             }
         }
-
 
         public void RefreshRelatedData()
         {
@@ -238,6 +306,7 @@ namespace gip.bso.facility
             RefreshFacilityChargeSumMaterialHelperList();
             RefreshFacilityChargeSumFacilityHelperList();
             RefreshFacilityChargeSumLocationHelperList();
+            LoadReservation(CurrentFacilityLot);
         }
 
         private List<FacilityLot> _FacilityLotList;
@@ -541,9 +610,93 @@ namespace gip.bso.facility
         }
         #endregion
 
+        #region BSO->ACProperty->PickingReservation
+
+        private FacilityReservationModel _SelectedPickingReservation;
+        /// <summary>
+        /// Selected property for FacilityReservation
+        /// </summary>
+        /// <value>The selected PickingReservation</value>
+        [ACPropertySelected(9999, "PickingReservation", "en{'TODO: PickingReservation'}de{'TODO: PickingReservation'}")]
+        public FacilityReservationModel SelectedPickingReservation
+        {
+            get
+            {
+                return _SelectedPickingReservation;
+            }
+            set
+            {
+                if (_SelectedPickingReservation != value)
+                {
+                    _SelectedPickingReservation = value;
+                    OnPropertyChanged(nameof(SelectedPickingReservation));
+                }
+            }
+        }
+
+
+        private List<FacilityReservationModel> _PickingReservationList;
+        /// <summary>
+        /// List property for FacilityReservation
+        /// </summary>
+        /// <value>The PickingReservation list</value>
+        [ACPropertyList(9999, "PickingReservation")]
+        public List<FacilityReservationModel> PickingReservationList
+        {
+            get
+            {
+                return _PickingReservationList;
+            }
+        }
+
+        #endregion
+
+        #region BSO->ACProperty->ProdOrderReservation
+
+        private FacilityReservationModel _SelectedProdOrderReservation;
+        /// <summary>
+        /// Selected property for FacilityReservation
+        /// </summary>
+        /// <value>The selected ProdOrderReservation</value>
+        [ACPropertySelected(9999, "ProdOrderReservation", "en{'TODO: ProdOrderReservation'}de{'TODO: ProdOrderReservation'}")]
+        public FacilityReservationModel SelectedProdOrderReservation
+        {
+            get
+            {
+                return _SelectedProdOrderReservation;
+            }
+            set
+            {
+                if (_SelectedProdOrderReservation != value)
+                {
+                    _SelectedProdOrderReservation = value;
+                    OnPropertyChanged(nameof(SelectedProdOrderReservation));
+                }
+            }
+        }
+
+
+        private List<FacilityReservationModel> _ProdOrderReservationList;
+        /// <summary>
+        /// List property for FacilityReservation
+        /// </summary>
+        /// <value>The ProdOrderReservation list</value>
+        [ACPropertyList(9999, "ProdOrderReservation")]
+        public List<FacilityReservationModel> ProdOrderReservationList
+        {
+            get
+            {
+                return _ProdOrderReservationList;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
+
+        #region BSO->ACMethod->Save&Search
 
         /// <summary>
         /// Saves this instance.
@@ -648,6 +801,48 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region BSO->ACMethod->Reservation
+
+        private void LoadReservation(FacilityLot facilityLot)
+        {
+            _PickingReservationList = null;
+            _ProdOrderReservationList = null;
+
+            if (facilityLot != null)
+            {
+                FacilityReservation[] reservations = facilityLot.FacilityReservation_FacilityLot.ToArray();
+
+                List<FacilityReservation> pickingReservations = reservations.Where(c => c.PickingPos != null).OrderBy(c => c.InsertDate).ToList();
+                if (pickingReservations.Any())
+                {
+                    _PickingReservationList = new List<FacilityReservationModel>();
+                    foreach (FacilityReservation reservation in pickingReservations)
+                    {
+                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(reservation);
+                        _PickingReservationList.Add(facilityReservationModel);
+                    }
+                }
+
+                List<FacilityReservation> prodOrderReservations = reservations.Where(c => c.ProdOrderPartslistPos != null).OrderBy(c => c.InsertDate).ToList();
+                if (prodOrderReservations.Any())
+                {
+                    _ProdOrderReservationList = new List<FacilityReservationModel>();
+                    foreach (FacilityReservation reservation in prodOrderReservations)
+                    {
+                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(reservation);
+                        _ProdOrderReservationList.Add(facilityReservationModel);
+                    }
+                }
+            }
+
+            OnPropertyChanged(nameof(PickingReservationList));
+            OnPropertyChanged(nameof(ProdOrderReservationList));
+        }
+
+        #endregion
+
+        #endregion
+
         #region Execute-Helper-Handlers
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
@@ -725,6 +920,7 @@ namespace gip.bso.facility
                 }
             }
         }
+
         #endregion
 
     }
