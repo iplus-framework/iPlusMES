@@ -22,6 +22,8 @@ using System.Text;
 using gip.mes.facility;
 using System.Runtime.InteropServices;
 using System.Data.Objects;
+using static gip.core.datamodel.Global;
+using System.Runtime.CompilerServices;
 
 namespace gip.bso.facility
 {
@@ -92,6 +94,69 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Properties
+
+        #region Properties -> Filter
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo)]
+        public string FilterLotNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.LotNo));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo)]
+        public string FilterExternLotNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.ExternLotNo));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        // Material\MaterialNo
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo)]
+        public string FilterMaterialNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>($"{nameof(Material)}\\{nameof(Material.MaterialNo)}");
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue($"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #endregion
+
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         /// <summary>
@@ -130,7 +195,9 @@ namespace gip.bso.facility
             {
                 return new List<ACFilterItem>()
                 {
-                    new ACFilterItem(Global.FilterTypes.filter, "LotNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, $"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, Global.Operators.and, null, true, true)
                 };
             }
         }
@@ -625,6 +692,17 @@ namespace gip.bso.facility
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override void OnPropertyChanged([CallerMemberName] string name = "")
+        {
+            base.OnPropertyChanged(name);
+            if (name == nameof(FilterMaterialNo)
+                || name == nameof(FilterLotNo)
+                || name == nameof(FilterExternLotNo))
+            {
+                Search();
+            }
         }
 
         #endregion

@@ -284,7 +284,7 @@ namespace gip.bso.logistics
 
         private void BSOFacilityRservation_ReservationChanged()
         {
-            if(CurrentPickingPos != null)
+            if (CurrentPickingPos != null)
             {
                 CurrentPickingPos.OnEntityPropertyChanged(nameof(PickingPos.PickingMaterial));
             }
@@ -382,8 +382,26 @@ namespace gip.bso.logistics
 
         public bool InFilterChange { get; set; }
 
-        #region Picking -> Filter -> Properties -> FilterPickingTypeIndex
-
+        /// <summary>
+        /// Source Property:  "en{'Extern Lot No.'}de{'Externe Losnr.'}"
+        /// </summary>
+        private string _FilterLotNo;
+        [ACPropertyInfo(999, nameof(FilterLotNo), "en{'(Extern) Lot No.'}de{'(Externe) Los-Nr.'}")]
+        public string FilterLotNo
+        {
+            get
+            {
+                return _FilterLotNo;
+            }
+            set
+            {
+                if (_FilterLotNo != value)
+                {
+                    _FilterLotNo = value;
+                    OnPropertyChanged(nameof(FilterLotNo));
+                }
+            }
+        }
 
         [ACPropertyInfo(300, "FilterPickingPickingNo", "en{'Picking-No.'}de{'Kommissions-Nr.'}")]
         public string FilterPickingPickingNo
@@ -406,6 +424,8 @@ namespace gip.bso.logistics
                 }
             }
         }
+
+        #region Picking -> Filter -> Properties -> Date
 
         [ACPropertyInfo(301, "FilterDateFrom", "en{'From'}de{'Von'}")]
         public DateTime? FilterDateFrom
@@ -488,6 +508,8 @@ namespace gip.bso.logistics
                 }
             }
         }
+
+        #endregion
 
         #region Picking -> Filter -> Properties -> FilterPickingTypeIndex -> FilterMDPickingType
         private MDPickingType _SelectedFilterMDPickingType;
@@ -839,7 +861,6 @@ namespace gip.bso.logistics
 
         #endregion
 
-        #endregion
 
         /// <summary>
         /// Source Property: 
@@ -967,6 +988,25 @@ namespace gip.bso.logistics
                                 )
                            );
 
+            if (!string.IsNullOrEmpty(FilterLotNo))
+            {
+                result =
+                    result
+                    .Where(c =>
+                            c.PickingPos_Picking
+                            .SelectMany(x => x.FacilityReservation_PickingPos)
+                            .Where(x =>
+                                        x.FacilityLot != null
+                                        &&
+                                        (
+                                            x.FacilityLot.LotNo.Contains(FilterLotNo)
+                                            || (!string.IsNullOrEmpty(x.FacilityLot.ExternLotNo) && x.FacilityLot.ExternLotNo.Contains(FilterLotNo))
+                                         )
+                                    )
+                            .Any()
+                        );
+            }
+
             return result;
         }
 
@@ -1020,18 +1060,22 @@ namespace gip.bso.logistics
             }
         }
 
+        private List<Picking> _PickingList;
         /// <summary>
         /// Gets the delivery note list.
         /// </summary>
         /// <value>The delivery note list.</value>
         [ACPropertyList(602, "Picking")]
-        public IEnumerable<Picking> PickingList
+        public List<Picking> PickingList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _PickingList;
+            }
+            set
+            {
+                _PickingList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1880,10 +1924,10 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (   CurrentPickingPos == null 
-                    || CurrentPicking == null 
-                    || CurrentPickingPos.EntityState == EntityState.Added 
-                    || CurrentPickingPos.EntityState == EntityState.Deleted 
+                if (CurrentPickingPos == null
+                    || CurrentPicking == null
+                    || CurrentPickingPos.EntityState == EntityState.Added
+                    || CurrentPickingPos.EntityState == EntityState.Deleted
                     || CurrentPickingPos.EntityState == EntityState.Detached)
                     return null;
                 if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
@@ -2565,7 +2609,14 @@ namespace gip.bso.logistics
         {
             if (AccessPrimary == null)
                 return;
-            AccessPrimary.NavSearch(DatabaseApp);
+
+            _PickingList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _PickingList = AccessPrimary.NavList.ToList();
+            }
+
             OnPropertyChanged(nameof(PickingList));
 
             if (refreshList)
@@ -3177,7 +3228,7 @@ namespace gip.bso.logistics
                 {
                     MsgResult msgResult = MsgResult.No;
                     if (msg != null)
-                        msgResult= Messages.Question(this, msg.Message, MsgResult.No, true);
+                        msgResult = Messages.Question(this, msg.Message, MsgResult.No, true);
                     if (autoSetQuantToZero == SetQuantToZeroMode.Force || msgResult == MsgResult.Yes)
                     {
                         if (ACFacilityManager == null)
@@ -3816,7 +3867,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (   ProcessWorkflowPresenter == null
+                if (ProcessWorkflowPresenter == null
                     || ProcessWorkflowPresenter.SelectedWFNode == null
                     || ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF == null
                     || ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.PWACClass == null)
@@ -3999,6 +4050,8 @@ namespace gip.bso.logistics
             FilterPickingPickingNo = null;
             FilterDateFrom = null;
             FilterDateTo = null;
+            FilterMaterialNo = null;
+            FilterLotNo = null;
             SelectedFilterMDPickingType = null;
             SelectedFilterPickingState = null;
             SelectedFilterDeliveryAddress = null;
@@ -4426,10 +4479,13 @@ namespace gip.bso.logistics
                     _SelectedProcessWorkflow = value;
                     if (ProcessWorkflowPresenter != null)
                     {
-                        gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ? 
+                        if(CurrentPicking != null)
+                        {
+                            gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ?
                                                            CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
                                                            null;
-                        ProcessWorkflowPresenter.Load(method);
+                            ProcessWorkflowPresenter.Load(method);
+                        }
                     }
                     OnPropertyChanged(nameof(SelectedProcessWorkflow));
                 }
@@ -4455,15 +4511,15 @@ namespace gip.bso.logistics
         private List<gipCoreData.ACClassMethod> LoadProcessWorkflowList()
         {
             string pwClassNameOfRoot = nameof(PWMethodTransportBase);
-               
+
             List<gipCoreData.ACClassMethod> tempList = DatabaseApp.ContextIPlus.ACClassMethod
-                                                                  .Where(c => c.ACKindIndex == (Int16)Global.ACKinds.MSWorkflow 
+                                                                  .Where(c => c.ACKindIndex == (Int16)Global.ACKinds.MSWorkflow
                                                                            && c.ACClassWF_ACClassMethod
-                                                                               .Any(wf => !wf.ParentACClassWFID.HasValue 
+                                                                               .Any(wf => !wf.ParentACClassWFID.HasValue
                                                                                        && (wf.PWACClass.ACIdentifier == pwClassNameOfRoot
-                                                                                       || (wf.PWACClass.BasedOnACClassID.HasValue 
+                                                                                       || (wf.PWACClass.BasedOnACClassID.HasValue
                                                                                        && (wf.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot
-                                                                                       || (wf.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue 
+                                                                                       || (wf.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
                                                                                         && wf.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot))))
                                                                                        && !wf.ACClassMethod.IsSubMethod))
                                                                   .ToArray()
@@ -4506,7 +4562,7 @@ namespace gip.bso.logistics
         [ACMethodInteraction("ProcessWorkflow", "en{'Add'}de{'Hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow")]
         public void ProcessWorkflowAssign()
         {
-            if (!IsEnabledProcessWorkflowAssign()) 
+            if (!IsEnabledProcessWorkflowAssign())
                 return;
 
             ShowDialog(this, "SelectWorkflowDialog");

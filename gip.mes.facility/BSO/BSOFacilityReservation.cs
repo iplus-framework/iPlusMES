@@ -35,7 +35,37 @@ namespace gip.mes.facility
         {
             bool baseInit = base.ACInit(startChildMode);
             _ = UseBackGroundWorker;
+
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
             return baseInit;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            bool baseDeInit = base.ACDeInit(deleteACClassTask);
+
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
+            return baseDeInit;
+        }
+
+        #endregion
+
+        #region Managers
+
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
         }
 
         #endregion
@@ -217,25 +247,6 @@ namespace gip.mes.facility
             }
         }
 
-        private FacilityReservationModel GetFacilityReservationModel(FacilityReservation facilityReservation)
-        {
-            FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
-            facilityReservationModel.Material = facilityReservation.Material;
-            facilityReservationModel.FacilityLot = facilityReservation.FacilityLot;
-            facilityReservationModel.FacilityReservation = facilityReservation;
-            facilityReservationModel.AssignedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
-            facilityReservationModel.OriginalReservedQuantity = facilityReservation.ReservedQuantityUOM ?? 0;
-            return facilityReservationModel;
-        }
-
-        private FacilityReservationModel GetFacilityReservationModel(Material material, FacilityLot facilityLot)
-        {
-            FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
-            facilityReservationModel.Material = material;
-            facilityReservationModel.FacilityLot = facilityLot;
-            return facilityReservationModel;
-        }
-
         #endregion
 
         #region FacilityReservation -> Methods
@@ -250,7 +261,7 @@ namespace gip.mes.facility
         {
             if (!IsEnabledAddFaciltiyReservation())
                 return;
-            ForReservationQuantityUOM = GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
+            ForReservationQuantityUOM = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
             if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50604 Production component realise complete quantity!
@@ -342,105 +353,6 @@ namespace gip.mes.facility
             }
         }
 
-        private FacilityReservationModelBase CalcFacilityReservationModelQuantity(DatabaseApp databaseApp, FacilityReservationModel model, bool calculateReservedQuantity)
-        {
-            FacilityReservationModelBase reservationModelBase = new FacilityReservationModelBase();
-
-            if (FacilityReservationOwner != null)
-            {
-
-                if (FacilityReservationOwner is ProdOrderPartslistPos)
-                {
-                    reservationModelBase.TotalReservedQuantity =
-                    databaseApp
-                    .FacilityReservation
-                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
-                    .Select(c => c.ReservedQuantityUOM ?? 0)
-                    .DefaultIfEmpty()
-                    .Sum();
-
-                    reservationModelBase.UsedQuantity =
-                    databaseApp
-                    .FacilityReservation
-                    .Where(FacilityReservation.ProdOrderComponentReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
-                    .Select(c => c.ProdOrderPartslistPos)
-                    .SelectMany(c => c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
-                    .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation)
-                    .Select(c => c.OutwardQuantity)
-                    .Sum();
-                }
-                else if (FacilityReservationOwner is PickingPos)
-                {
-                    reservationModelBase.TotalReservedQuantity =
-                    databaseApp
-                    .FacilityReservation
-                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
-                    .Select(c => c.ReservedQuantityUOM ?? 0)
-                    .DefaultIfEmpty()
-                    .Sum();
-
-                    reservationModelBase.UsedQuantity =
-                    databaseApp
-                    .FacilityReservation
-                    .Where(FacilityReservation.PickingPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
-                    .Select(c => c.PickingPos)
-                    .SelectMany(c => c.FacilityBookingCharge_PickingPos)
-                    .Select(c => c.OutwardQuantity)
-                    .Sum();
-                }
-                else if (FacilityReservationOwner is OutOrderPos)
-                {
-                    reservationModelBase.TotalReservedQuantity =
-                   databaseApp
-                   .FacilityReservation
-                   .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
-                   .Select(c => c.ReservedQuantityUOM ?? 0)
-                   .DefaultIfEmpty()
-                   .Sum();
-
-                    reservationModelBase.UsedQuantity =
-                    databaseApp
-                    .FacilityReservation
-                    .Where(FacilityReservation.OutOrderPosReservations(model.Material.MaterialID, model.FacilityLot.FacilityLotID))
-                    .Select(c => c.OutOrderPos)
-                    .SelectMany(c => c.FacilityBookingCharge_OutOrderPos)
-                    .Select(c => c.OutwardQuantity)
-                    .Sum();
-                }
-
-                reservationModelBase.FreeQuantity =
-                    databaseApp
-                    .FacilityCharge
-                    .Where(c =>
-                            c.Material != null
-                            && c.Material.MaterialNo == model.Material.MaterialNo
-                            && c.FacilityLot != null
-                            && c.FacilityLot.LotNo == model.FacilityLot.LotNo
-                        )
-                    .AsEnumerable()
-                    .Select(c => c.AvailableQuantity)
-                    .DefaultIfEmpty()
-                    .Sum();
-
-                reservationModelBase.FreeQuantity = reservationModelBase.FreeQuantity - reservationModelBase.TotalReservedQuantity + reservationModelBase.UsedQuantity + (calculateReservedQuantity ? model.AssignedQuantity : 0);
-
-            }
-            return reservationModelBase;
-        }
-
-        private double GetMissingQuantity(double neededQuantity, List<FacilityReservationModel> reservationModels)
-        {
-            double missingQuantity = neededQuantity;
-            if (missingQuantity > 0)
-            {
-                if (reservationModels != null)
-                {
-                    missingQuantity = missingQuantity - reservationModels.Sum(c => c.AssignedQuantity);
-                }
-            }
-            return missingQuantity;
-        }
-
         private void LoadFacilityReservationList(List<FacilityReservationModel> reservationModels)
         {
             if (reservationModels == null)
@@ -461,8 +373,8 @@ namespace gip.mes.facility
 
                 foreach (FacilityReservation facilityReservation in facilityReservations)
                 {
-                    FacilityReservationModel facilityReservationModel = GetFacilityReservationModel(facilityReservation);
-                    FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(DatabaseApp, facilityReservationModel, false);
+                    FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(facilityReservation);
+                    FacilityReservationModelBase modelBase = ACFacilityManager.CalcFacilityReservationModelQuantity(DatabaseApp, FacilityReservationOwner, facilityReservationModel, false);
                     facilityReservationModel.CopyFrom(modelBase);
                     facilityReservationModel.PropertyChanged += FacilityReservationModel_PropertyChanged;
                     reservations.Add(facilityReservationModel);
@@ -486,9 +398,9 @@ namespace gip.mes.facility
                     EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
                     break;
                 case nameof(FacilityReservationModel.IsSelected):
-                    if(item.IsSelected)
+                    if (item.IsSelected)
                     {
-                        if(DiffReservationQuantityUOM > 0)
+                        if (DiffReservationQuantityUOM > 0)
                         {
                             if (item.FreeQuantity >= DiffReservationQuantityUOM)
                             {
@@ -511,37 +423,6 @@ namespace gip.mes.facility
                     EditorReserverdQuantity = FacilityLotList == null ? 0 : FacilityLotList.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
                     break;
             }
-        }
-
-        private FacilityReservationModel GetNewFacilityReservation(FacilityReservationModel facilityReservationModel)
-        {
-            string secondaryKey = ACRoot.SRoot.NoManager.GetNewNo(DatabaseApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
-            FacilityReservation facilityReservation = null;
-            if (FacilityReservationOwner is ProdOrderPartslistPos)
-            {
-                ProdOrderPartslistPos pos = FacilityReservationOwner as ProdOrderPartslistPos;
-                facilityReservation = FacilityReservation.NewACObject(DatabaseApp, pos, secondaryKey);
-                pos.FacilityReservation_ProdOrderPartslistPos.Add(facilityReservation);
-            }
-            else if (FacilityReservationOwner is PickingPos)
-            {
-                PickingPos pickingPos = FacilityReservationOwner as PickingPos;
-                facilityReservation = FacilityReservation.NewACObject(DatabaseApp, pickingPos, secondaryKey);
-                pickingPos.FacilityReservation_PickingPos.Add(facilityReservation);
-            }
-            else if (FacilityReservationOwner is OutOrderPos)
-            {
-                OutOrderPos outOrderPos = FacilityReservationOwner as OutOrderPos;
-                facilityReservation = FacilityReservation.NewACObject(DatabaseApp, outOrderPos, secondaryKey);
-                outOrderPos.FacilityReservation_OutOrderPos.Add(facilityReservation);
-            }
-
-            facilityReservation.Material = facilityReservationModel.Material;
-            facilityReservation.FacilityLot = facilityReservationModel.FacilityLot;
-            facilityReservation.ReservedQuantityUOM = facilityReservationModel.AssignedQuantity;
-            facilityReservationModel.FacilityReservation = facilityReservation;
-
-            return facilityReservationModel;
         }
 
         #endregion
@@ -640,7 +521,7 @@ namespace gip.mes.facility
 
                     foreach (FacilityReservationModel model in inputModels)
                     {
-                        FacilityReservationModel facilityReservationModel = GetNewFacilityReservation(model);
+                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetNewFacilityReservation(DatabaseApp, FacilityReservationOwner, model);
                         outputModels.Add(facilityReservationModel);
                     }
 
@@ -745,7 +626,7 @@ namespace gip.mes.facility
                     FacilityReservationModel facilityReservation = facilityReservations.Where(c => c.FacilityLot.LotNo == facilityCharge.FacilityLot.LotNo).FirstOrDefault();
                     if (facilityReservation == null)
                     {
-                        facilityReservation = GetFacilityReservationModel(material, facilityCharge.FacilityLot);
+                        facilityReservation = ACFacilityManager.GetFacilityReservationModel(material, facilityCharge.FacilityLot);
                         facilityReservations.Add(facilityReservation);
                     }
 
@@ -774,7 +655,7 @@ namespace gip.mes.facility
             foreach (FacilityReservationModel facilityReservation in facilityReservations)
             {
                 // Calculate values
-                FacilityReservationModelBase modelBase = CalcFacilityReservationModelQuantity(databaseApp, facilityReservation, false);
+                FacilityReservationModelBase modelBase = ACFacilityManager.CalcFacilityReservationModelQuantity(databaseApp, FacilityReservationOwner, facilityReservation, false);
                 facilityReservation.CopyFrom(modelBase);
 
                 // save original values
@@ -1037,9 +918,9 @@ namespace gip.mes.facility
 
         private void DeleteReservationsOnMaterialChange()
         {
-            if(FacilityReservationList != null && FacilityReservationList.Any())
+            if (FacilityReservationList != null && FacilityReservationList.Any())
             {
-                foreach(FacilityReservationModel item in FacilityReservationList)
+                foreach (FacilityReservationModel item in FacilityReservationList)
                 {
                     item.FacilityReservation.DeleteACObject(DatabaseApp, false);
                 }
@@ -1082,7 +963,7 @@ namespace gip.mes.facility
             if (aCObjectEntity is ProdOrderPartslistPos)
             {
                 ProdOrderPartslistPos pos = aCObjectEntity as ProdOrderPartslistPos;
-                FacilityReservationCollection = pos.FacilityReservation_ProdOrderPartslistPos.Where(c=>c.VBiACClassID == null && c.MaterialID != null);
+                FacilityReservationCollection = pos.FacilityReservation_ProdOrderPartslistPos.Where(c => c.VBiACClassID == null && c.MaterialID != null);
             }
             else if (aCObjectEntity is PickingPos)
             {
