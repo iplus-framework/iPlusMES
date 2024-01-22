@@ -137,6 +137,7 @@
     <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
     <Compile Include="Model\PlanningTargetStockPreview.cs" />
     <Compile Include="Model\ProdOrderPartslistOverview.cs" />
+    <Compile Include="Model\RemotePickingInfo.cs" />
     <Compile Include="Model\RemoteStoreConfig.cs" />
     <Compile Include="Model\RemoteStorePostingData.cs" />
     <Compile Include="Model\SchedulingMaxBPOrder.cs" />
