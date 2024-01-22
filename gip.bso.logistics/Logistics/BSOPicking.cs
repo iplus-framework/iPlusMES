@@ -382,26 +382,93 @@ namespace gip.bso.logistics
 
         public bool InFilterChange { get; set; }
 
+        #region Picking -> Filter -> Properties -> FacilityLot
         /// <summary>
         /// Source Property:  "en{'Extern Lot No.'}de{'Externe Losnr.'}"
         /// </summary>
-        private string _FilterLotNo;
-        [ACPropertyInfo(999, nameof(FilterLotNo), "en{'(Extern) Lot No.'}de{'(Externe) Los-Nr.'}")]
-        public string FilterLotNo
+        private string _FilterLotNoFB;
+        [ACPropertyInfo(999, nameof(FilterLotNoFB), ConstApp.LotNo)]
+        public string FilterLotNoFB
         {
             get
             {
-                return _FilterLotNo;
+                return _FilterLotNoFB;
             }
             set
             {
-                if (_FilterLotNo != value)
+                if (_FilterLotNoFB != value)
                 {
-                    _FilterLotNo = value;
-                    OnPropertyChanged(nameof(FilterLotNo));
+                    _FilterLotNoFB = value;
+                    OnPropertyChanged();
                 }
             }
         }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterExternLotNoFB;
+        [ACPropertyInfo(999, nameof(FilterExternLotNoFB), ConstApp.ExternLotNo)]
+        public string FilterExternLotNoFB
+        {
+            get
+            {
+                return _FilterExternLotNoFB;
+            }
+            set
+            {
+                if (_FilterExternLotNoFB != value)
+                {
+                    _FilterExternLotNoFB = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterLotNoFR;
+        [ACPropertyInfo(999, nameof(FilterLotNoFR), ConstApp.LotNo)]
+        public string FilterLotNoFR
+        {
+            get
+            {
+                return _FilterLotNoFR;
+            }
+            set
+            {
+                if (_FilterLotNoFR != value)
+                {
+                    _FilterLotNoFR = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterExternLotNoFR;
+        [ACPropertyInfo(999, nameof(FilterExternLotNoFR), ConstApp.ExternLotNo)]
+        public string FilterExternLotNoFR
+        {
+            get
+            {
+                return _FilterExternLotNoFR;
+            }
+            set
+            {
+                if (_FilterExternLotNoFR != value)
+                {
+                    _FilterExternLotNoFR = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        #endregion
 
         [ACPropertyInfo(300, "FilterPickingPickingNo", "en{'Picking-No.'}de{'Kommissions-Nr.'}")]
         public string FilterPickingPickingNo
@@ -988,7 +1055,83 @@ namespace gip.bso.logistics
                                 )
                            );
 
-            if (!string.IsNullOrEmpty(FilterLotNo))
+            // FilterLotNoFB
+            if (!string.IsNullOrEmpty(FilterLotNoFB))
+            {
+                result =
+                    result
+                    .Where(c =>
+                            c.PickingPos_Picking
+                            .SelectMany(x => x.FacilityBookingCharge_PickingPos)
+                            .Where(x =>
+                                        (
+                                            x.InwardFacilityLot != null
+                                            && x.InwardFacilityLot.LotNo.Contains(FilterLotNoFB)
+                                        )
+                                        ||
+                                        (
+                                            x.InwardFacilityCharge != null
+                                            && x.InwardFacilityCharge.FacilityLot != null
+                                            && x.InwardFacilityCharge.FacilityLot.LotNo.Contains(FilterLotNoFB)
+                                        )
+                                        ||
+                                        (
+                                            x.OutwardFacilityLot != null
+                                            && x.OutwardFacilityLot.LotNo.Contains(FilterLotNoFB)
+                                        )
+                                        ||
+                                        (
+                                            x.OutwardFacilityCharge != null
+                                            && x.OutwardFacilityCharge.FacilityLot != null
+                                            && x.OutwardFacilityCharge.FacilityLot.LotNo.Contains(FilterLotNoFB)
+                                        )
+                                    )
+                            .Any()
+                        );
+            }
+
+            // FilterExternLotNoFB
+            if (!string.IsNullOrEmpty(FilterExternLotNoFB))
+            {
+                result =
+                    result
+                    .Where(c =>
+                            c.PickingPos_Picking
+                            .SelectMany(x => x.FacilityBookingCharge_PickingPos)
+                            .Where(x =>
+                                        (
+                                            x.InwardFacilityLot != null
+                                            && !string.IsNullOrEmpty(x.InwardFacilityLot.ExternLotNo)
+                                            && x.InwardFacilityLot.ExternLotNo.Contains(FilterExternLotNoFB)
+                                        )
+                                        ||
+                                        (
+                                            x.InwardFacilityCharge != null
+                                            && x.InwardFacilityCharge.FacilityLot != null
+                                            && !string.IsNullOrEmpty(x.InwardFacilityCharge.FacilityLot.ExternLotNo)
+                                            && x.InwardFacilityCharge.FacilityLot.ExternLotNo.Contains(FilterExternLotNoFB)
+                                        )
+                                        ||
+                                        (
+                                            x.OutwardFacilityLot != null
+                                            && !string.IsNullOrEmpty(x.OutwardFacilityLot.ExternLotNo)
+                                            && x.OutwardFacilityLot.ExternLotNo.Contains(FilterExternLotNoFB)
+                                        )
+                                        ||
+                                        (
+                                            x.OutwardFacilityCharge != null
+                                            && x.OutwardFacilityCharge.FacilityLot != null
+                                            && !string.IsNullOrEmpty(x.OutwardFacilityCharge.FacilityLot.ExternLotNo)
+                                            && x.OutwardFacilityCharge.FacilityLot.ExternLotNo.Contains(FilterExternLotNoFB)
+                                        )
+                                    )
+                            .Any()
+                        );
+            }
+
+
+            // FilterLotNoFR
+            if (!string.IsNullOrEmpty(FilterLotNoFR))
             {
                 result =
                     result
@@ -997,11 +1140,24 @@ namespace gip.bso.logistics
                             .SelectMany(x => x.FacilityReservation_PickingPos)
                             .Where(x =>
                                         x.FacilityLot != null
-                                        &&
-                                        (
-                                            x.FacilityLot.LotNo.Contains(FilterLotNo)
-                                            || (!string.IsNullOrEmpty(x.FacilityLot.ExternLotNo) && x.FacilityLot.ExternLotNo.Contains(FilterLotNo))
-                                         )
+                                        && x.FacilityLot.LotNo.Contains(FilterLotNoFR)
+                                    )
+                            .Any()
+                        );
+            }
+
+            // FilterExternLotNoFR
+            if (!string.IsNullOrEmpty(FilterExternLotNoFR))
+            {
+                result =
+                    result
+                    .Where(c =>
+                            c.PickingPos_Picking
+                            .SelectMany(x => x.FacilityReservation_PickingPos)
+                            .Where(x =>
+                                        x.FacilityLot != null
+                                        && !string.IsNullOrEmpty(x.FacilityLot.ExternLotNo)
+                                        && x.FacilityLot.LotNo.Contains(FilterExternLotNoFR)
                                     )
                             .Any()
                         );
@@ -4051,7 +4207,10 @@ namespace gip.bso.logistics
             FilterDateFrom = null;
             FilterDateTo = null;
             FilterMaterialNo = null;
-            FilterLotNo = null;
+            FilterLotNoFB = null;
+            FilterExternLotNoFB = null;
+            FilterLotNoFR = null;
+            FilterExternLotNoFR = null;
             SelectedFilterMDPickingType = null;
             SelectedFilterPickingState = null;
             SelectedFilterDeliveryAddress = null;
@@ -4479,7 +4638,7 @@ namespace gip.bso.logistics
                     _SelectedProcessWorkflow = value;
                     if (ProcessWorkflowPresenter != null)
                     {
-                        if(CurrentPicking != null)
+                        if (CurrentPicking != null)
                         {
                             gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ?
                                                            CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
