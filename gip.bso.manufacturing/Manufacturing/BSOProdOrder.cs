@@ -1580,6 +1580,20 @@ namespace gip.bso.manufacturing
             PostExecute("Load");
         }
 
+        public override PAOrderInfo GetOrderInfo()
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            if (SelectedProdOrderPartslist != null)
+                pAOrderInfo.Add(ProdOrderPartslist.ClassName, SelectedProdOrderPartslist.ProdOrderPartslistID);
+            if (this.SelectedBatch != null)
+                pAOrderInfo.Add(ProdOrderBatch.ClassName, SelectedBatch.ProdOrderBatchID);
+            if (this.SelectedIntermediate != null)
+                pAOrderInfo.Add(ProdOrderPartslistPos.ClassName, SelectedIntermediate.ProdOrderPartslistPosID);
+            if (this.SelectedOutwardPartslistPos != null)
+                pAOrderInfo.Add(ProdOrderPartslistPosRelation.ClassName, SelectedOutwardPartslistPos.ProdOrderPartslistPosRelationID);
+            return pAOrderInfo;
+        }
+
         public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (paOrderInfo == null)
