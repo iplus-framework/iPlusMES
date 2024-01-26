@@ -2091,7 +2091,7 @@ namespace gip.mes.facility
                                         instance, "Storage", RouteDirections.Forwards, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                                         null,
-                                        0, true, true, false, false, 0, false, false, true);
+                                        0, true, true, false, false, 0, false, false, RouteResultMode.ShortRoute);
                     if (rResult.Routes != null && rResult.Routes.Any())
                         routes.AddRange(rResult.Routes);
                 }
