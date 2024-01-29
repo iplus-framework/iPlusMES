@@ -18,6 +18,7 @@ namespace gip.mes.facility.TandTv3
         public static string EmptyLotName = "0000";
 
         public string LogFileNameTemplate = @"TandTV3-log-{0}-{1}.log";
+        public string MDLogFileNameTemplate = @"TandTV3-log-{0}-{1}.md";
 
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace gip.mes.facility.TandTv3
 
         #region Properties
 
-        public bool FilterFaciltiyAtSearchInwardCharges { get;set; }
+        public bool FilterFaciltiyAtSearchInwardCharges { get; set; }
 
         #endregion
 
@@ -747,12 +748,12 @@ namespace gip.mes.facility.TandTv3
             }
         }
 
-        public string GetLogFileName(string itemNo)
+        public string GetLogFileName(string itemNo, bool useMD)
         {
             string folder = Path.GetTempPath();
             if (!string.IsNullOrEmpty(RootLogFolder))
                 folder = RootLogFolder;
-            return Path.Combine(folder, string.Format(LogFileNameTemplate, itemNo, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")));
+            return Path.Combine(folder, string.Format(useMD ? MDLogFileNameTemplate : LogFileNameTemplate, itemNo, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")));
         }
         #endregion
 

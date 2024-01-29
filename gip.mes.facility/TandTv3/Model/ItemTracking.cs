@@ -2,8 +2,7 @@
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using gip.mes.facility;
-using System.Linq;
+using System.Text;
 
 namespace gip.mes.facility.TandTv3
 {
@@ -61,12 +60,12 @@ namespace gip.mes.facility.TandTv3
             string toString = TrackingDirection.ToString() + "|";
             toString += "[" + Item.ToString() + "]";
             toString += "| " + GetItemNo();
-            if(!string.IsNullOrEmpty(SameStepParent))
+            if (SameStepParent != null)
             {
                 toString += Environment.NewLine;
                 toString += string.Format(@"| SameStepParent: {0}", SameStepParent);
             }
-            if (!string.IsNullOrEmpty(NextStepParent))
+            if (NextStepParent != null)
             {
                 toString += Environment.NewLine;
                 toString += string.Format(@"| NextStepParent: {0}", NextStepParent);
@@ -74,40 +73,275 @@ namespace gip.mes.facility.TandTv3
             return toString;
         }
 
+        public string ToMDString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(GetMDString());
+            if (SameStepParent != null)
+            {
+                sb.AppendLine($"ParentSameStep: " + SameStepParent.GetMDLink());
+            }
+            if (NextStepParent != null)
+            {
+                sb.AppendLine($"ParentPrevousStep:" + NextStepParent.GetMDLink());
+            }
+            return sb.ToString();
+        }
+
+        public string GetMDString()
+        {
+            StringBuilder content = new StringBuilder();
+            content.AppendLine($"<h4>{GetItemNo()}</h4>");
+            content.AppendLine($"<div>{Item}</h4>");
+            return $"<div id=\"{GetItemID()}\">{content.ToString()}</div>";
+        }
+
+        public string GetMDLink()
+        {
+            return $"<a href=\"#{GetItemID()}\">{GetItemNo()}</a>";
+        }
+
         public string GetItemNo()
         {
             string itemNo = "";
-            if (Item is ProdOrder)
-            {
-                ProdOrder prodOrder = Item as ProdOrder;
-                itemNo = prodOrder.ProgramNo;
-            }
+
             if (Item is FacilityBookingCharge)
             {
-                FacilityBookingCharge fbc = Item as FacilityBookingCharge;
-                itemNo = fbc.FacilityBookingChargeNo;
+                FacilityBookingCharge tempItem = Item as FacilityBookingCharge;
+                itemNo = tempItem.FacilityBookingChargeNo;
+            }
+
+            if (Item is FacilityBooking)
+            {
+                FacilityBooking tempItem = Item as FacilityBooking;
+                itemNo = tempItem.FacilityBookingNo;
+            }
+
+            if (Item is FacilityPreBooking)
+            {
+                FacilityPreBooking tempItem = Item as FacilityPreBooking;
+                itemNo = tempItem.FacilityPreBookingNo;
+            }
+
+            if (Item is InOrderPos)
+            {
+                InOrderPos tempItem = Item as InOrderPos;
+                itemNo = tempItem.InOrder.InOrderNo + " #" + tempItem.Sequence;
+            }
+
+            if (Item is ProdOrderPartslistPos)
+            {
+                ProdOrderPartslistPos tempItem = Item as ProdOrderPartslistPos;
+                itemNo = nameof(ProdOrderPartslistPos);
+            }
+
+            if (Item is ProdOrderPartslistPosRelation)
+            {
+                ProdOrderPartslistPosRelation tempItem = Item as ProdOrderPartslistPosRelation;
+                itemNo = nameof(ProdOrderPartslistPosRelation);
+            }
+
+            if (Item is FacilityCharge)
+            {
+                FacilityCharge tempItem = Item as FacilityCharge;
+                itemNo = tempItem.FacilityLot?.LotNo + " | " + tempItem.Facility?.FacilityNo;
+            }
+
+            if (Item is ProdOrder)
+            {
+                ProdOrder tempItem = Item as ProdOrder;
+                itemNo = tempItem.ProgramNo;
+            }
+
+            if (Item is ProdOrderPartslist)
+            {
+                ProdOrderPartslist tempItem = Item as ProdOrderPartslist;
+                itemNo = tempItem.ProdOrder.ProgramNo + " #" + tempItem.Sequence;
+            }
+
+            if (Item is OutOrder)
+            {
+                OutOrder tempItem = Item as OutOrder;
+                itemNo = tempItem.OutOrderNo;
+
+            }
+
+            if (Item is OutOrderPos)
+            {
+                OutOrderPos tempItem = Item as OutOrderPos;
+                itemNo = tempItem.OutOrder.OutOrderNo + " #" + tempItem.Sequence;
+            }
+
+            if (Item is Picking)
+            {
+                Picking tempItem = Item as Picking;
+                itemNo = tempItem.PickingNo;
+            }
+
+            if (Item is PickingPos)
+            {
+                PickingPos tempItem = Item as PickingPos;
+                itemNo = tempItem.Picking.PickingNo + " #" + tempItem.Sequence;
+            }
+
+            if (Item is FacilityLot)
+            {
+                FacilityLot tempItem = Item as FacilityLot;
+                itemNo = tempItem.LotNo;
+            }
+
+            if (Item is InOrder)
+            {
+                InOrder tempItem = Item as InOrder;
+                itemNo = tempItem.InOrderNo;
+            }
+
+            if (Item is DeliveryNotePos)
+            {
+                DeliveryNotePos tempItem = Item as DeliveryNotePos;
+                itemNo = tempItem.DeliveryNote.DeliveryNoteNo + " #" + tempItem.Sequence;
+            }
+
+            if (Item is Facility)
+            {
+                Facility tempItem = Item as Facility;
+                itemNo = tempItem.FacilityNo;
+            }
+
+            if (Item is gip.mes.datamodel.ACClass)
+            {
+                gip.mes.datamodel.ACClass tempItem = Item as gip.mes.datamodel.ACClass;
+                itemNo = tempItem.ACIdentifier;
+            }
+
+            if (Item is DeliveryNote)
+            {
+                DeliveryNote tempItem = Item as DeliveryNote;
+                itemNo = tempItem.DeliveryNoteNo;
+            }
+            return itemNo;
+        }
+
+        public Guid GetItemID()
+        {
+            Guid itemID = Guid.Empty;
+
+            if (Item is FacilityBookingCharge)
+            {
+                FacilityBookingCharge tempItem = Item as FacilityBookingCharge;
+                itemID = tempItem.FacilityBookingChargeID;
+
             }
             if (Item is FacilityBooking)
             {
-                FacilityBooking fb = Item as FacilityBooking;
-                itemNo = fb.FacilityBookingNo;
+                FacilityBooking tempItem = Item as FacilityBooking;
+                itemID = tempItem.FacilityBookingID;
+
+            }
+            if (Item is FacilityPreBooking)
+            {
+                FacilityPreBooking tempItem = Item as FacilityPreBooking;
+                itemID = tempItem.FacilityPreBookingID;
+
+            }
+            if (Item is InOrderPos)
+            {
+                InOrderPos tempItem = Item as InOrderPos;
+                itemID = tempItem.InOrderPosID;
+
             }
             if (Item is ProdOrderPartslistPos)
             {
-                ProdOrderPartslistPos pos = Item as ProdOrderPartslistPos;
-                itemNo = pos.ToString();
-            }
-            if (Item is FacilityLot)
-            {
-                FacilityLot fl = Item as FacilityLot;
-                itemNo = fl.LotNo;
+                ProdOrderPartslistPos tempItem = Item as ProdOrderPartslistPos;
+                itemID = tempItem.ProdOrderPartslistPosID;
+
             }
             if (Item is ProdOrderPartslistPosRelation)
             {
-                ProdOrderPartslistPosRelation rel = Item as ProdOrderPartslistPosRelation;
-                itemNo = rel.ToString();
+                ProdOrderPartslistPosRelation tempItem = Item as ProdOrderPartslistPosRelation;
+                itemID = tempItem.ProdOrderPartslistPosRelationID;
+
             }
-            return itemNo;
+            if (Item is FacilityCharge)
+            {
+                FacilityCharge tempItem = Item as FacilityCharge;
+                itemID = tempItem.FacilityChargeID;
+
+            }
+            if (Item is ProdOrder)
+            {
+                ProdOrder tempItem = Item as ProdOrder;
+                itemID = tempItem.ProdOrderID;
+
+            }
+            if (Item is ProdOrderPartslist)
+            {
+                ProdOrderPartslist tempItem = Item as ProdOrderPartslist;
+                itemID = tempItem.ProdOrderPartslistID;
+
+            }
+            if (Item is OutOrder)
+            {
+                OutOrder tempItem = Item as OutOrder;
+                itemID = tempItem.OutOrderID;
+
+            }
+            if (Item is OutOrderPos)
+            {
+                OutOrderPos tempItem = Item as OutOrderPos;
+                itemID = tempItem.OutOrderPosID;
+
+            }
+            if (Item is Picking)
+            {
+                Picking tempItem = Item as Picking;
+                itemID = tempItem.PickingID;
+
+            }
+            if (Item is PickingPos)
+            {
+                PickingPos tempItem = Item as PickingPos;
+                itemID = tempItem.PickingPosID;
+
+            }
+            if (Item is FacilityLot)
+            {
+                FacilityLot tempItem = Item as FacilityLot;
+                itemID = tempItem.FacilityLotID;
+
+            }
+            if (Item is InOrder)
+            {
+                InOrder tempItem = Item as InOrder;
+                itemID = tempItem.InOrderID;
+
+            }
+            if (Item is DeliveryNotePos)
+            {
+                DeliveryNotePos tempItem = Item as DeliveryNotePos;
+                itemID = tempItem.DeliveryNotePosID;
+
+            }
+            if (Item is Facility)
+            {
+                Facility tempItem = Item as Facility;
+                itemID = tempItem.FacilityID;
+
+            }
+            if (Item is gip.mes.datamodel.ACClass)
+            {
+                gip.mes.datamodel.ACClass tempItem = Item as gip.mes.datamodel.ACClass;
+                itemID = tempItem.ACClassID;
+
+            }
+            if (Item is DeliveryNote)
+            {
+                DeliveryNote tempItem = Item as DeliveryNote;
+                itemID = tempItem.DeliveryNoteID;
+
+            }
+
+            return itemID;
         }
 
         #endregion
@@ -116,13 +350,13 @@ namespace gip.mes.facility.TandTv3
 
         #region private methods
 
-        
+
         #endregion
 
         #region Tree
 
-        public string SameStepParent { get; set; }
-        public string NextStepParent { get; set; }
+        public IItemTracking<IACObjectEntity> SameStepParent { get; set; }
+        public IItemTracking<IACObjectEntity> NextStepParent { get; set; }
 
         #endregion
 
