@@ -1510,7 +1510,10 @@ namespace gip.mes.processapplication
                     return msg;
                 }
 
-                if (dosingPosRelation.SourceProdOrderPartslistPos.MaterialID != outwardFacility.MaterialID.Value)
+                 
+
+                if (!  (   (dosingPosRelation.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && outwardFacility.MaterialID == dosingPosRelation.SourceProdOrderPartslistPos.Material.ProductionMaterialID)
+                        || (!dosingPosRelation.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && outwardFacility.MaterialID == dosingPosRelation.SourceProdOrderPartslistPos.MaterialID)))
                 {
                     // Error50263: The dosing Material {0} / {1} doesn't match Material {2} / {3} in Source {4}.
                     msg = new Msg(this, eMsgLevel.Error, PWClassName, "CanResumeDosingProd(4)", 1313, "Error50263",
