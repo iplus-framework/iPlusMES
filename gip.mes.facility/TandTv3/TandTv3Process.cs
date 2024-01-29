@@ -263,7 +263,7 @@ namespace gip.mes.facility.TandTv3
         #endregion
 
         #region ITandTv3Process -> Operate [same|next] step items
-        public virtual List<IItemTracking<IACObjectEntity>> OperateSameStepItems(List<IACObjectEntity> sameStepItems, MDTrackingDirectionEnum trackingDirection, string callerItemNo)
+        public virtual List<IItemTracking<IACObjectEntity>> OperateSameStepItems(List<IACObjectEntity> sameStepItems, MDTrackingDirectionEnum trackingDirection, IItemTracking<IACObjectEntity> callerItem)
         {
             List<IItemTracking<IACObjectEntity>> sameStepResult = new List<IItemTracking<IACObjectEntity>>();
             foreach (var sameStepItem in sameStepItems)
@@ -285,12 +285,12 @@ namespace gip.mes.facility.TandTv3
 
             if (sameStepResult != null)
                 foreach (var childItem in sameStepResult)
-                    childItem.SameStepParent = callerItemNo;
+                    childItem.SameStepParent = callerItem;
 
             return sameStepResult;
         }
 
-        public virtual List<IItemTracking<IACObjectEntity>> OperateNextStepItems(List<IACObjectEntity> nextStepItems, MDTrackingDirectionEnum trackingDirection, string callerItemNo)
+        public virtual List<IItemTracking<IACObjectEntity>> OperateNextStepItems(List<IACObjectEntity> nextStepItems, MDTrackingDirectionEnum trackingDirection, IItemTracking<IACObjectEntity> callerItem)
         {
             List<IItemTracking<IACObjectEntity>> nextStepResult = new List<IItemTracking<IACObjectEntity>>(); ;
             foreach (var nextStepItem in nextStepItems)
@@ -311,7 +311,7 @@ namespace gip.mes.facility.TandTv3
 
             if (nextStepResult != null)
                 foreach (var childItem in nextStepResult)
-                    childItem.NextStepParent = callerItemNo;
+                    childItem.NextStepParent = callerItem;
 
             return nextStepResult;
         }
@@ -339,7 +339,7 @@ namespace gip.mes.facility.TandTv3
                 itemTracking = FactoryForwardItem(StartItem);
 
 #if DEBUG
-            string fileName = TandTv3Command.GetLogFileName(TandTResult.Filter.ItemSystemNo);
+            string fileName = TandTv3Command.GetLogFileName(TandTResult.Filter.ItemSystemNo, TandTv3Command.TrackingConfiguration.UseMDFile);
             if (TandTv3Command.TandTWriteDiagnosticLog && Directory.Exists(Path.GetDirectoryName(fileName)))
             {
                 using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
@@ -429,8 +429,15 @@ namespace gip.mes.facility.TandTv3
                 TandTResult.LogWritter.WriteLine(new String('-', 20));
                 foreach (var item in trackSameStepItems)
                 {
-                    TandTResult.LogWritter.WriteLine(item);
-                    TandTResult.LogWritter.WriteLine("");
+                    if (TandTv3Command.TrackingConfiguration.UseMDFile)
+                    {
+                        TandTResult.LogWritter.WriteLine(item.ToMDString());
+                    }
+                    else
+                    {
+                        TandTResult.LogWritter.WriteLine(item);
+                        TandTResult.LogWritter.WriteLine("");
+                    }
                 }
                 TandTResult.LogWritter.WriteLine(new String('=', 20));
                 TandTResult.LogWritter.WriteLine("");
@@ -457,18 +464,13 @@ namespace gip.mes.facility.TandTv3
                 List<IACObjectEntity> itemGetNextStepResult = trackItemSameStep.GetNextStepItems();
                 if (itemGetNextStepResult != null)
                 {
-                    List<IItemTracking<IACObjectEntity>> itemNextStepItems = OperateNextStepItems(itemGetNextStepResult, trackingDirection, trackItemSameStep.GetItemNo());
+                    List<IItemTracking<IACObjectEntity>> itemNextStepItems = OperateNextStepItems(itemGetNextStepResult, trackingDirection, trackItemSameStep);
                     if (itemNextStepItems != null && itemNextStepItems.Any())
                     {
                         trackNextStepItems.AddRange(itemNextStepItems);
                     }
                 }
             }
-
-            //trackNextStepItems =
-            //    trackNextStepItems
-            //     .OrderBy(c => c.Item, new IACObjectEntityComparer())
-            //    .ToList();
 
             bool breakTracking = TandTResult.Filter.BreakTrackingCondition != null && TandTResult.Filter.BreakTrackingCondition.Invoke(TandTResult.CurrentStep);
 
@@ -518,7 +520,7 @@ namespace gip.mes.facility.TandTv3
             List<IACObjectEntity> itemGetSameStepResult = item.GetSameStepItems();
             if (itemGetSameStepResult != null)
             {
-                List<IItemTracking<IACObjectEntity>> itemSameStepItems = OperateSameStepItems(itemGetSameStepResult, trackingDirection, item.GetItemNo());
+                List<IItemTracking<IACObjectEntity>> itemSameStepItems = OperateSameStepItems(itemGetSameStepResult, trackingDirection, item);
                 if (itemSameStepItems != null)
                 {
                     foreach (var childItem in itemSameStepItems)
@@ -566,7 +568,7 @@ namespace gip.mes.facility.TandTv3
                 previousCommand = "DoSelect()";
                 TandTResult = TandTv3Command.DoSelect(DatabaseApp, TandTResult.Filter);
             }
-            
+
             if (TandTResult.Filter.BackgroundWorker != null)
                 TandTResult.Filter.BackgroundWorker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"Tracking: [{0}] | {1} --> DoTrackingFinish() ...", TandTResult.Filter.ItemSystemNo, previousCommand);
             TandTv3Command.DoTrackingFinish(DatabaseApp, TandTResult, TandTResult.Filter);
@@ -598,6 +600,7 @@ namespace gip.mes.facility.TandTv3
             //}
             //return false;
         }
-        #endregion
+
+       #endregion
     }
 }
