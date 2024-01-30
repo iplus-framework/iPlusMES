@@ -113,7 +113,7 @@ namespace gip.mes.processapplication
             {
                 if (_RefMotor == null)
                 {
-                    PAEEMotorBase result = FindMemberACComponent(typeof(PAEEMotorBase)) as PAEEMotorBase;
+                    PAEEMotorBase result = FindChildComponents<PAEEMotorBase>(c => c is PAEEMotorBase).FirstOrDefault();
                     if (result != null)
                         _RefMotor = new ACRef<PAEEMotorBase>(result, this);
                 }
@@ -130,7 +130,7 @@ namespace gip.mes.processapplication
             {
                 if (_RefRotationControl == null)
                 {
-                    PAERotationControl result = FindMemberACComponent(typeof(PAERotationControl)) as PAERotationControl;
+                    PAERotationControl result = FindChildComponents<PAERotationControl>(c => c is PAERotationControl).FirstOrDefault();
                     if (result != null)
                         _RefRotationControl = new ACRef<PAERotationControl>(result, this);
                 }
@@ -144,17 +144,15 @@ namespace gip.mes.processapplication
         {
             get
             {
-                List<PAEJamSensor> listResult = new List<PAEJamSensor>();
-                if (this.ACComponentChilds.Count() <= 0)
-                    return listResult;
-                var query = this.ACComponentChilds.Where(c => typeof(PAEJamSensor).IsAssignableFrom(c.GetType())).Select(c => c as PAEJamSensor);
-                if (!query.Any())
-                    return listResult;
-                foreach (PAEJamSensor member in query)
-                {
-                    listResult.Add(member);
-                }
-                return listResult;
+                return FindChildComponents<PAEJamSensor>(c => c is PAEJamSensor);
+            }
+        }
+
+        public IEnumerable<PAELimitSwitch> LimitSwitches
+        {
+            get
+            {
+                return FindChildComponents<PAELimitSwitch>(c => c is PAELimitSwitch);
             }
         }
         #endregion
