@@ -42,7 +42,7 @@ namespace gip2006.variobatch.processapplication
                 {
                     string errorMsg = null;
                     // If route data not sucessful transferred to plc, then wait
-                    if (!serializer.SendRoute(this, complexObj, prevComplexObj, dbNo, offset, routeOffset, miscParams, out errorMsg))
+                    if (!serializer.SendRoute(this, complexObj, prevComplexObj, dbNo, routeOffset.Value, null, miscParams, out errorMsg))
                     {
                         WriteAlarm(miscParams, errorMsg);
                         return false;

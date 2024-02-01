@@ -184,9 +184,13 @@ namespace gip2006.variobatch.processapplication
             short i = 0;
             foreach (RouteItem rItem in targetItems)
             {
-                targetItemIDs[i] = GetRouteItemID(rItem.TargetACComponent);
-                if (targetItemIDs[i] <= 0)
-                    sb.AppendLine(String.Format("RouteItemID {1} of target {0} is invalid", rItem.TargetACComponent.GetACUrl(), targetItemIDs[i]));
+                short itemID = GetRouteItemID(rItem.TargetACComponent);
+                if (itemID <= 0)
+                    sb.AppendLine(String.Format("RouteItemID {1} of target {0} is invalid", rItem.TargetACComponent.GetACUrl(), itemID));
+
+                if (targetItemIDs.Where(c => c == itemID).Any())
+                    continue;
+                targetItemIDs[i] = itemID;
                 if (i > 3)
                     break;
                 i++;
@@ -446,6 +450,8 @@ namespace gip2006.variobatch.processapplication
             {
                 IRoutableModule routableModule = component as IRoutableModule;
                 PAEControlModuleBase controlModuleBase = routableModule as PAEControlModuleBase;
+                if (controlModuleBase == null && routableModule is PAETransport)
+                    controlModuleBase = (routableModule as PAETransport).Motor;
                 if (controlModuleBase != null)
                 {
                     turnOffDelay = (short)controlModuleBase.TurnOffDelay.ValueT.TotalSeconds;
@@ -574,10 +580,10 @@ namespace gip2006.variobatch.processapplication
                 }
 
                 bool isFirstControlModuleInRoute = false, isLastControlModuleInRoute = false;
-                if (itemGroup.Any(c => c.SourceACComponent.ACUrl == routeSource.SourceACComponent.ACUrl) && currentComponent is PAEControlModuleBase)
+                if (itemGroup.Any(c => c.SourceACComponent.ACUrl == routeSource.SourceACComponent.ACUrl) && currentComponent is IRoutableModule)
                     isFirstControlModuleInRoute = true;
 
-                if (routeTargets.Any(c => c.SourceACComponent.ACUrl == currentComponent.ACUrl && c.SourceACComponent is PAEControlModuleBase))
+                if (routeTargets.Any(c => c.SourceACComponent.ACUrl == currentComponent.ACUrl && c.SourceACComponent is IRoutableModule))
                     isLastControlModuleInRoute = true;
 
                 RouteItemModel routeItemModel = new RouteItemModel()

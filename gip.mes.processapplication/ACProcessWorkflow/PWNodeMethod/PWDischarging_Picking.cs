@@ -248,10 +248,11 @@ namespace gip.mes.processapplication
             }
 
             Facility destinationSilo = null;
+            FacilityReservation facReservation = null;
             IList<FacilityReservation> plannedSilos = ParentPWMethod<PWMethodTransportBase>().ACFacilityManager.GetSelectedTargets(pickingPos);
             if (plannedSilos != null && plannedSilos.Any())
             {
-                FacilityReservation facReservation = GetNextFreeDestination(plannedSilos, pickingPos, pickingPos.TargetQuantityUOM);
+                facReservation = GetNextFreeDestination(plannedSilos, pickingPos, pickingPos.TargetQuantityUOM);
                 if (facReservation != null)
                     destinationSilo = facReservation.Facility;
             }
@@ -323,12 +324,19 @@ namespace gip.mes.processapplication
 
             Type typeOfSilo = typeof(PAMSilo);
             Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+            Route predefinedRoute = null;
+            if (facReservation != null)
+            {
+                predefinedRoute = facReservation.PredefinedRoute;
+                if (predefinedRoute != null)
+                    predefinedRoute = predefinedRoute.Clone() as Route;
+            }
             PAProcessModule targetModule = null;
             bool isLastDischarging = true;
             // Falls Workflow mehrere Gruppe hat, prüfe zuerst ob vom akteullen Prozessmodul direkt in das Ziel enteleert werden kann oder über ein weiteres Prozessmodul geschleust werden muss
             DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
                                     (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                    PAProcessModule.SelRuleID_ProcessModule_Deselector, null);
+                                    PAProcessModule.SelRuleID_ProcessModule_Deselector, null, predefinedRoute);
             // Falls kein direkter Weg gefunden, prüfe über welche gemappte PWGroup weiter transportiert werden kann 
             if (CurrentDischargingDest(db, false) == null)
             {
@@ -736,12 +744,20 @@ namespace gip.mes.processapplication
 
             Type typeOfSilo = typeof(PAMSilo);
             Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+
+            Route predefinedRoute = null;
+            if (facReservation != null)
+            {
+                predefinedRoute = facReservation.PredefinedRoute;
+                if (predefinedRoute != null)
+                    predefinedRoute = predefinedRoute.Clone() as Route;
+            }
             PAProcessModule targetModule = null;
             bool isLastDischarging = true;
             // Falls Workflow mehrere Gruppe hat, prüfe zuerst ob vom akteullen Prozessmodul direkt in das Ziel enteleert werden kann oder über ein weiteres Prozessmodul geschleust werden muss
             DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                        PAProcessModule.SelRuleID_ProcessModule_Deselector, null);
+                                        PAProcessModule.SelRuleID_ProcessModule_Deselector, null, predefinedRoute);
             // Falls kein direkter Weg gefunden, prüfe über welche gemappte PWGroup weiter transportiert werden kann 
             if (CurrentDischargingDest(db, false) == null)
             {
