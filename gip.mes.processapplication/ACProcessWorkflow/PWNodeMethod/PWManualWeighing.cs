@@ -1232,6 +1232,7 @@ namespace gip.mes.processapplication
                     if (ParentPWGroup.AccessedProcessModule == null)
                     {
                         SubscribeToProjectWorkCycle();
+                        Messages.LogInfo(this.GetACUrl(), nameof(SMRunning_Prod), "AccessedProcessModule == null");
                         return;
                     }
 
@@ -2153,6 +2154,7 @@ namespace gip.mes.processapplication
                         //Error50279:intermediateChildPos is null.
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(70)", 1238, "Error50279");
                         ActivateProcessAlarmWithLog(msg, false);
+                        Messages.LogMessageMsg(msg);
                         return StartNextCompResult.CycleWait;
                     }
 
@@ -3257,7 +3259,10 @@ namespace gip.mes.processapplication
             }
 
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))
+            {
+                Messages.LogInfo(this.GetACUrl(), nameof(StartManualWeighingNextComp), nameof(AfterConfigForACMethodIsSet) + " return false!");
                 return StartNextCompResult.CycleWait;
+            }
 
             if (!acMethod.IsValid())
             {
@@ -3275,7 +3280,10 @@ namespace gip.mes.processapplication
 
             RecalcTimeInfo(true);
             if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
+            {
+                Messages.LogInfo(this.GetACUrl(), nameof(StartManualWeighingNextComp), nameof(CreateNewProgramLog) + " Cycle wait!");
                 return StartNextCompResult.CycleWait;
+            }
             _ExecutingACMethod = acMethod;
 
             module.TaskInvocationPoint.ClearMyInvocations(this);
