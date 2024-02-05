@@ -1,14 +1,6 @@
-﻿using gip.core.autocomponent;
-using gip.core.datamodel;
+﻿using gip.core.datamodel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
 using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
-using System.ServiceModel.Web;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.webservices;
 
 namespace gip.mes.webservices
@@ -22,8 +14,6 @@ namespace gip.mes.webservices
         {
         }
         #endregion
-
-
 
         #region Implementation
 

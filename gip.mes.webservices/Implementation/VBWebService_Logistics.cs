@@ -3,8 +3,6 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.autocomponent;
 using System.Data.Objects;
 using gip.mes.facility;
