@@ -979,7 +979,7 @@ namespace gip.mes.processapplication
             InformSchedulerOnStateChange();
         }
 
-        protected void InformSchedulerOnStateChange()
+        public void InformSchedulerOnStateChange()
         {
             PAWorkflowSchedulerBase scheduler = GetScheduler();
             if (scheduler != null)
@@ -1354,6 +1354,10 @@ namespace gip.mes.processapplication
                     && (   RootPW.IsStartingProcessFunction 
                         || RootPW.CurrentACState <= ACStateEnum.SMStarting)))
             {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _PlanningWait = DateTime.Now.AddSeconds(1);
+                }
                 SubscribeToProjectWorkCycle();
                 return;
             }

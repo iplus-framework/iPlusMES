@@ -1747,7 +1747,8 @@ namespace gip.mes.facility
                                                 ACValueList projSpecificParams = null,
                                                 bool onlyContainer = true,
                                                 short reservationMode = 0,
-                                                string selectionRuleID = "PAMSilo.Deselector")
+                                                string selectionRuleID = "PAMSilo.Deselector",
+                                                bool includeReserved = true, bool includeAllocated = true)
         {
             if (scaleACClass == null)
             {
@@ -1772,7 +1773,7 @@ namespace gip.mes.facility
                                         scaleACClass, oldestSiloClass, RouteDirections.Backwards, selectionRuleID, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.StorageBin.VBiFacilityACClassID == c.ACClassID,
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0,true, true, false, false, 10);
+                                        0, includeReserved, includeAllocated, false, false, 10);
                 if (result.Routes == null || !result.Routes.Any())
                     return null;
             }
@@ -1786,7 +1787,7 @@ namespace gip.mes.facility
                                         scaleACClass, possibleSilosACUrl, RouteDirections.Backwards, selectionRuleID, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, true, true, false, false, 10);
+                                        0, includeReserved, includeAllocated, false, false, 10);
 
                 if (result.Routes == null || !result.Routes.Any())
                     return null;

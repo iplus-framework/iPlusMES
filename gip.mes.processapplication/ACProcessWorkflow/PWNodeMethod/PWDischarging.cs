@@ -1175,8 +1175,8 @@ namespace gip.mes.processapplication
 #region Routing
         public static MsgWithDetails DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo, 
             out Route route, int searchDepth, 
-            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector, 
-            string deSelectionRuleID, object[] deSelParams = null)
+            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector,
+            string deSelectionRuleID, bool includeReserved, bool includeAllocated, object[] deSelParams = null)
         {
             route = null;
             ACComponent routingService = null;
@@ -1189,7 +1189,7 @@ namespace gip.mes.processapplication
                                  acCompFrom, acCompTo, RouteDirections.Forwards, deSelectionRuleID, deSelParams != null ? deSelParams : new object[] { },
                                  (c, p, r) => c.ACClassID == acClassIDCompTo,
                                  deSelector,
-                                 0, true, true, false, false, searchDepth);
+                                 0, includeReserved, includeAllocated, false, false, searchDepth);
             if (rResult.Routes == null || !rResult.Routes.Any())
                 return new MsgWithDetails { Source = acCompFrom.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "DetermineDischargingRoute(1)", Message = "No route found" };
 
@@ -1200,7 +1200,7 @@ namespace gip.mes.processapplication
 
         protected void DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo,
             int searchDepth,
-            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector, 
+            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector,
             string deSelectionRuleID, object[] deSelParams = null, Route predefinedRoute = null)
         {
             Route route = null;
@@ -1213,13 +1213,32 @@ namespace gip.mes.processapplication
                     route = predefinedRoute;
             }
             if (route == null)
-                PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, deSelParams);
+            {
+                PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, ApplicationManager.IncludeReservedOnRoutingSearch, ApplicationManager.IncludeAllocatedOnRoutingSearch, deSelParams);
+                if (route == null && ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
+                    PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
+            }
             if (route != null)
             {
                 route.Detach(true);
                 route.IsPredefinedRoute = predefinedRoute != null && route == predefinedRoute;
             }
             CurrentDischargingRoute = route;
+        }
+
+        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(out Route route)
+        {
+            route = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
+            return ValidateRouteForFuncParam(route);
+        }
+
+        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod)
+        {
+            Route route;
+            if (!ValidateAndGetCurrentDischargingRouteForParam(out route))
+                return false;
+            acMethod["Route"] = route;
+            return route != null;
         }
 
         public virtual RouteItem CurrentDischargingDest(Database db, bool leaveAttached = false)

@@ -396,8 +396,9 @@ namespace gip.mes.processapplication
             if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, dnPos, targetModule))
                 return StartDisResult.CycleWait;
 
-            acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
-            ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
+            if (!ValidateAndSetRouteForParam(acMethod))
+                return StartDisResult.CycleWait;
+           ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
             if (acValue != null)
             {
                 if (acValue.ObjectType != null)
@@ -742,8 +743,9 @@ namespace gip.mes.processapplication
                     return StartDisResult.CycleWait;
             }
 
+            if (!ValidateAndSetRouteForParam(acMethod))
+                return StartDisResult.CycleWait;
 
-            acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
             ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
             if (acValue != null)
             {

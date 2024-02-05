@@ -273,7 +273,9 @@ namespace gip.mes.processapplication
                         if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
 
-                        acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
+                        if (!ValidateAndSetRouteForParam(acMethod))
+                            return StartDisResult.CycleWait;
+
                         ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
                         if (acValue != null)
                         {
@@ -465,7 +467,9 @@ namespace gip.mes.processapplication
                                 if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
-                                acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
+                                if (!ValidateAndSetRouteForParam(acMethod))
+                                    return StartDisResult.CycleWait;
+
                                 ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
                                 if (acValue != null)
                                 {
@@ -1038,7 +1042,10 @@ namespace gip.mes.processapplication
                         if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
                             return StartDisResult.CycleWait;
                     }
-                    acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
+
+                    if (!ValidateAndSetRouteForParam(acMethod))
+                        return StartDisResult.CycleWait;
+
                     ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
                     if (acValue != null)
                     {

@@ -385,6 +385,42 @@ namespace gip.mes.processapplication
             }
         }
 
+        public override void SMCompleted()
+        {
+            Picking detachedPicking = CurrentPicking;
+            if (detachedPicking != null)
+            {
+                var nodes = FindChildComponents<PWNodeProcessWorkflowVB>(c => c is PWNodeProcessWorkflowVB, null, 1);
+                PWNodeProcessWorkflowVB onePlanningNode = nodes.FirstOrDefault();
+                bool updateScheduler = false;
+                if (onePlanningNode != null)
+                {
+                    using (Database dbiPlus = new Database())
+                    using (DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        Picking picking = detachedPicking.FromAppContext<Picking>(dbApp);
+                        if (picking.PickingState == PickingStateEnum.WFActive)
+                        {
+                            updateScheduler = true;
+                            if (onePlanningNode.EndProdOrderPartslistMode > EndPListMode.DoNothing)
+                                picking.PickingState = PickingStateEnum.Finished;
+                            else
+                                picking.PickingState = PickingStateEnum.InProcess;
+                        }
+                        dbApp.ACSaveChanges();
+                    }
+                }
+
+                if (updateScheduler)
+                {
+                    foreach (var node in nodes)
+                    {
+                        node.InformSchedulerOnStateChange();
+                    }
+                }
+            }
+            base.SMCompleted();
+        }
         #endregion
 
 

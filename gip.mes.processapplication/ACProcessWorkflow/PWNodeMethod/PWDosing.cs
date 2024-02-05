@@ -1785,6 +1785,12 @@ namespace gip.mes.processapplication
                                         true,
                                         queryParams.ReservationMode,
                                         PAMSilo.SelRuleID_SiloDirect);
+                                        //this.ApplicationManager.IncludeReservedOnRoutingSearch,
+                                        //this.ApplicationManager.IncludeAllocatedOnRoutingSearch);
+            //if ((routes == null || !routes.Any()) && ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
+            //{
+            //}
+
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
             return routes;
@@ -1903,11 +1909,19 @@ namespace gip.mes.processapplication
             LastQueriedDosingSilo = item.SourceACComponent as PAMSilo;
             return LastQueriedDosingSilo;
         }
-        
-#endregion
+
+        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod, Route dosingRoute)
+        {
+            Route route = dosingRoute != null ? dosingRoute.Clone() as Route : null;
+            if (!ValidateRouteForFuncParam(route))
+                return false;
+            acMethod["Route"] = route;
+            return route != null;
+        }
+        #endregion
 
 
-#region Misc
+        #region Misc
         public override PAOrderInfo GetPAOrderInfo()
         {
             if (CurrentACState == ACStateEnum.SMIdle || CurrentACState == ACStateEnum.SMBreakPoint)

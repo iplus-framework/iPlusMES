@@ -20,6 +20,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using System.Data.Objects;
+using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
@@ -58,12 +59,19 @@ namespace gip.bso.masterdata
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
             Search();
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
             this._CurrentVehicleContainer = null;
             this._SelectedVehicleContainer = null;
             var b = base.ACDeInit(deleteACClassTask);
@@ -78,6 +86,19 @@ namespace gip.bso.masterdata
         #endregion
 
         #region BSO->ACProperty
+
+        #region Manager
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+        #endregion
 
         #region Vehicle
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -387,8 +408,9 @@ namespace gip.bso.masterdata
             MDFacilityType facilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.Vehicle).FirstOrDefault();
             if (facilityType == null)
                 return;
-            Facility vehicle = Facility.NewACObject(DatabaseApp, null);
-            vehicle = Facility.NewACObject(DatabaseApp, null);
+
+            Facility rootStore = this.ACFacilityManager.GetRootStoreForVehicles(DatabaseApp);
+            Facility vehicle = Facility.NewACObject(DatabaseApp, rootStore);
             vehicle.MDFacilityType = facilityType;
             vehicle.InwardEnabled = true;
             vehicle.OutwardEnabled = true;

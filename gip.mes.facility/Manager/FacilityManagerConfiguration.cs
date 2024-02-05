@@ -39,6 +39,7 @@ namespace gip.mes.facility
             _BookingParameterIgnoreManagement = new ACPropertyConfigValue<bool>(this, "BookingParameterIgnoreManagement", false);
             _BookingParameterQuantityIsAbsolute = new ACPropertyConfigValue<bool>(this, "BookingParameterQuantityIsAbsolute", false);
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
+            _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", null);
             CreateModuleConstants();
         }
 
@@ -376,6 +377,22 @@ namespace gip.mes.facility
             set { _BookingParameterBalancingMode.ValueT = value; }
         }
 
+        private ACPropertyConfigValue<string> _RootStoreForVehicles;
+        [ACPropertyConfig("en{'Store for vehicles'}de{'Lagerort für Fahrzeuge'}")]
+        public string RootStoreForVehicles
+        {
+            get { return _RootStoreForVehicles.ValueT; }
+            set { _RootStoreForVehicles.ValueT = value; }
+        }
+
+
+        public Facility GetRootStoreForVehicles(DatabaseApp dbApp)
+        {
+            string rootStore = RootStoreForVehicles;
+            if (String.IsNullOrEmpty(rootStore))
+                return null;
+            return dbApp.Facility.Where(c => c.FacilityNo == rootStore).FirstOrDefault();
+        }
     }
 }
 

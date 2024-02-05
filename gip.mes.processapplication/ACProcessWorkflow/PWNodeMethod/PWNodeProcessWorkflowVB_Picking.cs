@@ -211,6 +211,9 @@ namespace gip.mes.processapplication
                 if (invokeID >= 20 && BatchSizeLoss && CurrentACState >= ACStateEnum.SMRunning && this.IterationCount.ValueT > 0)
                     return true;
             }
+            if (invokeID == 10 && IsThisDesignatedProcessNode.HasValue && !IsThisDesignatedProcessNode.Value && CompleteIfNotPlan)
+                return true;
+            
             return false;
         }
 
