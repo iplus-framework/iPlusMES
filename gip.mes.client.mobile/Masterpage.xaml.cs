@@ -19,6 +19,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Data.Entity.Infrastructure;
+using System.Diagnostics;
 
 namespace gip.mes.client.mobile
 {
@@ -231,11 +232,20 @@ namespace gip.mes.client.mobile
             {
                 if (VBFrameControl.MainContent.CanGoBack)
                 {
-                    VBFrameControl.MainContent.NavigationService.GoBack();
                     foreach (JournalEntry entry in VBFrameControl.MainContent.BackStack)
                     {
-                        Title.Text = entry.Name;
-                        break;
+                        if (CheckIfEntryEmpty(entry))
+                        {
+                            Title.Text = null;
+                            VBFrameControl.ClearContent();
+                            break;
+                        }
+                        else
+                        {
+                            Title.Text = entry.Name;
+                            VBFrameControl.MainContent.NavigationService.GoBack();
+                            break;
+                        }
                     }
                 }
                 else
@@ -253,13 +263,32 @@ namespace gip.mes.client.mobile
         {
             if (VBFrameControl.MainContent.CanGoForward)
             {
-                VBFrameControl.MainContent.GoForward();
                 foreach (JournalEntry entry in VBFrameControl.MainContent.ForwardStack)
                 {
-                    Title.Text = entry.Name;
-                    break;
+                    if (CheckIfEntryEmpty(entry))
+                    {
+                        Title.Text = null;
+                        VBFrameControl.ClearContent();
+                        break;
+                    }
+                    else
+                    {
+                        VBFrameControl.MainContent.GoForward();
+                        Title.Text = entry.Name;
+                        break;
+                    }
                 }
             }
+        }
+
+        private bool CheckIfEntryEmpty(JournalEntry entry)
+        {
+            var prop = entry.GetType().GetProperty("KeepAliveRoot", BindingFlags.Instance | BindingFlags.NonPublic);
+            VBPage entryPage = prop.GetValue(entry) as VBPage;
+            if (entryPage.VBDesignContent is VBDesign vBDesign && vBDesign.ACCompInitState == ACInitState.Constructing)
+                return true;
+            else
+                return false;
         }
 
         #endregion
@@ -448,9 +477,13 @@ namespace gip.mes.client.mobile
 
         public void StartBusinessobject(string acUrl, ACValueList parameterList, string acCaption = "")
         {
-            if (DockingManager == null)
+            if (VBFrameControl == null)
                 return;
-            DockingManager.StartBusinessobject(acUrl, parameterList, acCaption);
+            if (parameterList == null)
+                Debugger.Break();
+            //VBFrameControl.ShowDesign(acUrl, acCaption);
+            else
+                VBFrameControl.StartBusinessobject(acUrl, parameterList, acCaption);
         }
 
         public FocusBSOResult FocusBSO(IACBSO bso)
