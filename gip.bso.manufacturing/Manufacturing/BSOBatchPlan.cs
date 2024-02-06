@@ -1252,7 +1252,7 @@ namespace gip.bso.manufacturing
             }
 
             //set flag to true if route is read only
-            routeSelector.EditRoutes(SelectedTarget.CurrentRoute, false, true, true);
+            routeSelector.EditRoutesWithAttach(SelectedTarget.CurrentRoute, false, true, true);
 
             if (routeSelector.RouteResult != null)
             {
