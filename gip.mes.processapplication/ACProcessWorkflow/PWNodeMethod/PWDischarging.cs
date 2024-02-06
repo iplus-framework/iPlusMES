@@ -1226,16 +1226,28 @@ namespace gip.mes.processapplication
             CurrentDischargingRoute = route;
         }
 
-        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(out Route route)
+        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, out Route route)
         {
             route = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
-            return ValidateRouteForFuncParam(route);
+            Route diffRouteOnDestChange = null;
+            if (acMethod != null && route != null)
+            {
+                ACValue acValue = acMethod.ParameterValueList.GetACValue("Route");
+                if (acValue != null)
+                {
+                    Route prevRoute = (Route)acValue.Value;
+                    if (prevRoute != null)
+                        diffRouteOnDestChange = Route.IntersectRoutesGetDiff(route, prevRoute, true);
+                }
+            }
+            return ValidateRouteForFuncParam(diffRouteOnDestChange != null ? diffRouteOnDestChange : route);
         }
 
         public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod)
         {
             Route route;
-            if (!ValidateAndGetCurrentDischargingRouteForParam(out route))
+
+            if (!ValidateAndGetCurrentDischargingRouteForParam(acMethod, out route))
                 return false;
             acMethod["Route"] = route;
             return route != null;
