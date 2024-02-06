@@ -39,13 +39,14 @@ namespace gip.mes.facility
             _BookingParameterIgnoreManagement = new ACPropertyConfigValue<bool>(this, "BookingParameterIgnoreManagement", false);
             _BookingParameterQuantityIsAbsolute = new ACPropertyConfigValue<bool>(this, "BookingParameterQuantityIsAbsolute", false);
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
-            _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", null);
+            _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
             CreateModuleConstants();
         }
 
         protected virtual void InitConfigParams()
         {
             InitModuleConstants();
+            _ = RootStoreForVehicles;
         }
 
         private ACPropertyConfigValue<int> _DayClosingDays;

@@ -55,6 +55,8 @@ namespace gip.mes.processapplication
                 maxWeight = 1000;
             Random random = new Random();
             double weight = random.NextDouble() * maxWeight;
+            if (_this.ActualValue.ValueT >= 0.0001)
+                weight = _this.ActualValue.ValueT;
             _this.AlibiWeight.ValueT = weight;
             _this.AlibiNo.ValueT = DateTime.Now.ToString();
         }
