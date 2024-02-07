@@ -575,7 +575,7 @@ namespace gip.mes.processapplication
                     acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;
 
                     acMethod["PLPosRelation"] = pickingPos.PickingPosID;
-                    if (ValidateAndSetRouteForParam(acMethod, dosingRoute))
+                    if (!ValidateAndSetRouteForParam(acMethod, dosingRoute))
                         return StartNextCompResult.CycleWait;
                     acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
                     acMethod["TargetQuantity"] = targetWeight;

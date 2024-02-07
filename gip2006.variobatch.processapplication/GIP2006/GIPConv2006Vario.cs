@@ -906,8 +906,14 @@ namespace gip2006.variobatch.processapplication
                 };
                 return msg;
             }
-            else if (IsSimulationOn && _ResponseValue != null && _ResponseValue.Bit00_ToleranceError)
-                _ResponseValue.Bit00_ToleranceError = false;
+            else
+            {
+                if (IsSimulationOn && _ResponseValue != null && _ResponseValue.Bit00_ToleranceError)
+                    _ResponseValue.Bit00_ToleranceError = false;
+                // If Vario-Way, then inform on Destination change
+                if (sender is PAFDischarging && routingOffset.HasValue && previousParams != null)
+                    _RequestValue.Bit05_DestinationChanged = true;
+            }
             return null;
         }
 
@@ -1018,7 +1024,14 @@ namespace gip2006.variobatch.processapplication
                     if (_ResponseValue.Bit06_DestinationFull)
                         StateDestinationFull.ValueT = PANotifyState.AlarmOrFault;
                     else
+                    {
                         StateDestinationFull.ValueT = PANotifyState.Off;
+                        if (_RequestValue.Bit05_DestinationChanged)
+                        {
+                            _RequestValue.Bit05_DestinationChanged = false;
+                            changed = true;
+                        }
+                    }
                 }
 
                 if (_RequestValue.Bit04_PrepareSourceSwitching && _ResponseValue.Bit03_SourceSwitchable)
@@ -1315,6 +1328,10 @@ namespace gip2006.variobatch.processapplication
                     if (_RequestValue.Bit10_Continue)
                         changed = true;
                     _RequestValue.Bit10_Continue = false;
+
+                    if (_RequestValue.Bit05_DestinationChanged)
+                        changed = true;
+                    _RequestValue.Bit05_DestinationChanged = false;
 
                     // Zusätzlicher Trigger um sicher zu sein, dass Kommando auch abgesendet wird, falls der Kommandostatus in der SPS untershciedlich sein sollte
                     if (!changed)

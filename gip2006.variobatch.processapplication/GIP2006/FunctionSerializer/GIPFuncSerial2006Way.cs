@@ -61,6 +61,9 @@ namespace gip2006.variobatch.processapplication
             }
 
 
+            IEnumerable<Route> splittedRoutes = Route.SplitRoute(route);
+            Route routeForSending = Route.MergeRoutesWithoutDuplicates(splittedRoutes);
+
             IACComponent destinationChangeComponent = null;
             Route previousRoute = null;
             ACMethod previousRequest = prevComplexObj as ACMethod;
@@ -69,15 +72,30 @@ namespace gip2006.variobatch.processapplication
                 previousRoute = previousRequest.ParameterValueList.Where(c => c.ACIdentifier == nameof(Route)).FirstOrDefault()?.Value as Route;
                 if (previousRoute != null)
                 {
-                    route.Compare(previousRoute, out destinationChangeComponent);
+                    // If one Element is negative, then there is a forced change (e.g. Scales, that must be emptied first)
+                    RouteItem forcedItemForChange = routeForSending.Where(c => GetRouteItemID(c.SourceACComponent) < -1).FirstOrDefault();
+                    if (forcedItemForChange != null)
+                    {
+                        RouteItem prevForcedItemForChange = previousRoute.Where(c => GetRouteItemID(c.SourceACComponent) < -1).FirstOrDefault();
+                        if (prevForcedItemForChange != null && prevForcedItemForChange.SourceACComponent == forcedItemForChange.SourceACComponent)
+                        {
+                            destinationChangeComponent = prevForcedItemForChange.SourceACComponent;
+                        }
+                    }
+
+                    if (destinationChangeComponent == null)
+                    {
+                        IEnumerable<Route> prevSplittedRoutes = Route.SplitRoute(previousRoute);
+                        Route previousRouteForCompare = Route.MergeRoutesWithoutDuplicates(prevSplittedRoutes);
+                        routeForSending.Compare(previousRouteForCompare, out destinationChangeComponent);
+                    }
                 }
             }
-
 
             int maxPackageSize = 200;
             int maxRouteItems = 49;
             string errorMsg = null;
-            List<byte[]> sendPackages = CreateSendPackages(route, maxRouteItems, maxPackageSize, out errorMsg, destinationChangeComponent);
+            List<byte[]> sendPackages = CreateSendPackages(routeForSending, maxRouteItems, maxPackageSize, out errorMsg, destinationChangeComponent);
             if (sendPackages == null)
             {
                 if (invoker == null && errorMsg != null)
@@ -177,20 +195,21 @@ namespace gip2006.variobatch.processapplication
 
             StringBuilder sb = new StringBuilder();
             short sourceItemID = GetRouteItemID(sourceItem.SourceACComponent);
-            if (sourceItemID <= 0)
+            if (sourceItemID == -1 || sourceItemID == 0)
                 sb.AppendLine(String.Format("RouteItemID {1} of source {0} is invalid", sourceItem.SourceACComponent.GetACUrl(), sourceItemID));
+            sourceItemID = Math.Abs(sourceItemID);
 
             short[] targetItemIDs = new short[] { 0, 0, 0, 0 };
             short i = 0;
             foreach (RouteItem rItem in targetItems)
             {
                 short itemID = GetRouteItemID(rItem.TargetACComponent);
-                if (itemID <= 0)
+                if (itemID == -1 || itemID == 0)
                     sb.AppendLine(String.Format("RouteItemID {1} of target {0} is invalid", rItem.TargetACComponent.GetACUrl(), itemID));
 
                 if (targetItemIDs.Where(c => c == itemID).Any())
                     continue;
-                targetItemIDs[i] = itemID;
+                targetItemIDs[i] = Math.Abs(itemID);
                 if (i > 3)
                     break;
                 i++;
@@ -200,8 +219,9 @@ namespace gip2006.variobatch.processapplication
             if (destinationChangeComponent != null)
             {
                 destinationChangeAggrNo = GetRouteItemID(destinationChangeComponent);
-                if (destinationChangeAggrNo <= 0)
+                if (destinationChangeAggrNo == -1 || destinationChangeAggrNo == 0)
                     sb.AppendLine(String.Format("RouteItemID {1} of destination change component {0} is invalid", destinationChangeComponent.GetACUrl(), destinationChangeAggrNo));
+                destinationChangeAggrNo = Math.Abs(destinationChangeAggrNo);
             }
 
             
@@ -451,8 +471,15 @@ namespace gip2006.variobatch.processapplication
                 IRoutableModule routableModule = component as IRoutableModule;
                 PAEControlModuleBase controlModuleBase = routableModule as PAEControlModuleBase;
                 if (controlModuleBase == null && routableModule is PAETransport)
+                {
                     controlModuleBase = (routableModule as PAETransport).Motor;
-                if (controlModuleBase != null)
+                    if (controlModuleBase != null)
+                    {
+                        turnOffDelay = (short)(routableModule as PAETransport).DepletingTime.ValueT.TotalSeconds;
+                        turnOnDelay = (short)controlModuleBase.TurnOnDelay.ValueT.TotalSeconds;
+                    }
+                }
+                else if (controlModuleBase != null)
                 {
                     turnOffDelay = (short)controlModuleBase.TurnOffDelay.ValueT.TotalSeconds;
                     turnOnDelay = (short)controlModuleBase.TurnOnDelay.ValueT.TotalSeconds;
@@ -500,20 +527,22 @@ namespace gip2006.variobatch.processapplication
                 string currentACUrl = currentComponent.ACUrl;
                 short turnOnDelay = 0, turnOffDelay = 0;
                 short currentItemID = GetRouteItemData(currentComponent, out turnOnDelay, out turnOffDelay);
-                if (currentItemID <= 0)
+                if (currentItemID == -1 || currentItemID == 0)
                 {
                     errorStringBuilder.AppendLine(String.Format("A: RouteItemID {1} of {0} is invalid", currentComponent.GetACUrl(), currentItemID));
                     modelValid = false;
                 }
+                currentItemID = Math.Abs(currentItemID);
 
                 IACComponent sourceComponent = itemGroup.FirstOrDefault().SourceACComponent;
                 string sourceACUrl = sourceComponent.GetACUrl();
                 short sourceItemID = GetRouteItemID(sourceComponent);
-                if (sourceItemID <= 0)
+                if (sourceItemID == -1 || sourceItemID == 0)
                 {
                     errorStringBuilder.AppendLine(String.Format("B: RouteItemID {1} of source {0} is invalid at {2}", sourceACUrl, sourceItemID, currentACUrl));
                     modelValid = false;
                 }
+                sourceItemID = Math.Abs(sourceItemID);
 
                 int sourceItemsCount = itemGroup.Count();
                 if (sourceItemsCount > 3)
@@ -529,20 +558,22 @@ namespace gip2006.variobatch.processapplication
                 {
                     source2ACUrl = itemGroup.ToArray()[1].SourceACComponent.ACUrl;
                     source2ItemID = GetRouteItemID(itemGroup.ToArray()[1].SourceACComponent);
-                    if (source2ItemID <= 0)
+                    if (source2ItemID == -1 || source2ItemID == 0)
                     {
                         errorStringBuilder.AppendLine(String.Format("D: RouteItemID {1} of second source {0} is invalid at {2}", source2ACUrl, source2ItemID, currentACUrl));
                         modelValid = false;
                     }
+                    source2ItemID = Math.Abs(source2ItemID);
                     if (sourceItemsCount > 2)
                     {
                         source3ACUrl = itemGroup.ToArray()[2].SourceACComponent.ACUrl; ;
                         source3ItemID = GetRouteItemID(itemGroup.ToArray()[2].SourceACComponent);
-                        if (source3ItemID <= 0)
+                        if (source3ItemID == -1 || source3ItemID == 0)
                         {
                             errorStringBuilder.AppendLine(String.Format("E: RouteItemID {1} of third source {0} is invalid at {2}", source3ACUrl, source3ItemID, currentACUrl));
                             modelValid = false;
                         }
+                        source3ItemID = Math.Abs(source3ItemID);
                     }
                 }
 
@@ -561,22 +592,24 @@ namespace gip2006.variobatch.processapplication
                 string targetACUrl, target2ACUrl = "";
                 targetACUrl = nextRouteItems[0].TargetACComponent.ACUrl;
                 short targetItemID = GetRouteItemID(nextRouteItems[0].TargetACComponent);
-                if (targetItemID <= 0)
+                if (targetItemID == -1 || targetItemID == 0)
                 {
                     errorStringBuilder.AppendLine(String.Format("G: RouteItemID {1} of target {0} is invalid at {2}", targetACUrl, targetItemID, currentACUrl));
                     modelValid = false;
                 }
+                targetItemID = Math.Abs(targetItemID);
 
                 short target2ItemID = 0;
                 if (nextRouteItems.Length > 1)
                 {
                     target2ACUrl = nextRouteItems[1].TargetACComponent.ACUrl;
                     target2ItemID = GetRouteItemID(nextRouteItems[1].TargetACComponent);
-                    if (target2ItemID <= 0)
+                    if (target2ItemID == -1 || target2ItemID == 0)
                     {
                         errorStringBuilder.AppendLine(String.Format("H: RouteItemID {1} of second target {0} is invalid at {2}", target2ACUrl, target2ItemID, currentACUrl));
                         modelValid = false;
                     }
+                    target2ItemID = Math.Abs(target2ItemID);
                 }
 
                 bool isFirstControlModuleInRoute = false, isLastControlModuleInRoute = false;
