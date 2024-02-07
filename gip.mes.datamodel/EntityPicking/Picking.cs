@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking Order'}de{'Kommissionierauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPicking")]
+    [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.Picking, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPicking")]
     [ACPropertyEntity(1, "PickingNo", ConstApp.PickingNo, "", "", true)]
     [ACPropertyEntity(2, "PickingTypeIndex", "en{'Picking Type'}de{'Kommissioniertyp'}", typeof(GlobalApp.PickingType), Const.ContextDatabase + "\\PickingTypeList", "", true)]
     [ACPropertyEntity(3, "PickingStateIndex", "en{'Picking Status'}de{'Status'}", typeof(PickingStateEnum), Const.ContextDatabase + "\\PickingStateList", "", true)]
