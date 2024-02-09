@@ -294,6 +294,7 @@
         public const string Reset = "en{'Reset'}de{'Zurücksetzen'}";
         public const string Select = "en{'Select'}de{'Auswahl'}";
         public const string SelectAll = "en{'Select all'}de{'Alles auswählen'}";
+        public const string Picking = "en{'Picking Order'}de{'Kommissionierauftrag'}";
         public const string PickingType = "en{'Picking type'}de{'Kommissionierung Typ'}";
         public const string PickingNo = "en{'Picking-No.'}de{'Kommissions-Nr.'}";
 
