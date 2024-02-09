@@ -157,6 +157,7 @@ namespace gip.mes.datamodel
             NoFacility = 1,             // Keine Lagerverwaltung
             Facility = 2,               // Lagerführung ohne Chargen
             FacilityCharge = 3,         // Lagerführung mit Chargen
+            FacilityChargeReservation = 4 // Lagerführung mit Chargen und reservierungspflichtig
         }
 
         static ACValueItemList _FacilityManagementTypesList = null;
@@ -173,6 +174,7 @@ namespace gip.mes.datamodel
                     _FacilityManagementTypesList.AddEntry((short)FacilityManagementTypes.NoFacility, "en{'No Inventory Management'}de{'Keine Lagerverwaltung'}");
                     _FacilityManagementTypesList.AddEntry((short)FacilityManagementTypes.Facility, "en{'Inventory Management Without Batches'}de{'Lagerführung ohne Chargen'}");
                     _FacilityManagementTypesList.AddEntry((short)FacilityManagementTypes.FacilityCharge, "en{'Inventory Management with Batches'}de{'Lagerführung mit Chargen'}");
+                    _FacilityManagementTypesList.AddEntry((short)FacilityManagementTypes.FacilityChargeReservation, "en{'Inventory Management with Batches + Reservation'}de{'Lagerführung mit Chargen Reservierungspflichtig'}");
                 }
                 return _FacilityManagementTypesList;
             }

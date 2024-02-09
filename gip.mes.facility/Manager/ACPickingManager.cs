@@ -1241,6 +1241,21 @@ namespace gip.mes.facility
             foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                         .OrderBy(c => c.Sequence))
             {
+                if (pos.Material != null && pos.Material.IsLotReservationNeeded)
+                {
+                    if (!pos.FacilityReservation_PickingPos.Where(c => !c.VBiACClassID.HasValue).Any())
+                    {
+                        // Error50634: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
+                        msg = new Msg
+                        {
+                            Source = GetACUrl(),
+                            MessageLevel = eMsgLevel.Error,
+                            ACIdentifier = "CheckResourcesAndRouting(20)",
+                            Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
+                        };
+                        detailMessages.AddDetailMessage(msg);
+                    }
+                }
                 if (pos.FromFacility != null)
                 {
                     CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType);
@@ -1358,7 +1373,39 @@ namespace gip.mes.facility
                     return;
                 }
             }
-
+            else if (validationBehaviour == PARole.ValidationBehaviour.Strict
+                && pos.Material != null
+                && pos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+            {
+                if (pos.ToFacility.MaterialID.HasValue && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.Material))
+                {
+                    //Error50116: Material {0} in source {1} is not equal to Material {2} in target {3}.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(50)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50116",
+                                pos.Material.MaterialNo, pos.Material.MaterialName1,
+                                pos.ToFacility.Material.MaterialNo, pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+                if (!pos.ToFacility.InwardEnabled)
+                {
+                    //Error50118: Inward to Bin/Silo/Container {0} is not enabled.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(70)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+            }
             var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
             var toClass = pos.ToFacility.GetFacilityACClass(dbiPlus);
             if (fromClass == toClass)

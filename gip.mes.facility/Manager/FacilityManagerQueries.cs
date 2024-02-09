@@ -848,7 +848,11 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
         {
             get
             {
-                return (dbApp, facility, matID) => dbApp.FacilityCharge
+                return (dbApp, facility, matID) => dbApp
+                                                        .FacilityCharge
+                                                        .Include(c => c.FacilityLot)
+                                                        .Include(c => c.Material)
+                                                        .Include(c => c.Facility)
                                                         .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
                                                                                     && facility.Contains(x.FacilityID)
                                                                                     && (x.MDReleaseStateID == null || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))

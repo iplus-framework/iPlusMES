@@ -742,7 +742,8 @@ namespace gip.mes.datamodel
                 bool lotManaged = false;
                 if (MDFacilityManagementType != null)
                 {
-                    if (MDFacilityManagementType.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.FacilityCharge)
+                    if (MDFacilityManagementType.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.FacilityCharge
+                        || MDFacilityManagementType.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.FacilityChargeReservation)
                         lotManaged = true;
                 }
                 return lotManaged;
@@ -771,7 +772,50 @@ namespace gip.mes.datamodel
                             MDFacilityManagementType = query.First();
                     }
                 }
-                OnPropertyChanged("IsLotManaged");
+                OnPropertyChanged(nameof(IsLotReservationNeeded));
+                OnPropertyChanged(nameof(IsLotManaged));
+            }
+        }
+
+        [ACPropertyInfo(15, "", "en{'Is Lot reservation obligatory'}de{'Chargenreservierungspflichtig'}")]
+        public bool IsLotReservationNeeded
+        {
+            get
+            {
+                bool lotManaged = false;
+                if (MDFacilityManagementType != null)
+                {
+                    if (MDFacilityManagementType.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.FacilityChargeReservation)
+                        lotManaged = true;
+                }
+                return lotManaged;
+            }
+            set
+            {
+                if (MDFacilityManagementType != null)
+                {
+                    if (MDFacilityManagementType.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.NoFacility)
+                        return;
+                }
+
+                DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                if (dbApp != null)
+                {
+                    if (value == true)
+                    {
+                        var query = dbApp.MDFacilityManagementType.Where(c => c.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.FacilityChargeReservation);
+                        if (query.Any())
+                            MDFacilityManagementType = query.First();
+                    }
+                    else
+                    {
+                        var query = dbApp.MDFacilityManagementType.Where(c => c.MDFacilityManagementTypeIndex == (int)MDFacilityManagementType.FacilityManagementTypes.FacilityCharge);
+                        if (query.Any())
+                            MDFacilityManagementType = query.First();
+                    }
+                }
+                OnPropertyChanged(nameof(IsLotReservationNeeded));
+                OnPropertyChanged(nameof(IsLotManaged));
             }
         }
 
