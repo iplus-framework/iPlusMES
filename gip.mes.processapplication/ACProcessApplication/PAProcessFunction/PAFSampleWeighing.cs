@@ -109,9 +109,9 @@ namespace gip.mes.processapplication
             UnSubscribeToProjectWorkCycle();
         }
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
-            return base.CompleteACMethodOnSMStarting(acMethod);
+            return base.CompleteACMethodOnSMStarting(acMethod, previousParams);
         }
 
         [ACMethodInfo("", "", 410)]

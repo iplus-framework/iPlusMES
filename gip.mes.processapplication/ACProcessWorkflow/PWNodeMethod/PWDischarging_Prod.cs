@@ -199,6 +199,11 @@ namespace gip.mes.processapplication
                                     }
                                     return StartDisResult.CycleWait;
                                 }
+
+                                Route predefinedRoute = nextDestination?.PredefinedRoute;
+                                if (predefinedRoute != null)
+                                    predefinedRoute = predefinedRoute.Clone() as Route;
+
                                 Type typeOfSilo = typeof(PAMSilo);
                                 Guid thisMethodID = ContentACClassWF.ACClassMethodID;
                                 DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
@@ -206,7 +211,7 @@ namespace gip.mes.processapplication
                                                                 && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                     || !c.BasedOnACClassID.HasValue
                                                                     || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                                        PAMSilo.SelRuleID_Silo_Deselector, null);
+                                                        PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute);
 
                                 nextDestination.ReservationState = GlobalApp.ReservationState.Active;
                                 // Falls Zielsilo nicht belegt
@@ -888,14 +893,14 @@ namespace gip.mes.processapplication
                         }
                         return StartDisResult.CycleWait;
                     }
-                    else
-                    {
-                        fullSiloReservation.ReservationState = GlobalApp.ReservationState.Finished;
-                    }
+                    //else
+                    //{
+                    //    fullSiloReservation.ReservationState = GlobalApp.ReservationState.Finished;
+                    //}
 
                     //batchPos = batchPlan.ProdOrderPartslistPos;
-                    FacilityReservation plannedSilo = GetNextFreeDestination(plannedSilos, currentBatchPos, true, fullSiloReservation, discharging);
-                    if (plannedSilo == null)
+                    FacilityReservation nextPlannedSiloReservation = GetNextFreeDestination(plannedSilos, currentBatchPos, true, fullSiloReservation, discharging);
+                    if (nextPlannedSiloReservation == null)
                     {
                         CheckIfAutomaticTargetChangePossible = false;
                         // Error50069: No further target-container/silo/tank found, which has enough remaining space for this batch, at Order {0}, Bill of material {1}, Line {2}
@@ -913,7 +918,7 @@ namespace gip.mes.processapplication
                         return StartDisResult.CycleWait;
                     }
 
-                    gip.core.datamodel.ACClass acClassSilo = plannedSilo.Facility.GetFacilityACClass(Root.Database as Database);
+                    gip.core.datamodel.ACClass acClassSilo = nextPlannedSiloReservation.Facility.GetFacilityACClass(Root.Database as Database);
                     if (acClassSilo == null)
                     {
                         // Error50070: acClassSilo is null at Order {0}, Bill of material {1}, Line {2}
@@ -962,16 +967,58 @@ namespace gip.mes.processapplication
                     }
 
                     CurrentDischargingRoute = null;
+                    
+                    Route predefinedRoute = null;
+                    if (nextPlannedSiloReservation != null)
+                    {
+                        predefinedRoute = nextPlannedSiloReservation.PredefinedRoute;
+                        if (predefinedRoute != null)
+                            predefinedRoute = predefinedRoute.Clone() as Route;
+                    }
+
                     Type typeOfSilo = typeof(PAMSilo);
                     Guid thisMethodID = ContentACClassWF.ACClassMethodID;
-                    DetermineDischargingRoute(Root.Database as Database, discharging.ParentACComponent as ACComponent, targetSiloACComp, 0,
+
+                    ACMethod acMethod = null;
+                    ACPointAsyncRMISubscrWrap<ACComponent> taskEntry = null;
+                    using (ACMonitor.Lock(TaskSubscriptionPoint.LockLocalStorage_20033))
+                    {
+                        taskEntry = this.TaskSubscriptionPoint.ConnectionList.FirstOrDefault();
+                    }
+                    if (taskEntry != null)
+                    {
+                        var tmpACMethod = taskEntry.ACMethodDescriptor as ACMethod;
+                        if (tmpACMethod != null)
+                            acMethod = tmpACMethod.Clone() as ACMethod;
+                    }
+
+                    FindDisRouteResult findResult = DetermineDischargingRoute(Root.Database as Database, discharging.ParentACComponent as ACComponent, targetSiloACComp, 0,
                                             (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                                     && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                         || !c.BasedOnACClassID.HasValue
                                                         || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                            PAMSilo.SelRuleID_Silo_Deselector, null);
+                                            PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute, acMethod);
 
-                    if (CurrentDischargingDest(dbIPlus, false) == null)
+                    if (findResult == FindDisRouteResult.OccupiedFromOtherOrderWarning && _CriticalRouteFoundAcknowledged == 0)
+                    {
+                        _CriticalRouteFoundAcknowledged = 1;
+                        // Warning50072: The found route is occupied by another order  at Order {0}, Bill of material {1}, Line {2}!
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(10)", 1300, "Warning50072",
+                                        batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
+
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        if (previousDischargingRoute != null)
+                            CurrentDischargingRoute = previousDischargingRoute;
+                        return StartDisResult.CycleWait;
+                    }
+
+                    if (findResult == FindDisRouteResult.NotFound
+                        || findResult == FindDisRouteResult.OccupiedFromOtherOrderBlock
+                        || CurrentDischargingDest(dbIPlus, false) == null)
                     {
                         CheckIfAutomaticTargetChangePossible = false;
                         // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.
@@ -986,6 +1033,8 @@ namespace gip.mes.processapplication
                                 Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(10)", msg.InnerMessage);
                             OnNewAlarmOccurred(ProcessAlarm, msg, true);
                         }
+                        if (previousDischargingRoute != null)
+                            CurrentDischargingRoute = previousDischargingRoute;
                         return StartDisResult.CycleWait;
                     }
 
@@ -1004,6 +1053,8 @@ namespace gip.mes.processapplication
                                 Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(11)", msg.InnerMessage);
                             OnNewAlarmOccurred(ProcessAlarm, msg, true);
                         }
+                        if (previousDischargingRoute != null)
+                            CurrentDischargingRoute = previousDischargingRoute;
                         return StartDisResult.CycleWait;
                     }
 
@@ -1011,40 +1062,50 @@ namespace gip.mes.processapplication
 
                     bool isNewACMethod = false;
                     CheckIfAutomaticTargetChangePossible = null;
-                    ACMethod acMethod = null;
-                    ACPointAsyncRMISubscrWrap<ACComponent> taskEntry = null;
 
-                    using (ACMonitor.Lock(TaskSubscriptionPoint.LockLocalStorage_20033))
-                    {
-                        taskEntry = this.TaskSubscriptionPoint.ConnectionList.FirstOrDefault();
-                    }
-                    if (taskEntry != null)
-                    {
-                        var tmpACMethod = taskEntry.ACMethodDescriptor as ACMethod;
-                        if (tmpACMethod != null)
-                            acMethod = tmpACMethod.Clone() as ACMethod;
-                    }
                     if (acMethod == null)
                     {
                         core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
                         if (refPAACClassMethod == null)
+                        {
+                            if (previousDischargingRoute != null)
+                                CurrentDischargingRoute = previousDischargingRoute;
                             return StartDisResult.CancelDischarging;
+                        }
                         acMethod = refPAACClassMethod.TypeACSignature();
                         if (acMethod == null)
                         {
                             //Error50153: acMethod is null.
                             msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(11a)", 1320, "Error50153");
                             OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                            if (previousDischargingRoute != null)
+                                CurrentDischargingRoute = previousDischargingRoute;
                             return StartDisResult.CycleWait;
                         }
 
                         isNewACMethod = true;
                         if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
+                        {
+                            if (previousDischargingRoute != null)
+                                CurrentDischargingRoute = previousDischargingRoute;
                             return StartDisResult.CycleWait;
+                        }
                     }
 
                     if (!ValidateAndSetRouteForParam(acMethod))
+                    {
+                        if (previousDischargingRoute != null)
+                            CurrentDischargingRoute = previousDischargingRoute;
+                        // Warning50072: The found route is occupied by another order  at Order {0}, Bill of material {1}, Line {2}!
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(10)", 1300, "Warning50072",
+                                        batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
+                        if (ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
+                            _CriticalRouteFoundAcknowledged = 1;
                         return StartDisResult.CycleWait;
+                    }
+                    _CriticalRouteFoundAcknowledged = 0;
 
                     ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
                     if (acValue != null)
@@ -1078,8 +1139,6 @@ namespace gip.mes.processapplication
                     if (acValue != null)
                         OnSetLastBatchParam(acValue, acMethod, targetContainer, dbApp, batchPlan, currentBatchPos);
 
-                    if (CurrentDischargingRoute != null)
-                        CurrentDischargingRoute.Detach(true);
 
                     acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
                     if (acValue != null
@@ -1093,10 +1152,18 @@ namespace gip.mes.processapplication
                     if (isNewACMethod)
                     {
                         if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
+                        {
+                            if (previousDischargingRoute != null)
+                                CurrentDischargingRoute = previousDischargingRoute;
                             return StartDisResult.CycleWait;
+                        }
                     }
 
-                    OnSwitchingToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, plannedSilo);
+                    OnSwitchingToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, nextPlannedSiloReservation);
+
+                    if (CurrentDischargingRoute != null)
+                        CurrentDischargingRoute.Detach(true);
+
                     // Sende neues Ziel an dies SPS
                     msg = OnReSendACMethod(discharging, acMethod, dbApp);
                     if (msg != null)
@@ -1111,17 +1178,20 @@ namespace gip.mes.processapplication
                             RememberWeightOnRunDischarging(false);
                         }
 
-                        plannedSilo.ReservationState = GlobalApp.ReservationState.Active;
+                        if (fullSiloReservation != null)
+                            fullSiloReservation.ReservationState = GlobalApp.ReservationState.Finished;
+                        if (nextPlannedSiloReservation != null)
+                            nextPlannedSiloReservation.ReservationState = GlobalApp.ReservationState.Active;
                         // Falls Zielsilo nicht belegt
-                        if (plannedSilo.Facility != null 
-                            && plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                        if (nextPlannedSiloReservation.Facility != null 
+                            && nextPlannedSiloReservation.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         {
-                            if (!plannedSilo.Facility.MaterialID.HasValue)
-                                plannedSilo.Facility.Material = currentBatchPos.BookingMaterial?.Material1_ProductionMaterial != null ? currentBatchPos.BookingMaterial.Material1_ProductionMaterial : currentBatchPos.BookingMaterial;
+                            if (!nextPlannedSiloReservation.Facility.MaterialID.HasValue)
+                                nextPlannedSiloReservation.Facility.Material = currentBatchPos.BookingMaterial?.Material1_ProductionMaterial != null ? currentBatchPos.BookingMaterial.Material1_ProductionMaterial : currentBatchPos.BookingMaterial;
                             if (!currentBatchPos.IsFinalMixureBatch
-                                &&  ( !plannedSilo.Facility.PartslistID.HasValue
-                                    || plannedSilo.Facility.PartslistID != currentBatchPos.ProdOrderPartslist.PartslistID))
-                                plannedSilo.Facility.Partslist = currentBatchPos.ProdOrderPartslist.Partslist;
+                                &&  ( !nextPlannedSiloReservation.Facility.PartslistID.HasValue
+                                    || nextPlannedSiloReservation.Facility.PartslistID != currentBatchPos.ProdOrderPartslist.PartslistID))
+                                nextPlannedSiloReservation.Facility.Partslist = currentBatchPos.ProdOrderPartslist.Partslist;
                         }
                         if (dbApp.IsChanged)
                             dbApp.ACSaveChanges();
@@ -1131,7 +1201,7 @@ namespace gip.mes.processapplication
                         ExecuteMethod(nameof(OnACMethodSended), acMethod, false, dbApp, batchPlan, currentBatchPos, targetContainer, discharging);
                         if (discharging.CurrentACState == ACStateEnum.SMPaused)
                             discharging.Resume();
-                        OnSwitchedToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, plannedSilo);
+                        OnSwitchedToNextSilo(dbApp, currentBatchPos, discharging, targetContainer, fullSilo, targetSiloACComp as PAMSilo, fullSiloReservation, nextPlannedSiloReservation);
                     }
                 }
             }
@@ -1537,6 +1607,164 @@ namespace gip.mes.processapplication
         protected virtual Msg OnReSendACMethod(PAProcessFunction function, ACMethod acMethod, DatabaseApp dbApp)
         {
             return function.ReSendACMethod(acMethod);
+        }
+        #endregion
+
+        #region Planned Silos
+        public virtual FacilityReservation GetNextFreeDestination(IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos,
+            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null, PAFDischarging discharging = null)
+        {
+            if (plannedSilos == null || !plannedSilos.Any())
+                return null;
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
+            {
+                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+                    return plannedSilo;
+            }
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
+            {
+                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+                    return plannedSilo;
+            }
+            //foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
+            //{
+            //    if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+            //    {
+            //        plannedSilo.ReservationState = GlobalApp.ReservationState.New;
+            //        return plannedSilo;
+            //    }
+            //}
+            return null;
+        }
+
+        public static FacilityReservation GetNextFreeDestination(ACComponent invoker, IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos,
+            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
+        {
+            if (plannedSilos == null || !plannedSilos.Any())
+                return null;
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
+            {
+                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+                    return plannedSilo;
+            }
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
+            {
+                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+                    return plannedSilo;
+            }
+            //foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
+            //{
+            //    if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+            //    {
+            //        plannedSilo.ReservationState = GlobalApp.ReservationState.New;
+            //        return plannedSilo;
+            //    }
+            //}
+            return null;
+        }
+
+        protected virtual bool CheckPlannedDestinationSilo(FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null, int additionalSearchFlags = 0)
+        {
+            if (plannedSilo == null || (ignoreFullSilo != null && ignoreFullSilo == plannedSilo))
+                return false;
+            if (plannedSilo.Facility != null
+                && plannedSilo.Facility.InwardEnabled)
+            {
+                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                {
+                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
+                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
+                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
+                    if (!plannedSilo.Facility.MaterialID.HasValue
+                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                             && (batchPos.IsFinalMixure
+                                 || (!batchPos.IsFinalMixure
+                                     && (!plannedSilo.Facility.PartslistID.HasValue
+                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
+                                    )
+                                )
+                           )
+                       )
+                    {
+                        // Prüfe ob rechnerisch die Charge reinpassen würde
+                        if (plannedSilo.Facility.CurrentFacilityStock != null
+                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
+                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
+                        {
+                            if (changeReservationStateIfFull)
+                                Messages.LogDebug(this.GetACUrl(), "PWDischarging.CheckPlannedDestinationSilo(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
+                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
+                            return false;
+                        }
+                        else
+                            return true;
+                    }
+                }
+                // Auf Lagerplätze ohne Belegung darf immer entleert werden
+                else
+                    return true;
+            }
+            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
+            else if (plannedSilo.Facility == null
+                && batchPos.BookingMaterial.MDFacilityManagementType != null
+                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool CheckPlannedDestinationSilo(ACComponent invoker, FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
+        {
+            if (plannedSilo == null)
+                return false;
+            if (plannedSilo.Facility != null
+                && plannedSilo.Facility.InwardEnabled)
+            {
+                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                {
+                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
+                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
+                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
+                    if (!plannedSilo.Facility.MaterialID.HasValue
+                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                             && (batchPos.IsFinalMixure
+                                 || (!batchPos.IsFinalMixure
+                                     && (!plannedSilo.Facility.PartslistID.HasValue
+                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
+                                    )
+                                )
+                           )
+                       )
+                    {
+                        // Prüfe ob rechnerisch die Charge reinpassen würde
+                        if (plannedSilo.Facility.CurrentFacilityStock != null
+                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
+                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
+                        {
+                            if (changeReservationStateIfFull)
+                                invoker.Messages.LogDebug(invoker.GetACUrl(), "PWDischarging.CheckPlannedDestinationSilo(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
+                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
+                            return false;
+                        }
+                        else
+                            return true;
+                    }
+                }
+                // Auf Lagerplätze ohne Belegung darf immer entleert werden
+                else
+                    return true;
+            }
+            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
+            else if (plannedSilo.Facility == null
+                && batchPos.BookingMaterial.MDFacilityManagementType != null
+                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
+            {
+                return true;
+            }
+            return false;
         }
         #endregion
 

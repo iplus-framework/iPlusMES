@@ -401,7 +401,7 @@ namespace gip.mes.processapplication
 
         #region Methods => Overrides
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
             string matName = CurrentACMethod.ValueT[vd.Material.ClassName] as string;
             CurrentWeighingMaterial.ValueT = matName;

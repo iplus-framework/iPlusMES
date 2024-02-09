@@ -83,6 +83,7 @@ namespace gip.mes.processapplication
                 _CheckIfAutomaticTargetChangePossible = null;
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
+                _CriticalRouteFoundAcknowledged = 0;
             }
 
             CurrentDisEntityID.ValueT = Guid.Empty;
@@ -101,6 +102,7 @@ namespace gip.mes.processapplication
                 _CheckIfAutomaticTargetChangePossible = null;
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
+                _CriticalRouteFoundAcknowledged = 0;
             }
 
             CurrentDisEntityID.ValueT = Guid.Empty;
@@ -362,6 +364,9 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected short _CriticalRouteFoundAcknowledged = 0;
+
+
         protected bool SkipIfNoComp
         {
             get
@@ -537,11 +542,17 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "EnterExtraDisTargetDest":
+                case nameof(EnterExtraDisTargetDest):
                     EnterExtraDisTargetDest();
                     return true;
-                case Const.IsEnabledPrefix + "EnterExtraDisTargetDest":
+                case nameof(IsEnabledEnterExtraDisTargetDest):
                     result = IsEnabledEnterExtraDisTargetDest();
+                    return true;
+                case nameof(CriticalRouteAck):
+                    CriticalRouteAck();
+                    return true;
+                case nameof(IsEnabledCriticalRouteAck):
+                    result = IsEnabledCriticalRouteAck();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -560,6 +571,7 @@ namespace gip.mes.processapplication
         {
             CacheModuleDestinations = null;
             LastTargets = null;
+            _CriticalRouteFoundAcknowledged = 0;
             base.SMIdle();
         }
 
@@ -611,6 +623,7 @@ namespace gip.mes.processapplication
                 if (NoTargetWait.HasValue && DateTime.Now < NoTargetWait.Value) // Zyklisches Warten um zyklische Datenbankabfragen zu minimieren
                     return;
                 NoTargetWait = null;
+                _CriticalRouteFoundAcknowledged = 0;
                 CheckIfAutomaticTargetChangePossible = null;
                 StartDisResult result = StartDischarging(module);
                 if (result == StartDisResult.CycleWait || result == StartDisResult.FastCycleWait)
@@ -1013,165 +1026,6 @@ namespace gip.mes.processapplication
         #endregion
 
 
-        #region Planned Silos
-        public virtual FacilityReservation GetNextFreeDestination(IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos, 
-            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null, PAFDischarging discharging = null)
-        {
-            if (plannedSilos == null || !plannedSilos.Any())
-                return null;
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
-            {
-                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
-            {
-                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
-            {
-                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                {
-                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
-                    return plannedSilo;
-                }
-            }
-            return null;
-        }
-
-        public static FacilityReservation GetNextFreeDestination(ACComponent invoker, IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos, 
-            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
-        {
-            if (plannedSilos == null || !plannedSilos.Any())
-                return null;
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
-            {
-                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
-            {
-                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
-            {
-                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                {
-                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
-                    return plannedSilo;
-                }
-            }
-            return null;
-        }
-
-        protected virtual bool CheckPlannedDestinationSilo(FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null, int additionalSearchFlags = 0)
-        {            
-            if (plannedSilo == null || (ignoreFullSilo != null && ignoreFullSilo == plannedSilo))
-                return false;
-            if (plannedSilo.Facility != null
-                && plannedSilo.Facility.InwardEnabled)
-            {
-                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                {
-                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
-                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
-                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (   !plannedSilo.Facility.MaterialID.HasValue
-                        || (   (    (batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
-                             && (batchPos.IsFinalMixure
-                                 || (   !batchPos.IsFinalMixure
-                                     &&  (    !plannedSilo.Facility.PartslistID.HasValue 
-                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
-                                    )
-                                ) 
-                           )
-                       )
-                    {
-                        // Prüfe ob rechnerisch die Charge reinpassen würde
-                        if (plannedSilo.Facility.CurrentFacilityStock != null
-                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
-                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
-                        {
-                            if (changeReservationStateIfFull)
-                                Messages.LogDebug(this.GetACUrl(), "PWDischarging.CheckPlannedDestinationSilo(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
-                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
-                            return false;
-                        }
-                        else
-                            return true;
-                    }
-                }
-                // Auf Lagerplätze ohne Belegung darf immer entleert werden
-                else
-                    return true;
-            }
-            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
-            else if (plannedSilo.Facility == null 
-                && batchPos.BookingMaterial.MDFacilityManagementType != null 
-                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public static bool CheckPlannedDestinationSilo(ACComponent invoker, FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
-        {
-            if (plannedSilo == null)
-                return false;
-            if (plannedSilo.Facility != null
-                && plannedSilo.Facility.InwardEnabled)
-            {
-                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                {
-                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
-                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
-                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (!plannedSilo.Facility.MaterialID.HasValue
-                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
-                             && (batchPos.IsFinalMixure
-                                 || (!batchPos.IsFinalMixure
-                                     && (!plannedSilo.Facility.PartslistID.HasValue
-                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
-                                    )
-                                )
-                           )
-                       )
-                    {
-                        // Prüfe ob rechnerisch die Charge reinpassen würde
-                        if (plannedSilo.Facility.CurrentFacilityStock != null
-                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
-                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
-                        {
-                            if (changeReservationStateIfFull)
-                                invoker.Messages.LogDebug(invoker.GetACUrl(), "PWDischarging.CheckPlannedDestinationSilo(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
-                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
-                            return false;
-                        }
-                        else
-                            return true;
-                    }
-                }
-                // Auf Lagerplätze ohne Belegung darf immer entleert werden
-                else
-                    return true;
-            }
-            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
-            else if (plannedSilo.Facility == null
-                && batchPos.BookingMaterial.MDFacilityManagementType != null
-                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
-            {
-                return true;
-            }
-            return false;
-        }
-#endregion
-
-
 #region Routing
         public static MsgWithDetails DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo, 
             out Route route, int searchDepth, 
@@ -1198,11 +1052,20 @@ namespace gip.mes.processapplication
         }
 
 
-        protected void DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo,
+        public enum FindDisRouteResult
+        {
+            NotFound = 0x00,
+            FoundValidRoute = 0x01,
+            OccupiedFromOtherOrderBlock = 0x02,
+            OccupiedFromOtherOrderWarning = 0x04,
+        }
+
+        protected FindDisRouteResult DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo,
             int searchDepth,
             Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector,
-            string deSelectionRuleID, object[] deSelParams = null, Route predefinedRoute = null)
+            string deSelectionRuleID, object[] deSelParams = null, Route predefinedRoute = null, ACMethod currentActiveMethod = null)
         {
+            FindDisRouteResult result = FindDisRouteResult.NotFound;
             Route route = null;
             if (predefinedRoute != null)
             {
@@ -1212,18 +1075,72 @@ namespace gip.mes.processapplication
                 if (item != null && item.TargetACComponent == acCompTo)
                     route = predefinedRoute;
             }
-            if (route == null)
+
+            Route prevRoute = null;
+            if (currentActiveMethod != null)
             {
-                PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, ApplicationManager.IncludeReservedOnRoutingSearch, ApplicationManager.IncludeAllocatedOnRoutingSearch, deSelParams);
-                if (route == null && ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
-                    PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
+                ACValue acValue = currentActiveMethod.ParameterValueList.GetACValue("Route");
+                if (acValue != null)
+                {
+                    prevRoute = (Route)acValue.Value;
+                    // Try keep same elements from previous root
+                    if (prevRoute != null)
+                    {
+                        if (route == null) // Predefined was not set!
+                            PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
+                        if (route != null)
+                        {
+                            // Remove same elements from root and test if rest of elements are not occupied
+                            Route diffRouteOnDestChange = Route.IntersectRoutesGetDiff(route, prevRoute, true);
+                            if (   diffRouteOnDestChange != null 
+                                && !ValidateRouteForFuncParam(diffRouteOnDestChange))
+                            {
+                                // Validation failed, try to search an alternative route
+                                route = null;
+                                result = FindDisRouteResult.OccupiedFromOtherOrderBlock;
+                            }
+                            else
+                                result = FindDisRouteResult.FoundValidRoute;
+                        }
+                    }
+                }
             }
+
+            if (route == null && predefinedRoute != null)
+            {
+                // If there is no predefined route or comparison to previous route failed, try to search a new alternative route
+                if (!ApplicationManager.IncludeReservedOnRoutingSearch || !ApplicationManager.IncludeAllocatedOnRoutingSearch)
+                {
+                    PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, ApplicationManager.IncludeReservedOnRoutingSearch, ApplicationManager.IncludeAllocatedOnRoutingSearch, deSelParams);
+                    if (route != null)
+                        result = FindDisRouteResult.FoundValidRoute;
+                }
+                if (route == null && result == FindDisRouteResult.NotFound)
+                {
+                    PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
+                    if (route != null)
+                    {
+                        result = FindDisRouteResult.OccupiedFromOtherOrderWarning;
+                        if (!ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
+                            result = FindDisRouteResult.OccupiedFromOtherOrderBlock;
+                        else if (_CriticalRouteFoundAcknowledged == 2)
+                        {
+                            result = FindDisRouteResult.FoundValidRoute;
+                            _CriticalRouteFoundAcknowledged = 0;
+                        }
+                    }
+                }
+            }
+
             if (route != null)
             {
                 route.Detach(true);
                 route.IsPredefinedRoute = predefinedRoute != null && route == predefinedRoute;
+                if (result == FindDisRouteResult.NotFound)
+                    result = FindDisRouteResult.FoundValidRoute;
             }
             CurrentDischargingRoute = route;
+            return result;
         }
 
         public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, out Route route)
@@ -1638,6 +1555,19 @@ namespace gip.mes.processapplication
                 return false;
             PWMethodVBBase.EnterExtraDisTargetDest(acComponent.ParentACComponent);
             return true;
+        }
+
+        [ACMethodInteraction("Process", "en{'Allow occupied Route'}de{'Erlaube belegte Route'}", 401, true)]
+        public void CriticalRouteAck()
+        {
+            if (!IsEnabledCriticalRouteAck())
+                return;
+            _CriticalRouteFoundAcknowledged = 2;
+        }
+
+        public virtual bool IsEnabledCriticalRouteAck()
+        {
+            return _CriticalRouteFoundAcknowledged == 1;
         }
         #endregion
 

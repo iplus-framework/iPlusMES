@@ -268,7 +268,7 @@ namespace gip.mes.processapplication
         }
         #endregion
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
             ACValue value = acMethod.ParameterValueList.GetACValue("Route");
             if (value == null)
@@ -276,36 +276,52 @@ namespace gip.mes.processapplication
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
                 return msg;
             }
-            Route originalR = value.ValueT<Route>();
-            if (originalR == null)
+
+            Route newR = value.ValueT<Route>();
+            if (newR == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Route is null." };
                 return msg;
             }
+
+            ACValue valuePrev = null;
+            Route prevR = null;
+            if (previousParams != null && IsSimulationOn)
+            {
+                valuePrev = previousParams.ParameterValueList.GetACValue("Route");
+                if (valuePrev != null)
+                    prevR = valuePrev.ValueT<Route>();
+            }
+
             //Route clonedR = originalR.Clone() as Route;
             //RouteItem targetRouteItem = clonedR.LastOrDefault();
-            RouteItem targetRouteItem = originalR.LastOrDefault();
+            RouteItem targetRouteItem = newR.LastOrDefault();
             if (targetRouteItem == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Last RouteItem is null." };
                 return msg;
             }
 
-            if (originalR.IsPredefinedRoute)
-                RoutingService.ExecuteMethod(nameof(ACRoutingService.OnRouteUsed), originalR);
+            if (newR.IsPredefinedRoute)
+                RoutingService.ExecuteMethod(nameof(ACRoutingService.OnRouteUsed), newR);
 
             using (var db = new Database())
             {
                 try
                 {
-                    originalR.AttachTo(db); // Global context
+                    newR?.AttachTo(db); // Global context
+                    prevR?.AttachTo(db);
 
-                    MsgWithDetails msg = GetACMethodFromConfig(db, originalR, acMethod);
+                    MsgWithDetails msg = GetACMethodFromConfig(db, newR, acMethod);
                     if (msg != null)
                         return msg;
 
                     if (IsSimulationOn)
-                        PAEControlModuleBase.ActivateRouteOnSimulation(originalR, false);
+                    {
+                        if (prevR != null)
+                            PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
+                        PAEControlModuleBase.ActivateRouteOnSimulation(newR, false);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -315,11 +331,12 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    originalR.Detach(true);
+                    newR?.Detach(true);
+                    prevR?.Detach(true);
                     //targetRouteItem.DetachEntitesFromDbContext();
                     // Update Route, that Route-serializers can access ACComponent-Properties of RouteItems
                     //if (!originalR.AreACUrlInfosSet)
-                        //value.Value = clonedR;
+                    //value.Value = clonedR;
                 }
             }
 

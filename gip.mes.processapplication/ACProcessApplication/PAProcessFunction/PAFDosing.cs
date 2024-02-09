@@ -1161,7 +1161,7 @@ namespace gip.mes.processapplication
         #endregion
 
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
             ACValue value = acMethod.ParameterValueList.GetACValue("Route");
             if (value == null)
@@ -1177,17 +1177,32 @@ namespace gip.mes.processapplication
                 return msg;
             }
 
+            ACValue valuePrev = null;
+            Route prevR = null;
+            if (previousParams != null && IsSimulationOn)
+            {
+                valuePrev = previousParams.ParameterValueList.GetACValue("Route");
+                if (valuePrev != null)
+                    prevR = valuePrev.ValueT<Route>();
+            }
+
             using (var db = new Database())
             {
                 try
                 {
-                    route.AttachTo(db);
+                    route?.AttachTo(db);
+                    prevR?.AttachTo(db);
+                    
                     MsgWithDetails msg = GetACMethodFromConfig(db, route, acMethod);
                     if (msg != null)
                         return msg;
 
                     if (IsSimulationOn)
+                    {
+                        if (prevR != null)
+                            PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
                         PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1197,8 +1212,8 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    if (route != null)
-                        route.Detach(true);
+                     route?.Detach(true);
+                     prevR?.Detach(true);
                     //sourceRouteItem.DetachEntitesFromDbContext();
                 }
             }
