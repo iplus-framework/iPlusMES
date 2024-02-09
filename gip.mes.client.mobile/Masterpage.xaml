@@ -84,9 +84,9 @@
 
         <Grid x:Name="StatusDockPanel" vb:VBDockPanel.Dock="Bottom" Height="56">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="220"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="260"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <vb:VBStatusBar x:Name="PageStatusBar" Grid.Column="0" Height="56">
                 <vb:VBStatusBarItem x:Name="StatusBarZoom">
@@ -95,7 +95,7 @@
                     </vb:VBButton>
                 </vb:VBStatusBarItem>
                 <vb:VBStatusBarItem x:Name="StatusBarInfoMessage"></vb:VBStatusBarItem>
-                <vb:VBStatusBarItem Padding="5,0,0,0" MouseDoubleClick="WarningIcon_MouseDoubleClick" x:Name="WarningIcon">
+                <vb:VBStatusBarItem Padding="5,0,0,0" MouseDoubleClick="WarningIcon_MouseDoubleClick" x:Name="WarningIcon" Width="60" HorizontalAlignment="Left">
                     <vb:VBStatusBarItem.Style>
                         <Style TargetType="vb:VBStatusBarItem">
                             <Style.Triggers>
@@ -156,30 +156,25 @@
                         </Canvas>
                     </Viewbox>
                 </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem Padding="5,0,0,0">
-                    <vb:VBControlSelectionIcon x:Name="FreezeScreenIcon" Click="FreezeScreenIcon_Click"></vb:VBControlSelectionIcon>
-                </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem Padding="5,0,0,0">
-                    <vb:VBControlSelectionIcon x:Name="EditVBDesignIcon" Click="EditVBDesignIcon_Click" IconType="1"></vb:VBControlSelectionIcon>
-                </vb:VBStatusBarItem>
 
             </vb:VBStatusBar>
             <vb:VBStatusBar x:Name="MidStatusBar" Grid.Column="1" Height="56">
             </vb:VBStatusBar>
-            <vb:VBStatusBar x:Name="ConnectionStatusBar" Grid.Column="2" Height="56" Padding="0,0,5,0">
-                <vb:VBStatusBarItem Padding="5,0,0,0">
-                    <vb:VBConnectionState x:Name="ServerConnIcon" Width="50" Height="35" IsServerConnection="True" MouseDoubleClick="ServerConnectionInfoClicked"></vb:VBConnectionState>
-                </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem>
-                    <vb:VBTextBlock x:Name="ServerConnText" FontSize="25">0 Ʃ0</vb:VBTextBlock>
-                </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem Padding="15,0,0,0">
-                    <vb:VBConnectionState x:Name="ClientConnIcon" Width="50" Height="35" IsServerConnection="False" MouseDoubleClick="ClientConnectionInfoClicked"></vb:VBConnectionState>
-                </vb:VBStatusBarItem>
-                <vb:VBStatusBarItem>
-                    <vb:VBTextBlock x:Name="ClientConnText" FontSize="25">+0 -0</vb:VBTextBlock>
-                </vb:VBStatusBarItem>
+            <vb:VBStatusBar Grid.Column="2" Height="56" Padding="0,0,5,0">
+                <vb:VBButton Width="120" Height="40" x:Name="ServerConnectionButton" Click="ServerConnectionInfoClicked">
+                    <vb:VBStackPanel Orientation="Horizontal">
+                        <vb:VBConnectionState x:Name="ServerConnIcon" Width="30" Height="35" IsServerConnection="True" MouseDoubleClick="ServerConnectionInfoClicked"></vb:VBConnectionState>
+                        <vb:VBTextBlock x:Name="ServerConnText" FontSize="25">0 Ʃ0</vb:VBTextBlock>
+                    </vb:VBStackPanel>
+                </vb:VBButton>
+                <vb:VBButton Width="120" Height="40" x:Name="ClientConnectionButton" Click="ClientConnectionInfoClicked">
+                    <vb:VBStackPanel Orientation="Horizontal">
+                        <vb:VBConnectionState x:Name="ClientConnIcon" Width="30" Height="35" IsServerConnection="False" MouseDoubleClick="ClientConnectionInfoClicked"></vb:VBConnectionState>
+                        <vb:VBTextBlock x:Name="ClientConnText" FontSize="25">+0 -0</vb:VBTextBlock>
+                    </vb:VBStackPanel>
+                </vb:VBButton>
             </vb:VBStatusBar>
+
         </Grid>
 
         <!--Tab Control--> 

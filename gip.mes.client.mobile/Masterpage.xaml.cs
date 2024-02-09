@@ -228,32 +228,32 @@ namespace gip.mes.client.mobile
 
         private void FrameGoBack_Click(object sender, RoutedEventArgs e)
         {
-            if (VBFrameControl.MainContent != null)
+            if (VBFrameController != null)
             {
-                if (VBFrameControl.MainContent.CanGoBack)
+                if (VBFrameController.CanGoBack)
                 {
-                    foreach (JournalEntry entry in VBFrameControl.MainContent.BackStack)
+                    foreach (JournalEntry entry in VBFrameController.BackStack)
                     {
-                        if (CheckIfEntryEmpty(entry))
+                        if (VBFrameController.CheckIfEntryEmpty(entry))
                         {
                             Title.Text = null;
-                            VBFrameControl.ClearContent();
+                            VBFrameController.ClearContent();
                             break;
                         }
                         else
                         {
                             Title.Text = entry.Name;
-                            VBFrameControl.MainContent.NavigationService.GoBack();
+                            VBFrameController.NavigationService.GoBack();
                             break;
                         }
                     }
                 }
                 else
                 {
-                    if (VBFrameControl.MainContent.Content != null)
+                    if (VBFrameController.Content != null)
                     {
                         Title.Text = null;
-                        VBFrameControl.ClearContent();
+                        VBFrameController.ClearContent();
                     }
                 }
             }
@@ -261,34 +261,24 @@ namespace gip.mes.client.mobile
 
         private void FrameGoFoward_Click(object sender, RoutedEventArgs e)
         {
-            if (VBFrameControl.MainContent.CanGoForward)
+            if (VBFrameController.CanGoForward)
             {
-                foreach (JournalEntry entry in VBFrameControl.MainContent.ForwardStack)
+                foreach (JournalEntry entry in VBFrameController.ForwardStack)
                 {
-                    if (CheckIfEntryEmpty(entry))
+                    if (VBFrameController.CheckIfEntryEmpty(entry))
                     {
                         Title.Text = null;
-                        VBFrameControl.ClearContent();
+                        VBFrameController.ClearContent();
                         break;
                     }
                     else
                     {
-                        VBFrameControl.MainContent.GoForward();
+                        VBFrameController.GoForward();
                         Title.Text = entry.Name;
                         break;
                     }
                 }
             }
-        }
-
-        private bool CheckIfEntryEmpty(JournalEntry entry)
-        {
-            var prop = entry.GetType().GetProperty("KeepAliveRoot", BindingFlags.Instance | BindingFlags.NonPublic);
-            VBPage entryPage = prop.GetValue(entry) as VBPage;
-            if (entryPage.VBDesignContent is VBDesign vBDesign && vBDesign.ACCompInitState == ACInitState.Constructing)
-                return true;
-            else
-                return false;
         }
 
         #endregion
@@ -306,13 +296,13 @@ namespace gip.mes.client.mobile
             }
         }
 
-        VBFrameControl VBFrameControl
+        VBFrameController VBFrameController
         { 
             get
             {
                 if (_RootVBDesign == null)
                     return null;
-                return _RootVBDesign.Content as VBFrameControl;
+                return _RootVBDesign.Content as VBFrameController;
             } 
         }
 
@@ -348,7 +338,7 @@ namespace gip.mes.client.mobile
             _RootVBDesign.Margin = new Thickness(0, 0, -5, 0);
             _RootVBDesign.Loaded += new RoutedEventHandler(RootVBDesign_Loaded);
             MainDockPanel.Children.Add(_RootVBDesign);
-            //VBFrameControl.Navigate(_RootVBDesign);
+            //VBFrameController.Navigate(_RootVBDesign);
             //MainFrame.Navigate(_RootVBDesign);
             foreach (ACComponent childComp in ACRoot.SRoot.ACComponentChilds)
             {
@@ -420,10 +410,10 @@ namespace gip.mes.client.mobile
 
         void RootVBDesign_Loaded(object sender, RoutedEventArgs e)
         {
-            if ((_RootVBDesign.Content == null) || !(_RootVBDesign.Content is VBFrameControl))
+            if ((_RootVBDesign.Content == null) || !(_RootVBDesign.Content is VBFrameController))
             {
-                _RootVBDesign.Content = new VBFrameControl();
-                VBFrameControl.Name = "mainFrameControl";
+                _RootVBDesign.Content = new VBFrameController();
+                VBFrameController.Name = "MainFrameController";
             }
             //DockingManager.IsBSOManager = true;
             //DockingManager.InitBusinessobjectsAtStartup();
@@ -471,19 +461,19 @@ namespace gip.mes.client.mobile
                 title = menuItem.ACCaption;
                 Title.Text = menuItem.ACCaption;
             }
-            VBFrameControl.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, title, ribbonVisibilityOff);
+            VBFrameController.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, title, ribbonVisibilityOff);
             ToggleMenuVisibility();
         }
 
         public void StartBusinessobject(string acUrl, ACValueList parameterList, string acCaption = "")
         {
-            if (VBFrameControl == null)
+            if (VBFrameController == null)
                 return;
             if (parameterList == null)
                 Debugger.Break();
-            //VBFrameControl.ShowDesign(acUrl, acCaption);
+            //VBFrameController.ShowDesign(acUrl, acCaption);
             else
-                VBFrameControl.StartBusinessobject(acUrl, parameterList, acCaption);
+                VBFrameController.StartBusinessobject(acUrl, parameterList, acCaption);
         }
 
         public FocusBSOResult FocusBSO(IACBSO bso)
@@ -569,6 +559,7 @@ namespace gip.mes.client.mobile
             }
             else
             {
+                ServerConnectionButton.Visibility = Visibility.Collapsed;
                 ServerConnIcon.Visibility = System.Windows.Visibility.Collapsed;
                 ServerConnText.Visibility = System.Windows.Visibility.Collapsed;
             }
@@ -588,13 +579,13 @@ namespace gip.mes.client.mobile
             }
             else
             {
-                if (VBFrameControl == null)
+                if (VBFrameController == null)
                     return;
                 ACComponent channelManager = (ACComponent)ACRoot.SRoot.ACUrlCommand("?\\Communications\\WCFClientManager");
                 if (channelManager != null)
                 {
                     Title.Text = "ConnectionInfo";
-                    VBFrameControl.ShowDialog(channelManager, "ConnectionInfo", "", false);
+                    VBFrameController.ShowDialog(channelManager, "ConnectionInfoMobile", "", false);
                 }
             }
         }
@@ -609,13 +600,13 @@ namespace gip.mes.client.mobile
             }
             else
             {
-                if (VBFrameControl == null)
+                if (VBFrameController == null)
                     return;
                 ACComponent serviceHost = (ACComponent)ACRoot.SRoot.ACUrlCommand("?\\Communications\\WCFServiceManager");
                 if (serviceHost != null)
                 {
                     Title.Text = "ConnectionInfo";
-                    VBFrameControl.ShowDialog(serviceHost, "ConnectionInfo", "", false);
+                    VBFrameController.ShowDialog(serviceHost, "ConnectionInfo", "", false);
                 }
             }
         }
@@ -899,21 +890,13 @@ namespace gip.mes.client.mobile
         // 1. Click auf StatusBar-Icon von Benutzer
         private void FreezeScreenIcon_Click(object sender, RoutedEventArgs e)
         {
-            FreezeScreenIcon.SwitchControlSelectionState();
-            if (FreezeScreenIcon.ControlSelectionActive)
-                VBDockingManagerFreezing = new WPFControlSelectionEventArgs(ControlSelectionState.FrameSearch);
-            else
-                VBDockingManagerFreezing = new WPFControlSelectionEventArgs(ControlSelectionState.Off);
+
         }
 
         // 2. Aufruf vom Dockingmanager, dass Rahmen geklickt worden ist => Schalte Modus aus
         public void DockingManagerFreezed(object dockingManager)
         {
-            FreezeScreenIcon.SwitchControlSelectionState();
-            if (FreezeScreenIcon.ControlSelectionActive)
-                VBDockingManagerFreezing = new WPFControlSelectionEventArgs(ControlSelectionState.FrameSearch);
-            else
-                VBDockingManagerFreezing = new WPFControlSelectionEventArgs(ControlSelectionState.Off);
+
         }
 #endregion
 
@@ -932,18 +915,12 @@ namespace gip.mes.client.mobile
         // 3. Click wenn Editierung zu Ende ist
         private void EditVBDesignIcon_Click(object sender, RoutedEventArgs e)
         {
-            EditVBDesignIcon.SwitchControlSelectionState();
-            if (EditVBDesignIcon.ControlSelectionActive)
-                VBDesignEditing = new WPFControlSelectionEventArgs(ControlSelectionState.FrameSearch);
-            else
-                VBDesignEditing = new WPFControlSelectionEventArgs(ControlSelectionState.Off);
+
         }
 
         // 2. Aufruf von VBDesign, dass Rahmen geklickt worden ist
         public void VBDesignEditingActivated(object vbDesign)
         {
-            if (!EditVBDesignIcon.ControlSelectionActive)
-                EditVBDesignIcon.SwitchControlSelectionState();
             VBDesignEditing = new WPFControlSelectionEventArgs(ControlSelectionState.FrameSelected);
         }
 #endregion
