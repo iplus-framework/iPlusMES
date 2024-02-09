@@ -1106,16 +1106,13 @@ namespace gip.mes.processapplication
                 }
             }
 
-            if (route == null && predefinedRoute != null)
+            if (route == null && result == FindDisRouteResult.NotFound)
             {
                 // If there is no predefined route or comparison to previous route failed, try to search a new alternative route
-                if (!ApplicationManager.IncludeReservedOnRoutingSearch || !ApplicationManager.IncludeAllocatedOnRoutingSearch)
-                {
-                    PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, ApplicationManager.IncludeReservedOnRoutingSearch, ApplicationManager.IncludeAllocatedOnRoutingSearch, deSelParams);
-                    if (route != null)
-                        result = FindDisRouteResult.FoundValidRoute;
-                }
-                if (route == null && result == FindDisRouteResult.NotFound)
+                PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, ApplicationManager.IncludeReservedOnRoutingSearch, ApplicationManager.IncludeAllocatedOnRoutingSearch, deSelParams);
+                if (route != null)
+                    result = FindDisRouteResult.FoundValidRoute;
+                else if (!ApplicationManager.IncludeReservedOnRoutingSearch || !ApplicationManager.IncludeAllocatedOnRoutingSearch)
                 {
                     PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
                     if (route != null)
