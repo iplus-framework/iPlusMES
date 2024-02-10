@@ -11,6 +11,7 @@ using gip.core.processapplication;
 using System.Windows;
 using gip.mes.processapplication;
 using System.Security.Policy;
+using System.Xml.XPath;
 
 namespace gip2006.variobatch.processapplication
 {
@@ -515,7 +516,7 @@ namespace gip2006.variobatch.processapplication
             bool modelValid = true;
             result = new List<RouteItemModel>();
 
-            IEnumerable<IGrouping<IACComponent,RouteItem>> itemsGroupedByTargetComp = route.GroupBy(x => x.TargetACComponent);
+            IEnumerable<IGrouping<IACComponent,RouteItem>> itemsGroupedByTargetComp = GroupRouteByTargetComp(route, routeSource, routeTargets); //route.GroupBy(x => x.TargetACComponent);
 
             foreach (var itemGroup in itemsGroupedByTargetComp)
             {
@@ -643,6 +644,88 @@ namespace gip2006.variobatch.processapplication
             }
 
             return modelValid;
+        }
+
+        public virtual IEnumerable<IGrouping<IACComponent, RouteItem>> GroupRouteByTargetComp (Route route, RouteItem routeSource, IEnumerable<RouteItem> routeTargets)
+        {
+            var groupedByRouteNo = route.GroupBy(c => c.RouteNo);
+            var result = route.GroupBy(x => x.TargetACComponent).ToList();
+
+            if (groupedByRouteNo.Count() > 1)
+            {
+                var multiPointRouteItems = result.Where(c => c.Count() > 1).ToList();
+                if (multiPointRouteItems.Any())
+                {
+                    List<IGrouping<IACComponent, RouteItem>> newResult = new List<IGrouping<IACComponent, RouteItem>>();
+
+                    while(result.Any())
+                    {
+                        while(multiPointRouteItems.Any())
+                        {
+                            IGrouping<IACComponent, RouteItem> multiPointItem = multiPointRouteItems.FirstOrDefault();
+                            if (multiPointItem != null)
+                            {
+                                foreach (RouteItem rItem in multiPointItem)
+                                {
+                                    List<IGrouping<IACComponent,RouteItem>> partResult = result.Where(c => c.Any(x => x.RouteNo == rItem.RouteNo)).ToList();
+
+                                    SortRouteByTargetComp(partResult);
+
+                                    foreach (var partItem in partResult)
+                                    {
+                                        if (partItem == multiPointItem)
+                                            break;
+
+                                        newResult.Add(partItem);
+                                        result.Remove(partItem);
+                                    }
+                                }
+
+                                newResult.Add(multiPointItem);
+                                multiPointRouteItems.Remove(multiPointItem);
+                                result.Remove(multiPointItem);
+                            }
+                        }
+
+                        if (result.Any())
+                        {
+                            newResult.AddRange(result);
+                            result.Clear();
+                        }
+                    }
+
+                    return newResult;
+                }
+            }
+
+            return result;
+        }
+
+        private void SortRouteByTargetComp(List<IGrouping<IACComponent, RouteItem>> items)
+        {
+            IGrouping<IACComponent, RouteItem> firstMultiPointItem = items.FirstOrDefault(c => c.Count() > 1);
+            if (firstMultiPointItem != null)
+            {
+                foreach (RouteItem routeItem in firstMultiPointItem)
+                {
+                    IGrouping<IACComponent, RouteItem> source = items.FirstOrDefault(c => c.Key == routeItem.SourceACComponent);
+                    if (source != null)
+                    {
+                        
+                        int indexMultiPointItem = items.IndexOf(firstMultiPointItem);
+                        int indexNew = items.IndexOf(source);
+
+                        if (indexNew > indexMultiPointItem)
+                        {
+                            items.RemoveAt(indexMultiPointItem);
+                            indexNew = items.IndexOf(source);
+                            items.Insert(indexNew + 1, firstMultiPointItem);
+                        }
+
+                        break;
+                    }
+                }
+            }
         }
 
         class RouteItemModel
