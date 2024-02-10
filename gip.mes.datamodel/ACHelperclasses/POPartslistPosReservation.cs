@@ -415,7 +415,7 @@ namespace gip.mes.datamodel
                     List<FacilityReservation> reservationList = null;
                     if (value && SelectedReservation == null)
                     {
-                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.ToArray().OrderBy(c => c.Sequence).ToList();
+                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).ToArray().OrderBy(c => c.Sequence).ToList();
                         FacilityReservation tempReservation = reservationList.Where(c => c.VBiACClassID == Module.ACClassID).FirstOrDefault();
                         if (tempReservation == null)
                         {
@@ -434,7 +434,7 @@ namespace gip.mes.datamodel
                     }
                     else if (!value && SelectedReservation != null)
                     {
-                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.ToArray().OrderBy(c => c.Sequence).ToList();
+                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).ToArray().OrderBy(c => c.Sequence).ToList();
                         FacilityReservation tempReservation = reservationList.Where(c => c == SelectedReservation).FirstOrDefault();
                         if (tempReservation != null)
                         {

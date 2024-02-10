@@ -1451,8 +1451,13 @@ namespace gip.mes.processapplication
         protected virtual void RememberWeightOnRunDischarging(bool isNewStart)
         {
             PAEScaleGravimetric scale = GravimetricScale;
-            if (scale != null && !(scale is PAEScaleTotalizing))
-                scale.StoredWeightForPosting.ValueT = isNewStart ? 0.0 : scale.ActualWeight.ValueT;
+            if (scale != null)
+            {
+                if (scale is PAEScaleTotalizing)
+                    scale.StoredWeightForPosting.ValueT = isNewStart ? 0.0 : (scale as PAEScaleTotalizing).TotalActualWeight.ValueT;
+                else
+                    scale.StoredWeightForPosting.ValueT = isNewStart ? 0.0 : scale.ActualWeight.ValueT;
+            }
         }
         #endregion
 

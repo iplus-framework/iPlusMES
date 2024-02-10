@@ -325,7 +325,7 @@ namespace gip.bso.logistics
             {
                 var bso = PickingBSO;
                 if (bso != null)
-                    return bso.SelectedPickingPos;
+                    return bso.GetPickingPosForWFTargetSelector();
                 return null;
             }
         }

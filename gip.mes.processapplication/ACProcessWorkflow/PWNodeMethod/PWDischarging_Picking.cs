@@ -250,8 +250,25 @@ namespace gip.mes.processapplication
                     destinationSilo = facReservation.Facility;
             }
             if (destinationSilo == null)
+            {
                 destinationSilo = pickingPos.ToFacility;
-
+                if (destinationSilo != null)
+                {
+                    foreach (PickingPos altPickingPos in picking.PickingPos_Picking)
+                    {
+                        if (altPickingPos != pickingPos && altPickingPos.Material == pickingPos.Material && altPickingPos.ToFacility == destinationSilo)
+                        {
+                            plannedSilos = ParentPWMethod<PWMethodTransportBase>().ACFacilityManager.GetSelectedTargets(altPickingPos);
+                            if (plannedSilos != null && plannedSilos.Any())
+                            {
+                                facReservation = GetNextFreeDestination(plannedSilos, altPickingPos, altPickingPos.TargetQuantityUOM);
+                                if (facReservation != null && facReservation.Facility != null)
+                                    destinationSilo = facReservation.Facility;
+                            }
+                        }
+                    }
+                }
+            }
 
             if (destinationSilo == null)
             {
@@ -596,6 +613,20 @@ namespace gip.mes.processapplication
 
             Facility destinationSilo = null;
             IList<FacilityReservation> plannedSilos = ParentPWMethod<PWMethodTransportBase>().ACFacilityManager.GetSelectedTargets(pickingPos);
+
+            if (plannedSilos == null || !plannedSilos.Any())
+            {
+                foreach (PickingPos altPickingPos in picking.PickingPos_Picking)
+                {
+                    if (altPickingPos != pickingPos && altPickingPos.Material == pickingPos.Material && pickingPos.ToFacility == destinationSilo)
+                    {
+                        plannedSilos = ParentPWMethod<PWMethodTransportBase>().ACFacilityManager.GetSelectedTargets(altPickingPos);
+                        if (plannedSilos != null && plannedSilos.Any())
+                            break;
+                    }
+                }
+            }
+
             if (plannedSilos == null || !plannedSilos.Any())
             {
                 CheckIfAutomaticTargetChangePossible = false;

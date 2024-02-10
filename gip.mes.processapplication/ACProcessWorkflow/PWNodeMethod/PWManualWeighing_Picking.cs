@@ -825,15 +825,21 @@ namespace gip.mes.processapplication
 
                         if (actualQuantity > 0.000001)
                         {
-                            FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
-                            ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                            bookingParam.OutwardQuantity = (double)actualQuantity;
-                            bookingParam.OutwardFacility = facility;
-                            bookingParam.OutwardFacilityCharge = facilityCharge;
-                            bookingParam.SetCompleted = isConsumedLot;
-                            if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-                                bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-                            msg = dbApp.ACSaveChangesWithRetry();
+                            FacilityPreBooking facilityPreBooking = null;
+                            ACMethodBooking bookingParam = null;
+                            bool canExecutePosting = CanExecutePosting(null, pickingPos);
+                            if (canExecutePosting)
+                            {
+                                facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
+                                bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                                bookingParam.OutwardQuantity = (double)actualQuantity;
+                                bookingParam.OutwardFacility = facility;
+                                bookingParam.OutwardFacilityCharge = facilityCharge;
+                                bookingParam.SetCompleted = isConsumedLot;
+                                if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                                    bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                                msg = dbApp.ACSaveChangesWithRetry();
+                            }
 
                             if (msg != null)
                             {
@@ -845,7 +851,7 @@ namespace gip.mes.processapplication
                             {
                                 bookingParam.IgnoreIsEnabled = true;
                                 ACMethodEventArgs resultBooking = null;
-                                bool canExecutePosting = CanExecutePosting(bookingParam, pickingPos);
+                                canExecutePosting = CanExecutePosting(bookingParam, pickingPos);
                                 if (canExecutePosting)
                                     resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
                                 if (resultBooking != null && (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible))
@@ -864,7 +870,7 @@ namespace gip.mes.processapplication
                                         changePosState = false;
                                     }
                                     changePosState = true;
-                                    if (   (resultBooking == null && !canExecutePosting) 
+                                    if ((resultBooking == null && !canExecutePosting)
                                         || bookingParam.ValidMessage.IsSucceded())
                                     {
                                         if (canExecutePosting)
@@ -922,6 +928,17 @@ namespace gip.mes.processapplication
                                     }
                                     else
                                         collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                                }
+                            }
+                            else if (!canExecutePosting)
+                            {
+                                pickingPos.MDDelivPosLoadState = posState;
+                                msg = dbApp.ACSaveChangesWithRetry();
+                                if (msg != null)
+                                {
+                                    collectedMessages.AddDetailMessage(msg);
+                                    msg = new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(91)", 2094);
+                                    ActivateProcessAlarmWithLog(msg, false);
                                 }
                             }
                         }

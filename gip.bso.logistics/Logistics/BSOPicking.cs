@@ -1430,7 +1430,7 @@ namespace gip.bso.logistics
                 if (changed)
                 {
                     OnPropertyChanged(nameof(SelectedPickingPos));
-                    RefreshWeighingList();
+                    RefreshWeighingList(true);
                 }
 
                 CurrentPickingPos = value;
@@ -4086,6 +4086,10 @@ namespace gip.bso.logistics
             SelectedAppManager = selected;
         }
 
+        public virtual PickingPos GetPickingPosForWFTargetSelector()
+        {
+            return SelectedPickingPos;
+        }
         #endregion
 
         #region Show order dialog
