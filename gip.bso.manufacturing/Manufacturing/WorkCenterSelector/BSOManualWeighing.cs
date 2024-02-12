@@ -2427,9 +2427,14 @@ namespace gip.bso.manufacturing
                             {
                                 SelectedWeighingMaterial = comp;
                                 SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
+                            }
+
+                            if (SelectedWeighingMaterial != null && SelectedFacilityCharge == null)
+                            {
                                 _StartWeighingFromF_FC = true;
                                 ShowSelectFacilityLotInfo = true;
                             }
+
                             break;
                         }
                     case WeighingComponentInfoType.StateSelectFC_F:
@@ -2924,11 +2929,13 @@ namespace gip.bso.manufacturing
                     if (compInfo.PLPosRelation != Guid.Empty)
                     {
                         SelectedWeighingMaterial = WeighingMaterialList.FirstOrDefault(c => c.PosRelation != null && c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                        SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
                         Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "SelectedWeighinMaterial is corrected!");
                     }
                     else if (compInfo.PickingPos != Guid.Empty)
                     {
                         SelectedWeighingMaterial = WeighingMaterialList.FirstOrDefault(c => c.PickingPosition != null && c.PickingPosition.PickingPosID == compInfo.PickingPos);
+                        SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
                         Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "SelectedWeighinMaterial is corrected! (Picking)");
                     }
                 }
