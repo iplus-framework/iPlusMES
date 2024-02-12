@@ -1,7 +1,6 @@
 ﻿using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
@@ -10,12 +9,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Objects;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using vd = gip.mes.datamodel;
-using System.Xml;
 using System.Data;
 using gip.core.media;
 
