@@ -14,6 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(4, "IdentNr", "en{'Weighing-ID'}de{'Wägeidentnr.'}", "", "", true)]
     [ACPropertyEntity(5, "StartDate", "en{'Start weighing'}de{'Start Wägung'}", "", "", true)]
     [ACPropertyEntity(6, "EndDate", "en{'End weighing'}de{'Ende Wägung'}", "", "", true)]
+    [ACPropertyEntity(7, nameof(Weighing.StateIndex), "en{'Status'}de{'Status'}", typeof(WeighingStateEnum), Const.ContextDatabase + "\\WeighingStateList", "", true)]
     [ACPropertyEntity(11, OutOrderPos.ClassName, "en{'Orderline (Delivery)'}de{'Warenausgangsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
     [ACPropertyEntity(12, InOrderPos.ClassName, "en{'Orderline (Goods issue)'}de{'Wareneingangsposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
     [ACPropertyEntity(13, PickingPos.ClassName, "en{'Commissioningline'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName, "", true)]
@@ -21,6 +22,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(15, VisitorVoucher.ClassName, "en{'Visitor voucher'}de{'Besucherbeleg'}", Const.ContextDatabase + "\\" + VisitorVoucher.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
+    [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
+    [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACPropertyEntity(9999, "WeighingTotalXML", "en{'Serialized Weighingdata'}de{'Serialisierte Wägedaten'}", "", "", false)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + Weighing.ClassName, "en{'Weighing'}de{'Wägung'}", typeof(Weighing), Weighing.ClassName, "WeighingNo", "WeighingNo")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Weighing>) })]
@@ -37,6 +40,7 @@ namespace gip.mes.datamodel
             entity.WeighingID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.WeighingNo = secondaryKey;
+            entity.WeighingState = WeighingStateEnum.New;
 
             LabOrderPos lOPos = parentACObject as LabOrderPos;
             if (lOPos != null)
@@ -46,6 +50,18 @@ namespace gip.mes.datamodel
             return entity;
         }
 
+        [ACPropertyInfo(999)]
+        public WeighingStateEnum WeighingState
+        {
+            get
+            {
+                return (WeighingStateEnum)StateIndex;
+            }
+            set
+            {
+                StateIndex = (Int16)value;
+            }
+        }
         #endregion
 
         #region IACUrl Member

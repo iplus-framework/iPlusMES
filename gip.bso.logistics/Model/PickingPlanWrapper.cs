@@ -381,6 +381,7 @@ namespace gip.bso.logistics
         {
             _Reservations = new List<PickingPlanReservWrapper>();
             _Targets = new List<PickingPlanTargetWrapper>();
+            PickingPos.FacilityReservation_PickingPos.AutoRefresh();
             foreach (FacilityReservation reservation in PickingPos.FacilityReservation_PickingPos)
             {
                 if (!reservation.VBiACClassID.HasValue && reservation.FacilityLot != null)

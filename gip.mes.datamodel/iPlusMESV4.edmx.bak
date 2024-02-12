@@ -4807,6 +4807,9 @@
           <Property Name="PickingPosID" Type="uniqueidentifier" />
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
           <Property Name="VisitorVoucherID" Type="uniqueidentifier" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -25273,6 +25276,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_Weighing_PickingPosID" FromRole="Weighing" ToRole="PickingPos" />
           <Property Name="VisitorVoucherID" Type="Guid" />
           <NavigationProperty Name="VisitorVoucher" Relationship="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" FromRole="Weighing" ToRole="VisitorVoucher" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="StateIndex" Type="Int16" Nullable="false" />
         </EntityType>
         <Association Name="FK_ACChangeLog_ACClass">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="1" />
@@ -39194,6 +39200,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="Weighing">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Weighing">
               <MappingFragment StoreEntitySet="Weighing">
+                <ScalarProperty Name="StateIndex" ColumnName="StateIndex" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="VisitorVoucherID" ColumnName="VisitorVoucherID" />
                 <ScalarProperty Name="LabOrderPosID" ColumnName="LabOrderPosID" />
                 <ScalarProperty Name="PickingPosID" ColumnName="PickingPosID" />

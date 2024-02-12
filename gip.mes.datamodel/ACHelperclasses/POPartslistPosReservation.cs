@@ -444,6 +444,7 @@ namespace gip.mes.datamodel
                                 childReservation.DeleteACObject(ParentPickingPos.GetObjectContext(), true);
                             }
 
+                            ParentPickingPos.Picking.VBiACClassWFID = PlanningNode?.ACClassWFID;
                             ParentPickingPos.FacilityReservation_PickingPos.Remove(tempReservation);
                             tempReservation.DeleteACObject(ParentPickingPos.GetObjectContext(), true);
                             reservationList.Remove(tempReservation);

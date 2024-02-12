@@ -1214,7 +1214,7 @@ namespace gip.mes.facility
         }
 
         #region Virtual and protected
-        public void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
+        public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages)
         {
             //if (configStores == null)

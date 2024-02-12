@@ -1414,7 +1414,7 @@ namespace gip.mes.processapplication
             {
                 totalizingScale = scale as PAEScaleTotalizing;
                 if (totalizingScale != null)
-                    disChargedWeight = totalizingScale.TotalActualWeight.ValueT;
+                    disChargedWeight = totalizingScale.TotalActualWeight.ValueT - scale.StoredWeightForPosting.ValueT;
                 else
                     // Negative Weighing
                     disChargedWeight = scale.StoredWeightForPosting.ValueT - scale.ActualWeight.ValueT;

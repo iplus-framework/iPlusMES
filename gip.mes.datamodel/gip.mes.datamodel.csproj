@@ -133,6 +133,7 @@
     <Compile Include="Enums\MovementReasonsEnum.cs" />
     <Compile Include="Enums\OperationLogEnum.cs" />
     <Compile Include="Enums\OperationLogStateEnum.cs" />
+    <Compile Include="Enums\WeighingStateEnum.cs" />
     <Compile Include="Enums\PickingStateEnum.cs" />
     <Compile Include="Enums\PostingBehaviourEnum.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
@@ -525,6 +526,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-02-11_16-26_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2024-02-09_18-45_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
