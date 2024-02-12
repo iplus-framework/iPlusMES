@@ -1154,7 +1154,10 @@ namespace gip.mes.processapplication
                         if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
                         {
                             if (previousDischargingRoute != null)
+                            {
                                 CurrentDischargingRoute = previousDischargingRoute;
+                                acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                            }
                             return StartDisResult.CycleWait;
                         }
                     }
@@ -1169,6 +1172,7 @@ namespace gip.mes.processapplication
                     if (msg != null)
                     {
                         CurrentDischargingRoute = previousDischargingRoute;
+                        acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
                     }
                     else
                     {

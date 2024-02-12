@@ -609,7 +609,7 @@ namespace gip.bso.manufacturing
 
                 var currentPickingPos = CurrentPicking.FromAppContext<PickingPos>(dbApp);
 
-                FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, currentPickingPos, ScaleActualWeight);
+                FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, currentPickingPos, null, ScaleActualWeight);
 
                 Msg msg = dbApp.ACSaveChanges();
 

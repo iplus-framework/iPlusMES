@@ -798,7 +798,10 @@ namespace gip.mes.processapplication
                 if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, dnPos, targetSilo))
                 {
                     if (previousDischargingRoute != null)
+                    {
                         CurrentDischargingRoute = previousDischargingRoute;
+                        acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                    }
                     return StartDisResult.CycleWait;
                 }
             }
@@ -809,6 +812,7 @@ namespace gip.mes.processapplication
             if (msg != null)
             {
                 CurrentDischargingRoute = previousDischargingRoute;
+                acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
             }
             else
             {
@@ -827,7 +831,7 @@ namespace gip.mes.processapplication
                 //if (actualWeight > 0)
                 if (disChargedWeight.HasValue)
                 {
-                    DoInwardBooking(disChargedWeight.Value, dbApp, previousDischargingRoute.LastOrDefault(), dnPos, null, false);
+                    DoInwardBooking(disChargedWeight.Value, dbApp, previousDischargingRoute.LastOrDefault(), fullSiloReservation?.Facility, dnPos, null, false);
                     RememberWeightOnRunDischarging(false);
                 }
                 // switch active destinations
@@ -862,7 +866,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, DeliveryNotePos dnPos, ACEventArgs e, bool isDischargingEnd)
+        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Facility facilityDest, DeliveryNotePos dnPos, ACEventArgs e, bool isDischargingEnd)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;

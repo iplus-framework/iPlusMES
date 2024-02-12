@@ -1035,7 +1035,7 @@ namespace gip.mes.processapplication
                         if (postingQuantity > 0.00001 || postingQuantity < -0.00001)
                         {
                             // 1. Bereite Buchung vor
-                            FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, postingQuantity);
+                            FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, null, postingQuantity);
                             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                             bookingParam.OutwardQuantity = (double)postingQuantity;
                             bookingParam.OutwardFacility = outwardFacility;

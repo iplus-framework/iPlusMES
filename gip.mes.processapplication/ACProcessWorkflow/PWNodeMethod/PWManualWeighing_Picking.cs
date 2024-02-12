@@ -830,7 +830,7 @@ namespace gip.mes.processapplication
                             bool canExecutePosting = CanExecutePosting(null, pickingPos);
                             if (canExecutePosting)
                             {
-                                facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
+                                facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, null, actualQuantity);
                                 bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                                 bookingParam.OutwardQuantity = (double)actualQuantity;
                                 bookingParam.OutwardFacility = facility;

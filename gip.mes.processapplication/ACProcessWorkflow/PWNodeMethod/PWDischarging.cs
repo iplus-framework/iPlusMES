@@ -905,6 +905,14 @@ namespace gip.mes.processapplication
                                         {
                                             try
                                             {
+                                                PAMSilo targetSilo = targetModule as PAMSilo;
+                                                Facility inwardFacility = null;
+                                                if (targetSilo != null && targetSilo.Facility.ValueT != null && targetSilo.Facility.ValueT.ValueT != null)
+                                                {
+                                                    Guid facilityId = targetSilo.Facility.ValueT.ValueT.FacilityID;
+                                                    inwardFacility = dbApp.Facility.Where(c => c.FacilityID == facilityId).FirstOrDefault();
+                                                }
+
                                                 if (IsIntake)
                                                 {
                                                     var pwMethod = ParentPWMethod<PWMethodIntake>();
@@ -916,13 +924,13 @@ namespace gip.mes.processapplication
                                                         picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                         PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
                                                         if (picking != null)
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, picking, pickingPos, e, true);
                                                     }
                                                     else if (pwMethod.CurrentDeliveryNotePos != null)
                                                     {
                                                         notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
                                                         if (notePos != null)
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, notePos, e, true);
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
                                                     {
@@ -944,7 +952,7 @@ namespace gip.mes.processapplication
                                                         {
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
                                                                 actualWeight = pickingPos.TargetQuantityUOM;
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, null, picking, pickingPos, e, true);
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
@@ -1086,6 +1094,7 @@ namespace gip.mes.processapplication
                     // Try keep same elements from previous root
                     if (prevRoute != null)
                     {
+                        // TODO: Pass existing Route to Routing to get a similar Route
                         if (route == null) // Predefined was not set!
                             PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
                         if (route != null)

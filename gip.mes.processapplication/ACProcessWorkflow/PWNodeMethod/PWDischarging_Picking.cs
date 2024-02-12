@@ -994,7 +994,10 @@ namespace gip.mes.processapplication
                 if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 {
                     if (previousDischargingRoute != null)
+                    {
                         CurrentDischargingRoute = previousDischargingRoute;
+                        acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                    }
                     return StartDisResult.CycleWait;
                 }
             }
@@ -1009,7 +1012,10 @@ namespace gip.mes.processapplication
                     Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 if (previousDischargingRoute != null)
+                {
                     CurrentDischargingRoute = previousDischargingRoute;
+                    acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                }
                 return StartDisResult.CycleWait;
             }
 
@@ -1023,6 +1029,7 @@ namespace gip.mes.processapplication
             if (msg != null)
             {
                 CurrentDischargingRoute = previousDischargingRoute;
+                acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
             }
             else
             {
@@ -1034,7 +1041,7 @@ namespace gip.mes.processapplication
                 if (disChargedWeight.HasValue)
                 {
                     //double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd
-                    DoInwardBooking(disChargedWeight.Value, dbApp, previousDischargingRoute.LastOrDefault(), picking, pickingPos, null, false);
+                    DoInwardBooking(disChargedWeight.Value, dbApp, previousDischargingRoute.LastOrDefault(), fullSiloReservation?.Facility, picking, pickingPos, null, false);
                     RememberWeightOnRunDischarging(false);
                 }
 
@@ -1102,7 +1109,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
+        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Facility facilityDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -1127,7 +1134,7 @@ namespace gip.mes.processapplication
                 else 
                 { 
                     // 1. Bereite Buchung vor
-                    FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, pickingPos.Material.ConvertBaseWeightToBaseUnit(actualWeight));
+                    FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, facilityDest, pickingPos.Material.ConvertBaseWeightToBaseUnit(actualWeight));
                     ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                     if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                         bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
