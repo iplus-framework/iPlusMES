@@ -1038,7 +1038,7 @@ namespace gip.mes.processapplication
         public static MsgWithDetails DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo, 
             out Route route, int searchDepth, 
             Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector,
-            string deSelectionRuleID, bool includeReserved, bool includeAllocated, object[] deSelParams = null)
+            string deSelectionRuleID, bool includeReserved, bool includeAllocated, object[] deSelParams = null, Route previousRoute = null)
         {
             route = null;
             ACComponent routingService = null;
@@ -1051,7 +1051,7 @@ namespace gip.mes.processapplication
                                  acCompFrom, acCompTo, RouteDirections.Forwards, deSelectionRuleID, deSelParams != null ? deSelParams : new object[] { },
                                  (c, p, r) => c.ACClassID == acClassIDCompTo,
                                  deSelector,
-                                 0, includeReserved, includeAllocated, false, false, searchDepth);
+                                 0, includeReserved, includeAllocated, false, false, searchDepth, false, false, previousRoute);
             if (rResult.Routes == null || !rResult.Routes.Any())
                 return new MsgWithDetails { Source = acCompFrom.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "DetermineDischargingRoute(1)", Message = "No route found" };
 
@@ -1096,7 +1096,7 @@ namespace gip.mes.processapplication
                     {
                         // TODO: Pass existing Route to Routing to get a similar Route
                         if (route == null) // Predefined was not set!
-                            PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
+                            PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams, prevRoute);
                         if (route != null)
                         {
                             // Remove same elements from root and test if rest of elements are not occupied
