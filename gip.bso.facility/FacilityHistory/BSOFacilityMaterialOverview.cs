@@ -139,6 +139,23 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
+        public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservationOverview_Child == null)
+                    _BSOFacilityReservationOverview_Child = new ACChildItem<BSOFacilityReservationOverview>(this, nameof(BSOFacilityReservationOverview_Child));
+                return _BSOFacilityReservationOverview_Child;
+            }
+        }
+
+        #endregion
+
         #region BSO->ACProperty
 
         #region BSO->ACPropertyPrimary->MaterialStock
@@ -592,88 +609,6 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region BSO->ACProperty->PickingReservation
-
-        private FacilityReservationModel _SelectedPickingReservation;
-        /// <summary>
-        /// Selected property for FacilityReservation
-        /// </summary>
-        /// <value>The selected PickingReservation</value>
-        [ACPropertySelected(9999, "PickingReservation", "en{'TODO: PickingReservation'}de{'TODO: PickingReservation'}")]
-        public FacilityReservationModel SelectedPickingReservation
-        {
-            get
-            {
-                return _SelectedPickingReservation;
-            }
-            set
-            {
-                if (_SelectedPickingReservation != value)
-                {
-                    _SelectedPickingReservation = value;
-                    OnPropertyChanged(nameof(SelectedPickingReservation));
-                }
-            }
-        }
-
-
-        private List<FacilityReservationModel> _PickingReservationList;
-        /// <summary>
-        /// List property for FacilityReservation
-        /// </summary>
-        /// <value>The PickingReservation list</value>
-        [ACPropertyList(9999, "PickingReservation")]
-        public List<FacilityReservationModel> PickingReservationList
-        {
-            get
-            {
-                return _PickingReservationList;
-            }
-        }
-
-        #endregion
-
-        #region BSO->ACProperty->ProdOrderReservation
-
-        private FacilityReservationModel _SelectedProdOrderReservation;
-        /// <summary>
-        /// Selected property for FacilityReservation
-        /// </summary>
-        /// <value>The selected ProdOrderReservation</value>
-        [ACPropertySelected(9999, "ProdOrderReservation", "en{'TODO: ProdOrderReservation'}de{'TODO: ProdOrderReservation'}")]
-        public FacilityReservationModel SelectedProdOrderReservation
-        {
-            get
-            {
-                return _SelectedProdOrderReservation;
-            }
-            set
-            {
-                if (_SelectedProdOrderReservation != value)
-                {
-                    _SelectedProdOrderReservation = value;
-                    OnPropertyChanged(nameof(SelectedProdOrderReservation));
-                }
-            }
-        }
-
-
-        private List<FacilityReservationModel> _ProdOrderReservationList;
-        /// <summary>
-        /// List property for FacilityReservation
-        /// </summary>
-        /// <value>The ProdOrderReservation list</value>
-        [ACPropertyList(9999, "ProdOrderReservation")]
-        public List<FacilityReservationModel> ProdOrderReservationList
-        {
-            get
-            {
-                return _ProdOrderReservationList;
-            }
-        }
-
-        #endregion
-
         #endregion
 
         #region BSO->ACMethod
@@ -880,7 +815,10 @@ namespace gip.bso.facility
         {
             if (!IsEnabledMethodName())
                 return;
-            LoadReservation(CurrentMaterialStock.Material, SearchFrom, SearchTo);
+            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
+            {
+                BSOFacilityReservationOverview_Child.Value.LoadReservation(CurrentMaterialStock.Material, SearchFrom, SearchTo);
+            }
         }
 
         public bool IsEnabledMethodName()
@@ -892,45 +830,10 @@ namespace gip.bso.facility
 
         private void ClearReservation()
         {
-            _PickingReservationList = null;
-            _ProdOrderReservationList = null;
-            OnPropertyChanged(nameof(PickingReservationList));
-        }
-
-        private void LoadReservation(Material material, DateTime startTime, DateTime endTime)
-        {
-            _PickingReservationList = null;
-            _ProdOrderReservationList = null;
-
-            if (material != null)
+            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
             {
-                FacilityReservation[] reservations = material.FacilityReservation_Material.Where(c => c.InsertDate >= startTime && c.InsertDate < endTime).ToArray();
-
-                List<FacilityReservation> pickingReservations = reservations.Where(c => c.PickingPos != null).OrderBy(c => c.InsertDate).ToList();
-                if (pickingReservations.Any())
-                {
-                    _PickingReservationList = new List<FacilityReservationModel>();
-                    foreach (FacilityReservation reservation in pickingReservations)
-                    {
-                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(reservation);
-                        _PickingReservationList.Add(facilityReservationModel);
-                    }
-                }
-
-                List<FacilityReservation> prodOrderReservations = reservations.Where(c => c.ProdOrderPartslistPos != null).OrderBy(c => c.InsertDate).ToList();
-                if (prodOrderReservations.Any())
-                {
-                    _ProdOrderReservationList = new List<FacilityReservationModel>();
-                    foreach (FacilityReservation reservation in prodOrderReservations)
-                    {
-                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(reservation);
-                        _ProdOrderReservationList.Add(facilityReservationModel);
-                    }
-                }
+                BSOFacilityReservationOverview_Child.Value.ClearReservation();
             }
-
-            OnPropertyChanged(nameof(PickingReservationList));
-            OnPropertyChanged(nameof(ProdOrderReservationList));
         }
 
         #endregion

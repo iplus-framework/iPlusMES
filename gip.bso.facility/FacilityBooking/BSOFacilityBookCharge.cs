@@ -2025,7 +2025,6 @@ namespace gip.bso.facility
                 info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslist), poPL.ProdOrderPartslistID));
                 service.ShowDialogOrder(this, info);
             }
-
         }
 
         public bool IsEnabledShowOrder()

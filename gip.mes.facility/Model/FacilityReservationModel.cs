@@ -15,15 +15,18 @@ namespace gip.mes.facility
 
         #region Material & Lot
 
-
         [ACPropertyInfo(1, "", ConstApp.Material)]
+        public string DocumentNo { get; set; }
+
+
+        [ACPropertyInfo(2, "", ConstApp.Material)]
         public Material Material { get; set; }
 
-        [ACPropertyInfo(2, "", ConstApp.LotNo)]
+        [ACPropertyInfo(3, "", ConstApp.LotNo)]
         public FacilityLot FacilityLot { get; set; }
 
         private string _FacilityNos;
-        [ACPropertyInfo(3, "", ConstApp.FacilityNo)]
+        [ACPropertyInfo(4, "", ConstApp.FacilityNo)]
         public string FacilityNos
         {
             get
@@ -42,10 +45,15 @@ namespace gip.mes.facility
 
         #endregion
 
+        #region Navigation properties
+        public Guid ProdOrderPartslistID { get; set; }
+        public Guid PickingID { get; set; }
+        #endregion
+
         #region Quantities
 
         public double _AssignedQuantity;
-        [ACPropertyInfo(4, "", ConstApp.AssignedQuantity)]
+        [ACPropertyInfo(5, "", ConstApp.AssignedQuantity)]
         public double AssignedQuantity
         {
             get
@@ -106,7 +114,7 @@ namespace gip.mes.facility
 
         public FacilityReservation FacilityReservation { get; set; }
 
-        [ACPropertyInfo(5, "", "en{'Oldest charge date'}de{'Ältestes Quant-Datum'}")]
+        [ACPropertyInfo(6, "", "en{'Oldest charge date'}de{'Ältestes Quant-Datum'}")]
         public DateTime? OldestFacilityChargeDate { get; set; }
 
     }

@@ -104,6 +104,7 @@
     <Compile Include="FacilityHistory\BSOFacilityMaterialOverview.cs" />
     <Compile Include="FacilityHistory\BSOFacilityChargeOverview.cs" />
     <Compile Include="FacilityHistory\BSOFacilityLocationOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityReservationOverview.cs" />
     <Compile Include="FacilityHistory\BSOTandTFastView.cs" />
     <Compile Include="Model\IntermediateMaterialOverview.cs" />
     <Compile Include="Model\TandTFastViewModel.cs" />
@@ -286,6 +287,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2024-01-23 11-13_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2024-02-13 10-26_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

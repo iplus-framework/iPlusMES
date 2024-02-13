@@ -113,6 +113,19 @@ namespace gip.bso.facility
             }
         }
 
+        ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
+        public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservationOverview_Child == null)
+                    _BSOFacilityReservationOverview_Child = new ACChildItem<BSOFacilityReservationOverview>(this, nameof(BSOFacilityReservationOverview_Child));
+                return _BSOFacilityReservationOverview_Child;
+            }
+        }
+
         #endregion
 
         #region Properties
@@ -306,7 +319,10 @@ namespace gip.bso.facility
             RefreshFacilityChargeSumMaterialHelperList();
             RefreshFacilityChargeSumFacilityHelperList();
             RefreshFacilityChargeSumLocationHelperList();
-            LoadReservation(CurrentFacilityLot);
+            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
+            {
+                BSOFacilityReservationOverview_Child.Value.LoadReservation(CurrentFacilityLot);
+            }
         }
 
         private List<FacilityLot> _FacilityLotList;
@@ -610,88 +626,6 @@ namespace gip.bso.facility
         }
         #endregion
 
-        #region BSO->ACProperty->PickingReservation
-
-        private FacilityReservationModel _SelectedPickingReservation;
-        /// <summary>
-        /// Selected property for FacilityReservation
-        /// </summary>
-        /// <value>The selected PickingReservation</value>
-        [ACPropertySelected(9999, "PickingReservation", "en{'TODO: PickingReservation'}de{'TODO: PickingReservation'}")]
-        public FacilityReservationModel SelectedPickingReservation
-        {
-            get
-            {
-                return _SelectedPickingReservation;
-            }
-            set
-            {
-                if (_SelectedPickingReservation != value)
-                {
-                    _SelectedPickingReservation = value;
-                    OnPropertyChanged(nameof(SelectedPickingReservation));
-                }
-            }
-        }
-
-
-        private List<FacilityReservationModel> _PickingReservationList;
-        /// <summary>
-        /// List property for FacilityReservation
-        /// </summary>
-        /// <value>The PickingReservation list</value>
-        [ACPropertyList(9999, "PickingReservation")]
-        public List<FacilityReservationModel> PickingReservationList
-        {
-            get
-            {
-                return _PickingReservationList;
-            }
-        }
-
-        #endregion
-
-        #region BSO->ACProperty->ProdOrderReservation
-
-        private FacilityReservationModel _SelectedProdOrderReservation;
-        /// <summary>
-        /// Selected property for FacilityReservation
-        /// </summary>
-        /// <value>The selected ProdOrderReservation</value>
-        [ACPropertySelected(9999, "ProdOrderReservation", "en{'TODO: ProdOrderReservation'}de{'TODO: ProdOrderReservation'}")]
-        public FacilityReservationModel SelectedProdOrderReservation
-        {
-            get
-            {
-                return _SelectedProdOrderReservation;
-            }
-            set
-            {
-                if (_SelectedProdOrderReservation != value)
-                {
-                    _SelectedProdOrderReservation = value;
-                    OnPropertyChanged(nameof(SelectedProdOrderReservation));
-                }
-            }
-        }
-
-
-        private List<FacilityReservationModel> _ProdOrderReservationList;
-        /// <summary>
-        /// List property for FacilityReservation
-        /// </summary>
-        /// <value>The ProdOrderReservation list</value>
-        [ACPropertyList(9999, "ProdOrderReservation")]
-        public List<FacilityReservationModel> ProdOrderReservationList
-        {
-            get
-            {
-                return _ProdOrderReservationList;
-            }
-        }
-
-        #endregion
-
         #endregion
 
         #region BSO->ACMethod
@@ -797,46 +731,6 @@ namespace gip.bso.facility
                 }
             }
             return query;
-        }
-
-        #endregion
-
-        #region BSO->ACMethod->Reservation
-
-        private void LoadReservation(FacilityLot facilityLot)
-        {
-            _PickingReservationList = null;
-            _ProdOrderReservationList = null;
-
-            if (facilityLot != null)
-            {
-                FacilityReservation[] reservations = facilityLot.FacilityReservation_FacilityLot.ToArray();
-
-                List<FacilityReservation> pickingReservations = reservations.Where(c => c.PickingPos != null).OrderBy(c => c.InsertDate).ToList();
-                if (pickingReservations.Any())
-                {
-                    _PickingReservationList = new List<FacilityReservationModel>();
-                    foreach (FacilityReservation reservation in pickingReservations)
-                    {
-                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(reservation);
-                        _PickingReservationList.Add(facilityReservationModel);
-                    }
-                }
-
-                List<FacilityReservation> prodOrderReservations = reservations.Where(c => c.ProdOrderPartslistPos != null).OrderBy(c => c.InsertDate).ToList();
-                if (prodOrderReservations.Any())
-                {
-                    _ProdOrderReservationList = new List<FacilityReservationModel>();
-                    foreach (FacilityReservation reservation in prodOrderReservations)
-                    {
-                        FacilityReservationModel facilityReservationModel = ACFacilityManager.GetFacilityReservationModel(reservation);
-                        _ProdOrderReservationList.Add(facilityReservationModel);
-                    }
-                }
-            }
-
-            OnPropertyChanged(nameof(PickingReservationList));
-            OnPropertyChanged(nameof(ProdOrderReservationList));
         }
 
         #endregion
