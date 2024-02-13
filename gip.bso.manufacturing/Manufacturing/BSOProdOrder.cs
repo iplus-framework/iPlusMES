@@ -2328,7 +2328,7 @@ namespace gip.bso.manufacturing
             newComponent.Sequence = 1;
             if (ProdOrderPartslistPosList != null)
             {
-                newComponent.Sequence = ProdOrderPartslistPosList.Max(x => x.Sequence) + 1;
+                newComponent.Sequence = ProdOrderPartslistPosList.Select(x => x.Sequence).DefaultIfEmpty().Max() + 1;
             }
             DatabaseApp.ProdOrderPartslistPos.AddObject(newComponent);
             ProdOrderPartslistPosList.Add(newComponent);
