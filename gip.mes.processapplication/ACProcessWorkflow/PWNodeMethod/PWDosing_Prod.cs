@@ -1183,7 +1183,7 @@ namespace gip.mes.processapplication
                             else
                             {
                                 preferredDosingFacilityNotRoutableHere = prioSilo;
-                                break;
+                                //break;
                             }
                         }
                     }
