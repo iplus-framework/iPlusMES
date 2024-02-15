@@ -1029,10 +1029,32 @@ namespace gip.bso.logistics
                 result = result.Where(c => c.DeliveryCompanyAddressID == SelectedFilterDeliveryAddress.CompanyAddressID);
 
             if (SelectedFilterFromFacility != null)
-                result = result.Where(c => c.PickingPos_Picking.Any(x => x.FromFacility != null && x.FromFacility.FacilityID == SelectedFilterFromFacility.FacilityID));
+            {
+                result = 
+                    result
+                    .Where(c =>
+                                !c.PickingPos_Picking.Any()// show picking without positions
+                                || c.PickingPos_Picking
+                                .Any(x => 
+                                            x.FromFacility != null 
+                                            && x.FromFacility.FacilityID == SelectedFilterFromFacility.FacilityID
+                                    )
+                          );
+            }
 
             if (SelectedFilterToFacility != null)
-                result = result.Where(c => c.PickingPos_Picking.Any(x => x.ToFacility != null && x.ToFacility.FacilityID == SelectedFilterToFacility.FacilityID));
+            {
+                result = 
+                    result
+                    .Where(c =>
+                                !c.PickingPos_Picking.Any() // show picking without positions
+                                || c.PickingPos_Picking
+                                .Any(x => 
+                                            x.ToFacility != null 
+                                            && x.ToFacility.FacilityID == SelectedFilterToFacility.FacilityID
+                                    )
+                            );
+            }
 
             if (!string.IsNullOrEmpty(FilterMaterialNo))
                 result =

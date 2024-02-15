@@ -339,31 +339,34 @@ namespace gip.mes.facility.TandTv3
                 itemTracking = FactoryForwardItem(StartItem);
 
 #if DEBUG
-            string fileName = TandTv3Command.GetLogFileName(TandTResult.Filter.ItemSystemNo, TandTv3Command.TrackingConfiguration.UseMDFile);
-            if (TandTv3Command.TandTWriteDiagnosticLog && Directory.Exists(Path.GetDirectoryName(fileName)))
+            if (TandTResult.Filter != null && TandTv3Command.TrackingConfiguration != null)
             {
-                using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
+                string fileName = TandTv3Command.GetLogFileName(TandTResult.Filter.ItemSystemNo, TandTv3Command.TrackingConfiguration.UseMDFile);
+                if (TandTv3Command.TandTWriteDiagnosticLog && Directory.Exists(Path.GetDirectoryName(fileName)))
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
                     {
-                        TandTResult.LogWritter = sw;
-                        #region T&Tv3 Log
-                        if (TandTResult.LogWritter != null)
+                        using (StreamWriter sw = new StreamWriter(fs))
                         {
-                            TandTResult.LogWritter.WriteLine("Tracking log");
-                            TandTResult.LogWritter.WriteLine(new String('-', 20));
-                            TandTResult.LogWritter.WriteLine(string.Format(@"Direction: {0}", TandTResult.Filter.MDTrackingDirectionEnum.ToString()));
-                            TandTResult.LogWritter.WriteLine(string.Format(@"Start Type: {0}", TandTResult.Filter.MDTrackingStartItemTypeEnum.ToString()));
-                            TandTResult.LogWritter.WriteLine(string.Format(@"ItemNo: {0}", TandTResult.Filter.ItemSystemNo));
-                            TandTResult.LogWritter.WriteLine(string.Format(@"PrimaryKeyID: {0}", TandTResult.Filter.PrimaryKeyID.ToString()));
+                            TandTResult.LogWritter = sw;
+                            #region T&Tv3 Log
+                            if (TandTResult.LogWritter != null)
+                            {
+                                TandTResult.LogWritter.WriteLine("Tracking log");
+                                TandTResult.LogWritter.WriteLine(new String('-', 20));
+                                TandTResult.LogWritter.WriteLine(string.Format(@"Direction: {0}", TandTResult.Filter.MDTrackingDirectionEnum.ToString()));
+                                TandTResult.LogWritter.WriteLine(string.Format(@"Start Type: {0}", TandTResult.Filter.MDTrackingStartItemTypeEnum.ToString()));
+                                TandTResult.LogWritter.WriteLine(string.Format(@"ItemNo: {0}", TandTResult.Filter.ItemSystemNo));
+                                TandTResult.LogWritter.WriteLine(string.Format(@"PrimaryKeyID: {0}", TandTResult.Filter.PrimaryKeyID.ToString()));
+                            }
+                            #endregion
+                            Process(TandTResult.Filter.MDTrackingDirectionEnum, new List<IItemTracking<IACObjectEntity>>() { itemTracking });
                         }
-                        #endregion
-                        Process(TandTResult.Filter.MDTrackingDirectionEnum, new List<IItemTracking<IACObjectEntity>>() { itemTracking });
                     }
                 }
+                else
+                    Process(TandTResult.Filter.MDTrackingDirectionEnum, new List<IItemTracking<IACObjectEntity>>() { itemTracking });
             }
-            else
-                Process(TandTResult.Filter.MDTrackingDirectionEnum, new List<IItemTracking<IACObjectEntity>>() { itemTracking });
 #else
             Process(TandTResult.Filter.MDTrackingDirectionEnum, new List<IItemTracking<IACObjectEntity>>() { itemTracking });
 #endif
