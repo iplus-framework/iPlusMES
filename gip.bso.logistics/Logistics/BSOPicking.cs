@@ -4562,6 +4562,12 @@ namespace gip.bso.logistics
                 case nameof(IsEnabledRegisterWeight):
                     result = IsEnabledRegisterWeight();
                     return true;
+                case nameof(BroadCastPicking):
+                    BroadCastPicking();
+                    return true;
+                case nameof(IsEnabledBroadCastPicking):
+                    result = IsEnabledBroadCastPicking();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
