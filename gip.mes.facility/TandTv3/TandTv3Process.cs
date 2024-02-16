@@ -48,103 +48,137 @@ namespace gip.mes.facility.TandTv3
             {
                 gip.mes.datamodel.ACClass aCClass = item as gip.mes.datamodel.ACClass;
                 if (!TandTResult.Ids.Keys.Contains(aCClass.ACClassID))
-                    tmpItem = new DoBackward_ACClass(DatabaseApp, TandTResult, aCClass) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_ACClass(DatabaseApp, TandTResult, aCClass);
+                }
             }
             if (item is DeliveryNote)
             {
                 DeliveryNote deliveryNote = item as DeliveryNote;
                 if (!TandTResult.Ids.Keys.Contains(deliveryNote.DeliveryNoteID))
-                    tmpItem = new DoBackward_DeliveryNote(DatabaseApp, TandTResult, deliveryNote) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_DeliveryNote(DatabaseApp, TandTResult, deliveryNote);
+                }
             }
             if (item is DeliveryNotePos)
             {
                 DeliveryNotePos deliveryNotePos = item as DeliveryNotePos;
                 if (!TandTResult.Ids.Keys.Contains(deliveryNotePos.DeliveryNotePosID))
-                    tmpItem = new DoBackward_DeliveryNotePos(DatabaseApp, TandTResult, deliveryNotePos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_DeliveryNotePos(DatabaseApp, TandTResult, deliveryNotePos);
+                }
             }
             if (item is Facility)
             {
                 Facility facility = item as Facility;
                 if (!TandTResult.Ids.Keys.Contains(facility.FacilityID))
-                    tmpItem = new DoBackward_Facility(DatabaseApp, TandTResult, facility) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_Facility(DatabaseApp, TandTResult, facility);
+                }
             }
             if (item is FacilityBooking)
             {
                 FacilityBooking facilityBooking = item as FacilityBooking;
                 if (!TandTResult.Ids.Keys.Contains(facilityBooking.FacilityBookingID))
-                    tmpItem = new DoBackward_FacilityBooking(DatabaseApp, TandTResult, facilityBooking) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_FacilityBooking(DatabaseApp, TandTResult, facilityBooking);
+                }
             }
             if (item is FacilityBookingCharge)
             {
                 FacilityBookingCharge facilityBookingCharge = item as FacilityBookingCharge;
                 if (!TandTResult.Ids.Keys.Contains(facilityBookingCharge.FacilityBookingChargeID))
-                    tmpItem = new DoBackward_FacilityBookingCharge(DatabaseApp, TandTResult, facilityBookingCharge) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_FacilityBookingCharge(DatabaseApp, TandTResult, facilityBookingCharge);
+                }
             }
             if (item is FacilityCharge)
             {
                 FacilityCharge facilityCharge = item as FacilityCharge;
                 if (!TandTResult.Ids.Keys.Contains(facilityCharge.FacilityChargeID))
-                    tmpItem = new DoBackward_FacilityCharge(DatabaseApp, TandTResult, facilityCharge) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_FacilityCharge(DatabaseApp, TandTResult, facilityCharge);
+                }
             }
             if (item is FacilityLot)
             {
                 FacilityLot facilityLot = item as FacilityLot;
                 if (!TandTResult.Ids.Keys.Contains(facilityLot.FacilityLotID))
-                    tmpItem = new DoBackward_FacilityLot(DatabaseApp, TandTResult, facilityLot) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_FacilityLot(DatabaseApp, TandTResult, facilityLot);
+                }
             }
             if (item is FacilityPreBooking)
             {
                 FacilityPreBooking facilityPreBooking = item as FacilityPreBooking;
                 if (!TandTResult.Ids.Keys.Contains(facilityPreBooking.FacilityPreBookingID))
-                    tmpItem = new DoBackward_FacilityPreBooking(DatabaseApp, TandTResult, facilityPreBooking) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_FacilityPreBooking(DatabaseApp, TandTResult, facilityPreBooking);
+                }
             }
             if (item is InOrder)
             {
                 InOrder inOrder = item as InOrder;
                 if (!TandTResult.Ids.Keys.Contains(inOrder.InOrderID))
-                    tmpItem = new DoBackward_InOrder(DatabaseApp, TandTResult, inOrder) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_InOrder(DatabaseApp, TandTResult, inOrder);
+                }
             }
             if (item is InOrderPos)
             {
                 InOrderPos inOrderPos = item as InOrderPos;
                 if (!TandTResult.Ids.Keys.Contains(inOrderPos.InOrderPosID))
-                    tmpItem = new DoBackward_InOrderPos(DatabaseApp, TandTResult, inOrderPos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_InOrderPos(DatabaseApp, TandTResult, inOrderPos);
+                }
             }
             if (item is OutOrder)
             {
                 OutOrder outOrder = item as OutOrder;
                 if (!TandTResult.Ids.Keys.Contains(outOrder.OutOrderID))
-                    tmpItem = new DoBackward_OutOrder(DatabaseApp, TandTResult, outOrder) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_OutOrder(DatabaseApp, TandTResult, outOrder);
+                }
             }
             if (item is OutOrderPos)
             {
                 OutOrderPos outOrderPos = item as OutOrderPos;
                 if (!TandTResult.Ids.Keys.Contains(outOrderPos.OutOrderPosID))
-                    tmpItem = new DoBackward_OutOrderPos(DatabaseApp, TandTResult, outOrderPos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_OutOrderPos(DatabaseApp, TandTResult, outOrderPos);
+                }
             }
             if (item is ProdOrder)
             {
                 ProdOrder prodOrder = item as ProdOrder;
                 if (!TandTResult.Ids.Keys.Contains(prodOrder.ProdOrderID))
-                    tmpItem = new DoBackward_ProdOrder(DatabaseApp, TandTResult, prodOrder) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_ProdOrder(DatabaseApp, TandTResult, prodOrder);
+                }
             }
             if (item is ProdOrderPartslist)
             {
                 ProdOrderPartslist prodOrderPartslist = item as ProdOrderPartslist;
                 if (!TandTResult.Ids.Keys.Contains(prodOrderPartslist.ProdOrderPartslistID))
-                    tmpItem = new DoBackward_ProdOrderPartslist(DatabaseApp, TandTResult, prodOrderPartslist) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_ProdOrderPartslist(DatabaseApp, TandTResult, prodOrderPartslist);
+                }
             }
             if (item is ProdOrderPartslistPos)
             {
                 ProdOrderPartslistPos prodOrderPartslistPos = item as ProdOrderPartslistPos;
                 if (!TandTResult.Ids.Keys.Contains(prodOrderPartslistPos.ProdOrderPartslistPosID))
-                    tmpItem = new DoBackward_ProdOrderPartslistPos(DatabaseApp, TandTResult, prodOrderPartslistPos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_ProdOrderPartslistPos(DatabaseApp, TandTResult, prodOrderPartslistPos);
+                }
             }
             if (item is ProdOrderPartslistPosRelation)
             {
                 ProdOrderPartslistPosRelation prodOrderPartslistPosRelation = item as ProdOrderPartslistPosRelation;
                 if (!TandTResult.Ids.Keys.Contains(prodOrderPartslistPosRelation.ProdOrderPartslistPosRelationID))
-                    tmpItem = new DoBackward_ProdOrderPartslistPosRelation(DatabaseApp, TandTResult, prodOrderPartslistPosRelation) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoBackward_ProdOrderPartslistPosRelation(DatabaseApp, TandTResult, prodOrderPartslistPosRelation);
+                }
             }
 
             return tmpItem;
@@ -158,103 +192,137 @@ namespace gip.mes.facility.TandTv3
             {
                 gip.mes.datamodel.ACClass aCClass = item as gip.mes.datamodel.ACClass;
                 if (!TandTResult.Ids.Keys.Contains(aCClass.ACClassID))
-                    tmpItem = new DoForward_ACClass(DatabaseApp, TandTResult, aCClass) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_ACClass(DatabaseApp, TandTResult, aCClass);
+                }
             }
             if (item is DeliveryNote)
             {
                 DeliveryNote deliveryNote = item as DeliveryNote;
                 if (!TandTResult.Ids.Keys.Contains(deliveryNote.DeliveryNoteID))
-                    tmpItem = new DoForward_DeliveryNote(DatabaseApp, TandTResult, deliveryNote) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_DeliveryNote(DatabaseApp, TandTResult, deliveryNote);
+                }
             }
             if (item is DeliveryNotePos)
             {
                 DeliveryNotePos deliveryNotePos = item as DeliveryNotePos;
                 if (!TandTResult.Ids.Keys.Contains(deliveryNotePos.DeliveryNotePosID))
+                {
                     tmpItem = new DoForward_DeliveryNotePos(DatabaseApp, TandTResult, deliveryNotePos) as IItemTracking<IACObjectEntity>;
+                }
             }
             if (item is Facility)
             {
                 Facility facility = item as Facility;
                 if (!TandTResult.Ids.Keys.Contains(facility.FacilityID))
-                    tmpItem = new DoForward_Facility(DatabaseApp, TandTResult, facility) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_Facility(DatabaseApp, TandTResult, facility);
+                }
             }
             if (item is FacilityBooking)
             {
                 FacilityBooking facilityBooking = item as FacilityBooking;
                 if (!TandTResult.Ids.Keys.Contains(facilityBooking.FacilityBookingID))
-                    tmpItem = new DoForward_FacilityBooking(DatabaseApp, TandTResult, facilityBooking) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_FacilityBooking(DatabaseApp, TandTResult, facilityBooking);
+                }
             }
             if (item is FacilityBookingCharge)
             {
                 FacilityBookingCharge facilityBookingCharge = item as FacilityBookingCharge;
                 if (!TandTResult.Ids.Keys.Contains(facilityBookingCharge.FacilityBookingChargeID))
-                    tmpItem = new DoForward_FacilityBookingCharge(DatabaseApp, TandTResult, facilityBookingCharge) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_FacilityBookingCharge(DatabaseApp, TandTResult, facilityBookingCharge);
+                }
             }
             if (item is FacilityCharge)
             {
                 FacilityCharge facilityCharge = item as FacilityCharge;
                 if (!TandTResult.Ids.Keys.Contains(facilityCharge.FacilityChargeID))
-                    tmpItem = new DoForward_FacilityCharge(DatabaseApp, TandTResult, facilityCharge) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_FacilityCharge(DatabaseApp, TandTResult, facilityCharge);
+                }
             }
             if (item is FacilityLot)
             {
                 FacilityLot facilityLot = item as FacilityLot;
                 if (!TandTResult.Ids.Keys.Contains(facilityLot.FacilityLotID))
-                    tmpItem = new DoForward_FacilityLot(DatabaseApp, TandTResult, facilityLot) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_FacilityLot(DatabaseApp, TandTResult, facilityLot);
+                }
             }
             if (item is FacilityPreBooking)
             {
                 FacilityPreBooking facilityPreBooking = item as FacilityPreBooking;
                 if (!TandTResult.Ids.Keys.Contains(facilityPreBooking.FacilityPreBookingID))
-                    tmpItem = new DoForward_FacilityPreBooking(DatabaseApp, TandTResult, facilityPreBooking) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_FacilityPreBooking(DatabaseApp, TandTResult, facilityPreBooking);
+                }
             }
             if (item is InOrder)
             {
                 InOrder inOrder = item as InOrder;
                 if (!TandTResult.Ids.Keys.Contains(inOrder.InOrderID))
-                    tmpItem = new DoForward_InOrder(DatabaseApp, TandTResult, inOrder) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_InOrder(DatabaseApp, TandTResult, inOrder);
+                }
             }
             if (item is InOrderPos)
             {
                 InOrderPos inOrderPos = item as InOrderPos;
                 if (!TandTResult.Ids.Keys.Contains(inOrderPos.InOrderPosID))
-                    tmpItem = new DoForward_InOrderPos(DatabaseApp, TandTResult, inOrderPos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_InOrderPos(DatabaseApp, TandTResult, inOrderPos);
+                }
             }
             if (item is OutOrder)
             {
                 OutOrder outOrder = item as OutOrder;
                 if (!TandTResult.Ids.Keys.Contains(outOrder.OutOrderID))
-                    tmpItem = new DoForward_OutOrder(DatabaseApp, TandTResult, outOrder) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_OutOrder(DatabaseApp, TandTResult, outOrder);
+                }
             }
             if (item is OutOrderPos)
             {
                 OutOrderPos outOrderPos = item as OutOrderPos;
                 if (!TandTResult.Ids.Keys.Contains(outOrderPos.OutOrderPosID))
-                    tmpItem = new DoForward_OutOrderPos(DatabaseApp, TandTResult, outOrderPos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_OutOrderPos(DatabaseApp, TandTResult, outOrderPos);
+                }
             }
             if (item is ProdOrder)
             {
                 ProdOrder prodOrder = item as ProdOrder;
                 if (!TandTResult.Ids.Keys.Contains(prodOrder.ProdOrderID))
-                    tmpItem = new DoForward_ProdOrder(DatabaseApp, TandTResult, prodOrder) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_ProdOrder(DatabaseApp, TandTResult, prodOrder);
+                }
             }
             if (item is ProdOrderPartslist)
             {
                 ProdOrderPartslist prodOrderPartslist = item as ProdOrderPartslist;
                 if (!TandTResult.Ids.Keys.Contains(prodOrderPartslist.ProdOrderPartslistID))
-                    tmpItem = new DoForward_ProdOrderPartslist(DatabaseApp, TandTResult, prodOrderPartslist) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_ProdOrderPartslist(DatabaseApp, TandTResult, prodOrderPartslist);
+                }
             }
             if (item is ProdOrderPartslistPos)
             {
                 ProdOrderPartslistPos prodOrderPartslistPos = item as ProdOrderPartslistPos;
                 if (!TandTResult.Ids.Keys.Contains(prodOrderPartslistPos.ProdOrderPartslistPosID))
-                    tmpItem = new DoForward_ProdOrderPartslistPos(DatabaseApp, TandTResult, prodOrderPartslistPos) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_ProdOrderPartslistPos(DatabaseApp, TandTResult, prodOrderPartslistPos);
+                }
             }
             if (item is ProdOrderPartslistPosRelation)
             {
                 ProdOrderPartslistPosRelation prodOrderPartslistPosRelation = item as ProdOrderPartslistPosRelation;
                 if (!TandTResult.Ids.Keys.Contains(prodOrderPartslistPosRelation.ProdOrderPartslistPosRelationID))
-                    tmpItem = new DoForward_ProdOrderPartslistPosRelation(DatabaseApp, TandTResult, prodOrderPartslistPosRelation) as IItemTracking<IACObjectEntity>;
+                {
+                    tmpItem = new DoForward_ProdOrderPartslistPosRelation(DatabaseApp, TandTResult, prodOrderPartslistPosRelation);
+                }
             }
 
             return tmpItem;
@@ -333,6 +401,23 @@ namespace gip.mes.facility.TandTv3
                 TandTResult.Filter.BackgroundWorker.ProgressInfo.TotalProgress.ProgressText = string.Format("Tracking: [{0}] | Start fetching data...", TandTResult.Filter.ItemSystemNo);
             }
             IItemTracking<IACObjectEntity> itemTracking = null;
+
+            if(StartItem is FacilityBooking)
+            {
+                FacilityBooking facilityBooking = StartItem as FacilityBooking;
+                if(facilityBooking != null)
+                {
+                    if(facilityBooking.InwardTargetQuantity > 0)
+                    {
+                        TandTResult.StartingQuantity = facilityBooking.InwardTargetQuantity;
+                    }
+                    else if(facilityBooking.OutwardQuantity > 0)
+                    {
+                        TandTResult.StartingQuantity = facilityBooking.OutwardTargetQuantity;
+                    }
+                }
+            }
+
             if (TandTResult.Filter.MDTrackingDirectionEnum == MDTrackingDirectionEnum.Backward)
                 itemTracking = FactoryBacwardItem(StartItem);
             if (TandTResult.Filter.MDTrackingDirectionEnum == MDTrackingDirectionEnum.Forward)

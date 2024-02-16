@@ -73,6 +73,24 @@ namespace gip.mes.datamodel
 
         }
 
+        [ConfigurationProperty(nameof(RootLogFolder), DefaultValue = "")]
+        public double? PercentageToFollow
+        {
+            get
+            {
+                if(this[nameof(PercentageToFollow)] == null)
+                {
+                    return null;
+                }
+                return (double)this[nameof(PercentageToFollow)];
+            }
+            set
+            {
+                this[nameof(PercentageToFollow)] = value;
+            }
+
+        }
+
         public static TrackingConfiguration FactoryDefaultConfiguration()
         {
             TrackingConfiguration trackingConfiguration= new TrackingConfiguration();
