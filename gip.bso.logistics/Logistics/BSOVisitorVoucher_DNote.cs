@@ -101,35 +101,58 @@ namespace gip.bso.logistics
                 if (_AccessUnAssignedDeliveryNote == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "DeliveryNoteUnAssigned", ACType.ACIdentifier);
-                    bool rebuildACQueryDef = false;
-                    if (navACQueryDefinition.ACFilterColumns.Count <= 0)
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "VisitorVoucherID")
-                            {
-                                if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
-                                    countFoundCorrect++;
-                            }
-                        }
-                        if (countFoundCorrect < 1)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
-                        navACQueryDefinition.SaveConfig(true);
-                    }
+                    //bool rebuildACQueryDef = false;
+                    //if (navACQueryDefinition.ACFilterColumns.Count <= 0)
+                    //{
+                    //    rebuildACQueryDef = true;
+                    //}
+                    //else
+                    //{
+                    //    int countFoundCorrect = 0;
+                    //    foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
+                    //    {
+                    //        if (filterItem.PropertyName == "VisitorVoucherID")
+                    //        {
+                    //            if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
+                    //                countFoundCorrect++;
+                    //        }
+                    //    }
+                    //    if (countFoundCorrect < 1)
+                    //        rebuildACQueryDef = true;
+                    //}
+                    //if (rebuildACQueryDef)
+                    //{
+                    //    navACQueryDefinition.ClearFilter(true);
+                    //    navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
+                    //    navACQueryDefinition.SaveConfig(true);
+                    //}
                     _AccessUnAssignedDeliveryNote = navACQueryDefinition.NewAccessNav<DeliveryNote>("UnAssignedDeliveryNote", this);
                     _AccessUnAssignedDeliveryNote.AutoSaveOnNavigation = false;
+                    _AccessUnAssignedDeliveryNote.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessUnAssignedDeliveryNote_DefaultFilter, AccessUnAssignedDeliveryNote_DefaultSort);
                 }
                 return _AccessUnAssignedDeliveryNote;
+            }
+        }
+
+        private List<ACFilterItem> AccessUnAssignedDeliveryNote_DefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true),
+                };
+            }
+        }
+
+        private List<ACSortItem> AccessUnAssignedDeliveryNote_DefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("DeliveryNoteNo", Global.SortDirections.ascending, true),
+                };
             }
         }
 

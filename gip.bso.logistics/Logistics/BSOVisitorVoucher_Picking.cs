@@ -101,51 +101,78 @@ namespace gip.bso.logistics
                 if (_AccessUnAssignedPicking == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "PickingUnAssigned", ACType.ACIdentifier);
-                    bool rebuildACQueryDef = false;
-                    if (navACQueryDefinition.ACFilterColumns.Count <= 0)
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "PickingTypeIndex")
-                            {
-                                string pickingTypeNo = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
-                                if ((filterItem.SearchWord == pickingTypeNo) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
-                                    countFoundCorrect++;
-                            }
-                            //else if (filterItem.PropertyName == "PickingStateIndex")
-                            //{
-                            //    string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
-                            //    if ((filterItem.SearchWord == pickingState) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThan)
-                            //        countFoundCorrect++;
-                            //}
-                            else if (filterItem.PropertyName == "VisitorVoucherID")
-                            {
-                                if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
-                                    countFoundCorrect++;
-                            }
-                        }
-                        if (countFoundCorrect < 2)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        navACQueryDefinition.ClearFilter(true);
-                        string pickingType = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, pickingType, true));
-                        //string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
-                        //navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingStateIndex", Global.LogicalOperators.isNull, Global.Operators.and, pickingState, true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
-                        navACQueryDefinition.SaveConfig(true);
-                    }
+                    //bool rebuildACQueryDef = false;
+                    //if (navACQueryDefinition.ACFilterColumns.Count <= 0)
+                    //{
+                    //    rebuildACQueryDef = true;
+                    //}
+                    //else
+                    //{
+                    //    int countFoundCorrect = 0;
+                    //    foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
+                    //    {
+                    //        if (filterItem.PropertyName == "PickingTypeIndex")
+                    //        {
+                    //            string pickingTypeNo = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
+                    //            if ((filterItem.SearchWord == pickingTypeNo) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
+                    //                countFoundCorrect++;
+                    //        }
+                    //        //else if (filterItem.PropertyName == "PickingStateIndex")
+                    //        //{
+                    //        //    string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
+                    //        //    if ((filterItem.SearchWord == pickingState) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThan)
+                    //        //        countFoundCorrect++;
+                    //        //}
+                    //        else if (filterItem.PropertyName == "VisitorVoucherID")
+                    //        {
+                    //            if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
+                    //                countFoundCorrect++;
+                    //        }
+                    //    }
+                    //    if (countFoundCorrect < 2)
+                    //        rebuildACQueryDef = true;
+                    //}
+                    //if (rebuildACQueryDef)
+                    //{
+                    //    navACQueryDefinition.ClearFilter(true);
+                    //    string pickingType = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
+                    //    navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, pickingType, true));
+                    //    //string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
+                    //    //navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingStateIndex", Global.LogicalOperators.isNull, Global.Operators.and, pickingState, true));
+                    //    navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
+                    //    navACQueryDefinition.SaveConfig(true);
+                    //}
                     _AccessUnAssignedPicking = navACQueryDefinition.NewAccessNav<Picking>("UnAssignedPicking", this);
                     _AccessUnAssignedPicking.AutoSaveOnNavigation = false;
+                    _AccessUnAssignedPicking.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessUnAssignedPicking_DefaultFilter, AccessUnAssignedPicking_DefaultSort);
                 }
                 return _AccessUnAssignedPicking;
+            }
+        }
+
+        private List<ACFilterItem> AccessUnAssignedPicking_DefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.IssueVehicle), true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true)
+                };
+            }
+        }
+
+        private List<ACSortItem> AccessUnAssignedPicking_DefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("PickingNo", Global.SortDirections.descending, true),
+                };
             }
         }
 

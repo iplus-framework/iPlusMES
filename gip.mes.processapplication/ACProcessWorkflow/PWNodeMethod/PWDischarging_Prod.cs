@@ -1630,14 +1630,14 @@ namespace gip.mes.processapplication
                 if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
                     return plannedSilo;
             }
-            //foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
-            //{
-            //    if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-            //    {
-            //        plannedSilo.ReservationState = GlobalApp.ReservationState.New;
-            //        return plannedSilo;
-            //    }
-            //}
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
+            {
+                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+                {
+                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
+                    return plannedSilo;
+                }
+            }
             return null;
         }
 
@@ -1656,14 +1656,14 @@ namespace gip.mes.processapplication
                 if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
                     return plannedSilo;
             }
-            //foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
-            //{
-            //    if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-            //    {
-            //        plannedSilo.ReservationState = GlobalApp.ReservationState.New;
-            //        return plannedSilo;
-            //    }
-            //}
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
+            {
+                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
+                {
+                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
+                    return plannedSilo;
+                }
+            }
             return null;
         }
 

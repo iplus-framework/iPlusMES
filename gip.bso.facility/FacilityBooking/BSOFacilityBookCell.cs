@@ -1060,7 +1060,6 @@ namespace gip.bso.facility
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot lot = dlgResult.ReturnValue as FacilityLot;
-                CurrentFacility.Material.FacilityLot_Material.Add(lot);
                 CurrentBookParamInwardMovement.InwardFacilityLot = lot;
                 OnPropertyChanged(nameof(FacilityLotList));
             }
