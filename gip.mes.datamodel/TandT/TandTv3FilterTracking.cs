@@ -198,6 +198,7 @@ namespace gip.mes.datamodel
         public StreamWriter LogFileStream { get; set; }
 
         public int? OrderDepth { get; set; }
+        public int? MaxOrderCount { get; set; }
 
         private List<string> _MaterialNOsForStopTracking;
         /// <summary>
