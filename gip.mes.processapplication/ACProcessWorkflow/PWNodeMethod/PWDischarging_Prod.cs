@@ -787,6 +787,7 @@ namespace gip.mes.processapplication
                     var batchPlan = dbApp.ProdOrderBatchPlan.Where(c => c.ProdOrderBatchPlanID == pwMethod.CurrentProdOrderBatch.ProdOrderBatchPlanID.Value).FirstOrDefault();
                     if (batchPlan == null || !batchPlan.VBiACClassWFID.HasValue)
                     {
+                        CheckIfAutomaticTargetChangePossible = false;
                         // Error50068: Reference from Batchplan to Workflownode is null
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(2)", 1220, "Error50068",
                                         batchPlan == null ? "" : batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
@@ -804,6 +805,7 @@ namespace gip.mes.processapplication
 
                     if (CurrentDischargingDest(dbIPlus, false) == null)
                     {
+                        CheckIfAutomaticTargetChangePossible = false;
                         // Error50072: CurrentDischargingDest() is null because no route couldn't be found at Order {0}, Bill of material {1}, Line {2}.
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(3)", 1230, "Error50072",
                                         batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
@@ -821,6 +823,7 @@ namespace gip.mes.processapplication
                     targetContainer = TargetPAModule(null);
                     if (targetContainer == null)
                     {
+                        CheckIfAutomaticTargetChangePossible = false;
                         // Error50073: targetSilo is null at Order {0}, Bill of material {1}, Line {2}.
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(4)", 1240, "Error50073",
                                         batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
@@ -921,6 +924,7 @@ namespace gip.mes.processapplication
                     gip.core.datamodel.ACClass acClassSilo = nextPlannedSiloReservation.Facility.GetFacilityACClass(Root.Database as Database);
                     if (acClassSilo == null)
                     {
+                        CheckIfAutomaticTargetChangePossible = false;
                         // Error50070: acClassSilo is null at Order {0}, Bill of material {1}, Line {2}
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(8)", 1280, "Error50070",
                                         batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
@@ -939,6 +943,7 @@ namespace gip.mes.processapplication
                     ACComponent targetSiloACComp = this.Root.ACUrlCommand(acClassSilo.GetACUrlComponent()) as ACComponent;
                     if (targetSiloACComp == null)
                     {
+                        CheckIfAutomaticTargetChangePossible = false;
                         // Error50071: targetSiloACComp is null at Order {0}, Bill of material {1}, Line {2}
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "OnHandleStateCheckFullSilo(9)", 1290, "Error50071",
                                         batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
@@ -1061,8 +1066,6 @@ namespace gip.mes.processapplication
                     double? disChargedWeight = GetDischargedWeight(true);
 
                     bool isNewACMethod = false;
-                    CheckIfAutomaticTargetChangePossible = null;
-
                     if (acMethod == null)
                     {
                         core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
@@ -1176,6 +1179,7 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
+                        CheckIfAutomaticTargetChangePossible = true;
                         if (disChargedWeight.HasValue)
                         {
                             DoInwardBooking(disChargedWeight.Value, dbApp, previousDischargingRoute.LastOrDefault(), fullSiloReservation.Facility, currentBatchPos, null, false);

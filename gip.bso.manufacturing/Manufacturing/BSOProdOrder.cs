@@ -3276,14 +3276,23 @@ namespace gip.bso.manufacturing
             ProdOrderPartslistPos item = SelectedIntermediate;
             if (SelectedProdOrderIntermediateBatch != null)
                 item = SelectedProdOrderIntermediateBatch;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", item.Material);
-            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            string lotNo = null;
+            FacilityLot result = null;
+            this.ProdOrderManager.GetFacilityLotForPos(Database, DatabaseApp, item, false, out result, out lotNo, null);
+            if (result == null)
+            {
+                VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), lotNo, item.Material);
+                if (dlgResult.SelectedCommand == eMsgButton.OK)
+                {
+                    result = dlgResult.ReturnValue as FacilityLot;
+                }
+            }
+
+            if (result != null)
             {
                 item = SelectedIntermediate;
                 if (SelectedProdOrderIntermediateBatch != null)
                     item = SelectedProdOrderIntermediateBatch;
-
-                FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 item.FacilityLot = result;
                 // Clear lot in parent / children sequence from new lot defined membmerd
                 if (SelectedProdOrderIntermediateBatch != null && SelectedIntermediate.FacilityLot != null)
@@ -3298,6 +3307,7 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged(nameof(ProdOrderIntermediateBatchList));
                 Save();
             }
+
             if (childBSO != null)
                 childBSO.Stop();
         }
@@ -3311,7 +3321,7 @@ namespace gip.bso.manufacturing
                 childBSO = StartComponent(ConstApp.BSOFacilityLot_ChildName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", SelectedProdOrderIntermediateBatch.Material);
+            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), "", SelectedProdOrderIntermediateBatch.Material);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot facilityLot = dlgResult.ReturnValue as FacilityLot;

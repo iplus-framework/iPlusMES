@@ -8,6 +8,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
 using DocumentFormat.OpenXml.Vml.Office;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -708,6 +709,7 @@ namespace gip.mes.processapplication
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 if (previousDischargingRoute != null)
                     CurrentDischargingRoute = previousDischargingRoute;
+                CheckIfAutomaticTargetChangePossible = false;
                 return StartDisResult.CycleWait;
             }
 
@@ -816,6 +818,7 @@ namespace gip.mes.processapplication
             }
             else
             {
+                CheckIfAutomaticTargetChangePossible = true;
                 //if (intakeBin.Scale != null)
                 //    intakeBin.Scale.StoredTareWeight.ValueT = intakeBin.Scale.ActualWeight.ValueT;
                 if (fullSiloReservation != null)
@@ -971,6 +974,14 @@ namespace gip.mes.processapplication
 
                         var facilityManager = ParentPWMethod<PWMethodIntake>().ACFacilityManager;
                         var inDeliveryNoteManager = ParentPWMethod<PWMethodIntake>().InDeliveryNoteManager;
+
+                        //Alibi-No
+                        Weighing weighing = InsertNewWeighingIfAlibi(dbApp, actualWeight, e);
+                        if (weighing != null)
+                        {
+                            weighing.InOrderPos = currentPos.InOrderPos;
+                            currentPos.InOrderPos.Weighing_InOrderPos.Add(weighing);
+                        }
 
                         FacilityPreBooking facilityPreBooking = inDeliveryNoteManager.NewFacilityPreBooking(facilityManager, dbApp, currentPos);
                         ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;

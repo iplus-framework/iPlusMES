@@ -164,7 +164,7 @@ namespace gip.mes.processapplication
         [ACPropertyBindingTarget(441, "Read from PLC", "en{'Allocated by Way'}de{'Belegt von Wegesteuerung'}", "", false, false)]
         public IACContainerTNet<BitAccessForAllocatedByWay> AllocatedByWay { get; set; }
 
-        [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", false, false)]
+        [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", true, true)]
         public IACContainerTNet<TimeSpan> DepletingTime { get; set; }
         #endregion
 

@@ -927,6 +927,13 @@ namespace gip.mes.processapplication
             resultTranslation.Add("ScaleTotalWeight", "en{'Total quantity'}de{'Gesamtgewicht'}");
             method.ResultValueList.Add(new ACValue("DischargingTime", typeof(TimeSpan), TimeSpan.Zero, Global.ParamOption.Optional));
             resultTranslation.Add("DischargingTime", "en{'Discharging time'}de{'Entleerzeit'}");
+            method.ResultValueList.Add(new ACValue("GaugeCode", typeof(string), "", Global.ParamOption.Optional));
+            resultTranslation.Add("GaugeCode", "en{'Gauge code/Alibi-No.'}de{'Wägeid/Alibi-No.'}");
+            //method.ResultValueList.Add(new ACValue("GaugeCodeStart", typeof(string), "", Global.ParamOption.Optional));
+            //resultTranslation.Add("GaugeCodeStart", "en{'Gauge code start/Alibi-No.'}de{'Wägeid Start/Alibi-No.'}");
+            //method.ResultValueList.Add(new ACValue("GaugeCodeEnd", typeof(string), "", Global.ParamOption.Optional));
+            //resultTranslation.Add("GaugeCodeEnd", "en{'Gauge code end/Alibi-No.'}de{'Wägeid Ende/Alibi-No.'}");
+
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
         }

@@ -1923,11 +1923,11 @@ namespace gip.mes.processapplication
             method.ResultValueList.Add(new ACValue("Temperature", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             resultTranslation.Add("Temperature", "en{'Temperature'}de{'Temperatur'}");
             method.ResultValueList.Add(new ACValue("GaugeCode", typeof(string), "", Global.ParamOption.Optional));
-            resultTranslation.Add("GaugeCode", "en{'Gauge code'}de{'Wägeid'}");
+            resultTranslation.Add("GaugeCode", "en{'Gauge code/Alibi-No.'}de{'Wägeid/Alibi-No.'}");
             method.ResultValueList.Add(new ACValue("GaugeCodeStart", typeof(string), "", Global.ParamOption.Optional));
-            resultTranslation.Add("GaugeCodeStart", "en{'Gauge code start'}de{'Wägeid Start'}");
+            resultTranslation.Add("GaugeCodeStart", "en{'Gauge code start/Alibi-No.'}de{'Wägeid Start/Alibi-No.'}");
             method.ResultValueList.Add(new ACValue("GaugeCodeEnd", typeof(string), "", Global.ParamOption.Optional));
-            resultTranslation.Add("GaugeCodeEnd", "en{'Gauge code end'}de{'Wägeid Ende'}");
+            resultTranslation.Add("GaugeCodeEnd", "en{'Gauge code end/Alibi-No.'}de{'Wägeid Ende/Alibi-No.'}");
             method.ResultValueList.Add(new ACValue("FlowRate", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             resultTranslation.Add("FlowRate", "en{'Flow rate'}de{'Durchflussrate'}");
             method.ResultValueList.Add(new ACValue("ImpulseCounter", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
