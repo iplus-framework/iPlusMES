@@ -1957,7 +1957,6 @@ namespace gip.bso.facility
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot lot = dlgResult.ReturnValue as FacilityLot;
-                CurrentFacilityCharge.Material.FacilityLot_Material.Add(lot);
                 _AccessFacilityLot.NavList.Add(lot);
                 OnPropertyChanged(nameof(FacilityLotList));
                 CurrentFacilityLot = lot;

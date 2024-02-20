@@ -8,7 +8,8 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Xml;
 using gip.core.processapplication;
-using System.Runtime.CompilerServices;
+
+using System.Reflection.Emit;
 
 namespace gip.mes.processapplication
 {
@@ -724,16 +725,48 @@ namespace gip.mes.processapplication
             if (!IsProduction && !IsIntake && !IsRelocation && !IsLoading)
                 return StartDisResult.WaitForCallback;
 
+            //if (!IsConditionForDestinationChange(discharging))
+            //{
+            //    NoTargetWait = null;
+            //    return StartDisResult.WaitForCallback;
+            //}
+            //else if (!discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            //{
+            //    return StartDisResult.CycleWait;
+            //}
+            //else if (discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            //{
+            //    CheckIfAutomaticTargetChangePossible = null;
+            //    discharging.FaultAckDestinationFull.ValueT = false;
+            //}
+
             if (!IsConditionForDestinationChange(discharging))
             {
+                if (discharging.StateDestinationFull.ValueT == PANotifyState.Off && CheckIfAutomaticTargetChangePossible.HasValue)
+                    CheckIfAutomaticTargetChangePossible = null;
                 NoTargetWait = null;
                 return StartDisResult.WaitForCallback;
             }
-            else if (!discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            // If Target full, but last destination-search was unsucessfull, then wait for User-Acknowledge
+            if (   discharging.StateDestinationFull.ValueT != PANotifyState.Off
+                && !discharging.FaultAckDestinationFull.ValueT
+                && CheckIfAutomaticTargetChangePossible.HasValue
+                && !CheckIfAutomaticTargetChangePossible.Value)
             {
                 return StartDisResult.CycleWait;
             }
-            else if (discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            // Destination Changed and wait for Response from PLC -> Wait
+            if (discharging.StateDestinationFull.ValueT != PANotifyState.Off
+                && discharging.FaultAckDestinationFull.ValueT
+                && CheckIfAutomaticTargetChangePossible.HasValue
+                && CheckIfAutomaticTargetChangePossible.Value)
+            {
+                return StartDisResult.CycleWait;
+            }
+            if (   discharging.StateDestinationFull.ValueT != PANotifyState.Off
+                && discharging.FaultAckDestinationFull.ValueT
+                && CheckIfAutomaticTargetChangePossible.HasValue
+                && IsSimulationOn)
             {
                 CheckIfAutomaticTargetChangePossible = null;
                 discharging.FaultAckDestinationFull.ValueT = false;
@@ -982,6 +1015,14 @@ namespace gip.mes.processapplication
                                                             DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
                                                     }
                                                 }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Messages.LogException(this.GetACUrl(), "TaskCallback(21)", ex);
+                                                ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                                                OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "TaskCallback", 1021), true);
+                                                discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
+                                                discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1021), true);
                                             }
                                             finally
                                             {
@@ -1470,6 +1511,39 @@ namespace gip.mes.processapplication
                 }
             }
             return disChargedWeight;
+        }
+
+        protected virtual Weighing InsertNewWeighingIfAlibi(DatabaseApp dbApp, double actualWeight, ACEventArgs e)
+        {
+            Weighing weighing = null;
+            PAEScaleGravimetric scale = null;
+            string identNr = null;
+            if (e != null)
+            {
+                var paramLfdNr = e.GetACValue("GaugeCode");
+                if (paramLfdNr != null)
+                    identNr = paramLfdNr.ParamAsString;
+            }
+            if (String.IsNullOrEmpty(identNr))
+            {
+                scale = GravimetricScale;
+                PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
+                if (totalizingScale != null && totalizingScale.AlibiNo != null)
+                    identNr = totalizingScale.AlibiNo.ValueT;
+            }
+
+            if (!String.IsNullOrEmpty(identNr))
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, this);
+                weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
+                weighing.IdentNr = identNr;
+                weighing.Weight = actualWeight;
+                if (scale == null)
+                    scale = GravimetricScale;
+                if (scale != null)
+                    weighing.VBiACClassID = scale.ComponentClass.ACClassID;
+            }
+            return weighing;
         }
 
         protected virtual void RememberWeightOnRunDischarging(bool isNewStart)

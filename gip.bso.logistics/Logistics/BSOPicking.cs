@@ -47,6 +47,7 @@ namespace gip.bso.logistics
             new object[] { "PickingStateIndex", Global.ParamOption.Optional, typeof(short) }
        }
    )]
+
     public partial class BSOPicking : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider
     {
         #region c´tors

@@ -713,6 +713,7 @@ namespace gip.mes.processapplication
 
             if (!destinationSilo.VBiFacilityACClassID.HasValue)
             {
+                CheckIfAutomaticTargetChangePossible = false;
                 // Error50086: Foreign Key to ACComponent for Facility {0} not defined!
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(30)", 1030, "Error50086", destinationSilo.FacilityNo);
 
@@ -726,6 +727,7 @@ namespace gip.mes.processapplication
                 && !(pickingPos.Material == destinationSilo.Material
                       || pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID == destinationSilo.Material.MaterialID))
             {
+                CheckIfAutomaticTargetChangePossible = false;
                 // Error50087: Material {0} on Silo {1} doesn't match Material {2} at Commssioningorder {3}!
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(40)", 1040, "Error50087",
                               destinationSilo.Material.MaterialName1, destinationSilo.FacilityNo, destinationSilo.Material.MaterialName1, picking.PickingNo);
@@ -739,6 +741,7 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass acClassSilo = destinationSilo.GetFacilityACClass(db);
             if (acClassSilo == null)
             {
+                CheckIfAutomaticTargetChangePossible = false;
                 // Error50070: acClassSilo is null at Order {0}, Bill of material {1}, Line {2}
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(50)", 1050, "Error50070",
                                 picking.PickingNo, pickingPos.LineNumber, pickingPos.Material.MaterialName1);
@@ -752,6 +755,7 @@ namespace gip.mes.processapplication
             ACComponent targetSiloACComp = this.Root.ACUrlCommand(acClassSilo.GetACUrlComponent()) as ACComponent;
             if (targetSiloACComp == null)
             {
+                CheckIfAutomaticTargetChangePossible = false;
                 // Error50071: targetSiloACComp is null at Order {0}, Bill of material {1}, Line {2}
                 msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(60)", 1060, "Error50071",
                                 picking.PickingNo, pickingPos.LineNumber, pickingPos.Material.MaterialName1);
@@ -771,6 +775,7 @@ namespace gip.mes.processapplication
                         Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo.OnPrepareSwitchToNextSilo(1)", msg.InnerMessage);
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 }
+                CheckIfAutomaticTargetChangePossible = false;
                 return StartDisResult.CycleWait;
             }
 
@@ -889,6 +894,7 @@ namespace gip.mes.processapplication
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 if (previousDischargingRoute != null)
                     CurrentDischargingRoute = previousDischargingRoute;
+                CheckIfAutomaticTargetChangePossible = false;
                 return StartDisResult.CycleWait;
             }
 
@@ -912,8 +918,6 @@ namespace gip.mes.processapplication
             }
 
             bool isNewACMethod = false;
-            CheckIfAutomaticTargetChangePossible = null;
-
             if (acMethod == null)
             {
                 acMethod = refPAACClassMethod.TypeACSignature();
@@ -1053,6 +1057,7 @@ namespace gip.mes.processapplication
             }
             else
             {
+                CheckIfAutomaticTargetChangePossible = true;
                 if (fullSiloReservation != null)
                     fullSiloReservation.ReservationState = GlobalApp.ReservationState.Finished;
                 if (nextPlannedSiloReservation != null)
@@ -1152,7 +1157,15 @@ namespace gip.mes.processapplication
                     }
                 }
                 else 
-                { 
+                {
+                    //Alibi-No
+                    Weighing weighing = InsertNewWeighingIfAlibi(dbApp, actualWeight, e);
+                    if (weighing != null)
+                    {
+                        weighing.PickingPos = pickingPos;
+                        pickingPos.Weighing_PickingPos.Add(weighing);
+                    }
+
                     // 1. Bereite Buchung vor
                     FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, facilityDest, pickingPos.Material.ConvertBaseWeightToBaseUnit(actualWeight));
                     ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;

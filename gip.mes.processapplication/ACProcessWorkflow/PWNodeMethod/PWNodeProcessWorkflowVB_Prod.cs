@@ -548,10 +548,12 @@ namespace gip.mes.processapplication
                         facilityLot = newChildPosForBatch.FacilityLot;
                         if (facilityLot == null)
                         {
-                            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
-                            facilityLot = FacilityLot.NewACObject(dbApp, null, secondaryKey);
-                            facilityLot.UpdateExpirationInfo(newChildPosForBatch.BookingMaterial);
-                            newChildPosForBatch.FacilityLot = facilityLot;
+                            string lotNo = null;
+                            this.ProdOrderManager.GetFacilityLotForPos(Database, dbApp, newChildPosForBatch, true, out facilityLot, out lotNo, null);
+                            //string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
+                            //facilityLot = FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                            //facilityLot.UpdateExpirationInfo(newChildPosForBatch.BookingMaterial);
+                            //newChildPosForBatch.FacilityLot = facilityLot;
                         }
                     }
 

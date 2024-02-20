@@ -2929,7 +2929,16 @@ namespace gip.mes.facility
                                 || (ParamsAdjusted.OutwardMaterial == ParamsAdjusted.OutwardFacility.Material)
                                 || (ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && ParamsAdjusted.OutwardMaterial.ProductionMaterialID == ParamsAdjusted.OutwardFacility.MaterialID)))
                 {
-                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacility.Material;
+                    if (   ParamsAdjusted.OutwardMaterial == null 
+                        && ParamsAdjusted.OutwardFacilityLot != null
+                        && ParamsAdjusted.OutwardFacilityLot.Material != null
+                        && ParamsAdjusted.OutwardFacilityLot.Material != ParamsAdjusted.OutwardFacility.Material
+                        && ParamsAdjusted.OutwardFacilityLot.Material.IsMaterialEqual(ParamsAdjusted.OutwardFacility.Material))
+                    {
+                        ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacilityLot.Material;
+                    }
+                    else
+                        ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacility.Material;
                 }
                 if (ParamsAdjusted.InwardFacility != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType != null
@@ -2939,7 +2948,16 @@ namespace gip.mes.facility
                                 || (ParamsAdjusted.InwardMaterial == ParamsAdjusted.InwardFacility.Material)
                                 || (ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && ParamsAdjusted.InwardMaterial.ProductionMaterialID == ParamsAdjusted.InwardFacility.MaterialID)))
                 {
-                    ParamsAdjusted.InwardMaterial = ParamsAdjusted.InwardFacility.Material;
+                    if (   ParamsAdjusted.InwardMaterial == null
+                        && ParamsAdjusted.InwardFacilityLot != null 
+                        && ParamsAdjusted.InwardFacilityLot.Material != null 
+                        && ParamsAdjusted.InwardFacilityLot.Material != ParamsAdjusted.InwardFacility.Material
+                        && ParamsAdjusted.InwardFacilityLot.Material.IsMaterialEqual(ParamsAdjusted.InwardFacility.Material))
+                    {
+                        ParamsAdjusted.InwardMaterial = ParamsAdjusted.InwardFacilityLot.Material;
+                    }
+                    else
+                        ParamsAdjusted.InwardMaterial = ParamsAdjusted.InwardFacility.Material;
                 }
 
                 if (ParamsAdjusted.OutwardMaterial != null && ParamsAdjusted.InwardMaterial == null)

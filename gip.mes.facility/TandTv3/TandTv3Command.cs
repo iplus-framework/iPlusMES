@@ -807,7 +807,8 @@ namespace gip.mes.facility.TandTv3
                     IsReport = filter.IsReport,
                     MaterialIDs = new List<Guid>(),
                     RecalcAgain = filter.RecalcAgain,
-                    OrderDepth = filter.OrderDepth
+                    OrderDepth = filter.OrderDepth,
+                    MaxOrderCount = filter.MaxOrderCount
                 };
 
                 if (filter.MaterialIDs != null && filter.MaterialIDs.Any())

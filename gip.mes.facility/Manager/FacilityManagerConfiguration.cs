@@ -339,7 +339,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<int> _BookingParameterNotAvailableMode;
-        [ACPropertyConfig("Modus zum Umgang mit Nullbestandskennzeichen", DefaultValue = (int)MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSet)]
+        [ACPropertyConfig("en{'Mode for handling not available state'}de{'Modus zum Umgang mit Nullbestandskennzeichen'}", DefaultValue = (int)MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSet)]
         public int BookingParameterNotAvailableMode
         {
             get { return _BookingParameterNotAvailableMode.ValueT; }
@@ -347,7 +347,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _BookingParameterDontAllowNegativeStock;
-        [ACPropertyConfig("Keine negativen Bestände", DefaultValue = false)]
+        [ACPropertyConfig("en{'No negative Stocks'}de{'Keine negativen Bestände'}", DefaultValue = false)]
         public bool BookingParameterDontAllowNegativeStock
         {
             get { return _BookingParameterDontAllowNegativeStock.ValueT; }
@@ -355,7 +355,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _BookingParameterIgnoreManagement;
-        [ACPropertyConfig("Buchung auch wenn Lager von ext. System verwaltet", DefaultValue = false)]
+        [ACPropertyConfig("en{'Posting if managed from external system'}de{'Buchung auch wenn Lager von ext. System verwaltet'}", DefaultValue = false)]
         public bool BookingParameterIgnoreManagement
         {
             get { return _BookingParameterIgnoreManagement.ValueT; }
@@ -363,7 +363,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _BookingParameterQuantityIsAbsolute;
-        [ACPropertyConfig("Keine Differenzbuchuchungen", DefaultValue = false)]
+        [ACPropertyConfig("en{'No differntial postings'}de{'Keine Differenzbuchuchungen'}", DefaultValue = false)]
         public bool BookingParameterQuantityIsAbsolute
         {
             get { return _BookingParameterQuantityIsAbsolute.ValueT; }
@@ -371,7 +371,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<int> _BookingParameterBalancingMode;
-        [ACPropertyConfig("Bilanzierung auf Zu- und Abgangsfeldern", DefaultValue = (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn)]
+        [ACPropertyConfig("en{'Balacing on In/Outward fields'}de{'Bilanzierung auf Zu- und Abgangsfeldern'}", DefaultValue = (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn)]
         public int BookingParameterBalancingMode
         {
             get { return _BookingParameterBalancingMode.ValueT; }
@@ -385,7 +385,6 @@ namespace gip.mes.facility
             get { return _RootStoreForVehicles.ValueT; }
             set { _RootStoreForVehicles.ValueT = value; }
         }
-
 
         public Facility GetRootStoreForVehicles(DatabaseApp dbApp)
         {
