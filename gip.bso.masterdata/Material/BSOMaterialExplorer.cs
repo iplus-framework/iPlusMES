@@ -164,7 +164,9 @@ namespace gip.bso.masterdata
                         .Any(x => x.MDSchedulingGroupID == FilterMDSchedulingGroupID));
 
                 query = partslistQuery
-                    .Join(query, pl => pl.MaterialID, q => q.MaterialID, (pl, q) => q)
+                    .Select(c=>c.MaterialID)
+                    .Distinct()
+                    .Join(query, plID => plID, q => q.MaterialID, (pl, q) => q)
                     as ObjectQuery<Material>;
             }
 
