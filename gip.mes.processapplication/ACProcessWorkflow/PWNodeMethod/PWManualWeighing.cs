@@ -2664,11 +2664,21 @@ namespace gip.mes.processapplication
 
             using (Database db = new core.datamodel.Database())
             {
-                RoutingResult routeResult = ACRoutingService.FindSuccessors(RoutingService, db, false, toComponent,
-                                        PAMSilo.SelRuleID_Storage, RouteDirections.Backwards, new object[] { },
-                                        (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType),
-                                        (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
-                                        0, true, true);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = false,
+                    SelectionRuleID = PAMSilo.SelRuleID_Storage,
+                    Direction = RouteDirections.Backwards,
+                    DBSelector = (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType),
+                    DBDeSelector = (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                    };
+
+                RoutingResult routeResult = ACRoutingService.FindSuccessors(toComponent.GetACUrl(), routingParameters);
 
                 if (routeResult != null)
                 {

@@ -412,11 +412,22 @@ namespace gip.bso.manufacturing
                 return msg;
             }
 
-            RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
-                                    fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
-                                    (c, p, r) => c.ACClassID == toClass.ACClassID,
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
-                                    10, true, true, false, false, 10);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                AttachRouteItemsToContext = false,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = "",
+                DBSelector = (c, p, r) => c.ACClassID == toClass.ACClassID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
+                MaxRouteAlternativesInLoop = 10,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 10
+            };
+
+            RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
             {
                 //Error50122: No route found for this transport.

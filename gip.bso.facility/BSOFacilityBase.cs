@@ -17,7 +17,8 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Threading;
-using gip.mes.datamodel; using gip.core.datamodel;
+using gip.mes.datamodel;
+using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
 using System.Data.Objects;
@@ -382,7 +383,7 @@ namespace gip.bso.facility
             // Sonst Umlagerungsprozess von Silo zu Silo
             else if (forBooking.OutwardFacility != null && forBooking.InwardFacility != null)
             {
-                if (   !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
+                if (!forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
                     || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                     return false;
                 msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
@@ -406,11 +407,27 @@ namespace gip.bso.facility
                 if (!forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                     return false;
                 Type typeIntake = typeof(PAMIntake);
-                RoutingResult result = ACRoutingService.FindSuccessors(RoutingService, this.Database.ContextIPlus, true,
-                                        forBooking.InwardFacility.FacilityACClass, PAMIntake.SelRuleID_PAMIntake, RouteDirections.Backwards, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && typeIntake.IsAssignableFrom(c.ObjectType),
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != forBooking.InwardFacility.VBiFacilityACClassID,
-                                        0, true, true, false, false, 10, false, true);
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = this.Database.ContextIPlus,
+                    SelectionRuleID = PAMIntake.SelRuleID_PAMIntake,
+                    Direction = RouteDirections.Backwards,
+                    AttachRouteItemsToContext = true,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && typeIntake.IsAssignableFrom(c.ObjectType),
+                    DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != forBooking.InwardFacility.VBiFacilityACClassID,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true,
+                    AutoDetachFromDBContext = false,
+                    DBIncludeInternalConnections = false,
+                    DBRecursionLimit = 10,
+                    DBIgnoreRecursionLoop = false,
+                    ForceReattachToDatabaseContext = true
+                };
+
+                RoutingResult result = ACRoutingService.FindSuccessors(forBooking.InwardFacility.FacilityACClass, routingParameters);
                 if (result.Routes == null || !result.Routes.Any())
                 {
                     //Error50122: No route found for this transport.
@@ -429,7 +446,7 @@ namespace gip.bso.facility
                 List<RouteItem> routeItemsWithComp = result.Routes.Select(c => c.FirstOrDefault()).ToList();
                 if (routeItemsWithComp != null && routeItemsWithComp.Any())
                 {
-                    foreach (RouteItem routeItem in routeItemsWithComp.ToArray()) 
+                    foreach (RouteItem routeItem in routeItemsWithComp.ToArray())
                     {
                         if (routeItem.SourceACComponent != null && routeItem.SourceACComponent.ConnectionState == ACObjectConnectionState.ValuesReceived)
                         {
@@ -577,7 +594,7 @@ namespace gip.bso.facility
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
-            if (   (forBooking.OutwardFacilityCharge != null || forBooking.OutwardFacility != null)
+            if ((forBooking.OutwardFacilityCharge != null || forBooking.OutwardFacility != null)
                     && forBooking.InwardFacility != null)
             {
                 if (this.ACFacilityManager != null)
@@ -670,7 +687,7 @@ namespace gip.bso.facility
         {
             Msg msg = null;
             string siloClass = this.ACFacilityManager.C_SiloClass;
-            gip.core.datamodel.ACClass siloACClass = this.ACFacilityManager.GetACClassForIdentifier(siloClass,this.Database.ContextIPlus);
+            gip.core.datamodel.ACClass siloACClass = this.ACFacilityManager.GetACClassForIdentifier(siloClass, this.Database.ContextIPlus);
             if (siloACClass == null)
             {
                 msg = new Msg
@@ -695,11 +712,22 @@ namespace gip.bso.facility
                 return msg;
             }
 
-            RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
-                                    fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
-                                    (c, p, r) => c.ACClassID == toClass.ACClassID,
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
-                                    0, true, true, false, false, 10);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                AttachRouteItemsToContext = false,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = "",
+                DBSelector = (c, p, r) => c.ACClassID == toClass.ACClassID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
+                MaxRouteAlternativesInLoop = 0,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 10
+            };
+
+            RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
             {
                 //Error50122: No route found for this transport.

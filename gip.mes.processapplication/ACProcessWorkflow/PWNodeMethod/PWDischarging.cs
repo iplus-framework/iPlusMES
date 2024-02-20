@@ -8,6 +8,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Xml;
 using gip.core.processapplication;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.processapplication
 {
@@ -1047,11 +1048,25 @@ namespace gip.mes.processapplication
                 routingService = routeableComp.RoutingService;
 
             Guid acClassIDCompTo = acCompTo.ComponentClass.ACClassID;
-            RoutingResult rResult = ACRoutingService.SelectRoutes(routingService, db, routingService != null && routingService.IsProxy,
-                                 acCompFrom, acCompTo, RouteDirections.Forwards, deSelectionRuleID, deSelParams != null ? deSelParams : new object[] { },
-                                 (c, p, r) => c.ACClassID == acClassIDCompTo,
-                                 deSelector,
-                                 0, includeReserved, includeAllocated, false, false, searchDepth, false, false, previousRoute);
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = routingService,
+                Database = db,
+                AttachRouteItemsToContext = routingService != null && routingService.IsProxy,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = deSelectionRuleID,
+                SelectionRuleParams = deSelParams,
+                DBSelector = (c, p, r) => c.ACClassID == acClassIDCompTo,
+                DBDeSelector = deSelector,
+                MaxRouteAlternativesInLoop = 0,
+                IncludeReserved = includeReserved,
+                IncludeAllocated = includeAllocated,
+                DBRecursionLimit = searchDepth,
+                PreviousRoute = previousRoute
+            };
+
+            RoutingResult rResult = ACRoutingService.SelectRoutes(acCompFrom, acCompTo, routingParameters);
             if (rResult.Routes == null || !rResult.Routes.Any())
                 return new MsgWithDetails { Source = acCompFrom.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "DetermineDischargingRoute(1)", Message = "No route found" };
 

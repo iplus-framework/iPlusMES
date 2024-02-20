@@ -425,7 +425,16 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-                var routes = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatOut1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID, null, RouteDirections.Forwards, true, false);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    Database = dbIPlus,
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID,
+                    DBIncludeInternalConnections = true,
+                    AutoDetachFromDBContext = false
+                };
+
+                var routes = ACRoutingService.DbSelectRoutesFromPoint(thisACClass, this.PAPointMatOut1.PropertyInfo, routingParameters);
                 if (routes != null && routes.Any())
                 {
                     string virtMethodName = VMethodName_Discharging;

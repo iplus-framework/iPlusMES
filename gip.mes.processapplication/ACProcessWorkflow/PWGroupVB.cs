@@ -389,14 +389,25 @@ namespace gip.mes.processapplication
                                     if (!LastCalculatedRouteablePMList.Contains(module))
                                     {
                                         Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-                                        RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                            module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
-                                            (c, p, r) => targets.Contains(c.ACClassID),
-                                                            (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+
+                                        ACRoutingParameters routingParameters = new ACRoutingParameters()
+                                        {
+                                            RoutingService = this.RoutingService,
+                                            Database = db,
+                                            SelectionRuleID = SelRuleID_ReachableDest,
+                                            Direction = RouteDirections.Forwards,
+                                            SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                                            DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                                            DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                                                         && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                             || !c.BasedOnACClassID.HasValue
                                                                             || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                                            0, true, true, false, false);
+                                            MaxRouteAlternativesInLoop = 0,
+                                            IncludeReserved = true,
+                                            IncludeAllocated = true
+                                        };
+
+                                        RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
                                         if (rResult.Routes != null && rResult.Routes.Any())
                                             LastCalculatedRouteablePMList.Add(module);
                                     }
@@ -492,20 +503,32 @@ namespace gip.mes.processapplication
                                         Guid thisMethodID = ContentACClassWF.ACClassMethodID;
                                         IList<gip.core.datamodel.ACClass> selectedModules = pwMethod.ACFacilityManager.GetSelectedModulesAsACClass(notePos, db);
 
+                                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+                                        ACRoutingParameters routingParameters = new ACRoutingParameters()
+                                        {
+                                            RoutingService = this.RoutingService,
+                                            Database = db,
+                                            AttachRouteItemsToContext = false,
+                                            SelectionRuleID = SelRuleID_ReachableDest,
+                                            Direction = RouteDirections.Forwards,
+                                            SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                                            DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                                            DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                                                && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                                                    || !c.BasedOnACClassID.HasValue
+                                                                                    || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                                            MaxRouteAlternativesInLoop = 0,
+                                            IncludeReserved = true,
+                                            IncludeAllocated = true
+                                        };
+
                                         foreach (var module in modulesInAutomaticMode)
                                         {
                                             if (!LastCalculatedRouteablePMList.Contains(module)
                                                 && selectedModules.Where(c => c.ACClassID == module.ComponentClass.ACClassID).Any())
                                             {
-                                                Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-                                                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                                    module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
-                                                                    (c, p, r) => targets.Contains(c.ACClassID),
-                                                                    (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                                                && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                                                    || !c.BasedOnACClassID.HasValue
-                                                                                    || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                                                    0, true, true, false, false);
+                                                RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
                                                 if (rResult.Routes != null && rResult.Routes.Any())
                                                     LastCalculatedRouteablePMList.Add(module);
                                             }
@@ -648,30 +671,47 @@ namespace gip.mes.processapplication
 
                 Type typeOfSilo = typeof(PAMSilo);
                 Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+                Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = false,
+                    SelectionRuleID = SelRuleID_ReachableDest,
+                    Direction = RouteDirections.Forwards,
+                    SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                    DBSelector = (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
+                    DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                        && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                            || !c.BasedOnACClassID.HasValue
+                                                            || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
                 foreach (var module in modulesInAutomaticMode)
                 {
                     if (!LastCalculatedRouteablePMList.Contains(module))
                     {
-                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-                        RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                            module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
-                                            (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
-                                            (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                        && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                            || !c.BasedOnACClassID.HasValue
-                                                            || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                            0,true, true, false, false);
+                        string moduleACUrl = module.GetACUrl();
+
+
+                        RoutingResult rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
                         if (rResult.Routes != null && rResult.Routes.Any())
                         {
                             if (hasGroupDosings)
                             {
                                 if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
                                 {
-                                    rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                                                module, SelRuleID_ReachableSource, RouteDirections.Backwards, new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value },
-                                                                (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value,
-                                                                (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType))),
-                                                                0, true, true, false, false);
+                                    routingParameters.SelectionRuleID = SelRuleID_ReachableSource;
+                                    routingParameters.Direction = RouteDirections.Backwards;
+                                    routingParameters.DBSelector = (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value;
+                                    routingParameters.DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType)));
+                                    routingParameters.SelectionRuleParams = new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value };
+
+                                    rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
                                 }
                                 else if (pickingPos.FromFacility == null)
                                 {

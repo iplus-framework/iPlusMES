@@ -441,12 +441,23 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-                var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    Database = dbIPlus,
+                    Direction = RouteDirections.Backwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID,
+                    DBIncludeInternalConnections = true,
+                    AutoDetachFromDBContext = false
+                };
+
+                var parentModule = ACRoutingService.DbSelectRoutesFromPoint(thisACClass, this.PAPointMatIn1.PropertyInfo, routingParameters).FirstOrDefault();
                 var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                 if (sourcePoint == null)
                     return;
 
-                var routes = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, parentACClass, sourcePoint, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID, null, RouteDirections.Backwards, true, false);
+                routingParameters.DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID;
+
+                var routes = ACRoutingService.DbSelectRoutesFromPoint(parentACClass, sourcePoint, routingParameters);
                 if (routes != null && routes.Any())
                 {
                     string virtMethodName = VMethodName_InOutOperation;

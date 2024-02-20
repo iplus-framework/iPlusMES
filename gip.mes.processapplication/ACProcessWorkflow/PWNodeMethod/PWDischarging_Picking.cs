@@ -349,11 +349,20 @@ namespace gip.mes.processapplication
             {
                 isLastDischarging = false;
 
-                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, RoutingService != null && RoutingService.IsProxy,
-                                    ParentPWGroup.AccessedProcessModule, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, new object[] { },
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                    null,
-                                    0, true, true, false, false);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = RoutingService != null && RoutingService.IsProxy,
+                    SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
+                RoutingResult rResult = ACRoutingService.FindSuccessors(ParentPWGroup.AccessedProcessModule.GetACUrl(), routingParameters);
                 if (rResult.Routes != null && rResult.Routes.Any())
                 {
                     // Falls keine Sonderentleerung sondern regulärer weitertransport zu einem Prozessmodul
@@ -799,11 +808,22 @@ namespace gip.mes.processapplication
                 && RootPW.FindChildComponents<PWGroup>(c => c is PWGroup && c != this.ParentPWGroup && (!(c is PWGroupVB) || !(c as PWGroupVB).OccupationByScan)).Any())
             {
                 isLastDischarging = false;
-                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, RoutingService != null && RoutingService.IsProxy,
-                                    ParentPWGroup.AccessedProcessModule, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, new object[] { },
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                    null,
-                                    0, true, true, false, false);
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = RoutingService != null && RoutingService.IsProxy,
+                    SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
+
+                RoutingResult rResult = ACRoutingService.FindSuccessors(ParentPWGroup.AccessedProcessModule.GetACUrl(), routingParameters);
                 if (rResult.Routes != null && rResult.Routes.Any())
                 {
                     // Falls keine Sonderentleerung sondern regulärer weitertransport zu einem Prozessmodul

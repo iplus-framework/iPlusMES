@@ -144,11 +144,23 @@ namespace gip.mes.facility
             if (sourceModule == null || deliveryNotePos == null)
                 return null;
 
-            RoutingResult result = ACRoutingService.FindSuccessors(RoutingService, db, true, 
-                                    sourceModule, C_SiloClass, RouteDirections.Forwards, new object[] { },
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                    null,
-                                    0, true, true, false, false, 3, false, false, RouteResultMode.ShortRoute);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = db,
+                AttachRouteItemsToContext = true,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = C_SiloClass,
+                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                DBDeSelector = null,
+                MaxRouteAlternativesInLoop = 0,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 3,
+                ResultMode = RouteResultMode.ShortRoute
+            };
+
+            RoutingResult result = ACRoutingService.FindSuccessors(sourceModule, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
                 return null;
             if (!result.IsDbResult)

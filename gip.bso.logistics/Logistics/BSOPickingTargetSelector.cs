@@ -964,8 +964,19 @@ namespace gip.bso.logistics
             }
 
             string targetCompACUrl = SelectedTarget.Module.ACUrlComponent;
-            var sources = ACRoutingService.MemFindSuccessors(RoutingService, Database.ContextIPlus, targetCompACUrl, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Backwards, 1,
-                                                             true, true);
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                Direction = RouteDirections.Backwards,
+                MaxRouteAlternativesInLoop = 1,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
+
+            var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
             if (sources == null)
             {
                 Messages.Info(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));

@@ -916,8 +916,20 @@ namespace gip.mes.webservices
                         else
                         {
                             Facility facility = null;
-                            RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, db, false, machineFunction.ACClass1_ParentACClass, PAMParkingspace.SelRuleID_ParkingSpace, RouteDirections.Forwards,
-                                                                        null, null, null, 0, true, true);
+
+                            ACRoutingParameters routingParameters = new ACRoutingParameters()
+                            {
+                                RoutingService = routingService,
+                                Database = db,
+                                AttachRouteItemsToContext = false,
+                                SelectionRuleID = PAMParkingspace.SelRuleID_ParkingSpace,
+                                Direction = RouteDirections.Forwards,
+                                MaxRouteAlternativesInLoop = 0,
+                                IncludeReserved = true,
+                                IncludeAllocated = true
+                            };
+
+                            RoutingResult rResult = ACRoutingService.FindSuccessors(machineFunction.ACClass1_ParentACClass, routingParameters);
                             if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
                             {
                                 Route route = rResult.Routes.FirstOrDefault();
