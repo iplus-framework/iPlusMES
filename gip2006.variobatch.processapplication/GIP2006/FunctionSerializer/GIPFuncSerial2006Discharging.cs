@@ -151,7 +151,6 @@ namespace gip2006.variobatch.processapplication
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-
                 //Array.Copy(gip.core.communication.ISOonTCP.Types.String.ToByteArray(request.ParameterValueList.GetString(""), 30, 32), 0, sendPackage1, 2, 32);
                 //iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
@@ -322,7 +321,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ActualQuantity
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ScaleTotalWeight
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DischargingTime
-                iOffset += 23; // GaugeCode/Alibi
+                iOffset += 20; // GaugeCode/Alibi
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
                 byte[] readPackage1 = new byte[iOffset];
@@ -341,8 +340,8 @@ namespace gip2006.variobatch.processapplication
                 response.ResultValueList.GetACValue("DischargingTime").Value = TimeSpan.FromMilliseconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                response.ResultValueList.GetACValue("GaugeCode").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
-                iOffset += 23;
+                response.ResultValueList.GetACValue("GaugeCode").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 20, true);
+                iOffset += 20;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
             }

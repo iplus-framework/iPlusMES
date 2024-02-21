@@ -1433,7 +1433,7 @@ namespace gip.mes.processapplication
             return completeResult;
         }
 
-        protected virtual void OnSetRouteItemData(ACMethod acMethod, PAMSilo silo, RouteItem routeItem)
+        protected virtual void OnSetRouteItemData(ACMethod acMethod, PAMSilo silo, RouteItem routeItem, bool isConfigInitialization)
         {
             if (silo != null)
                 silo.SubscribeTransportFunction(this);
@@ -1575,7 +1575,7 @@ namespace gip.mes.processapplication
                             valueSource.Value = Convert.ToUInt16(pamSilo.RouteItemIDAsNum);
                     }
                 }
-                OnSetRouteItemData(acMethod, pamSilo, sourceRouteItem);
+                OnSetRouteItemData(acMethod, pamSilo, sourceRouteItem, isConfigInitialization);
             }
 
             List<MaterialConfig> materialConfigList = null;

@@ -166,6 +166,9 @@ namespace gip.mes.processapplication
 
         [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", true, true)]
         public IACContainerTNet<TimeSpan> DepletingTime { get; set; }
+
+        [ACPropertyBindingTarget(443, "Configuration", "en{'Fee performance [kg/min]'}de{'Förderleistung [kg/min]'}", "", true, true)]
+        public IACContainerTNet<double> FeedPerf { get; set; }
         #endregion
 
         public string RouteItemID

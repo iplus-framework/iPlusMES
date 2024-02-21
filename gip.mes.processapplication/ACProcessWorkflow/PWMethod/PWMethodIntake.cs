@@ -20,7 +20,8 @@ namespace gip.mes.processapplication
             new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {Picking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
-            new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid)}
+            new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {gip.core.datamodel.ACClassWF.ClassName, Global.ParamOption.Optional, typeof(Guid)}
         }
     )]
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Intake'}de{'Wareneingang'}", Global.ACKinds.TPWMethod, Global.ACStorableTypes.Optional, true, true, "", "ACProgram", 20)]

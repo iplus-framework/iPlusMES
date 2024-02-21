@@ -10,7 +10,7 @@ using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Entleeren'}de{'Entleeren'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWDischarging.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Discharging'}de{'Entleeren'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWDischarging.PWClassName, true)]
     public class PAFDischarging : PAProcessFunction, IPAFuncDeliverMaterial, IPAFuncScaleConfig
     {
         
@@ -501,7 +501,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            OnSetRouteItemData(acMethod, targetRouteItem, sourceRouteItem, route);
+            OnSetRouteItemData(acMethod, targetRouteItem, sourceRouteItem, route, isConfigInitialization);
 
 
             List<MaterialConfig> materialConfigList = null;
@@ -620,7 +620,7 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        protected virtual void OnSetRouteItemData(ACMethod acMethod, RouteItem targetItem, RouteItem sourceItem, Route route)
+        protected virtual void OnSetRouteItemData(ACMethod acMethod, RouteItem targetItem, RouteItem sourceItem, Route route, bool isConfigInitialization)
         {
             if (targetItem != null)
             {
