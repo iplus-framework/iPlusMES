@@ -1339,7 +1339,18 @@ namespace gip.mes.processapplication
                 if (routingService != null)
                 {
                     activeDosings = new List<PAFDosing>();
-                    var routingResult = ACRoutingService.MemFindSuccessors(routingService, null, this, SelRuleID_DosingFunc, RouteDirections.Forwards, 0, true, true);
+
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = routingService,
+                        SelectionRuleID = SelRuleID_DosingFunc,
+                        Direction = RouteDirections.Forwards,
+                        MaxRouteAlternativesInLoop = 0,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    var routingResult = ACRoutingService.MemFindSuccessors(this, routingParameters);
                     if (routingResult != null && routingResult.Routes != null && routingResult.Routes.Any())
                     {
                         foreach (var route in routingResult.Routes)
@@ -1391,7 +1402,17 @@ namespace gip.mes.processapplication
                 var routingService = this.RoutingService;
                 if (routingService != null)
                 {
-                    var routingResult = ACRoutingService.MemFindSuccessors(routingService, null, this, SelRuleID_DischargingFunc, RouteDirections.Backwards, 0, true, true);
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = routingService,
+                        SelectionRuleID = SelRuleID_DischargingFunc,
+                        Direction = RouteDirections.Backwards,
+                        MaxRouteAlternativesInLoop = 0,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    var routingResult = ACRoutingService.MemFindSuccessors(this, routingParameters);
                     if (routingResult != null && routingResult.Routes != null && routingResult.Routes.Any())
                     {
                         foreach (var route in routingResult.Routes)

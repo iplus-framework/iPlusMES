@@ -1387,13 +1387,24 @@ namespace gip.mes.facility
             if (acClassWFDischarging != null && batchPlan != null)
             {
                 List<Route> routes = new List<Route>();
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = routingService,
+                    Database = databaseApp.ContextIPlus,
+                    AttachRouteItemsToContext = true,
+                    SelectionRuleID = "Storage",
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true,
+                    ResultMode = RouteResultMode.ShortRoute
+                };
+
                 foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
                 {
-                    RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, databaseApp.ContextIPlus, true,
-                                        instance, "Storage", RouteDirections.Forwards, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                        null,
-                                        0, true, true, false, false, 0, false, false, RouteResultMode.ShortRoute);
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(instance, routingParameters);
                     if (rResult.Routes != null && rResult.Routes.Any())
                         routes.AddRange(rResult.Routes);
                 }

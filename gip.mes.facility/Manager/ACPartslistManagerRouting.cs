@@ -1759,6 +1759,19 @@ namespace gip.mes.facility
             if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
                 return null;
 
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = dbIPlus,
+                Direction = RouteDirections.Backwards,
+                SelectionRuleID = selectionRuleID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID,
+                MaxRouteAlternativesInLoop = 0,
+                IncludeReserved = includeReserved,
+                IncludeAllocated = includeAllocated,
+                DBRecursionLimit = 10
+            };
+
             RoutingResult result = null;
             if (searchMode == SearchMode.OnlyEnabledOldestSilo)
             {
@@ -1769,11 +1782,9 @@ namespace gip.mes.facility
                     return null;
                 var oldestSiloClass = oldestSilo.StorageBin.GetFacilityACClass(dbIPlus);
 
-                result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        scaleACClass, oldestSiloClass, RouteDirections.Backwards, selectionRuleID, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.StorageBin.VBiFacilityACClassID == c.ACClassID,
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, includeReserved, includeAllocated, false, false, 10);
+                routingParameters.DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.StorageBin.VBiFacilityACClassID == c.ACClassID;
+
+                result = ACRoutingService.SelectRoutes(scaleACClass, oldestSiloClass, routingParameters);
                 if (result.Routes == null || !result.Routes.Any())
                     return null;
             }
@@ -1783,11 +1794,9 @@ namespace gip.mes.facility
                 var acClassIDsOfPossibleSilos = possibleSilos.FilteredResult.Where(c => c.StorageBin.VBiFacilityACClassID.HasValue).Select(c => c.StorageBin.VBiFacilityACClassID.Value);
                 IEnumerable<string> possibleSilosACUrl = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityACClass != null).Select(x => x.StorageBin.FacilityACClass.GetACUrlComponent());
 
-                result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        scaleACClass, possibleSilosACUrl, RouteDirections.Backwards, selectionRuleID, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, includeReserved, includeAllocated, false, false, 10);
+                routingParameters.DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID);
+
+                result = ACRoutingService.SelectRoutes(scaleACClass, possibleSilosACUrl, routingParameters);
 
                 if (result.Routes == null || !result.Routes.Any())
                     return null;

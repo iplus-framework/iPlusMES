@@ -408,11 +408,23 @@ namespace gip.mes.processapplication
                             if (targetSiloACComp != null)
                             {
                                 Guid targetACClassID = targetSiloACComp.ComponentClass.ACClassID;
-                                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, dbIPlus, RoutingService != null && RoutingService.IsProxy,
-                                                    ParentPWGroup.AccessedProcessModule, PWGroupVB.SelRuleID_IsDestDirectSucessor, RouteDirections.Forwards, new object[] { targetACClassID },
-                                                    (c, p, r) => c.ACClassID == targetACClassID,
-                                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                                    0, true, true, false, false);
+
+                                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                                {
+                                    RoutingService = this.RoutingService,
+                                    Database = dbIPlus,
+                                    AttachRouteItemsToContext = RoutingService != null && RoutingService.IsProxy,
+                                    SelectionRuleID = PWGroupVB.SelRuleID_IsDestDirectSucessor,
+                                    Direction = RouteDirections.Forwards,
+                                    SelectionRuleParams = new object[] { targetACClassID },
+                                    DBSelector = (c, p, r) => c.ACClassID == targetACClassID,
+                                    DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                                    MaxRouteAlternativesInLoop = 0,
+                                    IncludeReserved = true,
+                                    IncludeAllocated = true
+                                };
+
+                                RoutingResult rResult = ACRoutingService.FindSuccessors(ParentPWGroup.AccessedProcessModule.GetACUrl(), routingParameters);
                                 routes = rResult.Routes;
                             }
                         }
@@ -420,11 +432,20 @@ namespace gip.mes.processapplication
                         if (routes == null || !routes.Any())
                         {
                             targetSiloACComp = null;
-                            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, dbIPlus, RoutingService != null && RoutingService.IsProxy,
-                                                ParentPWGroup.AccessedProcessModule, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, new object[] { },
-                                                (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                                null,
-                                                0, true, true, false, false);
+
+                            ACRoutingParameters routingParameters = new ACRoutingParameters()
+                            {
+                                RoutingService = this.RoutingService,
+                                Database = dbIPlus,
+                                AttachRouteItemsToContext = RoutingService != null && RoutingService.IsProxy,
+                                SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                                Direction = RouteDirections.Forwards,
+                                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                                IncludeReserved = true,
+                                IncludeAllocated = true
+                            };
+
+                            RoutingResult rResult = ACRoutingService.FindSuccessors(ParentPWGroup.AccessedProcessModule.GetACUrl(), routingParameters);
                             routes = rResult.Routes;
                         }
                         if (routes != null && routes.Any())

@@ -1806,11 +1806,11 @@ namespace gip.bso.facility
 
         public void Test()
         {
-            core.datamodel.ACClass from = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\NachBehWa24");
-            //core.datamodel.ACClass to = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\SiloGrp2\Silo328");
-            RoutingResult result = ACRoutingService.MemSelectRoutes(Database.ContextIPlus, @"\AppAnnahme\SiloGrp4\Silo227", @"\AppRoesterei\SiloGrp2\Silo328", RouteDirections.Forwards, "", 1, true, true, null, RoutingService);
-            var test = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, false, from, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, null,
-                                                       (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), null, 1, true, true, false, false, 1, false);
+            //core.datamodel.ACClass from = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\NachBehWa24");
+            ////core.datamodel.ACClass to = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\SiloGrp2\Silo328");
+            //RoutingResult result = ACRoutingService.MemSelectRoutes(Database.ContextIPlus, @"\AppAnnahme\SiloGrp4\Silo227", @"\AppRoesterei\SiloGrp2\Silo328", RouteDirections.Forwards, "", 1, true, true, null, RoutingService);
+            //var test = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, false, from, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, null,
+            //                                           (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), null, 1, true, true, false, false, 1, false);
         }
 
         #endregion

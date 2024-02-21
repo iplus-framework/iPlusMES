@@ -176,11 +176,21 @@ namespace gip.mes.processapplication
             // Search for a route using ACRoutingService
             using (Database db = new Database())
             {
-                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, RoutingService != null && RoutingService.IsProxy,
-                 this, SelRuleID_ProcessModule, RouteDirections.Forwards, new object[] { },
-                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                        0, true, true, false, false);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = RoutingService != null && RoutingService.IsProxy,
+                    SelectionRuleID = SelRuleID_ProcessModule,
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
+                RoutingResult rResult = ACRoutingService.FindSuccessors(this.GetACUrl(), routingParameters);
                 if (rResult.Routes != null && rResult.Routes.Any())
                 {
                     Route firstFoundRouteToADest = rResult.Routes.FirstOrDefault();

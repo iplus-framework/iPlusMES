@@ -1411,11 +1411,22 @@ namespace gip.mes.facility
             if (fromClass == toClass)
                 return;
 
-            RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
-                                    fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)), // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                    0, true, true, false, false, 10);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                AttachRouteItemsToContext = false,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = "",
+                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)),
+                MaxRouteAlternativesInLoop = 0,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 10
+            };
+
+            RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
             {
                 //Error50120: No route found for transport from {0} to {1}
@@ -1916,11 +1927,22 @@ namespace gip.mes.facility
                     return null;
                 var oldestSiloClass = oldestSilo.GetFacilityACClass(dbIPlus);
 
-                result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        currentProcessModule, oldestSiloClass, RouteDirections.Backwards, selectionRuleID, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, true, true, false, false, 10);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = dbIPlus,
+                    AttachRouteItemsToContext = true,
+                    Direction = RouteDirections.Backwards,
+                    SelectionRuleID = selectionRuleID,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
+                    DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true,
+                    DBRecursionLimit = 10
+                };
+
+                result = ACRoutingService.SelectRoutes(currentProcessModule, oldestSiloClass, routingParameters);
                 if (result.Routes == null || !result.Routes.Any())
                 {
                     // TODO: Fehler
@@ -1933,11 +1955,22 @@ namespace gip.mes.facility
                 var acClassIDsOfPossibleSilos = possibleSilos.FilteredResult.Where(c => c.StorageBin.VBiFacilityACClassID.HasValue).Select(c => c.StorageBin.VBiFacilityACClassID.Value);
                 IEnumerable<string> possibleSilosACUrl = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityACClass != null).Select(x => x.StorageBin.FacilityACClass.GetACUrlComponent());
 
-                result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        currentProcessModule, possibleSilosACUrl, RouteDirections.Backwards, selectionRuleID, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, true, true, false, false, 10);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = dbIPlus,
+                    AttachRouteItemsToContext = true,
+                    Direction = RouteDirections.Backwards,
+                    SelectionRuleID = selectionRuleID,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
+                    DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true,
+                    DBRecursionLimit = 10
+                };
+
+                result = ACRoutingService.SelectRoutes(currentProcessModule, possibleSilosACUrl, routingParameters);
 
                 if (result.Routes == null || !result.Routes.Any())
                 {
@@ -2132,13 +2165,24 @@ namespace gip.mes.facility
             {
                 core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                 List<Route> routes = new List<Route>();
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = routingService,
+                    Database = databaseApp.ContextIPlus,
+                    AttachRouteItemsToContext = true,
+                    SelectionRuleID = "Storage",
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true,
+                    ResultMode = RouteResultMode.ShortRoute
+                };
+
                 foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
                 {
-                    RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, databaseApp.ContextIPlus, true,
-                                        instance, "Storage", RouteDirections.Forwards, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                        null,
-                                        0, true, true, false, false, 0, false, false, RouteResultMode.ShortRoute);
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(instance, routingParameters);
                     if (rResult.Routes != null && rResult.Routes.Any())
                         routes.AddRange(rResult.Routes);
                 }

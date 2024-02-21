@@ -186,8 +186,18 @@ namespace gip.mes.processapplication
                     compClass = ComponentClass.FromIPlusContext<core.datamodel.ACClass>(db);
                 }
 
-                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false, compClass, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards, 
-                                                                        null, null, null, 0, true, true);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    SelectionRuleID = PAMSilo.SelRuleID_Silo,
+                    Direction = RouteDirections.Backwards,
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
+                RoutingResult rResult = ACRoutingService.FindSuccessors(compClass, routingParameters);
 
                 if (rResult == null)
                 {

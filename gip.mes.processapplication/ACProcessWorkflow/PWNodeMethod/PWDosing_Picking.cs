@@ -133,11 +133,22 @@ namespace gip.mes.processapplication
                         }
                         else
                         {
-                            rResult = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                            scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_SiloDirect, new object[] { },
-                                            (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
-                                            (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                            0, true, true, false, false, 10);
+                            ACRoutingParameters rParameters = new ACRoutingParameters()
+                            {
+                                RoutingService = this.RoutingService,
+                                Database = dbIPlus,
+                                AttachRouteItemsToContext = true,
+                                Direction = RouteDirections.Backwards,
+                                SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
+                                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
+                                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID,
+                                MaxRouteAlternativesInLoop = 0,
+                                IncludeReserved = true,
+                                IncludeAllocated = true,
+                                DBRecursionLimit = 10
+                            };
+
+                            rResult = ACRoutingService.SelectRoutes(scaleACClass, pickingPos.FromFacility.FacilityACClass, rParameters);
                         }
 
                         Route dosingRoute = null;
@@ -183,15 +194,34 @@ namespace gip.mes.processapplication
                         if (responsibleFunc == null)
                             continue;
 
-                        var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
+                        ACRoutingParameters routingParametersDB = new ACRoutingParameters()
+                        {
+                            Database = dbIPlus,
+                            Direction = RouteDirections.Backwards,
+                            DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID,
+                            DBIncludeInternalConnections = true,
+                            AutoDetachFromDBContext = false
+                        };
+
+                        var parentModule = ACRoutingService.DbSelectRoutesFromPoint(responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, routingParametersDB).FirstOrDefault();
 
                         var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                         var sourceClass = parentModule?.FirstOrDefault()?.Source;
                         if (sourcePoint == null || sourceClass == null)
                             continue;
 
-                        RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(RoutingService, Database.ContextIPlus, false, sourceClass, sourcePoint, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards,
-                                                                                             null, null, null, 0, true, true);
+                        ACRoutingParameters routingParameters = new ACRoutingParameters()
+                        {
+                            RoutingService = this.RoutingService,
+                            Database = dbIPlus,
+                            Direction = RouteDirections.Backwards,
+                            SelectionRuleID = PAMSilo.SelRuleID_Silo,
+                            MaxRouteAlternativesInLoop = 0,
+                            IncludeReserved = true,
+                            IncludeAllocated = true
+                        };
+
+                        RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(sourceClass, sourcePoint, routingParameters);
 
                         if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
                             continue;
@@ -331,11 +361,22 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
-                        rResult = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                        scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_SiloDirect, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, true, true, false, false, 10);
+                        ACRoutingParameters rParameters = new ACRoutingParameters()
+                        {
+                            RoutingService = this.RoutingService,
+                            Database = dbIPlus,
+                            AttachRouteItemsToContext = true,
+                            Direction = RouteDirections.Backwards,
+                            SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
+                            DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
+                            DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
+                            MaxRouteAlternativesInLoop = 0,
+                            IncludeReserved = true,
+                            IncludeAllocated = true,
+                            DBRecursionLimit = 10
+                        };
+
+                        rResult = ACRoutingService.SelectRoutes(scaleACClass, pickingPos.FromFacility.FacilityACClass, rParameters);
                     }
 
                     Route dosingRoute = null;
@@ -523,7 +564,16 @@ namespace gip.mes.processapplication
                         return StartNextCompResult.CycleWait;
                     }
 
-                    var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
+                    ACRoutingParameters routingParametersDB = new ACRoutingParameters()
+                    {
+                        Database = dbIPlus,
+                        Direction = RouteDirections.Backwards,
+                        DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID,
+                        DBIncludeInternalConnections = true,
+                        AutoDetachFromDBContext = false
+                    };
+
+                    var parentModule = ACRoutingService.DbSelectRoutesFromPoint(responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, routingParametersDB).FirstOrDefault();
 
                     var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                     var sourceClass = parentModule?.FirstOrDefault()?.Source;
@@ -535,8 +585,19 @@ namespace gip.mes.processapplication
                             return StartNextCompResult.CycleWait;
                     }
 
-                    RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(RoutingService, Database.ContextIPlus, false, sourceClass, sourcePoint, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards,
-                                                                                         null, null, null, 0, true, true);
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = this.RoutingService,
+                        Database = dbIPlus,
+                        AutoDetachFromDBContext = false,
+                        SelectionRuleID = PAMSilo.SelRuleID_Silo,
+                        Direction = RouteDirections.Backwards,
+                        MaxRouteAlternativesInLoop = 0,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(sourceClass, sourcePoint, routingParameters);
 
                     if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
                     {
