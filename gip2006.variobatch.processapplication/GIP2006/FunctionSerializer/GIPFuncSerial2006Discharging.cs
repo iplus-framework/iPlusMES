@@ -340,7 +340,9 @@ namespace gip2006.variobatch.processapplication
                 response.ResultValueList.GetACValue("DischargingTime").Value = TimeSpan.FromMilliseconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                response.ResultValueList.GetACValue("GaugeCode").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 20, true);
+                ACValue acValue = response.ResultValueList.GetACValue("GaugeCode");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 20, true);
                 iOffset += 20;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
