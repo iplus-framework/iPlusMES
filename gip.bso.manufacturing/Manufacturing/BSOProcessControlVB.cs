@@ -625,7 +625,7 @@ namespace gip.bso.manufacturing
                     // is empty but query down returns result
                     if (prodOrderPartslistPos == null)
                     {
-                        prodOrderPartslistPos = DatabaseApp.ProdOrderPartslistPos.Where(c => c.ACClassTaskID == task.ACClassTaskID).FirstOrDefault();
+                        prodOrderPartslistPos = databaseApp.ProdOrderPartslistPos.Where(c => c.ACClassTaskID == task.ACClassTaskID).FirstOrDefault();
                     }
 
                 }
