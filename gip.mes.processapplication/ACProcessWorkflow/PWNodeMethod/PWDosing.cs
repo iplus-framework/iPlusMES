@@ -1009,16 +1009,22 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "CancelCurrentComponent":
+                case nameof(CancelCurrentComponent):
                     CancelCurrentComponent();
                     return true;
-                case Const.IsEnabledPrefix + "CancelCurrentComponent":
+                case nameof(IsEnabledCancelCurrentComponent):
                     result = IsEnabledCancelCurrentComponent();
                     return true;
-                case "AckNotEmptyScale":
+                case nameof(CancelCurrentComponentEnd):
+                    CancelCurrentComponentEnd();
+                    return true;
+                case nameof(IsEnabledCancelCurrentComponentEnd):
+                    result = IsEnabledCancelCurrentComponentEnd();
+                    return true;
+                case nameof(AckNotEmptyScale):
                     AckNotEmptyScale();
                     return true;
-                case Const.IsEnabledPrefix + "AckNotEmptyScale":
+                case nameof(IsEnabledAckNotEmptyScale):
                     result = IsEnabledAckNotEmptyScale();
                     return true;
             }
@@ -1994,6 +2000,33 @@ namespace gip.mes.processapplication
         public virtual bool IsEnabledCancelCurrentComponent()
         {
             return NoSourceFoundForDosing.ValueT == 1;
+        }
+
+        [ACMethodInteraction("", "en{'Dont dose current component => End Order'}de{'Aktuelle Komponente nicht mehr dosieren => Auftrag beenden'}", 801, true)]
+        public virtual void CancelCurrentComponentEnd()
+        {
+            if (!IsEnabledCancelCurrentComponentEnd())
+                return;
+            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+            if (IsProduction)
+            {
+                ParentPWMethod<PWMethodProduction>().EndBatchPlan();
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+            }
+            else if (IsTransport)
+            {
+                ParentPWMethod<PWMethodTransportBase>().EndPicking();
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+            }
+            RootPW.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+
+            AcknowledgeAlarms();
+            NoSourceFoundForDosing.ValueT = 2;
+        }
+
+        public virtual bool IsEnabledCancelCurrentComponentEnd()
+        {
+            return IsEnabledCancelCurrentComponent();
         }
         #endregion
 

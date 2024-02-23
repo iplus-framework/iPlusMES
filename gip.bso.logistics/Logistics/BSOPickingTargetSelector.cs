@@ -740,7 +740,7 @@ namespace gip.bso.logistics
                 if (!StartBatchPlanValidation())
                     return;
 
-                gip.core.datamodel.ACClassMethod acClassMethod = CurrentACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>(this.Database.ContextIPlus);
+                gip.core.datamodel.ACClassMethod acClassMethod = CurrentACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>(this.DatabaseApp.ContextIPlus);
                 if (acClassMethod == null)
                     return;
                 gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;

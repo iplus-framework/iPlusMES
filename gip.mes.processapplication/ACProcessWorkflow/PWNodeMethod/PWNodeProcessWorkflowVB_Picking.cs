@@ -239,7 +239,7 @@ namespace gip.mes.processapplication
             try
             {
                 using (Database dbiPlus = new Database())
-                using (DatabaseApp dbApp = new DatabaseApp())
+                using (DatabaseApp dbApp = new DatabaseApp(dbiPlus))
                 {
                     IEnumerable<Picking> possiblePickings = dbApp.Picking.Where(c => c.PickingStateIndex == (short)PickingStateEnum.New
                                                                                  && c.ACClassMethodID == detachedPicking.ACClassMethodID
