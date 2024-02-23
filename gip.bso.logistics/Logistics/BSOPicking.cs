@@ -3977,7 +3977,7 @@ namespace gip.bso.logistics
                     }
                 }
 
-                gip.core.datamodel.ACClassMethod acClassMethod = CurrentPicking.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>(this.Database.ContextIPlus);
+                gip.core.datamodel.ACClassMethod acClassMethod = CurrentPicking.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>(this.DatabaseApp.ContextIPlus);
                 if (acClassMethod == null)
                     return;
                 gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;

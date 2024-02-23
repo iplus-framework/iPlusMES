@@ -318,13 +318,17 @@ namespace gip.mes.processapplication
                             remainingWeight = scaleBoundaries.MaxWeightCapacity;
                         if (!remainingWeight.HasValue)
                         {
-                            //Error50162: MaxWeightCapacity of scale {0} is not configured.
-                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(1.1)", 1000, "Error50162", scale.GetACUrl());
-
-                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            if (!MaxWeightAlarmSet)
                             {
-                                Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                MaxWeightAlarmSet = true;
+                                //Error50162: MaxWeightCapacity of scale {0} is not configured.
+                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(1.1)", 1000, "Error50162", scale.GetACUrl());
+
+                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                {
+                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                }
                             }
                         }
                         else if (Math.Abs(targetWeight) > remainingWeight.Value)
@@ -437,6 +441,10 @@ namespace gip.mes.processapplication
                                 pickingPos.MDDelivPosLoadState = posLoadState;
                                 dbApp.ACSaveChanges();
                                 continue;
+                            }
+                            else if (NoSourceFoundForDosing.ValueT == 1)
+                            {
+                                return StartNextCompResult.CycleWait;
                             }
                         }
                         else if (NoSourceFoundForDosing.ValueT == 1)
