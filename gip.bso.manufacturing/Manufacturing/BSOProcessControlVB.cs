@@ -620,6 +620,14 @@ namespace gip.bso.manufacturing
                            .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
                            .FirstOrDefault();
                     }
+
+                    // @aagincic: there is some issue with refreshing task.ProdOrderPartslistPos_ACClassTask() while this list in this case
+                    // is empty but query down returns result
+                    if (prodOrderPartslistPos == null)
+                    {
+                        prodOrderPartslistPos = DatabaseApp.ProdOrderPartslistPos.Where(c => c.ACClassTaskID == task.ACClassTaskID).FirstOrDefault();
+                    }
+
                 }
 
                 model.Material = "";
