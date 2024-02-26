@@ -2937,6 +2937,12 @@ namespace gip.bso.manufacturing
 
                 if (SelectedWeighingMaterial != null && SelectedFacilityCharge == null)
                 {
+                    if (FacilityChargeList == null)
+                    {
+                        RefreshMaterialOrFC_F();
+                        Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "FacilityChargeList is corrected!");
+                    }
+
                     if (compInfo.FacilityCharge.HasValue)
                     {
                         SelectedFacilityCharge = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge.Value);
