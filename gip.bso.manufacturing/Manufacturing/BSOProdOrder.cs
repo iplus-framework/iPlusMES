@@ -2358,19 +2358,18 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "CreateNewLabOrderFromProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void CreateNewLabOrderFromProdOrderPartslist()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderDialogProd") as ACComponent;
-            if (childBSO == null)
-            {
-                childBSO = StartComponent("LabOrderDialogProd", null, new object[] { }) as ACComponent;
-                if (SelectedProdOrderIntermediateBatch != null)
-                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null, null);
-                else
-                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null, null);
-            }
-            if (childBSO == null)
-            {
+            if (!IsEnabledCreateNewLabOrderFromProdOrderPartslist())
                 return;
-            }
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            if (SelectedProdOrderIntermediateBatch != null)
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null, null);
+            else
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrderFromProdOrderPartslist()
@@ -2396,9 +2395,11 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("Dialog", "en{'Lab Report View'}de{'Laborbericht'}", (short)MISort.QueryPrintDlg)]
         public void ShowLabOrderFromProdOrder()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
+            if (!IsEnabledShowLabOrderFromProdOrder())
+                return;
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
             if (childBSO == null)
-                childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
             if (SelectedProdOrderIntermediateBatch != null)
@@ -2427,39 +2428,41 @@ namespace gip.bso.manufacturing
             return false;
         }
 
-        [ACMethodInfo("Dialog", "en{'Lab Report MES View'}de{'Laborbericht MES'}", (short)MISort.QueryPrintDlg)]
-        public void ShowLabOrderMESFromProdOrder()
-        {
-            ACComponent childBSO = ACUrlCommand("?LabOrderMESViewDialog") as ACComponent;
-            if (childBSO == null)
-                childBSO = StartComponent("LabOrderMESViewDialog", null, new object[] { }) as ACComponent;
-            if (childBSO == null)
-                return;
-            if (SelectedProdOrderIntermediateBatch != null)
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
-            else
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
-            childBSO.Stop();
-        }
+        //[ACMethodInfo("Dialog", "en{'Lab Report MES View'}de{'Laborbericht MES'}", (short)MISort.QueryPrintDlg)]
+        //public void ShowLabOrderMESFromProdOrder()
+        //{
+        //    if (!IsEnabledShowLabOrderMESFromProdOrder())
+        //        return;
+        //    ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+        //    if (childBSO == null)
+        //        childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+        //    if (childBSO == null)
+        //        return;
+        //    if (SelectedProdOrderIntermediateBatch != null)
+        //        childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
+        //    else
+        //        childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
+        //    childBSO.Stop();
+        //}
 
-        public bool IsEnabledShowLabOrderMESFromProdOrder()
-        {
-            if (SelectedIntermediate != null)
-            {
-                if (!SelectedIntermediate.LabOrder_ProdOrderPartslistPos.Any() && SelectedProdOrderIntermediateBatch == null)
-                    return false;
-                else if (SelectedProdOrderIntermediateBatch != null)
-                {
-                    if (!SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.Any())
-                        return false;
-                    else
-                        return true;
-                }
-                else
-                    return true;
-            }
-            return false;
-        }
+        //public bool IsEnabledShowLabOrderMESFromProdOrder()
+        //{
+        //    if (SelectedIntermediate != null)
+        //    {
+        //        if (!SelectedIntermediate.LabOrder_ProdOrderPartslistPos.Any() && SelectedProdOrderIntermediateBatch == null)
+        //            return false;
+        //        else if (SelectedProdOrderIntermediateBatch != null)
+        //        {
+        //            if (!SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.Any())
+        //                return false;
+        //            else
+        //                return true;
+        //        }
+        //        else
+        //            return true;
+        //    }
+        //    return false;
+        //}
 
         #endregion
 

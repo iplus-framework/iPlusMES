@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Reflection;
 using static gip.core.datamodel.Global;
+using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
@@ -26,7 +27,6 @@ namespace gip.bso.masterdata
         public BSOLabOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -389,6 +389,8 @@ namespace gip.bso.masterdata
                 {
                     if (_LastLabOrder != null)
                         _LastLabOrder.PropertyChanged -= CurrentLabOrder_PropertyChanged;
+                    if (value == null || value.EntityState != System.Data.EntityState.Added)
+                        _DialogTemplateList = null;
                     SetCurrentSelected(value);
                     _LastLabOrder = value;
                     if (_LastLabOrder != null)
@@ -402,23 +404,26 @@ namespace gip.bso.masterdata
         protected virtual void CurrentLabOrder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "MaterialID")
-                OnPropertyChanged(nameof(DialogTemplateList));
-
-            if (e.PropertyName == "InOrderPosID")
+            {
+                if (CurrentLabOrder == null || CurrentLabOrder.EntityState != System.Data.EntityState.Added)
+                {
+                    _DialogTemplateList = null;
+                    OnPropertyChanged(nameof(DialogTemplateList));
+                }
+            }
+            else if (e.PropertyName == "InOrderPosID")
             {
                 if (CurrentLabOrder != null && CurrentLabOrder.InOrderPos != null)
                     CurrentLabOrder.Material = CurrentLabOrder.InOrderPos.Material;
                 OnPropertyChanged(nameof(CurrentLabOrder));
             }
-
-            if (e.PropertyName == "OutOrderPosID")
+            else if (e.PropertyName == "OutOrderPosID")
             {
                 if (CurrentLabOrder != null && CurrentLabOrder.OutOrderPos != null)
                     CurrentLabOrder.Material = CurrentLabOrder.OutOrderPos.Material;
                 OnPropertyChanged(nameof(CurrentLabOrder));
             }
-
-            if (e.PropertyName == "ProdOrderPartslistPosID")
+            else if (e.PropertyName == "ProdOrderPartslistPosID")
             {
                 if (CurrentLabOrder != null && CurrentLabOrder.ProdOrderPartslistPos != null)
                 {
@@ -427,11 +432,16 @@ namespace gip.bso.masterdata
                 }
                 OnPropertyChanged(nameof(CurrentLabOrder));
             }
-
-            if (e.PropertyName == "FacilityLotID")
+            else if (e.PropertyName == "FacilityLotID")
             {
                 if (CurrentLabOrder != null && CurrentLabOrder.FacilityLot != null)
                     CurrentLabOrder.Material = CurrentLabOrder.FacilityLot.Material;
+                OnPropertyChanged(nameof(CurrentLabOrder));
+            }
+            else if (e.PropertyName == "PickingPosID")
+            {
+                if (CurrentLabOrder != null && CurrentLabOrder.PickingPos != null)
+                    CurrentLabOrder.Material = CurrentLabOrder.PickingPos.Material;
                 OnPropertyChanged(nameof(CurrentLabOrder));
             }
         }
@@ -441,20 +451,26 @@ namespace gip.bso.masterdata
             base.CurrentLabOrderPos_PropertyChanged(sender, e);
         }
 
+        List<LabOrder> _DialogTemplateList = null;
         /// <summary>
         /// Gets the list of laboratory templates in laboratory order dialog.
         /// </summary>
         /// <summary xml:lang="de">
         /// Ruft die Liste der Laborvorlagen im Laborauftragsdialog ab.
         /// </summary>
-        [ACPropertyInfo(710, "Dialog", "en{'Template'}de{'Vorlage'}", "DialogTemplateList", false)]
-        public IQueryable<LabOrder> DialogTemplateList
+        [ACPropertyList(710, "Template", "en{'Template'}de{'Vorlage'}", "", false)]
+        public List<LabOrder> DialogTemplateList
         {
             get
             {
-                if (CurrentLabOrder != null)
-                    return LabOrderManager.ReturnLabOrderTemplateList(DatabaseApp).Where(c => c.MaterialID == CurrentLabOrder.MaterialID);
-                return null;
+                if (_DialogTemplateList == null && CurrentLabOrder != null && CurrentLabOrder.Material != null)
+                {
+                    Material material = null;
+                    material = CurrentLabOrder.Material;
+                    if (material != null)
+                        _DialogTemplateList = LabOrderManager.ReturnLabOrderTemplateList(DatabaseApp).Where(c => c.MaterialID == material.MaterialID || (material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID.Value)).ToList();
+                }
+                return _DialogTemplateList;
             }
         }
 
@@ -465,7 +481,7 @@ namespace gip.bso.masterdata
         /// <summary xml:lang="de">
         /// Liest oder setzt die ausgewählte Laborvorlage im Laborauftragsdialog.
         /// </summary>
-        [ACPropertyInfo(711, "Dialog", "en{'Template'}de{'Vorlage'}", "DialogSelectedTemplate", false)]
+        [ACPropertySelected(711, "Template", "en{'Template'}de{'Vorlage'}", "", false)]
         public LabOrder DialogSelectedTemplate
         {
             get
@@ -517,6 +533,7 @@ namespace gip.bso.masterdata
                     _DialogSelectedTemplate = null;
                     OnPropertyChanged(nameof(CurrentLabOrder));
                     OnPropertyChanged(nameof(DialogSelectedTemplate));
+                    _DialogTemplateList = null;
                     OnPropertyChanged(nameof(DialogTemplateList));
                 }
             }
@@ -763,12 +780,23 @@ namespace gip.bso.masterdata
             if (DialogResult == null)
                 DialogResult = new VBDialogResult();
             DialogResult.SelectedCommand = eMsgButton.Cancel;
-            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null)
-            {
+            bool hasOrderEntities = !(inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null);
+            if (!hasOrderEntities)
                 _IsMaterialStateEnabled = true;
-            }
             else
                 FilterDialog(inOrderPos != null ? inOrderPos.InOrderPos : null, outOrderPos != null ? outOrderPos.OutOrderPos : null, prodOrderPartslistPos, facilityLot, null, null);
+
+            List<LabOrder> labOrderTemplates = null;
+            if (hasOrderEntities)
+            {
+                Msg msg = LabOrderManager.GetOrCreateDefaultLabTemplate(DatabaseApp, inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, out labOrderTemplates);
+                if (msg != null)
+                {
+                    Messages.Msg(msg, MsgResult.OK);
+                    return new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
+                }
+                _DialogTemplateList = labOrderTemplates;
+            }
 
             base.New();
             CurrentLabOrder.MDLabOrderState = DatabaseApp.MDLabOrderState.FirstOrDefault(c => c.IsDefault);
@@ -917,12 +945,12 @@ namespace gip.bso.masterdata
             if (filter)
                 FilterDialog(inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, labOrder, orderInfo);
 
-            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null)
-            {
-                ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
-                if (childBSO == null)
-                    childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
-            }
+            //if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null)
+            //{
+            //    ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            //    if (childBSO == null)
+            //        childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            //}
             ShowDialog(this, "LabOrderViewDialog");
             Save();
             CloseTopDialog();

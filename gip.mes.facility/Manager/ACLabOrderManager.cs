@@ -13,8 +13,8 @@ namespace gip.mes.facility
     public class ACLabOrderManager : PARole
     {
         #region c'tors
-         public ACLabOrderManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
-            : base(acType, content, parentACObject, parameter, acIdentifier)
+        public ACLabOrderManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+           : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
         public const string C_DefaultServiceACIdentifier = "LabOrderManager";
@@ -35,6 +35,21 @@ namespace gip.mes.facility
         }
         #endregion
 
+
+        public Msg CreateNewLabOrder(DatabaseApp dbApp, string labOrderName, InOrderPos inOrderPos, OutOrderPos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos, out LabOrder labOrder)
+        {
+            List<LabOrder> labOrderTemplates = null;
+            labOrder = null;
+            Msg msg = GetOrCreateDefaultLabTemplate(dbApp, inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, out labOrderTemplates);
+            if (msg != null)
+                return msg;
+
+            if (labOrderTemplates == null || !labOrderTemplates.Any())
+                return null;
+
+            return CreateNewLabOrder(dbApp, labOrderTemplates.FirstOrDefault(), labOrderName, inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, out labOrder);
+        }
+
         /// <summary>
         /// Create new lab order based on template.
         /// </summary>
@@ -46,7 +61,7 @@ namespace gip.mes.facility
             if (template == null)
             {
                 //"Error:Lab order template missing!"
-                return new Msg 
+                return new Msg
                 {
                     Source = GetACUrl(),
                     MessageLevel = eMsgLevel.Error,
@@ -135,8 +150,15 @@ namespace gip.mes.facility
         public Msg GetOrCreateLabTemplateForPWNode(DatabaseApp dbApp, string templateName, Material material, ACMethod pwNodeACMethod, IEnumerable<string> acIdentifiersOfExcludedResult, out LabOrder template)
         {
             template = null;
+            if (material == null || pwNodeACMethod == null || dbApp == null)
+                return null;
+            return GetOrCreateLabTemplateForValueList(dbApp, templateName, material, pwNodeACMethod.ResultValueList, acIdentifiersOfExcludedResult, out template);
+        }
 
-            ACValueList resultList = pwNodeACMethod.ResultValueList;
+        public Msg GetOrCreateLabTemplateForValueList(DatabaseApp dbApp, string templateName, Material material, ACValueList resultList, IEnumerable<string> acIdentifiersOfExcludedResult, out LabOrder template)
+        {
+            template = null;
+
             if (resultList == null || !resultList.Any())
                 return null;
 
@@ -154,7 +176,7 @@ namespace gip.mes.facility
                 dbApp.LabOrder.AddObject(template);
 
             }
-            
+
             foreach (ACValue resultItem in resultList)
             {
                 if (acIdentifiersOfExcludedResult != null && acIdentifiersOfExcludedResult.Contains(resultItem.ACIdentifier))
@@ -182,12 +204,13 @@ namespace gip.mes.facility
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)
                 return msg;
-            
+
             return null;
         }
 
-        public Msg CreateOrUpdateLabOrderForPWNode(DatabaseApp dbApp, string templateName, ACMethod pwNodeACMethod, ProdOrderPartslistPos intermediateChildPos, 
-                                                   ProdOrderPartslistPos intermediatePosition, ProdOrderPartslistPos endBatchPos, 
+
+        public Msg CreateOrUpdateLabOrderForPWNode(DatabaseApp dbApp, string templateName, ACMethod pwNodeACMethod, ProdOrderPartslistPos intermediateChildPos,
+                                                   ProdOrderPartslistPos intermediatePosition, ProdOrderPartslistPos endBatchPos,
                                                    IEnumerable<string> acIdentifersOfRepeatedResult, IEnumerable<string> acIdentifiersOfExcludedResult)
         {
             ACValueList resultList = pwNodeACMethod.ResultValueList;
@@ -254,7 +277,7 @@ namespace gip.mes.facility
                         loPos = LabOrderPos.NewACObject(dbApp, currentLabOrder, templatePos);
 
                     int nextSequence = currentLabOrder.LabOrderPos_LabOrder.Max(c => c.Sequence) + 1;
-                    
+
                     if (loPos != null)
                     {
                         loPos.Sequence = nextSequence;
@@ -285,6 +308,76 @@ namespace gip.mes.facility
 
                 return dbApp.ACSaveChanges();
             }
+            return null;
+        }
+
+
+        public Msg GetOrCreateDefaultLabTemplate(DatabaseApp dbApp, DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos, out List<LabOrder> labOrderTemplates)
+        {
+            return GetOrCreateDefaultLabTemplate(dbApp, inOrderPos?.InOrderPos, outOrderPos?.OutOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, out labOrderTemplates);
+        }
+
+        public Msg GetOrCreateDefaultLabTemplate(DatabaseApp dbApp, InOrderPos inOrderPos, OutOrderPos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos, out List<LabOrder> labOrderTemplates)
+        {
+            labOrderTemplates = null;
+            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null)
+            {
+                //"Error:Material state is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CreateNewLabOrder(1)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50051")
+                };
+            }
+
+            Material material = inOrderPos?.Material;
+            if (material == null)
+                material = outOrderPos?.Material;
+            if (material == null)
+                material = prodOrderPartslistPos?.BookingMaterial;
+            if (material == null)
+                material = facilityLot?.Material;
+            if (material == null)
+                material = pickingPos?.Material;
+            return GetOrCreateDefaultLabTemplate(dbApp, material, out labOrderTemplates);
+        }
+
+        public Msg GetOrCreateDefaultLabTemplate(DatabaseApp dbApp, Material material, out List<LabOrder> labOrderTemplates)
+        {
+            labOrderTemplates = null;
+            if (material == null)
+            {
+                //"Error:Material state is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CreateNewLabOrder(1)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50051")
+                };
+            }
+            labOrderTemplates = ReturnLabOrderTemplateList(dbApp).Where(c => c.MaterialID == material.MaterialID || (material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID.Value)).ToList();
+            if (labOrderTemplates != null && labOrderTemplates.Any())
+                return null;
+
+            LabOrder newTemplate = OnCreateNewTemplate(dbApp, material);
+            if (newTemplate != null)
+            {
+                if (newTemplate.EntityState == EntityState.Added)
+                {
+                    Msg msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                        return msg;
+                }
+                labOrderTemplates.Add(newTemplate);
+            }
+            return null;
+        }
+
+        protected virtual LabOrder OnCreateNewTemplate(DatabaseApp dbApp, Material material)
+        {
             return null;
         }
     }

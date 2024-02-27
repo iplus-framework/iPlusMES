@@ -2214,19 +2214,15 @@ namespace gip.bso.purchasing
         public virtual void CreateNewLabOrderFromInOrder()
         {
             Save();
-            if (this.DatabaseApp.IsChanged)
+            if (this.DatabaseApp.IsChanged || SelectedDeliveryNotePos == null)
                 return;
-
             ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
-            if (childBSO == null && SelectedDeliveryNotePos != null)
-            {
-                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), SelectedDeliveryNotePos, null, null, null, null);
-            }
             if (childBSO == null)
-            {
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
                 return;
-            }
+            childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), SelectedDeliveryNotePos, null, null, null, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrderFromInOrder()
@@ -2243,13 +2239,15 @@ namespace gip.bso.purchasing
         [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606)]
         public void ShowLabOrderFromInOrder()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
-            if (childBSO == null && SelectedDeliveryNotePos != null)
-            {
-                childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), SelectedDeliveryNotePos.InOrderPos, null, null, null, null, null, true, null);
-                childBSO.Stop();
-            }
+            if (this.DatabaseApp.IsChanged || SelectedDeliveryNotePos == null)
+                return;
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), SelectedDeliveryNotePos.InOrderPos, null, null, null, null, null, true, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledShowLabOrderFromInOrder()

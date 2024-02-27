@@ -4315,19 +4315,15 @@ namespace gip.bso.logistics
         public virtual void CreateNewLabOrder()
         {
             Save();
-            if (this.DatabaseApp.IsChanged)
+            if (this.DatabaseApp.IsChanged || SelectedPickingPos == null)
                 return;
-
             ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
-            if (childBSO == null && SelectedPickingPos != null)
-            {
-                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, null, null, null, SelectedPickingPos);
-            }
             if (childBSO == null)
-            {
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
                 return;
-            }
+            childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, null, null, null, SelectedPickingPos);
+            childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrder()
@@ -4344,13 +4340,15 @@ namespace gip.bso.logistics
         [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606)]
         public void ShowLabOrder()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
-            if (childBSO == null && SelectedPickingPos != null)
-            {
-                childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, null, null, SelectedPickingPos, null, true, null);
-                childBSO.Stop();
-            }
+            if (this.DatabaseApp.IsChanged || SelectedPickingPos == null)
+                return;
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, null, null, SelectedPickingPos, null, true, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledShowLabOrder()
