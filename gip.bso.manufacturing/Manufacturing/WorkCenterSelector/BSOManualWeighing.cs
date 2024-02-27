@@ -1,21 +1,16 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using vd = gip.mes.datamodel;
-using System.Text;
-using System.Threading.Tasks;
 using gip.mes.processapplication;
 using System.ComponentModel;
 using System.Data;
 using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
-using gip.core.layoutengine;
 using System.Collections.ObjectModel;
-using System.Xml.Linq;
 
 namespace gip.bso.manufacturing
 {
@@ -2942,6 +2937,12 @@ namespace gip.bso.manufacturing
 
                 if (SelectedWeighingMaterial != null && SelectedFacilityCharge == null)
                 {
+                    if (FacilityChargeList == null)
+                    {
+                        RefreshMaterialOrFC_F();
+                        Messages.LogInfo(this.GetACUrl(), nameof(CorrectManualWeighingItems), "FacilityChargeList is corrected!");
+                    }
+
                     if (compInfo.FacilityCharge.HasValue)
                     {
                         SelectedFacilityCharge = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge.Value);
