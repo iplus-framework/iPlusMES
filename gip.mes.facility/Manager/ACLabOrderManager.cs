@@ -38,7 +38,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Create new lab order based on template.
         /// </summary>
-        public Msg CreateNewLabOrder(DatabaseApp dbApp, LabOrder template, string labOrderName, InOrderPos inOrderPos, OutOrderPos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, out LabOrder labOrder)
+        public Msg CreateNewLabOrder(DatabaseApp dbApp, LabOrder template, string labOrderName, InOrderPos inOrderPos, OutOrderPos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos, out LabOrder labOrder)
         {
             Msg msg = null;
             labOrder = null;
@@ -73,6 +73,7 @@ namespace gip.mes.facility
             labOrder.OutOrderPos = outOrderPos;
             labOrder.ProdOrderPartslistPos = prodOrderPartslistPos;
             labOrder.FacilityLot = facilityLot;
+            labOrder.PickingPos = pickingPos;
             if (!String.IsNullOrEmpty(labOrderName))
                 labOrder.TemplateName = labOrderName;
 
@@ -217,7 +218,7 @@ namespace gip.mes.facility
 
             if (currentLabOrder == null)
             {
-                msg = CreateNewLabOrder(dbApp, template, "", null, null, intermediateChildPos, null, out currentLabOrder);
+                msg = CreateNewLabOrder(dbApp, template, "", null, null, intermediateChildPos, null, null, out currentLabOrder);
                 if (msg != null)
                     return msg;
             }

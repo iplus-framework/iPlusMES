@@ -660,7 +660,7 @@ namespace gip.mes.facility
                 childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, null, null, labOrder, true, orderInfo);
+            childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, null, null, null, labOrder, true, orderInfo);
             childBSO.Stop();
         }
 
@@ -731,7 +731,7 @@ namespace gip.mes.facility
                             return;
 
                         LabOrder labOrder = null;
-                        labOrderMgr.CreateNewLabOrder(dbApp, labOrderTemplate, caller.ACIdentifier, null, null, batchPos, null, out labOrder);
+                        labOrderMgr.CreateNewLabOrder(dbApp, labOrderTemplate, caller.ACIdentifier, null, null, batchPos, null, null, out labOrder);
 
                         if (labOrder != null)
                         {

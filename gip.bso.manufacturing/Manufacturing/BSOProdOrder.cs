@@ -2363,9 +2363,9 @@ namespace gip.bso.manufacturing
             {
                 childBSO = StartComponent("LabOrderDialogProd", null, new object[] { }) as ACComponent;
                 if (SelectedProdOrderIntermediateBatch != null)
-                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null);
+                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null, null);
                 else
-                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null);
+                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null, null);
             }
             if (childBSO == null)
             {
@@ -2402,9 +2402,9 @@ namespace gip.bso.manufacturing
             if (childBSO == null)
                 return;
             if (SelectedProdOrderIntermediateBatch != null)
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
             else
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
             childBSO.Stop();
         }
 
@@ -2436,9 +2436,9 @@ namespace gip.bso.manufacturing
             if (childBSO == null)
                 return;
             if (SelectedProdOrderIntermediateBatch != null)
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
             else
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
             childBSO.Stop();
         }
 

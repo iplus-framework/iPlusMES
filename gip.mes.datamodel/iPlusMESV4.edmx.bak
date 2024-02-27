@@ -1907,6 +1907,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="RefACClassID" Type="uniqueidentifier" />
+          <Property Name="PickingPosID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="LabOrderPos">
           <Key>
@@ -9189,6 +9190,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_LabOrder_PickingPosID">
+          <End Role="PickingPos" Type="Self.PickingPos" Multiplicity="0..1" />
+          <End Role="LabOrder" Type="Self.LabOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PickingPos">
+              <PropertyRef Name="PickingPosID" />
+            </Principal>
+            <Dependent Role="LabOrder">
+              <PropertyRef Name="PickingPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_LabOrder_ProdOrderPartslistPosID">
           <End Role="ProdOrderPartslistPos" Type="Self.ProdOrderPartslistPos" Multiplicity="0..1" />
           <End Role="LabOrder" Type="Self.LabOrder" Multiplicity="*" />
@@ -15340,6 +15353,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
             <End Role="LabOrder" EntitySet="LabOrder" />
           </AssociationSet>
+          <AssociationSet Name="FK_LabOrder_PickingPosID" Association="Self.FK_LabOrder_PickingPosID">
+            <End Role="PickingPos" EntitySet="PickingPos" />
+            <End Role="LabOrder" EntitySet="LabOrder" />
+          </AssociationSet>
           <AssociationSet Name="FK_LabOrder_ProdOrderPartslistPosID" Association="Self.FK_LabOrder_ProdOrderPartslistPosID">
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
             <End Role="LabOrder" EntitySet="LabOrder" />
@@ -19780,6 +19797,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <End Role="ACClassWF" EntitySet="ACClassWF" />
             <End Role="Picking" EntitySet="Picking" />
           </AssociationSet>
+          <AssociationSet Name="FK_LabOrder_PickingPosID" Association="iPlusMESV4_Model.FK_LabOrder_PickingPosID">
+            <End Role="PickingPos" EntitySet="PickingPos" />
+            <End Role="LabOrder" EntitySet="LabOrder" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -22082,6 +22103,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_LabOrder_OutOrderPosID" FromRole="LabOrder" ToRole="OutOrderPos" />
           <NavigationProperty Name="LabOrderPos_LabOrder" Relationship="iPlusMESV4_Model.FK_LabOrderPos_LabOrderID" FromRole="LabOrder" ToRole="LabOrderPos" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_LabOrder_ProdOrderPartslistPosID" FromRole="LabOrder" ToRole="ProdOrderPartslistPos" />
+          <Property Name="PickingPosID" Type="Guid" />
+          <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_LabOrder_PickingPosID" FromRole="LabOrder" ToRole="PickingPos" />
         </EntityType>
         <EntityType Name="LabOrderPos">
           <Key>
@@ -33740,6 +33763,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Weighing_PickingPos" Relationship="iPlusMESV4_Model.FK_Weighing_PickingPosID" FromRole="PickingPos" ToRole="Weighing" />
           <NavigationProperty Name="TandTv3MixPointPickingPos_PickingPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointPickingPos_PickingPosID" FromRole="PickingPos" ToRole="TandTv3MixPointPickingPos" />
           <NavigationProperty Name="FacilityReservation_PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" FromRole="PickingPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="LabOrder" Relationship="iPlusMESV4_Model.FK_LabOrder_PickingPosID" FromRole="PickingPos" ToRole="LabOrder" />
         </EntityType>
         <Association Name="FK_ACClassTask_TaskTypeACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="1">
@@ -34670,6 +34694,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="Picking">
               <PropertyRef Name="VBiACClassWFID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LabOrder_PickingPosID">
+          <End Type="iPlusMESV4_Model.PickingPos" Role="PickingPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.LabOrder" Role="LabOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PickingPos">
+              <PropertyRef Name="PickingPosID" />
+            </Principal>
+            <Dependent Role="LabOrder">
+              <PropertyRef Name="PickingPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -36456,6 +36492,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="LabOrder">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.LabOrder">
               <MappingFragment StoreEntitySet="LabOrder">
+                <ScalarProperty Name="PickingPosID" ColumnName="PickingPosID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -40908,6 +40945,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_ACClassWFID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_LabOrder_PickingPosID" />
       </Diagram>
     </Diagrams>
   </Designer>

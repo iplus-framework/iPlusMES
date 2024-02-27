@@ -2221,7 +2221,7 @@ namespace gip.bso.purchasing
             if (childBSO == null && SelectedDeliveryNotePos != null)
             {
                 childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!NewLabOrderDialog", SelectedDeliveryNotePos, null, null, null);
+                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), SelectedDeliveryNotePos, null, null, null, null);
             }
             if (childBSO == null)
             {
@@ -2247,7 +2247,7 @@ namespace gip.bso.purchasing
             if (childBSO == null && SelectedDeliveryNotePos != null)
             {
                 childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!ShowLabOrderViewDialog", SelectedDeliveryNotePos.InOrderPos, null, null, null, null, true, null);
+                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), SelectedDeliveryNotePos.InOrderPos, null, null, null, null, null, true, null);
                 childBSO.Stop();
             }
         }
@@ -2875,187 +2875,187 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case "BookAllACMethodBookings":
+                case nameof(BookAllACMethodBookings):
                     BookAllACMethodBookings();
                     return true;
-                case "IsEnabledBookAllACMethodBookings":
+                case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
-                case "NewFacilityLot":
+                case nameof(NewFacilityLot):
                     NewFacilityLot();
                     return true;
-                case "IsEnabledNewFacilityLot":
+                case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
-                case "ShowFacilityLot":
+                case nameof(ShowFacilityLot):
                     ShowFacilityLot();
                     return true;
-                case "IsEnabledShowFacilityLot":
+                case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
                     return true;
-                case "ShowDialogNewDeliveryNote":
+                case nameof(ShowDialogNewDeliveryNote):
                     result = ShowDialogNewDeliveryNote(acParameter.Count() == 1 ? (String)acParameter[0] : "");
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "ShowDialogNote":
+                case nameof(ShowDialogNote):
                     ShowDialogNote((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
-                case "OnActivate":
+                case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
                     return true;
-                case "ShowDeliveryCompanyRatingComplaint":
+                case nameof(ShowDeliveryCompanyRatingComplaint):
                     ShowDeliveryCompanyRatingComplaint();
                     return true;
-                case "ShowShipperCompanyRatingComplaint":
+                case nameof(ShowShipperCompanyRatingComplaint):
                     ShowShipperCompanyRatingComplaint();
                     return true;
-                case "IsEnabledShowDeliveryCompanyRatingComplaint":
+                case nameof(IsEnabledShowDeliveryCompanyRatingComplaint):
                     result = IsEnabledShowDeliveryCompanyRatingComplaint();
                     return true;
-                case "IsEnabledShowShipperCompanyRatingComplaint":
+                case nameof(IsEnabledShowShipperCompanyRatingComplaint):
                     result = IsEnabledShowShipperCompanyRatingComplaint();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "DeliveryNoteReady":
+                case nameof(DeliveryNoteReady):
                     DeliveryNoteReady();
                     return true;
-                case "IsEnabledDeliveryNoteReady":
+                case nameof(IsEnabledDeliveryNoteReady):
                     result = IsEnabledDeliveryNoteReady();
                     return true;
-                case "Delivered":
+                case nameof(Delivered):
                     Delivered();
                     return true;
-                case "IsEnabledDelivered":
+                case nameof(IsEnabledDelivered):
                     result = IsEnabledDelivered();
                     return true;
-                case "CancelDelivery":
+                case nameof(CancelDelivery):
                     CancelDelivery();
                     return true;
-                case "IsEnabledCancelDelivery":
+                case nameof(IsEnabledCancelDelivery):
                     result = IsEnabledCancelDelivery();
                     return true;
-                case "AssignInOrderPos":
+                case nameof(AssignInOrderPos):
                     AssignInOrderPos();
                     return true;
-                case "IsEnabledAssignInOrderPos":
+                case nameof(IsEnabledAssignInOrderPos):
                     result = IsEnabledAssignInOrderPos();
                     return true;
-                case "UnassignInOrderPos":
+                case nameof(UnassignInOrderPos):
                     UnassignInOrderPos();
                     return true;
-                case "IsEnabledUnassignInOrderPos":
+                case nameof(IsEnabledUnassignInOrderPos):
                     result = IsEnabledUnassignInOrderPos();
                     return true;
-                case "FilterDialogInOrderPos":
+                case nameof(FilterDialogInOrderPos):
                     result = FilterDialogInOrderPos();
                     return true;
-                case "RefreshInOrderPosList":
+                case nameof(RefreshInOrderPosList):
                     RefreshInOrderPosList();
                     return true;
-                case "CreateNewLabOrderFromInOrder":
+                case nameof(CreateNewLabOrderFromInOrder):
                     CreateNewLabOrderFromInOrder();
                     return true;
-                case "IsEnabledCreateNewLabOrderFromInOrder":
+                case nameof(IsEnabledCreateNewLabOrderFromInOrder):
                     result = IsEnabledCreateNewLabOrderFromInOrder();
                     return true;
-                case "ShowLabOrderFromInOrder":
+                case nameof(ShowLabOrderFromInOrder):
                     ShowLabOrderFromInOrder();
                     return true;
-                case "IsEnabledShowLabOrderFromInOrder":
+                case nameof(IsEnabledShowLabOrderFromInOrder):
                     result = IsEnabledShowLabOrderFromInOrder();
                     return true;
-                case "AssignPicking":
+                case nameof(AssignPicking):
                     AssignPicking();
                     return true;
-                case "IsEnabledAssignPicking":
+                case nameof(IsEnabledAssignPicking):
                     result = IsEnabledAssignPicking();
                     return true;
-                case "NewFacilityPreBooking":
+                case nameof(NewFacilityPreBooking):
                     NewFacilityPreBooking();
                     return true;
-                case "IsEnabledNewFacilityPreBooking":
+                case nameof(IsEnabledNewFacilityPreBooking):
                     result = IsEnabledNewFacilityPreBooking();
                     return true;
-                case "CancelFacilityPreBooking":
+                case nameof(CancelFacilityPreBooking):
                     CancelFacilityPreBooking();
                     return true;
-                case "IsEnabledCancelFacilityPreBooking":
+                case nameof(IsEnabledCancelFacilityPreBooking):
                     result = IsEnabledCancelFacilityPreBooking();
                     return true;
-                case "DeleteFacilityPreBooking":
+                case nameof(DeleteFacilityPreBooking):
                     DeleteFacilityPreBooking();
                     return true;
-                case "IsEnabledDeleteFacilityPreBooking":
+                case nameof(IsEnabledDeleteFacilityPreBooking):
                     result = IsEnabledDeleteFacilityPreBooking();
                     return true;
-                case "BookDeliveryPos":
+                case nameof(BookDeliveryPos):
                     BookDeliveryPos();
                     return true;
-                case "IsEnabledBookDeliveryPos":
+                case nameof(IsEnabledBookDeliveryPos):
                     result = IsEnabledBookDeliveryPos();
                     return true;
-                case "BookCurrentACMethodBooking":
+                case nameof(BookCurrentACMethodBooking):
                     BookCurrentACMethodBooking();
                     return true;
-                case "IsEnabledBookCurrentACMethodBooking":
+                case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
-                case "ShowDialogOrder":
+                case nameof(ShowDialogOrder):
                     ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
-                case "ShowDialogOrderInfo":
+                case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
-                case "ShowDlgInwardAvailableQuants":
+                case nameof(ShowDlgInwardAvailableQuants):
                     ShowDlgInwardAvailableQuants();
                     return true;
-                case "IsEnabledShowDlgInwardAvailableQuants":
+                case nameof(IsEnabledShowDlgInwardAvailableQuants):
                     result = IsEnabledShowDlgInwardAvailableQuants();
                     return true;
-                case "DlgAvailableQuantsOk":
+                case nameof(DlgAvailableQuantsOk):
                     DlgAvailableQuantsOk();
                     return true;
-                case "IsEnabledDlgAvailableQuantsOk":
+                case nameof(IsEnabledDlgAvailableQuantsOk):
                     result = IsEnabledDlgAvailableQuantsOk();
                     return true;
-                case "DlgAvailableQuantsCancel":
+                case nameof(DlgAvailableQuantsCancel):
                     DlgAvailableQuantsCancel();
                     return true;
                 default:

@@ -18,6 +18,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(10, "LabOrderTypeIndex", "en{'Type of Order'}de{'Auftragstyp'}", typeof(GlobalApp.LabOrderType), Const.ContextDatabase + "\\LabOrderTypeList", "", true)]
     [ACPropertyEntity(11, "BasedOnTemplate", "en{'Based on Template'}de{'Basierend auf Vorlage'}", Const.ContextDatabase + "\\LabOrder", "", true)]
     [ACPropertyEntity(495, "TemplateName", "en{'Template Name'}de{'Name der Vorlage'}", "", "", true)]
+    [ACPropertyEntity(13, PickingPos.ClassName, "en{'Picking line'}de{'Kommissionierposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

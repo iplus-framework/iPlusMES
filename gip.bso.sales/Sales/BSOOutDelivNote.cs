@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using gip.bso.masterdata;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -1667,7 +1668,7 @@ namespace gip.bso.sales
             if (childBSO == null && SelectedDeliveryNotePos != null)
             {
                 childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, SelectedDeliveryNotePos.OutOrderPos, null, null, null, true, null);
+                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, SelectedDeliveryNotePos.OutOrderPos, null, null, null, null, true, null);
                 childBSO.Stop();
             }
         }
@@ -1810,7 +1811,7 @@ namespace gip.bso.sales
             if (childBSO == null && SelectedDeliveryNotePos != null)
             {
                 childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!NewLabOrderDialog", null, SelectedDeliveryNotePos, null, null);
+                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, SelectedDeliveryNotePos, null, null, null);
             }
             if (childBSO == null)
             {

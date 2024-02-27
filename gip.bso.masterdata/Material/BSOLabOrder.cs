@@ -758,12 +758,12 @@ namespace gip.bso.masterdata
         /// <param name="facilityLot">The facility lot.The facility lot.</param>
         /// <returns>The result in <see cref="VBDialogResult" /> object</returns>
         [ACMethodInfo("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 701)]
-        public VBDialogResult NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot)
+        public VBDialogResult NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos)
         {
             if (DialogResult == null)
                 DialogResult = new VBDialogResult();
             DialogResult.SelectedCommand = eMsgButton.Cancel;
-            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null)
+            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null)
             {
                 _IsMaterialStateEnabled = true;
             }
@@ -775,29 +775,36 @@ namespace gip.bso.masterdata
             if (inOrderPos != null)
             {
                 _IsMaterialStateEnabled = false;
-                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == InOrderPos.ClassName);
+                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == nameof(GlobalApp.LabOrderMaterialState.InOrderPos));
                 CurrentLabOrder.InOrderPosID = inOrderPos.InOrderPosID;
             }
 
             if (outOrderPos != null)
             {
                 _IsMaterialStateEnabled = false;
-                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == OutOrderPos.ClassName);
+                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == nameof(GlobalApp.LabOrderMaterialState.OutOrderPos));
                 CurrentLabOrder.OutOrderPosID = outOrderPos.OutOrderPosID;
             }
 
             if (prodOrderPartslistPos != null)
             {
                 _IsMaterialStateEnabled = false;
-                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == PartslistPos.ClassName);
+                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == nameof(GlobalApp.LabOrderMaterialState.PartslistPos));
                 CurrentLabOrder.ProdOrderPartslistPos = prodOrderPartslistPos;
             }
 
             if (facilityLot != null)
             {
                 _IsMaterialStateEnabled = false;
-                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == "LotCharge");
+                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == nameof(GlobalApp.LabOrderMaterialState.LotCharge));
                 CurrentLabOrder.FacilityLot = facilityLot;
+            }
+
+            if (pickingPos != null)
+            {
+                _IsMaterialStateEnabled = false;
+                _LabOrderMaterialState = LabOrderMaterialStateList.FirstOrDefault(c => c.Value.ToString() == nameof(GlobalApp.LabOrderMaterialState.PickingPos));
+                CurrentLabOrder.PickingPos = pickingPos;
             }
 
             _IsNewLabOrderDialogOpen = true;
@@ -849,15 +856,17 @@ namespace gip.bso.masterdata
             if (!IsLabOrderParent)
             {
                 if (CurrentLabOrder.InOrderPos != null)
-                    ShowLabOrderViewDialog(CurrentLabOrder.InOrderPos, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(CurrentLabOrder.InOrderPos, null, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
                 else if (CurrentLabOrder.OutOrderPos != null)
-                    ShowLabOrderViewDialog(null, CurrentLabOrder.OutOrderPos, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, CurrentLabOrder.OutOrderPos, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
                 else if (CurrentLabOrder.ProdOrderPartslistPos != null)
-                    ShowLabOrderViewDialog(null, null, CurrentLabOrder.ProdOrderPartslistPos, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, null, CurrentLabOrder.ProdOrderPartslistPos, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                else if (CurrentLabOrder.PickingPos != null)
+                    ShowLabOrderViewDialog(null, null, null, null, CurrentLabOrder.PickingPos, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
                 else if (CurrentLabOrder.FacilityLot != null)
-                    ShowLabOrderViewDialog(null, null, null, CurrentLabOrder.FacilityLot, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, null, null, CurrentLabOrder.FacilityLot, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
                 else
-                    ShowLabOrderViewDialog(null, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
+                    ShowLabOrderViewDialog(null, null, null, null, null, null, CurrentLabOrder.EntityState != System.Data.EntityState.Added, null);
             }
             else
             {
@@ -890,6 +899,7 @@ namespace gip.bso.masterdata
         /// <param name="outOrderPos">The out order position.</param>
         /// <param name="prodOrderPartslistPos">The production order partslist position.</param>
         /// <param name="facilityLot">The facility lot.</param>
+        /// <param name="pickingPos">Picking pos</param>
         /// <param name="labOrder">The laboratory order.</param>
         /// <param name="filter">The filter, enables or disables filter.</param>
         /// <param name="orderInfo"> The PAOrderInfo.</param>
@@ -899,6 +909,7 @@ namespace gip.bso.masterdata
             OutOrderPos outOrderPos,
             ProdOrderPartslistPos prodOrderPartslistPos,
             FacilityLot facilityLot,
+            PickingPos pickingPos,
             LabOrder labOrder,
             bool filter,
             PAOrderInfo orderInfo)
@@ -1126,7 +1137,7 @@ namespace gip.bso.masterdata
 
         public override void New()
         {
-            NewLabOrderDialog(null, null, null, null);
+            NewLabOrderDialog(null, null, null, null, null);
         }
 
         /// <summary>
@@ -1318,7 +1329,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(NewLabOrderDialog):
-                    result = NewLabOrderDialog((gip.mes.datamodel.DeliveryNotePos)acParameter[0], (gip.mes.datamodel.DeliveryNotePos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3]);
+                    result = NewLabOrderDialog((gip.mes.datamodel.DeliveryNotePos)acParameter[0], (gip.mes.datamodel.DeliveryNotePos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4]);
                     return true;
                 case nameof(DialogCreatePos):
                     DialogCreatePos();
@@ -1327,7 +1338,7 @@ namespace gip.bso.masterdata
                     DialogCancelPos();
                     return true;
                 case nameof(ShowLabOrderViewDialog):
-                    ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.LabOrder)acParameter[4], (System.Boolean)acParameter[5], (gip.core.autocomponent.PAOrderInfo)acParameter[6]);
+                    ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4], (gip.mes.datamodel.LabOrder)acParameter[5], (System.Boolean)acParameter[6], (gip.core.autocomponent.PAOrderInfo)acParameter[7]);
                     return true;
                 case nameof(CloseLabOrderViewDialog):
                     CloseLabOrderViewDialog();

@@ -1114,6 +1114,29 @@ namespace gip.mes.facility
                 pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
             else
                 pickingPos.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(dbApp);
+
+            if (pickingPos.Material.IsLotReservationNeeded)
+            {
+                List<FacilityCharge> lotsForReservation = new List<FacilityCharge>();
+                if (relocationBooking.OutwardFacilityCharge != null && relocationBooking.OutwardFacilityCharge.FacilityLot != null)
+                    lotsForReservation.Add(relocationBooking.OutwardFacilityCharge);
+                else if (relocationBooking.OutwardFacility != null)
+                    lotsForReservation = dbApp.FacilityCharge.Include(c => c.FacilityLot).Where(c => c.FacilityID == relocationBooking.OutwardFacility.FacilityID && !c.NotAvailable).ToList();
+                if (lotsForReservation.Any())
+                {
+                    foreach (var flGroup in lotsForReservation.GroupBy(c => c.FacilityLot))
+                    {
+                        double reservationQ = flGroup.Sum(c => c.StockQuantityUOM);
+                        secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
+                        FacilityReservation reservation = FacilityReservation.NewACObject(dbApp, pickingPos, secondaryKey);
+                        reservation.ReservedQuantityUOM = reservationQ;
+                        reservation.FacilityLot = flGroup.Key;
+                        reservation.PickingPos = pickingPos;
+                        dbApp.FacilityReservation.AddObject(reservation);
+                    }
+                }
+            }
+
             msgWithDetails = dbApp.ACSaveChanges();
             return msgWithDetails;
         }

@@ -4309,6 +4309,64 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region LabOrder
+
+        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 605, false, "CreateNewLabOrder", Global.ACKinds.MSMethodPrePost)]
+        public virtual void CreateNewLabOrder()
+        {
+            Save();
+            if (this.DatabaseApp.IsChanged)
+                return;
+
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null && SelectedPickingPos != null)
+            {
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, null, null, null, SelectedPickingPos);
+            }
+            if (childBSO == null)
+            {
+                return;
+            }
+        }
+
+        public bool IsEnabledCreateNewLabOrder()
+        {
+            if (SelectedPickingPos != null)
+            {
+                if (SelectedPickingPos.LabOrder_PickingPos.Any())
+                    return false;
+            }
+
+            return true;
+        }
+
+        [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606)]
+        public void ShowLabOrder()
+        {
+            ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
+            if (childBSO == null && SelectedPickingPos != null)
+            {
+                childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
+                childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, null, null, SelectedPickingPos, null, true, null);
+                childBSO.Stop();
+            }
+        }
+
+        public bool IsEnabledShowLabOrder()
+        {
+            if (SelectedPickingPos != null)
+            {
+                if (!SelectedPickingPos.LabOrder_PickingPos.Any())
+                    return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -4590,6 +4648,12 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledBroadCastPicking):
                     result = IsEnabledBroadCastPicking();
+                    return true;
+                case nameof(CreateNewLabOrder):
+                    CreateNewLabOrder();
+                    return true;
+                case nameof(IsEnabledCreateNewLabOrder):
+                    result = IsEnabledCreateNewLabOrder();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
