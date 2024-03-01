@@ -238,6 +238,7 @@ namespace gip.mes.client.mobile
                         {
                             Title.Text = null;
                             VBFrameController.ClearContent();
+                            OpenRibbonBarButton.Visibility = Visibility.Collapsed;
                             break;
                         }
                         else
@@ -253,8 +254,12 @@ namespace gip.mes.client.mobile
                     if (VBFrameController.Content != null)
                     {
                         Title.Text = null;
+                        OpenRibbonBarButton.Visibility = Visibility.Collapsed;
                         VBFrameController.ClearContent();
+                        VBFrameController.RemoveVBRibbon(RibbonBarGridMobile);
                     }
+                    if (RibbonBarGridMobile.Visibility == Visibility.Visible)
+                        ToggleVBRibbon();
                 }
             }
         }
@@ -338,8 +343,6 @@ namespace gip.mes.client.mobile
             _RootVBDesign.Margin = new Thickness(0, 0, -5, 0);
             _RootVBDesign.Loaded += new RoutedEventHandler(RootVBDesign_Loaded);
             MainDockPanel.Children.Add(_RootVBDesign);
-            //VBFrameController.Navigate(_RootVBDesign);
-            //MainFrame.Navigate(_RootVBDesign);
             foreach (ACComponent childComp in ACRoot.SRoot.ACComponentChilds)
             {
                 if (childComp is ApplicationManagerProxy || childComp is ACComponentManager)
@@ -448,8 +451,28 @@ namespace gip.mes.client.mobile
             }
         }
 
+        public void OpenRibbonBar_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleVBRibbon();
+        }
+
+        public void ToggleVBRibbon()
+        {
+            if (RibbonBarGridMobile.Visibility == Visibility.Collapsed)
+            {
+                VBFrameController.ShowVBRibbon(RibbonBarGridMobile);
+                RibbonBarGridMobile.Visibility = Visibility.Visible;
+            }
+            else if (RibbonBarGridMobile.Visibility == Visibility.Visible)
+            {
+                VBFrameController.RemoveVBRibbon(RibbonBarGridMobile);
+                RibbonBarGridMobile.Visibility = Visibility.Collapsed;
+            }
+        }
+
         public void StartBusinessobjectByACCommand(ACCommand acCommand)
         {
+            OpenRibbonBarButton.Visibility = Visibility.Visible;
             bool ribbonVisibilityOff = false;
             string caption = "";
             string title = "";
