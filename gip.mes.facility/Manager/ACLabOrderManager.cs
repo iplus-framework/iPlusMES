@@ -70,7 +70,7 @@ namespace gip.mes.facility
                 };
             }
 
-            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null)
+            if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null)
             {
                 //"Error:Material state is not defined!"
                 return new Msg

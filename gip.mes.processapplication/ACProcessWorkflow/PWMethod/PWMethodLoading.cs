@@ -47,9 +47,6 @@ namespace gip.mes.processapplication
             if (!base.ACInit(startChildMode))
                 return false;
 
-            _LabOrderManager = ACLabOrderManager.ACRefToServiceInstance(this);
-            if (_LabOrderManager == null)
-                throw new Exception("LabOrderManager not configured");
             _InDeliveryNoteManager = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_InDeliveryNoteManager == null)
                 throw new Exception("ACInDeliveryNoteManager not configured");
@@ -59,8 +56,6 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
-            _LabOrderManager = null;
             ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
             _InDeliveryNoteManager = null;
 
@@ -88,16 +83,6 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
-        protected ACRef<ACLabOrderManager> _LabOrderManager = null;
-        public ACLabOrderManager LabOrderManager
-        {
-            get
-            {
-                if (_LabOrderManager == null)
-                    return null;
-                return _LabOrderManager.ValueT;
-            }
-        }
 
         protected ACRef<ACInDeliveryNoteManager> _InDeliveryNoteManager = null;
         public ACInDeliveryNoteManager InDeliveryNoteManager

@@ -52,9 +52,6 @@ namespace gip.mes.processapplication
             _MatReqManager = facility.ACMatReqManager.ACRefToServiceInstance(this);
             if (_MatReqManager == null)
                 throw new Exception("MatReqManager is not configured");
-            _LabOrderManager = ACLabOrderManager.ACRefToServiceInstance(this);
-            if(_LabOrderManager == null)
-                throw new Exception("LabOrderManager is not configured");
 
             return true;
         }
@@ -67,8 +64,6 @@ namespace gip.mes.processapplication
             _PartslistManager = null;
             facility.ACMatReqManager.DetachACRefFromServiceInstance(this, _MatReqManager);
             _MatReqManager = null;
-            ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
-            _LabOrderManager = null;
             UnregisterFromCachedDestinations();
 
             using (ACMonitor.Lock(_20015_LockValue))
@@ -136,18 +131,6 @@ namespace gip.mes.processapplication
                 return _MatReqManager.ValueT;
             }
         }
-
-        protected ACRef<ACLabOrderManager> _LabOrderManager = null;
-        public ACLabOrderManager LabOrderManager
-        {
-            get
-            {
-                if (_LabOrderManager == null)
-                    return null;
-                return _LabOrderManager.ValueT;
-            }
-        }
-
 
         private gip.mes.datamodel.ProdOrderPartslistPos _CurrentProdOrderPartslistPos = null;
         /// <summary>
