@@ -2765,10 +2765,32 @@ namespace gip.mes.processapplication
             Guid? moduleID = ParentPWGroup?.AccessedProcessModule?.ComponentClass?.ACClassID;
 
             if (!moduleID.HasValue)
+            {
+                Messages.LogError(this.GetACUrl(), nameof(TryGetLastUsedLot)+"(10)", "The AccessedProcessModule component class is null!");
                 return new List<FacilityCharge>();
+            }
 
-            MaterialConfig lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
-                                                                                                            && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+            MaterialConfig lastUsedFC = null;
+
+            try
+            {
+                lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
+                                                                                                 && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(TryGetLastUsedLot) + "(20)", e);
+
+                try
+                {
+                    lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
+                                                                                                 && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+                }
+                catch (Exception exc)
+                {
+                    Messages.LogException(this.GetACUrl(), nameof(TryGetLastUsedLot) + "(25)", exc);
+                }
+            }
 
             if (lastUsedFC == null || lastUsedFC.Value == null)
             {
@@ -2786,6 +2808,8 @@ namespace gip.mes.processapplication
                 FacilityCharge fc = facilityCharges.FirstOrDefault(c => c.FacilityChargeID == fcID);
                 if (fc != null)
                     return new List<FacilityCharge>() { fc };
+                else
+                    Messages.LogInfo(this.GetACUrl(), nameof(TryGetLastUsedLot) + "30", "In the available facility charges missing last used facility charge.");
             }
 
             return new List<FacilityCharge>();
@@ -3249,10 +3273,10 @@ namespace gip.mes.processapplication
                 {
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
                 }
-                //else
-                //{
-                //    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
-                //}
+                else
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
+                }
 
                 bool isLast;
                 using (ACMonitor.Lock(_65050_WeighingCompLock))
