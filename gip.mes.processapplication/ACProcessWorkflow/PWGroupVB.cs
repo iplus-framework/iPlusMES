@@ -9,6 +9,7 @@ using System.Xml;
 using gip.mes.facility;
 using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.processapplication.PWDosing;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 
@@ -1059,6 +1060,8 @@ namespace gip.mes.processapplication
                     info.Add(DeliveryNotePos.ClassName, notePos.DeliveryNotePosID);
                 if (fBooking != null)
                     info.Add(FacilityBooking.ClassName, fBooking.FacilityBookingID);
+                if (pwMethod.CurrentPickingPos != null)
+                    info.Add(PickingPos.ClassName, pwMethod.CurrentPickingPos.PickingPosID);
             }
             else if (IsRelocation)
             {
@@ -1069,6 +1072,8 @@ namespace gip.mes.processapplication
                     info.Add(FacilityBooking.ClassName, fBooking.FacilityBookingID);
                 if (picking != null)
                     info.Add(Picking.ClassName, picking.PickingID);
+                if (pwMethod.CurrentPickingPos != null)
+                    info.Add(PickingPos.ClassName, pwMethod.CurrentPickingPos.PickingPosID);
             }
             else if (IsLoading)
             {
@@ -1079,6 +1084,8 @@ namespace gip.mes.processapplication
                     info.Add(Picking.ClassName, picking.PickingID);
                 if (notePos != null)
                     info.Add(DeliveryNotePos.ClassName, notePos.DeliveryNotePosID);
+                if (pwMethod.CurrentPickingPos != null)
+                    info.Add(PickingPos.ClassName, pwMethod.CurrentPickingPos.PickingPosID);
             }
 
             _PAOrderRecursionLock = true;
