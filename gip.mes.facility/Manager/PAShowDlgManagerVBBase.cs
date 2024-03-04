@@ -286,7 +286,7 @@ namespace gip.mes.facility
             {
                 if (!String.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
                     return _C_BSONameForShowLabOrder.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOLabOrder");
+                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOLabOrderMES");
                 if (classOfBso != null)
                 {
                     gip.core.datamodel.ACClass derivation = null;
@@ -302,7 +302,7 @@ namespace gip.mes.facility
                 }
 
                 if (String.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
-                    _C_BSONameForShowLabOrder.ValueT = "BSOLabOrder(Dialog)";
+                    _C_BSONameForShowLabOrder.ValueT = "BSOLabOrderMES(Dialog)";
                 return _C_BSONameForShowLabOrder.ValueT;
             }
             set
@@ -677,11 +677,13 @@ namespace gip.mes.facility
 
         public virtual bool IsEnabledShowLabOrder(IACComponent caller)
         {
-            // Mus be done in Derivation:
-            //IACContainerTNet<String> orderInfoProp = null;
-            //if (!HasOrderInfo(caller, out orderInfoProp))
-            //    return false;
-            return false;
+            IACContainerTNet<String> orderInfoProp = null;
+            if (!HasOrderInfo(caller, out orderInfoProp))
+                return false;
+            Type typeOfInstance = caller.ACType.ObjectType;
+            if (typeOfInstance == null)
+                return false;
+            return true;
         }
 
         public virtual void GenerateNewLabOrder(IACComponent caller, bool createAlwaysNewOne = true)
@@ -700,7 +702,6 @@ namespace gip.mes.facility
             if (orderInfo == null)
                 return;
 
-
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -713,88 +714,10 @@ namespace gip.mes.facility
                     OutOrderPos outOrderPos = null;
                     LabOrder labOrder = null;
 
-                    PAOrderInfoEntry orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == ProdOrderBatch.ClassName).FirstOrDefault();
-                    if (orderInfoEntry != null)
-                    {
-                        ProdOrderBatch batch = dbApp.ProdOrderBatch
-                            .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
-                            .Include(c => c.ProdOrderPartslist)
-                            .Include(c => c.ProdOrderPartslist.ProdOrder)
-                            .Where(c => c.ProdOrderBatchID == orderInfoEntry.EntityID).FirstOrDefault();
-                        if (batch == null)
-                            return;
-                        batchPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
-                        if (batchPos == null)
-                            return;
-                        if (!createAlwaysNewOne)
-                            labOrder = batchPos.LabOrder_ProdOrderPartslistPos.FirstOrDefault();
-                    }
-                    if (orderInfoEntry == null)
-                    {
-                        orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == PickingPos.ClassName).FirstOrDefault();
-                        if (orderInfoEntry != null)
-                        {
-                            pickingPos = dbApp.PickingPos
-                                .Include(c => c.PickingMaterial)
-                                .Where(c => c.PickingPosID == orderInfoEntry.EntityID).FirstOrDefault();
-                            if (pickingPos == null)
-                                return;
-                            if (!createAlwaysNewOne)
-                                labOrder = pickingPos.LabOrder_PickingPos.FirstOrDefault();
-                        }
-                    }
-                    if (orderInfoEntry == null)
-                    {
-                        orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == Picking.ClassName).FirstOrDefault();
-                        if (orderInfoEntry != null)
-                        {
-                            Picking picking = dbApp.Picking
-                                .Include("PickingPos_Picking.PickingMaterial")
-                                .Where(c => c.PickingID == orderInfoEntry.EntityID).FirstOrDefault();
-                            if (picking == null)
-                                return;
-                            pickingPos = picking.PickingPos_Picking.Where(c => c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive).FirstOrDefault();
-                            if (pickingPos == null)
-                                pickingPos = picking.PickingPos_Picking.FirstOrDefault();
-                            if (pickingPos == null)
-                                return;
-                            if (!createAlwaysNewOne)
-                                labOrder = pickingPos.LabOrder_PickingPos.FirstOrDefault();
-                        }
-                    }
-                    if (orderInfoEntry == null)
-                    {
-                        orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).FirstOrDefault();
-                        if (orderInfoEntry != null)
-                        {
-                            dnPos = dbApp.DeliveryNotePos
-                                .Include(c => c.DeliveryNote)
-                                .Include(c => c.InOrderPos.Material)
-                                .Include(c => c.OutOrderPos.Material)
-                                .Where(c => c.DeliveryNotePosID == orderInfoEntry.EntityID).FirstOrDefault();
-                            if (dnPos == null)
-                                return;
-                            inOrderPos = dnPos.InOrderPos;
-                            if (inOrderPos != null && !createAlwaysNewOne)
-                                labOrder = inOrderPos.LabOrder_InOrderPos.FirstOrDefault();
-                            outOrderPos = dnPos.OutOrderPos;
-                            if (outOrderPos != null && !createAlwaysNewOne)
-                                labOrder = outOrderPos.LabOrder_OutOrderPos.FirstOrDefault();
-                        }
-                    }
-                    if (orderInfoEntry == null)
-                    {
-                        orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == FacilityBooking.ClassName).FirstOrDefault();
-                        if (orderInfoEntry != null)
-                        {
-                            fBooking = dbApp.FacilityBooking.Where(c => c.FacilityBookingID == orderInfoEntry.EntityID).FirstOrDefault();
-                            if (fBooking == null)
-                                return;
-                        }
-                    }
-
-                    if (orderInfoEntry == null)
+                    if (!labOrderMgr.ResolveEntities(dbApp, orderInfo, out batchPos, out dnPos, out pickingPos, out fBooking, out inOrderPos, out outOrderPos, out labOrder))
                         return;
+                    if (createAlwaysNewOne)
+                        labOrder = null;
 
                     LabOrder labOrderTemplate = null;
                     Material materialForTemplate = null;
@@ -851,11 +774,13 @@ namespace gip.mes.facility
 
         public virtual bool IsEnabledGenerateNewLabOrder(IACComponent caller)
         {
-            // Mus be done in Derivation:
-            //IACContainerTNet<String> orderInfoProp = null;
-            //if (!HasOrderInfo(caller, out orderInfoProp))
-            //    return false;
-            return false;
+            IACContainerTNet<String> orderInfoProp = null;
+            if (!HasOrderInfo(caller, out orderInfoProp))
+                return false;
+            Type typeOfInstance = caller.ACType.ObjectType;
+            if (typeOfInstance == null)
+                return false;
+            return true;
         }
 
         public virtual void ShowFacilityBookCellDialog(IACComponent caller)
@@ -942,6 +867,42 @@ namespace gip.mes.facility
         #endregion
 
         #region OrderInfo methods
+        public static PAOrderInfo QueryOrderInfo(IACComponent caller)
+        {
+            if (caller == null)
+                return null;
+            PAOrderInfo orderInfo = null;
+            if (caller is IACComponentPWNode)
+            {
+                orderInfo = caller.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PWBase.GetPAOrderInfo)) as PAOrderInfo;
+            }
+            else
+            {
+                string[] accessedFromVBGroupACUrl = caller.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PAProcessModule.SemaphoreAccessedFrom)) as string[];
+                if (accessedFromVBGroupACUrl != null && accessedFromVBGroupACUrl.Any())
+                {
+                    string firstModule = accessedFromVBGroupACUrl[0];
+                    if (!String.IsNullOrEmpty(firstModule))
+                        orderInfo = caller.ACUrlCommand(accessedFromVBGroupACUrl[0] + ACUrlHelper.Delimiter_InvokeMethod + nameof(PWBase.GetPAOrderInfo)) as PAOrderInfo;
+                }
+            }
+            return orderInfo;
+        }
+
+        public static bool HasOrderInfo(IACComponent caller, out IACContainerTNet<String> orderInfoProp)
+        {
+            orderInfoProp = null;
+            if (caller == null)
+                return false;
+            if (caller is IACComponentPWNode)
+                return true;
+            orderInfoProp = caller.GetProperty(nameof(PAProcessModule.OrderInfo)) as IACContainerTNet<String>;
+            if (orderInfoProp == null)
+                return false;
+            if (String.IsNullOrEmpty(orderInfoProp.ValueT))
+                return false;
+            return true;
+        }
 
         public override string BuildAndSetOrderInfo(PAProcessModule pm)
         {

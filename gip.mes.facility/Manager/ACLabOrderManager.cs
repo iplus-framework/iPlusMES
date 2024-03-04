@@ -380,5 +380,113 @@ namespace gip.mes.facility
         {
             return null;
         }
+
+        public bool ResolveEntities(DatabaseApp dbApp, PAOrderInfo orderInfo, out ProdOrderPartslistPos batchPos, out DeliveryNotePos dnPos, out PickingPos pickingPos, out FacilityBooking fBooking, out InOrderPos inOrderPos, out OutOrderPos outOrderPos, out LabOrder labOrder)
+        {
+            batchPos = null;
+            dnPos = null;
+            pickingPos = null;
+            fBooking = null;
+            inOrderPos = null;
+            outOrderPos = null;
+            labOrder = null;
+            if (orderInfo == null)
+                return false;
+            PAOrderInfoEntry orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == ProdOrderBatch.ClassName).FirstOrDefault();
+            if (orderInfoEntry != null)
+            {
+                ProdOrderBatch batch = dbApp.ProdOrderBatch
+                    .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                    .Include(c => c.ProdOrderPartslist)
+                    .Include(c => c.ProdOrderPartslist.ProdOrder)
+                    .Where(c => c.ProdOrderBatchID == orderInfoEntry.EntityID).FirstOrDefault();
+                if (batch == null)
+                    return false;
+                batchPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
+                if (batchPos == null)
+                    return false;
+                labOrder = batchPos.LabOrder_ProdOrderPartslistPos.FirstOrDefault();
+            }
+            if (orderInfoEntry == null)
+            {
+                orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == PickingPos.ClassName).FirstOrDefault();
+                if (orderInfoEntry != null)
+                {
+                    pickingPos = dbApp.PickingPos
+                        .Include(c => c.PickingMaterial)
+                        .Where(c => c.PickingPosID == orderInfoEntry.EntityID).FirstOrDefault();
+                    if (pickingPos == null)
+                        return false;
+                    labOrder = pickingPos.LabOrder_PickingPos.FirstOrDefault();
+                }
+            }
+            if (orderInfoEntry == null)
+            {
+                orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == Picking.ClassName).FirstOrDefault();
+                if (orderInfoEntry != null)
+                {
+                    Picking picking = dbApp.Picking
+                        .Include("PickingPos_Picking.PickingMaterial")
+                        .Where(c => c.PickingID == orderInfoEntry.EntityID).FirstOrDefault();
+                    if (picking == null)
+                        return false;
+                    pickingPos = picking.PickingPos_Picking.Where(c => c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive).FirstOrDefault();
+                    if (pickingPos == null)
+                        pickingPos = picking.PickingPos_Picking.FirstOrDefault();
+                    if (pickingPos == null)
+                        return false;
+                    labOrder = pickingPos.LabOrder_PickingPos.FirstOrDefault();
+                }
+            }
+            if (orderInfoEntry == null)
+            {
+                orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).FirstOrDefault();
+                if (orderInfoEntry != null)
+                {
+                    dnPos = dbApp.DeliveryNotePos
+                        .Include(c => c.DeliveryNote)
+                        .Include(c => c.InOrderPos.Material)
+                        .Include(c => c.OutOrderPos.Material)
+                        .Where(c => c.DeliveryNotePosID == orderInfoEntry.EntityID).FirstOrDefault();
+                    if (dnPos == null)
+                        return false;
+                    inOrderPos = dnPos.InOrderPos;
+                    if (inOrderPos != null)
+                        labOrder = inOrderPos.LabOrder_InOrderPos.FirstOrDefault();
+                    outOrderPos = dnPos.OutOrderPos;
+                    if (outOrderPos != null)
+                        labOrder = outOrderPos.LabOrder_OutOrderPos.FirstOrDefault();
+                }
+            }
+            if (orderInfoEntry == null)
+            {
+                orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == FacilityBooking.ClassName).FirstOrDefault();
+                if (orderInfoEntry != null)
+                {
+                    fBooking = dbApp.FacilityBooking.Where(c => c.FacilityBookingID == orderInfoEntry.EntityID).FirstOrDefault();
+                    if (fBooking == null)
+                        return false;
+                }
+            }
+            if (orderInfoEntry == null)
+            {
+                orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == ProdOrderPartslistPosRelation.ClassName).FirstOrDefault();
+                if (orderInfoEntry != null)
+                {
+                    ProdOrderPartslistPosRelation relation = dbApp.ProdOrderPartslistPosRelation
+                        .Include(c => c.TargetProdOrderPartslistPos)
+                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist)
+                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
+                        .Where(c => c.ProdOrderPartslistPosRelationID == orderInfoEntry.EntityID)
+                        .FirstOrDefault();
+                    if (relation != null)
+                        batchPos = relation.TargetProdOrderPartslistPos;
+                    else
+                        return false;
+                }
+            }
+            return batchPos != null || pickingPos != null || fBooking != null || inOrderPos != null || outOrderPos != null || labOrder != null;
+        }
+
     }
 }

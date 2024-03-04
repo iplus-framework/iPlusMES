@@ -7,6 +7,7 @@ using gip.core.autocomponent;
 using System.Reflection;
 using static gip.core.datamodel.Global;
 using gip.mes.facility;
+using System.Net;
 
 namespace gip.bso.masterdata
 {
@@ -784,7 +785,7 @@ namespace gip.bso.masterdata
             if (!hasOrderEntities)
                 _IsMaterialStateEnabled = true;
             else
-                FilterDialog(inOrderPos != null ? inOrderPos.InOrderPos : null, outOrderPos != null ? outOrderPos.OutOrderPos : null, prodOrderPartslistPos, facilityLot, null, null);
+                FilterDialog(inOrderPos != null ? inOrderPos.InOrderPos : null, outOrderPos != null ? outOrderPos.OutOrderPos : null, prodOrderPartslistPos, facilityLot, pickingPos,  null, null);
 
             List<LabOrder> labOrderTemplates = null;
             if (hasOrderEntities)
@@ -943,7 +944,7 @@ namespace gip.bso.masterdata
             PAOrderInfo orderInfo)
         {
             if (filter)
-                FilterDialog(inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, labOrder, orderInfo);
+                FilterDialog(inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, labOrder, orderInfo);
 
             //if (inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && pickingPos == null)
             //{
@@ -962,56 +963,18 @@ namespace gip.bso.masterdata
             OutOrderPos outOrderPos,
             ProdOrderPartslistPos prodOrderPartslistPos,
             FacilityLot facilityLot,
+            PickingPos pickingPos,
             LabOrder labOrder,
             PAOrderInfo orderInfo)
         {
             if (AccessPrimary == null)
                 return;
+            FacilityBooking fBooking = null;
+            DeliveryNotePos dnPos = null;
             if (orderInfo != null && inOrderPos == null && outOrderPos == null && prodOrderPartslistPos == null && facilityLot == null && labOrder == null)
             {
-                foreach (var entry in orderInfo.Entities)
-                {
-                    if (entry.EntityName == ProdOrderPartslistPosRelation.ClassName)
-                    {
-                        ProdOrderPartslistPosRelation relation = this.DatabaseApp.ProdOrderPartslistPosRelation
-                            .Include(c => c.TargetProdOrderPartslistPos)
-                            .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist)
-                            .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
-                            .Where(c => c.ProdOrderPartslistPosRelationID == entry.EntityID)
-                            .FirstOrDefault();
-                        if (relation != null)
-                        {
-                            prodOrderPartslistPos = relation.TargetProdOrderPartslistPos;
-                            break;
-                        }
-                    }
-                    else if (entry.EntityName == ProdOrderBatch.ClassName)
-                    {
-                        ProdOrderBatch batch = this.DatabaseApp.ProdOrderBatch
-                            .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
-                            .Include(c => c.ProdOrderPartslist)
-                            .Include(c => c.ProdOrderPartslist.ProdOrder)
-                            .Where(c => c.ProdOrderBatchID == entry.EntityID).FirstOrDefault();
-                        if (batch != null)
-                        {
-                            prodOrderPartslistPos = batch.ProdOrderPartslistPos_ProdOrderBatch.ToArray().Where(c => c.IsFinalMixureBatch).FirstOrDefault();
-                            if (prodOrderPartslistPos != null)
-                                break;
-                        }
-                    }
-                    else if (entry.EntityName == DeliveryNotePos.ClassName)
-                    {
-                        DeliveryNotePos dnPos = this.DatabaseApp.DeliveryNotePos
-                            .Include(c => c.DeliveryNote)
-                            .Where(c => c.DeliveryNotePosID == entry.EntityID)
-                            .FirstOrDefault();
-                        if (dnPos != null)
-                        {
-                            inOrderPos = dnPos.InOrderPos;
-                            outOrderPos = dnPos.OutOrderPos;
-                        }
-                    }
-                }
+                if (!LabOrderManager.ResolveEntities(DatabaseApp, orderInfo, out prodOrderPartslistPos, out dnPos, out pickingPos, out fBooking, out inOrderPos, out outOrderPos, out labOrder))
+                    return;
             }
 
             if (inOrderPos != null)
@@ -1025,7 +988,9 @@ namespace gip.bso.masterdata
                 filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "LabOrderID").FirstOrDefault();
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
-
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "PickingPos\\PickingPosID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
                 _IsLabOrderPosViewDialog = true;
                 ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "InOrderPos\\InOrderPosID").FirstOrDefault();
                 if (filterItem == null)
@@ -1047,6 +1012,9 @@ namespace gip.bso.masterdata
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
                 filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "LabOrderID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "PickingPos\\PickingPosID").FirstOrDefault();
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
 
@@ -1072,12 +1040,39 @@ namespace gip.bso.masterdata
                 filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "LabOrderID").FirstOrDefault();
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
-
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "PickingPos\\PickingPosID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
                 _IsLabOrderPosViewDialog = true;
                 ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "ProdOrderPartslistPos\\ProdOrderPartslistPosID").FirstOrDefault();
                 if (filterItem == null)
                 {
                     filterItem = new ACFilterItem(Global.FilterTypes.filter, "ProdOrderPartslistPos\\ProdOrderPartslistPosID", Global.LogicalOperators.equal, Global.Operators.and, prodOrderPartslistPos.ProdOrderPartslistPosID.ToString(), false);
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+                }
+                else
+                    filterItem.SearchWord = prodOrderPartslistPos.ProdOrderPartslistPosID.ToString();
+                this.Search();
+            }
+            else if (pickingPos != null)
+            {
+                ACFilterItem filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "InOrderPos\\InOrderPosID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "OutOrderPos\\OutOrderPosID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "ProdOrderPartslistPos\\ProdOrderPartslistPosID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits); filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "LabOrderID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
+
+                _IsLabOrderPosViewDialog = true;
+                ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "PickingPos\\PickingPosID").FirstOrDefault();
+                if (filterItem == null)
+                {
+                    filterItem = new ACFilterItem(Global.FilterTypes.filter, "PickingPos\\PickingPosID", Global.LogicalOperators.equal, Global.Operators.and, pickingPos.PickingPosID.ToString(), false);
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
                 }
                 else
@@ -1093,6 +1088,9 @@ namespace gip.bso.masterdata
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
                 filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "ProdOrderPartslistPos\\ProdOrderPartslistPosID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "PickingPos\\PickingPosID").FirstOrDefault();
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
 
@@ -1119,6 +1117,9 @@ namespace gip.bso.masterdata
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
                 filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "LabOrderID").FirstOrDefault();
+                if (filterItemExits != null)
+                    AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
+                filterItemExits = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "PickingPos\\PickingPosID").FirstOrDefault();
                 if (filterItemExits != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExits);
             }

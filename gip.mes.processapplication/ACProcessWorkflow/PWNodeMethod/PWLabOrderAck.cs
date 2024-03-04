@@ -136,7 +136,7 @@ namespace gip.mes.processapplication
                     PAShowDlgManagerVB serviceInstance = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
                     if (serviceInstance != null)
                     {
-                        bool createNew = (bool) acComponent.ExecuteMethod(nameof(GetAlwaysCreateNew));
+                        bool createNew = (bool)acComponent.ExecuteMethod(nameof(GetAlwaysCreateNew));
                         serviceInstance.GenerateNewLabOrder(acComponent, createNew);
                     }
 
@@ -151,7 +151,15 @@ namespace gip.mes.processapplication
                 }
             }
             else
+            {
+                PAShowDlgManagerVB serviceInstance = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
+                if (serviceInstance != null)
+                {
+                    bool createNew = (bool)acComponent.ExecuteMethod(nameof(GetAlwaysCreateNew));
+                    serviceInstance.GenerateNewLabOrder(acComponent, createNew);
+                }
                 acComponent.ACUrlCommand("!" + nameof(AckStart));
+            }
         }
 
         #endregion

@@ -788,7 +788,7 @@ namespace gip.mes.webservices
                     if (processModule == null)
                         return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "Can not find the process module of scanned function!"));
 
-                    PAOrderInfo orderInfo = PAShowDlgManagerBase.QueryOrderInfo(processModule);
+                    PAOrderInfo orderInfo = PAShowDlgManagerVBBase.QueryOrderInfo(processModule);
                     if (orderInfo == null)
                         return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "Order info on process module is null!"));
 
