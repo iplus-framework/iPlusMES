@@ -6,11 +6,8 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.core.autocomponent;
 using gip.core.manager;
-using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
-using System.Data.Objects;
-using System.Windows.Interop;
 
 namespace gip.bso.logistics
 {
@@ -989,7 +986,13 @@ namespace gip.bso.logistics
                 return;
             }
 
-            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module });
+            List<core.datamodel.ACClass> possibleSources = sources.Routes.Select(c => c.FirstOrDefault().Source).ToList();
+            core.datamodel.ACClass start = null;
+
+            if (CurrentACClassWF != null)
+                start = ConfigManagerIPlus.FilterByAllowedInstances(CurrentACClassWF, MandatoryConfigStores, VarioConfigManager, possibleSources).FirstOrDefault();
+
+            routeSelector.ShowAvailableRoutes(possibleSources, new core.datamodel.ACClass[] { SelectedTarget.Module }, null, null, true, start);
 
             if (routeSelector.RouteResult != null)
             {
