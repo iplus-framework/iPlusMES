@@ -553,9 +553,9 @@ namespace gip.bso.purchasing
                 return;
             }
 
-            IEnumerable<string> sourceCompsACUrl = sources.Routes.Select(c => c.FirstOrDefault().Source.ACUrlComponent);
+            //IEnumerable<string> sourceCompsACUrl = sources.Routes.Select(c => c.FirstOrDefault().Source.ACUrlComponent);
 
-            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module });
+            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module }, null, null, true, SelectedModule?.Module);
 
             if (routeSelector.RouteResult != null)
             {
