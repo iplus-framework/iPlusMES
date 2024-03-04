@@ -487,7 +487,7 @@ namespace gip.mes.facility
             // If Availability 100% und auto correction is set, then recalculate new Average
             foreach (List<FacilityMaterialOEE> facMatOEEs in oeeEntriesOfEntireOrder)
             {
-                foreach (FacilityMaterial facMat in facMatOEEs.Where(c => c.FacilityMaterial.ThroughputAuto == 1 && c.AvailabilityOEE >= C_AvailabilityThreasholdForAutoCalc && c.Quantity >= FacilityConst.C_ZeroCompare)
+                foreach (FacilityMaterial facMat in facMatOEEs.Where(c => c.FacilityMaterial != null && c.FacilityMaterial.ThroughputAuto == 1 && c.AvailabilityOEE >= C_AvailabilityThreasholdForAutoCalc && c.Quantity >= FacilityConst.C_ZeroCompare)
                             .Select(c => c.FacilityMaterial)
                             .Distinct())
                 {
