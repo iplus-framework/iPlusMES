@@ -1573,6 +1573,8 @@ namespace gip.mes.facility
                 if (facilityLot != null)
                 {
                     lotNo = facilityLot.LotNo;
+                    if (createNewLot)
+                        pos.FacilityLot = facilityLot;
                     return;
                 }
             }
@@ -1588,10 +1590,13 @@ namespace gip.mes.facility
             }
             lotNo = tempLotNo;
 
-            if (facilityLot == null && createNewLot)
+            if (createNewLot)
             {
-                facilityLot = FacilityLot.NewACObject(dbApp, null, tempLotNo);
-                facilityLot.UpdateExpirationInfo(pos.BookingMaterial);
+                if (facilityLot == null)
+                {
+                    facilityLot = FacilityLot.NewACObject(dbApp, null, tempLotNo);
+                    facilityLot.UpdateExpirationInfo(pos.BookingMaterial);
+                }
                 pos.FacilityLot = facilityLot;
             }
         }

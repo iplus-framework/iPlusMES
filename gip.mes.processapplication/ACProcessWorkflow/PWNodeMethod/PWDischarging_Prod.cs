@@ -1427,9 +1427,8 @@ namespace gip.mes.processapplication
                         facilityLot = currentBatchPos.FacilityLot;
                         if (facilityLot == null)
                         {
-                            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
-                            facilityLot = FacilityLot.NewACObject(dbApp, null, secondaryKey);
-                            currentBatchPos.FacilityLot = facilityLot;
+                            string lotNo = null;
+                            ParentPWMethod<PWMethodProduction>().ProdOrderManager.GetFacilityLotForPos(Database, dbApp, currentBatchPos, true, out facilityLot, out lotNo);
                         }
                         facilityLot.UpdateExpirationInfo(currentBatchPos.BookingMaterial);
                     }
