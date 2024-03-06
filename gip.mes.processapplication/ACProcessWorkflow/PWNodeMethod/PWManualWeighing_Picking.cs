@@ -514,6 +514,20 @@ namespace gip.mes.processapplication
                                         ReservationMode);                                                        
 
             if (routes == null || qrySilosResult == null || qrySilosResult.FilteredResult == null || !qrySilosResult.FilteredResult.Any())
+            {
+                routes = PickingManager.GetRoutes(pickingPos, dbApp, dbApp.ContextIPlus,
+                                        accessAClass,
+                                        ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                        null,
+                                        out qrySilosResult,
+                                        null,
+                                        null,
+                                        null,
+                                        false,
+                                        ReservationMode);
+            }
+
+            if (routes == null || qrySilosResult == null || qrySilosResult.FilteredResult == null || !qrySilosResult.FilteredResult.Any())
                 return new List<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots>();
 
             var routeList = routes.ToList();

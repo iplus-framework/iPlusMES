@@ -2584,6 +2584,35 @@ namespace gip.mes.processapplication
                                                                     false,
                                                                     ReservationMode);
 
+            // Temp fix - GetRoutes DBException
+            if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
+            {
+                routes = PartslistManager.GetRoutes(posRel, dbApp, dbApp.ContextIPlus,
+                                                                    accessAClass,
+                                                                    ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                                    null,
+                                                                    out facilities,
+                                                                    null,
+                                                                    null,
+                                                                    null,
+                                                                    false,
+                                                                    ReservationMode);
+
+                if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
+                {
+                    routes = PartslistManager.GetRoutes(posRel, dbApp, dbApp.ContextIPlus,
+                                                                        accessAClass,
+                                                                        ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                                        null,
+                                                                        out facilities,
+                                                                        null,
+                                                                        null,
+                                                                        null,
+                                                                        false,
+                                                                        ReservationMode);
+                }
+            }
+
             if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
                 return new List<Facility>();
 
