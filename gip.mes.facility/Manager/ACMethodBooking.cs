@@ -249,7 +249,7 @@ namespace gip.mes.facility
         public FacilityBooking FacilityBooking
         {
             get;
-            internal set;
+            set;
         }
 
         internal List<Facility> InwardCellsWithLotManagedBookings

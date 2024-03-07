@@ -616,7 +616,7 @@ namespace gip.mes.facility
         /// 1. [FacilityCharge]:                           
         /// Zur Bestandsveränderung oder Umlagerung einer Facility-Charge
         /// </summary>
-        private Global.ACMethodResultState BookingOn_FacilityCharge(ACMethodBooking BP)
+        protected Global.ACMethodResultState BookingOn_FacilityCharge(ACMethodBooking BP)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             FacilityBooking FB = BP.FacilityBooking != null ? BP.FacilityBooking : NewFacilityBooking(BP);

@@ -83,7 +83,7 @@ namespace gip.mes.facility
             }
         }
 
-        private ACMonitorObject _40010_ValueLock = new ACMonitorObject(40010);
+        protected ACMonitorObject _40010_ValueLock = new ACMonitorObject(40010);
         protected gip.core.datamodel.ACClass _TypeOfACMethodBooking = null;
         public virtual core.datamodel.ACClass TypeOfACMethodBooking
         {
