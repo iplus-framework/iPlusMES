@@ -40,7 +40,7 @@ namespace gip.mes.facility.TandTv3
         #region  ITandTv3Process
 
         #region ITandTv3Process -> Factory  IItemTracking<IACObjectEntity>
-        public virtual IItemTracking<IACObjectEntity> FactoryBacwardItem(IACObjectEntity item)
+        public virtual IItemTracking<IACObjectEntity> FactoryBackwardItem(IACObjectEntity item)
         {
             IItemTracking<IACObjectEntity> tmpItem = null;
 
@@ -338,7 +338,7 @@ namespace gip.mes.facility.TandTv3
             {
                 if (trackingDirection == MDTrackingDirectionEnum.Backward)
                 {
-                    IItemTracking<IACObjectEntity> backwardTrackingItem = FactoryBacwardItem(sameStepItem);
+                    IItemTracking<IACObjectEntity> backwardTrackingItem = FactoryBackwardItem(sameStepItem);
                     if (backwardTrackingItem != null)
                         sameStepResult.Add(backwardTrackingItem);
                 }
@@ -365,7 +365,7 @@ namespace gip.mes.facility.TandTv3
             {
                 if (trackingDirection == MDTrackingDirectionEnum.Backward)
                 {
-                    IItemTracking<IACObjectEntity> backwardTrackingItem = FactoryBacwardItem(nextStepItem);
+                    IItemTracking<IACObjectEntity> backwardTrackingItem = FactoryBackwardItem(nextStepItem);
                     if (backwardTrackingItem != null)
                         nextStepResult.Add(backwardTrackingItem);
                 }
@@ -419,7 +419,7 @@ namespace gip.mes.facility.TandTv3
             }
 
             if (TandTResult.Filter.MDTrackingDirectionEnum == MDTrackingDirectionEnum.Backward)
-                itemTracking = FactoryBacwardItem(StartItem);
+                itemTracking = FactoryBackwardItem(StartItem);
             if (TandTResult.Filter.MDTrackingDirectionEnum == MDTrackingDirectionEnum.Forward)
                 itemTracking = FactoryForwardItem(StartItem);
 

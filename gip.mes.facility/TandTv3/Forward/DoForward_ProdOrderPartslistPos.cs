@@ -18,6 +18,7 @@ namespace gip.mes.facility.TandTv3
 
         #endregion
 
+
         #region POS Operations
 
         #region POS Operations -> SameStep
@@ -64,20 +65,24 @@ namespace gip.mes.facility.TandTv3
         public override List<IACObjectEntity> OperateNextStepItems_InwardPartIntern()
         {
             List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
-            List<FacilityBookingCharge> fbcs = Item.FacilityBookingCharge_ProdOrderPartslistPos.ToList();
-            if (fbcs.Any())
+            // in case when use MaterialWFNoForFilterLotByTime charges should be fetched on other point
+            if (!IsMaterialWFNoForFilterLotByTime)
             {
-                nextStepItems.AddRange(fbcs);
-            }
-            else
-            {
-                List<ProdOrderPartslistPosRelation> relations =
-                    Item.ProdOrderPartslistPos1_ParentProdOrderPartslistPos
-                    .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
-                    .Where(c => c.TargetProdOrderPartslistPos.ProdOrderBatchID != null &&
-                    Result.BatchIDs.Contains(c.ProdOrderBatchID ?? Guid.Empty))
-                    .ToList();
-                nextStepItems.AddRange(relations);
+                List<FacilityBookingCharge> fbcs = Item.FacilityBookingCharge_ProdOrderPartslistPos.ToList();
+                if (fbcs.Any())
+                {
+                    nextStepItems.AddRange(fbcs);
+                }
+                else
+                {
+                    List<ProdOrderPartslistPosRelation> relations =
+                        Item.ProdOrderPartslistPos1_ParentProdOrderPartslistPos
+                        .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                        .Where(c => c.TargetProdOrderPartslistPos.ProdOrderBatchID != null &&
+                        Result.BatchIDs.Contains(c.ProdOrderBatchID ?? Guid.Empty))
+                        .ToList();
+                    nextStepItems.AddRange(relations);
+                }
             }
             return nextStepItems;
         }

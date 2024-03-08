@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Objects.DataClasses;
 using System.Linq;
 
 namespace gip.mes.facility
