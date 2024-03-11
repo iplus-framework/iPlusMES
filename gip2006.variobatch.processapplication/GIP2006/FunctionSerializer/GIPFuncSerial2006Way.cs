@@ -23,15 +23,336 @@ namespace gip2006.variobatch.processapplication
         {
         }
 
+        public override bool ACPostInit()
+        {
+            bool result = base.ACPostInit();
+
+
+
+            return result;
+        }
+
         public override bool IsSerializerFor(string typeOrACMethodName)
         {
             return false;
         }
 
-        public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
+        public SafeList<Tuple<short,string, string>> RouteItemIDs
         {
-            throw new NotImplementedException();
+            get;
+            set;
         }
+
+        #region Read route
+
+        public override object ReadObject(object complexObj, int dbNo, int offset, int? routeOffset, object miscParams)
+        {
+            try
+            {
+
+                if (!routeOffset.HasValue)
+                    return null;
+
+                S7TCPSession s7Session = ParentACComponent as S7TCPSession;
+
+                ACMethod request = complexObj as ACMethod;
+                Route route = request?.ParameterValueList.Where(c => c.ACIdentifier == nameof(Route)).FirstOrDefault()?.Value as Route;
+
+                List<Tuple<short, string>> routeItemIDs = route?.Select(c => new Tuple<short, string>(GetRouteItemID(c.SourceACComponent), c.SourceACComponent.ACUrl)).ToList();
+                IACComponent targetComp = route?.GetRouteTarget().TargetACComponent;
+                if (targetComp != null)
+                    routeItemIDs.Add(new Tuple<short, string>(GetRouteItemID(targetComp), targetComp.ACUrl));
+
+                if (routeItemIDs == null)
+                    routeItemIDs = new List<Tuple<short, string>>();
+
+                int maxPackageSize = 200;
+                int maxRouteItems = 49;
+
+                int headerSize = GetHeaderSize();
+                int routeItemSize = GetRouteItemSize();
+
+                int totalSize = headerSize + (routeItemSize * maxRouteItems);
+                int remainingSize = totalSize;
+
+                int myOffset = routeOffset.Value;
+                int iOffset = headerSize;
+
+                List<byte[]> result = new List<byte[]>();
+                RouteItemHeaderModel header = new RouteItemHeaderModel();
+                List<RouteItemModel> routeItems = new List<RouteItemModel>();
+                bool readHeader = true;
+
+                while (remainingSize > 0)
+                {
+                    int availableSize = maxPackageSize - iOffset;
+                    if (availableSize > 0)
+                        iOffset += (availableSize / routeItemSize) * routeItemSize;
+                    else
+                    {
+                        //TODO:Error
+                        return null;
+                    }
+
+                    if (iOffset > remainingSize)
+                        iOffset = remainingSize;
+
+                    byte[] readPackage = new byte[iOffset];
+
+                    PLC.Result errCode = s7Session.PLCConn.ReadBytes(DataTypeEnum.DataBlock, dbNo, myOffset, iOffset, out readPackage);
+                    if (errCode != null && !errCode.IsSucceeded)
+                        return null;
+
+                    result.Add(readPackage);
+
+                    RouteItemHeaderModel headerTemp = null;
+                    if (readHeader)
+                        headerTemp = header;
+
+                    ReadRoute(readPackage, headerTemp, routeItems, routeItemSize, routeItemIDs);
+
+                    bool isLastElement = IsLastElement(header, routeItems);
+                    if (isLastElement)
+                        break;
+
+                    myOffset += iOffset;
+                    remainingSize -= iOffset;
+                    iOffset = 0;
+                    readHeader = false;
+                }
+
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var item in routeItems)
+                {
+                    stringBuilder.AppendLine(item.ToString());
+                }
+                this.Messages.LogDebug(this.GetACUrl(), nameof(ReadObject), stringBuilder.ToString());
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(ReadObject), e);
+            }
+
+            return null;
+        }
+
+        private void ReadRoute(byte[] readPackage, RouteItemHeaderModel header, List<RouteItemModel> routeItems, int routeItemSize, List<Tuple<short, string>> routeItemIDs)
+        {
+            int iOffset = 0;
+
+            int packageLenght = readPackage.Length;
+
+            if (header != null)
+            {
+                header.Command = gip.core.communication.ISOonTCP.Types.Word.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Word.Length;
+
+                //Destination change component
+                header.DestinationChangeAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Source
+                header.SourceAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Target
+                header.TargetAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //SecondTarget
+                header.SecondTargetAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Third Target
+                header.ThirdTargetAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Fourth Target
+                header.FourthTargetAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 0
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 0
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 0
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 0
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 1
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //TargetFull
+                header.DestinationChangeAggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 0
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Unused = 0
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                packageLenght = packageLenght - iOffset;
+            }
+
+            int packageItemCount = packageLenght / routeItemSize;
+
+            for (int i=0; i < packageItemCount; i++)
+            {
+                RouteItemModel routeItem = new RouteItemModel();
+
+                routeItem.AggrNo = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Aggregat-Typ
+                routeItem.AggrType = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Source
+                routeItem.Source = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Target
+                routeItem.Target = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //First group
+                iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
+
+                //Second group
+                iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
+
+                //TurnOn delay
+                routeItem.TurnOnDelay = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //TurnOff delay
+                routeItem.TurnOffDelay = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Second target
+                routeItem.SecondTarget = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Para1
+                //routeItem.Para1 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Para2
+                //routeItem.Para2 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Para3
+                //routeItem.Para3 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Para4
+                //routeItem.Para4 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Para5
+                //routeItem.Para5 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Second source
+                routeItem.SecondSource = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                //Third source
+                routeItem.ThirdSource = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                
+                if (routeItemIDs != null)
+                {
+                    var item = routeItemIDs.FirstOrDefault(c => c.Item1 == routeItem.AggrNo);
+                    if (item != null)
+                        routeItem.SourceT = item.Item2;
+                    else
+                        routeItem.SourceT = GetRouteItemIDFromCache(routeItem.AggrNo);
+
+                    item = routeItemIDs.FirstOrDefault(c => c.Item1 == routeItem.Target);
+                    if (item != null)
+                        routeItem.TargetT = item.Item2;
+                    else
+                        routeItem.TargetT = GetRouteItemIDFromCache(routeItem.Target);
+
+                    item = routeItemIDs.FirstOrDefault(c => c.Item1 == routeItem.SecondSource);
+                    if (item != null)
+                        routeItem.Source2T = item.Item2;
+                    else
+                        routeItem.Source2T = GetRouteItemIDFromCache(routeItem.SecondSource);
+
+                    item = routeItemIDs.FirstOrDefault(c => c.Item1 == routeItem.ThirdSource);
+                    if (item != null)
+                        routeItem.Source3T = item.Item2;
+                    else
+                        routeItem.Source3T = GetRouteItemIDFromCache(routeItem.ThirdSource);
+
+                    item = routeItemIDs.FirstOrDefault(c => c.Item1 == routeItem.SecondTarget);
+                    if (item != null)
+                        routeItem.Target2T = item.Item2;
+                    else
+                        routeItem.Target2T = GetRouteItemIDFromCache(routeItem.SecondTarget);
+                }
+
+
+                routeItems.Add(routeItem);
+            }
+        }
+
+        private string GetRouteItemIDFromCache(short routeItemID)
+        {
+            if (RouteItemIDs == null)
+                FillRouteItemIDs();
+
+            string routeID = routeItemID.ToString();
+
+            string sessionACUrl = this.ParentACComponent.ACUrl;
+
+            var tempList = RouteItemIDs.Where(c => c.Item1 == routeItemID && c.Item3 == sessionACUrl).ToList();
+
+            if (tempList.Count == 1)
+                routeID = tempList.FirstOrDefault().Item2;
+
+            return routeID;
+        }
+
+        private bool IsLastElement(RouteItemHeaderModel header, List<RouteItemModel> routeItems)
+        {
+            if (header == null || routeItems == null || !routeItems.Any())
+                return false;
+
+            return routeItems.Any(c => (c.Target == header.TargetAggrNo || c.SecondTarget == header.TargetAggrNo)
+                                   && (header.SecondTargetAggrNo <= 0 || (c.Target == header.SecondTargetAggrNo || c.SecondTarget == header.SecondTargetAggrNo))
+                                   && (header.ThirdTargetAggrNo <= 0 || (c.Target == header.ThirdTargetAggrNo || c.SecondTarget == header.ThirdTargetAggrNo))
+                                   && (header.FourthTargetAggrNo <= 0 || (c.Target == header.FourthTargetAggrNo || c.SecondTarget == header.FourthTargetAggrNo)));
+        }
+
+        private void FillRouteItemIDs()
+        {
+            var converters = Root.FindChildComponents<GIPConv2006Base>(c => c is GIPConv2006Base && c.ACOperationMode == ACOperationModes.Live).ToList();
+
+            RouteItemIDs = new SafeList<Tuple<short, string, string>>();
+
+            foreach (GIPConv2006Base conv in converters)
+            {
+                short aggrNo = conv.AggrNo.ValueT;
+
+                if (conv.Session == null || conv.ParentACComponent == conv.Session)
+                    continue;
+
+                if (aggrNo != 0)
+                    RouteItemIDs.Add(new Tuple<short, string, string>(aggrNo, conv.ParentACComponent.ACUrl, conv.Session.ACUrl));
+            }
+        }
+
+        #endregion
+
 
         [ACMethodInfo("", "", 999)]
         public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
@@ -60,7 +381,6 @@ namespace gip2006.variobatch.processapplication
                 message = "route is empty";
                 return false;
             }
-
 
             IEnumerable<Route> splittedRoutes = Route.SplitRoute(route);
             Route routeForSending = Route.MergeRoutesWithoutDuplicates(splittedRoutes);
@@ -130,45 +450,10 @@ namespace gip2006.variobatch.processapplication
 
         private List<byte[]> CreateSendPackages(Route route, int maxRouteItems, int maxPackageSize, out string errorMessage, IACComponent destinationChangeComponent = null)
         {
-            int headerSize = 0, routeItemSize = 0, definedMaxPackSize = maxPackageSize;
+            int headerSize = GetHeaderSize();
+            int routeItemSize = GetRouteItemSize(); 
+            int definedMaxPackSize = maxPackageSize;
             //errorMessage = null;
-
-            #region Header size
-            headerSize += gip.core.communication.ISOonTCP.Types.Word.Length; //VARIOBATCH Command
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Destination change component
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Source
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Target
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //SecondTarget
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Third Target
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Fourth Target
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 1
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //TargetFull
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
-            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
-            #endregion
-
-            #region Route item size
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//GIPConv2006Base.AggrNo from Converter-Child-Instance.
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Aggregat-Typ
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Source
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Target
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Byte.Length;//First group
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Byte.Length;//Second group
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//TurnOn delay
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//TurnOff delay
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Second target
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para1
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para2
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para3
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para4
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para5
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Second source
-            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Third source
-            #endregion
 
             if (maxPackageSize < headerSize || maxPackageSize < routeItemSize)
             {
@@ -728,6 +1013,91 @@ namespace gip2006.variobatch.processapplication
             }
         }
 
+        private int GetHeaderSize()
+        {
+            int headerSize = 0;
+
+            headerSize += gip.core.communication.ISOonTCP.Types.Word.Length; //VARIOBATCH Command
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Destination change component
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Source
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Target
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //SecondTarget
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Third Target
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Fourth Target
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 1
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //TargetFull
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
+            headerSize += gip.core.communication.ISOonTCP.Types.Int.Length; //Unused = 0
+
+            return headerSize;
+        }
+
+        private int GetRouteItemSize()
+        {
+            int routeItemSize = 0;
+
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//GIPConv2006Base.AggrNo from Converter-Child-Instance.
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Aggregat-Typ
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Source
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Target
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Byte.Length;//First group
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Byte.Length;//Second group
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//TurnOn delay
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//TurnOff delay
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Second target
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para1
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para2
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para3
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para4
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Para5
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Second source
+            routeItemSize += gip.core.communication.ISOonTCP.Types.Int.Length;//Third source
+
+            return routeItemSize;
+        }
+
+        class RouteItemHeaderModel
+        {
+            public ushort Command
+            {
+                get;set;
+            }
+
+            public short DestinationChangeAggrNo
+            {
+                get;set;
+            }
+
+            public short SourceAggrNo
+            {
+                get;set;
+            }
+
+            public short TargetAggrNo
+            {
+                get;set;
+            }
+
+            public short SecondTargetAggrNo
+            {
+                get;set;
+            }
+
+            public short ThirdTargetAggrNo
+            {
+                get;set;
+            }
+
+            public short FourthTargetAggrNo
+            {
+                get;set;
+            }
+        }
+
         class RouteItemModel
         {
             public short AggrNo
@@ -869,5 +1239,6 @@ namespace gip2006.variobatch.processapplication
                 return result;
             }
         }
+
     }
 }

@@ -201,7 +201,7 @@ namespace gip2006.variobatch.processapplication
             return;
         }
 
-        public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override object ReadObject(object complexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)
@@ -230,6 +230,18 @@ namespace gip2006.variobatch.processapplication
 
             if (readParameter)
             {
+                if (routeOffset.HasValue)
+                {
+                    GIPFuncSerial2006Way serializer = FindChildComponents<GIPFuncSerial2006Way>(c => c is GIPFuncSerial2006Way).FirstOrDefault();
+                    if (serializer == null)
+                        serializer = ParentACComponent.FindChildComponents<GIPFuncSerial2006Way>(c => c is GIPFuncSerial2006Way, null, 1).FirstOrDefault();
+                    if (serializer != null)
+                    {
+                        serializer.ReadObject(complexObj, dbNo, offset, routeOffset, miscParams);
+                    }
+                }
+
+
                 int iOffset = 0;
                 if (s7Session.HashCodeValidation == HashCodeValidationEnum.Head || s7Session.HashCodeValidation == HashCodeValidationEnum.Head_WithRead)
                     iOffset += gip.core.communication.ISOonTCP.Types.DInt.Length;
