@@ -217,7 +217,7 @@ namespace gip.bso.facility
                         {
                             SearchRouteCombination routeCombination = new SearchRouteCombination()
                             {
-                                FromACUrl = inwardFacility.Value.FacilityACClass.ACUrlComponent,
+                                FromACUrl = inwardFacility.Value.FacilityACClass?.ACUrlComponent,
                                 FromType = MDTrackingStartItemTypeEnum.FacilityPreview,
 
                                 ToACUrl = outwardMachine.ACUrlComponent,

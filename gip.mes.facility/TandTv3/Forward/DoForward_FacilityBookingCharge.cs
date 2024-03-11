@@ -76,6 +76,19 @@ namespace gip.mes.facility.TandTv3
                 nextStepItems.AddRange(nextFbcs);
             }
 
+            // MaterialWFNoForFilterLotByTime used - fetch time matched inward items
+            if (
+                    !string.IsNullOrEmpty(Result.Filter.MaterialWFNoForFilterLotByTime)
+                    && Item.OutwardMaterialID != null
+                    && Item.OutwardFacilityChargeID != null
+                    && Item.ProdOrderPartslistPosRelationID != null
+                    && IsMaterialWFNoForFilterLotByTime
+                    )
+            {
+                List<IACObjectEntity> inwardItems = GetInwardItemsForThisOutwardFilterByTime(Item);
+                nextStepItems.AddRange(inwardItems);
+            }
+
             if (Item.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.PickingRelocation)
             {
                 List<FacilityBookingCharge> nextFbcs = new List<FacilityBookingCharge>();
@@ -120,6 +133,49 @@ namespace gip.mes.facility.TandTv3
             //    var nextFbcs = inwardCharges.Union(outwardCharges);
             //    nextStepItems.AddRange(nextFbcs);
             //}
+
+            return nextStepItems;
+        }
+
+        private List<IACObjectEntity> GetInwardItemsForThisOutwardFilterByTime(FacilityBookingCharge fbc)
+        {
+            List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
+
+            FacilityBookingCharge firstFBCWithSameFC =
+                fbc
+                .ProdOrderPartslistPosRelation
+                .FacilityBookingCharge_ProdOrderPartslistPosRelation
+                .Where(c => 
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                            && c.InsertDate < fbc.InsertDate
+                            && c.OutwardFacilityChargeID == fbc.OutwardFacilityChargeID
+                      )
+                .OrderBy(c => c.InsertDate)
+                .FirstOrDefault();
+
+            FacilityBookingCharge lastFBCWithSameFC =
+                fbc
+                .ProdOrderPartslistPosRelation
+                .FacilityBookingCharge_ProdOrderPartslistPosRelation
+                .Where(c => 
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                            && c.InsertDate > fbc.InsertDate
+                            && c.OutwardFacilityChargeID == fbc.OutwardFacilityChargeID
+                      )
+                .OrderByDescending(c => c.InsertDate)
+                .FirstOrDefault();
+
+            (DateTime startTime, DateTime endTime) = GetFBCTimeFrame(fbc, firstFBCWithSameFC, lastFBCWithSameFC);
+
+            FacilityBookingCharge[] outwardBookings =
+                fbc
+                .ProdOrderPartslistPosRelation
+                .TargetProdOrderPartslistPos
+                .FacilityBookingCharge_ProdOrderPartslistPos
+                .Where(c => c.InsertDate >= startTime && c.InsertDate <= endTime)
+                .ToArray();
+
+            nextStepItems.AddRange(outwardBookings);
 
             return nextStepItems;
         }

@@ -808,7 +808,8 @@ namespace gip.mes.facility.TandTv3
                     MaterialIDs = new List<Guid>(),
                     RecalcAgain = filter.RecalcAgain,
                     OrderDepth = filter.OrderDepth,
-                    MaxOrderCount = filter.MaxOrderCount
+                    MaxOrderCount = filter.MaxOrderCount,
+                    MaterialWFNoForFilterLotByTime = filter.MaterialWFNoForFilterLotByTime
                 };
 
                 if (filter.MaterialIDs != null && filter.MaterialIDs.Any())

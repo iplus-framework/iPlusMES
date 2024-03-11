@@ -208,11 +208,13 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if(_MaterialNOsForStopTracking == null)
+                if (_MaterialNOsForStopTracking == null)
                     _MaterialNOsForStopTracking = new List<string>();
                 return _MaterialNOsForStopTracking;
             }
         }
+
+        public string MaterialWFNoForFilterLotByTime { get; set; }
 
         #endregion
 

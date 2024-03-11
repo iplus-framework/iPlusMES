@@ -33,16 +33,26 @@ namespace gip.mes.facility.TandTv3
         public override List<IACObjectEntity> GetSameStepItems()
         {
             List<IACObjectEntity> sameStepItems = new List<IACObjectEntity>();
-            List<FacilityBookingCharge> fbc =
-           Item
-           .FacilityBookingCharge_ProdOrderPartslistPosRelation
-           .Where(c => TandTv3Query.s_cQry_FBCOutwardQuery(c, Result.Filter))
-           .OrderBy(c => c.FacilityBookingChargeNo)
-           .ToList();
-            if (IsUseLotCheck)
+            if(!string.IsNullOrEmpty(Result.Filter.MaterialWFNoForFilterLotByTime))
             {
-                fbc = fbc.Where(c => Result.Lots.Contains(c.OutwardFacilityCharge.FacilityLot.LotNo)).ToList();
+                // When not all OutwardFacilityBookingCharge have part in dosing
+                // case when periodicaly step by step is produced
+                // with inward lot change for same batch or lot stay the same but (manual work) 
+                // but not all outward lots belong to same inward lot
+                return sameStepItems;
             }
+            List<FacilityBookingCharge> fbc =
+                Item
+               .FacilityBookingCharge_ProdOrderPartslistPosRelation
+               .Where(c => TandTv3Query.s_cQry_FBCOutwardQuery(c, Result.Filter))
+               .OrderBy(c => c.FacilityBookingChargeNo)
+               .ToList();
+                if (IsUseLotCheck)
+                {
+                    fbc = fbc.Where(c => Result.Lots.Contains(c.OutwardFacilityCharge.FacilityLot.LotNo)).ToList();
+                }
+
+            
             sameStepItems.AddRange(fbc);
             return sameStepItems;
         }
