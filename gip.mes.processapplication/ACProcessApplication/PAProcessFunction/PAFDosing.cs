@@ -1819,7 +1819,7 @@ namespace gip.mes.processapplication
             return pamSilo;
         }
 
-        protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
+        public static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
         {
             ACMethod method = new ACMethod(acIdentifier);
 
