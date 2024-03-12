@@ -185,7 +185,7 @@ namespace gip.mes.processapplication
                     Direction = RouteDirections.Forwards,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true
                 };

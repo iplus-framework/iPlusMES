@@ -192,7 +192,7 @@ namespace gip.mes.processapplication
                     Database = db,
                     SelectionRuleID = PAMSilo.SelRuleID_Silo,
                     Direction = RouteDirections.Backwards,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true
                 };

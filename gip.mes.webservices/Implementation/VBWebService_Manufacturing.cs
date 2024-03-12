@@ -924,7 +924,7 @@ namespace gip.mes.webservices
                                 AttachRouteItemsToContext = false,
                                 SelectionRuleID = PAMParkingspace.SelRuleID_ParkingSpace,
                                 Direction = RouteDirections.Forwards,
-                                MaxRouteAlternativesInLoop = 0,
+                                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                                 IncludeReserved = true,
                                 IncludeAllocated = true
                             };

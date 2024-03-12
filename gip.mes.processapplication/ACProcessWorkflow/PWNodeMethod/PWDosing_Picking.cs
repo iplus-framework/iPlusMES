@@ -8,6 +8,7 @@ using gip.mes.facility;
 using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 using gip.core.processapplication;
+using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication
 {
@@ -142,7 +143,7 @@ namespace gip.mes.processapplication
                                 SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
                                 DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
                                 DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID,
-                                MaxRouteAlternativesInLoop = 0,
+                                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                                 IncludeReserved = true,
                                 IncludeAllocated = true,
                                 DBRecursionLimit = 10
@@ -216,7 +217,7 @@ namespace gip.mes.processapplication
                             Database = dbIPlus,
                             Direction = RouteDirections.Backwards,
                             SelectionRuleID = PAMSilo.SelRuleID_Silo,
-                            MaxRouteAlternativesInLoop = 0,
+                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                             IncludeReserved = true,
                             IncludeAllocated = true
                         };
@@ -374,7 +375,7 @@ namespace gip.mes.processapplication
                             SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
                             DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
                             DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                            MaxRouteAlternativesInLoop = 0,
+                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                             IncludeReserved = true,
                             IncludeAllocated = true,
                             DBRecursionLimit = 10
@@ -600,7 +601,7 @@ namespace gip.mes.processapplication
                         AutoDetachFromDBContext = false,
                         SelectionRuleID = PAMSilo.SelRuleID_Silo,
                         Direction = RouteDirections.Backwards,
-                        MaxRouteAlternativesInLoop = 0,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                         IncludeReserved = true,
                         IncludeAllocated = true
                     };
@@ -915,6 +916,72 @@ namespace gip.mes.processapplication
 
             CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.NoSilosAvailable;
             return CachedEmptySiloHandlingOption.Value;
+        }
+
+        public virtual bool HasAndCanProcessAnyMaterialPicking(PAProcessModule module)
+        {
+            PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+            if (pwMethodTransport == null || pwMethodTransport.CurrentPicking == null)
+                return false;
+
+            using (var dbIPlus = new Database())
+            using (var dbApp = new DatabaseApp(dbIPlus))
+            {
+                Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
+                if (picking == null)
+                    return false;
+                PickingPos pickingPosFromPWMethod = null;
+                if (pwMethodTransport.CurrentPickingPos != null && !DoseAllPosFromPicking)
+                    pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
+
+                PickingPos[] openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
+                                //.Include(c => c.FromFacility.FacilityCharge_Facility)
+                                .Where(c => c.PickingID == picking.PickingID
+                                        && c.MDDelivPosLoadStateID.HasValue
+                                        && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                            || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                .OrderBy(c => c.Sequence)
+                                .ToArray();
+
+                //PickingPos[] openPickings = picking.PickingPos_Picking
+                //                                    .Where(c => c.MDDelivPosLoadStateID.HasValue
+                //                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                //                                             || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                //                                    .OrderBy(c => c.Sequence).ToArray();
+
+                if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && openPickings != null && openPickings.Any())
+                {
+                    openPickings = openPickings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                               .OrderBy(c => c.Sequence)
+                                               .ToArray();
+                }
+
+                if (openPickings == null || !openPickings.Any())
+                    return false;
+
+                RoutingResult routingResult = HasAndCanProcessAnyMaterialPicking(module, dbApp, dbIPlus, openPickings.FirstOrDefault());
+                return routingResult != null && routingResult.Routes != null && routingResult.Routes.Any();
+            }
+        }
+
+        public virtual RoutingResult HasAndCanProcessAnyMaterialPicking(PAProcessModule module, DatabaseApp dbApp, Database db, PickingPos pickingPos)
+        {
+            facility.ACPartslistManager.QrySilosResult possibleSilos = null;
+            RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
+                            OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                            null, null, ExcludedSilos, ReservationMode);
+            IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, db, queryParams, module, out possibleSilos);
+            if (possibleSilos != null && possibleSilos.FoundSilos != null && possibleSilos.FoundSilos.Any())
+            {
+                foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
+                {
+                    if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue
+                        || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
+                        continue;
+                    return new RoutingResult(routes, false, null, null);
+                }
+            }
+            return null;
         }
 
         public virtual Msg CanResumeDosingPicking()

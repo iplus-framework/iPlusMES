@@ -2995,7 +2995,7 @@ namespace gip.bso.manufacturing
                     AttachRouteItemsToContext = true,
                     SelectionRuleID = PAMParkingspace.SelRuleID_ParkingSpace,
                     Direction = RouteDirections.Forwards,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true
                 };

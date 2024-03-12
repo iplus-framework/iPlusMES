@@ -1100,7 +1100,7 @@ namespace gip.mes.processapplication
                 SelectionRuleParams = deSelParams,
                 DBSelector = (c, p, r) => c.ACClassID == acClassIDCompTo,
                 DBDeSelector = deSelector,
-                MaxRouteAlternativesInLoop = 0,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = includeReserved,
                 IncludeAllocated = includeAllocated,
                 DBRecursionLimit = searchDepth,

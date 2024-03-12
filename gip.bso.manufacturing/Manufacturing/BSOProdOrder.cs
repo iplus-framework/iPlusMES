@@ -98,7 +98,6 @@ namespace gip.bso.manufacturing
 
             _AccessInBookingFacility = null;
             _AccessOutBookingFacility = null;
-            _ACFacilityManager = null;
             _AddPartslistSequence = null;
             _AddPartslistTargetQuantity = null;
             _AlternativeProdOrderPartslistPosList = null;

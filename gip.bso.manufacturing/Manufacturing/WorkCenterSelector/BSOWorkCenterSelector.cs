@@ -1535,7 +1535,7 @@ namespace gip.bso.manufacturing
                 DBSelector = (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType) || typeof(PAMSilo).IsAssignableFrom(c.ObjectFullType)
                                                                                                      || typeof(PAMIntermediatebin).IsAssignableFrom(c.ObjectFullType),
                 DBDeSelector = (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
-                MaxRouteAlternativesInLoop = 0,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true
             };

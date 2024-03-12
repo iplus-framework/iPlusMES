@@ -155,6 +155,10 @@ namespace gip.mes.processapplication
             if (refBatchPlanSchedulerComponent != null)
                 _PAWorkflowScheduler = new ACRef<ACComponent>(refBatchPlanSchedulerComponent, this);
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
             InitBatchPlanSchedulerComponent();
 
             string selectedLine = GetSelectedLine();
@@ -171,6 +175,10 @@ namespace gip.mes.processapplication
                 _PAWorkflowScheduler.Detach();
                 _PAWorkflowScheduler = null;
             }
+
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
             _TempRules = null;
             return base.ACDeInit(deleteACClassTask);
         }
@@ -325,6 +333,17 @@ namespace gip.mes.processapplication
             {
                 if (_PAWorkflowScheduler == null) return null;
                 return _PAWorkflowScheduler.ValueT;
+            }
+        }
+
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
             }
         }
         #endregion

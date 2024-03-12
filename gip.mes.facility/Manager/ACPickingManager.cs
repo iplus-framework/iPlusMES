@@ -1291,7 +1291,7 @@ namespace gip.mes.facility
         }
 
         private void CheckResourcesAndRoutingKnownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType)
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType, string selectionRuleID = "PAMSilo.Deselector")
         {
             Msg msg;
 
@@ -1440,10 +1440,10 @@ namespace gip.mes.facility
                 Database = this.Database.ContextIPlus,
                 AttachRouteItemsToContext = false,
                 Direction = RouteDirections.Forwards,
-                SelectionRuleID = "",
+                SelectionRuleID = selectionRuleID,
                 DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
                 DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)),
-                MaxRouteAlternativesInLoop = 0,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true,
                 DBRecursionLimit = 10
@@ -1466,7 +1466,7 @@ namespace gip.mes.facility
         }
 
         private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType)
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType, string selectionRuleID = "PAMSilo.Deselector")
         {
             Msg msg;
 
@@ -1547,7 +1547,7 @@ namespace gip.mes.facility
             QrySilosResult possibleSilos = null;
             core.datamodel.ACClass compClass = pos.ToFacility.FacilityACClass;
 
-            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, null);
+            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, null, null, null, true, 0, selectionRuleID);
 
             if (routes == null || !routes.Any())
             {
@@ -1959,7 +1959,7 @@ namespace gip.mes.facility
                     SelectionRuleID = selectionRuleID,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true,
                     DBRecursionLimit = 10
@@ -1987,7 +1987,7 @@ namespace gip.mes.facility
                     SelectionRuleID = selectionRuleID,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true,
                     DBRecursionLimit = 10
@@ -2178,7 +2178,7 @@ namespace gip.mes.facility
         #region Target-Selection
         public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
             Picking picking, PickingPos pickingPos, string configACUrl,
-            bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation)
+            bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation, string selectionRuleID = "Storage")
         {
             BindingList<POPartslistPosReservation> reservationCollection = new BindingList<POPartslistPosReservation>();
             MaterialWFACClassMethod materialWFACClassMethod = null;
@@ -2194,10 +2194,10 @@ namespace gip.mes.facility
                     RoutingService = routingService,
                     Database = databaseApp.ContextIPlus,
                     AttachRouteItemsToContext = true,
-                    SelectionRuleID = "Storage",
+                    SelectionRuleID = selectionRuleID,
                     Direction = RouteDirections.Forwards,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true,
                     ResultMode = RouteResultMode.ShortRoute

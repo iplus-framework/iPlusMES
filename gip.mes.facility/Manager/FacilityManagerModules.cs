@@ -153,7 +153,7 @@ namespace gip.mes.facility
                 SelectionRuleID = C_SiloClass,
                 DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                 DBDeSelector = null,
-                MaxRouteAlternativesInLoop = 0,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true,
                 DBRecursionLimit = 3,

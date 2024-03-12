@@ -1396,7 +1396,7 @@ namespace gip.mes.facility
                     SelectionRuleID = "Storage",
                     Direction = RouteDirections.Forwards,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true,
                     ResultMode = RouteResultMode.ShortRoute

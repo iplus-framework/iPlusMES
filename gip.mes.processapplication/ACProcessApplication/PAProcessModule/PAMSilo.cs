@@ -1345,7 +1345,7 @@ namespace gip.mes.processapplication
                         RoutingService = routingService,
                         SelectionRuleID = SelRuleID_DosingFunc,
                         Direction = RouteDirections.Forwards,
-                        MaxRouteAlternativesInLoop = 0,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                         IncludeReserved = true,
                         IncludeAllocated = true
                     };
@@ -1407,7 +1407,7 @@ namespace gip.mes.processapplication
                         RoutingService = routingService,
                         SelectionRuleID = SelRuleID_DischargingFunc,
                         Direction = RouteDirections.Backwards,
-                        MaxRouteAlternativesInLoop = 0,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                         IncludeReserved = true,
                         IncludeAllocated = true
                     };

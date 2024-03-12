@@ -56,6 +56,8 @@ namespace gip.mes.processapplication
                     wrapper.ParameterTranslation.Add("MaxBatchWeight", "en{'Max. batch weight [kg]'}de{'Maximales Batchgewicht [kg]'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
                     wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
+                    wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
+                    wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where BOM-materials can be processed'}de{'Nur Prozessmodule wo Stückliste verarbeitet werden kann'}");
                 }
             }
             RegisterExecuteHandler(typeof(PWGroupVB), HandleExecuteACMethod_PWGroupVB);
@@ -142,6 +144,23 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("SkipIfNoComp");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool DosableOnGroupCheck
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("DosableOnGroupCheck");
                     if (acValue != null)
                     {
                         return acValue.ParamAsBoolean;
@@ -371,6 +390,8 @@ namespace gip.mes.processapplication
 
                         if (targets != null && targets.Any())
                         {
+                            var pwDosings = this.FindChildComponents<IPWNodeReceiveMaterialRouteable>(c => c is IPWNodeReceiveMaterialRouteable);
+
                             // Performance-Optimization:
                             // If targets changed, then recalculate routebale PM List
                             if (PWMethodTransportBase.AreCachedDestinationsDifferent(LastTargets, targets))
@@ -403,14 +424,32 @@ namespace gip.mes.processapplication
                                                                         && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                             || !c.BasedOnACClassID.HasValue
                                                                             || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                            MaxRouteAlternativesInLoop = 0,
+                                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                                             IncludeReserved = true,
                                             IncludeAllocated = true
                                         };
 
                                         RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
                                         if (rResult.Routes != null && rResult.Routes.Any())
-                                            LastCalculatedRouteablePMList.Add(module);
+                                        {
+                                            bool canAdd = true;
+                                            if (DosableOnGroupCheck)
+                                            {
+                                                if (pwDosings != null && pwDosings.Any())
+                                                {
+                                                    canAdd = false;
+                                                    foreach (IPWNodeReceiveMaterialRouteable pwDosing in pwDosings)
+                                                    {
+                                                        canAdd = pwDosing.HasAndCanProcessAnyMaterial(module);
+                                                        if (canAdd)
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+                                            if (canAdd)
+                                                LastCalculatedRouteablePMList.Add(module);
+                                        }
                                     }
                                 }
                             }
@@ -423,6 +462,7 @@ namespace gip.mes.processapplication
                         }
                         else
                             LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+
                         _LastTargets = targets;
                         return LastCalculatedRouteablePMList.ToList();
                     }
@@ -519,7 +559,7 @@ namespace gip.mes.processapplication
                                                                                 && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                                     || !c.BasedOnACClassID.HasValue
                                                                                     || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                            MaxRouteAlternativesInLoop = 0,
+                                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                                             IncludeReserved = true,
                                             IncludeAllocated = true
                                         };
@@ -687,7 +727,7 @@ namespace gip.mes.processapplication
                                                         && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                             || !c.BasedOnACClassID.HasValue
                                                             || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true
                 };
@@ -718,27 +758,10 @@ namespace gip.mes.processapplication
                                 {
                                     var pwDosing = pwDosings.FirstOrDefault();
                                     if (pwDosing != null)
-                                    {
-                                        facility.ACPartslistManager.QrySilosResult possibleSilos = null;
-                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
-                                                        pwDosing.OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                                        null, null, pwDosing.ExcludedSilos, pwDosing.ReservationMode);
-                                        IEnumerable<Route> routes = pwDosing.GetRoutes(pickingPos, dbApp, db, queryParams, module, out possibleSilos);
-                                        if (possibleSilos != null && possibleSilos.FoundSilos != null && possibleSilos.FoundSilos.Any())
-                                        {
-                                            foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
-                                            {
-                                                if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue
-                                                    || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
-                                                    continue;
-                                                rResult = new RoutingResult(routes, false, null, null);
-                                                break;
-                                            }
-                                        }
-                                    }
+                                        rResult = pwDosing.HasAndCanProcessAnyMaterialPicking(module, dbApp, db, pickingPos);
                                 }
                             }
-                            if (rResult.Routes != null && rResult.Routes.Any())
+                            if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
                                 LastCalculatedRouteablePMList.Add(module);
                         }
                     }
@@ -911,7 +934,7 @@ namespace gip.mes.processapplication
             ExtraDisTargetDest = null;
             ExtraDisTargetComp = null;
 
-            if (SkipIfNoComp)
+            if (!DosableOnGroupCheck && SkipIfNoComp)
             {
                 if (SkipIfNoDosComp())
                 {
@@ -930,6 +953,16 @@ namespace gip.mes.processapplication
             LastTargets = null;
             _LastCalculatedRouteablePMList = null;
             _SkipGroup = null;
+        }
+
+        protected override bool OnHandleAvailableProcessModule(PAProcessModule processModule)
+        {
+            if (SkipIfNoComp && DosableOnGroupCheck && processModule == null)
+            {
+                CurrentACState = ACStateEnum.SMCompleted;
+                return true;
+            }
+            return base.OnHandleAvailableProcessModule(processModule);
         }
 
         protected override void OnProcessModuleReleased(PAProcessModule module)

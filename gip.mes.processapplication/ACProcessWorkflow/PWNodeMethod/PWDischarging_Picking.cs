@@ -357,7 +357,7 @@ namespace gip.mes.processapplication
                     SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
                     Direction = RouteDirections.Forwards,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true
                 };
@@ -822,7 +822,7 @@ namespace gip.mes.processapplication
                     SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
                     Direction = RouteDirections.Forwards,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true
                 };

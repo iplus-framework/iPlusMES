@@ -1766,7 +1766,7 @@ namespace gip.mes.facility
                 Direction = RouteDirections.Backwards,
                 SelectionRuleID = selectionRuleID,
                 DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClass.ACClassID,
-                MaxRouteAlternativesInLoop = 0,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = includeReserved,
                 IncludeAllocated = includeAllocated,
                 DBRecursionLimit = 10

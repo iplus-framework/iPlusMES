@@ -1518,6 +1518,16 @@ namespace gip.mes.processapplication
             return null;
         }
 
+
+        public virtual bool HasAndCanProcessAnyMaterial(PAProcessModule module)
+        {
+            if (IsProduction)
+                return HasAndCanProcessAnyMaterialProd(module);
+            else if (IsTransport)
+                return HasAndCanProcessAnyMaterialPicking(module);
+            return false;
+        }
+
         #endregion
 
 

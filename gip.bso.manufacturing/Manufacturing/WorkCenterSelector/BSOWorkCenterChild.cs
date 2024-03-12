@@ -421,7 +421,7 @@ namespace gip.bso.manufacturing
                 SelectionRuleID = "",
                 DBSelector = (c, p, r) => c.ACClassID == toClass.ACClassID,
                 DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
-                MaxRouteAlternativesInLoop = 10,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true,
                 DBRecursionLimit = 10

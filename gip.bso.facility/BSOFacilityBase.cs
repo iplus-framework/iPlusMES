@@ -417,7 +417,7 @@ namespace gip.bso.facility
                     AttachRouteItemsToContext = true,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && typeIntake.IsAssignableFrom(c.ObjectType),
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != forBooking.InwardFacility.VBiFacilityACClassID,
-                    MaxRouteAlternativesInLoop = 0,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
                     IncludeAllocated = true,
                     AutoDetachFromDBContext = false,
@@ -721,7 +721,7 @@ namespace gip.bso.facility
                 SelectionRuleID = "",
                 DBSelector = (c, p, r) => c.ACClassID == toClass.ACClassID,
                 DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
-                MaxRouteAlternativesInLoop = 0,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true,
                 DBRecursionLimit = 10

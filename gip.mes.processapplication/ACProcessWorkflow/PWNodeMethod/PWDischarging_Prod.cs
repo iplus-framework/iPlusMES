@@ -419,7 +419,7 @@ namespace gip.mes.processapplication
                                     SelectionRuleParams = new object[] { targetACClassID },
                                     DBSelector = (c, p, r) => c.ACClassID == targetACClassID,
                                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                    MaxRouteAlternativesInLoop = 0,
+                                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                                     IncludeReserved = true,
                                     IncludeAllocated = true
                                 };
