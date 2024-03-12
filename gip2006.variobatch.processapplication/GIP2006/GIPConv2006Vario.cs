@@ -888,10 +888,12 @@ namespace gip2006.variobatch.processapplication
             }
             bool sended = false;
             ACChildInstanceInfo childInfo = new ACChildInstanceInfo(ParentACComponent);
+            object[] miscParams = new object[] { childInfo, true };
+
             Int32? routingOffset = null;
             if (RoutingDBOffset.HasValue)
                 routingOffset = Convert.ToInt32(RoutingDBOffset.Value);
-            object result = this.Session.ACUrlCommand("!SendObject", acMethod, previousParams, Convert.ToInt32(CmdDBNo), Convert.ToInt32(CmdDBOffset), routingOffset, childInfo);
+            object result = this.Session.ACUrlCommand("!SendObject", acMethod, previousParams, Convert.ToInt32(CmdDBNo), Convert.ToInt32(CmdDBOffset), routingOffset, miscParams);
             if (result != null)
                 sended = (bool)result;
 
