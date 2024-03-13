@@ -860,7 +860,7 @@ namespace gip.mes.processapplication
                         CheckIfAutomaticTargetChangePossible = null;
                         if (discharging != null)
                         {
-                            double? disChargedWeight = GetDischargedWeight(false, taskEntry, eM);
+                            double? disChargedWeight = GetDischargedWeight(false, taskEntry, eM, acMethod);
                             double actualWeight = disChargedWeight.HasValue ? disChargedWeight.Value : 0;
 
                             if (OnTaskCallbackCanExecutePostings(sender, e, wrapObject, discharging, acMethod))
@@ -957,14 +957,22 @@ namespace gip.mes.processapplication
                                                     {
                                                         picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                         PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                        if (picking != null)
+                                                        if (picking != null && pickingPos != null)
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
+                                                                actualWeight = pickingPos.TargetQuantityUOM;
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, picking, pickingPos, e, true);
+                                                        }
                                                     }
                                                     else if (pwMethod.CurrentDeliveryNotePos != null)
                                                     {
                                                         notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
                                                         if (notePos != null)
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && notePos != null)
+                                                                actualWeight = notePos.TargetQuantityUOM.HasValue ? notePos.TargetQuantityUOM.Value : 0.0;
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, notePos, e, true);
+                                                        }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
                                                     {
@@ -1005,14 +1013,22 @@ namespace gip.mes.processapplication
                                                     {
                                                         picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                         PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                        if (picking != null)
+                                                        if (picking != null && pickingPos != null)
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
+                                                                actualWeight = pickingPos.TargetQuantityUOM;
                                                             DoOutwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
-                                                    }
-                                                    else if (pwMethod.CurrentDeliveryNotePos != null)
-                                                    {
-                                                        notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
-                                                        if (notePos != null)
-                                                            DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                        }
+                                                        else if (pwMethod.CurrentDeliveryNotePos != null)
+                                                        {
+                                                            notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
+                                                            if (notePos != null)
+                                                            {
+                                                                if (this.IsSimulationOn && actualWeight <= 0.000001 && notePos != null)
+                                                                    actualWeight = notePos.TargetQuantityUOM.HasValue ? notePos.TargetQuantityUOM.Value : 0.0; 
+                                                                DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1457,7 +1473,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        protected virtual double? GetDischargedWeight(bool getDefaultValueIfSim, IACTask taskEntry = null, ACMethodEventArgs eM = null)
+        protected virtual double? GetDischargedWeight(bool getDefaultValueIfSim, IACTask taskEntry = null, ACMethodEventArgs eM = null, ACMethod acMethod = null)
         {
             double? disChargedWeight = null;
             if (taskEntry != null && eM != null)
@@ -1490,18 +1506,30 @@ namespace gip.mes.processapplication
                 {
                     if (getDefaultValueIfSim)
                         disChargedWeight = 0.001;
+                    else if (acMethod != null)
+                    {
+                        var acValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                        if (acValue != null)
+                        {
+                            disChargedWeight = acValue.ParamAsDouble;
+                            if (Math.Abs(disChargedWeight.Value) <= double.Epsilon)
+                            {
+                                disChargedWeight = null;
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     PAFDischarging discharging = ParentPWGroup != null && taskEntry != null ? ParentPWGroup.GetExecutingFunction<PAFDischarging>(taskEntry.RequestID) : CurrentExecutingFunction;
                     if (discharging != null)
                     {
-                        ACMethod acMethod;
+                        ACMethod acMethod2;
                         MsgWithDetails msgError;
-                        PAProcessFunction.CompleteResult result = discharging.ReceiveACMethodResult(out acMethod, out msgError);
-                        if (result == PAProcessFunction.CompleteResult.Succeeded && acMethod != null)
+                        PAProcessFunction.CompleteResult result = discharging.ReceiveACMethodResult(out acMethod2, out msgError);
+                        if (result == PAProcessFunction.CompleteResult.Succeeded && acMethod2 != null)
                         {
-                            var acValue = acMethod.ResultValueList.GetACValue("ActualQuantity");
+                            var acValue = acMethod2.ResultValueList.GetACValue("ActualQuantity");
                             if (acValue != null)
                                 disChargedWeight = acValue.ParamAsDouble;
                         }

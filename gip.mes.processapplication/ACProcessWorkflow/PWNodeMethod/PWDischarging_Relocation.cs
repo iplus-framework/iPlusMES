@@ -174,6 +174,10 @@ namespace gip.mes.processapplication
             if (CurrentDischargingRoute != null)
                 CurrentDischargingRoute.Detach(true);
 
+            ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+            if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
+                acValueTargetQ.Value = facilityBooking.OutwardQuantity;
+
             NoTargetWait = null;
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, facilityBooking, targetModule))
                 return StartDisResult.CycleWait;

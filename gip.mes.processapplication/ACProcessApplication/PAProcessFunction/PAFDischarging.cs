@@ -919,7 +919,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("Sieve", typeof(Int16), (Int16)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("Sieve", "en{'Sieve'}de{'Sieb'}");
             method.ParameterValueList.Add(new ACValue("TargetQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
-            paramTranslation.Add("TargetQuantity", "en{'Target quantity'}de{'Sollmenge'}");
+            paramTranslation.Add("TargetQuantity", "en{'Target quantity (Set value if negative)'}de{'Sollmenge (Setze Wert falls negativ)'}");
 
             if (acIdentifier == "DischargingIntake")
             {

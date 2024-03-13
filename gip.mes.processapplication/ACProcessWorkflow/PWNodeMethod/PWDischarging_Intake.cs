@@ -714,7 +714,7 @@ namespace gip.mes.processapplication
             }
 
 
-            double? disChargedWeight = GetDischargedWeight(true);
+            double? disChargedWeight = GetDischargedWeight(true, null, null, acMethod);
 
             //PAMIntake intakeBin = module as PAMIntake;
             //double actualWeight = intakeBin.Scale != null ? intakeBin.Scale.ActualWeight.ValueT - intakeBin.Scale.StoredTareWeight.ValueT : 0;

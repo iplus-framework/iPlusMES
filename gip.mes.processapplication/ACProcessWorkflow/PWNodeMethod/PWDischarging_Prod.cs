@@ -324,6 +324,10 @@ namespace gip.mes.processapplication
                             acValue.Value = (Int16)1;
                         }
 
+                        ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                        if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
+                            acValueTargetQ.Value = currentBatchPos.TargetQuantityUOM;
+
                         NoTargetWait = null;
                         if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
@@ -1084,7 +1088,7 @@ namespace gip.mes.processapplication
                         return StartDisResult.CycleWait;
                     }
 
-                    double? disChargedWeight = GetDischargedWeight(true);
+                    double? disChargedWeight = GetDischargedWeight(true, null, null, acMethod);
 
                     bool isNewACMethod = false;
                     if (acMethod == null)

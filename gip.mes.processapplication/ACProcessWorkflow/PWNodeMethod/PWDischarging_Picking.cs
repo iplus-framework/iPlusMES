@@ -499,6 +499,10 @@ namespace gip.mes.processapplication
                 }
             }
 
+            ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+            if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
+                acValueTargetQ.Value = pickingPos.RemainingDosingQuantityUOM > 0 ? 0.001 : pickingPos.RemainingDosingQuantityUOM * -1;
+
             NoTargetWait = null;
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 return StartDisResult.CycleWait;
@@ -907,7 +911,7 @@ namespace gip.mes.processapplication
                 dbApp.ACSaveChanges();
             }
 
-            double? disChargedWeight = GetDischargedWeight(true);
+            double? disChargedWeight = GetDischargedWeight(true, null, null, acMethod);
 
             core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
             if (refPAACClassMethod == null)

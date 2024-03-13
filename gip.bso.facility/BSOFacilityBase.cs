@@ -316,8 +316,9 @@ namespace gip.bso.facility
             Msg msg = null;
 
             IEnumerable<gip.core.datamodel.ACClassWF> workflowRootWFs = null;
-            // Falls Umlagerung eines Quants, dann muss Benutzer gefargt werden an welcher Aufgabestelle er das Quant aufgeben will für einen Transport
-            if (forBooking.OutwardFacilityCharge != null)
+            // Falls Umlagerung eines Quants, dann muss Benutzer gefragt werden an welcher Aufgabestelle er das Quant aufgeben will für einen Transport
+            if (   forBooking.OutwardFacilityCharge != null 
+                && (forBooking.OutwardFacilityCharge.Facility.MDFacilityType == null || forBooking.OutwardFacilityCharge.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
             {
                 if (!forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                     return false;
@@ -381,12 +382,15 @@ namespace gip.bso.facility
                                                      .Select(c => c.ACClassWF1_ParentACClassWF);
             }
             // Sonst Umlagerungsprozess von Silo zu Silo
-            else if (forBooking.OutwardFacility != null && forBooking.InwardFacility != null)
+            else if ((    forBooking.OutwardFacility != null 
+                       || (forBooking.OutwardFacilityCharge != null && forBooking.OutwardFacilityCharge.Facility.MDFacilityType != null && forBooking.OutwardFacilityCharge.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
+                     && forBooking.InwardFacility != null)
             {
-                if (!forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
+                Facility outwardFacility = forBooking.OutwardFacility != null ? forBooking.OutwardFacility : forBooking.OutwardFacilityCharge.Facility;
+                if (   !outwardFacility.VBiFacilityACClassID.HasValue
                     || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                     return false;
-                msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
+                msg = OnValidateRoutesForWF(forBooking, outwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
                     Messages.Msg(msg);
