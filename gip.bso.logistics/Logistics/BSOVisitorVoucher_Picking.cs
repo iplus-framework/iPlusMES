@@ -150,7 +150,7 @@ namespace gip.bso.logistics
             }
         }
 
-        private List<ACFilterItem> AccessUnAssignedPicking_DefaultFilter
+        protected virtual List<ACFilterItem> AccessUnAssignedPicking_DefaultFilter
         {
             get
             {
@@ -165,7 +165,7 @@ namespace gip.bso.logistics
             }
         }
 
-        private List<ACSortItem> AccessUnAssignedPicking_DefaultSort
+        protected virtual List<ACSortItem> AccessUnAssignedPicking_DefaultSort
         {
             get
             {

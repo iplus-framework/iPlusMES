@@ -1193,13 +1193,11 @@ namespace gip.bso.logistics
         [ACMethodCommand(Visitor.ClassName, "en{'Check Out'}de{'Abmelden'}", (short)601, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void CheckOut()
         {
-            if (!PreExecute("CheckOut")) return;
-            MDVisitorVoucherState state = DatabaseApp.MDVisitorVoucherState.Where(c => c.MDVisitorVoucherStateIndex == (short)MDVisitorVoucherState.VisitorVoucherStates.CheckedOut).FirstOrDefault();
-            if (state != null)
-            {
-                CurrentVisitorVoucher.MDVisitorVoucherState = state;
-                CurrentVisitorVoucher.CheckOutDate = DateTime.Now;
-            }
+            if (!PreExecute("CheckOut")) 
+                return;
+            if (this.VisitorVoucherManager == null)
+                return;
+            this.VisitorVoucherManager.CheckOut(CurrentVisitorVoucher, DatabaseApp);
             PostExecute("CheckOut");
         }
 
@@ -1209,7 +1207,7 @@ namespace gip.bso.logistics
         /// <returns><c>true</c> if [is enabled check out]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledCheckOut()
         {
-            if (CurrentVisitorVoucher == null)
+            if (CurrentVisitorVoucher == null || VisitorVoucherManager == null)
                 return false;
             if (CurrentVisitorVoucher.MDVisitorVoucherState == null)
                 return false;
