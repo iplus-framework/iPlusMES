@@ -946,7 +946,7 @@ namespace gip2006.variobatch.processapplication
             ACChildInstanceInfo childInfo = new ACChildInstanceInfo(ParentACComponent);
             object[] miscParams = new object[] { childInfo, false };
 
-            ACMethod result = this.Session.ACUrlCommand("!ReadObject", acMethod, StateDBNo, StateDBOffset, miscParams) as ACMethod;
+            ACMethod result = this.Session.ACUrlCommand("!" + nameof(ACSession.ReadObject), acMethod, StateDBNo, StateDBOffset, null, miscParams) as ACMethod;
             if (result == null)
             {
                 msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "ReceiveACMethodResult()", Message = "ACMethod-Result was not received. Please check if connection is established." };
