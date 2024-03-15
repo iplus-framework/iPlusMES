@@ -45,7 +45,7 @@
                     </Grid.ColumnDefinitions>
 
                     <vb:VBStatusBarItem Grid.Column="0">
-                        <vb:VBButton x:Name="OpenRibbonBarButton" Click="OpenRibbonBar_Click" Height="50" Width="50" Visibility="Collapsed">
+                        <vb:VBButton x:Name="ToggleRibbonBarButton" Click="OpenRibbonBar_Click" Height="50" Width="50" Visibility="Collapsed">
                             <Viewbox Width="20" Height="20">
                                 <Path Data="M2,8 L10,18 L18,8 M16,8 L10,16 M4,8 L10,16" Stroke="White" StrokeThickness="4" />
                             </Viewbox>
@@ -61,7 +61,7 @@
                     </vb:VBStatusBarItem>
 
                     <vb:VBStatusBarItem Grid.Column="2">
-                        <vb:VBButton x:Name="FrameGoFowardButton" Click="FrameGoFoward_Click" Height="50" Width="50">
+                        <vb:VBButton x:Name="FrameGoForwardButton" Click="FrameGoForward_Click" Height="50" Width="50">
                             <Viewbox Width="20" Height="20">
                                 <Path Data="M13,2 L18,10 L13,18 M18,10 L2,10" Stroke="White" StrokeThickness="2" />
                             </Viewbox>
