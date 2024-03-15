@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using System.Transactions;
 using static gip.mes.datamodel.MDReservationMode;
 
 namespace gip.mes.facility
@@ -1504,227 +1505,230 @@ namespace gip.mes.facility
             // 1. Suche freie Silos, mit dem zu dosierenden Material + die Freigegeben sind + die keine gesperrte Chargen haben
             // soriert nach der ältesten eingelagerten Charge
             QrySilosResult facilityQuery = null;
-            if (poRelation != null)
-            {
-                if (filterTimeOlderThan.HasValue)
-                {
-                    if (poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
-                    {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        {
-                            facilityQuery = SilosFromPrevIntermediateTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                        else
-                        {
-                            if (FindSiloModes <= 0)
-                                facilityQuery = SilosFromLotsOfPrevStageTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                            else
-                                facilityQuery = SilosFromPrevStageTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                    }
-                    else
-                    {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        {
-                            facilityQuery = SilosWithIntermediateMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                        else
-                        {
-                            facilityQuery = SilosWithMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                    }
-                }
-                else
-                {
-                    if (poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
-                    {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        {
-                            facilityQuery = SilosFromPrevIntermediate(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                        else
-                        {
-                            if (FindSiloModes <= 0)
-                                facilityQuery = SilosFromLotsOfPrevStage(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                            else
-                                facilityQuery = SilosFromPrevStage(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                    }
-                    else
-                    {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        {
-                            facilityQuery = SilosWithIntermediateMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                        else
-                        {
-                            facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                        }
-                    }
-                }
-                ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
-            }
-            else
-            {
-                if (filterTimeOlderThan.HasValue)
-                {
-                    if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                    {
-                        facilityQuery = SilosWithIntermediateMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                    }
-                    else
-                    {
-                        facilityQuery = SilosWithMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                    }
-                }
-                else
-                {
-                    if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                    {
-                        facilityQuery = SilosWithIntermediateMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                    }
-                    else
-                    {
-                        facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
-                    }
-                }
-            }
 
-            if (onlyContainer)
+            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted}))
             {
-                if (searchMode != SearchMode.AllSilos)
-                    facilityQuery.ApplyBlockedQuantsFilter();
-            }
-            else
-                facilityQuery.ApplyFreeQuantsInBinFilter();
-
-            facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
-            if (facilityQuery.FilteredResult != null && facilityQuery.FilteredResult.Any())
-                return facilityQuery;
-
-            // 2. Suche nach Material das von einem anderen Auftrag produziert worden ist, wenn es keine Silos gibt
-            if (poRelation != null)
-            {
-                // Prüfe ob Entnahme von anderem Auftrag erlaubt
-                if (poRelation.SourceProdOrderPartslistPos.TakeMatFromOtherOrder
-                    && poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
+                if (poRelation != null)
                 {
                     if (filterTimeOlderThan.HasValue)
                     {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        if (poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
                         {
-                            facilityQuery = SilosWithIntermediateMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosFromPrevIntermediateTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                if (FindSiloModes <= 0)
+                                    facilityQuery = SilosFromLotsOfPrevStageTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                                else
+                                    facilityQuery = SilosFromPrevStageTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
                         }
                         else
                         {
-                            facilityQuery = SilosWithMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
                         }
                     }
                     else
                     {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        if (poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
                         {
-                            facilityQuery = SilosWithIntermediateMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosFromPrevIntermediate(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                if (FindSiloModes <= 0)
+                                    facilityQuery = SilosFromLotsOfPrevStage(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                                else
+                                    facilityQuery = SilosFromPrevStage(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
                         }
                         else
                         {
-                            facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
                         }
                     }
                     ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
-
-                    if (onlyContainer)
-                        facilityQuery.ApplyBlockedQuantsFilter();
+                }
+                else
+                {
+                    if (filterTimeOlderThan.HasValue)
+                    {
+                        if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        {
+                            facilityQuery = SilosWithIntermediateMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                        }
+                        else
+                        {
+                            facilityQuery = SilosWithMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                        }
+                    }
                     else
-                        facilityQuery.ApplyFreeQuantsInBinFilter();
-                    facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
-                    if (facilityQuery.FilteredResult == null || !facilityQuery.FilteredResult.Any())
-                        return facilityQuery;
+                    {
+                        if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        {
+                            facilityQuery = SilosWithIntermediateMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                        }
+                        else
+                        {
+                            facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                        }
+                    }
+                }
+
+                if (onlyContainer)
+                {
+                    if (searchMode != SearchMode.AllSilos)
+                        facilityQuery.ApplyBlockedQuantsFilter();
+                }
+                else
+                    facilityQuery.ApplyFreeQuantsInBinFilter();
+
+                facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                if (facilityQuery.FilteredResult != null && facilityQuery.FilteredResult.Any())
+                    return facilityQuery;
+
+                // 2. Suche nach Material das von einem anderen Auftrag produziert worden ist, wenn es keine Silos gibt
+                if (poRelation != null)
+                {
+                    // Prüfe ob Entnahme von anderem Auftrag erlaubt
+                    if (poRelation.SourceProdOrderPartslistPos.TakeMatFromOtherOrder
+                        && poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
+                    {
+                        if (filterTimeOlderThan.HasValue)
+                        {
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                        }
+                        else
+                        {
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
+                            }
+                        }
+                        ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
+
+                        if (onlyContainer)
+                            facilityQuery.ApplyBlockedQuantsFilter();
+                        else
+                            facilityQuery.ApplyFreeQuantsInBinFilter();
+                        facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                        if (facilityQuery.FilteredResult == null || !facilityQuery.FilteredResult.Any())
+                            return facilityQuery;
+                    }
+                    // Falls kein Alternativmaterial gepflegt, gebe leeres resultat zurück
+                    else if (!poRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
+                        return null;
                 }
                 // Falls kein Alternativmaterial gepflegt, gebe leeres resultat zurück
-                else if (!poRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
-                    return null;
-            }
-            // Falls kein Alternativmaterial gepflegt, gebe leeres resultat zurück
-            else if (!plRelation.SourcePartslistPos.PartslistPos_AlternativePartslistPos.Any())
-                    return null;
+                else if (!plRelation.SourcePartslistPos.PartslistPos_AlternativePartslistPos.Any())
+                        return null;
 
 
-            // 3. Suche nach alternativem Material
-            if (poRelation != null)
-            {
-                if (poRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
+                // 3. Suche nach alternativem Material
+                if (poRelation != null)
                 {
-                    if (filterTimeOlderThan.HasValue)
+                    if (poRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                     {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        if (filterTimeOlderThan.HasValue)
                         {
-                            facilityQuery = SilosWithIntermediateMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
                         }
                         else
                         {
-                            facilityQuery = SilosWithMaterialTime(dbApp, poRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (poRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        {
-                            facilityQuery = SilosWithIntermediateMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
-                        }
+                        ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
+
+                        if (onlyContainer)
+                            facilityQuery.ApplyBlockedQuantsFilter();
                         else
-                        {
-                            facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
-                        }
+                            facilityQuery.ApplyFreeQuantsInBinFilter();
+
+                        facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                        return facilityQuery;
                     }
-                    ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
-
-                    if (onlyContainer)
-                        facilityQuery.ApplyBlockedQuantsFilter();
-                    else
-                        facilityQuery.ApplyFreeQuantsInBinFilter();
-
-                    facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
-                    return facilityQuery;
                 }
-            }
-            else
-            {
-                if (plRelation.SourcePartslistPos.PartslistPos_AlternativePartslistPos.Any())
+                else
                 {
-                    if (filterTimeOlderThan.HasValue)
+                    if (plRelation.SourcePartslistPos.PartslistPos_AlternativePartslistPos.Any())
                     {
-                        if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        if (filterTimeOlderThan.HasValue)
                         {
-                            facilityQuery = SilosWithIntermediateMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
                         }
                         else
                         {
-                            facilityQuery = SilosWithMaterialTime(dbApp, plRelation, filterTimeOlderThan.Value, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            {
+                                facilityQuery = SilosWithIntermediateMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
+                            else
+                            {
+                                facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (plRelation.SourcePartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        {
-                            facilityQuery = SilosWithIntermediateMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
-                        }
-                        else
-                        {
-                            facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
-                        }
-                    }
-                    ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
+                        ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
 
-                    if (onlyContainer)
-                        facilityQuery.ApplyBlockedQuantsFilter();
-                    else
-                        facilityQuery.ApplyFreeQuantsInBinFilter();
-                    facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
-                    return facilityQuery;
-                }
+                        if (onlyContainer)
+                            facilityQuery.ApplyBlockedQuantsFilter();
+                        else
+                            facilityQuery.ApplyFreeQuantsInBinFilter();
+                        facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+                        return facilityQuery;
+                    }
+                }            
             }
-
             return facilityQuery == null ? new QrySilosResult() : facilityQuery;
         }
 

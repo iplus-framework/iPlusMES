@@ -2515,6 +2515,11 @@ namespace gip.bso.logistics
 
         protected override Msg OnPreSave()
         {
+            if (this.PickingManager != null)
+            {
+                this.PickingManager.ValidateOnSave(DatabaseApp, CurrentPicking);
+            }
+
             _ForwardPlan = null;
             if (ForwardToRemoteStores
                 && _VisitedPickings != null

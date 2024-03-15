@@ -1185,6 +1185,10 @@ namespace gip.mes.facility
         #endregion
 
         #region Validation
+        public virtual void ValidateOnSave(DatabaseApp dbApp, Picking picking)
+        {
+        }
+
         public virtual MsgWithDetails ValidateStart(DatabaseApp dbApp, Database dbiPlus,
             Picking picking, List<IACConfigStore> configStores,
             PARole.ValidationBehaviour validationBehaviour)
