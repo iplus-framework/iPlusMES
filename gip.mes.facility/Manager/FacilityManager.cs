@@ -1,14 +1,11 @@
+using gip.core.autocomponent;
+using gip.core.datamodel;
+using gip.core.reporthandler;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
 using System.Threading;
-using gip.core.datamodel;
-using gip.core.autocomponent;
-using gip.mes.datamodel;
-using gip.core.reporthandler;
-using System.Reflection;
 
 namespace gip.mes.facility
 {
@@ -1231,6 +1228,8 @@ namespace gip.mes.facility
                 }
                 else if (facilityReservationOwner is PickingPos)
                 {
+                    reservationModelBase.IsOnlyStockMovement = true;
+
                     reservationModelBase.TotalReservedQuantity =
                     databaseApp
                     .FacilityReservation
@@ -1282,7 +1281,14 @@ namespace gip.mes.facility
                     .DefaultIfEmpty()
                     .Sum();
 
-                reservationModelBase.FreeQuantity = reservationModelBase.FreeQuantity - reservationModelBase.TotalReservedQuantity + reservationModelBase.UsedQuantity + (calculateReservedQuantity ? model.AssignedQuantity : 0);
+                if(!reservationModelBase.IsOnlyStockMovement)
+                {
+                    reservationModelBase.FreeQuantity =
+                        reservationModelBase.FreeQuantity -
+                        reservationModelBase.TotalReservedQuantity +
+                        reservationModelBase.UsedQuantity +
+                        (calculateReservedQuantity ? model.AssignedQuantity : 0);
+                }
 
             }
             return reservationModelBase;

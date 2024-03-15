@@ -260,14 +260,14 @@ namespace gip.mes.facility
         {
             if (!IsEnabledAddFaciltiyReservation())
                 return;
-            ForReservationQuantityUOM = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
+            double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
             if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50604 Production component realise complete quantity!
                 // Produktionskomponente in kompletter Stückzahl realisieren!
                 Messages.Error(this, "Error50604");
             }
-            else if (IsNegligibleQuantity(TargetQuantityUOM, ForReservationQuantityUOM, Const_ZeroQuantityCheckFactor))
+            else if (IsNegligibleQuantity(TargetQuantityUOM, missingQuantity, Const_ZeroQuantityCheckFactor))
             {
                 // Error50601 Sufficient quantity has already been reserved
                 // Es ist bereits eine ausreichende Menge reserviert
@@ -275,6 +275,7 @@ namespace gip.mes.facility
             }
             else
             {
+                ForReservationQuantityUOM = NeededQuantityUOM;
                 BackgroundWorker.RunWorkerAsync(nameof(AddFaciltiyReservation));
                 ShowDialog(this, DesignNameProgressBar);
             }
@@ -331,7 +332,8 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    LoadFacilityReservationList(null);
+                    List<FacilityReservationModel> facilityReservationModels = GetFacilityReservationList();
+                    LoadFacilityReservationList(facilityReservationModels);
                 }
             }
             else
@@ -342,22 +344,8 @@ namespace gip.mes.facility
             }
         }
 
-        private void LoadFacilityReservationModelQuantity(FacilityReservationModelBase facilityReservationModelBase)
-        {
-            SelectedFacilityReservation.CopyFrom(facilityReservationModelBase);
-            OnPropertyChanged(nameof(SelectedFacilityReservation));
-            if (SelectedFacilityReservation.FreeQuantityNegative)
-            {
-                Root.Messages.Warning(this, "Warning50069", false, SelectedFacilityReservation.FacilityLot.LotNo);
-            }
-        }
-
         private void LoadFacilityReservationList(List<FacilityReservationModel> reservationModels)
         {
-            if (reservationModels == null)
-            {
-                reservationModels = GetFacilityReservationList();
-            }
             _FacilityReservationList = reservationModels;
             OnPropertyChanged(nameof(FacilityReservationList));
             SelectedFacilityReservation = _FacilityReservationList.FirstOrDefault();
@@ -508,10 +496,14 @@ namespace gip.mes.facility
                 }
                 else
                 {
+
+                    List<FacilityReservationModel> notSelectedModels = FacilityLotList.Where(c => !c.IsSelected && c.FacilityReservation != null).ToList();
+
                     List<FacilityReservationModel> inputModels =
                         FacilityLotList
                         .Where(c =>
                             c.IsSelected
+                            && c.FacilityReservation == null
                             && !IsNegligibleQuantity(TargetQuantityUOM, c.AssignedQuantity, Const_ZeroQuantityCheckFactor)
                             )
                         .ToList();
@@ -524,16 +516,25 @@ namespace gip.mes.facility
                         outputModels.Add(facilityReservationModel);
                     }
 
-                    if (outputModels.Any())
+                    if (_FacilityReservationList == null)
                     {
-                        if (_FacilityReservationList == null)
-                        {
-                            _FacilityReservationList = new List<FacilityReservationModel>();
-                        }
-                        _FacilityReservationList.AddRange(outputModels);
-                        OnPropertyChanged(nameof(FacilityReservationList));
-
+                        _FacilityReservationList = new List<FacilityReservationModel>();
                     }
+
+                    if (notSelectedModels.Any())
+                    {
+                        foreach (FacilityReservationModel forRemove in notSelectedModels)
+                        {
+                            _FacilityReservationList.Remove(forRemove);
+                            forRemove.FacilityReservation.DeleteACObject(DatabaseApp,false);
+                        }
+                    }
+
+                    _FacilityReservationList.AddRange(outputModels);
+                    _FacilityReservationList = _FacilityReservationList.OrderBy(c => c.FacilityLot.LotNo).ToList();
+
+                    OnPropertyChanged(nameof(FacilityReservationList));
+
                     SelectedFacilityLot = null;
                     _FacilityLotList = null;
                     CloseTopDialog();
@@ -607,7 +608,7 @@ namespace gip.mes.facility
             return chargeDate;
         }
 
-        private List<FacilityReservationModel> LoadFacilityLotList(DatabaseApp databaseApp, Material material, string[] reservedLotNos)
+        private List<FacilityReservationModel> LoadFacilityLotList(DatabaseApp databaseApp, Material material, List<FacilityReservationModel> externalReservationList)
         {
             List<FacilityReservationModel> facilityReservations = new List<FacilityReservationModel>();
 
@@ -619,61 +620,78 @@ namespace gip.mes.facility
 
             foreach (FacilityCharge facilityCharge in facilityCharges)
             {
-                bool notReserved = FacilityReservationList == null || !FacilityReservationList.Any(c => c.FacilityLot.LotNo == facilityCharge.FacilityLot.LotNo);
-                if (notReserved)
+                FacilityReservationModel facilityReservation = facilityReservations.Where(c => c.FacilityLot.LotNo == facilityCharge.FacilityLot.LotNo).FirstOrDefault();
+
+                if (facilityReservation == null && externalReservationList != null)
                 {
-                    FacilityReservationModel facilityReservation = facilityReservations.Where(c => c.FacilityLot.LotNo == facilityCharge.FacilityLot.LotNo).FirstOrDefault();
-                    if (facilityReservation == null)
+                    FacilityReservationModel tempFacilityReservation = externalReservationList.Where(c => c.FacilityLot.LotNo == facilityCharge.FacilityLot.LotNo).FirstOrDefault();
+                    if (tempFacilityReservation != null && tempFacilityReservation.FreeQuantity > 0)
                     {
-                        facilityReservation = ACFacilityManager.GetFacilityReservationModel(material, facilityCharge.FacilityLot);
+                        facilityReservation = tempFacilityReservation;
                         facilityReservations.Add(facilityReservation);
                     }
+                }
 
-                    // Charge date
-                    DateTime? chargeDate = GetFacilityChargeDate(facilityCharge);
-                    if (chargeDate != null)
-                    {
-                        if (facilityReservation.OldestFacilityChargeDate == null || facilityReservation.OldestFacilityChargeDate.Value > chargeDate.Value)
-                        {
-                            facilityReservation.OldestFacilityChargeDate = chargeDate;
-                        }
-                    }
+                if (facilityReservation == null)
+                {
+                    facilityReservation = ACFacilityManager.GetFacilityReservationModel(material, facilityCharge.FacilityLot);
+                    facilityReservations.Add(facilityReservation);
+                }
 
-                    // FacilityNo list
-                    if (facilityReservation.FacilityNoList == null)
+                // Charge date
+                DateTime? chargeDate = GetFacilityChargeDate(facilityCharge);
+                if (chargeDate != null)
+                {
+                    if (facilityReservation.OldestFacilityChargeDate == null || facilityReservation.OldestFacilityChargeDate.Value > chargeDate.Value)
                     {
-                        facilityReservation.FacilityNoList = new List<string>();
+                        facilityReservation.OldestFacilityChargeDate = chargeDate;
                     }
-                    if (!facilityReservation.FacilityNoList.Contains(facilityCharge.Facility.FacilityNo))
-                    {
-                        facilityReservation.FacilityNoList.Add(facilityCharge.Facility.FacilityNo);
-                    }
+                }
+
+                // FacilityNo list
+                if (facilityReservation.FacilityNoList == null)
+                {
+                    facilityReservation.FacilityNoList = new List<string>();
+                }
+                if (!facilityReservation.FacilityNoList.Contains(facilityCharge.Facility.FacilityNo))
+                {
+                    facilityReservation.FacilityNoList.Add(facilityCharge.Facility.FacilityNo);
                 }
             }
 
+
             foreach (FacilityReservationModel facilityReservation in facilityReservations)
             {
-                // Calculate values
-                FacilityReservationModelBase modelBase = ACFacilityManager.CalcFacilityReservationModelQuantity(databaseApp, FacilityReservationOwner, facilityReservation, false);
-                facilityReservation.CopyFrom(modelBase);
-
-                // save original values
-                facilityReservation.OriginalValues = new Dictionary<string, double>
+                if (facilityReservation.FacilityReservation == null)
                 {
-                    { nameof(FacilityReservationModel.TotalReservedQuantity), facilityReservation.TotalReservedQuantity },
-                    { nameof(FacilityReservationModel.UsedQuantity), facilityReservation.UsedQuantity },
-                    { nameof(FacilityReservationModel.FreeQuantity), facilityReservation.FreeQuantity }
-                };
+                    // Calculate values  
+                    FacilityReservationModelBase modelBase = ACFacilityManager.CalcFacilityReservationModelQuantity(databaseApp, FacilityReservationOwner, facilityReservation, false);
+                    facilityReservation.CopyFrom(modelBase);
+
+
+                    // save original values
+                    facilityReservation.OriginalValues = new Dictionary<string, double>
+                    {
+                        { nameof(FacilityReservationModel.TotalReservedQuantity), facilityReservation.TotalReservedQuantity },
+                        { nameof(FacilityReservationModel.UsedQuantity), facilityReservation.UsedQuantity },
+                        { nameof(FacilityReservationModel.FreeQuantity), facilityReservation.FreeQuantity }
+                    };
+                }
+                else
+                {
+                    facilityReservation.SetSelected(true);
+                }
             }
 
-            facilityReservations = DoDistributeQuantity(facilityReservations, ForReservationQuantityUOM);
-
+            double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
+            List<FacilityReservationModel> frForDistribution = facilityReservations.Where(c => c.FacilityReservation == null).ToList();
+            DoDistributeQuantity(frForDistribution, missingQuantity, false);
             EditorReserverdQuantity = facilityReservations.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
 
             return facilityReservations;
         }
 
-        public List<FacilityReservationModel> DoDistributeQuantity(List<FacilityReservationModel> facilityReservations, double quantity, bool clearOldQuantity = false)
+        public List<FacilityReservationModel> DoDistributeQuantity(List<FacilityReservationModel> facilityReservations, double quantity, bool clearOldQuantity)
         {
             if (clearOldQuantity)
             {
@@ -700,6 +718,7 @@ namespace gip.mes.facility
                     }
                 }
             }
+
             facilityReservations =
                 facilityReservations
                 .OrderBy(c => c.OldestFacilityChargeDate)
@@ -718,14 +737,20 @@ namespace gip.mes.facility
                     {
                         facilityReservation._AssignedQuantity = facilityReservation.FreeQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.AssignedQuantity;
-                        facilityReservation.FreeQuantity = 0;
+                        if(!facilityReservation.IsOnlyStockMovement)
+                        {
+                            facilityReservation.FreeQuantity = 0;
+                        }
                         restQuantity -= facilityReservation.AssignedQuantity;
                     }
                     else
                     {
                         facilityReservation._AssignedQuantity = restQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.AssignedQuantity;
-                        facilityReservation.FreeQuantity -= restQuantity;
+                        if(!facilityReservation.IsOnlyStockMovement)
+                        {
+                            facilityReservation.FreeQuantity -= restQuantity;
+                        }
                         restQuantity = 0;
                     }
                     facilityReservation.IsSelected = true;
@@ -738,6 +763,7 @@ namespace gip.mes.facility
         {
             foreach (FacilityReservationModel facilityReservationModel in facilityReservationModels)
             {
+                facilityReservationModel.PropertyChanged -= FacilityReservationModel_PropertyChanged;
                 facilityReservationModel.PropertyChanged += FacilityReservationModel_PropertyChanged;
             }
 
@@ -778,12 +804,7 @@ namespace gip.mes.facility
                     e.Result = GetFacilityReservationList();
                     break;
                 case nameof(AddFaciltiyReservation):
-                    string[] reservedLotNos = new string[] { };
-                    if (FacilityReservationList != null)
-                    {
-                        reservedLotNos = FacilityReservationList.Select(c => c.FacilityLot.LotNo).ToArray();
-                    }
-                    e.Result = LoadFacilityLotList(DatabaseApp, Material, reservedLotNos);
+                    e.Result = LoadFacilityLotList(DatabaseApp, Material, FacilityReservationList);
                     break;
             }
         }

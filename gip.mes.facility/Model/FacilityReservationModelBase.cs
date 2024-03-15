@@ -8,7 +8,11 @@ namespace gip.mes.facility
     [ACClassInfo(Const.PackName_VarioFacility, "en{'FacilityReservationModelBase'}de{'FacilityReservationModelBase'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class FacilityReservationModelBase : INotifyPropertyChanged
     {
-        private bool _IsSelected;
+
+        #region Properties
+
+
+        protected bool _IsSelected;
         [ACPropertyInfo(1, "IsSelected", ConstApp.Select)]
         public bool IsSelected
         {
@@ -18,7 +22,7 @@ namespace gip.mes.facility
             }
             set
             {
-                if(_IsSelected != value)
+                if (_IsSelected != value)
                 {
                     _IsSelected = value;
                     OnPropertyChanged(nameof(IsSelected));
@@ -81,6 +85,10 @@ namespace gip.mes.facility
             }
         }
 
+        #endregion
+
+        #region Additional properties
+
         public Dictionary<string, double> OriginalValues { get; set; }
 
         public bool FreeQuantityNegative
@@ -90,6 +98,10 @@ namespace gip.mes.facility
                 return FreeQuantity < 0;
             }
         }
+
+        public bool IsOnlyStockMovement { get; set; }
+
+        #endregion
 
         #region INotifyPropertyChanged
 
@@ -102,6 +114,15 @@ namespace gip.mes.facility
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        #endregion
+
+        #region Methods
+        public void SetSelected(bool value)
+        {
+            _IsSelected = value;
+        }
+
         #endregion
     }
 }

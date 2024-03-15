@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.core.processapplication;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,10 @@ namespace gip.mes.facility
                 if (_AssignedQuantity != value)
                 {
                     double difference = value - _AssignedQuantity;
-                    FreeQuantity = FreeQuantity - difference;
+                    if(!IsOnlyStockMovement)
+                    {
+                        FreeQuantity = FreeQuantity - difference;
+                    }
                     TotalReservedQuantity = TotalReservedQuantity + difference;
                     _AssignedQuantity = value;
                     if (FacilityReservation != null)
@@ -104,18 +108,26 @@ namespace gip.mes.facility
 
         #endregion
 
-        public void CopyFrom(FacilityReservationModelBase model)
-        {
-            TotalReservedQuantity = model.TotalReservedQuantity;
-            UsedQuantity = model.UsedQuantity;
-            FreeQuantity = model.FreeQuantity;
-            IsRecalculated = true;
-        }
+        #region Additional members
 
         public FacilityReservation FacilityReservation { get; set; }
 
         [ACPropertyInfo(6, "", "en{'Oldest charge date'}de{'Ältestes Quant-Datum'}")]
         public DateTime? OldestFacilityChargeDate { get; set; }
 
+        #endregion
+
+        #region Methods
+
+        public void CopyFrom(FacilityReservationModelBase model)
+        {
+            TotalReservedQuantity = model.TotalReservedQuantity;
+            UsedQuantity = model.UsedQuantity;
+            FreeQuantity = model.FreeQuantity;
+            IsRecalculated = true;
+            IsOnlyStockMovement = model.IsOnlyStockMovement;
+        }
+
+        #endregion
     }
 }
