@@ -169,16 +169,8 @@ namespace gip2006.variobatch.processapplication
         protected void WriteAlarm(object miscParams, string message)
         {
             bool written = false;
-            ACChildInstanceInfo childInfo = null;
-            IACComponent invokerModule = null;
-            if (miscParams != null)
-            {
-                childInfo = miscParams as ACChildInstanceInfo;
-                if (childInfo != null)
-                {
-                    invokerModule = ACUrlCommand(childInfo.ACUrlParent) as IACComponent;
-                }
-            }
+
+            (ACChildInstanceInfo childInfo, IACComponent invokerModule) = GetSendParameters(miscParams);
 
             if (invokerModule != null)
             {

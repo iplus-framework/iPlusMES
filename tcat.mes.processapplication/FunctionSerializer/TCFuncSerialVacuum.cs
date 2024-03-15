@@ -64,7 +64,7 @@ namespace tcat.mes.processapplication
                 return false;
 
             ACMethod request = complexObj as ACMethod;
-            ACChildInstanceInfo instanceInfo = miscParams as ACChildInstanceInfo;
+            (ACChildInstanceInfo instanceInfo, IACComponent invokerModule) = GetSendParameters(miscParams, false);
 
             if (request == null && instanceInfo == null)
                 return false;
