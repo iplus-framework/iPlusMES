@@ -238,7 +238,8 @@ namespace gip.mes.client.mobile
                         {
                             Title.Text = null;
                             VBFrameController.ClearContent();
-                            OpenRibbonBarButton.Visibility = Visibility.Collapsed;
+                            VBFrameController.CloseVBRibbon(RibbonBarGridMobile);
+                            ToggleRibbonBarButton.Visibility = Visibility.Collapsed;
                             break;
                         }
                         else
@@ -254,17 +255,18 @@ namespace gip.mes.client.mobile
                     if (VBFrameController.Content != null)
                     {
                         Title.Text = null;
-                        OpenRibbonBarButton.Visibility = Visibility.Collapsed;
+                        ToggleRibbonBarButton.Visibility = Visibility.Collapsed;
                         VBFrameController.ClearContent();
-                        VBFrameController.RemoveVBRibbon(RibbonBarGridMobile);
                     }
                     if (RibbonBarGridMobile.Visibility == Visibility.Visible)
-                        ToggleVBRibbon();
+                    {
+                        VBFrameController.CloseVBRibbon(RibbonBarGridMobile);
+                    }
                 }
             }
         }
 
-        private void FrameGoFoward_Click(object sender, RoutedEventArgs e)
+        private void FrameGoForward_Click(object sender, RoutedEventArgs e)
         {
             if (VBFrameController.CanGoForward)
             {
@@ -416,7 +418,7 @@ namespace gip.mes.client.mobile
             if ((_RootVBDesign.Content == null) || !(_RootVBDesign.Content is VBFrameController))
             {
                 _RootVBDesign.Content = new VBFrameController();
-                VBFrameController.Name = "MainFrameController";
+                VBFrameController.Name = "VBFrameController";
             }
             //DockingManager.IsBSOManager = true;
             //DockingManager.InitBusinessobjectsAtStartup();
@@ -460,19 +462,17 @@ namespace gip.mes.client.mobile
         {
             if (RibbonBarGridMobile.Visibility == Visibility.Collapsed)
             {
-                VBFrameController.ShowVBRibbon(RibbonBarGridMobile);
-                RibbonBarGridMobile.Visibility = Visibility.Visible;
+                VBFrameController.ShowVBRibbon(RibbonBarGridMobile, ToggleRibbonBarButton);
             }
             else if (RibbonBarGridMobile.Visibility == Visibility.Visible)
             {
-                VBFrameController.RemoveVBRibbon(RibbonBarGridMobile);
-                RibbonBarGridMobile.Visibility = Visibility.Collapsed;
+                VBFrameController.HideVBRibbon(RibbonBarGridMobile);
             }
         }
 
         public void StartBusinessobjectByACCommand(ACCommand acCommand)
         {
-            OpenRibbonBarButton.Visibility = Visibility.Visible;
+            ToggleRibbonBarButton.Visibility = Visibility.Visible;
             bool ribbonVisibilityOff = false;
             string caption = "";
             string title = "";

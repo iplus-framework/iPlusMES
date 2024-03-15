@@ -295,6 +295,7 @@ namespace gip.mes.client.mobile
             _Keyword = TextboxKey.Text;
             label3.Visibility = System.Windows.Visibility.Hidden;
             TextboxKey.Visibility = System.Windows.Visibility.Hidden;
+            ControlManager.TouchScreenMode = true;
 
             Monitor.Exit(_WaitOnOkClick);
         }
