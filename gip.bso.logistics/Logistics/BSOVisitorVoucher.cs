@@ -121,6 +121,7 @@ namespace gip.bso.logistics
             }
             if (_AccessUnAssignedPicking != null)
             {
+                _AccessUnAssignedPicking.NavSearchExecuting -= _Picking_NavSearchExecuting;
                 _AccessUnAssignedPicking.ACDeInit(false);
                 _AccessUnAssignedPicking = null;
             }
@@ -1405,6 +1406,42 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledRegisterWeight):
                     result = IsEnabledRegisterWeight();
+                    return true;
+                case nameof(NavigateToAPicking):
+                    NavigateToAPicking();
+                    return true;
+                case nameof(IsEnabledNavigateToAPicking):
+                    result = IsEnabledNavigateToAPicking();
+                    return true;
+                case nameof(NavigateToUPicking):
+                    NavigateToUPicking();
+                    return true;
+                case nameof(IsEnabledNavigateToUPicking):
+                    result = IsEnabledNavigateToUPicking();
+                    return true;
+                case nameof(NavigateToADeliveryNote):
+                    NavigateToADeliveryNote();
+                    return true;
+                case nameof(IsEnabledNavigateToADeliveryNote):
+                    result = IsEnabledNavigateToADeliveryNote();
+                    return true;
+                case nameof(NavigateToUDeliveryNote):
+                    NavigateToUDeliveryNote();
+                    return true;
+                case nameof(IsEnabledNavigateToUDeliveryNote):
+                    result = IsEnabledNavigateToUDeliveryNote();
+                    return true;
+                case nameof(NavigateToATourplan):
+                    NavigateToATourplan();
+                    return true;
+                case nameof(IsEnabledNavigateToATourplan):
+                    result = IsEnabledNavigateToATourplan();
+                    return true;
+                case nameof(NavigateToUTourplan):
+                    NavigateToUTourplan();
+                    return true;
+                case nameof(IsEnabledNavigateToUTourplan):
+                    result = IsEnabledNavigateToUTourplan();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

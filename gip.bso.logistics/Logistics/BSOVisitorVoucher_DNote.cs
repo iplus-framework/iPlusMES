@@ -313,6 +313,50 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Navigation
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Show Deliverynote'}de{'Lieferschein anzeigen'}", 622, false, "SelectedDeliveryNote")]
+        public void NavigateToADeliveryNote()
+        {
+            if (!IsEnabledNavigateToADeliveryNote())
+                return;
+            NavigateToDeliveryNote(SelectedDeliveryNote);
+        }
+
+        public bool IsEnabledNavigateToADeliveryNote()
+        {
+            return SelectedDeliveryNote != null;
+        }
+
+        [ACMethodInteraction("UnAssignedDeliveryNote", "en{'Show Deliverynote'}de{'Lieferschein anzeigen'}", 623, false, "SelectedUnAssignedDeliveryNote")]
+        public void NavigateToUDeliveryNote()
+        {
+            if (!IsEnabledNavigateToUDeliveryNote())
+                return;
+            NavigateToDeliveryNote(SelectedUnAssignedDeliveryNote);
+        }
+
+        public bool IsEnabledNavigateToUDeliveryNote()
+        {
+            return SelectedUnAssignedPicking != null;
+        }
+
+        private void NavigateToDeliveryNote(DeliveryNote deliveryNote)
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = deliveryNote.DeliveryNoteID,
+                    EntityName = DeliveryNote.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+        #endregion
+
         #endregion
     }
 }

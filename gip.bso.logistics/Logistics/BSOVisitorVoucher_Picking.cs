@@ -21,6 +21,7 @@ using gip.mes.autocomponent;
 using gip.bso.sales;
 using gip.bso.purchasing;
 using gip.mes.facility;
+using System.Data.Objects;
 
 namespace gip.bso.logistics
 {
@@ -143,11 +144,22 @@ namespace gip.bso.logistics
                     //    navACQueryDefinition.SaveConfig(true);
                     //}
                     _AccessUnAssignedPicking = navACQueryDefinition.NewAccessNav<Picking>("UnAssignedPicking", this);
+                    _AccessUnAssignedPicking.NavSearchExecuting += _Picking_NavSearchExecuting;
                     _AccessUnAssignedPicking.AutoSaveOnNavigation = false;
                     _AccessUnAssignedPicking.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessUnAssignedPicking_DefaultFilter, AccessUnAssignedPicking_DefaultSort);
                 }
                 return _AccessUnAssignedPicking;
             }
+        }
+
+        private IQueryable<Picking> _Picking_NavSearchExecuting(IQueryable<Picking> result)
+        {
+            ObjectQuery<Picking> query = result as ObjectQuery<Picking>;
+            if (query != null)
+            {
+                query.Include(c => c.DeliveryCompanyAddress.Company).Include(c => c.MDPickingType);
+            }
+            return query;
         }
 
         protected virtual List<ACFilterItem> AccessUnAssignedPicking_DefaultFilter
@@ -341,6 +353,50 @@ namespace gip.bso.logistics
             OnPropertyChanged("UnAssignedPickingList");
         }
 
+        #endregion
+
+        #region Navigation
+        [ACMethodInteraction("Picking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 632, false, "SelectedPicking")]
+        public void NavigateToAPicking()
+        {
+            if (!IsEnabledNavigateToAPicking())
+                return; 
+            NavigateToPicking(SelectedPicking);
+        }
+
+        public bool IsEnabledNavigateToAPicking()
+        {
+            return SelectedPicking != null;
+        }
+
+        [ACMethodInteraction("UnAssignedPicking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 633, false, "SelectedUnAssignedPicking")]
+        public void NavigateToUPicking()
+        {
+            if (!IsEnabledNavigateToUPicking())
+                return;
+            NavigateToPicking(SelectedUnAssignedPicking);
+        }
+
+        public bool IsEnabledNavigateToUPicking()
+        {
+            return SelectedUnAssignedPicking != null;
+        }
+
+        private void NavigateToPicking(Picking picking)
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = picking.PickingID,
+                    EntityName = Picking.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
         #endregion
 
         #endregion

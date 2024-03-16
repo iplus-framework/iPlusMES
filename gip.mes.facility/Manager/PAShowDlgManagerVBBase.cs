@@ -481,12 +481,18 @@ namespace gip.mes.facility
                     return;
                 }
                 // Lieferschein WE/WA
-                else if (orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).Any())
+                else if (orderInfo.Entities.Where(c => c.EntityName == DeliveryNote.ClassName 
+                                                    || c.EntityName == DeliveryNotePos.ClassName).Any())
                 {
                     var notePosEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).FirstOrDefault();
+                    var noteEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNote.ClassName).FirstOrDefault();
                     using (DatabaseApp dbApp = new DatabaseApp())
                     {
-                        DeliveryNotePos dnPos = dbApp.DeliveryNotePos.Where(c => c.DeliveryNotePosID == notePosEntry.EntityID).FirstOrDefault();
+                        DeliveryNotePos dnPos = null;
+                        if (notePosEntry == null && noteEntry != null)
+                            dnPos = dbApp.DeliveryNotePos.Where(c => c.DeliveryNoteID == noteEntry.EntityID).FirstOrDefault();
+                        else
+                            dnPos = dbApp.DeliveryNotePos.Where(c => c.DeliveryNotePosID == notePosEntry.EntityID).FirstOrDefault();
                         if (dnPos != null)
                         {
                             if (dnPos.InOrderPosID.HasValue)

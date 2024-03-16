@@ -315,6 +315,50 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Navigation
+        [ACMethodInteraction(Tourplan.ClassName, "en{'Show Tourplan'}de{'Lieferschein anzeigen'}", 642, false, "SelectedTourplan")]
+        public void NavigateToATourplan()
+        {
+            if (!IsEnabledNavigateToATourplan())
+                return; 
+            NavigateToTourplan(SelectedTourplan);
+        }
+
+        public bool IsEnabledNavigateToATourplan()
+        {
+            return SelectedTourplan != null;
+        }
+
+        [ACMethodInteraction("UnAssignedTourplan", "en{'Show Tourplan'}de{'Lieferschein anzeigen'}", 643, false, "SelectedUnAssignedTourplan")]
+        public void NavigateToUTourplan()
+        {
+            if (!IsEnabledNavigateToUTourplan())
+                return; 
+            NavigateToTourplan(SelectedUnAssignedTourplan);
+        }
+
+        public bool IsEnabledNavigateToUTourplan()
+        {
+            return SelectedUnAssignedPicking != null;
+        }
+
+        private void NavigateToTourplan(Tourplan Tourplan)
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = Tourplan.TourplanID,
+                    EntityName = Tourplan.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+        #endregion
+
         #endregion
     }
 }

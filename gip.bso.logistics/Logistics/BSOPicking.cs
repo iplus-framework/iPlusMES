@@ -4369,6 +4369,33 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Navigation
+
+        [ACMethodInteraction("Picking", "en{'Show Visitor voucher'}de{'Besucherbeleg anzeigen'}", 633, false, "SelectedPicking")]
+        public void NavigateToVisitorVoucher()
+        {
+            if (!IsEnabledNavigateToVisitorVoucher())
+                return;
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedPicking.VisitorVoucher.VisitorVoucherID,
+                    EntityName = VisitorVoucher.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToVisitorVoucher()
+        {
+            return SelectedPicking != null && SelectedPicking.VisitorVoucher != null;
+        }
+
+        #endregion
 
         #endregion
 
@@ -4657,6 +4684,12 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledCreateNewLabOrder):
                     result = IsEnabledCreateNewLabOrder();
+                    return true;
+                case nameof(NavigateToVisitorVoucher):
+                    NavigateToVisitorVoucher();
+                    return true;
+                case nameof(IsEnabledNavigateToVisitorVoucher):
+                    result = IsEnabledNavigateToVisitorVoucher();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
