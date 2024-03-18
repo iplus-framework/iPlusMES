@@ -1170,8 +1170,9 @@ namespace gip.bso.facility
                         // Option select charge for Material->IsLotReservationNeeded
                         List<FacilityCharge> lotsForReservation = null;
                         if (
-                                booking.OutwardMaterial != null
-                                && booking.OutwardMaterial.IsLotReservationNeeded
+                                booking.OutwardFacility != null
+                                && booking.OutwardFacility.Material != null
+                                && booking.OutwardFacility.Material.IsLotReservationNeeded
                                 && FacilityChargeList != null
                                 && FacilityChargeList.Any()
                             )
