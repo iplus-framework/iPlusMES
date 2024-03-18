@@ -109,7 +109,7 @@ namespace gip.mes.facility
                                     .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.Material")
                                     .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.FacilityStock_Facility")
                                     .Where(c => (mdSchedulingGroupID == null || (c.VBiACClassWF != null && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty))))
-                                            && (   c.PickingStateIndex >= greaterEqualState
+                                            && (c.PickingStateIndex >= greaterEqualState
                                                 || c.PickingStateIndex <= lessEqualState)
                                             && (string.IsNullOrEmpty(pickingNo) || c.PickingNo.Contains(pickingNo))
                                             && (
@@ -735,7 +735,7 @@ namespace gip.mes.facility
 
             MsgWithDetails msgDet = new MsgWithDetails();
 
-            foreach(DeliveryNotePos dnPos in deliveryNote.DeliveryNotePos_DeliveryNote)
+            foreach (DeliveryNotePos dnPos in deliveryNote.DeliveryNotePos_DeliveryNote)
             {
                 InOrderPos pickingInOrderPos = dnPos.InOrderPos.InOrderPos_ParentInOrderPos.FirstOrDefault();
                 if (pickingInOrderPos != null)
@@ -1070,7 +1070,7 @@ namespace gip.mes.facility
 
         #region Booking
 
-        public MsgWithDetails CreateNewPicking(ACMethodBooking relocationBooking, gip.core.datamodel.ACClassMethod aCClassMethod, DatabaseApp dbApp, Database dbIPlus, bool setReadyToLoad, out Picking picking)
+        public MsgWithDetails CreateNewPicking(ACMethodBooking relocationBooking, gip.core.datamodel.ACClassMethod aCClassMethod, DatabaseApp dbApp, Database dbIPlus, bool setReadyToLoad, out Picking picking, List<FacilityCharge> lotsForReservation = null)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             Msg msg;
@@ -1117,11 +1117,10 @@ namespace gip.mes.facility
 
             if (pickingPos.Material.IsLotReservationNeeded)
             {
-                List<FacilityCharge> lotsForReservation = new List<FacilityCharge>();
-                if (relocationBooking.OutwardFacilityCharge != null && relocationBooking.OutwardFacilityCharge.FacilityLot != null)
-                    lotsForReservation.Add(relocationBooking.OutwardFacilityCharge);
-                else if (relocationBooking.OutwardFacility != null)
-                    lotsForReservation = dbApp.FacilityCharge.Include(c => c.FacilityLot).Where(c => c.FacilityID == relocationBooking.OutwardFacility.FacilityID && !c.NotAvailable).ToList();
+                if (lotsForReservation == null)
+                {
+                    lotsForReservation = GetDefaultLotsForReservation(dbApp, relocationBooking);
+                }
                 if (lotsForReservation.Any())
                 {
                     foreach (var flGroup in lotsForReservation.GroupBy(c => c.FacilityLot))
@@ -1140,6 +1139,17 @@ namespace gip.mes.facility
             msgWithDetails = dbApp.ACSaveChanges();
             return msgWithDetails;
         }
+
+        private List<FacilityCharge> GetDefaultLotsForReservation(DatabaseApp dbApp, ACMethodBooking relocationBooking)
+        {
+            List<FacilityCharge> lotsForReservation = new List<FacilityCharge>();
+            if (relocationBooking.OutwardFacilityCharge != null && relocationBooking.OutwardFacilityCharge.FacilityLot != null)
+                lotsForReservation.Add(relocationBooking.OutwardFacilityCharge);
+            else if (relocationBooking.OutwardFacility != null)
+                lotsForReservation = dbApp.FacilityCharge.Include(c => c.FacilityLot).Where(c => c.FacilityID == relocationBooking.OutwardFacility.FacilityID && !c.NotAvailable).ToList();
+            return lotsForReservation;
+        }
+
 
         public Msg GetActivatedFacilityChargeForBooking(DatabaseApp dbApp, PickingPos pPos, MaterialConfig[] materialConfigs, out FacilityCharge fc)
         {
@@ -1726,11 +1736,11 @@ namespace gip.mes.facility
                     if (picking.MDPickingType != null && picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.InternalRelocation)
                     {
                         IEnumerable<FacilityCharge> facilityCharges = pPos.FacilityBooking_PickingPos.SelectMany(f => f.FacilityBookingCharge_FacilityBooking)
-                                                                          .Where(x => x.InwardFacilityCharge != null 
+                                                                          .Where(x => x.InwardFacilityCharge != null
                                                                                    && x.InwardFacility != null
                                                                                    && x.InwardFacility.PostingBehaviourIndex == (short)PostingBehaviourEnum.BlockOnRelocation)
                                                                           .Select(c => c.InwardFacilityCharge)
-                                                                          .Where(fc => fc.MDReleaseState != null && 
+                                                                          .Where(fc => fc.MDReleaseState != null &&
                                                                                        fc.MDReleaseState.MDReleaseStateIndex != (short)MDReleaseState.ReleaseStates.Free);
 
                         foreach (FacilityCharge fc in facilityCharges)
@@ -1875,7 +1885,7 @@ namespace gip.mes.facility
                     separatePickingForEachPos = false;
             }
 
-            MDPickingType pickingType =  databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
+            MDPickingType pickingType = databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
             MDDelivPosLoadState loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(databaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
 
             List<Picking> mirroredPickings = new List<Picking>();
@@ -2128,7 +2138,7 @@ namespace gip.mes.facility
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
-                                                                && (   (material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
+                                                                && ((material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
                                                                     || (c.MaterialID == material.MaterialID)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                 && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
@@ -2138,7 +2148,7 @@ namespace gip.mes.facility
                                                           || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
-                                               //.Select(c => c.Facility)
+        //.Select(c => c.Facility)
         );
 
         /// <summary>
@@ -2156,7 +2166,7 @@ namespace gip.mes.facility
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
-                                                                && (   (material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
+                                                                && ((material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
                                                                     || (c.MaterialID == material.MaterialID)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
                                                                 && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
@@ -2167,7 +2177,7 @@ namespace gip.mes.facility
                                                       && ((c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
                                                           || (c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)))
                                                .OrderBy(c => c.FillingDate)
-                                               //.Select(c => c.Facility)
+        //.Select(c => c.Facility)
         );
 
 
@@ -2308,7 +2318,7 @@ namespace gip.mes.facility
                                         && unselFacility.Material != null
                                         && (
                                                 pickingPos.Material != null
-                                            && (   (unselFacility.MaterialID == pickingPos.Material.MaterialID)
+                                            && ((unselFacility.MaterialID == pickingPos.Material.MaterialID)
                                                 || (pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID.Value == unselFacility.MaterialID))
                                          );
                                 if (showSameMaterialCells && !ifMaterialMatch)
