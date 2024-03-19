@@ -37,9 +37,6 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(9999, "StockQuantity", ConstApp.StockQuantity, "", false)]
         public double StockQuantity { get; set; }
 
-        [ACPropertyInfo(9999, "MDUnitName", ConstApp.MDUnit)]
-        public string MDUnitName { get; set; }
-
         public ProdOrderPartslistPos IntermediateItem { get; set; }
 
         public bool IsFinalOutput { get; set; }
@@ -49,6 +46,15 @@ namespace gip.mes.datamodel
         public int StepNo { get; set; }
 
         #region overrides
+
+        public void RoundDosedQuantity(string mdUnitForRounding = null)
+        {
+            if (mdUnitForRounding == null || mdUnitForRounding.Contains(MDUnitName))
+            {
+                DosedQuantity = (int)Math.Round(DosedQuantity);
+            }
+        }
+
         public override string ToString()
         {
             return string.Format(@"{0} | {1} {2} | {3} {4}", LotNo, MaterialNo, MaterialName1, FacilityNo, FacilityName);

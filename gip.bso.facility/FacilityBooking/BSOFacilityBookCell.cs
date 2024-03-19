@@ -143,6 +143,9 @@ namespace gip.bso.facility
         #endregion
 
         #region BSO->ACProperty
+
+        public VBDialogResult Dialog_Result;
+
         #region BSO->ACProperty->BookingParam
         /// <summary>
         /// Gets the current book param.
@@ -397,7 +400,7 @@ namespace gip.bso.facility
                             || (!BookingFilterMaterial && filterItem.SearchWord == fcTypeBin.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal))
                             countFoundCorrect++;
                     }
-                    else if (BookingFilterMaterial && filterItem.PropertyName == nameof(Material) + "\\" + nameof(Material.MaterialNo) 
+                    else if (BookingFilterMaterial && filterItem.PropertyName == nameof(Material) + "\\" + nameof(Material.MaterialNo)
                                                    && CurrentFacility != null && CurrentFacility.Material != null)
                     {
                         if (filterItem.SearchWord == CurrentFacility.Material.MaterialNo)
@@ -655,7 +658,7 @@ namespace gip.bso.facility
             }
         }
         #endregion
-         
+
         #region Units
         [ACPropertyList(791, "StorageUnit")]
         public IEnumerable<MDUnit> StorageUnitTestList
@@ -1163,7 +1166,26 @@ namespace gip.bso.facility
                             return;
                         }
                         Picking picking = null;
-                        MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking);
+
+                        // Option select charge for Material->IsLotReservationNeeded
+                        List<FacilityCharge> lotsForReservation = null;
+                        if (
+                                booking.OutwardFacility != null
+                                && booking.OutwardFacility.Material != null
+                                && booking.OutwardFacility.Material.IsLotReservationNeeded
+                                && FacilityChargeList != null
+                                && FacilityChargeList.Any()
+                            )
+                        {
+                            Dialog_Result = new VBDialogResult();
+                            ShowDialog(this, "SelectChargeForRelocationDlg");
+                            if (Dialog_Result.SelectedCommand == eMsgButton.OK)
+                            {
+                                lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
+                            }
+                        }
+
+                        MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
                         if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
                         {
                             Messages.Msg(msgDetails);
@@ -1208,6 +1230,41 @@ namespace gip.bso.facility
             UpdateBSOMsg();
             return bRetVal;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo(nameof(DlgSelectChargeOk), Const.Ok, 502)]
+        public void DlgSelectChargeOk()
+        {
+            if (!IsEnabledDlgSelectChargeOk())
+                return;
+            Dialog_Result.SelectedCommand = eMsgButton.OK;
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgSelectChargeOk()
+        {
+            return FacilityChargeList != null && FacilityChargeList.Any(c => c.IsSelected);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo(nameof(DlgSelectChargeCancel), Const.Cancel, 500)]
+        public void DlgSelectChargeCancel()
+        {
+            if (!IsEnabledDlgSelectChargeCancel())
+                return;
+            Dialog_Result.SelectedCommand = eMsgButton.Cancel;
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgSelectChargeCancel()
+        {
+            return true;
+        }
+
 
         protected override bool BookRelocation()
         {
@@ -1513,7 +1570,7 @@ namespace gip.bso.facility
             {
                 CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility);
             }
-            
+
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);
@@ -1737,7 +1794,7 @@ namespace gip.bso.facility
             }
             else
                 filterItem.SearchWord = facilityNo;
-            
+
             this.Search();
             ShowDialog(this, "FacilityBookDialog");
             this.ParentACComponent.StopComponent(this);
@@ -1872,7 +1929,7 @@ namespace gip.bso.facility
                     if (!String.IsNullOrEmpty(url))
                     {
                         object result = ACUrlCommand(url + "!" + nameof(mes.processapplication.PAMSilo.IsDischargingToThisSiloActive), null);
-                        if (   result != null 
+                        if (result != null
                             && result is string[]
                             && (result as string[]).Any())
                         {

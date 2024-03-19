@@ -413,6 +413,24 @@ namespace gip.mes.datamodel
                 return "FacilityLot\\LotNo,SplitNo";
             }
         }
+
+        private bool _IsSelected;
+        [ACPropertyInfo(503, nameof(IsSelected), ConstApp.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
         #endregion
 
         #region IEntityProperty Members
