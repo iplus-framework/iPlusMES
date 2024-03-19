@@ -150,6 +150,12 @@ namespace gip.bso.logistics
                 case nameof(IsEnabledNavigateToPicking):
                     result = IsEnabledNavigateToPicking();
                     return true;
+                case nameof(NavigateToVoucher):
+                    NavigateToVoucher();
+                    return true;
+                case nameof(IsEnabledNavigateToVoucher):
+                    result = IsEnabledNavigateToVoucher();
+                    return true;
                 case nameof(MoveSelectedBatchUp):
                     MoveSelectedBatchUp();
                     return true;
@@ -1171,6 +1177,8 @@ namespace gip.bso.logistics
         [ACMethodInteraction("Picking", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedPicking")]
         public void NavigateToPicking()
         {
+            if (!IsEnabledNavigateToPicking())
+                return;
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
             if (service != null)
             {
@@ -1189,6 +1197,31 @@ namespace gip.bso.logistics
         public bool IsEnabledNavigateToPicking()
         {
             return SelectedPicking != null;
+        }
+
+        [ACMethodInteraction("Picking", "en{'Show Vistor voucher'}de{'Besucherbeleg anzeigen'}", 503, false, "SelectedPicking")]
+        public void NavigateToVoucher()
+        {
+            if (!IsEnabledNavigateToVoucher())
+                return;
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedPicking.VisitorVoucher.VisitorVoucherID,
+                    EntityName = VisitorVoucher.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+                Load(true);
+            }
+        }
+
+        public bool IsEnabledNavigateToVoucher()
+        {
+            return SelectedPicking != null && SelectedPicking.VisitorVoucher != null;
         }
 
         [ACMethodInteraction("MoveSelectedBatchUp", "en{'Up'}de{'Oben'}", 602, false, "SelectedPicking")]

@@ -27,6 +27,7 @@ namespace gip.mes.facility
             _C_BSONameForShowFacilityOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityOverview), "");
             _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOrder), "");
             _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowComponent), "");
+            _C_BSONameForShowVisitorVoucher = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowVisitorVoucher), "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -377,6 +378,41 @@ namespace gip.mes.facility
             }
         }
 
+
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowVisitorVoucher;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for Visitor voucher'}de{'Klassenname und ACIdentifier für Besucherbeleg'}")]
+        public string BSONameForShowVisitorVoucher
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
+                    return _C_BSONameForShowVisitorVoucher.ValueT;
+                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOVisitorVoucher");
+                if (classOfBso != null)
+                {
+                    gip.core.datamodel.ACClass derivation = null;
+                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
+                    {
+                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
+                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
+                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
+                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
+                    }
+                    if (derivation != null)
+                        _C_BSONameForShowVisitorVoucher.ValueT = derivation.ACIdentifier + "(Dialog)";
+                }
+
+                if (String.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
+                    _C_BSONameForShowVisitorVoucher.ValueT = "BSOVisitorVoucher(Dialog)";
+                return _C_BSONameForShowVisitorVoucher.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowVisitorVoucher.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region Precompiled Query
@@ -525,6 +561,21 @@ namespace gip.mes.facility
                             }
                         }
                     }
+                }
+                // Falls Besucherbeleg
+                else if (orderInfo.Entities.Where(c => c.EntityName == VisitorVoucher.ClassName).Any())
+                {
+                    string bsoName = BSONameForShowVisitorVoucher;
+                    if (String.IsNullOrEmpty(bsoName))
+                        bsoName = "BSOVisitorVoucher(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
                 }
             }
             // Wegen Kompatibilität zu Version 3, die noch keine PAOrderInfo-Struktur kannte

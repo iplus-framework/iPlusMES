@@ -1236,6 +1236,77 @@ namespace gip.bso.logistics
             if (!String.IsNullOrEmpty(FindVisitorCardNo))
                 FindVisitorCardNo = "";
         }
+
+        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(int visitorVoucherNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "VisitorVoucherNo").FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherNo", Global.LogicalOperators.contains, Global.Operators.and, visitorVoucherNo.ToString(), false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = visitorVoucherNo.ToString();
+
+            filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "MDVisitorVoucherState\\MDVisitorVoucherStateIndex").FirstOrDefault();
+            if (filterItem != null)
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItem);
+
+            this.Search();
+            if (VisitorVoucherList != null && VisitorVoucherList.Count() > 1)
+                CurrentVisitorVoucher = VisitorVoucherList.FirstOrDefault(c => c.VisitorVoucherNo == visitorVoucherNo);
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+
+        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            // Falls Produktionsauftrag
+            VisitorVoucher visitorVoucher = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == VisitorVoucher.ClassName)
+                {
+                    visitorVoucher = this.DatabaseApp.VisitorVoucher
+                        .Where(c => c.VisitorVoucherID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+            }
+
+            if (visitorVoucher == null)
+                return;
+
+            ShowDialogOrder(visitorVoucher.VisitorVoucherNo);
+        }
+
+
+        public VBDialogResult DialogResult { get; set; }
+
+        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        public void DialogOK()
+        {
+            DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.OK;
+            CloseTopDialog();
+        }
+
+        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        public void DialogCancel()
+        {
+            DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.Cancel;
+            CloseTopDialog();
+        }
+
         #endregion
 
         #region Refresh Lists
@@ -1442,6 +1513,18 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledNavigateToUTourplan):
                     result = IsEnabledNavigateToUTourplan();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((int)acParameter[0]);
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

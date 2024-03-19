@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data.Common;
 using System.Data.Objects;
 using System.Linq;
+using System.Transactions;
 using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.facility
@@ -1940,9 +1941,12 @@ namespace gip.mes.facility
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
-            possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode);
-            if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
-                return null;
+            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted }))
+            {
+                possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode);
+                if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
+                    return null;
+            }
 
             RoutingResult result = null;
             if (searchMode == ACPartslistManager.SearchMode.OnlyEnabledOldestSilo)
