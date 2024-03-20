@@ -236,7 +236,13 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
+            List<IACConfigStore> configStores = null;
+
+            var configManager = ConfigManagerIPlus.GetServiceInstance(this);
+            if (configManager != null)
+                configStores = configManager.GetACConfigStores(new List<IACConfigStore>() { picking, workflow.ACClassMethod, workflow.RefPAACClassMethod });
+
+            msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, configStores, validationBehaviour, workflow);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
                 Messages.Msg(msgDetails);
@@ -338,7 +344,7 @@ namespace gip.bso.manufacturing
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
-            return "PWMethodSingleDosing";
+            return nameof(PWMethodSingleDosing);
         }
 
         protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, Picking picking, ACComponent selectedAppManager, Guid allowedWFNode)

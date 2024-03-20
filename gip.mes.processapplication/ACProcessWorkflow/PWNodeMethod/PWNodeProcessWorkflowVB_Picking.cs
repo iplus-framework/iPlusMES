@@ -109,7 +109,11 @@ namespace gip.mes.processapplication
                 if (!ValidateExpectedConfigStores())
                     return StartNextBatchResult.CycleWait;
 
-                MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, mandantoryConfigStores, ValidationBehaviour);
+                core.datamodel.ACClassWF planningNode = null;
+                if (RootPW is PWMethodSingleDosing)
+                    planningNode = ContentACClassWF.FromIPlusContext<core.datamodel.ACClassWF>(dbiPlus);
+
+                MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, mandantoryConfigStores, ValidationBehaviour, planningNode);
                 if (msg2 != null)
                 {
                     if (!msg2.IsSucceded())
