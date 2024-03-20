@@ -1202,7 +1202,8 @@ namespace gip.mes.facility
 
         public virtual MsgWithDetails ValidateStart(DatabaseApp dbApp, Database dbiPlus,
             Picking picking, List<IACConfigStore> configStores,
-            PARole.ValidationBehaviour validationBehaviour)
+            PARole.ValidationBehaviour validationBehaviour,
+            core.datamodel.ACClassWF planningNode = null)
         {
             Msg msg = null;
             MsgWithDetails detailMessages = new MsgWithDetails();
@@ -1224,14 +1225,64 @@ namespace gip.mes.facility
                 return detailMessages;
             }
 
+            string selectionRuleID = "PAMSilo.Deselector";
+            object[] selectionRuleParams = null;
 
-            // Some global Checks
-            //foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
-            //            .OrderBy(c => c.Sequence))
-            //{
-            //}
+            if (planningNode != null && configStores != null)
+            {
+                List<object> ruleParams = new List<object>();
+                core.datamodel.ACClassMethod subWorkflow = planningNode.RefPAACClassMethod;
 
-            CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages);
+                if (subWorkflow != null)
+                {
+                    var pwGroups = subWorkflow.AllWFNodes.Where(c => c.PWACClass.ACKind == Global.ACKinds.TPWGroup).OfType<core.datamodel.ACClassWF>();
+
+                    if (pwGroups != null && pwGroups.Any())
+                    { 
+                        ConfigManagerIPlus configManager = ConfigManagerIPlus.GetServiceInstance(this);
+                        if (configManager != null)
+                        {
+                            core.datamodel.ACClass[] possibleClassProjects = planningNode.RefPAACClass.ACClass_BasedOnACClass.ToArray();
+                            // 2. Determine on which Application-Projects can subworkflows be started (Line-Check)
+                            possibleClassProjects = ApplyRulesOnProjects(dbiPlus, planningNode, possibleClassProjects, configStores);
+
+                            Guid[] possibleProjectIDs = Array.Empty<Guid>();
+
+                            if (possibleClassProjects.Any())
+                                possibleProjectIDs = possibleClassProjects.Select(c => c.ACProjectID).ToArray();
+
+                            foreach (core.datamodel.ACClassWF group in pwGroups)
+                            {
+                                var ruleValueList = configManager.GetRuleValueList(configStores, planningNode.ConfigACUrl + "\\",
+                                                                                   group.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString());
+
+                                var selectedClasses = ruleValueList?.GetSelectedClasses(ACClassWFRuleTypes.Allowed_instances, dbiPlus);
+                                if (selectedClasses == null || !selectedClasses.Any())
+                                {
+                                    selectedClasses = group.RefPAACClass.ACClass_BasedOnACClass.Where(d => possibleProjectIDs.Contains(d.ACProjectID)).ToList();
+                                }
+
+                                if (selectedClasses != null && selectedClasses.Any())
+                                {
+                                    foreach (var acClass in selectedClasses)
+                                    {
+                                        ruleParams.Add(acClass.ACClassID);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                if (ruleParams.Any())
+                {
+                    selectionRuleID = "PAProcessModuleParam.Deselector";
+                    selectionRuleParams = ruleParams.ToArray();
+                }
+            }
+
+            CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams);
 
             return detailMessages;
         }
@@ -1253,7 +1304,8 @@ namespace gip.mes.facility
 
         #region Virtual and protected
         public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                        PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages)
+                                        PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, string selectionRuleID = "PAMSilo.Deselector", 
+                                        object[] selectionRuleParams = null)
         {
             //if (configStores == null)
             //return;
@@ -1296,17 +1348,18 @@ namespace gip.mes.facility
                 }
                 if (pos.FromFacility != null)
                 {
-                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType);
+                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams);
                 }
                 else
                 {
-                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType);
+                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams);
                 }
             }
         }
 
         private void CheckResourcesAndRoutingKnownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType, string selectionRuleID = "PAMSilo.Deselector")
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType,
+                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
         {
             Msg msg;
 
@@ -1456,6 +1509,7 @@ namespace gip.mes.facility
                 AttachRouteItemsToContext = false,
                 Direction = RouteDirections.Forwards,
                 SelectionRuleID = selectionRuleID,
+                SelectionRuleParams = selectionRuleParams,
                 DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
                 DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)),
                 MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
@@ -1481,7 +1535,8 @@ namespace gip.mes.facility
         }
 
         private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType, string selectionRuleID = "PAMSilo.Deselector")
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType, 
+                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
         {
             Msg msg;
 
@@ -1562,7 +1617,8 @@ namespace gip.mes.facility
             QrySilosResult possibleSilos = null;
             core.datamodel.ACClass compClass = pos.ToFacility.FacilityACClass;
 
-            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, null, null, null, true, 0, selectionRuleID);
+            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, 
+                                                  null, null, null, true, 0, selectionRuleID, selectionRuleParams);
 
             if (routes == null || !routes.Any())
             {
@@ -1579,6 +1635,26 @@ namespace gip.mes.facility
             }
         }
 
+
+        protected core.datamodel.ACClass[] ApplyRulesOnProjects(Database dbiPlus, core.datamodel.ACClassWF planningNode, core.datamodel.ACClass[] possibleProjects, List<IACConfigStore> configStores)
+        {
+            if (possibleProjects == null || !possibleProjects.Any())
+                return possibleProjects;
+            RuleValueList ruleValueList = null;
+            ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
+            ruleValueList = serviceInstance.GetRuleValueList(configStores, "", planningNode.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString());
+            if (ruleValueList != null && ruleValueList.Items != null)
+            {
+                var selectedClasses = ruleValueList.GetSelectedClasses(ACClassWFRuleTypes.Allowed_instances, dbiPlus);
+                if (selectedClasses != null && selectedClasses.Any())
+                {
+                    var allowedComponents = selectedClasses.Select(c => c.ACClassID);
+                    var filteredList = possibleProjects.Where(c => allowedComponents.Contains(c.ACClassID)).ToArray();
+                    return filteredList;
+                }
+            }
+            return possibleProjects;
+        }
 
         //protected gip.mes.datamodel.ACClass[] ApplyRulesOnProjects(Database dbiPlus, gip.mes.datamodel.ACClass[] possibleProjects, MapPosToWFConn mapPosWF, List<IACConfigStore> configStores)
         //{
@@ -1944,7 +2020,8 @@ namespace gip.mes.facility
                                 ACValueList projSpecificParams = null,
                                 bool onlyContainer = true,
                                 short reservationMode = 0,
-                                string selectionRuleID = "PAMSilo.Deselector")
+                                string selectionRuleID = "PAMSilo.Deselector",
+                                object[] selectionRuleParams = null)
         {
             if (currentProcessModule == null)
             {
@@ -1975,6 +2052,7 @@ namespace gip.mes.facility
                     AttachRouteItemsToContext = true,
                     Direction = RouteDirections.Backwards,
                     SelectionRuleID = selectionRuleID,
+                    SelectionRuleParams = selectionRuleParams,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
                     MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
@@ -2003,6 +2081,7 @@ namespace gip.mes.facility
                     AttachRouteItemsToContext = true,
                     Direction = RouteDirections.Backwards,
                     SelectionRuleID = selectionRuleID,
+                    SelectionRuleParams = selectionRuleParams,
                     DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
                     MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
