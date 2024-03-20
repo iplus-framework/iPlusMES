@@ -4327,6 +4327,7 @@ namespace gip.bso.manufacturing
                 return;
 
             ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID);
+            paOrderInfo.DialogResult = this.DialogResult;
             //InShowDialogOrderInfo = false;
         }
 

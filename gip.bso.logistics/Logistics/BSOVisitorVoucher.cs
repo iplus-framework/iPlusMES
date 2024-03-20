@@ -1286,6 +1286,7 @@ namespace gip.bso.logistics
                 return;
 
             ShowDialogOrder(visitorVoucher.VisitorVoucherNo);
+            paOrderInfo.DialogResult = this.DialogResult;
         }
 
 

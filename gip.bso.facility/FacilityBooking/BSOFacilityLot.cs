@@ -554,6 +554,7 @@ namespace gip.bso.facility
                 return;
 
             ShowDialogOrder(facilityLot.LotNo);
+            paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
 

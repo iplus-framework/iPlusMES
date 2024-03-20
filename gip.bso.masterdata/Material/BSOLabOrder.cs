@@ -955,6 +955,7 @@ namespace gip.bso.masterdata
             ShowDialog(this, "LabOrderViewDialog");
             Save();
             CloseTopDialog();
+            orderInfo.DialogResult = this.DialogResult;
             this.ParentACComponent.StopComponent(this);
         }
 

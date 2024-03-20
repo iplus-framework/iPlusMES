@@ -1304,9 +1304,37 @@ namespace gip.bso.facility
                             ClearBookingData();
                             return;
                         }
-                        StartWorkflow(acClassMethod, picking);
-                    }
 
+                        Global.MsgResult openPicking = Global.MsgResult.No;
+                        if (OpenPickingBeforeStart)
+                        {
+                            // Question50035: Do you want to open the picking order before starting the workflow?
+                            openPicking = Messages.Question(this, "Question50106");
+                        }
+
+                        bool startWorkflow = true;
+                        if (openPicking == Global.MsgResult.Yes)
+                        {
+                            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+                            if (service != null)
+                            {
+                                PAOrderInfo info = new PAOrderInfo();
+                                info.Entities.Add(
+                                new PAOrderInfoEntry()
+                                {
+                                    EntityID = picking.PickingID,
+                                    EntityName = Picking.ClassName
+                                });
+                                service.ShowDialogOrder(this, info);
+                                if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
+                                    startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
+                            }
+                        }
+                        if (startWorkflow)
+                        {
+                            StartWorkflow(acClassMethod, picking);
+                        }
+                    }
                 }
                 else if (userQuestionAutomatic == Global.MsgResult.No)
                     BookRelocation();

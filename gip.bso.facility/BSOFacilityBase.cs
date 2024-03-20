@@ -115,6 +115,8 @@ namespace gip.bso.facility
 
             _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
 
+            _OpenPickingBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(OpenPickingBeforeStart), false);
+
             return true;
         }
 
@@ -131,6 +133,12 @@ namespace gip.bso.facility
             _RoutingService = null;
 
             return base.ACDeInit(deleteACClassTask);
+        }
+
+        public override bool ACPostInit()
+        {
+            _ = OpenPickingBeforeStart;
+            return base.ACPostInit();
         }
 
         public override DatabaseApp DatabaseApp
@@ -299,6 +307,20 @@ namespace gip.bso.facility
                 Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
                 return !(rightMode == Global.ControlModes.Collapsed || rightMode == Global.ControlModes.Disabled);
 
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _OpenPickingBeforeStart;
+        [ACPropertyConfig("en{'Open picking order before start workflow'}de{'Kommissionierauftrag öffnen vor Workflowstart'}")]
+        public bool OpenPickingBeforeStart
+        {
+            get
+            {
+                return _OpenPickingBeforeStart.ValueT;
+            }
+            set
+            {
+                _OpenPickingBeforeStart.ValueT = value;
             }
         }
 

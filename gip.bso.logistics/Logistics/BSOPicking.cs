@@ -2698,7 +2698,10 @@ namespace gip.bso.logistics
             {
                 _CurrentPickingPos = null;
                 CurrentPickingPos = PickingPosList.FirstOrDefault();
+                bool refreshWeighing = requery && SelectedPickingPos == CurrentPickingPos;
                 SelectedPickingPos = CurrentPickingPos;
+                if (refreshWeighing)
+                    RefreshWeighingList(true);
             }
             else
             {
@@ -4195,6 +4198,7 @@ namespace gip.bso.logistics
                 return;
 
             ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty);
+            paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
 

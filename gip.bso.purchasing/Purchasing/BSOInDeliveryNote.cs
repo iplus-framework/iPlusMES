@@ -2842,6 +2842,7 @@ namespace gip.bso.purchasing
                 return;
 
             ShowDialogOrder(dn.DeliveryNoteNo, dnPos != null ? dnPos.DeliveryNotePosID : Guid.Empty);
+            paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
 
