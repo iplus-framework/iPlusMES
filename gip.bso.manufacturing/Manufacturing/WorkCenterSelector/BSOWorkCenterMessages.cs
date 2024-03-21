@@ -173,30 +173,30 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var wfNodes = currentProcessModule.GetPropertyNet("WFNodes");
+            var wfNodes = currentProcessModule.GetPropertyNet(nameof(PAProcessModule.WFNodes));
             if (wfNodes == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "WFNodes");
+                Messages.Error(this, "Error50285", false, nameof(PAProcessModule.WFNodes));
                 return;
             }
 
-            var hasAlarms = currentProcessModule.GetPropertyNet("HasAlarms");
+            var hasAlarms = currentProcessModule.GetPropertyNet(nameof(PAProcessModule.HasAlarms));
             if (hasAlarms == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "HasAlarms");
+                Messages.Error(this, "Error50285", false, nameof(PAProcessModule.HasAlarms));
                 return;
             }
 
-            var alarmsAsText = currentProcessModule.GetPropertyNet("AlarmsAsText");
+            var alarmsAsText = currentProcessModule.GetPropertyNet(nameof(PAProcessModule.AlarmsAsText));
             if (alarmsAsText == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "AlarmsAsText");
+                Messages.Error(this, "Error50285", false, nameof(PAProcessModule.AlarmsAsText));
                 return;
             }
 
