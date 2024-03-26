@@ -1506,8 +1506,8 @@ namespace gip.mes.facility
             // soriert nach der ältesten eingelagerten Charge
             QrySilosResult facilityQuery = null;
 
-            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted}))
-            {
+            //using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted}))
+            //{
                 if (poRelation != null)
                 {
                     if (filterTimeOlderThan.HasValue)
@@ -1728,7 +1728,7 @@ namespace gip.mes.facility
                         return facilityQuery;
                     }
                 }            
-            }
+            //}
             return facilityQuery == null ? new QrySilosResult() : facilityQuery;
         }
 

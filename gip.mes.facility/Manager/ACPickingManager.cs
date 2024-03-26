@@ -1238,7 +1238,7 @@ namespace gip.mes.facility
                     var pwGroups = subWorkflow.AllWFNodes.Where(c => c.PWACClass.ACKind == Global.ACKinds.TPWGroup).OfType<core.datamodel.ACClassWF>();
 
                     if (pwGroups != null && pwGroups.Any())
-                    { 
+                    {
                         ConfigManagerIPlus configManager = ConfigManagerIPlus.GetServiceInstance(this);
                         if (configManager != null)
                         {
@@ -1304,7 +1304,7 @@ namespace gip.mes.facility
 
         #region Virtual and protected
         public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                        PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, string selectionRuleID = "PAMSilo.Deselector", 
+                                        PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, string selectionRuleID = "PAMSilo.Deselector",
                                         object[] selectionRuleParams = null)
         {
             //if (configStores == null)
@@ -1535,7 +1535,7 @@ namespace gip.mes.facility
         }
 
         private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType, 
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType,
                                                          string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
         {
             Msg msg;
@@ -1617,7 +1617,7 @@ namespace gip.mes.facility
             QrySilosResult possibleSilos = null;
             core.datamodel.ACClass compClass = pos.ToFacility.FacilityACClass;
 
-            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, 
+            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos,
                                                   null, null, null, true, 0, selectionRuleID, selectionRuleParams);
 
             if (routes == null || !routes.Any())
@@ -2028,12 +2028,12 @@ namespace gip.mes.facility
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
-            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted }))
-            {
-                possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode);
-                if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
-                    return null;
-            }
+            //using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted }))
+            //{
+            possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode);
+            if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
+                return null;
+            //}
 
             RoutingResult result = null;
             if (searchMode == ACPartslistManager.SearchMode.OnlyEnabledOldestSilo)
