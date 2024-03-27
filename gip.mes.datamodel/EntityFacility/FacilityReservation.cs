@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -254,8 +255,6 @@ namespace gip.mes.datamodel
             else
                 return this.VBiACClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
         }
-
-        #endregion
 
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
