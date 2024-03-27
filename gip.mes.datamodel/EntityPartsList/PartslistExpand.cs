@@ -1,3 +1,4 @@
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
@@ -205,7 +206,17 @@ namespace gip.mes.datamodel
             MDUnit = partslist.MDUnit;
             TargetQuantityUOM = partslist.TargetQuantityUOM * treeQuantityRatio;
             if (partslist.MDUnitID.HasValue)
-                TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
+            {
+                try
+                {
+                    TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
+                }
+                catch(Exception ec)
+                {
+                    Msg msg = new Msg() { MessageLevel = eMsgLevel.Exception, Message =  $"[{partslist.PartslistNo}]{partslist.PartslistName}: {ec.Message}" };
+                    ACRoot.SRoot.Messages.Msg(msg);
+                }
+            }
         }
         #endregion
 

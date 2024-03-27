@@ -19,6 +19,34 @@ namespace gip.mes.facility.TandTv3
 
         #endregion
 
+        #region Properties
+        public bool IsMaterialWFNoForFilterLotByTime
+        {
+            get
+            {
+                bool result = false;
+                ProdOrderPartslistPos pos = null;
+
+                if (Item.ProdOrderPartslistPosRelationID != null)
+                {
+                    pos = Item.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos;
+                }
+                else if(Item.ProdOrderPartslistPosID != null)
+                {
+                    pos = Item.ProdOrderPartslistPos;
+                }
+
+                if (pos != null)
+                {
+                    result = Result.Filter.MaterialWFNoForFilterLotByTime == pos.ProdOrderPartslist.Partslist?.MaterialWF?.MaterialWFNo;
+                }
+
+                return result;
+                    
+            }
+        }
+        #endregion
+
         #region IItemTracking
 
         public override List<IACObjectEntity> GetSameStepItems()
@@ -50,11 +78,6 @@ namespace gip.mes.facility.TandTv3
 
         public override List<IACObjectEntity> GetNextStepItems()
         {
-
-            if (Item?.OutwardFacilityCharge?.FacilityLot?.LotNo == "ZGFL10123338")
-            {
-                //System.Diagnostics.Debugger.Break();
-            }
             List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
 
             bool isFilteredMaterialForInwardSearch = false;
@@ -71,45 +94,112 @@ namespace gip.mes.facility.TandTv3
                 fc = Item.OutwardFacilityCharge;
             if (fc != null && fc.FacilityLot != null && Item.OutwardMaterialID != null)
             {
-                Guid? materialID = null;
-                if (!Result.Filter.IsDisableReworkTracking)
-                    materialID = Item.OutwardMaterialID;
-
-                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
-
-                Guid? outwardFacilityID = Item.OutwardFacilityID;
-                if (Result.TandTv3Command != null && !Result.TandTv3Command.FilterFaciltiyAtSearchInwardCharges)
-                {
-                    outwardFacilityID = null;
-                }
-
-                var nextFbcs =
-                    fc
-                    .FacilityLot
-                    .FacilityBookingCharge_InwardFacilityLot
-                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, outwardFacilityID, isOrderTrackingActive))
-                    .OrderBy(c => c.FacilityBookingChargeNo)
-                    .ToList();
-
-                var bookingTypes = fc
-                    .FacilityLot
-                    .FacilityBookingCharge_InwardFacilityLot
-                    .GroupBy(c => c.FacilityBookingTypeIndex)
-                    .Select(c=> new {c.Key, FCS = c.Select(x=> new {x.InwardFacility?.FacilityNo, x.InwardFacility.FacilityID })})
-                    .ToArray();
-
-
-                if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
-                {
-                    foreach (FacilityBookingCharge fbc in nextFbcs)
-                    {
-                        Result.AddOrderConnection(fbc, Item);
-                    }
-                }
-
-                if (isOrderTrackingActive && nextFbcs.Any())
-                    nextStepItems.AddRange(nextFbcs);
+                List<IACObjectEntity> inwardItems = GetInwardElementsForThisOutward(fc);
+                nextStepItems.AddRange(inwardItems);
             }
+
+
+            // MaterialWFNoForFilterLotByTime used - fetch time matched outward items
+            if (
+                    !string.IsNullOrEmpty(Result.Filter.MaterialWFNoForFilterLotByTime)
+                    && Item.InwardMaterialID != null
+                    && Item.InwardFacilityChargeID != null
+                    && Item.ProdOrderPartslistPos != null
+                    && IsMaterialWFNoForFilterLotByTime
+                    )
+            {
+                List<IACObjectEntity> inwardItems = GetInwardItemsForThisOutwardFilterByTime(Item);
+                nextStepItems.AddRange(inwardItems);
+            }
+
+            return nextStepItems;
+        }
+
+        private List<IACObjectEntity> GetInwardItemsForThisOutwardFilterByTime(FacilityBookingCharge fbc)
+        {
+            List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
+
+            FacilityBookingCharge firstFBCWithSameFC =
+                fbc
+                .ProdOrderPartslistPos
+                .FacilityBookingCharge_ProdOrderPartslistPos
+                .Where(c => 
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                            && c.InsertDate < fbc.InsertDate 
+                            && c.InwardFacilityChargeID == fbc.InwardFacilityChargeID
+                       )
+                .OrderBy(c => c.InsertDate)
+                .FirstOrDefault();
+
+            FacilityBookingCharge lastFBCWithSameFC =
+                fbc
+                .ProdOrderPartslistPos
+                .FacilityBookingCharge_ProdOrderPartslistPos
+                .Where(c => 
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                            && c.InsertDate > fbc.InsertDate
+                            && c.InwardFacilityChargeID == fbc.InwardFacilityChargeID
+                        )
+                .OrderByDescending(c => c.InsertDate)
+                .FirstOrDefault();
+
+            (DateTime startTime, DateTime endTime) = GetFBCTimeFrame(fbc, firstFBCWithSameFC, lastFBCWithSameFC);
+
+            FacilityBookingCharge[] outwardBookings =
+                fbc
+                .ProdOrderPartslistPos
+                .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                .SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation)
+                .Where(c => c.InsertDate >= startTime && c.InsertDate <= endTime)
+                .ToArray();
+
+            nextStepItems.AddRange(outwardBookings);
+
+            return nextStepItems;
+        }
+
+        private List<IACObjectEntity> GetInwardElementsForThisOutward(FacilityCharge fc)
+        {
+            List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
+            Guid? materialID = null;
+            if (!Result.Filter.IsDisableReworkTracking)
+                materialID = Item.OutwardMaterialID;
+
+            bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+
+            Guid? outwardFacilityID = Item.OutwardFacilityID;
+            if (Result.TandTv3Command != null && !Result.TandTv3Command.FilterFaciltiyAtSearchInwardCharges)
+            {
+                outwardFacilityID = null;
+            }
+
+            // for outward charges search inward source (delivery note, prod orders)
+            var nextFbcs =
+                fc
+                .FacilityLot
+                .FacilityBookingCharge_InwardFacilityLot
+                .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, outwardFacilityID, isOrderTrackingActive))
+                .OrderBy(c => c.FacilityBookingChargeNo)
+                .ToList();
+
+            var bookingTypes = fc
+                .FacilityLot
+                .FacilityBookingCharge_InwardFacilityLot
+                .GroupBy(c => c.FacilityBookingTypeIndex)
+                .Select(c => new { c.Key, FCS = c.Select(x => new { x.InwardFacility?.FacilityNo, x.InwardFacility.FacilityID }) })
+                .ToArray();
+
+            // populate order depth
+            if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
+            {
+                foreach (FacilityBookingCharge fbc in nextFbcs)
+                {
+                    Result.AddOrderConnection(fbc, Item);
+                }
+            }
+
+            if (isOrderTrackingActive && nextFbcs.Any())
+                nextStepItems.AddRange(nextFbcs);
 
             return nextStepItems;
         }
@@ -159,6 +249,32 @@ namespace gip.mes.facility.TandTv3
                 if (mixPoint.AddInwardBooking(Item))
                     mixPoint.AddInwardLotQuantity(Item);
             }
+        }
+
+        public (DateTime startTime, DateTime endTime) GetFBCTimeFrame(FacilityBookingCharge fbc, FacilityBookingCharge firstFBCWithSameFC, FacilityBookingCharge lastFBCWithSameFC)
+        {
+            DateTime startTime = DateTime.MinValue;
+            DateTime endTime = DateTime.MinValue;
+
+            if (firstFBCWithSameFC != null)
+            {
+                startTime = firstFBCWithSameFC.InsertDate.AddMinutes(-1);
+            }
+            else
+            {
+                startTime = fbc.InsertDate.AddMinutes(-1);
+            }
+
+            if (lastFBCWithSameFC != null)
+            {
+                endTime = lastFBCWithSameFC.InsertDate.AddMinutes(1);
+            }
+            else
+            {
+                endTime = fbc.InsertDate.AddMinutes(1);
+            }
+
+            return (startTime, endTime);
         }
 
         #endregion

@@ -610,7 +610,7 @@ namespace gip.mes.processapplication
                         return msg;
                 }
 
-                msg = labOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, out labOrder);
+                msg = labOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, null, out labOrder);
             }
             if (msg != null)
                 return msg;

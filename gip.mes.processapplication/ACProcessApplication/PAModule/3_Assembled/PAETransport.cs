@@ -15,7 +15,7 @@ namespace gip.mes.processapplication
     /// Basisklasse für steuerbare Bauteile/Elemente
     /// </summary>
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Baseclass Assembled Equipment'}de{'Basisklasse zusammenbau'}", Global.ACKinds.TPAModule, Global.ACStorableTypes.Required, false, true)]
-    public class PAETransport : PAModule
+    public class PAETransport : PAModule, IRoutableModule
     {
         #region c'tors
 
@@ -35,13 +35,42 @@ namespace gip.mes.processapplication
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            PAEEMotorBase motor = Motor;
+            if (motor != null && motor.AllocatedByWay != null)
+            {
+                IACPropertyNetServer serverProp = motor.AllocatedByWay as IACPropertyNetServer;
+                if (serverProp != null)
+                    serverProp.ValueUpdatedOnReceival += MotorProp_ValueUpdatedOnReceival;
+            }
+
+            if (this.AllocatedByWay != null)
+            {
+                IACPropertyNetServer serverProp = this.AllocatedByWay as IACPropertyNetServer;
+                if (serverProp != null)
+                    serverProp.ValueUpdatedOnReceival += SelfProp_ValueUpdatedOnReceival;
+            }
+
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            if (_RefMotor != null)
+            if (this.AllocatedByWay != null)
             {
+                IACPropertyNetServer serverProp = this.AllocatedByWay as IACPropertyNetServer;
+                if (serverProp != null)
+                    serverProp.ValueUpdatedOnReceival -= SelfProp_ValueUpdatedOnReceival;
+            }
+            if (_RefMotor != null && _RefMotor.IsAttached)
+            {
+                PAEEMotorBase motor = Motor;
+                if (motor != null)
+                {
+                    IACPropertyNetServer serverProp = motor.AllocatedByWay as IACPropertyNetServer;
+                    if (serverProp != null)
+                        serverProp.ValueUpdatedOnReceival -= MotorProp_ValueUpdatedOnReceival;
+                }
+
                 _RefMotor.Detach();
                 _RefMotor = null;
             }
@@ -84,7 +113,7 @@ namespace gip.mes.processapplication
             {
                 if (_RefMotor == null)
                 {
-                    PAEEMotorBase result = FindMemberACComponent(typeof(PAEEMotorBase)) as PAEEMotorBase;
+                    PAEEMotorBase result = FindChildComponents<PAEEMotorBase>(c => c is PAEEMotorBase).FirstOrDefault();
                     if (result != null)
                         _RefMotor = new ACRef<PAEEMotorBase>(result, this);
                 }
@@ -101,7 +130,7 @@ namespace gip.mes.processapplication
             {
                 if (_RefRotationControl == null)
                 {
-                    PAERotationControl result = FindMemberACComponent(typeof(PAERotationControl)) as PAERotationControl;
+                    PAERotationControl result = FindChildComponents<PAERotationControl>(c => c is PAERotationControl).FirstOrDefault();
                     if (result != null)
                         _RefRotationControl = new ACRef<PAERotationControl>(result, this);
                 }
@@ -115,17 +144,15 @@ namespace gip.mes.processapplication
         {
             get
             {
-                List<PAEJamSensor> listResult = new List<PAEJamSensor>();
-                if (this.ACComponentChilds.Count() <= 0)
-                    return listResult;
-                var query = this.ACComponentChilds.Where(c => typeof(PAEJamSensor).IsAssignableFrom(c.GetType())).Select(c => c as PAEJamSensor);
-                if (!query.Any())
-                    return listResult;
-                foreach (PAEJamSensor member in query)
-                {
-                    listResult.Add(member);
-                }
-                return listResult;
+                return FindChildComponents<PAEJamSensor>(c => c is PAEJamSensor);
+            }
+        }
+
+        public IEnumerable<PAELimitSwitch> LimitSwitches
+        {
+            get
+            {
+                return FindChildComponents<PAELimitSwitch>(c => c is PAELimitSwitch);
             }
         }
         #endregion
@@ -137,10 +164,34 @@ namespace gip.mes.processapplication
         [ACPropertyBindingTarget(441, "Read from PLC", "en{'Allocated by Way'}de{'Belegt von Wegesteuerung'}", "", false, false)]
         public IACContainerTNet<BitAccessForAllocatedByWay> AllocatedByWay { get; set; }
 
-        [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", false, false)]
+        [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", true, true)]
         public IACContainerTNet<TimeSpan> DepletingTime { get; set; }
+
+        [ACPropertyBindingTarget(443, "Configuration", "en{'Fee performance [kg/min]'}de{'Förderleistung [kg/min]'}", "", true, true)]
+        public IACContainerTNet<double> FeedPerf { get; set; }
         #endregion
 
+        public string RouteItemID
+        {
+            get
+            {
+                PAEEMotorBase motor = Motor;
+                if (motor != null)
+                    return motor.RouteItemID;
+                return null;
+            }
+        }
+
+        public int RouteItemIDAsNum
+        {
+            get
+            {
+                PAEEMotorBase motor = Motor;
+                if (motor != null)
+                    return motor.RouteItemIDAsNum;
+                return 0;
+            }
+        }
         #endregion
 
         #region Methods, Range: 400
@@ -158,6 +209,95 @@ namespace gip.mes.processapplication
             }
             return acMenuItemList;
         }
+
+        public virtual void SimulateAllocationState(RouteItem item, bool switchOff)
+        {
+            PAEEMotorBase motor = Motor;
+            if (motor != null)
+            {
+                motor.SimulateAllocationState(item, switchOff);
+            }
+            else if (AllocatedByWay != null && AllocatedByWay.ValueT != null)
+            {
+                AllocatedByWay.ValueT.Bit00_Reserved = false;
+                AllocatedByWay.ValueT.Bit01_Allocated = !switchOff;
+            }
+        }
+
+        public void ActivateRouteItemOnSimulation(RouteItem item, bool switchOff)
+        {
+            PAEEMotorBase motor = Motor;
+            if (motor != null)
+                motor.ActivateRouteItemOnSimulation(item, switchOff);
+        }
+
+        private static object _ChangingAllocationLock = new object();
+        private ushort _ChangingAllocationProp = 0;
+        private void MotorProp_ValueUpdatedOnReceival(object sender, ACPropertyChangedEventArgs e, ACPropertyChangedPhase phase)
+        {
+            if (phase == ACPropertyChangedPhase.BeforeBroadcast || e == null)
+                return;
+            if (e.PropertyName == nameof(AllocatedByWay))
+            {
+                IACContainerTNet<BitAccessForAllocatedByWay> allocatedByWay = sender as IACContainerTNet<BitAccessForAllocatedByWay>;
+                if (allocatedByWay != null 
+                    && allocatedByWay.ValueT != null
+                    && this.AllocatedByWay.ValueT != null) 
+                {
+                    lock (_ChangingAllocationLock)
+                    {
+                        if (_ChangingAllocationProp > 0)
+                            return;
+                        _ChangingAllocationProp = 1;
+                    }
+                    try
+                    {
+                        // Copy allocation state from the motor to this transport object
+                        this.AllocatedByWay.ValueT.ValueT = allocatedByWay.ValueT.ValueT;
+                    }
+                    finally
+                    {
+                        lock (_ChangingAllocationLock)
+                        {
+                            _ChangingAllocationProp = 0;
+                        }
+                    }
+                    //BitAccessForAllocatedByWay clonedValue = allocatedByWay.ValueT.Clone() as BitAccessForAllocatedByWay;
+                    //if (clonedValue != null)
+                }
+            }
+        }
+
+        private void SelfProp_ValueUpdatedOnReceival(object sender, ACPropertyChangedEventArgs e, ACPropertyChangedPhase phase)
+        {
+            if (phase == ACPropertyChangedPhase.BeforeBroadcast || e == null)
+                return;
+            if (e.PropertyName == nameof(AllocatedByWay))
+            {
+                PAEEMotorBase motor = Motor;
+                if (motor == null || motor.AllocatedByWay == null) 
+                    return;
+                lock (_ChangingAllocationLock)
+                {
+                    if (_ChangingAllocationProp > 0)
+                        return;
+                    _ChangingAllocationProp = 2;
+                }
+                try
+                {
+                    // Copy allocation state from this transport object to the motor
+                    motor.AllocatedByWay.ValueT.ValueT = this.AllocatedByWay.ValueT.ValueT;
+                }
+                finally
+                {
+                    lock (_ChangingAllocationLock)
+                    {
+                        _ChangingAllocationProp = 0;
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Handle execute helpers

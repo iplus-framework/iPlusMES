@@ -98,6 +98,7 @@
         public const string InwardQuantity = "en{'Inward Quantity'}de{'Zugangsmenge'}";
         public const string InwardTargetQuantity = "en{'Target Inward Qty.'}de{'Zugangsmenge Soll'}";
         public const string ReservedInwardQuantity = "en{'Reserved Inward Qty.'}de{'Reservierte Zugangsmenge'}";
+        public const string ReservedQuantity = "en{'Reserved Qty.'}de{'Reservierte Menge'}";
 
         public const string OutwardQuantity = "en{'Outward Quantity'}de{'Abgangsmenge'}";
         public const string OutwardTargetQuantity = "en{'Target Outward Qty.'}de{'Abgangsmenge Soll'}";
@@ -116,10 +117,13 @@
         public const string OptStockQuantity = "en{'Opt.Stock Quantity'}de{'Opt.Lagermenge'}";
 
         public const string TotalQuantity = "en{'Total Quantity'}de{'Gesamtmenge'}";
+        public const string TotalReservedQuantity = "en{'Total Reserved Quantity'}de{'Gesamte reservierte Menge'}";
         public const string BlockedQuantity = "en{'Blocked Quantity'}de{'Gesperrte Menge'}";
         public const string AbsoluteBlockedQuantity = "en{'Absolute Blocked Quantity'}de{'Absolut gesperrte Menge'}";
         public const string FreeQuantity = "en{'Free Quantity'}de{'Freie Menge'}";
         public const string NewPlannedStock = "en{'New Planned Stock'}de{'Neuer Planbestand'}";
+        public const string AssignedQuantity = "en{'Assigned Quantity'}de{'Zugewiesene Menge'}";
+        public const string TotalAssignedQuantity = "en{'Total Assigned Quantity'}de{'Gesamte zugewiesene Menge'}";
 
         public const string DayInward = "en{'Day Inward Qty.'}de{'Tageszugang'}";
         public const string DayInwardAmb = "en{'Day Inward Qty Ambient'}de{'Tageszugang ambient'}";
@@ -193,6 +197,7 @@
         public const string FacilityMDSchedulingGroup = "en{'Storage Bin Scheduling Group'}de{'Lagerplatz Scheduling Group'}";
         public const string FacilityNo = "en{'Storage Bin No.'}de{'Lagerplatznummer'}";
         public const string FacilityStock = "en{'Stock'}de{'Lagerbestand'}";
+        public const string FacilityReservation = "en{'Reservation'}de{'Reservierung'}";
 
         public const string Material = "en{'Material'}de{'Material'}";
         public const string MaterialNo = "en{'Material No.'}de{'Material-Nr.'}";
@@ -263,6 +268,8 @@
         public const string OrderNo = "en{'Order No.'}de{'Order Nr.'}";
         public const string ProdOrderProgramNo = "en{'Order Number'}de{'Auftragsnummer'}";
         public const string ProdOrderPartslist = "en{'Prod. Order BOM'}de{'Prod.auftrag Stückliste'}";
+        public const string ProductionStart = "en{'Production Start'}de{'Produktionsstart'}";
+        public const string ProductionEnd = "en{'Production End'}de{'Produktionsende'}";
         public const string DepartmentUserName = "en{'Ended by User'}de{'Beendet von Bediener'}";
 
         // Batches
@@ -284,8 +291,10 @@
         public const string PlanningMR = "en{'Template schedules'}de{'Vorlagepläne'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
+        public const string Reset = "en{'Reset'}de{'Zurücksetzen'}";
         public const string Select = "en{'Select'}de{'Auswahl'}";
         public const string SelectAll = "en{'Select all'}de{'Alles auswählen'}";
+        public const string Picking = "en{'Picking Order'}de{'Kommissionierauftrag'}";
         public const string PickingType = "en{'Picking type'}de{'Kommissionierung Typ'}";
         public const string PickingNo = "en{'Picking-No.'}de{'Kommissions-Nr.'}";
 

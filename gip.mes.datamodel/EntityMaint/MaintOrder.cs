@@ -15,7 +15,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, "Facility", "en{'Facility'}de{'Facility'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "Picking", "en{'Picking'}de{'Picking'}", Const.ContextDatabase + "\\" + Picking.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(5, "IsActive", "en{'Active'}de{'Aktiv'}", "", "", true)]
-    [ACPropertyEntity(6, "MaintInterval", "en{'Maintenance interval'}de{'Wartungsintervall'}", "", "", true)]
+    [ACPropertyEntity(6, "MaintInterval", "en{'Maintenance interval [days]'}de{'Wartungsintervall [Tage]'}", "", "", true)]
     [ACPropertyEntity(7, "LastMaintTerm", "en{'Last Maintenance on'}de{'Letzte Wartung am'}", "", "", true)]
     [ACPropertyEntity(8, "WarningDiff", "en{'Advance Notice Days'}de{'Vorank�ndigung Tage'}", "", "", true)]
     [ACPropertyEntity(9, "PlannedStartDate", "en{'Planned start date'}de{'Geplantes Startdatum'}", "", "", true)]
@@ -156,12 +156,12 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
 
-        [ACPropertyInfo(9999)]
-        public core.datamodel.ACClass TempACClass
-        {
-            get;
-            set;
-        }
+        //[ACPropertyInfo(9999)]
+        //public core.datamodel.ACClass TempACClass
+        //{
+        //    get;
+        //    set;
+        //}
 
         [ACPropertyInfo(999, "", "en{'Next Maintenance on'}de{'N�chste Wartung am'}")]
         public DateTime? NextMaintTerm

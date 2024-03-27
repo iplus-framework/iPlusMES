@@ -14,7 +14,7 @@ using static gip.core.datamodel.Global;
 
 namespace gip.mes.maintenance
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance templates'}de{'Wartungsvorlagen'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaintOrder.ClassName)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance plan'}de{'Wartungsplan'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaintOrder.ClassName)]
     public class BSOMaintOrderTemplate : BSOMaintOrderBase
     {
         #region c'tors
@@ -48,6 +48,11 @@ namespace gip.mes.maintenance
                 _CurrentACComponent = null;
             }
 
+            if (BSOFacilityExplorer_Child != null && BSOFacilityExplorer_Child.Value != null)
+            {
+                BSOFacilityExplorer_Child.Value.PropertyChanged -= FacilityExplorer_PropertyChanged;
+            }
+
             DetachMaintServices();
 
             return base.ACDeInit(deleteACClassTask);
@@ -63,6 +68,12 @@ namespace gip.mes.maintenance
                     CurrentACComponent = (this.SelectionManager as VBBSOSelectionManager).ShowACObjectForSelection;
                 }
             }
+
+            if (BSOFacilityExplorer_Child != null && BSOFacilityExplorer_Child.Value != null)
+            {
+                BSOFacilityExplorer_Child.Value.PropertyChanged += FacilityExplorer_PropertyChanged;
+            }
+
             return base.ACPostInit();
         }
 
@@ -96,8 +107,6 @@ namespace gip.mes.maintenance
                 return _BSOFacilityExplorer_Child;
             }
         }
-
-
 
         #endregion
 
@@ -270,6 +279,30 @@ namespace gip.mes.maintenance
             }
         }
         #endregion
+
+        public override MaintOrder CurrentMaintOrder 
+        { 
+            get => base.CurrentMaintOrder;
+            set
+            {
+                base.CurrentMaintOrder = value;
+
+                if (value != null)
+                {
+                    MaintACClassPropertyList = value.MaintACClass?.MaintACClassProperty_MaintACClass
+                                                                  .Where(c => c.IsActive)
+                                                                  .Select(c => new MaintACClassPropertyWrapper() { MaintACClassProperty = c, ACClassProperty = c.ACClassProperty })
+                                                                  .ToList();
+
+                    SearchProperties();
+                }
+                else
+                {
+                    MaintACClassPropertyList = null;
+                    ACClassPropertyList = null;
+                }
+            }
+        }
 
         private MaintenanceWizzardStepsEnum _CurrentWizzardStep;
         [ACPropertyInfo(9999)]
@@ -550,13 +583,24 @@ namespace gip.mes.maintenance
             }
         }
 
+        private ACBSO _ComponentSelector;
+        public ACBSO ComponentSelector
+        {
+            get
+            {
+                if (_ComponentSelector == null)
+                    _ComponentSelector = GetChildComponent("BSOComponentSelectorMaint") as ACBSO;
+                return _ComponentSelector;
+            }
+        }
+
         #endregion
 
         #region Methods
 
         protected override IQueryable<MaintOrder> _AccessPrimary_NavSearchExecuting(IQueryable<MaintOrder> result)
         {
-            return result.Where(c => c.BasedOnMaintOrderID.HasValue);
+            return result.Where(c => !c.BasedOnMaintOrderID.HasValue);
         }
 
         /// <summary>
@@ -595,8 +639,9 @@ namespace gip.mes.maintenance
                 tempACClass = (CurrentACComponent?.ACType as core.datamodel.ACClass)?.FromAppContext<mes.datamodel.ACClass>(DatabaseApp);
             }
 
-            //CurrentMaintOrder.TempACClass = tempACClass;
+            //CurrentMaintOrder.TempACClass = tempACClass.FromIPlusContext<core.datamodel.ACClass>(Database.ContextIPlus);
             CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
+            SearchProperties();
 
             CurrentWizzardStep = MaintenanceWizzardStepsEnum.TimeEvent;
 
@@ -660,11 +705,12 @@ namespace gip.mes.maintenance
                     if (compSel != null && compSel.CurrentProjectItemCS != null)
                     {
                         mes.datamodel.ACClass tempACClass = compSel.CurrentProjectItemCS.ValueT.FromAppContext<mes.datamodel.ACClass>(DatabaseApp);
-                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, CurrentMaintOrder.TempACClass);
+                        //CurrentMaintOrder.TempACClass = compSel.CurrentProjectItemCS.ValueT;
+                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
                     }    
                 }
 
-                if (CurrentMaintOrder != null && CurrentMaintOrder.TempACClass == null && CurrentMaintOrder.Facility == null)
+                if (CurrentMaintOrder != null && CurrentMaintOrder.MaintACClass == null && CurrentMaintOrder.Facility == null)
                     return;
 
                 SearchProperties();
@@ -795,14 +841,16 @@ namespace gip.mes.maintenance
         [ACMethodInfo("", "en{'Search'}de{'Suchen'}", 999)]
         public void SearchProperties()
         {
-            core.datamodel.ACClass tempACClass = CurrentMaintOrder.TempACClass;
+            core.datamodel.ACClass tempACClass = CurrentMaintOrder.MaintACClass?.VBiACClass.FromIPlusContext<core.datamodel.ACClass>(Database.ContextIPlus);
             if (tempACClass != null)
                 ACClassPropertyList = FindACClassProperties(tempACClass);
+            else
+                ACClassPropertyList = null;
         }
 
         public bool IsEnabledSearchProperties()
         {
-            if (CurrentMaintOrder != null && CurrentMaintOrder.TempACClass != null)
+            if (CurrentMaintOrder != null && CurrentMaintOrder.MaintACClass != null)
                 return true;
 
             return false;
@@ -976,6 +1024,13 @@ namespace gip.mes.maintenance
                     }
 
                 }
+
+                if (!templates.Any())
+                {
+                    AccessPrimary.ToNavList(templates);
+                    OnPropertyChanged(nameof(MaintOrderList));
+                    CurrentMaintOrder = null;
+                }
             }
         }
 
@@ -996,7 +1051,7 @@ namespace gip.mes.maintenance
             ShowDialog(BSOMedia_Child.Value, "MediaDialog");
         }
 
-        public bool IsEnabledOpenDocumentation()
+        public bool IsEnabledOpenTaskDocumentation()
         {
             return SelectedMaintOrderTask != null;
         }
@@ -1031,6 +1086,184 @@ namespace gip.mes.maintenance
         }
 
         #endregion
+
+        /// <summary>
+        /// Checks the configured maintenance rules and marks the ACClass with appropriate icon.
+        /// </summary>
+        /// <param name="items">The items for check.</param>
+        /// <param name="recursive">The recursive parameter, define is method check icons recursive or only for top level.</param>
+        /// <summary xml:lang="de">
+        /// 
+        /// </summary>
+        /// <param xml:lang="de" name="items"></param>
+        /// <param xml:lang="de" name="recursive"></param>
+        [ACMethodInfo("", "", 999, true)]
+        public void CheckIcons(ACClassInfoWithItems items, bool recursive = true)
+        {
+            //if (MaintRules.Any())
+            //{
+            //    CheckConfigRuleMarks(items, MaintRules, recursive);
+            //}
+            //else
+            //{
+            //    ClearConfigRuleMarks(items);
+            //}
+        }
+
+        private Global.ConfigIconState CheckConfigRuleMarks(ACClassInfoWithItems items, IEnumerable<MaintACClass> maintconfigs, bool recursive = true)
+        {
+            Global.ConfigIconState iconState = Global.ConfigIconState.NoConfig;
+            //items.IconState = iconState;
+            //IEnumerable<vd.MaintACClass> maintConfigsFilter = null;
+
+            //if (ActivatedRules && !DeactivatedRules)
+            //    maintConfigsFilter = maintconfigs.Where(c => c.IsActive);
+
+            //else if (!ActivatedRules && DeactivatedRules)
+            //    maintConfigsFilter = maintconfigs.Where(c => !c.IsActive);
+
+            //else if (!ActivatedRules && !DeactivatedRules)
+            //{
+            //    ClearConfigRuleMarks(items);
+            //    return Global.ConfigIconState.NoConfig;
+            //}
+
+            //else
+            //    maintConfigsFilter = maintconfigs;
+
+
+            //if (RuleOnComponent && maintConfigsFilter.Any(c => c.VBiACClassID == items.ValueT.ACClassID))
+            //{
+            //    iconState = Global.ConfigIconState.Config;
+            //    items.IconState = iconState;
+            //}
+
+            //else if (InheritedRule && !maintconfigs.Any(c => c.VBiACClassID == items.ValueT.ACClassID && (c.IsActive == ActivatedRules || !c.IsActive == DeactivatedRules)))
+            //{
+            //    foreach (var config in maintConfigsFilter)
+            //    {
+            //        if (items.ValueT.IsDerivedClassFrom(config.ACClass))
+            //        {
+            //            iconState = Global.ConfigIconState.InheritedConfig;
+            //            items.IconState = iconState;
+            //            continue;
+            //        }
+            //    }
+            //}
+
+            //if (recursive)
+            //{
+            //    foreach (ACClassInfoWithItems info in items.Items)
+            //    {
+            //        iconState = CheckConfigRuleMarks(info, maintconfigs);
+            //        if (items.IconState == null || (Global.ConfigIconState)items.IconState == Global.ConfigIconState.NoConfig)
+            //            items.IconState = iconState;
+            //        else if (items.IconState != null && items.IconState is Global.ConfigIconState)
+            //            iconState = (Global.ConfigIconState)items.IconState;
+            //    }
+            //}
+            return iconState;
+        }
+
+        private void ClearConfigRuleMarks(ACClassInfoWithItems items)
+        {
+            items.IconState = Global.ConfigIconState.NoConfig;
+            foreach (ACClassInfoWithItems item in items.Items)
+            {
+                item.IconState = Global.ConfigIconState.NoConfig;
+                ClearConfigRuleMarks(item);
+            }
+        }
+
+        private void RefreshOnSave(bool forceRefresh = false)
+        {
+            //if (_IsRefreshNeeded || forceRefresh)
+            //{
+            //    if (ComponentSelector != null)
+            //    {
+            //        ACClassInfoWithItems root = ComponentSelector.ACUrlCommand("CurrentProjectItemRoot") as ACClassInfoWithItems;
+            //        if (root != null)
+            //        {
+            //            CheckIcons(root);
+            //        }
+            //    }
+            //    _IsRefreshNeeded = false;
+            //}
+        }
+
+        private void FacilityExplorer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BSOFacilityExplorer.SelectedFacility))
+            {
+                //if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
+                //    || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
+                //{
+                //    _ACQueryDefinition.ClearFilter(true);
+                //    _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
+                //        Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
+                //}
+            }
+        }
+
+
+
+        #endregion
+
+        #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(NewTemplate):
+                    NewTemplate();
+                    return true;
+                case nameof(IsEnabledNewTemplate):
+                    result = IsEnabledNewTemplate();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(WizzardNext):
+                    WizzardNext();
+                    return true;
+                case nameof(IsEnabledWizzardNext):
+                    result = IsEnabledWizzardNext();
+                    return true;
+                case nameof(WizzardBack):
+                    WizzardBack();
+                    return true;
+                case nameof(IsEnabledWizzardBack):
+                    result = IsEnabledWizzardBack();
+                    return true;
+                case nameof(CloseWindow):
+                    CloseWizzard();
+                    return true;
+                case nameof(AddNewTask):
+                    AddNewTask();
+                    return true;
+                case nameof(RemoveTask):
+                    RemoveTask();
+                    return true;
+                case nameof(OpenTaskDocumentation):
+                    OpenTaskDocumentation();
+                    return true;
+                case nameof(IsEnabledOpenTaskDocumentation):
+                    result = IsEnabledOpenTaskDocumentation();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
 
         #endregion
     }

@@ -9,7 +9,6 @@ using gip.core.manager;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
-using System.Diagnostics;
 
 namespace gip.bso.manufacturing
 {
@@ -608,7 +607,6 @@ namespace gip.bso.manufacturing
         public void LoadBatchPlan()
         {
             var prodOrderBSO = ProdOrderBSO;
-            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
             try
             {
 
@@ -631,7 +629,7 @@ namespace gip.bso.manufacturing
                 }
 
                 VBCurrentACClassWF = _CurrentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(DatabaseApp);
-                MaterialWFConnection matWFConnection = poManager.GetMaterialWFConnection(VBCurrentACClassWF, currentProdOrderPartslist.Partslist.MaterialWFID);
+                MaterialWFConnection matWFConnection = ProdOrderManager.GetMaterialWFConnection(VBCurrentACClassWF, currentProdOrderPartslist.Partslist.MaterialWFID);
                 if (matWFConnection == null)
                 {
                     SelectedBatchPlanForIntermediate = null;
@@ -643,7 +641,7 @@ namespace gip.bso.manufacturing
 
                 _MandatoryConfigStores = ProdOrderManager.GetCurrentConfigStores(_CurrentACClassWF, VBCurrentACClassWF, currentProdOrderPartslist.Partslist.MaterialWFID, currentProdOrderPartslist.Partslist, currentProdOrderPartslist);
 
-                SelectedIntermediate = poManager.GetIntermediate(currentProdOrderPartslist, matWFConnection);
+                SelectedIntermediate = ProdOrderManager.GetIntermediate(currentProdOrderPartslist, matWFConnection);
                 if (SelectedIntermediate == null)
                 {
                     SelectedBatchPlanForIntermediate = null;
@@ -931,7 +929,7 @@ namespace gip.bso.manufacturing
             MsgWithDetails msg = null;
             ACPartslistManager plManager = ACPartslistManager.GetServiceInstance(this);
             ACMatReqManager matReqManager = ACMatReqManager.GetServiceInstance(this);
-            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
+            ACProdOrderManager poManager = ProdOrderManager;
 
             if (plManager != null)
             {
@@ -1013,18 +1011,6 @@ namespace gip.bso.manufacturing
                 return null;
             }
             return ProdOrderManager.GetACClassWFDischarging(DatabaseApp, currentProdOrderPartslist, VBCurrentACClassWF, SelectedIntermediate);
-        }
-
-        void AldiBSOPartslist_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "SelectedIntermediate")
-            {
-                OnPropertyChanged("BatchPlanForIntermediateList");
-                if (BatchPlanForIntermediateList != null)
-                    SelectedBatchPlanForIntermediate = BatchPlanForIntermediateList.FirstOrDefault();
-                OnPropertyChanged("StartBatchPlanText");
-                OnPropertyChanged("StartIntermediateText");
-            }
         }
 
         #region Sub-Methods for BatchPlanForIntermediate
@@ -1222,8 +1208,19 @@ namespace gip.bso.manufacturing
             }
 
             string targetCompACUrl = SelectedTarget.Module.ACUrlComponent;
-            var sources = ACRoutingService.MemFindSuccessors(RoutingService, Database.ContextIPlus, targetCompACUrl, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Backwards, 1,
-                                                             true, true);
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                Direction = RouteDirections.Backwards,
+                MaxRouteAlternativesInLoop = 1,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
+
+            var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
             if (sources == null)
             {
                 Messages.Info(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
@@ -1236,11 +1233,18 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module });
+            List<core.datamodel.ACClass> possibleSources = sources.Routes.Select(c => c.FirstOrDefault().Source).ToList();
+            core.datamodel.ACClass start = null;
+
+            if (CurrentACClassWF != null)
+                start = ConfigManagerIPlus.FilterByAllowedInstances(CurrentACClassWF, MandatoryConfigStores, VarioConfigManager, possibleSources).FirstOrDefault();
+
+            routeSelector.ShowAvailableRoutes(possibleSources, new core.datamodel.ACClass[] { SelectedTarget.Module }, null, null, true, start);
 
             if (routeSelector.RouteResult != null)
             {
-                SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
+                Route route = Route.MergeRoutes(routeSelector.RouteResult);
+                SelectedTarget.CurrentRoute = route;
             }
             else
             {
@@ -1264,13 +1268,13 @@ namespace gip.bso.manufacturing
             }
 
             //set flag to true if route is read only
-            routeSelector.EditRoutes(SelectedTarget.CurrentRoute, false, true, true);
+            routeSelector.EditRoutesWithAttach(SelectedTarget.CurrentRoute, false, true, true);
 
             if (routeSelector.RouteResult != null)
             {
-                Route result = routeSelector.RouteResult.FirstOrDefault();
-                if (result != SelectedTarget.CurrentRoute)
-                    SelectedTarget.CurrentRoute = result;
+                Route route = Route.MergeRoutes(routeSelector.RouteResult);
+                if (route != SelectedTarget.CurrentRoute)
+                    SelectedTarget.CurrentRoute = route;
             }
         }
 
@@ -1290,34 +1294,37 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case "StartBatchPlan":
+                case nameof(StartBatchPlan):
                     StartBatchPlan();
                     return true;
-                case "DialogOK":
+                case nameof(IsEnabledStartBatchPlan):
+                    result = IsEnabledStartBatchPlan();
+                    return true;
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "NewBatchPlanForIntermediate":
+                case nameof(NewBatchPlanForIntermediate):
                     NewBatchPlanForIntermediate();
                     return true;
-                case "IsEnabledNewBatchPlanForIntermediate":
+                case nameof(IsEnabledNewBatchPlanForIntermediate):
                     result = IsEnabledNewBatchPlanForIntermediate();
                     return true;
-                case "DeleteBatchPlanForIntermediate":
+                case nameof(DeleteBatchPlanForIntermediate):
                     DeleteBatchPlanForIntermediate();
                     return true;
-                case "OpenRoute":
+                case nameof(OpenRoute):
                     OpenRoute();
                     return true;
-                case Const.IsEnabledPrefix + "OpenRoute":
+                case nameof(IsEnabledOpenRoute):
                     result = IsEnabledOpenRoute();
                     return true;
-                case "SetRoute":
+                case nameof(SetRoute):
                     SetRoute();
                     return true;
-                case Const.IsEnabledPrefix + "SetRoute":
+                case nameof(IsEnabledSetRoute):
                     result = IsEnabledSetRoute();
                     return true;
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using gip.core.datamodel;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -14,11 +15,29 @@ namespace gip.mes.processapplication
         {
             get
             {
-                return (bool)this["DeactivateProcessConverter"];
+                return (bool)this[nameof(DeactivateProcessConverter)];
             }
             set
             {
-                this["DeactivateProcessConverter"] = value;
+                this[nameof(DeactivateProcessConverter)] = value;
+            }
+        }
+
+        private static ProcessConfiguration _StaticConfig = null;
+        public static ProcessConfiguration StaticConfig
+        {
+            get
+            {
+                if (_StaticConfig != null)
+                    return _StaticConfig;
+                try
+                {
+                    _StaticConfig = (ProcessConfiguration)CommandLineHelper.ConfigCurrentDir.GetSection("Process/ProcessConfiguration");
+                }
+                catch (Exception)
+                {
+                }
+                return null;
             }
         }
     }

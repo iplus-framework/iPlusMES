@@ -1,10 +1,5 @@
-﻿using gip.core.autocomponent;
-using gip.core.datamodel;
+﻿using gip.core.datamodel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.webservices;
 using CoreWCF;
 using CoreWCF.Description;
@@ -21,8 +16,6 @@ namespace gip.mes.webservices
         {
         }
         #endregion
-
-
 
         #region Implementation
 

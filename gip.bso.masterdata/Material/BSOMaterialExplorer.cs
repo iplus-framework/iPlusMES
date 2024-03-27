@@ -149,23 +149,25 @@ namespace gip.bso.masterdata
 
             if (FilterMDSchedulingGroupID != null)
             {
-
-                query =
+                var partslistQuery =
                     query
+                    .SelectMany(c => c.Partslist_Material)
                     .Where(c =>
-                               c.Partslist_Material.Any(x => x.IsEnabled)
-                               &&
-                               c
-                               .Partslist_Material
-                               .SelectMany(x => x.PartslistACClassMethod_Partslist)
-                               .Select(x => x.MaterialWFACClassMethod)
-                               .Select(x => x.ACClassMethod)
-                               .SelectMany(x => x.ACClassWF_ACClassMethod)
-                               .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
-                               .Any(x => x.MDSchedulingGroupID == FilterMDSchedulingGroupID)
-                    )
-                    as IQueryable<Material>;
+                        c.IsEnabled
+                        &&
+                        c
+                        .PartslistACClassMethod_Partslist
+                        .Select(x => x.MaterialWFACClassMethod)
+                        .Select(x => x.ACClassMethod)
+                        .SelectMany(x => x.ACClassWF_ACClassMethod)
+                        .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                        .Any(x => x.MDSchedulingGroupID == FilterMDSchedulingGroupID));
 
+                query = partslistQuery
+                    .Select(c=>c.MaterialID)
+                    .Distinct()
+                    .Join(query, plID => plID, q => q.MaterialID, (pl, q) => q)
+                    as IQueryable<Material>;
             }
 
             if (FilterIsNotDeleted != null)

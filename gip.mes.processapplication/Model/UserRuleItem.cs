@@ -6,10 +6,10 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.processapplication
 {
     /// <summary>
-    /// 
+    /// UserRuleItem
     /// </summary>
     [DataContract]
     [ACClassInfo(Const.PackName_VarioFacility, "en{'UserRuleItem'}de{'UserRuleItem'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]

@@ -14,7 +14,7 @@ namespace gip.mes.processapplication
     {
         static PAEScannerDecoderVB()
         {
-            RegisterExecuteHandler(typeof(PAEPump), HandleExecuteACMethod_PAEScannerDecoderVB);
+            RegisterExecuteHandler(typeof(PAEScannerDecoderVB), HandleExecuteACMethod_PAEScannerDecoderVB);
         }
 
         public PAEScannerDecoderVB(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")

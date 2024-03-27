@@ -574,6 +574,8 @@ namespace gip.bso.manufacturing
                         )
                     )
                 )
+                .OrderBy(c => c.ACProgram.ProgramNo)
+                .ThenByDescending(c => c.InsertDate)
                 .ToArray();
         }
 
@@ -600,13 +602,32 @@ namespace gip.bso.manufacturing
                 // prodOrderPartslistPos is null at planning nodes
                 if (prodOrderPartslistPos == null)
                 {
+
                     prodOrderPartslistPos =
                     task
-                    .ACProgram
-                    .ACClassTask_ACProgram
-                    .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
-                    .Where(c => c.ParentProdOrderPartslistPosID != null)
-                    .FirstOrDefault();
+                        .ACProgram
+                        .ACClassTask_ACProgram
+                        .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                        .Where(c => c.ParentProdOrderPartslistPosID != null)
+                        .FirstOrDefault();
+
+                    if (prodOrderPartslistPos == null)
+                    {
+                        prodOrderPartslistPos =
+                        task
+                           .ACProgram
+                           .ACClassTask_ACProgram
+                           .SelectMany(c => c.ProdOrderPartslistPos_ACClassTask)
+                           .FirstOrDefault();
+                    }
+
+                    // @aagincic: there is some issue with refreshing task.ProdOrderPartslistPos_ACClassTask() while this list in this case
+                    // is empty but query down returns result
+                    if (prodOrderPartslistPos == null)
+                    {
+                        prodOrderPartslistPos = databaseApp.ProdOrderPartslistPos.Where(c => c.ACClassTaskID == task.ACClassTaskID).FirstOrDefault();
+                    }
+
                 }
 
                 model.Material = "";
@@ -626,6 +647,11 @@ namespace gip.bso.manufacturing
                     .ACClassTask_ACProgram
                     .SelectMany(c => c.PickingPos_ACClassTask)
                     .FirstOrDefault();
+
+                    if (pickingPos == null)
+                    {
+                        pickingPos = databaseApp.ACClassTask.Where(c => c.ACProgramID == task.ACProgramID).SelectMany(c => c.PickingPos_ACClassTask).FirstOrDefault();
+                    }
                     if (pickingPos != null)
                     {
                         model.ProgramNo = pickingPos.Picking.PickingNo;

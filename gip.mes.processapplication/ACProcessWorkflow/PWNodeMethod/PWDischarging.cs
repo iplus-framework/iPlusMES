@@ -7,6 +7,9 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Xml;
+using gip.core.processapplication;
+
+using System.Reflection.Emit;
 
 namespace gip.mes.processapplication
 {
@@ -16,7 +19,7 @@ namespace gip.mes.processapplication
     /// The workflow node can also be linked to an intermediate product in a material workflow. 
     /// PWDischarging is used for fully automatic production. 
     /// It calls the PAFDischarging process function asynchronously to delegate the real-time critical tasks to a PLC controller. 
-    /// Manufactured, received or relocated quantities are posted via warehouse management (ACFacilityManager). 
+    /// Manufactured, received or relocated quantities are posted via warehouse management (ACFacilityMan ager). 
     /// It can work with different data contexts (production and picking orders or delivery notes).
     /// </summary>
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
@@ -51,6 +54,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("IgnorePredecessors", "en{'Ignore predecessor groups'}de{'Ignoriere Vorgangsgruppen'}");
             method.ParameterValueList.Add(new ACValue("LossCorrectionFactor", typeof(double?), null, Global.ParamOption.Optional));
             paramTranslation.Add("LossCorrectionFactor", "en{'Loss correction factor 0 = bill of material factor, n=%'}de{'Verlustfaktor 0 = Rezept Faktor, n=%'}");
+            method.ParameterValueList.Add(new ACValue("ClassCode", typeof(short), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("ClassCode", "en{'Classification allowed destinations'}de{'Klassifizierung erlaubte Ziele'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
@@ -80,6 +85,7 @@ namespace gip.mes.processapplication
                 _CheckIfAutomaticTargetChangePossible = null;
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
+                _CriticalRouteFoundAcknowledged = 0;
             }
 
             CurrentDisEntityID.ValueT = Guid.Empty;
@@ -98,6 +104,7 @@ namespace gip.mes.processapplication
                 _CheckIfAutomaticTargetChangePossible = null;
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
+                _CriticalRouteFoundAcknowledged = 0;
             }
 
             CurrentDisEntityID.ValueT = Guid.Empty;
@@ -359,6 +366,9 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected short _CriticalRouteFoundAcknowledged = 0;
+
+
         protected bool SkipIfNoComp
         {
             get
@@ -534,11 +544,17 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "EnterExtraDisTargetDest":
+                case nameof(EnterExtraDisTargetDest):
                     EnterExtraDisTargetDest();
                     return true;
-                case Const.IsEnabledPrefix + "EnterExtraDisTargetDest":
+                case nameof(IsEnabledEnterExtraDisTargetDest):
                     result = IsEnabledEnterExtraDisTargetDest();
+                    return true;
+                case nameof(CriticalRouteAck):
+                    CriticalRouteAck();
+                    return true;
+                case nameof(IsEnabledCriticalRouteAck):
+                    result = IsEnabledCriticalRouteAck();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -557,6 +573,7 @@ namespace gip.mes.processapplication
         {
             CacheModuleDestinations = null;
             LastTargets = null;
+            _CriticalRouteFoundAcknowledged = 0;
             base.SMIdle();
         }
 
@@ -608,6 +625,7 @@ namespace gip.mes.processapplication
                 if (NoTargetWait.HasValue && DateTime.Now < NoTargetWait.Value) // Zyklisches Warten um zyklische Datenbankabfragen zu minimieren
                     return;
                 NoTargetWait = null;
+                _CriticalRouteFoundAcknowledged = 0;
                 CheckIfAutomaticTargetChangePossible = null;
                 StartDisResult result = StartDischarging(module);
                 if (result == StartDisResult.CycleWait || result == StartDisResult.FastCycleWait)
@@ -675,7 +693,7 @@ namespace gip.mes.processapplication
         public virtual StartDisResult StartDischarging(PAProcessModule module)
         {
             // TODO Handle Methods for In- / Out- and Relocation-Methods
-            if (!IsProduction && !IsIntake && !IsRelocation)
+            if (!IsProduction && !IsIntake && !IsRelocation && !IsLoading)
                 return StartDisResult.CancelDischarging;
 
             // Falls Produktionsauftrag
@@ -707,16 +725,48 @@ namespace gip.mes.processapplication
             if (!IsProduction && !IsIntake && !IsRelocation && !IsLoading)
                 return StartDisResult.WaitForCallback;
 
+            //if (!IsConditionForDestinationChange(discharging))
+            //{
+            //    NoTargetWait = null;
+            //    return StartDisResult.WaitForCallback;
+            //}
+            //else if (!discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            //{
+            //    return StartDisResult.CycleWait;
+            //}
+            //else if (discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            //{
+            //    CheckIfAutomaticTargetChangePossible = null;
+            //    discharging.FaultAckDestinationFull.ValueT = false;
+            //}
+
             if (!IsConditionForDestinationChange(discharging))
             {
+                if (discharging.StateDestinationFull.ValueT == PANotifyState.Off && CheckIfAutomaticTargetChangePossible.HasValue)
+                    CheckIfAutomaticTargetChangePossible = null;
                 NoTargetWait = null;
                 return StartDisResult.WaitForCallback;
             }
-            else if (!discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            // If Target full, but last destination-search was unsucessfull, then wait for User-Acknowledge
+            if (   discharging.StateDestinationFull.ValueT != PANotifyState.Off
+                && !discharging.FaultAckDestinationFull.ValueT
+                && CheckIfAutomaticTargetChangePossible.HasValue
+                && !CheckIfAutomaticTargetChangePossible.Value)
             {
                 return StartDisResult.CycleWait;
             }
-            else if (discharging.FaultAckDestinationFull.ValueT && CheckIfAutomaticTargetChangePossible.HasValue)
+            // Destination Changed and wait for Response from PLC -> Wait
+            if (discharging.StateDestinationFull.ValueT != PANotifyState.Off
+                && discharging.FaultAckDestinationFull.ValueT
+                && CheckIfAutomaticTargetChangePossible.HasValue
+                && CheckIfAutomaticTargetChangePossible.Value)
+            {
+                return StartDisResult.CycleWait;
+            }
+            if (   discharging.StateDestinationFull.ValueT != PANotifyState.Off
+                && discharging.FaultAckDestinationFull.ValueT
+                && CheckIfAutomaticTargetChangePossible.HasValue
+                && IsSimulationOn)
             {
                 CheckIfAutomaticTargetChangePossible = null;
                 discharging.FaultAckDestinationFull.ValueT = false;
@@ -810,11 +860,8 @@ namespace gip.mes.processapplication
                         CheckIfAutomaticTargetChangePossible = null;
                         if (discharging != null)
                         {
-                            double actualWeight = 0;
-                            var acValue = e.GetACValue("ActualQuantity");
-                            if (acValue != null)
-                                actualWeight = acValue.ParamAsDouble;
-                            //short simulationWeight = (short)acMethod["Source"];
+                            double? disChargedWeight = GetDischargedWeight(false, taskEntry, eM, acMethod);
+                            double actualWeight = disChargedWeight.HasValue ? disChargedWeight.Value : 0;
 
                             if (OnTaskCallbackCanExecutePostings(sender, e, wrapObject, discharging, acMethod))
                             {
@@ -830,7 +877,7 @@ namespace gip.mes.processapplication
                                         OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualWeight);
 
                                         bool exceptionHandled = false;
-                                        var routeItem = CurrentDischargingDest(dbIPlus);
+                                        var routeItem = CurrentDischargingDest(dbIPlus, true);
                                         PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
                                         if (routeItem != null && targetModule != null)
                                         {
@@ -860,7 +907,9 @@ namespace gip.mes.processapplication
                                             {
                                                 foreach (var pwDosing in previousDosings)
                                                 {
-                                                    if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp))
+                                                    if (   (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp) && IsProduction)
+                                                        || (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging) && IsTransport)
+                                                        )
                                                         pwDosing.ResetDosingsAfterInterDischarging(dbApp);
                                                     else
                                                         pwDosing.SetDosingsCompletedAfterDischarging(dbApp);
@@ -884,12 +933,20 @@ namespace gip.mes.processapplication
                                                 actualWeight = acValueTargetQ.ParamAsDouble;
                                         }
 
-                                        var routeItem = CurrentDischargingDest(dbIPlus);
+                                        var routeItem = CurrentDischargingDest(dbIPlus, true);
                                         PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
                                         if (routeItem != null && targetModule != null)
                                         {
                                             try
                                             {
+                                                PAMSilo targetSilo = targetModule as PAMSilo;
+                                                Facility inwardFacility = null;
+                                                if (targetSilo != null && targetSilo.Facility.ValueT != null && targetSilo.Facility.ValueT.ValueT != null)
+                                                {
+                                                    Guid facilityId = targetSilo.Facility.ValueT.ValueT.FacilityID;
+                                                    inwardFacility = dbApp.Facility.Where(c => c.FacilityID == facilityId).FirstOrDefault();
+                                                }
+
                                                 if (IsIntake)
                                                 {
                                                     var pwMethod = ParentPWMethod<PWMethodIntake>();
@@ -900,14 +957,22 @@ namespace gip.mes.processapplication
                                                     {
                                                         picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                         PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                        if (picking != null)
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                        if (picking != null && pickingPos != null)
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
+                                                                actualWeight = pickingPos.TargetQuantityUOM;
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, picking, pickingPos, e, true);
+                                                        }
                                                     }
                                                     else if (pwMethod.CurrentDeliveryNotePos != null)
                                                     {
                                                         notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
                                                         if (notePos != null)
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && notePos != null)
+                                                                actualWeight = notePos.TargetQuantityUOM.HasValue ? notePos.TargetQuantityUOM.Value : 0.0;
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, notePos, e, true);
+                                                        }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
                                                     {
@@ -929,7 +994,7 @@ namespace gip.mes.processapplication
                                                         {
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
                                                                 actualWeight = pickingPos.TargetQuantityUOM;
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, null, picking, pickingPos, e, true);
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
@@ -948,16 +1013,32 @@ namespace gip.mes.processapplication
                                                     {
                                                         picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                         PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                                                        if (picking != null)
+                                                        if (picking != null && pickingPos != null)
+                                                        {
+                                                            if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
+                                                                actualWeight = pickingPos.TargetQuantityUOM;
                                                             DoOutwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
-                                                    }
-                                                    else if (pwMethod.CurrentDeliveryNotePos != null)
-                                                    {
-                                                        notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
-                                                        if (notePos != null)
-                                                            DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                        }
+                                                        else if (pwMethod.CurrentDeliveryNotePos != null)
+                                                        {
+                                                            notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
+                                                            if (notePos != null)
+                                                            {
+                                                                if (this.IsSimulationOn && actualWeight <= 0.000001 && notePos != null)
+                                                                    actualWeight = notePos.TargetQuantityUOM.HasValue ? notePos.TargetQuantityUOM.Value : 0.0; 
+                                                                DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                            }
+                                                        }
                                                     }
                                                 }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Messages.LogException(this.GetACUrl(), "TaskCallback(21)", ex);
+                                                ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                                                OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "TaskCallback", 1021), true);
+                                                discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
+                                                discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1021), true);
                                             }
                                             finally
                                             {
@@ -1011,170 +1092,11 @@ namespace gip.mes.processapplication
         #endregion
 
 
-        #region Planned Silos
-        public virtual FacilityReservation GetNextFreeDestination(IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos, 
-            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null, PAFDischarging discharging = null)
-        {
-            if (plannedSilos == null || !plannedSilos.Any())
-                return null;
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
-            {
-                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
-            {
-                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
-            {
-                if (CheckPlannedDestinationSilo(plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                {
-                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
-                    return plannedSilo;
-                }
-            }
-            return null;
-        }
-
-        public static FacilityReservation GetNextFreeDestination(ACComponent invoker, IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos, 
-            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
-        {
-            if (plannedSilos == null || !plannedSilos.Any())
-                return null;
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
-            {
-                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
-            {
-                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                    return plannedSilo;
-            }
-            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
-            {
-                if (CheckPlannedDestinationSilo(invoker, plannedSilo, pPos, changeReservationStateIfFull, ignoreFullSilo))
-                {
-                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
-                    return plannedSilo;
-                }
-            }
-            return null;
-        }
-
-        protected virtual bool CheckPlannedDestinationSilo(FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null, int additionalSearchFlags = 0)
-        {            
-            if (plannedSilo == null || (ignoreFullSilo != null && ignoreFullSilo == plannedSilo))
-                return false;
-            if (plannedSilo.Facility != null
-                && plannedSilo.Facility.InwardEnabled)
-            {
-                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                {
-                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
-                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
-                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (   !plannedSilo.Facility.MaterialID.HasValue
-                        || (   (    (batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
-                             && (batchPos.IsFinalMixure
-                                 || (   !batchPos.IsFinalMixure
-                                     &&  (    !plannedSilo.Facility.PartslistID.HasValue 
-                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
-                                    )
-                                ) 
-                           )
-                       )
-                    {
-                        // Prüfe ob rechnerisch die Charge reinpassen würde
-                        if (plannedSilo.Facility.CurrentFacilityStock != null
-                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
-                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
-                        {
-                            if (changeReservationStateIfFull)
-                                Messages.LogDebug(this.GetACUrl(), "PWDischarging.CheckPlannedDestinationSilo(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
-                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
-                            return false;
-                        }
-                        else
-                            return true;
-                    }
-                }
-                // Auf Lagerplätze ohne Belegung darf immer entleert werden
-                else
-                    return true;
-            }
-            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
-            else if (plannedSilo.Facility == null 
-                && batchPos.BookingMaterial.MDFacilityManagementType != null 
-                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public static bool CheckPlannedDestinationSilo(ACComponent invoker, FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
-        {
-            if (plannedSilo == null)
-                return false;
-            if (plannedSilo.Facility != null
-                && plannedSilo.Facility.InwardEnabled)
-            {
-                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                {
-                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
-                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
-                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (!plannedSilo.Facility.MaterialID.HasValue
-                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
-                             && (batchPos.IsFinalMixure
-                                 || (!batchPos.IsFinalMixure
-                                     && (!plannedSilo.Facility.PartslistID.HasValue
-                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
-                                    )
-                                )
-                           )
-                       )
-                    {
-                        // Prüfe ob rechnerisch die Charge reinpassen würde
-                        if (plannedSilo.Facility.CurrentFacilityStock != null
-                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
-                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
-                        {
-                            if (changeReservationStateIfFull)
-                                invoker.Messages.LogDebug(invoker.GetACUrl(), "PWDischarging.CheckPlannedDestinationSilo(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
-                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
-                            return false;
-                        }
-                        else
-                            return true;
-                    }
-                }
-                // Auf Lagerplätze ohne Belegung darf immer entleert werden
-                else
-                    return true;
-            }
-            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
-            else if (plannedSilo.Facility == null
-                && batchPos.BookingMaterial.MDFacilityManagementType != null
-                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
-            {
-                return true;
-            }
-            return false;
-        }
-#endregion
-
-
 #region Routing
         public static MsgWithDetails DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo, 
             out Route route, int searchDepth, 
-            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector, 
-            string deSelectionRuleID, object[] deSelParams = null)
+            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector,
+            string deSelectionRuleID, bool includeReserved, bool includeAllocated, object[] deSelParams = null, Route previousRoute = null)
         {
             route = null;
             ACComponent routingService = null;
@@ -1183,11 +1105,25 @@ namespace gip.mes.processapplication
                 routingService = routeableComp.RoutingService;
 
             Guid acClassIDCompTo = acCompTo.ComponentClass.ACClassID;
-            RoutingResult rResult = ACRoutingService.SelectRoutes(routingService, db, routingService != null && routingService.IsProxy,
-                                 acCompFrom, acCompTo, RouteDirections.Forwards, deSelectionRuleID, deSelParams != null ? deSelParams : new object[] { },
-                                 (c, p, r) => c.ACClassID == acClassIDCompTo,
-                                 deSelector,
-                                 0, true, true, false, false, searchDepth);
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = routingService,
+                Database = db,
+                AttachRouteItemsToContext = routingService != null && routingService.IsProxy,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = deSelectionRuleID,
+                SelectionRuleParams = deSelParams,
+                DBSelector = (c, p, r) => c.ACClassID == acClassIDCompTo,
+                DBDeSelector = deSelector,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = includeReserved,
+                IncludeAllocated = includeAllocated,
+                DBRecursionLimit = searchDepth,
+                PreviousRoute = previousRoute
+            };
+
+            RoutingResult rResult = ACRoutingService.SelectRoutes(acCompFrom, acCompTo, routingParameters);
             if (rResult.Routes == null || !rResult.Routes.Any())
                 return new MsgWithDetails { Source = acCompFrom.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "DetermineDischargingRoute(1)", Message = "No route found" };
 
@@ -1196,40 +1132,151 @@ namespace gip.mes.processapplication
         }
 
 
-        protected void DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo, 
-            int searchDepth, 
-            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector, 
-            string deSelectionRuleID, object[] deSelParams = null)
+        public enum FindDisRouteResult
         {
-            Route route = null;
-            PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, deSelParams);
-            if (route != null)
-                route.Detach(true);
-            CurrentDischargingRoute = route;
+            NotFound = 0x00,
+            FoundValidRoute = 0x01,
+            OccupiedFromOtherOrderBlock = 0x02,
+            OccupiedFromOtherOrderWarning = 0x04,
         }
 
-        public virtual RouteItem CurrentDischargingDest(Database db)
+        protected FindDisRouteResult DetermineDischargingRoute(Database db, ACComponent acCompFrom, ACComponent acCompTo,
+            int searchDepth,
+            Func<gip.core.datamodel.ACClass, gip.core.datamodel.ACClassProperty, Route, bool> deSelector,
+            string deSelectionRuleID, object[] deSelParams = null, Route predefinedRoute = null, ACMethod currentActiveMethod = null)
+        {
+            FindDisRouteResult result = FindDisRouteResult.NotFound;
+            Route route = null;
+            if (predefinedRoute != null)
+            {
+                if (!predefinedRoute.AreACUrlInfosSet)
+                    predefinedRoute.AttachTo(db);
+                var item = predefinedRoute.GetRouteTarget();
+                if (item != null && item.TargetACComponent == acCompTo)
+                    route = predefinedRoute;
+            }
+
+            Route prevRoute = null;
+            if (currentActiveMethod != null)
+            {
+                ACValue acValue = currentActiveMethod.ParameterValueList.GetACValue("Route");
+                if (acValue != null)
+                {
+                    prevRoute = (Route)acValue.Value;
+                    // Try keep same elements from previous root
+                    if (prevRoute != null)
+                    {
+                        // TODO: Pass existing Route to Routing to get a similar Route
+                        if (route == null) // Predefined was not set!
+                            PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams, prevRoute);
+                        if (route != null)
+                        {
+                            // Remove same elements from root and test if rest of elements are not occupied
+                            Route diffRouteOnDestChange = Route.IntersectRoutesGetDiff(route, prevRoute, true);
+                            if (   diffRouteOnDestChange != null 
+                                && !ValidateRouteForFuncParam(diffRouteOnDestChange))
+                            {
+                                // Validation failed, try to search an alternative route
+                                route = null;
+                                result = FindDisRouteResult.OccupiedFromOtherOrderBlock;
+                            }
+                            else
+                                result = FindDisRouteResult.FoundValidRoute;
+                        }
+                    }
+                }
+            }
+
+            if (route == null && result == FindDisRouteResult.NotFound)
+            {
+                // If there is no predefined route or comparison to previous route failed, try to search a new alternative route
+                PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, ApplicationManager.IncludeReservedOnRoutingSearch, ApplicationManager.IncludeAllocatedOnRoutingSearch, deSelParams);
+                if (route != null)
+                    result = FindDisRouteResult.FoundValidRoute;
+                else if (!ApplicationManager.IncludeReservedOnRoutingSearch || !ApplicationManager.IncludeAllocatedOnRoutingSearch)
+                {
+                    PWDischarging.DetermineDischargingRoute(db, acCompFrom, acCompTo, out route, searchDepth, deSelector, deSelectionRuleID, true, true, deSelParams);
+                    if (route != null)
+                    {
+                        result = FindDisRouteResult.OccupiedFromOtherOrderWarning;
+                        if (!ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
+                            result = FindDisRouteResult.OccupiedFromOtherOrderBlock;
+                        else if (_CriticalRouteFoundAcknowledged == 2)
+                        {
+                            result = FindDisRouteResult.FoundValidRoute;
+                            _CriticalRouteFoundAcknowledged = 0;
+                        }
+                    }
+                }
+            }
+
+            if (route != null)
+            {
+                route.Detach(true);
+                route.IsPredefinedRoute = predefinedRoute != null && route == predefinedRoute;
+                if (result == FindDisRouteResult.NotFound)
+                    result = FindDisRouteResult.FoundValidRoute;
+            }
+            CurrentDischargingRoute = route;
+            return result;
+        }
+
+        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, out Route route)
+        {
+            route = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
+            Route diffRouteOnDestChange = null;
+            if (acMethod != null && route != null)
+            {
+                ACValue acValue = acMethod.ParameterValueList.GetACValue("Route");
+                if (acValue != null)
+                {
+                    Route prevRoute = (Route)acValue.Value;
+                    if (prevRoute != null)
+                        diffRouteOnDestChange = Route.IntersectRoutesGetDiff(route, prevRoute, true);
+                }
+            }
+            return ValidateRouteForFuncParam(diffRouteOnDestChange != null ? diffRouteOnDestChange : route);
+        }
+
+        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod)
+        {
+            Route route;
+
+            if (!ValidateAndGetCurrentDischargingRouteForParam(acMethod, out route))
+                return false;
+            acMethod["Route"] = route;
+            return route != null;
+        }
+
+        public virtual RouteItem CurrentDischargingDest(Database db, bool leaveAttached = false)
         {
             if (CurrentDischargingRoute == null)
                 return null;
-            RouteItem item = CurrentDischargingRoute.LastOrDefault();
+            RouteItem item = CurrentDischargingRoute.GetRouteTarget();
+            //RouteItem item = CurrentDischargingRoute.LastOrDefault();
             if (item == null)
                 return null;
+            if (!item.AreACUrlInfosSet && db != null && db != core.datamodel.Database.GlobalDatabase)
+            {
+                item.AttachTo(db);
+                item.Detach(true);
+            }
             RouteItem clone = item.Clone() as RouteItem;
-            if (db != null)
+            if (db != null && leaveAttached)
                 clone.AttachTo(db);
             return clone;
         }
 
         private ACRef<PAMSilo> _CurrentCachedDestinationSilo = null;
-        public PAMSilo CurrentCachedDestinationSilo(Database db = null)
+        public PAMSilo CurrentCachedDestinationSilo(Database db = null, bool leaveAttached = false)
         {
             if (CurrentDischargingRoute == null)
             {
                 _CurrentCachedDestinationSilo = null;
                 return null;
             }
-            var lastItem = CurrentDischargingRoute.LastOrDefault();
+            RouteItem lastItem = CurrentDischargingRoute.GetRouteTarget();
+            //var lastItem = CurrentDischargingRoute.LastOrDefault();
             if (lastItem == null)
             {
                 _CurrentCachedDestinationSilo = null;
@@ -1245,12 +1292,12 @@ namespace gip.mes.processapplication
 
             RouteItem clone = lastItem.Clone() as RouteItem;
             IACComponent component = clone.TargetACComponent;
-            if (component == null)
+            if (component == null && db != null && db != core.datamodel.Database.GlobalDatabase)
             {
-                if (db == null)
-                    db = gip.core.datamodel.Database.GlobalDatabase;
                 clone.AttachTo(db);
                 component = clone.TargetACComponent;
+                if (!leaveAttached)
+                    clone.Detach(true);
             }
 
             PAMSilo targetSilo = component as PAMSilo;
@@ -1263,19 +1310,14 @@ namespace gip.mes.processapplication
 
         public PAProcessModule TargetPAModule(Database db)
         {
-            RouteItem item = CurrentDischargingDest(null);
+            RouteItem item = CurrentDischargingDest(db, false);
             if (item == null)
                 return null;
             PAProcessModule target = item.TargetACComponent as PAProcessModule;
             if (target != null)
                 return target;
-
-            item = CurrentDischargingDest(db);
-            if (item == null)
-                return null;
-            target = item.TargetACComponent as PAProcessModule;
-            if (target == null && db == null && !item.IsAttached)
-                item.AttachTo(this.Root.Database);
+            if (!item.IsAttached)
+                item.AttachTo(db == null ? this.Root.Database : db);
             item.Detach();
             return item.TargetACComponent as PAProcessModule;
         }
@@ -1407,6 +1449,145 @@ namespace gip.mes.processapplication
         #endregion
 
 
+        #region Weighing
+        public PAEScaleGravimetric GravimetricScale
+        {
+            get
+            {
+                IPAMContScale pamScale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
+                if (pamScale == null)
+                {
+                    if (IsTransport)
+                    {
+                        PWDischarging otherActivePWDis = RootPW.FindChildComponents<PWDischarging>(c => c is PWDischarging
+                                                                    && c != this
+                                                                    && (c as PWDischarging).CurrentACState > ACStateEnum.SMIdle
+                                                                    && (c as PWDischarging).ParentPWGroup != null
+                                                                    && (c as PWDischarging).ParentPWGroup.AccessedProcessModule is IPAMContScale)
+                            .FirstOrDefault();
+                        if (otherActivePWDis != null)
+                            pamScale = otherActivePWDis.ParentPWGroup.AccessedProcessModule as IPAMContScale;
+                    }
+                }
+                return pamScale?.Scale;
+            }
+        }
+
+        protected virtual double? GetDischargedWeight(bool getDefaultValueIfSim, IACTask taskEntry = null, ACMethodEventArgs eM = null, ACMethod acMethod = null)
+        {
+            double? disChargedWeight = null;
+            if (taskEntry != null && eM != null)
+            {
+                var acValue = eM.GetACValue("ActualQuantity");
+                if (acValue != null)
+                {
+                    disChargedWeight = acValue.ParamAsDouble;
+                    if (Math.Abs(disChargedWeight.Value) <= double.Epsilon)
+                        disChargedWeight = null;
+                }
+            }
+            if (disChargedWeight.HasValue)
+                return disChargedWeight;
+
+            PAEScaleGravimetric scale = GravimetricScale;
+            PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
+            if (scale != null)
+            {
+                totalizingScale = scale as PAEScaleTotalizing;
+                if (totalizingScale != null)
+                    disChargedWeight = totalizingScale.TotalActualWeight.ValueT - scale.StoredWeightForPosting.ValueT;
+                else
+                    // Negative Weighing
+                    disChargedWeight = scale.StoredWeightForPosting.ValueT - scale.ActualWeight.ValueT;
+            }
+            if ((!disChargedWeight.HasValue || Math.Abs(disChargedWeight.Value) <= double.Epsilon))
+            {
+                if (IsSimulationOn)
+                {
+                    if (getDefaultValueIfSim)
+                        disChargedWeight = 0.001;
+                    else if (acMethod != null)
+                    {
+                        var acValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                        if (acValue != null)
+                        {
+                            disChargedWeight = acValue.ParamAsDouble;
+                            if (Math.Abs(disChargedWeight.Value) <= double.Epsilon)
+                            {
+                                disChargedWeight = null;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    PAFDischarging discharging = ParentPWGroup != null && taskEntry != null ? ParentPWGroup.GetExecutingFunction<PAFDischarging>(taskEntry.RequestID) : CurrentExecutingFunction;
+                    if (discharging != null)
+                    {
+                        ACMethod acMethod2;
+                        MsgWithDetails msgError;
+                        PAProcessFunction.CompleteResult result = discharging.ReceiveACMethodResult(out acMethod2, out msgError);
+                        if (result == PAProcessFunction.CompleteResult.Succeeded && acMethod2 != null)
+                        {
+                            var acValue = acMethod2.ResultValueList.GetACValue("ActualQuantity");
+                            if (acValue != null)
+                                disChargedWeight = acValue.ParamAsDouble;
+                        }
+                    }
+                    if (getDefaultValueIfSim && IsSimulationOn && (!disChargedWeight.HasValue || Math.Abs(disChargedWeight.Value) <= double.Epsilon))
+                        disChargedWeight = 0.001;
+                }
+            }
+            return disChargedWeight;
+        }
+
+        protected virtual Weighing InsertNewWeighingIfAlibi(DatabaseApp dbApp, double actualWeight, ACEventArgs e)
+        {
+            Weighing weighing = null;
+            PAEScaleGravimetric scale = null;
+            string identNr = null;
+            if (e != null)
+            {
+                var paramLfdNr = e.GetACValue("GaugeCode");
+                if (paramLfdNr != null)
+                    identNr = paramLfdNr.ParamAsString;
+            }
+            if (String.IsNullOrEmpty(identNr))
+            {
+                scale = GravimetricScale;
+                PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
+                if (totalizingScale != null && totalizingScale.AlibiNo != null)
+                    identNr = totalizingScale.AlibiNo.ValueT;
+            }
+
+            if (!String.IsNullOrEmpty(identNr))
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, this);
+                weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
+                weighing.IdentNr = identNr;
+                weighing.Weight = actualWeight;
+                if (scale == null)
+                    scale = GravimetricScale;
+                if (scale != null)
+                    weighing.VBiACClassID = scale.ComponentClass.ACClassID;
+            }
+            return weighing;
+        }
+
+        protected virtual void RememberWeightOnRunDischarging(bool isNewStart)
+        {
+            PAEScaleGravimetric scale = GravimetricScale;
+            if (scale != null)
+            {
+                if (scale is PAEScaleTotalizing)
+                    scale.StoredWeightForPosting.ValueT = isNewStart ? 0.0 : (scale as PAEScaleTotalizing).TotalActualWeight.ValueT;
+                else
+                    scale.StoredWeightForPosting.ValueT = isNewStart ? 0.0 : scale.ActualWeight.ValueT;
+            }
+        }
+        #endregion
+
+
         #region User-Interaction-Methods
 
         //#region Cancel Component
@@ -1502,6 +1683,19 @@ namespace gip.mes.processapplication
                 return false;
             PWMethodVBBase.EnterExtraDisTargetDest(acComponent.ParentACComponent);
             return true;
+        }
+
+        [ACMethodInteraction("Process", "en{'Allow occupied Route'}de{'Erlaube belegte Route'}", 401, true)]
+        public void CriticalRouteAck()
+        {
+            if (!IsEnabledCriticalRouteAck())
+                return;
+            _CriticalRouteFoundAcknowledged = 2;
+        }
+
+        public virtual bool IsEnabledCriticalRouteAck()
+        {
+            return _CriticalRouteFoundAcknowledged == 1;
         }
         #endregion
 

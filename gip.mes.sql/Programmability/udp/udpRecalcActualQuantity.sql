@@ -59,7 +59,7 @@ begin
 	-- update ActualQuantityUOM pos children
 	update Pos
 	set Pos.ActualQuantityUOM = 
-		isnull((select sum(isnull(Fbc.OutwardQuantityUOM, 0)) + sum(isnull(Fbc.InwardQuantityUOM, 0))   from FacilityBookingCharge Fbc inner join FacilityBooking Fb on Fb.FacilityBookingID = Fbc.FacilityBookingID where Fb.ProdOrderPartslistPosID = Pos.ProdOrderPartslistPosID),0)	
+		isnull((select sum(isnull(Fbc.OutwardQuantityUOM, 0)) + sum(isnull(Fbc.InwardQuantityUOM, 0))   from FacilityBookingCharge Fbc inner join FacilityBooking Fb on Fb.FacilityBookingID = Fbc.FacilityBookingID where Fb.ProdOrderPartslistPosID = Pos.ProdOrderPartslistPosID and Fbc.FacilityBookingTypeIndex <> 106),0)	
 	FROM ProdOrderPartslistPos Pos
 	join dbo.JobTableRecalcActualQuantity Tmp on Tmp.ItemID = Pos.ProdOrderPartslistPosID
 	where Tmp.JobID = @jobID and Tmp.ItemType = 'pos-batch'
@@ -67,7 +67,7 @@ begin
 	update Pos
 	set Pos.ActualQuantityUOM = 
 		isnull((select sum(PosP.ActualQuantityUOM) from ProdOrderPartslistPos PosP where PosP.ParentProdOrderPartslistPosID = Pos.ProdOrderPartslistPosID), 0) + 
-		isnull((select sum(isnull(Fbc.OutwardQuantityUOM, 0)) + sum(isnull(Fbc.InwardQuantityUOM, 0))   from FacilityBookingCharge Fbc inner join FacilityBooking Fb on Fb.FacilityBookingID = Fbc.FacilityBookingID where Fb.ProdOrderPartslistPosID = Pos.ProdOrderPartslistPosID),0)
+		isnull((select sum(isnull(Fbc.OutwardQuantityUOM, 0)) + sum(isnull(Fbc.InwardQuantityUOM, 0))   from FacilityBookingCharge Fbc inner join FacilityBooking Fb on Fb.FacilityBookingID = Fbc.FacilityBookingID where Fb.ProdOrderPartslistPosID = Pos.ProdOrderPartslistPosID and Fbc.FacilityBookingTypeIndex <> 106),0)
 	FROM ProdOrderPartslistPos Pos
 	join dbo.JobTableRecalcActualQuantity Tmp on Tmp.ItemID = Pos.ProdOrderPartslistPosID
 	where Tmp.JobID = @jobID and Tmp.ItemType = 'pos'

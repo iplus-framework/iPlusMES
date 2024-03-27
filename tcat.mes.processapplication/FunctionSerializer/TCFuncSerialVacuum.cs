@@ -57,14 +57,14 @@ namespace tcat.mes.processapplication
                 || MethodNameEquals(typeOrACMethodName, "VacuumTime");
         }
 
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             TCSession session = ParentACComponent as TCSession;
             if (session == null && complexObj == null)
                 return false;
 
             ACMethod request = complexObj as ACMethod;
-            ACChildInstanceInfo instanceInfo = miscParams as ACChildInstanceInfo;
+            (ACChildInstanceInfo instanceInfo, IACComponent invokerModule) = GetSendParameters(miscParams, false);
 
             if (request == null && instanceInfo == null)
                 return false;

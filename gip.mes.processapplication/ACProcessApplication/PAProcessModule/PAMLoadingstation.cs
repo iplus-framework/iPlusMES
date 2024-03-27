@@ -9,7 +9,7 @@ using gip.core.processapplication;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Loadingstation'}de{'Befüllstation'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
-    public class PAMLoadingstation : PAProcessModuleVB
+    public class PAMLoadingstation : PAProcessModuleVB, IPAMContScale
     {
         static PAMLoadingstation()
         {
@@ -44,12 +44,59 @@ namespace gip.mes.processapplication
                 return _PAPointMatOut1;
             }
         }
+
+        public virtual PAEScaleGravimetric Scale
+        {
+            get
+            {
+                return PAMContScaleExtension.GetScale(this);
+            }
+        }
+
+        public virtual bool IsScaleEmpty
+        {
+            get
+            {
+                return PAMContScaleExtension.IsScaleEmpty(this);
+            }
+        }
+
+        public double? RemainingWeightCapacity
+        {
+            get
+            {
+                return PAMContScaleExtension.RemainingWeightCapacity(this);
+            }
+        }
+
+        public double? MinDosingWeight
+        {
+            get
+            {
+                return PAMContScaleExtension.MinDosingWeight(this);
+            }
+        }
+
+        public double? RemainingVolumeCapacity
+        {
+            get
+            {
+                return PAMContScaleExtension.RemainingVolumeCapacity(this);
+            }
+        }
+
+        public IACContainerTNet<double> FillVolume { get; set; }
+
         #endregion
 
         #region Execute-Helper-Handlers
         public static bool HandleExecuteACMethod_PAMLoadingstation(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PAProcessModuleVB(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
+        public void ResetFillVolume()
+        {
         }
         #endregion
 

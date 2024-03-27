@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
@@ -129,6 +130,19 @@ namespace gip.bso.facility
                 if (_BSOTandTFastView_Child == null)
                     _BSOTandTFastView_Child = new ACChildItem<BSOTandTFastView>(this, "BSOTandTFastView_Child");
                 return _BSOTandTFastView_Child;
+            }
+        }
+
+        ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
+        public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservationOverview_Child == null)
+                    _BSOFacilityReservationOverview_Child = new ACChildItem<BSOFacilityReservationOverview>(this, nameof(BSOFacilityReservationOverview_Child));
+                return _BSOFacilityReservationOverview_Child;
             }
         }
 
@@ -411,24 +425,34 @@ namespace gip.bso.facility
 
                 OnPropertyChanged("CurrentFacilityCharge");
                 CleanMovements();
+
+                if(BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
+                {
+                    BSOFacilityReservationOverview_Child.Value.LoadReservation(AccessPrimary.Current);
+                }
+                
                 OnPropertyChanged("FacilityChargeSumLocationHelperList");
                 OnPropertyChanged("FacilityChargeSumFacilityHelperList");
                 OnPropertyChanged("FacilityChargeSumMaterialHelperList");
             }
         }
 
+        private List<FacilityCharge> _FacilityChargeList;
         /// <summary>
         /// Gets the facility charge list.
         /// </summary>
         /// <value>The facility charge list.</value>
         [ACPropertyList(803, FacilityCharge.ClassName)]
-        public IEnumerable<FacilityCharge> FacilityChargeList
+        public List<FacilityCharge> FacilityChargeList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _FacilityChargeList;
+            }
+            set
+            {
+                _FacilityChargeList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -602,6 +626,9 @@ namespace gip.bso.facility
         #endregion
 
         #region BSO->ACMethod
+
+        #region BSO->ACMethod->Save&Search
+
         /// <summary>
         /// Saves this instance.
         /// </summary>
@@ -669,8 +696,15 @@ namespace gip.bso.facility
         {
             if (AccessPrimary == null)
                 return;
-            AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityChargeList");
+
+            _FacilityChargeList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _FacilityChargeList = AccessPrimary.NavList.ToList();
+            }
+
+            OnPropertyChanged(nameof(FacilityChargeList));
         }
 
         private bool _SearchFacilityChargeListInProgress;
@@ -701,6 +735,25 @@ namespace gip.bso.facility
                 Search();
             }
         }
+
+        public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (paOrderInfo != null)
+            {
+                PAOrderInfoEntry entry = paOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
+                CurrentFacilityCharge =
+                    DatabaseApp
+                    .FacilityCharge
+                    .Include(c => c.Facility)
+                    .Include(c => c.FacilityLot)
+                    .Include(c => c.Material)
+                    .FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
+                return null;
+            }
+            return new Msg() { MessageLevel = eMsgLevel.Error, Message = "" };
+        }
+
+        #endregion
 
         #region BSO->ACMethod Filter ExpirationDate
 
@@ -797,6 +850,14 @@ namespace gip.bso.facility
         #endregion
 
         #region FacilityBooking(Charge)Overview methods -> Executive methods overrides
+
+        public override PAOrderInfo GetOrderInfo()
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            if (SelectedFacilityCharge != null)
+                pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
+            return pAOrderInfo;
+        }
 
         public override bool IsEnabledRefreshMovements()
         {

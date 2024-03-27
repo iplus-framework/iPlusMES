@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -16,7 +17,7 @@ namespace gip.mes.processapplication
         {
             if (!IsLoading)
                 return StartDisResult.CancelDischarging;
-            var pwMethod = ParentPWMethod<PWMethodIntake>();
+            var pwMethod = ParentPWMethod<PWMethodLoading>();
             ACMethod acMethod = pwMethod.CurrentACMethod.ValueT;
             if (acMethod == null || pwMethod == null)
                 return StartDisResult.CancelDischarging;
@@ -124,6 +125,17 @@ namespace gip.mes.processapplication
         public virtual Msg DoOutwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, DeliveryNotePos dnPos, ACEventArgs e, bool isDischargingEnd)
         {
             // TODO: Implement Standard-Behaviour for DeliveryNotePos
+            if (dnPos != null && dnPos.OutOrderPos != null)
+            {
+                //Alibi-No
+                Weighing weighing = InsertNewWeighingIfAlibi(dbApp, actualQuantity, e);
+                if (weighing != null)
+                {
+                    weighing.OutOrderPos = dnPos.OutOrderPos;
+                    dnPos.OutOrderPos.Weighing_OutOrderPos.Add(weighing);
+                }
+            }
+
             return null;
         }
         #endregion

@@ -3795,6 +3795,23 @@ namespace gip.mes.datamodel
             }
         }
 
+        private ACValueItemList _WeighingStateList;
+        [ACPropertyInfo(9999)]
+        public ACValueItemList WeighingStateList
+        {
+            get
+            {
+                if (_WeighingStateList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(WeighingStateEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _WeighingStateList = enumClass.ACValueListForEnum;
+                    else
+                        _WeighingStateList = new ACValueListWeighingStateEnum();
+                }
+                return _WeighingStateList;
+            }
+        }
         #endregion
 
         #region INotifyPropertyChanged

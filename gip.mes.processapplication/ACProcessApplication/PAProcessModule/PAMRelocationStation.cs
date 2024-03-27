@@ -224,8 +224,8 @@ namespace gip.mes.processapplication
 
                 if (!string.IsNullOrEmpty(orderInfo))
                 {
-                    //Question50075: The process module is occupied with order {0}. Are you sure that you want continue?
-                    if (processModule.Messages.Question(processModule, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
+                    //Question50102: The process module is occupied with order {0}. Are you sure that you want continue?
+                    if (processModule.Messages.Question(processModule, "Question50102", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
                     {
                         return false;
                     }
@@ -234,8 +234,8 @@ namespace gip.mes.processapplication
                 string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo)) as string;
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
-                    //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
-                    if (processModule.Messages.Question(processModule, "Question50076",
+                    //Question50103: The process module is reserved for order {0}. Are you sure that you want continue?
+                    if (processModule.Messages.Question(processModule, "Question50103",
                         Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
                     {
                         return false;

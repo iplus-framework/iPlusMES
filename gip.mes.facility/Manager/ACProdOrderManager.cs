@@ -28,6 +28,7 @@ namespace gip.mes.facility
             _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, "TolRemainingCallQ", 20);
             _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, "IsActiveMatReqCheck", false);
             _CalculateOEEs = new ACPropertyConfigValue<bool>(this, "CalculateOEEs", false);
+            _OneLotPerOrder = new ACPropertyConfigValue<ushort>(this, "OneLotPerOrder", 0);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -35,6 +36,7 @@ namespace gip.mes.facility
             if (!base.ACInit(startChildMode))
                 return false;
             _FacilityOEEManager = ACFacilityOEEManager.ACRefToServiceInstance(this);
+            _ = OneLotPerOrder;
             return true;
         }
 
@@ -217,13 +219,41 @@ namespace gip.mes.facility
         {
             public int BatchSeqNo { get; set; }
             public double Size { get; set; }
-
-
         }
 
 
         [ACPropertyBindingSource(730, "Error", "en{'ProdOrderManager-Alarm'}de{'ProdOrderManager-Alarm'}", "", false, false)]
         public IACContainerTNet<PANotifyState> IsProdOrderManagerAlarm { get; set; }
+
+        private ACPropertyConfigValue<ushort> _OneLotPerOrder;
+        [ACPropertyConfig("en{'One Lot per Order (0=Off,1=Odernumber,2=Lotnumber)'}de{'Ein Los pro Auftrag (0=Aus,1=Auftragsnummer,2=Losnummer)'}", DefaultValue = false)]
+        public ushort OneLotPerOrder
+        {
+            get { return _OneLotPerOrder.ValueT; }
+            set { _OneLotPerOrder.ValueT = value; }
+        }
+
+        public LotCreationModeEnum LotCreationMode
+        {
+            get 
+            {
+                if (OneLotPerOrder == (ushort) LotCreationModeEnum.EachBatchOneLot)
+                    return LotCreationModeEnum.EachBatchOneLot;
+                else if (OneLotPerOrder == (ushort)LotCreationModeEnum.OneOrderOneLotWithOrderNo)
+                    return LotCreationModeEnum.OneOrderOneLotWithOrderNo;
+                else if (OneLotPerOrder == (ushort)LotCreationModeEnum.OneOrderOneLotWithLotNo)
+                    return LotCreationModeEnum.OneOrderOneLotWithLotNo;
+                else
+                    return LotCreationModeEnum.EachBatchOneLot;
+            }
+        }
+
+        public enum LotCreationModeEnum
+        {
+            EachBatchOneLot = 0,
+            OneOrderOneLotWithOrderNo = 1,
+            OneOrderOneLotWithLotNo = 2
+        }
 
         #endregion
 
@@ -1164,14 +1194,14 @@ namespace gip.mes.facility
             // 2.1 Fit quantities ProdOrderPartslist.TargetQuantity => FinalMix.TargetQuantity
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
             {
-                ProdOrderPartslistPos finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c=>c.IsFinalMixure).FirstOrDefault();
+                ProdOrderPartslistPos finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.IsFinalMixure).FirstOrDefault();
                 finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
             }
 
             // 3.0 Generate batch plans
             List<PartslistMDSchedulerGroupConnection> schedulerConnections = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName, null);
 
-        
+
             List<WizardSchedulerPartslist> wPls = new List<WizardSchedulerPartslist>();
 
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
@@ -1359,22 +1389,34 @@ namespace gip.mes.facility
             if (acClassWFDischarging != null && batchPlan != null)
             {
                 List<Route> routes = new List<Route>();
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = routingService,
+                    Database = databaseApp.ContextIPlus,
+                    AttachRouteItemsToContext = true,
+                    SelectionRuleID = "Storage",
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                    IncludeReserved = true,
+                    IncludeAllocated = true,
+                    ResultMode = RouteResultMode.ShortRoute
+                };
+
                 foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
                 {
-                    RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, databaseApp.ContextIPlus, true,
-                                        instance, "Storage", RouteDirections.Forwards, new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                        null,
-                                        0, true, true, false);
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(instance, routingParameters);
                     if (rResult.Routes != null && rResult.Routes.Any())
                         routes.AddRange(rResult.Routes);
                 }
 
-                #region Filter routes if is selected    ShowCellsInRoute
+                short? destinationFilterClassCode = null;
+                #region Filter routes if is selected  (ShowCellsInRoute)
+                core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
                 {
-                    core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
                     List<IACConfigStore> mandatoryConfigStores =
                     GetCurrentConfigStores(
                         aCClassWF,
@@ -1400,6 +1442,17 @@ namespace gip.mes.facility
                         {
                             routes = routes.Where(c => c.Items.Select(x => x.Source.GetACUrl()).Intersect(classes).Any()).ToList();
                         }
+                    }
+
+                    IACConfig configClassCode = configManager.GetConfiguration(
+                            mandatoryConfigStores,
+                            configACUrl + "\\",
+                            acClassWFDischarging.ConfigACUrl + ACUrlHelper.Delimiter_DirSeperator + ACStateConst.SMStarting + ACUrlHelper.Delimiter_DirSeperator + nameof(Facility.ClassCode),
+                            null,
+                            out priorityLevel);
+                    if (configClassCode != null)
+                    {
+                        destinationFilterClassCode = (short)configClassCode.Value;
                     }
                 }
                 #endregion
@@ -1464,16 +1517,23 @@ namespace gip.mes.facility
                                 if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
                                     continue;
                                 bool ifMaterialMatch =
-                                        unselFacility != null &&
-                                        unselFacility.Material != null &&
-                                        (
-                                            intermediatePos.BookingMaterial != null &&
-                                            unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID
+                                        unselFacility != null
+                                        && unselFacility.Material != null
+                                        && (
+                                               intermediatePos.BookingMaterial != null
+                                            && ((unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID)
+                                                || (intermediatePos.BookingMaterial.ProductionMaterialID.HasValue && intermediatePos.BookingMaterial.ProductionMaterialID.Value == unselFacility.MaterialID))
                                          );
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
+                                if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
+                                {
+                                    uint bitCmpResult = ((uint)unselFacility.ClassCode) & ((uint)destinationFilterClassCode.Value);
+                                    if (bitCmpResult == 0)
+                                        continue;
+                                }
                             }
-                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, batchPlan, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
+                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, batchPlan, null, selectedReservationForModule, unselFacility, acClassWFDischarging, aCClassWF));
                         }
                     }
 
@@ -1496,13 +1556,54 @@ namespace gip.mes.facility
                 configStores.Add(prodOrderPartslist);
             if (partslist != null)
                 configStores.Add(partslist);
-            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
-            MaterialWFConnection matWFConnection = poManager.GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
+            MaterialWFConnection matWFConnection = GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
             configStores.Add(matWFConnection.MaterialWFACClassMethod);
             configStores.Add(currentACClassWF.ACClassMethod);
             if (currentACClassWF.RefPAACClassMethod != null)
                 configStores.Add(currentACClassWF.RefPAACClassMethod);
             return configStores;
+        }
+
+        public void GetFacilityLotForPos(IACEntityObjectContext databaseForNumGen, DatabaseApp dbApp, ProdOrderPartslistPos pos, bool createNewLot, out FacilityLot facilityLot, out string lotNo, LotCreationModeEnum? lotCreationMode = null)
+        {
+            facilityLot = null;
+            lotNo = null;
+            if (pos == null)
+                return;
+            if (lotCreationMode == null)
+                lotCreationMode = LotCreationMode;
+            if (lotCreationMode.Value == LotCreationModeEnum.OneOrderOneLotWithOrderNo || lotCreationMode.Value == LotCreationModeEnum.OneOrderOneLotWithLotNo)
+            {
+                facilityLot = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistID == pos.ProdOrderPartslistID && c.FacilityLotID.HasValue).Select(c => c.FacilityLot).FirstOrDefault();
+                if (facilityLot != null)
+                {
+                    lotNo = facilityLot.LotNo;
+                    if (createNewLot)
+                        pos.FacilityLot = facilityLot;
+                    return;
+                }
+            }
+            string tempLotNo = null;
+            if (lotCreationMode.Value == LotCreationModeEnum.OneOrderOneLotWithOrderNo)
+            {
+                tempLotNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo + "-" + pos.ProdOrderPartslist.Sequence.ToString();
+                facilityLot = dbApp.FacilityLot.Where(c => c.LotNo == tempLotNo).FirstOrDefault();
+            }
+            else
+            {
+                tempLotNo = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
+            }
+            lotNo = tempLotNo;
+
+            if (createNewLot)
+            {
+                if (facilityLot == null)
+                {
+                    facilityLot = FacilityLot.NewACObject(dbApp, null, tempLotNo);
+                    facilityLot.UpdateExpirationInfo(pos.BookingMaterial);
+                }
+                pos.FacilityLot = facilityLot;
+            }
         }
 
         #endregion

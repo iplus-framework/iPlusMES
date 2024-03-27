@@ -265,7 +265,7 @@ namespace gip2006.variobatch.processapplication
             _StateDBNo = new ACPropertyConfigValue<UInt16>(this, "StateDBNo", 0);
             _CmdDBOffset = new ACPropertyConfigValue<UInt16>(this, "CmdDBOffset", 0);
             _CmdDBNo = new ACPropertyConfigValue<UInt16>(this, "CmdDBNo", 0);
-
+            _RoutingDBOffset = new ACPropertyConfigValue<UInt16?>(this, "RoutingDBOffset", null);
         }
 
         private static bool? _IsConverterDeactivated = null;
@@ -318,10 +318,11 @@ namespace gip2006.variobatch.processapplication
         public override bool ACPostInit()
         {
             // This calls are needed to add entries in Variobatch-Konfiguration
-            UInt16 dbNo = CmdDBNo;
-            UInt16 dbOffset = CmdDBOffset;
-            dbNo = StateDBNo;
-            dbOffset = StateDBOffset;
+            _ = CmdDBNo;
+            _ = CmdDBOffset;
+            _ = StateDBNo;
+            _ = StateDBOffset;
+            _ = RoutingDBOffset;
 
             bool result = base.ACPostInit();
             BindMyProperties();
@@ -521,6 +522,25 @@ namespace gip2006.variobatch.processapplication
             }
         }
 
+        private ACPropertyConfigValue<UInt16?> _RoutingDBOffset;
+        /// <summary>
+        /// If value == null, then routing data will not be sent to the plc
+        /// If value = 0, then only routing data will be sent to plc without parameters (= Standalone Routing)
+        /// If value > 0, then parameters will be first transferred and afterwards routing data (e.g. for discharging functions that uses routing)
+        /// </summary>
+        [ACPropertyConfig("en{'Startaddress routing data'}de{'Startadresse Routendaten'}")]
+        public UInt16? RoutingDBOffset
+        {
+            get
+            {
+                return _RoutingDBOffset.ValueT;
+            }
+            set
+            {
+                _RoutingDBOffset.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region Read-Values from PLC
@@ -707,11 +727,10 @@ namespace gip2006.variobatch.processapplication
                             else
                             {
                                 ConversionAlarm.ValueT = PANotifyState.AlarmOrFault;
-
                                 //Error:50172: The current state -{0}- in PLC is not in sync with current state -{1}- in iPlus
                                 Msg msg = new Msg(this, eMsgLevel.Error, "", "GIPConv2006Vario.GetNextACState()", 1000, "Error50172", stateInPLC, ACState.ValueT);
-
-                                Messages.LogException(this.GetACUrl(), "GIPConv2006Vario.GetNextACState()", msg.Message);
+                                if (IsAlarmActive(ConversionAlarm, msg.Message) == null)
+                                    Messages.LogError(this.GetACUrl(), "GIPConv2006Vario.GetNextACState()", msg.Message);
                                 OnNewAlarmOccurred(ConversionAlarm, msg, true);
 
                                 // TODO: Sicherstellen, dass beide PLC-Variablen eine aktuellen Stand haben
@@ -850,7 +869,7 @@ namespace gip2006.variobatch.processapplication
             return PAFuncStateConvBase.IsEnabledTransitionDefault(ACState.ValueT, transitionMethod, sender);
         }
 
-        public override MsgWithDetails SendACMethod(PAProcessFunction sender, ACMethod acMethod)
+        public override MsgWithDetails SendACMethod(PAProcessFunction sender, ACMethod acMethod, ACMethod previousParams = null)
         {
             if (Session == null)
             {
@@ -869,7 +888,12 @@ namespace gip2006.variobatch.processapplication
             }
             bool sended = false;
             ACChildInstanceInfo childInfo = new ACChildInstanceInfo(ParentACComponent);
-            object result = this.Session.ACUrlCommand("!SendObject", acMethod, CmdDBNo, CmdDBOffset, childInfo);
+            object[] miscParams = new object[] { childInfo, true };
+
+            Int32? routingOffset = null;
+            if (RoutingDBOffset.HasValue)
+                routingOffset = Convert.ToInt32(RoutingDBOffset.Value);
+            object result = this.Session.ACUrlCommand("!SendObject", acMethod, previousParams, Convert.ToInt32(CmdDBNo), Convert.ToInt32(CmdDBOffset), routingOffset, miscParams);
             if (result != null)
                 sended = (bool)result;
 
@@ -884,8 +908,14 @@ namespace gip2006.variobatch.processapplication
                 };
                 return msg;
             }
-            else if (IsSimulationOn && _ResponseValue != null && _ResponseValue.Bit00_ToleranceError)
-                _ResponseValue.Bit00_ToleranceError = false;
+            else
+            {
+                if (IsSimulationOn && _ResponseValue != null && _ResponseValue.Bit00_ToleranceError)
+                    _ResponseValue.Bit00_ToleranceError = false;
+                // If Vario-Way, then inform on Destination change
+                if (sender is PAFDischarging && routingOffset.HasValue && previousParams != null)
+                    _RequestValue.Bit05_DestinationChanged = true;
+            }
             return null;
         }
 
@@ -916,7 +946,7 @@ namespace gip2006.variobatch.processapplication
             ACChildInstanceInfo childInfo = new ACChildInstanceInfo(ParentACComponent);
             object[] miscParams = new object[] { childInfo, false };
 
-            ACMethod result = this.Session.ACUrlCommand("!ReadObject", acMethod, StateDBNo, StateDBOffset, miscParams) as ACMethod;
+            ACMethod result = this.Session.ACUrlCommand("!" + nameof(ACSession.ReadObject), acMethod, StateDBNo, StateDBOffset, null, miscParams) as ACMethod;
             if (result == null)
             {
                 msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "ReceiveACMethodResult()", Message = "ACMethod-Result was not received. Please check if connection is established." };
@@ -996,7 +1026,14 @@ namespace gip2006.variobatch.processapplication
                     if (_ResponseValue.Bit06_DestinationFull)
                         StateDestinationFull.ValueT = PANotifyState.AlarmOrFault;
                     else
+                    {
                         StateDestinationFull.ValueT = PANotifyState.Off;
+                        if (_RequestValue.Bit05_DestinationChanged)
+                        {
+                            _RequestValue.Bit05_DestinationChanged = false;
+                            changed = true;
+                        }
+                    }
                 }
 
                 if (_RequestValue.Bit04_PrepareSourceSwitching && _ResponseValue.Bit03_SourceSwitchable)
@@ -1293,6 +1330,10 @@ namespace gip2006.variobatch.processapplication
                     if (_RequestValue.Bit10_Continue)
                         changed = true;
                     _RequestValue.Bit10_Continue = false;
+
+                    if (_RequestValue.Bit05_DestinationChanged)
+                        changed = true;
+                    _RequestValue.Bit05_DestinationChanged = false;
 
                     // Zusätzlicher Trigger um sicher zu sein, dass Kommando auch abgesendet wird, falls der Kommandostatus in der SPS untershciedlich sein sollte
                     if (!changed)

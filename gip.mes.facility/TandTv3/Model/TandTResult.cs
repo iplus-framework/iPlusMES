@@ -65,6 +65,8 @@ namespace gip.mes.facility.TandTv3
 
         public TandTStep CurrentStep { get; internal set; }
 
+        public double StartingQuantity { get; set; }
+
         #endregion
 
         #region Relations
@@ -423,8 +425,16 @@ namespace gip.mes.facility.TandTv3
         public bool IsOrderTrackingActive()
         {
             return
-                Filter.OrderDepth == null
-                || GetOrderMaxDepth() < (Filter.OrderDepth ?? 0);
+                (
+                    Filter.OrderDepth == null
+                    || GetOrderMaxDepth() < (Filter.OrderDepth ?? 0)
+                )
+                &&
+                ( 
+                    Filter.MaxOrderCount == null
+                    ||
+                    (ProgramNos == null || ProgramNos.Count <= Filter.MaxOrderCount)
+                );
         }
         #endregion
 

@@ -45,7 +45,7 @@ namespace gip.mes.facility
                                  bool shiftBookingReverse, // false: normal, true: reverse booking
                                  bool negativeStockAllowed,
                                  Double quantityUOM, MDUnit mdUnitUOM,
-                                 IEnumerable<FacilityCharge> facilityCharges,
+                                 FacilityChargeList facilityCharges,
                                  ACMethodBooking BP,
                                  out StackItemList stackItemListInOut,
                                  out MsgBooking msgBookingResult,
@@ -67,7 +67,7 @@ namespace gip.mes.facility
         public abstract Global.ACMethodResultState CalculateRelocation(bool shiftBookingReverse, // false: normal, true: reverse booking
                                 bool negativeStockAllowed,
                                 StackItemList facilityChargesSource,
-                                IEnumerable<FacilityCharge> facilityChargesTarget,
+                                FacilityChargeList facilityChargesTarget,
                                 ACMethodBooking BP,
                                 out StackItemList stackItemListRelocation,
                                 out MsgBooking msgBookingResult);
@@ -81,7 +81,7 @@ namespace gip.mes.facility
         /// The method returns a integer-casted value of FacilityBookingManager.BookingResult
         /// The result of the calculation can be retrieved from the framework over the StackItemList of property StackItemListReOrganize
         /// </summary>
-        public abstract Global.ACMethodResultState ReOrganize(IEnumerable<FacilityCharge> facilityCharges, out StackItemList stackItemListReOrganize, out MsgBooking msgBookingResult);
+        public abstract Global.ACMethodResultState ReOrganize(List<FacilityCharge> facilityCharges, out StackItemList stackItemListReOrganize, out MsgBooking msgBookingResult);
         #endregion
     }
 }

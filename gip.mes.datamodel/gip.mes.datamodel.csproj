@@ -35,173 +35,209 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-06-26_09-26_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-07-11_10-40_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-07-28_08-40_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-09-22_13-13_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\info.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\InsertUpdateInfo.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="VBControlScripts\" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-08_12-50_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-08_12-50_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-11_10-00_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-11_10-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-12_09-50_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-12_09-50_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-12_16-00_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-12_16-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-15_13-28_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-15_13-28_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-17_10-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-17_10-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-24_15-00_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-24_15-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-03-26_18-00_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-26_18-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-04-01_13-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-04-01_13-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-04-13_20-40_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-04-13_20-40_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-04-14_10-05_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-04-14_10-05_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-04-14_14-31_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-04-14_14-31_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-04-29_15-47_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-04-29_15-47_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-09-19_18-10_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-09-19_18-10_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-07-23_08-15_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-23_08-15_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-07-20_10-00_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-20_10-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-07-16_09-31_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-16_09-31_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-07-08_10-53_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-08_10-53_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-06-29_10-35_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-06-29_10-35_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-05-14_12-19_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-05-14_12-19_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-05-11_13-32_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-05-11_13-32_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-09-01_13-20_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-09-01_13-20_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-08-30_10-54_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-10-08_10-30_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-08-30_10-54_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-10-12_10-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-10-08_10-30_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-10-29_14-10_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-10-12_10-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-08_12-51_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-10_13-16_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-11_11-46_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-10-29_14-10_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-23_19-45_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-08_12-51_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-10_13-16_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-11_11-46_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-25_12-47_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-23_19-45_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-29_11-57_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-25_12-47_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-30_08-49_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-29_11-57_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json" />
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-30_08-49_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-02-27_15-55_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-02-23_15-55_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-02-11_16-26_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-02-09_18-45_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-01-18_09-45_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="DbScripts\iPlusMES\dbsync_2023-07-28_08-40_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DbScripts\iPlusMES\dbsync_2023-07-11_10-40_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DbScripts\iPlusMES\dbsync_2023-06-26_09-26_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-01-12_12-50_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-01-03_08-50_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-01-02_17-30_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-12-20_10-12_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-11-24_17-30_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-11-22_13-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-11-07_13-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-11-02_12-26_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-10-26_11-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-10-23_16-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-09-22_13-13_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2023-08-29_09-26_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -214,9 +250,6 @@
     <None Include="DbScripts\iPlusMES\dbsync_2023-04-28_15-23_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="DbScripts\iPlusMES\dbsync_2023-04-27_08-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2023-04-25_09-48_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -226,112 +259,115 @@
     <None Include="DbScripts\iPlusMES\dbsync_2023-04-17_21-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="DbScripts\iPlusMES\dbsync_2023-04-17_08-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2023-04-13_09-40_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-03-07_17-37_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2023-03-07_17-37_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-02-21_15-20_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2023-02-21_15-20_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-17_08-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2023-04-27_08-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="DbScripts\iPlusMES\dbsync_2022-03-24_16-47_aagincic .sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Update="DbScripts\iPlusMES\dbsync_2023-01-10_10-05_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2023-01-10_10-05_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-12-19_11-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-12-19_11-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-09-21_16-00_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-09-21_16-00_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-09-21_11-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-09-21_11-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-07-23_10-10_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-07-23_10-10_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-07-21_09-10_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-07-21_09-10_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-06-21_22-10_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-06-21_22-10_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-06-20_16-40_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-06-20_16-40_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-05-13_06-00_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-05-13_06-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-05-12_11-35_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-05-12_11-35_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-04-28_13-33_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-04-28_13-33_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-04-14_15-55_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-04-14_15-55_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-04-10_21-55_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-04-10_21-55_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-03-24_12-35_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-03-24_12-35_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-03-18_11-28_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-03-18_11-28_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-03-01_15-17_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-03-01_15-17_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-02-26_09-00_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-26_09-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-02-24_14-38_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-24_14-38_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-02-21_13-45_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-21_13-45_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-02-15_23-40_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-15_23-40_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-02-09_11-39_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-09_11-39_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-02-08_15-14_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-08_15-14_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-01-28_16-00_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-01-28_16-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-01-27_14-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-01-27_14-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-01-21_11-30_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-01-21_11-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-01-11_16-23_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-01-11_16-23_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-12-15_10-52_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-12-15_10-52_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-12-11_18-04_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-12-11_18-04_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-12-04_12-54_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-12-04_12-54_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2021-11-30_16-52_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-30_16-52_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2022-03-23_11-03_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2022-03-23_11-03_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="DbScripts\iPlusMES\dbsync_2021-12-04_09-52_ihrastinski.sql">

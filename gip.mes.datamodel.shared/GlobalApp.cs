@@ -1404,6 +1404,7 @@ namespace gip.mes.datamodel
             OutOrderPos = 1,
             PartslistPos = 2,
             LotCharge = 3,
+            PickingPos = 4,
         }
 
 #if NETFRAMEWORK
@@ -1415,10 +1416,11 @@ namespace gip.mes.datamodel
                 if (GlobalApp._LabOrderMaterialStateList == null)
                 {
                     GlobalApp._LabOrderMaterialStateList = new ACValueItemList("LabOrderMaterialState");
-                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.InOrderPos.ToString(), "en{'Purchase Order Pos.'}de{'Bestellposition'}");
-                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.OutOrderPos.ToString(), "en{'Sales Order Pos.'}de{'Auftragsposition'}");
-                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.PartslistPos.ToString(), "en{'Bill of Materials Position'}de{'Stücklistenposition'}");
+                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.InOrderPos.ToString(), "en{'Purchase Order Line'}de{'Bestellposition'}");
+                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.OutOrderPos.ToString(), "en{'Sales Order Line'}de{'Auftragsposition'}");
+                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.PartslistPos.ToString(), "en{'BOM Line'}de{'Stücklistenposition'}");
                     GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.LotCharge.ToString(), "en{'Lot/Charge'}de{'Los/Charge'}");
+                    GlobalApp._LabOrderMaterialStateList.AddEntry(LabOrderMaterialState.PickingPos.ToString(), "en{'Picking line'}de{'Kommissionierposition'}");
                 }
                 return GlobalApp._LabOrderMaterialStateList;
             }

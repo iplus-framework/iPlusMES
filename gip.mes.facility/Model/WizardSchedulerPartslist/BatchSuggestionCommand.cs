@@ -21,6 +21,7 @@ namespace gip.mes.facility
                 switch (mode)
                 {
                     case BatchSuggestionCommandModeEnum.KeepStandardBatchSizeAndDivideRest:
+                        // TODO: Test new KeepStandardBatchSizeAndDivideRest2: Comment section
                         KeepStandardBatchSizeAndDivideRest suggestion1 = null;
                         do
                         {
@@ -37,7 +38,7 @@ namespace gip.mes.facility
                             i++;
                         }
                         while (rest >= wizardSchedulerPartslist.BatchSizeMinUOM && i < 10);
-                        if(rest >  0.1 && rest > wizardSchedulerPartslist.BatchSizeMinUOM)
+                        if (rest > 0.1 && rest > wizardSchedulerPartslist.BatchSizeMinUOM)
                         {
                             suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
                             if (suggestion2.Suggestion != null)
@@ -45,6 +46,13 @@ namespace gip.mes.facility
                                 wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
                             }
                         }
+
+                        // TODO: Test new KeepStandardBatchSizeAndDivideRest2: Uncomment section
+                        //KeepStandardBatchSizeAndDivideRest2 suggestionKPTmp = new KeepStandardBatchSizeAndDivideRest2(roundingQuantity, wizardSchedulerPartslist, 1, rest, 0, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
+                        //foreach(BatchPlanSuggestionItem suggestionTmp in suggestionKPTmp.Suggestions)
+                        //{
+                        //    wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestionTmp);
+                        //}
                         break;
                     case BatchSuggestionCommandModeEnum.KeepEqualBatchSizes:
                         do

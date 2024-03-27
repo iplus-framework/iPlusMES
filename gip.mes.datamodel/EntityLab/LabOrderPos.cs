@@ -20,6 +20,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(8, "ValueMin", "en{'Lowest value'}de{'Unterer Grenzwert'}", "", "", true)]
     [ACPropertyEntity(9, "ValueMax", "en{'Maximum value'}de{'Oberer Grenzwert'}", "", "", true)]
     [ACPropertyEntity(10, "ValueMaxMax", "en{'Maximum value for alarm'}de{'Oberer Alarmgrenzwert'}", "", "", true)]
+    [ACPropertyEntity(18, LabOrder.ClassName, "en{'Lab Report'}de{'Laborauftrag'}", Const.ContextDatabase + "\\" + LabOrder.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

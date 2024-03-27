@@ -1162,7 +1162,7 @@ namespace gip.mes.processapplication
         #endregion
 
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
             ACValue value = acMethod.ParameterValueList.GetACValue("Route");
             if (value == null)
@@ -1178,17 +1178,32 @@ namespace gip.mes.processapplication
                 return msg;
             }
 
+            ACValue valuePrev = null;
+            Route prevR = null;
+            if (previousParams != null && IsSimulationOn)
+            {
+                valuePrev = previousParams.ParameterValueList.GetACValue("Route");
+                if (valuePrev != null)
+                    prevR = valuePrev.ValueT<Route>();
+            }
+
             using (var db = new Database())
             {
                 try
                 {
-                    route.AttachTo(db);
+                    route?.AttachTo(db);
+                    prevR?.AttachTo(db);
+                    
                     MsgWithDetails msg = GetACMethodFromConfig(db, route, acMethod);
                     if (msg != null)
                         return msg;
 
                     if (IsSimulationOn)
+                    {
+                        if (prevR != null)
+                            PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
                         PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1198,14 +1213,15 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    if (route != null)
-                        route.Detach(true);
+                     route?.Detach(true);
+                     prevR?.Detach(true);
                     //sourceRouteItem.DetachEntitesFromDbContext();
                 }
             }
 
             var targetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
-            if (targetQ != null)
+            var swtValue = acMethod.ParameterValueList.GetACValue("SWTWeight");
+            if (targetQ != null && (swtValue == null || swtValue.ParamAsDouble < 0.0001))
             {
                 double targetQuantity = targetQ.ParamAsDouble;
                 var scale = ParentACComponent as IPAMContScale;
@@ -1326,7 +1342,7 @@ namespace gip.mes.processapplication
                     actualQuantity = (double)acMethod.ResultValueList["ActualQuantity"];
                     double newVolume = (actualQuantity * 1000) / densityACValue.ParamAsDouble;
                     IACPropertyNetTarget fillVolumeProp = container.FillVolume as IACPropertyNetTarget;
-                    if (fillVolumeProp == null || fillVolumeProp.Source == null)
+                    if (fillVolumeProp != null && fillVolumeProp.Source == null)
                         container.FillVolume.ValueT += newVolume;
                 }
             }
@@ -1418,7 +1434,7 @@ namespace gip.mes.processapplication
             return completeResult;
         }
 
-        protected virtual void OnSetRouteItemData(ACMethod acMethod, PAMSilo silo, RouteItem routeItem)
+        protected virtual void OnSetRouteItemData(ACMethod acMethod, PAMSilo silo, RouteItem routeItem, bool isConfigInitialization)
         {
             if (silo != null)
                 silo.SubscribeTransportFunction(this);
@@ -1428,6 +1444,29 @@ namespace gip.mes.processapplication
         protected override void OnChangingCurrentACMethod(ACMethod currentACMethod, ACMethod newACMethod)
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
+
+            ACValue value = currentACMethod.ParameterValueList.GetACValue("Route");
+            if (value != null)
+            {
+                Route originalR = value.ValueT<Route>();
+                if (originalR != null && !originalR.AreACUrlInfosSet)
+                {
+                    using (var db = new Database())
+                    {
+                        try
+                        {
+                            originalR.AttachTo(db); // Global context
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        finally
+                        {
+                            originalR.Detach(true);
+                        }
+                    }
+                }
+            }
 
             bool unsubscribe = true;
             if (IsMethodChangedFromClient 
@@ -1470,12 +1509,23 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-                var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    Database = dbIPlus,
+                    Direction = RouteDirections.Backwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID,
+                    DBIncludeInternalConnections = true,
+                    AutoDetachFromDBContext = false
+                };
+
+                var parentModule = ACRoutingService.DbSelectRoutesFromPoint(thisACClass, this.PAPointMatIn1.PropertyInfo, routingParameters).FirstOrDefault();
                 var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                 if (sourcePoint == null)
                     return;
 
-                var routes = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, parentACClass, sourcePoint, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID, null, RouteDirections.Backwards, true, false);
+                routingParameters.DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID;
+
+                var routes = ACRoutingService.DbSelectRoutesFromPoint(parentACClass, sourcePoint, routingParameters);
                 if (routes != null && routes.Any())
                 {
                     string virtMethodName = VMethodName_Dosing;
@@ -1537,7 +1587,7 @@ namespace gip.mes.processapplication
                             valueSource.Value = Convert.ToUInt16(pamSilo.RouteItemIDAsNum);
                     }
                 }
-                OnSetRouteItemData(acMethod, pamSilo, sourceRouteItem);
+                OnSetRouteItemData(acMethod, pamSilo, sourceRouteItem, isConfigInitialization);
             }
 
             List<MaterialConfig> materialConfigList = null;
@@ -1770,7 +1820,7 @@ namespace gip.mes.processapplication
             return pamSilo;
         }
 
-        protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
+        public static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
         {
             ACMethod method = new ACMethod(acIdentifier);
 
@@ -1870,6 +1920,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("AdjustmentFlowRate", "en{'Adjustment FlowRate'}de{'Dosierstufe in Nachdosierung'}");
             method.ParameterValueList.Add(new ACValue("EndlessDosing", typeof(bool), (bool)false, Global.ParamOption.Optional));
             paramTranslation.Add("EndlessDosing", "en{'Endless dosing'}de{'Endlose Dosierung'}");
+            method.ParameterValueList.Add(new ACValue("SWTWeight", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
+            paramTranslation.Add("SWTWeight", "en{'SWT tip weight'}de{'SWT Kippgewicht'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActualQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
@@ -1883,11 +1935,11 @@ namespace gip.mes.processapplication
             method.ResultValueList.Add(new ACValue("Temperature", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             resultTranslation.Add("Temperature", "en{'Temperature'}de{'Temperatur'}");
             method.ResultValueList.Add(new ACValue("GaugeCode", typeof(string), "", Global.ParamOption.Optional));
-            resultTranslation.Add("GaugeCode", "en{'Gauge code'}de{'Wägeid'}");
+            resultTranslation.Add("GaugeCode", "en{'Gauge code/Alibi-No.'}de{'Wägeid/Alibi-No.'}");
             method.ResultValueList.Add(new ACValue("GaugeCodeStart", typeof(string), "", Global.ParamOption.Optional));
-            resultTranslation.Add("GaugeCodeStart", "en{'Gauge code start'}de{'Wägeid Start'}");
+            resultTranslation.Add("GaugeCodeStart", "en{'Gauge code start/Alibi-No.'}de{'Wägeid Start/Alibi-No.'}");
             method.ResultValueList.Add(new ACValue("GaugeCodeEnd", typeof(string), "", Global.ParamOption.Optional));
-            resultTranslation.Add("GaugeCodeEnd", "en{'Gauge code end'}de{'Wägeid Ende'}");
+            resultTranslation.Add("GaugeCodeEnd", "en{'Gauge code end/Alibi-No.'}de{'Wägeid Ende/Alibi-No.'}");
             method.ResultValueList.Add(new ACValue("FlowRate", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             resultTranslation.Add("FlowRate", "en{'Flow rate'}de{'Durchflussrate'}");
             method.ResultValueList.Add(new ACValue("ImpulseCounter", typeof(Double), (Double)0.0, Global.ParamOption.Optional));

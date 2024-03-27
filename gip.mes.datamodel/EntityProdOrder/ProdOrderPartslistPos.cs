@@ -709,6 +709,8 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
+        [NotMapped]
+        private bool _OnMDUnitChanging = false;
         protected void OnMDUnitIDChanged()
         {
             _OnTargetQuantityUOMChanging = true;
@@ -914,6 +916,7 @@ namespace gip.mes.datamodel
             DatabaseApp dbApp = null;
             var sumsPerUnitID = Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPos)
                                         .Query()
+                                        .Where(c => c.FacilityBookingTypeIndex != (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
                                         .GroupBy(c => c.MDUnitID)
                                         .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
                                         .ToArray();

@@ -203,5 +203,28 @@ namespace gip.mes.datamodel
             }
         }
 
+        public double? TargetQuantityUOM
+        {
+            get
+            {
+                if (this.InOrderPos != null)
+                    return InOrderPos.TargetQuantityUOM;
+                else if (this.OutOrderPos != null)
+                    return OutOrderPos.TargetQuantityUOM;
+                return null;
+            }
+        }
+
+        public double? TargetQuantity
+        {
+            get
+            {
+                if (this.InOrderPos != null)
+                    return InOrderPos.TargetQuantity;
+                else if (this.OutOrderPos != null)
+                    return OutOrderPos.TargetQuantity;
+                return null;
+            }
+        }
     }
 }

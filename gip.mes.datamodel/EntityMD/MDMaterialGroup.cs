@@ -197,6 +197,11 @@ namespace gip.mes.datamodel
             Merchandise = 8,
             Service = 9,
             Rework = 20,
+            /// <summary>
+            /// The purpose of this group is to find material in:
+            /// 1. BSOWorkCenter - PickingByMaterial: that material which contains a configuration of the combination ACClass(machine or workplace) and planning workflow node
+            /// 2. BSOPicking: that intermediate material in the Material-Workflow which is intended for the Picking
+            /// </summary>
             Picking = 30,
             //Services = 100,
             Textarticle = 110,

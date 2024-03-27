@@ -24,6 +24,7 @@ namespace gip.mes.facility
         {
             _TandTBSOName = new ACPropertyConfigValue<string>(this, nameof(TandTBSOName), Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + "BSOTandTv3");
             _FilterFaciltiyAtSearchInwardCharges = new ACPropertyConfigValue<bool>(this, nameof(FilterFaciltiyAtSearchInwardCharges), true);
+            _MaxOrderCount = new ACPropertyConfigValue<int>(this, nameof(MaxOrderCount), 0);
             TandTv3Command = new TandTv3Command(FilterFaciltiyAtSearchInwardCharges);
         }
 
@@ -64,6 +65,20 @@ namespace gip.mes.facility
             set
             {
                 _FilterFaciltiyAtSearchInwardCharges.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<int> _MaxOrderCount;
+        [ACPropertyConfig("en{'Max order count'}de{'Maximale Auftraganzahl'}")]
+        public virtual int MaxOrderCount
+        {
+            get
+            {
+                return _MaxOrderCount.ValueT;
+            }
+            set
+            {
+                _MaxOrderCount.ValueT = value;
             }
         }
 
@@ -123,6 +138,10 @@ namespace gip.mes.facility
 
         public virtual TandTv3Process<IACObjectEntity> GetProcessObject(DatabaseApp databaseApp, TandTv3FilterTracking filter, IACObjectEntity aCObjectEntity, string vbUserNo, bool useGroupResult)
         {
+            if(MaxOrderCount > 0)
+            {
+                filter.MaxOrderCount = MaxOrderCount;
+            }
             return new TandTv3Process<IACObjectEntity>(databaseApp, TandTv3Command, filter, aCObjectEntity, vbUserNo, useGroupResult);
         }
 

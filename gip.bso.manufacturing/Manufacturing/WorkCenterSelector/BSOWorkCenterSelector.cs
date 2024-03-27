@@ -1523,13 +1523,22 @@ namespace gip.bso.manufacturing
 
             ACComponent currentProcessModule = CurrentProcessModule;
 
-            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, currentProcessModule.ComponentClass, PAMSilo.SelRuleID_Storage,
-                                                                    RouteDirections.Forwards, null, 
-                                                                    (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType)
-                                                                    || typeof(PAMSilo).IsAssignableFrom(c.ObjectFullType)
-                                                                    || typeof(PAMIntermediatebin).IsAssignableFrom(c.ObjectFullType),
-                                                                    (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), 
-                                                                    0, true, true);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = DatabaseApp.ContextIPlus,
+                AttachRouteItemsToContext = true,
+                SelectionRuleID = PAMSilo.SelRuleID_Storage,
+                Direction = RouteDirections.Forwards,
+                DBSelector = (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType) || typeof(PAMSilo).IsAssignableFrom(c.ObjectFullType)
+                                                                                                     || typeof(PAMIntermediatebin).IsAssignableFrom(c.ObjectFullType),
+                DBDeSelector = (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
+
+            RoutingResult rResult = ACRoutingService.FindSuccessors(currentProcessModule.ComponentClass, routingParameters);
 
             if (rResult == null || rResult.Routes == null)
             {

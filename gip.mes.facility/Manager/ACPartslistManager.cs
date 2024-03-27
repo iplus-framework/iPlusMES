@@ -18,6 +18,7 @@ namespace gip.mes.facility
         public ACPartslistManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _FindSiloModes = new ACPropertyConfigValue<short>(this, "FindSiloModes", 0);
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)

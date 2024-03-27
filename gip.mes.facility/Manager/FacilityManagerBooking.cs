@@ -1132,7 +1132,7 @@ namespace gip.mes.facility
 
         #region Book PickingPos -> Main Methods
 
-        public FacilityPreBooking NewFacilityPreBooking(DatabaseApp dbApp, PickingPos pickingPos, double? actualQuantityUOM = null, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
+        public FacilityPreBooking NewFacilityPreBooking(DatabaseApp dbApp, PickingPos pickingPos, Facility facilityDest = null, double? actualQuantityUOM = null, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
         {
             if (postingType == PostingTypeEnum.NotDefined)
                 postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
@@ -1227,7 +1227,7 @@ namespace gip.mes.facility
                         //    quantityUOM = pickingPos.DiffQuantityUOM;
                     }
                     acMethodBooking.InwardQuantity = quantityUOM;
-                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.InwardFacility = facilityDest != null ? facilityDest : pickingPos.ToFacility;
                     acMethodBooking.PickingPos = pickingPos;
                 }
 
@@ -1304,7 +1304,7 @@ namespace gip.mes.facility
                         acMethodBooking.InwardQuantity = quantityUOM;
                         acMethodBooking.OutwardQuantity = quantityUOM;
                     }
-                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.InwardFacility = facilityDest != null ? facilityDest : pickingPos.ToFacility;
                     acMethodBooking.OutwardFacility = pickingPos.FromFacility;
                     acMethodBooking.InwardMaterial = pickingPos.InOrderPos.Material;
                     acMethodBooking.InOrderPos = pickingPos.InOrderPos;
@@ -1325,7 +1325,7 @@ namespace gip.mes.facility
                         acMethodBooking.OutwardQuantity = quantityUOM;
                         acMethodBooking.InwardQuantity = quantityUOM;
                     }
-                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.InwardFacility = facilityDest != null ? facilityDest : pickingPos.ToFacility;
                     acMethodBooking.OutwardFacility = pickingPos.FromFacility;
                     acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
                     acMethodBooking.OutOrderPos = pickingPos.OutOrderPos;
@@ -1344,7 +1344,7 @@ namespace gip.mes.facility
                         //    quantityUOM = pickingPos.DiffQuantityUOM;
                     }
                     acMethodBooking.InwardQuantity = quantityUOM;
-                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.InwardFacility = facilityDest != null ? facilityDest : pickingPos.ToFacility;
                     acMethodBooking.OutwardQuantity = quantityUOM;
                     acMethodBooking.OutwardFacility = pickingPos.FromFacility;
                     if (pickingPos.FromFacility != null && pickingPos.FromFacility.Material != null)
@@ -2223,7 +2223,7 @@ namespace gip.mes.facility
                         }
                     }
 
-                    facility.Material = material;
+                    facility.Material = material.Material1_ProductionMaterial != null ? material.Material1_ProductionMaterial : material;
                     facility.Partslist = Partslist;
                 }
                 // Falls Belegung gleich
@@ -2276,7 +2276,7 @@ namespace gip.mes.facility
                         return Global.ACMethodResultState.Notpossible;
                     }
                     facility.Partslist = Partslist;
-                    facility.Material = material;
+                    facility.Material = material.Material1_ProductionMaterial != null ? material.Material1_ProductionMaterial : material;
                 }
             }
 

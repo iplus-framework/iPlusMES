@@ -59,7 +59,7 @@ namespace gip.mes.processapplication
             return CompleteResult.Succeeded;
         }
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
             return null;
         }

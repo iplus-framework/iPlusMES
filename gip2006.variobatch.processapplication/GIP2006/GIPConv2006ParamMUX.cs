@@ -27,7 +27,8 @@ namespace gip2006.variobatch.processapplication
             if (ParamValue != null && ParamValue is IACPropertyNetServer)
                 (ParamValue as IACPropertyNetServer).ValueUpdatedOnReceival += ParamValue_ValueUpdatedOnReceival;
             ReqParamNoT.ValueUpdatedOnReceival += ReqParamNo_ValueUpdatedOnReceival;
-            MUXCommandPLCT.ValueUpdatedOnReceival += MUXCommandPLC_ValueUpdatedOnReceival;
+            if (MUXCommandPLCT != null)
+                MUXCommandPLCT.ValueUpdatedOnReceival += MUXCommandPLC_ValueUpdatedOnReceival;
 
             StartPollingIntern(false);
             var propertiesToQuery = DAPropertiesToQuery;
@@ -71,7 +72,8 @@ namespace gip2006.variobatch.processapplication
             if (ParamValue != null && ParamValue is IACPropertyNetServer)
                 (ParamValue as IACPropertyNetServer).ValueUpdatedOnReceival -= ParamValue_ValueUpdatedOnReceival;
             ReqParamNoT.ValueUpdatedOnReceival -= ReqParamNo_ValueUpdatedOnReceival;
-            MUXCommandPLCT.ValueUpdatedOnReceival -= MUXCommandPLC_ValueUpdatedOnReceival;
+            if (MUXCommandPLCT != null)
+                MUXCommandPLCT.ValueUpdatedOnReceival -= MUXCommandPLC_ValueUpdatedOnReceival;
 
 
             return base.ACDeInit(deleteACClassTask);

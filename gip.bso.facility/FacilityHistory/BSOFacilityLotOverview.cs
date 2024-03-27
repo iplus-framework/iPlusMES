@@ -113,6 +113,82 @@ namespace gip.bso.facility
             }
         }
 
+        ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
+        public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservationOverview_Child == null)
+                    _BSOFacilityReservationOverview_Child = new ACChildItem<BSOFacilityReservationOverview>(this, nameof(BSOFacilityReservationOverview_Child));
+                return _BSOFacilityReservationOverview_Child;
+            }
+        }
+
+        #endregion
+
+        #region Properties
+
+        #region Properties -> Filter
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo)]
+        public string FilterLotNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.LotNo));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo)]
+        public string FilterExternLotNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.ExternLotNo));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        // Material\MaterialNo
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo)]
+        public string FilterMaterialNo
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>($"{nameof(Material)}\\{nameof(Material.MaterialNo)}");
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue($"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACProperty
@@ -154,7 +230,9 @@ namespace gip.bso.facility
             {
                 return new List<ACFilterItem>()
                 {
-                    new ACFilterItem(Global.FilterTypes.filter, "LotNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, $"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, Global.Operators.and, null, true)
                 };
             }
         }
@@ -215,7 +293,7 @@ namespace gip.bso.facility
                 if (BSOTandTFastView_Child != null && BSOTandTFastView_Child.Value != null && BSOTandTFastView_Child.Value.FilterFacilityLot != value)
                     BSOTandTFastView_Child.Value.SetFaciltiyLot(value);
 
-                OnPropertyChanged("CurrentFacilityLot");
+                OnPropertyChanged();
                 CleanMovements();
                 RefreshRelatedData();
             }
@@ -224,13 +302,16 @@ namespace gip.bso.facility
         public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
-            if (name == "ShowNotAvailable")
+
+            if (name == nameof(ShowNotAvailable)
+                || name == nameof(FilterMaterialNo)
+                || name == nameof(FilterExternLotNo)
+                || name == nameof(FilterLotNo))
             {
                 Search();
                 RefreshRelatedData();
             }
         }
-
 
         public void RefreshRelatedData()
         {
@@ -238,21 +319,28 @@ namespace gip.bso.facility
             RefreshFacilityChargeSumMaterialHelperList();
             RefreshFacilityChargeSumFacilityHelperList();
             RefreshFacilityChargeSumLocationHelperList();
+            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
+            {
+                BSOFacilityReservationOverview_Child.Value.LoadReservation(CurrentFacilityLot);
+            }
         }
 
-
+        private List<FacilityLot> _FacilityLotList;
         /// <summary>
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
         [ACPropertyList(803, FacilityLot.ClassName)]
-        public IEnumerable<FacilityLot> FacilityLotList
+        public List<FacilityLot> FacilityLotList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _FacilityLotList;
+            }
+            set
+            {
+                _FacilityLotList = value;
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -542,6 +630,8 @@ namespace gip.bso.facility
 
         #region BSO->ACMethod
 
+        #region BSO->ACMethod->Save&Search
+
         /// <summary>
         /// Saves this instance.
         /// </summary>
@@ -618,8 +708,15 @@ namespace gip.bso.facility
         {
             if (AccessPrimary == null)
                 return;
-            AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("FacilityLotList");
+
+            _FacilityLotList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _FacilityLotList = AccessPrimary.NavList.ToList();
+            }
+
+            OnPropertyChanged(nameof(FacilityLotList));
         }
 
         IQueryable<FacilityLot> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityLot> result)
@@ -635,6 +732,8 @@ namespace gip.bso.facility
             }
             return query;
         }
+
+        #endregion
 
         #endregion
 
@@ -715,6 +814,7 @@ namespace gip.bso.facility
                 }
             }
         }
+
         #endregion
 
     }

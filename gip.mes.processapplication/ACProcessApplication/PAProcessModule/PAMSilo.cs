@@ -456,24 +456,26 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(403, "ACConfig", "en{'Waiting time'}de{'Wartezeit'}", "", false, true)]
         public IACContainerTNet<TimeSpan> WaitingTime { get; set; }
 
-        [ACPropertyBindingSource(703, "ACConfig", "en{'Remaining time'}de{'Restzeit'}", "", false, false)]
+        [ACPropertyBindingSource(404, "ACConfig", "en{'Remaining time'}de{'Restzeit'}", "", false, false)]
         public IACContainerTNet<TimeSpan> RemainingTime { get; set; }
 
-        [ACPropertyBindingSource(704, "ACConfig", "en{'Elapsed time'}de{'Abgelaufene Zeit'}", "", false, false)]
+        [ACPropertyBindingSource(405, "ACConfig", "en{'Elapsed time'}de{'Abgelaufene Zeit'}", "", false, false)]
         public IACContainerTNet<TimeSpan> ElapsedTime { get; set; }
 
-        [ACPropertyBindingSource(705, "ACConfig", "en{'Is waiting'}de{'Wartet'}", "", false, false)]
+        [ACPropertyBindingSource(406, "ACConfig", "en{'Is waiting'}de{'Wartet'}", "", false, false)]
         public IACContainerTNet<bool> IsWaiting { get; set; }
 
-        [ACPropertyBindingSource(708, "ACConfig", "en{'Priority'}de{'Priorisierung'}", "", false, false)]
+        [ACPropertyBindingSource(407, "ACConfig", "en{'Priority'}de{'Priorisierung'}", "", false, false)]
         public IACContainerTNet<int> Priority { get; set; }
 
-        [ACPropertyBindingSource(710, "ACConfig", "en{'Order group'}de{'Auftragsgruppe'}", "", false, false)]
+        [ACPropertyBindingSource(408, "ACConfig", "en{'Order group'}de{'Auftragsgruppe'}", "", false, false)]
         public IACContainerTNet<int> OrderGroup { get; set; }
 
-        [ACPropertyBindingSource(711, "ACConfig", "en{'Priority per order'}de{'Priorisierung pro Auftrag'}", "", false, false)]
+        [ACPropertyBindingSource(409, "ACConfig", "en{'Priority per order'}de{'Priorisierung pro Auftrag'}", "", false, false)]
         public IACContainerTNet<int> PriorityPerOrderGroup { get; set; }
 
+        [ACPropertyBindingSource(410, "ACConfig", "en{'Classification code'}de{'Klassifizierungscode'}", "", false, false)]
+        public IACContainerTNet<short> ClassCode { get; set; }
 
         [ACPropertyBindingSource(440, "Configuration", "en{'Facility'}de{'Lagerplatz'}", "", true, false)]
         public IACContainerTNet<ACRef<Facility>> Facility { get; set; }
@@ -597,19 +599,6 @@ namespace gip.mes.processapplication
                 return _CurrentDensity;
             }
         }
-
-        public bool IsSimulationOn
-        {
-            get
-            {
-                if (ACOperationMode != ACOperationModes.Live)
-                    return true;
-                if (ApplicationManager == null)
-                    return false;
-                return ApplicationManager.IsSimulationOn;
-            }
-        }
-
 
         #endregion
 
@@ -767,6 +756,7 @@ namespace gip.mes.processapplication
                     InwardEnabled.ValueT = facilitySilo.InwardEnabled;
                     bool informDosings = OutwardEnabled.ValueT != facilitySilo.OutwardEnabled;
                     OutwardEnabled.ValueT = facilitySilo.OutwardEnabled;
+                    ClassCode.ValueT = facilitySilo.ClassCode;
                     OnRefreshFacility(facilitySilo, preventBroadcast, fbID);
                     if (informDosings && this.Root.Initialized)
                     {
@@ -1115,7 +1105,7 @@ namespace gip.mes.processapplication
 
             if (material != null)
             {
-                WaitingTime.ValueT = GetMaterialWaitingTime(material, parentFacility);
+                WaitingTime.ValueT = GetMaterialWaitingTime(material, facilitySilo, parentFacility);
             }
             else
                 WaitingTime.ValueT = TimeSpan.Zero;
@@ -1140,7 +1130,9 @@ namespace gip.mes.processapplication
                         FillingDate.ValueT = DateTime.Now;
                     else
                         FillingDate.ValueT = fcOldest.FillingDate.Value;
-                    string poNo = fc.ProdOrderProgramNo;
+                    string poNo = "";
+                    if (fc.Material != null && fc.Material.IsLotManaged)
+                        poNo = fc.ProdOrderProgramNo;
                     OrderInfo.ValueT = poNo;
                 }
             }
@@ -1235,7 +1227,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual TimeSpan GetMaterialWaitingTime(Material material, Facility facility)
+        public virtual TimeSpan GetMaterialWaitingTime(Material material, Facility silo, Facility parentStore)
         {
             return TimeSpan.Zero;
         }
@@ -1345,7 +1337,18 @@ namespace gip.mes.processapplication
                 if (routingService != null)
                 {
                     activeDosings = new List<PAFDosing>();
-                    var routingResult = ACRoutingService.MemFindSuccessors(routingService, null, this, SelRuleID_DosingFunc, RouteDirections.Forwards, 0, true, true);
+
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = routingService,
+                        SelectionRuleID = SelRuleID_DosingFunc,
+                        Direction = RouteDirections.Forwards,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    var routingResult = ACRoutingService.MemFindSuccessors(this, routingParameters);
                     if (routingResult != null && routingResult.Routes != null && routingResult.Routes.Any())
                     {
                         foreach (var route in routingResult.Routes)
@@ -1397,7 +1400,17 @@ namespace gip.mes.processapplication
                 var routingService = this.RoutingService;
                 if (routingService != null)
                 {
-                    var routingResult = ACRoutingService.MemFindSuccessors(routingService, null, this, SelRuleID_DischargingFunc, RouteDirections.Backwards, 0, true, true);
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = routingService,
+                        SelectionRuleID = SelRuleID_DischargingFunc,
+                        Direction = RouteDirections.Backwards,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    var routingResult = ACRoutingService.MemFindSuccessors(this, routingParameters);
                     if (routingResult != null && routingResult.Routes != null && routingResult.Routes.Any())
                     {
                         foreach (var route in routingResult.Routes)
@@ -1613,7 +1626,7 @@ namespace gip.mes.processapplication
                 this.FillLevelScale.ValueT = 0;
             else
             {
-                fillLevel_dm = fillLevel_dm * 0.1; // m => dm
+                fillLevel_dm = fillLevel_dm * 0.1; // cm => dm
                 this.FillLevelScale.ValueT = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingWeight), new double[] { fillLevel_dm }, DictDimensions);
             }
         }
@@ -1884,21 +1897,21 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
 
-        public static readonly Func<DatabaseApp, Guid?, IEnumerable<FacilityCharge>> s_cQry_Quants =
-        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<FacilityCharge>>(
-            (ctx, facilityID) => from c in ctx.FacilityCharge
-                               where c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue
-                               orderby c.FillingDate descending
-                               select c
+        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_Quants =
+        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
+            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+                                                .OrderByDescending(c => c.FillingDate)
         );
 
-        public static readonly Func<DatabaseApp, Guid?, IEnumerable<FacilityCharge>> s_cQry_QuantsReverse =
-        EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<FacilityCharge>>(
-            (ctx, facilityID) => from c in ctx.FacilityCharge
-                               where c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue
-                               orderby c.FillingDate
-                               select c
+        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
+        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
+            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+                                                .OrderBy(c => c.FillingDate)
         );
+        #endregion
+
         #endregion
 
         #endregion

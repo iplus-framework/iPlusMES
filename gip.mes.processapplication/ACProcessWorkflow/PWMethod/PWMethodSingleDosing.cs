@@ -43,12 +43,13 @@ namespace gip.mes.processapplication
         {
             get
             {
-                ACValue acclassWF = CurrentACMethod?.ValueT?.ParameterValueList.GetACValue(core.datamodel.ACClassWF.ClassName);
-                if (acclassWF != null && acclassWF.Value != null && ContentACClassWF != null)
-                {
-                    return acclassWF.ParamAsGuid;
-                }
-                return null;
+                return DesignatedProcessNodeACClassWFID;
+                //ACValue acclassWF = CurrentACMethod?.ValueT?.ParameterValueList.GetACValue(core.datamodel.ACClassWF.ClassName);
+                //if (acclassWF != null && acclassWF.Value != null && ContentACClassWF != null)
+                //{
+                //    return acclassWF.ParamAsGuid;
+                //}
+                //return null;
             }
         }
     }

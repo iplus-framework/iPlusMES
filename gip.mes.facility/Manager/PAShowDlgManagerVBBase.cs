@@ -28,6 +28,7 @@ namespace gip.mes.facility
             _C_BSONameForShowFacilityOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityOverview), "");
             _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOrder), "");
             _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowComponent), "");
+            _C_BSONameForShowVisitorVoucher = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowVisitorVoucher), "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -287,7 +288,7 @@ namespace gip.mes.facility
             {
                 if (!String.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
                     return _C_BSONameForShowLabOrder.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOLabOrder");
+                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOLabOrderMES");
                 if (classOfBso != null)
                 {
                     gip.core.datamodel.ACClass derivation = null;
@@ -303,7 +304,7 @@ namespace gip.mes.facility
                 }
 
                 if (String.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
-                    _C_BSONameForShowLabOrder.ValueT = "BSOLabOrder(Dialog)";
+                    _C_BSONameForShowLabOrder.ValueT = "BSOLabOrderMES(Dialog)";
                 return _C_BSONameForShowLabOrder.ValueT;
             }
             set
@@ -375,6 +376,41 @@ namespace gip.mes.facility
             set
             {
                 _C_BSONameForShowFacilityOverview.ValueT = value;
+            }
+        }
+
+
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowVisitorVoucher;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for Visitor voucher'}de{'Klassenname und ACIdentifier für Besucherbeleg'}")]
+        public string BSONameForShowVisitorVoucher
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
+                    return _C_BSONameForShowVisitorVoucher.ValueT;
+                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOVisitorVoucher");
+                if (classOfBso != null)
+                {
+                    gip.core.datamodel.ACClass derivation = null;
+                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
+                    {
+                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
+                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
+                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
+                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
+                    }
+                    if (derivation != null)
+                        _C_BSONameForShowVisitorVoucher.ValueT = derivation.ACIdentifier + "(Dialog)";
+                }
+
+                if (String.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
+                    _C_BSONameForShowVisitorVoucher.ValueT = "BSOVisitorVoucher(Dialog)";
+                return _C_BSONameForShowVisitorVoucher.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowVisitorVoucher.ValueT = value;
             }
         }
 
@@ -482,12 +518,18 @@ namespace gip.mes.facility
                     return;
                 }
                 // Lieferschein WE/WA
-                else if (orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).Any())
+                else if (orderInfo.Entities.Where(c => c.EntityName == DeliveryNote.ClassName 
+                                                    || c.EntityName == DeliveryNotePos.ClassName).Any())
                 {
                     var notePosEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).FirstOrDefault();
+                    var noteEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNote.ClassName).FirstOrDefault();
                     using (DatabaseApp dbApp = new DatabaseApp())
                     {
-                        DeliveryNotePos dnPos = dbApp.DeliveryNotePos.Where(c => c.DeliveryNotePosID == notePosEntry.EntityID).FirstOrDefault();
+                        DeliveryNotePos dnPos = null;
+                        if (notePosEntry == null && noteEntry != null)
+                            dnPos = dbApp.DeliveryNotePos.Where(c => c.DeliveryNoteID == noteEntry.EntityID).FirstOrDefault();
+                        else
+                            dnPos = dbApp.DeliveryNotePos.Where(c => c.DeliveryNotePosID == notePosEntry.EntityID).FirstOrDefault();
                         if (dnPos != null)
                         {
                             if (dnPos.InOrderPosID.HasValue)
@@ -520,6 +562,21 @@ namespace gip.mes.facility
                             }
                         }
                     }
+                }
+                // Falls Besucherbeleg
+                else if (orderInfo.Entities.Where(c => c.EntityName == VisitorVoucher.ClassName).Any())
+                {
+                    string bsoName = BSONameForShowVisitorVoucher;
+                    if (String.IsNullOrEmpty(bsoName))
+                        bsoName = "BSOVisitorVoucher(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
                 }
             }
             // Wegen Kompatibilität zu Version 3, die noch keine PAOrderInfo-Struktur kannte
@@ -661,7 +718,7 @@ namespace gip.mes.facility
                 childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, null, null, labOrder, true, orderInfo);
+            childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, null, null, null, labOrder, true, orderInfo);
             childBSO.Stop();
         }
 
@@ -678,14 +735,16 @@ namespace gip.mes.facility
 
         public virtual bool IsEnabledShowLabOrder(IACComponent caller)
         {
-            // Mus be done in Derivation:
-            //IACContainerTNet<String> orderInfoProp = null;
-            //if (!HasOrderInfo(caller, out orderInfoProp))
-            //    return false;
-            return false;
+            IACContainerTNet<String> orderInfoProp = null;
+            if (!HasOrderInfo(caller, out orderInfoProp))
+                return false;
+            Type typeOfInstance = caller.ACType.ObjectType;
+            if (typeOfInstance == null)
+                return false;
+            return true;
         }
 
-        public virtual void GenerateNewLabOrder(IACComponent caller)
+        public virtual void GenerateNewLabOrder(IACComponent caller, bool createAlwaysNewOne = true)
         {
             if (caller == null)
                 return;
@@ -701,51 +760,64 @@ namespace gip.mes.facility
             if (orderInfo == null)
                 return;
 
-            PAOrderInfoEntry orderInfoEntry = orderInfo.Entities.Where(c => c.EntityName == ProdOrderBatch.ClassName).FirstOrDefault();
-            if (orderInfoEntry == null)
-                return;
-
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    ProdOrderBatch batch = dbApp.ProdOrderBatch
-                        .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
-                        .Include(c => c.ProdOrderPartslist)
-                        .Include(c => c.ProdOrderPartslist.ProdOrder)
-                        .Where(c => c.ProdOrderBatchID == orderInfoEntry.EntityID).FirstOrDefault();
-                    if (batch == null)
-                        return;
-                    ProdOrderPartslistPos batchPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
-                    if (batchPos == null)
-                        return;
+                    ProdOrderPartslistPos batchPos = null;
+                    DeliveryNotePos dnPos = null;
+                    PickingPos pickingPos = null;
+                    FacilityBooking fBooking = null;
+                    InOrderPos inOrderPos = null;
+                    OutOrderPos outOrderPos = null;
+                    LabOrder labOrder = null;
 
-                    //if (!batchPos.LabOrder_ProdOrderPartslistPos.Any())
+                    if (!labOrderMgr.ResolveEntities(dbApp, orderInfo, out batchPos, out dnPos, out pickingPos, out fBooking, out inOrderPos, out outOrderPos, out labOrder))
+                        return;
+                    if (createAlwaysNewOne)
+                        labOrder = null;
+
+                    LabOrder labOrderTemplate = null;
+                    Material materialForTemplate = null;
+                    if (batchPos != null)
                     {
-                        Material materialForTemplate = null;
                         if (batchPos.ProdOrderPartslist != null && batchPos.ProdOrderPartslist.Partslist != null && batchPos.ProdOrderPartslist.Partslist.Material != null)
                             materialForTemplate = batchPos.ProdOrderPartslist.Partslist.Material;
                         if (materialForTemplate == null)
                             materialForTemplate = batchPos.BookingMaterial;
-                        LabOrder labOrderTemplate = materialForTemplate.LabOrder_Material.Where(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template).FirstOrDefault();
-                        if (labOrderTemplate == null)
-                            return;
-
-                        LabOrder labOrder = null;
-                        labOrderMgr.CreateNewLabOrder(dbApp, labOrderTemplate, caller.ACIdentifier, null, null, batchPos, null, out labOrder);
-
-                        if (labOrder != null)
-                        {
-                            MsgWithDetails msg = dbApp.ACSaveChanges();
-                            if (msg != null)
-                            {
-                                caller.Messages.Msg(msg);
-                            }
-                            else
-                                ShowLabOrder(caller, labOrder);
-                        }
+                    }
+                    else if (pickingPos != null)
+                        materialForTemplate = pickingPos.Material;
+                    else if (inOrderPos != null)
+                        materialForTemplate = inOrderPos.Material;
+                    else if (outOrderPos != null)
+                        materialForTemplate = outOrderPos.Material;
+                    else if (fBooking != null)
+                    {
+                        materialForTemplate = fBooking.InwardMaterial;
+                        if (materialForTemplate == null)
+                            materialForTemplate = fBooking.OutwardMaterial;
                     }
 
+                    if (materialForTemplate != null)
+                        labOrderTemplate = materialForTemplate.LabOrder_Material.Where(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template).FirstOrDefault();
+
+                    if (labOrder == null)
+                    {
+                        if (labOrderTemplate != null)
+                            labOrderMgr.CreateNewLabOrder(dbApp, labOrderTemplate, caller.ACIdentifier, inOrderPos, outOrderPos, batchPos, null, pickingPos, out labOrder);
+                        else
+                            labOrderMgr.CreateNewLabOrder(dbApp, caller.ACIdentifier, inOrderPos, outOrderPos, batchPos, null, pickingPos, out labOrder);
+                    }
+
+                    if (labOrder != null)
+                    {
+                        MsgWithDetails msg = dbApp.ACSaveChanges();
+                        if (msg != null)
+                            caller.Messages.Msg(msg);
+                        else
+                            ShowLabOrder(caller, labOrder);
+                    }
                 }
             }
             catch (Exception ec)
@@ -760,11 +832,13 @@ namespace gip.mes.facility
 
         public virtual bool IsEnabledGenerateNewLabOrder(IACComponent caller)
         {
-            // Mus be done in Derivation:
-            //IACContainerTNet<String> orderInfoProp = null;
-            //if (!HasOrderInfo(caller, out orderInfoProp))
-            //    return false;
-            return false;
+            IACContainerTNet<String> orderInfoProp = null;
+            if (!HasOrderInfo(caller, out orderInfoProp))
+                return false;
+            Type typeOfInstance = caller.ACType.ObjectType;
+            if (typeOfInstance == null)
+                return false;
+            return true;
         }
 
         public virtual void ShowFacilityBookCellDialog(IACComponent caller)
@@ -851,6 +925,42 @@ namespace gip.mes.facility
         #endregion
 
         #region OrderInfo methods
+        public static PAOrderInfo QueryOrderInfo(IACComponent caller)
+        {
+            if (caller == null)
+                return null;
+            PAOrderInfo orderInfo = null;
+            if (caller is IACComponentPWNode)
+            {
+                orderInfo = caller.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PWBase.GetPAOrderInfo)) as PAOrderInfo;
+            }
+            else
+            {
+                string[] accessedFromVBGroupACUrl = caller.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PAProcessModule.SemaphoreAccessedFrom)) as string[];
+                if (accessedFromVBGroupACUrl != null && accessedFromVBGroupACUrl.Any())
+                {
+                    string firstModule = accessedFromVBGroupACUrl[0];
+                    if (!String.IsNullOrEmpty(firstModule))
+                        orderInfo = caller.ACUrlCommand(accessedFromVBGroupACUrl[0] + ACUrlHelper.Delimiter_InvokeMethod + nameof(PWBase.GetPAOrderInfo)) as PAOrderInfo;
+                }
+            }
+            return orderInfo;
+        }
+
+        public static bool HasOrderInfo(IACComponent caller, out IACContainerTNet<String> orderInfoProp)
+        {
+            orderInfoProp = null;
+            if (caller == null)
+                return false;
+            if (caller is IACComponentPWNode)
+                return true;
+            orderInfoProp = caller.GetProperty(nameof(PAProcessModule.OrderInfo)) as IACContainerTNet<String>;
+            if (orderInfoProp == null)
+                return false;
+            if (String.IsNullOrEmpty(orderInfoProp.ValueT))
+                return false;
+            return true;
+        }
 
         public override string BuildAndSetOrderInfo(PAProcessModule pm)
         {

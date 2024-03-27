@@ -33,6 +33,19 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(partsListManager, "Warning50013", pos.Sequence, pos.Material.MaterialNo, pos.MaterialName)
                     });
                 }
+                if (   pos.Material != null 
+                    && pos.Material.IsLotReservationNeeded 
+                    && !pos.FacilityReservation_ProdOrderPartslistPos.Where(c => !c.VBiACClassID.HasValue).Any())
+                {
+                    // Error50635: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
+                    detailMessages.AddDetailMessage(new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(20)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
+                    });
+                }
             }
             return detailMessages;
         }

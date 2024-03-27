@@ -8,6 +8,7 @@ using gip.core.autocomponent;
 using gip.bso.iplus;
 using gip.bso.masterdata;
 using gip.core.media;
+using System.Diagnostics.Eventing.Reader;
 
 namespace gip.mes.maintenance
 {
@@ -138,6 +139,12 @@ namespace gip.mes.maintenance
                     MaintOrderTaskListDocu = value.MaintOrder1_BasedOnMaintOrder?.MaintOrderTask_MaintOrder.ToList();
                     if (_IsImageTabOpen)
                         BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
+
+                    MaintOrderPropertyList = value.MaintOrderProperty_MaintOrder.ToList();
+                }
+                else
+                {
+                    MaintOrderPropertyList = null;
                 }
             }
         }
@@ -276,49 +283,6 @@ namespace gip.mes.maintenance
                     SearchFilter();
                 }
                 return _MaintOrderStateFilterList;
-            }
-        }
-
-        private core.datamodel.ACClass _CurrentComponentFilter;
-        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
-        public core.datamodel.ACClass CurrentComponentFilter
-        {
-            get
-            {
-                return _CurrentComponentFilter;
-            }
-            set
-            {
-                _CurrentComponentFilter = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentObjectFilter));
-            }
-        }
-
-        private Facility _CurrentFacilityFilter;
-        [ACPropertyInfo(9999, "", "en{'Facility'}de{'Anlage'}")]
-        public Facility CurrentFacilityFilter
-        {
-            get => _CurrentFacilityFilter;
-            set
-            {
-                _CurrentFacilityFilter = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentObjectFilter));
-            }
-        }
-
-        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
-        public string CurrentObjectFilter
-        {
-            get
-            {
-                if (CurrentFacilityFilter != null)
-                    return CurrentFacilityFilter.ACCaption;
-                else if (CurrentComponentFilter != null)
-                    return CurrentComponentFilter.ACUrlComponent;
-
-                return null;
             }
         }
 
@@ -608,103 +572,6 @@ namespace gip.mes.maintenance
             }
         }
 
-        [ACMethodInfo("", "en{'Search'}de{'Suchen'}", 9999)]
-        public void SearchFilter()
-        {
-            CurrentMaintOrder = null;
-
-            //if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter == null)
-            //{
-            //    if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "MDMaintOrderState\\MDMaintOrderStateIndex"
-            //        || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
-            //    {
-            //        _ACQueryDefinition.ClearFilter(true);
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
-            //    }
-            //}
-            //else if (CurrentMaintOrderStateFilter == null && CurrentComponentFilter != null)
-            //{
-            //    if (_ACQueryDefinition.ACFilterColumns.Count != 1 || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().PropertyName != "VBiPAACClassID"
-            //        || _ACQueryDefinition.ACFilterColumns.FirstOrDefault().SearchWord != CurrentComponentFilter.ACClassID.ToString())
-            //    {
-            //        _ACQueryDefinition.ClearFilter(true);
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
-            //    }
-            //}
-            //else if (CurrentMaintOrderStateFilter != null && CurrentComponentFilter != null)
-            //{
-            //    bool rebuildACQuery = false;
-            //    if (_ACQueryDefinition.ACFilterColumns.Count != 2)
-            //        rebuildACQuery = true;
-            //    else
-            //    {
-            //        ACFilterItem state = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "MDMaintOrderState\\MDMaintOrderStateIndex");
-            //        if (state == null)
-            //            rebuildACQuery = true;
-            //        else if (state.SearchWord != CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString())
-            //            rebuildACQuery = true;
-            //        if (!rebuildACQuery)
-            //        {
-            //            ACFilterItem acClassID = _ACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "VBiPAACClassID");
-            //            if (acClassID == null)
-            //                rebuildACQuery = true;
-            //            else if (acClassID.SearchWord != CurrentComponentFilter.ACClassID.ToString())
-            //                rebuildACQuery = true;
-            //        }
-            //    }
-            //    if (rebuildACQuery)
-            //    {
-            //        _ACQueryDefinition.ClearFilter(true);
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VBiPAACClassID", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentComponentFilter.ACClassID.ToString(), true));
-            //        _ACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDMaintOrderState\\MDMaintOrderStateIndex", Global.LogicalOperators.equal,
-            //            Global.Operators.and, CurrentMaintOrderStateFilter.MDMaintOrderStateIndex.ToString(), true));
-            //    }
-            //}
-            //else
-            //{
-            //    _ACQueryDefinition.ClearFilter(true);
-            //}
-            Search();
-        }
-
-        [ACMethodInfo("", "en{'Choose Object'}de{'Objekt auswählen'}", 9999)]
-        public void ChooseComponent()
-        {
-            if (!IsEnabledChooseComponent())
-                return;
-
-            ShowDialog(this, "MaintOrderEntity");
-
-            BSOFacilityExplorer facilityExpl = FindChildComponents<BSOFacilityExplorer>(c => c is BSOFacilityExplorer).FirstOrDefault();
-            if (facilityExpl != null && facilityExpl.SelectedFacility != null)
-            {
-                CurrentFacilityFilter = facilityExpl.SelectedFacility;
-            }
-            else
-            {
-                BSOComponentSelector compExpl = FindChildComponents<BSOComponentSelector>(c => c is BSOComponentSelector).FirstOrDefault();
-                if (compExpl != null && compExpl.CurrentProjectItemCS != null)
-                {
-                    CurrentComponentFilter = compExpl.CurrentProjectItemCS.ValueT;
-                }
-            }
-        }
-
-        public bool IsEnabledChooseComponent()
-        {
-            return true;
-        }
-
-        [ACMethodInfo("", "", 999)]
-        public void ClearChosenComponent()
-        {
-            CurrentFacilityFilter = null;
-            CurrentComponentFilter = null;
-        }
-
         [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999)]
         public void OpenDocumentation()
         {
@@ -795,7 +662,7 @@ namespace gip.mes.maintenance
         {
             if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
             {
-                if (actionArgs.DropObject.VBContent == "*MaintOrderImages")
+                if (actionArgs.DropObject.VBContent == "*MaintOrderImages" && SelectedMaintOrderTask != null)
                 {
                     BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
                     _IsImageTabOpen = true;
@@ -940,68 +807,71 @@ namespace gip.mes.maintenance
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "StartMaintenanceTask":
+                case nameof(StartMaintenanceTask):
                     StartMaintenanceTask();
                     return true;
-                case "IsEnabledStartMaintenanceTask":
+                case nameof(IsEnabledStartMaintenanceTask):
                     result = IsEnabledStartMaintenanceTask();
                     return true;
-                case "EndMaintenanceTask":
+                case nameof(EndMaintenanceTask):
                     EndMaintenanceTask();
                     return true;
-                case "IsEnabledEndMaintenanceTask":
+                case nameof(IsEnabledEndMaintenanceTask):
                     result = IsEnabledEndMaintenanceTask();
                     return true;
-                case "ShowMaintenance":
+                case nameof(ShowMaintenance):
                     ShowMaintenance((IACComponent)acParameter[0]);
                     return true;
-                case "ShowMaintenanceHistory":
+                case nameof(ShowMaintenanceHistory):
                     ShowMaintenanceHistory((IACComponent)acParameter[0]);
                     return true;
-                case "ShowMaintenanceWarning":
+                case nameof(ShowMaintenanceWarning):
                     result = ShowMaintenanceWarning((List<gip.mes.maintenance.ACMaintWarning>)acParameter[0]);
                     return true;
-                case "ShowMaintenaceOrder":
+                case nameof(ShowMaintenaceOrder):
                     ShowMaintenaceOrder();
                     return true;
-                case "SearchFilter":
+                case nameof(SearchFilter):
                     SearchFilter();
                     return true;
-                case "ChooseComponent":
+                case nameof(ChooseComponent):
                     ChooseComponent();
                     return true;
-                case "IsEnabledChooseComponent":
+                case nameof(IsEnabledChooseComponent):
                     result = IsEnabledChooseComponent();
                     return true;
-                case "ClearChosenComponent":
+                case nameof(ClearChosenComponent):
                     ClearChosenComponent();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "NavigateToVisualisation":
+                case nameof(NavigateToVisualisation):
                     NavigateToVisualisation();
                     return true;
-                case "IsEnabledNavigateToVisualisation":
+                case nameof(IsEnabledNavigateToVisualisation):
                     result = IsEnabledNavigateToVisualisation();
+                    return true;
+                case nameof(OpenDocumentation):
+                    OpenDocumentation();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

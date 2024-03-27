@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using gip.bso.masterdata;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -1659,13 +1660,15 @@ namespace gip.bso.sales
         [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", (short)MISort.QueryPrintDlg)]
         public void ShowLabOrderFromOutOrder()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
-            if (childBSO == null && SelectedDeliveryNotePos != null)
-            {
-                childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, SelectedDeliveryNotePos.OutOrderPos, null, null, null, true, null);
-                childBSO.Stop();
-            }
+            if (this.DatabaseApp.IsChanged || SelectedDeliveryNotePos == null)
+                return;
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, SelectedDeliveryNotePos.OutOrderPos, null, null, null, null, true, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledShowLabOrderFromOutOrder()
@@ -1802,16 +1805,15 @@ namespace gip.bso.sales
         [ACMethodInteraction("Dialog", "en{'New Lab Report'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "CreateNewLabOrderFromOutOrder", Global.ACKinds.MSMethodPrePost)]
         public void CreateNewLabOrderFromOutOrder()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
-            if (childBSO == null && SelectedDeliveryNotePos != null)
-            {
-                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
-                childBSO.ACUrlCommand("!NewLabOrderDialog", null, SelectedDeliveryNotePos, null, null);
-            }
-            if (childBSO == null)
-            {
+            if (this.DatabaseApp.IsChanged || SelectedDeliveryNotePos == null)
                 return;
-            }
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, SelectedDeliveryNotePos, null, null, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrderFromOutOrder()
@@ -2420,6 +2422,7 @@ namespace gip.bso.sales
                 return;
 
             ShowDialogOrder(dn.DeliveryNoteNo, dnPos != null ? dnPos.DeliveryNotePosID : Guid.Empty);
+            paOrderInfo.DialogResult = this.DialogResult;
         }
 
         #endregion

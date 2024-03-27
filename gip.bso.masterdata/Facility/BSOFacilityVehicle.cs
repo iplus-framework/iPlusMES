@@ -20,6 +20,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using Microsoft.EntityFrameworkCore;
+using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
@@ -58,12 +59,19 @@ namespace gip.bso.masterdata
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
             Search();
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
             this._CurrentVehicleContainer = null;
             this._SelectedVehicleContainer = null;
             var b = base.ACDeInit(deleteACClassTask);
@@ -78,6 +86,19 @@ namespace gip.bso.masterdata
         #endregion
 
         #region BSO->ACProperty
+
+        #region Manager
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+        #endregion
 
         #region Vehicle
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -118,11 +139,11 @@ namespace gip.bso.masterdata
                                 if (filterItem.SearchWord == fcTypeLocation.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
                                     countFoundCorrect++;
                             }
-                            else if (filterItem.PropertyName == "Facility1_ParentFacility")
-                            {
-                                if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
-                                    countFoundCorrect++;
-                            }
+                            //else if (filterItem.PropertyName == "Facility1_ParentFacility")
+                            //{
+                            //    if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
+                            //        countFoundCorrect++;
+                            //}
                         }
                         if (countFoundCorrect < 2)
                             rebuildACQueryDef = true;
@@ -135,7 +156,7 @@ namespace gip.bso.masterdata
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.or, "", true));
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, fcTypeLocation.ToString(), true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Facility1_ParentFacility", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
+                        //navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Facility1_ParentFacility", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
                         navACQueryDefinition.SaveConfig(true);
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Facility>("Vehicle", this);
@@ -387,8 +408,9 @@ namespace gip.bso.masterdata
             MDFacilityType facilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.Vehicle).FirstOrDefault();
             if (facilityType == null)
                 return;
-            Facility vehicle = Facility.NewACObject(DatabaseApp, null);
-            vehicle = Facility.NewACObject(DatabaseApp, null);
+
+            Facility rootStore = this.ACFacilityManager.GetRootStoreForVehicles(DatabaseApp);
+            Facility vehicle = Facility.NewACObject(DatabaseApp, rootStore);
             vehicle.MDFacilityType = facilityType;
             vehicle.InwardEnabled = true;
             vehicle.OutwardEnabled = true;

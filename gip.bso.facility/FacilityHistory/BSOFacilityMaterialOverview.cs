@@ -45,7 +45,9 @@ namespace gip.bso.facility
     public class BSOFacilityMaterialOverview : BSOFacilityOverviewBase
     {
         #region constants
+        public const string filter_key_materialgroup_mdkey = "Material\\MDMaterialGroup\\MDKey";
         public const string filter_key_materialwf = "Material\\MaterialWF";
+        public const string filter_key_materialno = "Material\\MaterialNo";
 
 
         //public virtual Global.LogicalOperators WFOperator 
@@ -81,7 +83,23 @@ namespace gip.bso.facility
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            Search();
+            bool search = Parameters == null;
+            if (!search)
+            {
+                search = !Parameters.Any();
+            }
+            if (!search)
+            {
+                ACValue autoFilterParam = Parameters.Where(c => c.ACIdentifier == "AutoFilter").FirstOrDefault();
+                if (autoFilterParam != null)
+                {
+                    search = autoFilterParam.ValueT<bool>();
+                }
+            }
+            if (search)
+            {
+                Search();
+            }
             return true;
         }
 
@@ -117,6 +135,23 @@ namespace gip.bso.facility
             clone.FilterFBType = FilterFBType;
             clone.MaterialGroupFilter = MaterialGroupFilter;
             return clone;
+        }
+
+        #endregion
+
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
+        public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservationOverview_Child == null)
+                    _BSOFacilityReservationOverview_Child = new ACChildItem<BSOFacilityReservationOverview>(this, nameof(BSOFacilityReservationOverview_Child));
+                return _BSOFacilityReservationOverview_Child;
+            }
         }
 
         #endregion
@@ -187,7 +222,7 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedMaterialStock");
+                OnPropertyChanged(nameof(SelectedMaterialStock));
             }
         }
 
@@ -210,8 +245,9 @@ namespace gip.bso.facility
                     return;
                 AccessPrimary.Current = value;
                 CleanMovements();
-                OnPropertyChanged("CurrentMaterialStock");
+                OnPropertyChanged(nameof(CurrentMaterialStock));
                 RefreshRelatedData();
+                ClearReservation();
             }
         }
 
@@ -259,7 +295,7 @@ namespace gip.bso.facility
             set
             {
                 _MaterialGroupFilter = value;
-                OnPropertyChanged("MaterialGroupFilter");
+                OnPropertyChanged(nameof(MaterialGroupFilter));
             }
         }
 
@@ -298,7 +334,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentFacilityChargeSumLotHelper = value;
-                OnPropertyChanged("CurrentFacilityChargeSumLotHelper");
+                OnPropertyChanged(nameof(CurrentFacilityChargeSumLotHelper));
             }
         }
 
@@ -315,7 +351,13 @@ namespace gip.bso.facility
                     return null;
                 if (CurrentMaterialStock.Material == null)
                     return null;
-                return ACFacilityManager.GetFacilityChargeSumLotHelperList(FacilityChargeList, new FacilityQueryFilter() { MaterialID = CurrentMaterialStock.MaterialID });
+                List<FacilityChargeSumLotHelper> items = ACFacilityManager.GetFacilityChargeSumLotHelperList(FacilityChargeList, new FacilityQueryFilter() { MaterialID = CurrentMaterialStock.MaterialID }).ToList();
+                // when FilterLotNos exist - reduce already used FacilityLots
+                if (FilterLotNos != null && FilterLotNos.Any())
+                {
+                    items = items.Where(c => !FilterLotNos.Contains(c.FacilityLot.LotNo)).ToList();
+                }
+                return items;
             }
         }
         /// <summary>
@@ -336,7 +378,7 @@ namespace gip.bso.facility
             set
             {
                 _SelectedFacilityChargeSumLotHelper = value;
-                OnPropertyChanged("SelectedFacilityChargeSumLotHelper");
+                OnPropertyChanged(nameof(SelectedFacilityChargeSumLotHelper));
             }
         }
 
@@ -345,7 +387,7 @@ namespace gip.bso.facility
         {
             CurrentFacilityChargeSumLotHelper = null;
             SelectedFacilityChargeSumLotHelper = null;
-            OnPropertyChanged("FacilityChargeSumLotHelperList");
+            OnPropertyChanged(nameof(FacilityChargeSumLotHelperList));
         }
 
         #endregion
@@ -370,7 +412,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentFacilityCharge = value;
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
         }
 
@@ -413,7 +455,7 @@ namespace gip.bso.facility
             set
             {
                 _SelectedFacilityCharge = value;
-                OnPropertyChanged("SelectedFacilityCharge");
+                OnPropertyChanged(nameof(SelectedFacilityCharge));
             }
         }
 
@@ -422,7 +464,7 @@ namespace gip.bso.facility
             CurrentFacilityCharge = null;
             SelectedFacilityCharge = null;
             _FacilityChargeList = null;
-            OnPropertyChanged("FacilityChargeList");
+            OnPropertyChanged(nameof(FacilityChargeList));
         }
         #endregion
 
@@ -445,7 +487,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentFacilityChargeSumLocationHelper = value;
-                OnPropertyChanged("CurrentFacilityChargeSumLocationHelper");
+                OnPropertyChanged(nameof(CurrentFacilityChargeSumLocationHelper));
             }
         }
 
@@ -483,7 +525,7 @@ namespace gip.bso.facility
             set
             {
                 _SelectedFacilityChargeSumLocationHelper = value;
-                OnPropertyChanged("SelectedFacilityChargeSumLocationHelper");
+                OnPropertyChanged(nameof(SelectedFacilityChargeSumLocationHelper));
             }
         }
 
@@ -491,7 +533,7 @@ namespace gip.bso.facility
         {
             CurrentFacilityChargeSumLocationHelper = null;
             SelectedFacilityChargeSumLocationHelper = null;
-            OnPropertyChanged("FacilityChargeSumLocationHelperList");
+            OnPropertyChanged(nameof(FacilityChargeSumLocationHelperList));
         }
 
         #endregion
@@ -515,7 +557,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentFacilityChargeSumFacilityHelper = value;
-                OnPropertyChanged("CurrentFacilityChargeSumFacilityHelper");
+                OnPropertyChanged(nameof(CurrentFacilityChargeSumFacilityHelper));
             }
         }
 
@@ -554,7 +596,7 @@ namespace gip.bso.facility
             set
             {
                 _SelectedFacilityChargeSumFacilityHelper = value;
-                OnPropertyChanged("SelectedFacilityChargeSumFacilityHelper");
+                OnPropertyChanged(nameof(SelectedFacilityChargeSumFacilityHelper));
             }
         }
 
@@ -562,7 +604,7 @@ namespace gip.bso.facility
         {
             CurrentFacilityChargeSumFacilityHelper = null;
             SelectedFacilityChargeSumFacilityHelper = null;
-            OnPropertyChanged("FacilityChargeSumFacilityHelperList");
+            OnPropertyChanged(nameof(FacilityChargeSumFacilityHelperList));
         }
 
         #endregion
@@ -570,6 +612,9 @@ namespace gip.bso.facility
         #endregion
 
         #region BSO->ACMethod
+
+        #region BSO->ACMethod->Save&Search
+
         /// <summary>
         /// Saves this instance.
         /// </summary>
@@ -645,7 +690,7 @@ namespace gip.bso.facility
                 return;
             RefreshFacilityMaterialAccess();
             AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
-            OnPropertyChanged("MaterialStockList");
+            OnPropertyChanged(nameof(MaterialStockList));
         }
 
         IQueryable<MaterialStock> _AccessPrimary_NavSearchExecuting(IQueryable<MaterialStock> result)
@@ -665,10 +710,10 @@ namespace gip.bso.facility
                 return;
             if (MaterialGroupFilter != null)
             {
-                ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "Material\\MDMaterialGroup\\MDKey");
+                ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == filter_key_materialgroup_mdkey);
                 if (filterItem == null)
                 {
-                    filterItem = new ACFilterItem(Global.FilterTypes.filter, "Material\\MDMaterialGroup\\MDKey", Global.LogicalOperators.equal, Global.Operators.and, MaterialGroupFilter.MDKey.ToString(), false);
+                    filterItem = new ACFilterItem(Global.FilterTypes.filter, filter_key_materialgroup_mdkey, Global.LogicalOperators.equal, Global.Operators.and, MaterialGroupFilter.MDKey.ToString(), false);
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Add(filterItem);
                 }
                 else
@@ -676,11 +721,71 @@ namespace gip.bso.facility
             }
             else
             {
-                ACFilterItem filterItemExist = AccessPrimary.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == "Material\\MDMaterialGroup\\MDKey");
+                ACFilterItem filterItemExist = AccessPrimary.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == filter_key_materialgroup_mdkey);
                 if (filterItemExist != null)
                     AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemExist);
             }
             Search();
+        }
+
+        public VBDialogResult DialogResult { get; set; }
+        public string[] FilterLotNos { get; set; }
+
+        [ACMethodInfo(nameof(ShowLotDlg), "en{'Lot'}de{'Los'}", (short)MISort.QueryPrintDlg)]
+        public VBDialogResult ShowLotDlg(string materialNo, string[] lotNos)
+        {
+            if (DialogResult == null)
+                DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.Cancel;
+            FilterLotNos = lotNos;
+
+            ACFilterItem materialNoFilter = AccessPrimary.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == filter_key_materialno);
+            if (materialNoFilter == null)
+            {
+                materialNoFilter = new ACFilterItem(Global.FilterTypes.filter, filter_key_materialno, Global.LogicalOperators.equal, Global.Operators.and, MaterialGroupFilter.MDKey.ToString(), false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Add(materialNoFilter);
+            }
+            materialNoFilter.SearchWord = materialNo;
+
+            Search();
+
+            ShowDialog(this, "LotDlg");
+            this.ParentACComponent.StopComponent(this);
+            return DialogResult;
+        }
+
+        [ACMethodCommand(nameof(ShowLotDlg), "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        public void ShowLotDlgOk()
+        {
+            if (DialogResult != null)
+            {
+                DialogResult.SelectedCommand = eMsgButton.OK;
+                DialogResult.ReturnValue = SelectedFacilityChargeSumLotHelper.FacilityLot;
+            }
+            FilterLotNos = null;
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledShowLotDlgOk()
+        {
+            return SelectedFacilityChargeSumLotHelper != null;
+        }
+
+        [ACMethodCommand(nameof(ShowLotDlg), "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        public void ShowLotDlgCancel()
+        {
+            if (DialogResult != null)
+            {
+                DialogResult.SelectedCommand = eMsgButton.Cancel;
+                DialogResult.ReturnValue = null;
+            }
+            FilterLotNos = null;
+            CloseTopDialog();
+        }
+
+        public bool IsEnalbedShowLotDlgCancel()
+        {
+            return true;
         }
 
 
@@ -696,6 +801,43 @@ namespace gip.bso.facility
             //filterItem = new ACFilterItem(Global.FilterTypes.filter, filter_key_materialwf, WFOperator, Global.Operators.and, "", true);
             //AccessPrimary.NavACQueryDefinition.ACFilterColumns.Add(filterItem);
         }
+
+        #endregion
+
+        #region BSO->ACMethod->Reservation
+
+
+        /// <summary>
+        /// Source Property: LoadFacilityReservation
+        /// </summary>
+        [ACMethodInfo(nameof(LoadFacilityReservation), "en{'Load Facility Reservation'}de{'Reservierung einladen'}", 999)]
+        public void LoadFacilityReservation()
+        {
+            if (!IsEnabledMethodName())
+                return;
+            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
+            {
+                BSOFacilityReservationOverview_Child.Value.LoadReservation(CurrentMaterialStock.Material, SearchFrom, SearchTo);
+            }
+        }
+
+        public bool IsEnabledMethodName()
+        {
+            return CurrentMaterialStock != null;
+        }
+
+
+
+        private void ClearReservation()
+        {
+            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
+            {
+                BSOFacilityReservationOverview_Child.Value.ClearReservation();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -705,28 +847,28 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "Filter":
+                case nameof(Filter):
                     Filter();
                     return true;
             }

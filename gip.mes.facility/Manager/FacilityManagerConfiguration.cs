@@ -39,12 +39,14 @@ namespace gip.mes.facility
             _BookingParameterIgnoreManagement = new ACPropertyConfigValue<bool>(this, "BookingParameterIgnoreManagement", false);
             _BookingParameterQuantityIsAbsolute = new ACPropertyConfigValue<bool>(this, "BookingParameterQuantityIsAbsolute", false);
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
+            _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
             CreateModuleConstants();
         }
 
         protected virtual void InitConfigParams()
         {
             InitModuleConstants();
+            _ = RootStoreForVehicles;
         }
 
         private ACPropertyConfigValue<int> _DayClosingDays;
@@ -337,7 +339,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<int> _BookingParameterNotAvailableMode;
-        [ACPropertyConfig("Modus zum Umgang mit Nullbestandskennzeichen", DefaultValue = (int)MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSet)]
+        [ACPropertyConfig("en{'Mode for handling not available state'}de{'Modus zum Umgang mit Nullbestandskennzeichen'}", DefaultValue = (int)MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSet)]
         public int BookingParameterNotAvailableMode
         {
             get { return _BookingParameterNotAvailableMode.ValueT; }
@@ -345,7 +347,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _BookingParameterDontAllowNegativeStock;
-        [ACPropertyConfig("Keine negativen Bestände", DefaultValue = false)]
+        [ACPropertyConfig("en{'No negative Stocks'}de{'Keine negativen Bestände'}", DefaultValue = false)]
         public bool BookingParameterDontAllowNegativeStock
         {
             get { return _BookingParameterDontAllowNegativeStock.ValueT; }
@@ -353,7 +355,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _BookingParameterIgnoreManagement;
-        [ACPropertyConfig("Buchung auch wenn Lager von ext. System verwaltet", DefaultValue = false)]
+        [ACPropertyConfig("en{'Posting if managed from external system'}de{'Buchung auch wenn Lager von ext. System verwaltet'}", DefaultValue = false)]
         public bool BookingParameterIgnoreManagement
         {
             get { return _BookingParameterIgnoreManagement.ValueT; }
@@ -361,7 +363,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _BookingParameterQuantityIsAbsolute;
-        [ACPropertyConfig("Keine Differenzbuchuchungen", DefaultValue = false)]
+        [ACPropertyConfig("en{'No differntial postings'}de{'Keine Differenzbuchuchungen'}", DefaultValue = false)]
         public bool BookingParameterQuantityIsAbsolute
         {
             get { return _BookingParameterQuantityIsAbsolute.ValueT; }
@@ -369,13 +371,28 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<int> _BookingParameterBalancingMode;
-        [ACPropertyConfig("Bilanzierung auf Zu- und Abgangsfeldern", DefaultValue = (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn)]
+        [ACPropertyConfig("en{'Balacing on In/Outward fields'}de{'Bilanzierung auf Zu- und Abgangsfeldern'}", DefaultValue = (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn)]
         public int BookingParameterBalancingMode
         {
             get { return _BookingParameterBalancingMode.ValueT; }
             set { _BookingParameterBalancingMode.ValueT = value; }
         }
 
+        private ACPropertyConfigValue<string> _RootStoreForVehicles;
+        [ACPropertyConfig("en{'Store for vehicles'}de{'Lagerort für Fahrzeuge'}")]
+        public string RootStoreForVehicles
+        {
+            get { return _RootStoreForVehicles.ValueT; }
+            set { _RootStoreForVehicles.ValueT = value; }
+        }
+
+        public Facility GetRootStoreForVehicles(DatabaseApp dbApp)
+        {
+            string rootStore = RootStoreForVehicles;
+            if (String.IsNullOrEmpty(rootStore))
+                return null;
+            return dbApp.Facility.Where(c => c.FacilityNo == rootStore).FirstOrDefault();
+        }
     }
 }
 

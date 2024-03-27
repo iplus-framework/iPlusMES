@@ -3,8 +3,6 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.autocomponent;
 using gip.mes.facility;
 using gip.core.webservices;
@@ -62,7 +60,7 @@ namespace gip.mes.webservices
                         .Include("PickingPos_Picking.PickingMaterial")
                         .Include("PickingPos_Picking.PickingMaterial.BaseMDUnit")
                         .Where(c => (!pickingID.HasValue || c.PickingID == pickingID)
-                                    && (pickingID.HasValue || (c.PickingStateIndex == (short)PickingStateEnum.New || c.PickingStateIndex == (short)PickingStateEnum.InProcess))
+                                    && (pickingID.HasValue || c.PickingStateIndex <= (short)PickingStateEnum.InProcess || c.PickingStateIndex >= (short)PickingStateEnum.WFReadyToStart)
                               )
         );
 
@@ -270,7 +268,7 @@ namespace gip.mes.webservices
                                     && ((toFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.ToFacility.ParentFacilityID.HasValue && x.ToFacility.ParentFacilityID == toFacility))))
                                     && (fromDate == null || c.DeliveryDateFrom >= fromDate)
                                     && (toDate == null || c.DeliveryDateTo <= toDate)
-                                    && (c.PickingStateIndex == (short)PickingStateEnum.New || c.PickingStateIndex == (short)PickingStateEnum.InProcess))
+                                    && (c.PickingStateIndex <= (short)PickingStateEnum.InProcess || c.PickingStateIndex >= (short)PickingStateEnum.WFReadyToStart))
                               )
         ));
 
@@ -466,7 +464,8 @@ namespace gip.mes.webservices
                 .Include("OutwardFacilityCharge.FacilityLot")
 
                 // Where cause
-                .Where(fbc => (fbc.PickingPosID == pickingPos.PickingPosID || fbc.FacilityBooking.PickingPosID == pickingPos.PickingPosID)
+                .Where(fbc => 
+                            fbc.PickingPosID == pickingPos.PickingPosID
                             || (pickingPos.InOrderPosID.HasValue && fbc.InOrderPosID == pickingPos.InOrderPosID)
                             || (pickingPos.OutOrderPosID.HasValue && fbc.OutOrderPosID == pickingPos.OutOrderPosID))
                 .OrderBy(c => c.FacilityBookingChargeNo)

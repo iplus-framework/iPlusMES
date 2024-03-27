@@ -249,7 +249,7 @@ namespace gip.mes.facility
         public FacilityBooking FacilityBooking
         {
             get;
-            internal set;
+            set;
         }
 
         internal List<Facility> InwardCellsWithLotManagedBookings
@@ -727,6 +727,28 @@ namespace gip.mes.facility
                 if (acValue == null)
                 {
                     acValue = new ACValue("PreventSendToRemoteStore", typeof(bool), value, Global.ParamOption.Optional);
+                    ParameterValueList.Add(acValue);
+                }
+                acValue.Value = value;
+            }
+        }
+
+        [ACPropertyInfo(9999, "", "en{'Allow consumption of other Lot even if reserved'}de{'Erlaube den Verbrauch von einem anderen Lot trotz Reservierungen'}")]
+        public bool TakeOtherLotIfReserved
+        {
+            get
+            {
+                ACValue acValue = ParameterValueList.GetACValue("TakeOtherLotIfReserved");
+                if (acValue == null)
+                    return false;
+                return (bool)acValue.Value;
+            }
+            set
+            {
+                ACValue acValue = ParameterValueList.GetACValue("TakeOtherLotIfReserved");
+                if (acValue == null)
+                {
+                    acValue = new ACValue("TakeOtherLotIfReserved", typeof(bool), value, Global.ParamOption.Optional);
                     ParameterValueList.Add(acValue);
                 }
                 acValue.Value = value;
@@ -2341,10 +2363,13 @@ namespace gip.mes.facility
             {
                 if (acValue.Option == Global.ParamOption.Required)
                 {
-                    subResult = IACObjectReflectionExtension.CheckPropertyMinMax(vbControl.VBContentPropertyInfo, acValue.Value, null, acValue.ObjectFullType, false,
-                                                                    vbControl.VBContentPropertyInfo.MinLength, vbControl.VBContentPropertyInfo.MaxLength,
-                                                                    vbControl.VBContentPropertyInfo.MinValue, vbControl.VBContentPropertyInfo.MaxValue,
-                                                                    gip.core.datamodel.Database.GlobalDatabase);
+                    if (vbControl.VBContentPropertyInfo != null)
+                    {
+                        subResult = IACObjectReflectionExtension.CheckPropertyMinMax(vbControl.VBContentPropertyInfo, acValue.Value, null, acValue.ObjectFullType, false,
+                                                                        vbControl.VBContentPropertyInfo.MinLength, vbControl.VBContentPropertyInfo.MaxLength,
+                                                                        vbControl.VBContentPropertyInfo.MinValue, vbControl.VBContentPropertyInfo.MaxValue,
+                                                                        gip.core.datamodel.Database.GlobalDatabase);
+                    }
                 }
                 else if (acValue.Option == Global.ParamOption.Optional)
                 {
@@ -2902,7 +2927,16 @@ namespace gip.mes.facility
                                 || (ParamsAdjusted.OutwardMaterial == ParamsAdjusted.OutwardFacility.Material)
                                 || (ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && ParamsAdjusted.OutwardMaterial.ProductionMaterialID == ParamsAdjusted.OutwardFacility.MaterialID)))
                 {
-                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacility.Material;
+                    if (   ParamsAdjusted.OutwardMaterial == null 
+                        && ParamsAdjusted.OutwardFacilityLot != null
+                        && ParamsAdjusted.OutwardFacilityLot.Material != null
+                        && ParamsAdjusted.OutwardFacilityLot.Material != ParamsAdjusted.OutwardFacility.Material
+                        && ParamsAdjusted.OutwardFacilityLot.Material.IsMaterialEqual(ParamsAdjusted.OutwardFacility.Material))
+                    {
+                        ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacilityLot.Material;
+                    }
+                    else
+                        ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacility.Material;
                 }
                 if (ParamsAdjusted.InwardFacility != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType != null
@@ -2912,7 +2946,16 @@ namespace gip.mes.facility
                                 || (ParamsAdjusted.InwardMaterial == ParamsAdjusted.InwardFacility.Material)
                                 || (ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && ParamsAdjusted.InwardMaterial.ProductionMaterialID == ParamsAdjusted.InwardFacility.MaterialID)))
                 {
-                    ParamsAdjusted.InwardMaterial = ParamsAdjusted.InwardFacility.Material;
+                    if (   ParamsAdjusted.InwardMaterial == null
+                        && ParamsAdjusted.InwardFacilityLot != null 
+                        && ParamsAdjusted.InwardFacilityLot.Material != null 
+                        && ParamsAdjusted.InwardFacilityLot.Material != ParamsAdjusted.InwardFacility.Material
+                        && ParamsAdjusted.InwardFacilityLot.Material.IsMaterialEqual(ParamsAdjusted.InwardFacility.Material))
+                    {
+                        ParamsAdjusted.InwardMaterial = ParamsAdjusted.InwardFacilityLot.Material;
+                    }
+                    else
+                        ParamsAdjusted.InwardMaterial = ParamsAdjusted.InwardFacility.Material;
                 }
 
                 if (ParamsAdjusted.OutwardMaterial != null && ParamsAdjusted.InwardMaterial == null)

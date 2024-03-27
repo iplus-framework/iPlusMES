@@ -83,13 +83,16 @@ namespace gip.mes.datamodel
                     return msg;
             }
             if (InOrderPos != null)
-            {
                 InOrderPos.FacilityPreBooking_InOrderPos.Remove(this);
-            }
             else if (OutOrderPos != null)
-            {
                 OutOrderPos.FacilityPreBooking_OutOrderPos.Remove(this);
-            }
+            else if (PickingPos != null)
+                PickingPos.FacilityPreBooking_PickingPos.Remove(this);
+            else if (ProdOrderPartslistPos != null)
+                ProdOrderPartslistPos.FacilityPreBooking_ProdOrderPartslistPos.Remove(this);
+            else if (ProdOrderPartslistPosRelation != null)
+                ProdOrderPartslistPosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.Remove(this);
+
             if (_ACMethodBooking != null)
                 _ACMethodBooking.PropertyChanged -= _ACMethodBooking_PropertyChanged;
             database.Remove(this);

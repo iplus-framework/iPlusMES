@@ -20,6 +20,8 @@ namespace gip.mes.datamodel
         InProcess = 1,
         Finished = 2,
         Cancelled = 3,
+        WFReadyToStart = 4,
+        WFActive = 5,
     }
 
 
@@ -30,6 +32,8 @@ namespace gip.mes.datamodel
         {
             AddEntry(PickingStateEnum.New, "en{'New'}de{'Neu'}");
             AddEntry(PickingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
+            AddEntry(PickingStateEnum.WFReadyToStart, "en{'Workflow ready to start'}de{'Workflow Startbereit'}");
+            AddEntry(PickingStateEnum.WFActive, "en{'Workflow Active'}de{'Workflow Aktiv'}");
             AddEntry(PickingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
             AddEntry(PickingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
         }

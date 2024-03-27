@@ -12,36 +12,51 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'FacilityReservationView'}de{'FacilityReservationView'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class POPartslistPosReservation : ACObjectItemWCheckBox
     {
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderPartslistPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderPartslistPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentPos = parentPos;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderBatchPlan parentBatchPlan, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, ProdOrderBatchPlan parentBatchPlan, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentBatchPlan = parentBatchPlan;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
-        public POPartslistPosReservation(gip.core.datamodel.ACClass module, DeliveryNotePos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF workflowNode = null)
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, DeliveryNotePos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
             : base(parentReservation, module.ACCaption)
         {
             _Module = module;
             _ParentDeliveryNotePos = parentPos;
             _ParentReservation = parentReservation;
             _UnselFacility = unselFacility;
-            _WorkflowNode = workflowNode;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
+            SelectedReservation = selectedReservation;
+        }
+
+        public POPartslistPosReservation(gip.core.datamodel.ACClass module, PickingPos parentPos, FacilityReservation parentReservation, FacilityReservation selectedReservation, Facility unselFacility, gip.core.datamodel.ACClassWF destWorkflowNode = null, gip.core.datamodel.ACClassWF planningWorkflowNode = null)
+            : base(parentReservation, module.ACCaption)
+        {
+            _Module = module;
+            _ParentPickingPos = parentPos;
+            _ParentReservation = parentReservation;
+            _UnselFacility = unselFacility;
+            _WorkflowNode = destWorkflowNode;
+            _PlanningNode = planningWorkflowNode;
             SelectedReservation = selectedReservation;
         }
 
@@ -62,6 +77,16 @@ namespace gip.mes.datamodel
             get
             {
                 return _WorkflowNode;
+            }
+        }
+
+        gip.core.datamodel.ACClassWF _PlanningNode;
+        [ACPropertyInfo(9999, "", "en{'Workflownode'}de{'Workflowknoten'}")]
+        public gip.core.datamodel.ACClassWF PlanningNode
+        {
+            get
+            {
+                return _PlanningNode;
             }
         }
 
@@ -110,6 +135,16 @@ namespace gip.mes.datamodel
             }
         }
 
+        PickingPos _ParentPickingPos;
+        [ACPropertyInfo(9999)]
+        public PickingPos ParentPickingPos
+        {
+            get
+            {
+                return _ParentPickingPos;
+            }
+        }
+
         FacilityReservation _ParentReservation;
         [ACPropertyInfo(9999)]
         FacilityReservation ParentReservation
@@ -131,7 +166,7 @@ namespace gip.mes.datamodel
             set
             {
                 _SelectedReservation = value;
-                OnPropertyChanged("SelectedReservation");
+                OnPropertyChanged(nameof(SelectedReservation));
                 OnPropertyChanged("IsChecked");
 
             }
@@ -159,52 +194,22 @@ namespace gip.mes.datamodel
             }
         }
 
-        private Route _CurrentRoute;
+        //private Route _CurrentRoute;
         [ACPropertyInfo(999, "", "en{'Route'}de{'Route'}")]
         public Route CurrentRoute
         {
             get
             {
                 if (SelectedReservation == null)
-                {
-                    _CurrentRoute = null;
                     return null;
-                }
-
-                if (_CurrentRoute != null)
-                    return _CurrentRoute;
-
-                IACEntityProperty entityProperty = SelectedReservation as IACEntityProperty;
-                ACPropertyExt acPropertyExt = entityProperty.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
-                if (acPropertyExt != null && acPropertyExt.Value != null)
-                    _CurrentRoute = acPropertyExt.Value as Route;
-
-                return _CurrentRoute;
+                return SelectedReservation.PredefinedRoute;
             }
             set
             {
                 if (SelectedReservation == null)
                     return;
-
-                IACEntityProperty entityProperty = SelectedReservation as IACEntityProperty;
-                ACPropertyExt acPropertyExt = entityProperty.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
-                if (acPropertyExt == null)
-                {
-                    acPropertyExt = new ACPropertyExt();
-                    acPropertyExt.ACIdentifier = Route.ClassName;
-                    acPropertyExt.ObjectType = typeof(Route);
-                    acPropertyExt.AttachTo(entityProperty.ACProperties);
-                }
-
-                Route savedRoute = acPropertyExt.Value as Route;
-                if (savedRoute == null || !savedRoute.SequenceEqual(value))
-                {
-                    _CurrentRoute = value;
-                    acPropertyExt.Value = value;
-                    entityProperty.ACProperties.Properties.Add(acPropertyExt);
-                    entityProperty.ACProperties.Serialize();
-                }
-                OnPropertyChanged("CurrentRoute");
+                SelectedReservation.PredefinedRoute = value;
+                OnPropertyChanged();
             }
         }
 
@@ -239,27 +244,23 @@ namespace gip.mes.datamodel
                                 else if (ParentDeliveryNotePos.OutOrderPos != null)
                                     tempReservation.OutOrderPos = ParentDeliveryNotePos.OutOrderPos;
                             }
+                            else if (ParentPickingPos != null)
+                                tempReservation.PickingPos = ParentPickingPos;
                             ParentReservation.FacilityReservation_ParentFacilityReservation.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
                         FacilityReservation tempReservation = ParentReservation.FacilityReservation_ParentFacilityReservation.ToArray().Where(c => c == SelectedReservation).FirstOrDefault();
                         if (tempReservation != null)
                         {
-                            //foreach (FacilityReservation childReservation in tempReservation.FacilityReservation_ParentFacilityReservation.ToArray())
-                            //{
-                            //    tempReservation.FacilityReservation_ParentFacilityReservation.Remove(childReservation);
-                            //    tempReservation.DeleteACObject(ParentBatchPlan.GetObjectContext(), true);
-                            //}
-
                             ParentReservation.FacilityReservation_ParentFacilityReservation.Remove(tempReservation);
                             tempReservation.DeleteACObject(ParentReservation.GetObjectContext(), true);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                 }
                 else if (ParentPos != null)
@@ -278,7 +279,7 @@ namespace gip.mes.datamodel
                             ParentPos.FacilityReservation_ProdOrderPartslistPos.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
@@ -295,7 +296,7 @@ namespace gip.mes.datamodel
                             tempReservation.DeleteACObject(ParentPos.GetObjectContext(), true);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                 }
                 else if (ParentBatchPlan != null)
@@ -314,7 +315,7 @@ namespace gip.mes.datamodel
                             ParentBatchPlan.FacilityReservation_ProdOrderBatchPlan.Add(tempReservation);
                         }
                         _SelectedReservation = tempReservation;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                     else if (!value && SelectedReservation != null)
                     {
@@ -331,7 +332,7 @@ namespace gip.mes.datamodel
                             tempReservation.DeleteACObject(ParentBatchPlan.GetObjectContext(), true);
                         }
                         _SelectedReservation = null;
-                        OnPropertyChanged("SelectedReservation");
+                        OnPropertyChanged(nameof(SelectedReservation));
                     }
                 }
                 else if (ParentDeliveryNotePos != null)
@@ -352,7 +353,7 @@ namespace gip.mes.datamodel
                                 ParentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.Add(tempReservation);
                             }
                             _SelectedReservation = tempReservation;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                         else if (!value && SelectedReservation != null)
                         {
@@ -369,7 +370,7 @@ namespace gip.mes.datamodel
                                 tempReservation.DeleteACObject(ParentDeliveryNotePos.GetObjectContext(), true);
                             }
                             _SelectedReservation = null;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                     }
                     else if (ParentDeliveryNotePos.OutOrderPos != null)
@@ -388,7 +389,7 @@ namespace gip.mes.datamodel
                                 ParentDeliveryNotePos.OutOrderPos.FacilityReservation_OutOrderPos.Add(tempReservation);
                             }
                             _SelectedReservation = tempReservation;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
                         else if (!value && SelectedReservation != null)
                         {
@@ -405,8 +406,64 @@ namespace gip.mes.datamodel
                                 tempReservation.DeleteACObject(ParentDeliveryNotePos.GetObjectContext(), true);
                             }
                             _SelectedReservation = null;
-                            OnPropertyChanged("SelectedReservation");
+                            OnPropertyChanged(nameof(SelectedReservation));
                         }
+                    }
+                }
+                else if (ParentPickingPos != null)
+                {
+                    List<FacilityReservation> reservationList = null;
+                    if (value && SelectedReservation == null)
+                    {
+                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).ToArray().OrderBy(c => c.Sequence).ToList();
+                        FacilityReservation tempReservation = reservationList.Where(c => c.VBiACClassID == Module.ACClassID).FirstOrDefault();
+                        if (tempReservation == null)
+                        {
+                            DatabaseApp dbApp = ParentPickingPos.GetObjectContext() as DatabaseApp;
+                            string secondaryKey = ACRoot.SRoot.NoManager.GetNewNo(dbApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
+                            tempReservation = FacilityReservation.NewACObject(dbApp, ParentPickingPos, secondaryKey);
+                            tempReservation.FacilityACClass = Module;
+                            tempReservation.Facility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == Module.ACClassID).FirstOrDefault();
+                            tempReservation.PickingPos = ParentPickingPos;
+                            ParentPickingPos.FacilityReservation_PickingPos.Add(tempReservation);
+                            ParentPickingPos.Picking.VBiACClassWFID = PlanningNode?.ACClassWFID;
+                            reservationList.Add(tempReservation);
+                        }
+                        _SelectedReservation = tempReservation;
+                        OnPropertyChanged(nameof(SelectedReservation));
+                    }
+                    else if (!value && SelectedReservation != null)
+                    {
+                        reservationList = ParentPickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).ToArray().OrderBy(c => c.Sequence).ToList();
+                        FacilityReservation tempReservation = reservationList.Where(c => c == SelectedReservation).FirstOrDefault();
+                        if (tempReservation != null)
+                        {
+                            foreach (FacilityReservation childReservation in tempReservation.FacilityReservation_ParentFacilityReservation.ToArray())
+                            {
+                                tempReservation.FacilityReservation_ParentFacilityReservation.Remove(childReservation);
+                                childReservation.DeleteACObject(ParentPickingPos.GetObjectContext(), true);
+                            }
+
+                            ParentPickingPos.Picking.VBiACClassWFID = PlanningNode?.ACClassWFID;
+                            ParentPickingPos.FacilityReservation_PickingPos.Remove(tempReservation);
+                            tempReservation.DeleteACObject(ParentPickingPos.GetObjectContext(), true);
+                            reservationList.Remove(tempReservation);
+                        }
+                        _SelectedReservation = null;
+                        OnPropertyChanged(nameof(SelectedReservation));
+                    }
+                    if (reservationList != null)
+                    {
+                        bool changeDestination = true;
+                        var toFacility = ParentPickingPos.ToFacility;
+                        if (toFacility != null)
+                            changeDestination = !reservationList.Where(c => c.Facility == toFacility).Any();
+                        if (changeDestination)
+                            ParentPickingPos.ToFacility = reservationList.FirstOrDefault()?.Facility;
+                    }
+                    else
+                    {
+                        ParentPickingPos.ToFacility = null;
                     }
                 }
                 OnPropertyChanged("IsChecked");

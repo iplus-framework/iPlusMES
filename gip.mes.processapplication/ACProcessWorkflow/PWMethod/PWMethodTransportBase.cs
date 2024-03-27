@@ -18,7 +18,8 @@ namespace gip.mes.processapplication
             new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid) },
-            new object[] {PWMethodVBBase.IsLastBatchParamName, Global.ParamOption.Optional, typeof(Int16) }
+            new object[] {PWMethodVBBase.IsLastBatchParamName, Global.ParamOption.Optional, typeof(Int16) },
+            new object[] {core.datamodel.ACClassWF.ClassName, Global.ParamOption.Optional, typeof(Guid)}
         }
     )]
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWMethodTransportBase'}de{'PWMethodTransportBase'}", Global.ACKinds.TPWMethod, Global.ACStorableTypes.Optional, true, true, "", "PWMethodTransportBase", 20)]
@@ -180,6 +181,18 @@ namespace gip.mes.processapplication
             }
         }
 
+        public Guid? DesignatedProcessNodeACClassWFID
+        {
+            get
+            {
+                ACValue acclassWF = CurrentACMethod?.ValueT?.ParameterValueList.GetACValue(core.datamodel.ACClassWF.ClassName);
+                if (acclassWF != null && acclassWF.Value != null && ContentACClassWF != null)
+                {
+                    return acclassWF.ParamAsGuid;
+                }
+                return null;
+            }
+        }
         #endregion
 
         #region Methods
@@ -348,7 +361,8 @@ namespace gip.mes.processapplication
                 int expectedConfigStoresCount = 0;
 
                 List<IACConfigStore> pickingOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetPickingConfigStoreOfflineList(ContentTask.ACClassTaskID, CurrentPicking.PickingID,
-                                                                                                                                      out expectedConfigStoresCount, out errorMessage);                if (pickingOfflineList != null)
+                                                                                                                                      out expectedConfigStoresCount, out errorMessage);                
+                if (pickingOfflineList != null)
                 {
                     mandatoryConfigStores.AddRange(pickingOfflineList);
                 }
@@ -371,6 +385,42 @@ namespace gip.mes.processapplication
             }
         }
 
+        public override void SMCompleted()
+        {
+            Picking detachedPicking = CurrentPicking;
+            if (detachedPicking != null)
+            {
+                var nodes = FindChildComponents<PWNodeProcessWorkflowVB>(c => c is PWNodeProcessWorkflowVB, null, 1);
+                PWNodeProcessWorkflowVB onePlanningNode = nodes.FirstOrDefault();
+                bool updateScheduler = false;
+                if (onePlanningNode != null)
+                {
+                    using (Database dbiPlus = new Database())
+                    using (DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        Picking picking = detachedPicking.FromAppContext<Picking>(dbApp);
+                        if (picking.PickingState == PickingStateEnum.WFActive)
+                        {
+                            updateScheduler = true;
+                            if (onePlanningNode.EndProdOrderPartslistMode > EndPListMode.DoNothing)
+                                picking.PickingState = PickingStateEnum.Finished;
+                            else
+                                picking.PickingState = PickingStateEnum.InProcess;
+                        }
+                        dbApp.ACSaveChanges();
+                    }
+                }
+
+                if (updateScheduler)
+                {
+                    foreach (var node in nodes)
+                    {
+                        node.InformSchedulerOnStateChange();
+                    }
+                }
+            }
+            base.SMCompleted();
+        }
         #endregion
 
 

@@ -19,6 +19,8 @@ namespace gip2006.variobatch.processapplication
     [ACPropertyEntity(102, "Bit02", "en{'Running (Bit02/3.2)'}de{'Laufmeldung (Bit02/3.2)'}")]
     [ACPropertyEntity(103, "Bit03", "en{'Fast (Bit03/3.3)'}de{'Schnell (Bit03/3.3)'}")]
     [ACPropertyEntity(104, "Bit04", "en{'Direction 1 (Bit04/3.4)'}de{'Richtung 1 (Bit04/3.4)'}")]
+    [ACPropertyEntity(112, "Bit12", "en{'Endposition 1 (Bit12/2.4)'}de{'Endlage 1 (Bit12/2.4)'}")]
+    [ACPropertyEntity(113, "Bit13", "en{'Endposition 2 (Bit13/2.5)'}de{'Endlage 2 (Bit13/2.5)'}")]
     [ACPropertyEntity(119, "Bit19", "en{'Jam sensor fault (Bit19/1.3)'}de{'Staumelder (Bit19/1.3)'}")]
     [ACPropertyEntity(122, "Bit22", "en{'VFD fault (Bit22/1.6)'}de{'Störung FU, Softstarter (Bit22/1.6)'}")]
     [ACPropertyEntity(124, "Bit24", "en{'Thermistor fault (Bit24/0.0)'}de{'Kaltleiter, PTC (Bit24/0.0)'}")]
@@ -71,6 +73,18 @@ namespace gip2006.variobatch.processapplication
         {
             get { return Bit04; }
             set { Bit04 = value; }
+        }
+
+        public bool Bit12_Endposition1
+        {
+            get { return Bit12; }
+            set { Bit12 = value; }
+        }
+
+        public bool Bit13_Endposition2
+        {
+            get { return Bit13; }
+            set { Bit13 = value; }
         }
 
         public bool Bit19_JamSensorFault
@@ -245,6 +259,7 @@ namespace gip2006.variobatch.processapplication
                     //{
                     //}
                 }
+
                 if (motor.ParentACComponent is PAETransport)
                 {
                     PAETransport transport = motor.ParentACComponent as PAETransport;
@@ -270,6 +285,22 @@ namespace gip2006.variobatch.processapplication
                             if (FaultAckJam != null)
                                 (FaultAckJam as IACPropertyNetServer).ValueUpdatedOnReceival += ModelProperty_ValueUpdatedOnReceival;
                             break;
+                        }
+
+                        foreach (PAELimitSwitch limitSwitch in transport.LimitSwitches)
+                        {
+                            if (limitSwitch.ACIdentifier.EndsWith("LS1"))
+                            {
+                                LimitSwitch1SensorState = limitSwitch.SensorState;
+                                if (LimitSwitch1SensorState != null)
+                                    (LimitSwitch1SensorState as IACPropertyNetServer).ValueUpdatedOnReceival += ModelProperty_ValueUpdatedOnReceival;
+                            }
+                            else if (limitSwitch.ACIdentifier.EndsWith("LS2"))
+                            {
+                                LimitSwitch2SensorState = limitSwitch.SensorState;
+                                if (LimitSwitch2SensorState != null)
+                                    (LimitSwitch2SensorState as IACPropertyNetServer).ValueUpdatedOnReceival += ModelProperty_ValueUpdatedOnReceival;
+                            }
                         }
 
                         if (transport is PAEElevator)
@@ -386,6 +417,15 @@ namespace gip2006.variobatch.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+
+            if (LimitSwitch1SensorState != null)
+                (LimitSwitch1SensorState as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
+            LimitSwitch1SensorState = null;
+
+            if (LimitSwitch2SensorState != null)
+                (LimitSwitch2SensorState as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
+            LimitSwitch2SensorState = null;
+
             if (ContactorSensorState != null)
                 (ContactorSensorState as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
             ContactorSensorState = null;
@@ -584,6 +624,8 @@ namespace gip2006.variobatch.processapplication
         public IACContainerTNet<PANotifyState> MisBLSensorState { get; set; }
         public IACContainerTNet<PANotifyState> JamSensorState { get; set; }
         public IACContainerTNet<PANotifyState> VFDState { get; set; }
+        public IACContainerTNet<PANotifyState> LimitSwitch1SensorState { get; set; }
+        public IACContainerTNet<PANotifyState> LimitSwitch2SensorState { get; set; }
         #endregion
 
         #endregion
@@ -844,6 +886,41 @@ namespace gip2006.variobatch.processapplication
                 //    }
                 //}
                 bool hasNewUnboundedAlarm = false;
+
+                if (LimitSwitch1SensorState != null)
+                {
+                    if (Response.ValueT.Bit12_Endposition1)
+                        LimitSwitch1SensorState.ValueT = PANotifyState.InfoOrActive;
+                    else
+                        LimitSwitch1SensorState.ValueT = PANotifyState.Off;
+                }
+                else
+                {
+                    if (_UnboundedResponse.Bit12_Endposition1 != Response.ValueT.Bit12_Endposition1)
+                    {
+                        _UnboundedResponse.Bit12_Endposition1 = Response.ValueT.Bit12_Endposition1;
+                        if (Response.ValueT.Bit12_Endposition1)
+                            hasNewUnboundedAlarm = false;
+                    }
+                }
+
+                if (LimitSwitch2SensorState != null)
+                {
+                    if (Response.ValueT.Bit13_Endposition2)
+                        LimitSwitch2SensorState.ValueT = PANotifyState.InfoOrActive;
+                    else
+                        LimitSwitch2SensorState.ValueT = PANotifyState.Off;
+                }
+                else
+                {
+                    if (_UnboundedResponse.Bit13_Endposition2 != Response.ValueT.Bit13_Endposition2)
+                    {
+                        _UnboundedResponse.Bit13_Endposition2 = Response.ValueT.Bit13_Endposition2;
+                        if (Response.ValueT.Bit13_Endposition2)
+                            hasNewUnboundedAlarm = false;
+                    }
+                }
+
                 if (JamSensorState != null)
                 {
                     if (Response.ValueT.Bit19_JamSensorFault)

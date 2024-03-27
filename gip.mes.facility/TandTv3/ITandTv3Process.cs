@@ -6,11 +6,11 @@ namespace gip.mes.facility.TandTv3
 {
     public interface ITandTv3Process
     {
-        IItemTracking<IACObjectEntity> FactoryBacwardItem(IACObjectEntity item);
+        IItemTracking<IACObjectEntity> FactoryBackwardItem(IACObjectEntity item);
         IItemTracking<IACObjectEntity> FactoryForwardItem(IACObjectEntity item);
 
-        List<IItemTracking<IACObjectEntity>> OperateSameStepItems(List<IACObjectEntity> sameStepItems, MDTrackingDirectionEnum trackingDirection, string callerItemNo);
-        List<IItemTracking<IACObjectEntity>> OperateNextStepItems(List<IACObjectEntity> nextStepItems, MDTrackingDirectionEnum trackingDirection, string callerItemNo);
+        List<IItemTracking<IACObjectEntity>> OperateSameStepItems(List<IACObjectEntity> sameStepItems, MDTrackingDirectionEnum trackingDirection, IItemTracking<IACObjectEntity> callerItem);
+        List<IItemTracking<IACObjectEntity>> OperateNextStepItems(List<IACObjectEntity> nextStepItems, MDTrackingDirectionEnum trackingDirection, IItemTracking<IACObjectEntity> callerItem);
 
 
     }

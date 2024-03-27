@@ -53,7 +53,7 @@ namespace gip.bso.facility
                 if (_GraphItem != value)
                 {
                     _GraphItem = value;
-                    OnPropertyChanged("GraphItem");
+                    OnPropertyChanged(nameof(GraphItem));
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace gip.bso.facility
             set
             {
                 _SelectedGraphAction = value;
-                OnPropertyChanged("SelectedGraphAction");
+                OnPropertyChanged(nameof(SelectedGraphAction));
             }
         }
 
@@ -486,7 +486,7 @@ namespace gip.bso.facility
                     if (value != null)
                         value.AggregateOrderData = true;
                     AccessPrimary.Selected = value;
-                    OnPropertyChanged("SelectedFilter");
+                    OnPropertyChanged(nameof(SelectedFilter));
                     if (value != null && !BackgroundWorker.IsBusy && FilterSearchNo != value.ItemSystemNo)
                         SelectedFilter_Changed();
                 }
@@ -542,7 +542,7 @@ namespace gip.bso.facility
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
-            OnPropertyChanged("MsgList");
+            OnPropertyChanged(nameof(MsgList));
         }
 
         #region Messages -> Properties
@@ -565,7 +565,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentMsg = value;
-                OnPropertyChanged("CurrentMsg");
+                OnPropertyChanged(nameof(CurrentMsg));
             }
         }
 
@@ -610,7 +610,7 @@ namespace gip.bso.facility
                 if (_SelectedTrackingStyle != value)
                 {
                     _SelectedTrackingStyle = value;
-                    OnPropertyChanged("SelectedTrackingStyle");
+                    OnPropertyChanged(nameof(SelectedTrackingStyle));
                 }
             }
         }
@@ -660,7 +660,7 @@ namespace gip.bso.facility
                 if (_SelectedItemType != value)
                 {
                     _SelectedItemType = value;
-                    OnPropertyChanged("SelectedItemType");
+                    OnPropertyChanged(nameof(SelectedItemType));
                 }
             }
         }
@@ -715,7 +715,7 @@ namespace gip.bso.facility
                 if (_FilterSearchNo != value)
                 {
                     _FilterSearchNo = value;
-                    OnPropertyChanged("FilterSearchNo");
+                    OnPropertyChanged(nameof(FilterSearchNo));
                 }
             }
         }
@@ -733,7 +733,7 @@ namespace gip.bso.facility
                 if (_FilterDateFrom != value)
                 {
                     _FilterDateFrom = value;
-                    OnPropertyChanged("FilterDateFrom");
+                    OnPropertyChanged(nameof(FilterDateFrom));
                 }
             }
         }
@@ -751,7 +751,7 @@ namespace gip.bso.facility
                 if (_FilterDateTo != value)
                 {
                     _FilterDateTo = value;
-                    OnPropertyChanged("FilterDateTo");
+                    OnPropertyChanged(nameof(FilterDateTo));
                 }
             }
         }
@@ -769,7 +769,7 @@ namespace gip.bso.facility
                 if (_FilterRecalcAgain != value)
                 {
                     _FilterRecalcAgain = value;
-                    OnPropertyChanged("FilterRecalcAgain");
+                    OnPropertyChanged(nameof(FilterRecalcAgain));
                 }
             }
         }
@@ -835,7 +835,7 @@ namespace gip.bso.facility
                 if (_SelectedDisplayType != value)
                 {
                     _SelectedDisplayType = value;
-                    OnPropertyChanged("SelectedDisplayType");
+                    OnPropertyChanged(nameof(SelectedDisplayType));
                 }
             }
         }
@@ -1131,7 +1131,7 @@ namespace gip.bso.facility
                 if (_SelectedDeliveryNote != value)
                 {
                     _SelectedDeliveryNote = value;
-                    OnPropertyChanged("SelectedDeliveryNote");
+                    OnPropertyChanged(nameof(SelectedDeliveryNote));
                 }
             }
         }
@@ -1172,7 +1172,7 @@ namespace gip.bso.facility
                 if (_SelectedFacilityCharge != value)
                 {
                     _SelectedFacilityCharge = value;
-                    OnPropertyChanged("SelectedFacilityCharge");
+                    OnPropertyChanged(nameof(SelectedFacilityCharge));
                 }
             }
         }
@@ -1215,8 +1215,8 @@ namespace gip.bso.facility
                     if (SelectedTandTMixPoint != null)
                         if (SelectedTandTMixPoint.ExistLabOrder)
                             SelectedACObjectWithLabOrder = SelectedTandTMixPoint.ItemsWithLabOrder.FirstOrDefault();
-                    OnPropertyChanged("SelectedTandTMixPoint");
-                    OnPropertyChanged("ACObjectWithLabOrderList");
+                    OnPropertyChanged(nameof(SelectedTandTMixPoint));
+                    OnPropertyChanged(nameof(ACObjectWithLabOrderList));
                 }
             }
         }
@@ -1251,7 +1251,7 @@ namespace gip.bso.facility
             set
             {
                 _AvailableTandTEdges = value;
-                OnPropertyChanged("AvailableTandTEdges");
+                OnPropertyChanged(nameof(AvailableTandTEdges));
             }
         }
 
@@ -1269,7 +1269,7 @@ namespace gip.bso.facility
             set
             {
                 _ActiveTandTObjects = value;
-                OnPropertyChanged("ActiveTandTObjects");
+                OnPropertyChanged(nameof(ActiveTandTObjects));
             }
         }
 
@@ -1281,7 +1281,7 @@ namespace gip.bso.facility
             set
             {
                 _ActiveTandTPaths = value;
-                OnPropertyChanged("ActiveTandTPaths");
+                OnPropertyChanged(nameof(ActiveTandTPaths));
             }
         }
 
@@ -1301,7 +1301,7 @@ namespace gip.bso.facility
             set
             {
                 _UseEdgesRouting = value;
-                OnPropertyChanged("UseEdgesRouting");
+                OnPropertyChanged(nameof(UseEdgesRouting));
             }
         }
 
@@ -1338,8 +1338,8 @@ namespace gip.bso.facility
                     _SelectedACObjectWithLabOrder = value;
                     if (SelectedACObjectWithLabOrder != null)
                         SelectedLabOrder = SelectedACObjectWithLabOrder.LabOrderWithItems.Keys.FirstOrDefault();
-                    OnPropertyChanged("SelectedACObjectWithLabOrder");
-                    OnPropertyChanged("LabOrderList");
+                    OnPropertyChanged(nameof(SelectedACObjectWithLabOrder));
+                    OnPropertyChanged(nameof(LabOrderList));
                 }
             }
         }
@@ -1386,8 +1386,8 @@ namespace gip.bso.facility
                         SelectedACObjectWithLabOrder.LabOrderWithItems != null &&
                         SelectedACObjectWithLabOrder.LabOrderWithItems.Values.FirstOrDefault() != null)
                         SelectedLabOrderPos = SelectedACObjectWithLabOrder.LabOrderWithItems.Values.FirstOrDefault().FirstOrDefault();
-                    OnPropertyChanged("SelectedLabOrder");
-                    OnPropertyChanged("LabOrderPosList");
+                    OnPropertyChanged(nameof(SelectedLabOrder));
+                    OnPropertyChanged(nameof(LabOrderPosList));
                 }
             }
         }
@@ -1448,7 +1448,7 @@ namespace gip.bso.facility
                 if (_SelectedLabOrderPos != value)
                 {
                     _SelectedLabOrderPos = value;
-                    OnPropertyChanged("SelectedLabOrderPos");
+                    OnPropertyChanged(nameof(SelectedLabOrderPos));
                 }
             }
         }
@@ -1742,9 +1742,8 @@ namespace gip.bso.facility
             DoItemsClear();
             DoItemsOnPropertyChanged();
             AccessNav.NavSearch();
-            OnPropertyChanged("FilterList");
+            OnPropertyChanged(nameof(FilterList));
             CleanUpGrapModel();
-            OnPropertyChanged("AvailableRoutes");
         }
 
         public virtual void CleanUpGrapModel()
@@ -1771,15 +1770,15 @@ namespace gip.bso.facility
 
         public virtual void DoItemsOnPropertyChanged()
         {
-            OnPropertyChanged("FilterList");
+            OnPropertyChanged(nameof(FilterList));
 
-            OnPropertyChanged("TandTMixPointList");
+            OnPropertyChanged(nameof(TandTMixPointList));
 
-            OnPropertyChanged("DeliveryNoteList");
-            OnPropertyChanged("FacilityChargeList");
-            OnPropertyChanged("ACObjectWithLabOrderList");
-            OnPropertyChanged("LabOrderList");
-            OnPropertyChanged("LabOrderPosList");
+            OnPropertyChanged(nameof(DeliveryNoteList));
+            OnPropertyChanged(nameof(FacilityChargeList));
+            OnPropertyChanged(nameof(ACObjectWithLabOrderList));
+            OnPropertyChanged(nameof(LabOrderList));
+            OnPropertyChanged(nameof(LabOrderPosList));
 
         }
 
@@ -1808,11 +1807,11 @@ namespace gip.bso.facility
 
         public void Test()
         {
-            core.datamodel.ACClass from = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\NachBehWa24");
-            //core.datamodel.ACClass to = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\SiloGrp2\Silo328");
-            RoutingResult result = ACRoutingService.MemSelectRoutes(Database.ContextIPlus, @"\AppAnnahme\SiloGrp4\Silo227", @"\AppRoesterei\SiloGrp2\Silo328", RouteDirections.Forwards, "", 1, true, true, null, RoutingService);
-            var test = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, false, from, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, null,
-                                                       (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), null, 1, true, true, false, false, 1, false);
+            //core.datamodel.ACClass from = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\NachBehWa24");
+            ////core.datamodel.ACClass to = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACURLComponentCached == @"\AppRoesterei\SiloGrp2\Silo328");
+            //RoutingResult result = ACRoutingService.MemSelectRoutes(Database.ContextIPlus, @"\AppAnnahme\SiloGrp4\Silo227", @"\AppRoesterei\SiloGrp2\Silo328", RouteDirections.Forwards, "", 1, true, true, null, RoutingService);
+            //var test = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, false, from, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Forwards, null,
+            //                                           (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), null, 1, true, true, false, false, 1, false);
         }
 
         #endregion

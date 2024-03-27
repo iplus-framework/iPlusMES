@@ -138,6 +138,8 @@ namespace gip.mes.processapplication
                 _MDSchedulingGroup = null;
             }
 
+            StartedAnyPickingWF.ValueT = false;
+
             bool result = base.ACDeInit(deleteACClassTask);
             return result;
         }
@@ -162,6 +164,8 @@ namespace gip.mes.processapplication
                 _MDSchedulingGroupLoaded = false;
                 _MDSchedulingGroup = null;
             }
+
+            StartedAnyPickingWF.ValueT = false;
 
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
@@ -976,19 +980,25 @@ namespace gip.mes.processapplication
             InformSchedulerOnStateChange();
         }
 
-        protected void InformSchedulerOnStateChange()
+        public void InformSchedulerOnStateChange()
         {
-            PABatchPlanScheduler scheduler = GetScheduler();
+            PAWorkflowSchedulerBase scheduler = GetScheduler();
             if (scheduler != null)
                 scheduler.OnACStateChangedOfPWNode(this);
         }
 
-        protected PABatchPlanScheduler GetScheduler()
+        protected PAWorkflowSchedulerBase GetScheduler()
         {
             var appManager = this.ApplicationManager;
             if (appManager == null)
                 return null;
-            return appManager.FindChildComponents<PABatchPlanScheduler>(c => c is PABatchPlanScheduler, null, 1).FirstOrDefault();
+            var schedulers = appManager.FindChildComponents<PAWorkflowSchedulerBase>(c => c is PAWorkflowSchedulerBase, null, 1);
+            if (schedulers == null || !schedulers.Any())
+                return null;
+            PAWorkflowSchedulerBase scheduler = schedulers.Where(c => c.IsSchedulerFor(this)).FirstOrDefault();
+            if (scheduler != null)
+                return scheduler;
+            return schedulers.FirstOrDefault();
         }
         #endregion
 
@@ -1345,6 +1355,10 @@ namespace gip.mes.processapplication
                     && (   RootPW.IsStartingProcessFunction 
                         || RootPW.CurrentACState <= ACStateEnum.SMStarting)))
             {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _PlanningWait = DateTime.Now.AddSeconds(1);
+                }
                 SubscribeToProjectWorkCycle();
                 return;
             }

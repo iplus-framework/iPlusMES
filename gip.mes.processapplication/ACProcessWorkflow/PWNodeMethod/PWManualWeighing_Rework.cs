@@ -66,8 +66,9 @@ namespace gip.mes.processapplication
                     ProdOrderBatch batch;
                     ProdOrderBatchPlan batchPlan;
                     ProdOrderPartslistPos endBatchPos;
+                    MaterialWFConnection[] matWFConnections;
                     bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction,
-                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
 
                     if (!posFound)
                     {
@@ -341,8 +342,9 @@ namespace gip.mes.processapplication
                     ProdOrderBatch batch;
                     ProdOrderBatchPlan batchPlan;
                     ProdOrderPartslistPos endBatchPos;
+                    MaterialWFConnection[] matWFConnections;
                     bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction,
-                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
 
                     if (!posFound)
                     {

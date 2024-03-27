@@ -42,6 +42,8 @@ namespace gip.mes.processapplication
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
+
+            _LabOrderManager = ACLabOrderManager.ACRefToServiceInstance(this);
             return result;
         }
 
@@ -49,9 +51,13 @@ namespace gip.mes.processapplication
         {
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
 
+            if (_LabOrderManager != null)
+                ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
+
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _ACFacilityManager = null;
+                _LabOrderManager = null;
                 _ExtraDisTargetDest = null;
                 _ExtraDisTargetComp = null;
                 _IsLastBatch = null;
@@ -67,6 +73,7 @@ namespace gip.mes.processapplication
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _ACFacilityManager = null;
+                _LabOrderManager = null;
                 _ExtraDisTargetDest = null;
                 _ExtraDisTargetComp = null;
                 _IsLastBatch = null;
@@ -139,6 +146,17 @@ namespace gip.mes.processapplication
                 if (_ACFacilityManager == null)
                     return null;
                 return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        protected ACRef<ACLabOrderManager> _LabOrderManager = null;
+        public ACLabOrderManager LabOrderManager
+        {
+            get
+            {
+                if (_LabOrderManager == null)
+                    return null;
+                return _LabOrderManager.ValueT;
             }
         }
 

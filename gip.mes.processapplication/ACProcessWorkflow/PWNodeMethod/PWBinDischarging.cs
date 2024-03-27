@@ -58,8 +58,13 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            CurrentEndBatchPosKey = null;
+            IntermediateChildPosKey = null;
+
             using (ACMonitor.Lock(_20015_LockValue))
             {
+                _CheckScale = null;
+                ScaleWeightOnStart  = 0;
             }
 
             if (_DischargingItemManager != null)
@@ -199,11 +204,45 @@ namespace gip.mes.processapplication
 
         #region Properties -> Pos
 
+        private EntityKey _CurrentEndBatchPosKey;
+
         [ACPropertyInfo(999)]
-        public EntityKey CurrentEndBatchPosKey { get; set; }
+        public EntityKey CurrentEndBatchPosKey
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _CurrentEndBatchPosKey;
+                }
+            }
+            set
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _CurrentEndBatchPosKey = value;
+                }
+            }
+        }
 
-        public EntityKey IntermediateChildPosKey { get; set; }
-
+        private EntityKey _IntermediateChildPosKey;
+        public EntityKey IntermediateChildPosKey
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _IntermediateChildPosKey;
+                }
+            }
+            set
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _IntermediateChildPosKey = value;
+                }
+            }
+        }
 
         #endregion
 
@@ -262,8 +301,8 @@ namespace gip.mes.processapplication
 
             if (ProdOrderManager == null)
             {
-                // Error50330 - OK
-                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(20)", 970, "Error50330");
+                // Error50605 - Missing ProdOrderManager!
+                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(20)", 970, "Error50605");
                 if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                     Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                 OnNewAlarmOccurred(ProcessAlarm, msg, false);
@@ -286,18 +325,24 @@ namespace gip.mes.processapplication
             {
                 if (CheckScale == null)
                 {
-                    //TODO: alarm
+                    //Error50606: Scale missing!
+                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMStarting(20)", 863, "Error50606", "acMethod");
+                    OnNewAlarmOccurred(PropNameProcessAlarm, msg, false);
+                    SubscribeToProjectWorkCycle();
+                    return;
                 }
-
-                ScaleWeightOnStart = CheckScale.ActualValue.ValueT;
+                else
+                {
+                    ScaleWeightOnStart = CheckScale.ActualValue.ValueT;
+                }
             }
 
             core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
             ACMethod acMethod = refPAACClassMethod.TypeACSignature();
             if (acMethod == null)
             {
-                //Error50298: acMethod is null. - missing - ACProdOrderManager
-                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMStarting(20)", 863, "Error50298", "acMethod");
+                //Error50607: acMethod is null. - missing - ACProdOrderManager
+                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMStarting(20)", 863, "Error50607", "acMethod");
                 OnNewAlarmOccurred(PropNameProcessAlarm, msg, false);
                 SubscribeToProjectWorkCycle();
                 return;
@@ -354,9 +399,10 @@ namespace gip.mes.processapplication
                 if (IsProduction)
                     result = PreparePosition(module, pwMethodProduction);
 
+                Guid intermediateChildPosID = Guid.Empty;
                 if (IntermediateChildPosKey != null)
                 {
-                    Guid intermediateChildPosID = (Guid)IntermediateChildPosKey.EntityKeyValues[0].Value;
+                    intermediateChildPosID = (Guid)IntermediateChildPosKey.EntityKeyValues[0].Value;
                     List<DischargingItem> dischargingItems = DischargingItemManager.LoadDischargingItemList(intermediateChildPosID, SourceInfoType);
                     if (dischargingItems == null || !dischargingItems.Any(c => !c.IsDischarged))
                     {
@@ -384,12 +430,22 @@ namespace gip.mes.processapplication
                         ACMethodEventArgs eM = _CurrentMethodEventArgs;
                         if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
                         {
-                            // Error50303 H1 - H10 filling task not startable Order {0}, Bill of material {1}, line {2} [OK] 
-                            Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMStarting(40)", 1140, "Error50303");
+                            using (DatabaseApp databaseApp = new DatabaseApp())
+                            {
+                                ProdOrderPartslistPos pos = databaseApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == intermediateChildPosID).FirstOrDefault();
+                                if (pos != null)
+                                {
+                                    // Error50608: Bin Discarging task not startable at Order {0}, Bill of material {1}, line {2}
+                                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMStarting(40)", 1050, "Error50608",
+                                        pos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                        pos.ProdOrderPartslist.Partslist.PartslistNo,
+                                        pos.Sequence);
 
-                            if (IsAlarmActive(PropNameProcessAlarm, msg.Message) == null)
-                                Root.Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                            OnNewAlarmOccurred(PropNameProcessAlarm, msg, false);
+                                    if (IsAlarmActive(PropNameProcessAlarm, msg.Message) == null)
+                                        Root.Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                    OnNewAlarmOccurred(PropNameProcessAlarm, msg, false);
+                                }
+                            }
                         }
                         SubscribeToProjectWorkCycle();
                         return;
@@ -455,10 +511,22 @@ namespace gip.mes.processapplication
                         ACMethodEventArgs eM = _CurrentMethodEventArgs;
                         if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
                         {
-                            Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMStarting(40)", 1140, "Error50303");
-                            if (IsAlarmActive(PropNameProcessAlarm, msg.Message) == null)
-                                Root.Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                            OnNewAlarmOccurred(PropNameProcessAlarm, msg, false);
+                            using (DatabaseApp databaseApp = new DatabaseApp())
+                            {
+                                ProdOrderPartslistPos pos = databaseApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == intermediateChildPosID).FirstOrDefault();
+                                if (pos != null)
+                                {
+                                    // Error50608: Bin Discarging task not startable at Order {0}, Bill of material {1}, line {2}
+                                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "SMRunning(40)", 1050, "Error50608",
+                                        pos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                        pos.ProdOrderPartslist.Partslist.PartslistNo,
+                                        pos.Sequence);
+
+                                    if (IsAlarmActive(PropNameProcessAlarm, msg.Message) == null)
+                                        Root.Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                    OnNewAlarmOccurred(PropNameProcessAlarm, msg, false);
+                                }
+                            }
                         }
                         SubscribeToProjectWorkCycle();
                     }
@@ -580,6 +648,7 @@ namespace gip.mes.processapplication
         private StartNextCompResult PreparePosition(PAProcessModule module, PWMethodProduction pwMethodProduction)
         {
             Msg msg = null;
+
             using (var dbIPlus = new Database())
             {
                 using (var dbApp = new DatabaseApp(dbIPlus))
@@ -697,12 +766,48 @@ namespace gip.mes.processapplication
                     {
                         IntermediateChildPosKey = intermediateChildPos.EntityKey;
                     }
-
-
                 }
             }
             return StartNextCompResult.NextCompStarted;
         }
+
+        #endregion
+
+        #region Reset
+
+        public override void Reset()
+        {
+            CurrentEndBatchPosKey = null;
+            IntermediateChildPosKey = null;
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _CheckScale = null;
+                ScaleWeightOnStart = 0;
+            }
+            base.Reset();
+        }
+
+        public override bool IsEnabledReset()
+        {
+            //if (this.TaskSubscriptionPoint.ConnectionList.Any())
+            //return false;
+            return base.IsEnabledReset();
+        }
+
+        public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        {
+            CurrentEndBatchPosKey = null;
+            IntermediateChildPosKey = null;
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _CheckScale = null;
+                ScaleWeightOnStart = 0;
+            }
+            base.Recycle(content, parentACObject, parameter, acIdentifier);
+        }
+
         #endregion
 
         #region Private fields

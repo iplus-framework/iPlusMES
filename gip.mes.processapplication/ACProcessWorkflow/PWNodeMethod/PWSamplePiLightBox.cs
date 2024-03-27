@@ -328,12 +328,13 @@ namespace gip.mes.processapplication
             ProdOrderBatch batch;
             ProdOrderBatchPlan batchPlan;
             ProdOrderPartslistPos endBatchPos;
+            MaterialWFConnection[] matWFConnections;
 
             using (var dbIPlus = new Database())
             using (var dbApp = new DatabaseApp(dbIPlus))
             {
                 bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction,
-                    out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                    out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                 if (!posFound)
                     return;
                 Material material = null;
@@ -359,6 +360,18 @@ namespace gip.mes.processapplication
                 {
                     // TODO Error:
                     return;
+                }
+
+                if (matWFConnections.Count() > 1)
+                {
+                    GetReleatedIntermediates(matWFConnections, endBatchPos, intermediateChildPos, intermediatePosition);
+
+
+
+
+
+
+
                 }
 
                 tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
@@ -507,6 +520,31 @@ namespace gip.mes.processapplication
         {
             base.DumpPropertyList(doc, xmlACPropertyList);
         }
+
+        protected List<ProdOrderPartslistPos> GetReleatedIntermediates(MaterialWFConnection[] connectionList, ProdOrderPartslistPos endBatchPos, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition)
+        {
+            List<ProdOrderPartslistPos> resultList = new List<ProdOrderPartslistPos>();
+
+            GetRelatedMatWFConn(connectionList, endBatchPos, resultList);
+
+            return resultList;
+        }
+
+        private void GetRelatedMatWFConn(MaterialWFConnection[] connectionList, ProdOrderPartslistPos currentPos, List<ProdOrderPartslistPos> resultList)
+        {
+            MaterialWFConnection matWFConnection = connectionList.FirstOrDefault(c => c.MaterialID == currentPos.MaterialID);
+
+            if (matWFConnection != null)
+            {
+                resultList.Add(currentPos);
+            }
+
+            foreach (ProdOrderPartslistPos sourcePos in currentPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Select(x => x.SourceProdOrderPartslistPos))
+            {
+                GetRelatedMatWFConn(connectionList, sourcePos, resultList);
+            }
+        }
+
 
         #endregion
     }

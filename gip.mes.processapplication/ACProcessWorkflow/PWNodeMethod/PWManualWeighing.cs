@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Xml;
+using static gip.mes.facility.ACPartslistManager;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
@@ -75,6 +76,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
 
+            method.ParameterValueList.Add(new ACValue("ReservationMode", typeof(short), (short)0, Global.ParamOption.Optional));
+            paramTranslation.Add("ReservationMode", "en{'Allow other lots if reservation'}de{'Erlaube andere Lose bei Reservierungen'}");
+
             method.ParameterValueList.Add(new ACValue("ReworkMaterialNo", typeof(string), "", Global.ParamOption.Optional));
             paramTranslation.Add("ReworkMaterialNo", "en{'Material number for rework'}de{'Materialnummer für Nacharbeit'}");
 
@@ -92,6 +96,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("DiffWeighing", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("DiffWeighing", "en{'Difference weighing'}de{'Differenzwägung'}");
+
+            method.ParameterValueList.Add(new ACValue("EachPosSeparated", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleife verwiegen'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
@@ -515,6 +522,23 @@ namespace gip.mes.processapplication
             }
         }
 
+        public short ReservationMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReservationMode");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
+                    }
+                }
+                return 0;
+            }
+        }
+
         public bool AutoInterDis
         {
             get
@@ -601,6 +625,21 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("DiffWeighing");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
+        public bool EachPosSeparated
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("EachPosSeparated");
                     if (acValue != null)
                         return acValue.ParamAsBoolean;
                 }
@@ -742,7 +781,7 @@ namespace gip.mes.processapplication
             set;
         }
 
-        public bool HasAnyMaterialToProcess
+        public bool HasAnyMaterialToProcessProd
         {
             get
             {
@@ -761,8 +800,9 @@ namespace gip.mes.processapplication
                         ProdOrderBatchPlan batchPlan;
                         ProdOrderPartslistPos intermediatePos;
                         ProdOrderPartslistPos endBatchPos;
+                        MaterialWFConnection[] matWFConnections;
                         bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
-                            out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                            out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                         if (!posFound)
                             return true;
 
@@ -781,6 +821,24 @@ namespace gip.mes.processapplication
                             return false;
                     }
                 }
+
+                return true;
+            }
+        }
+
+        public bool HasAnyMaterialToProcess
+        {
+            get
+            {
+                if (IsProduction)
+                    return HasAnyMaterialToProcessProd;
+                else if (IsTransport)
+                {
+                    PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                    if (pwMethodTransport != null && pwMethodTransport.CurrentPicking != null)
+                        return HasAnyMaterialToProcessPicking;
+                }
+
 
                 return true;
             }
@@ -1175,6 +1233,7 @@ namespace gip.mes.processapplication
                     if (ParentPWGroup.AccessedProcessModule == null)
                     {
                         SubscribeToProjectWorkCycle();
+                        Messages.LogInfo(this.GetACUrl(), nameof(SMRunning_Prod), "AccessedProcessModule == null");
                         return;
                     }
 
@@ -2032,8 +2091,9 @@ namespace gip.mes.processapplication
                     ProdOrderBatch batch;
                     ProdOrderBatchPlan batchPlan;
                     ProdOrderPartslistPos endBatchPos;
+                    MaterialWFConnection[] matWFConnections;
                     bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction,
-                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                     if (batch == null)
                     {
                         // Error50276: No batch assigned to last intermediate material of this workflow
@@ -2096,6 +2156,7 @@ namespace gip.mes.processapplication
                         //Error50279:intermediateChildPos is null.
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(70)", 1238, "Error50279");
                         ActivateProcessAlarmWithLog(msg, false);
+                        Messages.LogMessageMsg(msg);
                         return StartNextCompResult.CycleWait;
                     }
 
@@ -2483,8 +2544,11 @@ namespace gip.mes.processapplication
                     PickingPos pickingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == PLPosRelation);
                     if (pickingPos != null)
                     {
-                        IEnumerable<Facility> facilities = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos);
-                        return new ACValueList(facilities.Select(c => new ACValue("ID", c.FacilityID)).ToArray());
+                        QrySilosResult qrySilosResult = null;
+                        IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> result = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos, out qrySilosResult);
+                        if (result == null || !result.Any())
+                            return new ACValueList();
+                        return new ACValueList(result.Select(c => new ACValue("ID", c.StorageBin.FacilityID)).ToArray());
                     }
                 }
             }
@@ -2508,7 +2572,7 @@ namespace gip.mes.processapplication
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
-            IList<Facility> facilities;
+            facility.ACPartslistManager.QrySilosResult facilities;
 
             core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
             IEnumerable<Route> routes = PartslistManager.GetRoutes(posRel, dbApp, dbApp.ContextIPlus,
@@ -2519,9 +2583,39 @@ namespace gip.mes.processapplication
                                                                     null,
                                                                     null,
                                                                     null,
-                                                                    false);
+                                                                    false,
+                                                                    ReservationMode);
 
-            if (routes == null || facilities == null)
+            // Temp fix - GetRoutes DBException
+            if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
+            {
+                routes = PartslistManager.GetRoutes(posRel, dbApp, dbApp.ContextIPlus,
+                                                                    accessAClass,
+                                                                    ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                                    null,
+                                                                    out facilities,
+                                                                    null,
+                                                                    null,
+                                                                    null,
+                                                                    false,
+                                                                    ReservationMode);
+
+                if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
+                {
+                    routes = PartslistManager.GetRoutes(posRel, dbApp, dbApp.ContextIPlus,
+                                                                        accessAClass,
+                                                                        ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                                        null,
+                                                                        out facilities,
+                                                                        null,
+                                                                        null,
+                                                                        null,
+                                                                        false,
+                                                                        ReservationMode);
+                }
+            }
+
+            if (routes == null || facilities == null || facilities.FilteredResult == null || !facilities.FilteredResult.Any())
                 return new List<Facility>();
 
             var routeList = routes.ToList();
@@ -2556,9 +2650,9 @@ namespace gip.mes.processapplication
                         RouteItem source = currRoute.GetRouteSource();
                         if (source != null)
                         {
-                            Facility facilityToAdd = facilities.FirstOrDefault(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == source.SourceGuid);
+                            facility.ACPartslistManager.QrySilosResult.FacilitySumByLots facilityToAdd = facilities.FilteredResult.FirstOrDefault(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID == source.SourceGuid);
                             if (facilityToAdd != null)
-                                routableFacilities.Add(facilityToAdd);
+                                routableFacilities.Add(facilityToAdd.StorageBin);
                         }
                     }
                 }
@@ -2601,11 +2695,21 @@ namespace gip.mes.processapplication
 
             using (Database db = new core.datamodel.Database())
             {
-                RoutingResult routeResult = ACRoutingService.FindSuccessors(RoutingService, db, false, toComponent,
-                                        PAMSilo.SelRuleID_Storage, RouteDirections.Backwards, new object[] { },
-                                        (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType),
-                                        (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
-                                        0, true, true);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = false,
+                    SelectionRuleID = PAMSilo.SelRuleID_Storage,
+                    Direction = RouteDirections.Backwards,
+                    DBSelector = (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType),
+                    DBDeSelector = (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                    };
+
+                RoutingResult routeResult = ACRoutingService.FindSuccessors(toComponent.GetACUrl(), routingParameters);
 
                 if (routeResult != null)
                 {
@@ -2692,10 +2796,32 @@ namespace gip.mes.processapplication
             Guid? moduleID = ParentPWGroup?.AccessedProcessModule?.ComponentClass?.ACClassID;
 
             if (!moduleID.HasValue)
+            {
+                Messages.LogError(this.GetACUrl(), nameof(TryGetLastUsedLot)+"(10)", "The AccessedProcessModule component class is null!");
                 return new List<FacilityCharge>();
+            }
 
-            MaterialConfig lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
-                                                                                                            && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+            MaterialConfig lastUsedFC = null;
+
+            try
+            {
+                lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
+                                                                                                 && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(TryGetLastUsedLot) + "(20)", e);
+
+                try
+                {
+                    lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
+                                                                                                 && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+                }
+                catch (Exception exc)
+                {
+                    Messages.LogException(this.GetACUrl(), nameof(TryGetLastUsedLot) + "(25)", exc);
+                }
+            }
 
             if (lastUsedFC == null || lastUsedFC.Value == null)
             {
@@ -2713,6 +2839,8 @@ namespace gip.mes.processapplication
                 FacilityCharge fc = facilityCharges.FirstOrDefault(c => c.FacilityChargeID == fcID);
                 if (fc != null)
                     return new List<FacilityCharge>() { fc };
+                else
+                    Messages.LogInfo(this.GetACUrl(), nameof(TryGetLastUsedLot) + "30", "In the available facility charges missing last used facility charge.");
             }
 
             return new List<FacilityCharge>();
@@ -3038,9 +3166,9 @@ namespace gip.mes.processapplication
 
             double? dosingWeight = weighingComponent?.TargetWeight;
 
+            bool interDischargingNeeded = false;
             if (AutoInterDis && weighingComponent != null && IsProduction)
             {
-                bool interDischargingNeeded = false;
                 ProdOrderPartslistPosRelation relation = weighingComponent.PLPosRelation;
                 if (relation != null)
                 {
@@ -3078,7 +3206,10 @@ namespace gip.mes.processapplication
                                 {
                                     // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
                                     // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && dosingWeight > scaleBoundaries.MaxWeightCapacity)
+                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 
+                                        && dosingWeight > scaleBoundaries.MaxWeightCapacity 
+                                        && (   !scaleBoundaries.MinDosingWeight.HasValue 
+                                            || remainingWeight.Value > scaleBoundaries.MinDosingWeight.Value))
                                     {
                                         // Fall A.1:
                                         interDischargingNeeded = true;
@@ -3173,10 +3304,10 @@ namespace gip.mes.processapplication
                 {
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
                 }
-                //else
-                //{
-                //    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
-                //}
+                else
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
+                }
 
                 bool isLast;
                 using (ACMonitor.Lock(_65050_WeighingCompLock))
@@ -3193,7 +3324,10 @@ namespace gip.mes.processapplication
             }
 
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))
+            {
+                Messages.LogInfo(this.GetACUrl(), nameof(StartManualWeighingNextComp), nameof(AfterConfigForACMethodIsSet) + " return false!");
                 return StartNextCompResult.CycleWait;
+            }
 
             if (!acMethod.IsValid())
             {
@@ -3211,7 +3345,10 @@ namespace gip.mes.processapplication
 
             RecalcTimeInfo(true);
             if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
+            {
+                Messages.LogInfo(this.GetACUrl(), nameof(StartManualWeighingNextComp), nameof(CreateNewProgramLog) + " Cycle wait!");
                 return StartNextCompResult.CycleWait;
+            }
             _ExecutingACMethod = acMethod;
 
             module.TaskInvocationPoint.ClearMyInvocations(this);
@@ -3235,6 +3372,9 @@ namespace gip.mes.processapplication
             }
 
             UpdateCurrentACMethod();
+
+            if (interDischargingNeeded && AutoInterDis)
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
 
             _LastOpenMaterial = CurrentOpenMaterial;
             ExecuteMethod(nameof(OnACMethodSended), acMethod, true, responsibleFunc);
@@ -3367,6 +3507,17 @@ namespace gip.mes.processapplication
                                     if (actWeightRounded < Math.Round(targetQuantity.Value - toleranceMinus.Value, 5))
                                     {
                                         isWeighingInTol = false;
+                                    }
+
+                                    if (!isWeighingInTol)
+                                    {
+                                        ACValue skipTolCheckValue = parentACMethod.ParameterValueList.GetACValue("SkipToleranceCheck");
+                                        if (skipTolCheckValue != null)
+                                        {
+                                            bool skipToleranceCheck = skipTolCheckValue.ParamAsBoolean;
+                                            if (skipToleranceCheck)
+                                                isWeighingInTol = true;
+                                        }
                                     }
 
                                     if (AutoInterDis && currentOpenMaterial != null)

@@ -8,6 +8,8 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.core.processapplication;
 using System.Xml;
+using static gip.mes.facility.ACPartslistManager;
+using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 
 namespace gip.mes.processapplication
 {
@@ -42,6 +44,7 @@ namespace gip.mes.processapplication
         }
     }
 
+
     /// <summary>
     /// Class that is responsible for processing input-materials that are associated with an intermediate product. 
     /// The intermediate prduct, in turn, is linked through the material workflow to one or more workflow nodes that are from this PWDosing class. 
@@ -72,10 +75,16 @@ namespace gip.mes.processapplication
             paramTranslation.Add("ComponentsSeqTo", "en{'Components to Seq.-No.'}de{'Komponenten BIS Seq.-Nr.'}");
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after Dosing'}de{'Restliche Komponenten anpassen'}");
+            method.ParameterValueList.Add(new ACValue("ReservationMode", typeof(short), (short)0, Global.ParamOption.Optional));
+            paramTranslation.Add("ReservationMode", "en{'Allow other lots if reservation'}de{'Erlaube andere Lose bei Reservierungen'}");
             method.ParameterValueList.Add(new ACValue("ManuallyChangeSource", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ManuallyChangeSource", "en{'Manually change source'}de{'Manueller Quellenwechsel'}");
             method.ParameterValueList.Add(new ACValue("MinDosQuantity", typeof(double), 0.0, Global.ParamOption.Optional));
             paramTranslation.Add("MinDosQuantity", "en{'Minimum dosing quantity'}de{'Minimale Dosiermenge'}");
+            method.ParameterValueList.Add(new ACValue("SWTOn", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("SWTOn", "en{'SWT On'}de{'SWT An'}");
+            method.ParameterValueList.Add(new ACValue("AdaptToTargetQ", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AdaptToTargetQ", "en{'Adapt to total remaining target quantity'}de{'Anpassung an Gesamtrestsollwert'}");
             method.ParameterValueList.Add(new ACValue("OldestSilo", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OldestSilo", "en{'Dosing from oldest Silo only'}de{'Nur aus ältestem Silo dosieren'}");
             method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(bool), false, Global.ParamOption.Optional));
@@ -299,6 +308,13 @@ namespace gip.mes.processapplication
             {
                 if (IsProduction)
                     return HasAnyMaterialToProcessProd;
+                else if (IsTransport)
+                {
+                    PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+                    if (pwMethodTransport != null && pwMethodTransport.CurrentPicking != null)
+                        return HasAnyMaterialToProcessPicking;
+                }
+
 
                 return true;
             }
@@ -478,9 +494,33 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool IsAutomaticContinousWeighing
+        {
+            get
+            {
+                PAEScaleTotalizing scale = TotalizingScaleIfSWT;
+                if (scale == null)
+                    return false;
+                return scale.SWTTipWeight >= 0.0001;
+            }
+        }
+
+        private PAEScaleTotalizing TotalizingScaleIfSWT
+        {
+            get
+            {
+                if (!SWTOn)
+                    return null;
+                IPAMContScale pamScale = this.ParentPWGroup.AccessedProcessModule as IPAMContScale;
+                if (pamScale == null)
+                    return null;
+                return pamScale.Scale as PAEScaleTotalizing;
+            }
+        }
+
         #endregion
 
-        #region PWMethodBase
+            #region PWMethodBase
         public PWMethodVBBase ParentPWMethodVBBase
         {
             get
@@ -563,6 +603,24 @@ namespace gip.mes.processapplication
                     }
                 }
                 return false;
+            }
+        }
+
+
+        public short ReservationMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReservationMode");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
+                    }
+                }
+                return 0;
             }
         }
 
@@ -717,6 +775,40 @@ namespace gip.mes.processapplication
             }
         }
 
+
+        public bool SWTOn
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("SWTOn");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool AdaptToTargetQ
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("AdaptToTargetQ");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
 
         public Int32 ComponentsSeqFrom
         {
@@ -917,16 +1009,22 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "CancelCurrentComponent":
+                case nameof(CancelCurrentComponent):
                     CancelCurrentComponent();
                     return true;
-                case Const.IsEnabledPrefix + "CancelCurrentComponent":
+                case nameof(IsEnabledCancelCurrentComponent):
                     result = IsEnabledCancelCurrentComponent();
                     return true;
-                case "AckNotEmptyScale":
+                case nameof(CancelCurrentComponentEnd):
+                    CancelCurrentComponentEnd();
+                    return true;
+                case nameof(IsEnabledCancelCurrentComponentEnd):
+                    result = IsEnabledCancelCurrentComponentEnd();
+                    return true;
+                case nameof(AckNotEmptyScale):
                     AckNotEmptyScale();
                     return true;
-                case Const.IsEnabledPrefix + "AckNotEmptyScale":
+                case nameof(IsEnabledAckNotEmptyScale):
                     result = IsEnabledAckNotEmptyScale();
                     return true;
             }
@@ -1420,6 +1518,16 @@ namespace gip.mes.processapplication
             return null;
         }
 
+
+        public virtual bool HasAndCanProcessAnyMaterial(PAProcessModule module)
+        {
+            if (IsProduction)
+                return HasAndCanProcessAnyMaterialProd(module);
+            else if (IsTransport)
+                return HasAndCanProcessAnyMaterialPicking(module);
+            return false;
+        }
+
         #endregion
 
 
@@ -1631,13 +1739,15 @@ namespace gip.mes.processapplication
                 ACPartslistManager.SearchMode searchMode,
                 DateTime? filterTimeOlderThan,
                 Guid? ignoreFacilityID,
-                IEnumerable<gip.core.datamodel.ACClass> exclusionList)
+                IEnumerable<gip.core.datamodel.ACClass> exclusionList,
+                short reservationMode)
             {
                 _Purpose = purpose;
                 SearchMode = searchMode;
                 FilterTimeOlderThan = filterTimeOlderThan;
                 IgnoreFacilityID = ignoreFacilityID;
                 ExclusionList = exclusionList;
+                ReservationMode = reservationMode;
             }
             #endregion
 
@@ -1655,6 +1765,7 @@ namespace gip.mes.processapplication
             public DateTime? FilterTimeOlderThan { get; set; }
             public Guid? IgnoreFacilityID { get; set; }
             public IEnumerable<gip.core.datamodel.ACClass> ExclusionList { get; set; }
+            public short ReservationMode { get; set; }
             #endregion
 
             #region Result
@@ -1666,7 +1777,7 @@ namespace gip.mes.processapplication
                                                 DatabaseApp dbApp, Database dbIPlus,
                                                 RouteQueryParams queryParams,
                                                 PAProcessModule useIfNotAccessedProcessModule,
-                                                out IList<Facility> possibleSilos)
+                                                out QrySilosResult possibleSilos)
         {
             if (ParentPWGroup == null || PartslistManager == null)
                 throw new NullReferenceException("ParentPWGroup || PartslistManager  is null");
@@ -1685,9 +1796,19 @@ namespace gip.mes.processapplication
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
-                                        queryParams.ExclusionList);
-            if (possibleSilos != null && possibleSilos.Any())
-                possibleSilos = ApplyPriorizationRules(possibleSilos);
+                                        queryParams.ExclusionList,
+                                        null,
+                                        true,
+                                        queryParams.ReservationMode,
+                                        PAMSilo.SelRuleID_SiloDirect);
+                                        //this.ApplicationManager.IncludeReservedOnRoutingSearch,
+                                        //this.ApplicationManager.IncludeAllocatedOnRoutingSearch);
+            //if ((routes == null || !routes.Any()) && ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
+            //{
+            //}
+
+            if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                ApplyPriorizationRules(possibleSilos);
             return routes;
         }
 
@@ -1695,7 +1816,8 @@ namespace gip.mes.processapplication
                                                     DatabaseApp dbApp, Database dbIPlus,
                                                     RouteQueryParams queryParams,
                                                     PAProcessModule useIfNotAccessedProcessModule,
-                                                    out IList<Facility> possibleSilos)
+                                                    out QrySilosResult possibleSilos,
+                                                    string selectionRuleID = PAMSilo.SelRuleID_SiloDirect)
         {
             if (ParentPWGroup == null || PickingManager == null)
                 throw new NullReferenceException("ParentPWGroup || PickingManager  is null");
@@ -1712,19 +1834,25 @@ namespace gip.mes.processapplication
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
-                                        queryParams.ExclusionList);
-            if (possibleSilos != null && possibleSilos.Any())
-                possibleSilos = ApplyPriorizationRules(possibleSilos);
+                                        queryParams.ExclusionList,
+                                        null,
+                                        true,
+                                        queryParams.ReservationMode,
+                                        selectionRuleID);
+            if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                ApplyPriorizationRules(possibleSilos);
             return routes;
         }
 
-        protected virtual IList<Facility> ApplyPriorizationRules(IList<Facility> possibleSilos)
+        protected virtual void ApplyPriorizationRules(QrySilosResult possibleSilos)
         {
-            if (String.IsNullOrEmpty(FacilityNoSort))
-                return possibleSilos;
+            if (String.IsNullOrEmpty(FacilityNoSort)
+                || possibleSilos.FilteredResult == null 
+                || !possibleSilos.FilteredResult.Any())
+                return;
             string[] facilitySortRules = FacilityNoSort.Split(';');
             if (facilitySortRules == null || !facilitySortRules.Any())
-                return possibleSilos;
+                return;
             List<Facility> priorizedList = new List<Facility>();
             List<Facility> posterizedList = new List<Facility>();
             int insertIndex = 0;
@@ -1733,31 +1861,30 @@ namespace gip.mes.processapplication
                 string rule = entry.Trim();
                 if (string.IsNullOrEmpty(rule))
                     continue;
-                Facility facility;
+                FacilitySumByLots facility;
                 if (rule[0] == '!')
                 {
                     rule = rule.Substring(1);
                     if (String.IsNullOrEmpty(rule))
                         continue;
-                    facility = possibleSilos.Where(c => c.FacilityNo == rule).FirstOrDefault();
+                    facility = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityNo == rule).FirstOrDefault();
                     if (facility != null)
                     {
-                        possibleSilos.Remove(facility);
-                        possibleSilos.Add(facility);
+                        possibleSilos.FilteredResult.Remove(facility);
+                        possibleSilos.FilteredResult.Add(facility);
                     }
                 }
                 else
                 {
-                    facility = possibleSilos.Where(c => c.FacilityNo == rule).FirstOrDefault();
+                    facility = possibleSilos.FilteredResult.Where(c => c.StorageBin.FacilityNo == rule).FirstOrDefault();
                     if (facility != null)
                     {
-                        possibleSilos.Remove(facility);
-                        possibleSilos.Insert(insertIndex, facility);
+                        possibleSilos.FilteredResult.Remove(facility);
+                        possibleSilos.FilteredResult.Insert(insertIndex, facility);
                         insertIndex++;
                     }
                 }
             }
-            return possibleSilos;
         }
 
         public virtual RouteItem CurrentDosingSource(Database db)
@@ -1798,11 +1925,19 @@ namespace gip.mes.processapplication
             LastQueriedDosingSilo = item.SourceACComponent as PAMSilo;
             return LastQueriedDosingSilo;
         }
-        
-#endregion
+
+        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod, Route dosingRoute)
+        {
+            Route route = dosingRoute != null ? dosingRoute.Clone() as Route : null;
+            if (!ValidateRouteForFuncParam(route))
+                return false;
+            acMethod["Route"] = route;
+            return route != null;
+        }
+        #endregion
 
 
-#region Misc
+        #region Misc
         public override PAOrderInfo GetPAOrderInfo()
         {
             if (CurrentACState == ACStateEnum.SMIdle || CurrentACState == ACStateEnum.SMBreakPoint)
@@ -1875,6 +2010,33 @@ namespace gip.mes.processapplication
         public virtual bool IsEnabledCancelCurrentComponent()
         {
             return NoSourceFoundForDosing.ValueT == 1;
+        }
+
+        [ACMethodInteraction("", "en{'Dont dose current component => End Order'}de{'Aktuelle Komponente nicht mehr dosieren => Auftrag beenden'}", 801, true)]
+        public virtual void CancelCurrentComponentEnd()
+        {
+            if (!IsEnabledCancelCurrentComponentEnd())
+                return;
+            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+            if (IsProduction)
+            {
+                ParentPWMethod<PWMethodProduction>().EndBatchPlan();
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+            }
+            else if (IsTransport)
+            {
+                ParentPWMethod<PWMethodTransportBase>().EndPicking();
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+            }
+            RootPW.CurrentACSubState = (uint)ACSubStateEnum.SMEmptyingMode;
+
+            AcknowledgeAlarms();
+            NoSourceFoundForDosing.ValueT = 2;
+        }
+
+        public virtual bool IsEnabledCancelCurrentComponentEnd()
+        {
+            return IsEnabledCancelCurrentComponent();
         }
         #endregion
 

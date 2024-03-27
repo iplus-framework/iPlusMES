@@ -1,3 +1,4 @@
+using gip.bso.facility;
 using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -36,7 +37,6 @@ namespace gip.bso.manufacturing
         public BSOProdOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
         }
 
         /// <summary>
@@ -48,6 +48,8 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
+
+            _AllowPostingOnIntermediate = new ACPropertyConfigValue<bool>(this, nameof(AllowPostingOnIntermediate), false);
 
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
@@ -74,8 +76,14 @@ namespace gip.bso.manufacturing
                 Search();
             }
 
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
+            }
+
             return true;
         }
+
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
@@ -90,7 +98,6 @@ namespace gip.bso.manufacturing
 
             _AccessInBookingFacility = null;
             _AccessOutBookingFacility = null;
-            _ACFacilityManager = null;
             _AddPartslistSequence = null;
             _AddPartslistTargetQuantity = null;
             _AlternativeProdOrderPartslistPosList = null;
@@ -150,7 +157,25 @@ namespace gip.bso.manufacturing
             }
             _BSOPartslistExplorer_Child = null;
             _AccessFilterPlanningMR = null;
+
+            if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+            {
+                BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityRservation_ReservationChanged;
+            }
+
             return baseResult;
+        }
+
+        public override bool ACPostInit()
+        {
+            bool postInitBase = base.ACPostInit();
+            _ = AllowPostingOnIntermediate;
+            return postInitBase;
+        }
+
+        private void BSOFacilityRservation_ReservationChanged()
+        {
+            OnPropertyChanged(nameof(SelectedInputMaterial));
         }
 
         #endregion
@@ -232,6 +257,37 @@ namespace gip.bso.manufacturing
             }
         }
 
+        ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
+        public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
+        {
+            get
+            {
+                if (_BSOFacilityReservation_Child == null)
+                    _BSOFacilityReservation_Child = new ACChildItem<BSOFacilityReservation>(this, nameof(BSOFacilityReservation_Child));
+                return _BSOFacilityReservation_Child;
+            }
+        }
+
+        #endregion
+
+        #region Configuration
+
+        private ACPropertyConfigValue<bool> _AllowPostingOnIntermediate;
+        [ACPropertyConfig("en{'Allow posting on Intermediate'}de{'Buchung auf Zwischenprodukt erlaubt'}")]
+        public bool AllowPostingOnIntermediate
+        {
+            get
+            {
+                return _AllowPostingOnIntermediate.ValueT;
+            }
+            set
+            {
+                _AllowPostingOnIntermediate.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region Properties
@@ -269,7 +325,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _BookingFacilityLotNo = value;
-                OnPropertyChanged("BookingFacilityLotNo");
+                OnPropertyChanged();
             }
         }
 
@@ -290,7 +346,7 @@ namespace gip.bso.manufacturing
                 if (_FilterDepartmentUserName != value)
                 {
                     _FilterDepartmentUserName = value;
-                    OnPropertyChanged(nameof(FilterDepartmentUserName));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -326,7 +382,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterProdOrderState != value)
                 {
                     _SelectedFilterProdOrderState = value;
-                    OnPropertyChanged("SelectedFilterProdOrderState");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -368,7 +424,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterOutputMaterial != value)
                 {
                     _SelectedFilterOutputMaterial = value;
-                    OnPropertyChanged("SelectedFilterOutputMaterial");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -384,7 +440,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _MaterialNoName = value;
-                OnPropertyChanged("MaterialNoName");
+                OnPropertyChanged();
             }
         }
 
@@ -551,7 +607,7 @@ namespace gip.bso.manufacturing
                         ProdOrderList.ToList().ForEach(c => c.IsSelected = value);
                         OnPropertyChanged(nameof(ProdOrderList));
                     }
-                    OnPropertyChanged(nameof(FilterProdOrderSelectAll));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -599,7 +655,7 @@ namespace gip.bso.manufacturing
                 if (AccessFilterPlanningMR == null)
                     return;
                 AccessFilterPlanningMR.Selected = value;
-                OnPropertyChanged("SelectedFilterPlanningMR");
+                OnPropertyChanged();
             }
         }
 
@@ -704,6 +760,15 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
+
+            if (!string.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith(nameof(SelectedInputMaterial)))
+            {
+                if (SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+                {
+                    return Global.ControlModes.Disabled;
+                }
+            }
+
             return result;
         }
 
@@ -787,7 +852,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _CurrentMsg = value;
-                OnPropertyChanged(nameof(CurrentMsg));
+                OnPropertyChanged();
             }
         }
 
@@ -810,7 +875,7 @@ namespace gip.bso.manufacturing
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
-            OnPropertyChanged(nameof(MsgList));
+            OnPropertyChanged();
         }
 
         public void ClearMessages()
@@ -973,7 +1038,7 @@ namespace gip.bso.manufacturing
                     if (AccessPrimary == null) return; AccessPrimary.Selected = value;
                     CurrentProdOrder = value;
                     RefreshProdOrder(value);
-                    OnPropertyChanged("SelectedProdOrder");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -999,7 +1064,7 @@ namespace gip.bso.manufacturing
                     AccessPrimary.Current = value;
                     SelectedProdOrder = value;
                     RefreshProdOrder(value);
-                    OnPropertyChanged("CurrentProdOrder");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1016,18 +1081,22 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private List<ProdOrder> _ProdOrderList;
         /// <summary>
         /// Gets the production order list.
         /// </summary>
         /// <value>The production order list.</value>
         [ACPropertyList(602, ProdOrder.ClassName)]
-        public IEnumerable<ProdOrder> ProdOrderList
+        public List<ProdOrder> ProdOrderList
         {
             get
             {
-                if (AccessPrimary == null)
-                    return null;
-                return AccessPrimary.NavList;
+                return _ProdOrderList;
+            }
+            set
+            {
+                _ProdOrderList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1044,7 +1113,7 @@ namespace gip.bso.manufacturing
             DatabaseApp.ProdOrder.Add(prodOrder);
             AccessPrimary.NavList.Insert(0, prodOrder);
             SelectedProdOrder = prodOrder;
-            OnPropertyChanged("ProdOrderList");
+            OnPropertyChanged(nameof(ProdOrderList));
         }
 
         /// <summary>
@@ -1096,7 +1165,7 @@ namespace gip.bso.manufacturing
         public void Save()
         {
             OnSave();
-            OnPropertyChanged("SelectedProdOrder");
+            OnPropertyChanged(nameof(SelectedProdOrder));
         }
 
         public bool IsEnabledSave()
@@ -1208,7 +1277,7 @@ namespace gip.bso.manufacturing
             OnFinishOrder();
 
             ACSaveChanges();
-            OnPropertyChanged("CurrentProdOrder");
+            OnPropertyChanged(nameof(CurrentProdOrder));
             return Global.MsgResult.OK;
         }
 
@@ -1252,7 +1321,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedOpenPosting != value)
                 {
                     _SelectedOpenPosting = value;
-                    //OnPropertyChanged("SelectedOpenPosting");
+                    //OnPropertyChanged(nameof(SelectedOpenPosting));
                 }
             }
         }
@@ -1408,7 +1477,7 @@ namespace gip.bso.manufacturing
                 else
                     SelectedOpenPosting = OpenPostingsList.FirstOrDefault();
             }
-            OnPropertyChanged("OpenPostingsList");
+            OnPropertyChanged(nameof(OpenPostingsList));
         }
 
         public Msg BalanceBackAndForeflushedStocks()
@@ -1441,7 +1510,16 @@ namespace gip.bso.manufacturing
             if (AccessPrimary == null)
                 return;
             LoadFilterOutputMaterialList();
-            AccessPrimary.NavSearch(DatabaseApp);
+
+            _ProdOrderList = null;
+            if (AccessPrimary != null)
+            {
+                AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
+                _ProdOrderList = AccessPrimary.NavList.ToList();
+            }
+
+            OnPropertyChanged(nameof(ProdOrderList));
+
             if (selectedProdOrder != null)
                 SelectedProdOrder = selectedProdOrder;
             PreselectedClear();
@@ -1450,7 +1528,7 @@ namespace gip.bso.manufacturing
             if (selectedProdOrderPartslist != null)
                 PreselectedProdorderPartslistID = selectedProdOrderPartslist.ProdOrderPartslistID;
             SearchProdOrderPartslist();
-            OnPropertyChanged("ProdOrderList");
+            OnPropertyChanged(nameof(ProdOrderList));
         }
 
         /// <summary>
@@ -1465,13 +1543,13 @@ namespace gip.bso.manufacturing
             if (acAccess == _AccessInBookingFacility)
             {
                 _AccessInBookingFacility.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("BookingInwardFacilityList");
+                OnPropertyChanged(nameof(BookingInwardFacilityList));
                 return true;
             }
             else if (acAccess == _AccessOutBookingFacility)
             {
                 _AccessOutBookingFacility.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("BookingOutwardFacilityList");
+                OnPropertyChanged(nameof(BookingOutwardFacilityList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -1495,12 +1573,62 @@ namespace gip.bso.manufacturing
                 PreselectedClearSelected();
                 SearchProdOrderPartslist();
                 PreselectedClear();
-                OnPropertyChanged("SelectedProdOrderPartslist");
-                OnPropertyChanged("CurrentProdOrderPartListExpand");
+                OnPropertyChanged(nameof(SelectedProdOrderPartslist));
+                OnPropertyChanged(nameof(CurrentProdOrderPartListExpand));
             }
             PostExecute("Load");
         }
 
+        public override PAOrderInfo GetOrderInfo()
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            if (SelectedProdOrderPartslist != null)
+                pAOrderInfo.Add(ProdOrderPartslist.ClassName, SelectedProdOrderPartslist.ProdOrderPartslistID);
+            if (this.SelectedBatch != null)
+                pAOrderInfo.Add(ProdOrderBatch.ClassName, SelectedBatch.ProdOrderBatchID);
+            if (this.SelectedIntermediate != null)
+                pAOrderInfo.Add(ProdOrderPartslistPos.ClassName, SelectedIntermediate.ProdOrderPartslistPosID);
+            if (this.SelectedOutwardPartslistPos != null)
+                pAOrderInfo.Add(ProdOrderPartslistPosRelation.ClassName, SelectedOutwardPartslistPos.ProdOrderPartslistPosRelationID);
+            return pAOrderInfo;
+        }
+
+        public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (paOrderInfo == null)
+                return base.FilterByOrderInfo(paOrderInfo);
+            
+            if (AccessPrimary == null || paOrderInfo == null)
+                return new Msg(eMsgLevel.Error, "(AccessPrimary == null || paOrderInfo == null)");
+
+            string orderNo = "";
+            Guid prodOrderPartslistID = Guid.Empty;
+            Guid intermPosID = Guid.Empty;
+            Guid intermBatchPosID = Guid.Empty;
+            Guid? facilityBookingID = null;
+            Guid? facilityPreBookingID = null;
+            Guid? planningMRID = null;
+
+            ProdOrderPartslistPosRelation relation = null;
+            ProdOrderBatch batch = null;
+            ProdOrderPartslistPos partslistPos = null;
+            ProdOrderPartslist poPartslist = null;
+            FacilityBooking facilityBooking = null;
+            FacilityPreBooking facilityPreBooking = null;
+            PlanningMR planningMR = null;
+
+            if (!ReadEntitiesFromOrderInfo(paOrderInfo, out orderNo, out prodOrderPartslistID, out intermPosID, out intermBatchPosID, out facilityPreBookingID, out facilityBookingID, out planningMRID,
+                out relation, out batch,
+                out partslistPos, out poPartslist,
+                out facilityBooking, out facilityPreBooking,
+                out planningMR))
+                return new Msg(eMsgLevel.Error, "Data not found");
+
+            if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
+                return new Msg(eMsgLevel.Error, "Order not filtered");
+
+            return null;
+        }
         #endregion
 
         #endregion
@@ -1535,8 +1663,8 @@ namespace gip.bso.manufacturing
 
                     this.LoadProcessWorkflows();
                     LoadMaterialWorkflows();
-                    OnPropertyChanged("SelectedProdOrderPartslist");
-                    OnPropertyChanged("CurrentProdOrderPartListExpand");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CurrentProdOrderPartListExpand));
                 }
             }
         }
@@ -1661,7 +1789,7 @@ namespace gip.bso.manufacturing
                 }
                 SelectedProdOrderPartslist = ProdOrderPartslistList.FirstOrDefault();
             }
-            OnPropertyChanged("ProdOrderPartslistList");
+            OnPropertyChanged(nameof(ProdOrderPartslistList));
             PostExecute("DeleteProdOrderPartslist");
         }
 
@@ -1721,7 +1849,7 @@ namespace gip.bso.manufacturing
             {
                 SelectedProdOrderPartslist = null;
             }
-            OnPropertyChanged("ProdOrderPartslistList");
+            OnPropertyChanged(nameof(ProdOrderPartslistList));
         }
 
         #endregion
@@ -1770,8 +1898,8 @@ namespace gip.bso.manufacturing
             else
             {
                 SelectedProdOrderPartslist.TargetQuantity = PartslistChangeTargetQuantityInput.Value;
-                OnPropertyChanged("SelectedProdOrderPartslist");
-                OnPropertyChanged("ProdOrderPartslistList");
+                OnPropertyChanged(nameof(SelectedProdOrderPartslist));
+                OnPropertyChanged(nameof(ProdOrderPartslistList));
             }
             CloseTopDialog();
         }
@@ -1812,7 +1940,7 @@ namespace gip.bso.manufacturing
                 if (_PartslistChangeTargetQuantityInput != value)
                 {
                     _PartslistChangeTargetQuantityInput = value;
-                    OnPropertyChanged("PartslistChangeTargetQuantityInput");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1834,7 +1962,7 @@ namespace gip.bso.manufacturing
                 if (_RecalculateQuantities != value)
                 {
                     _RecalculateQuantities = value;
-                    OnPropertyChanged("RecalculateQuantities");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1997,26 +2125,34 @@ namespace gip.bso.manufacturing
                     if (_SelectedProdOrderPartslistPos != null)
                         _SelectedProdOrderPartslistPos.PropertyChanged += _SelectedProdOrderPartslistPos_PropertyChanged;
                     SearchAlternative();
-                    OnPropertyChanged("SelectedProdOrderPartslistPos");
-                    OnPropertyChanged("SelectedInputMaterial");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedInputMaterial));
 
                     _ComponentBasedOnPlPosList = null;
                     _SelectedComponentBasedOnPlPos = null;
                     if (value != null)
                         _SelectedComponentBasedOnPlPos = ComponentBasedOnPlPosList.Where(c => c.PartslistPosID == value.BasedOnPartslistPosID).FirstOrDefault();
 
-                    OnPropertyChanged("SelectedComponentBasedOnPlPos");
-                    OnPropertyChanged("ComponentBasedOnPlPosList");
+                    OnPropertyChanged(nameof(SelectedComponentBasedOnPlPos));
+                    OnPropertyChanged(nameof(ComponentBasedOnPlPosList));
 
+                    if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
+                    {
+                        BSOFacilityReservation_Child.Value.FacilityReservationOwner = value;
+                    }
                 }
             }
         }
 
         private void _SelectedProdOrderPartslistPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "MaterialID")
+            if (new string[]
+                {
+                    nameof(SelectedProdOrderPartslistPos.MaterialID)
+                }.Contains(e.PropertyName))
             {
-                OnPropertyChanged("SelectedProdOrderPartslistPos");
+                OnPropertyChanged(nameof(SelectedProdOrderPartslistPos));
+                SelectedProdOrderPartslistPos.OnEntityPropertyChanged(nameof(Material));
             }
         }
 
@@ -2067,7 +2203,7 @@ namespace gip.bso.manufacturing
                             SelectedProdOrderPartslistPos.BasedOnPartslistPos = null;
                     }
 
-                    OnPropertyChanged("SelectedComponentBasedOnPlPos");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -2156,8 +2292,8 @@ namespace gip.bso.manufacturing
                 if (_ChangeViaPartslistNewTargetQuantityUOM != value)
                 {
                     _ChangeViaPartslistNewTargetQuantityUOM = value;
-                    OnPropertyChanged("ChangeViaPartslistNewTargetQuantityUOM");
-                    OnPropertyChanged("ChangeViaPartslistNewOrderTargetQuantityUOM");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ChangeViaPartslistNewOrderTargetQuantityUOM));
                 }
             }
         }
@@ -2187,17 +2323,16 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction(ProdOrderPartslistPos.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void NewProdOrderPartslistPos()
         {
-            if (!PreExecute("NewProdOrderPartslistPos")) return;
             ProdOrderPartslistPos newComponent = ProdOrderPartslistPos.NewACObject(DatabaseApp, SelectedProdOrderPartslist);
             newComponent.Sequence = 1;
             if (ProdOrderPartslistPosList != null)
             {
-                newComponent.Sequence = ProdOrderPartslistPosList.Max(x => x.Sequence) + 1;
+                newComponent.Sequence = ProdOrderPartslistPosList.Select(x => x.Sequence).DefaultIfEmpty().Max() + 1;
             }
             DatabaseApp.ProdOrderPartslistPos.Add(newComponent);
-            PreselectedProdorderPartslistID = newComponent.ProdOrderPartslistPosID;
-            SearchProdOrderPartslistPos();
-            PostExecute("NewProdOrderPartslistPos");
+            ProdOrderPartslistPosList.Add(newComponent);
+            OnPropertyChanged(nameof(ProdOrderPartslistPosList));
+            SelectedProdOrderPartslistPos = newComponent;
         }
 
         /// <summary>
@@ -2222,19 +2357,18 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "CreateNewLabOrderFromProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void CreateNewLabOrderFromProdOrderPartslist()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderDialogProd") as ACComponent;
-            if (childBSO == null)
-            {
-                childBSO = StartComponent("LabOrderDialogProd", null, new object[] { }) as ACComponent;
-                if (SelectedProdOrderIntermediateBatch != null)
-                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null);
-                else
-                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null);
-            }
-            if (childBSO == null)
-            {
+            if (!IsEnabledCreateNewLabOrderFromProdOrderPartslist())
                 return;
-            }
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            if (SelectedProdOrderIntermediateBatch != null)
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null, null);
+            else
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null, null);
+            childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrderFromProdOrderPartslist()
@@ -2260,15 +2394,17 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("Dialog", "en{'Lab Report View'}de{'Laborbericht'}", (short)MISort.QueryPrintDlg)]
         public void ShowLabOrderFromProdOrder()
         {
-            ACComponent childBSO = ACUrlCommand("?LabOrderViewDialog") as ACComponent;
+            if (!IsEnabledShowLabOrderFromProdOrder())
+                return;
+            ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
             if (childBSO == null)
-                childBSO = StartComponent("LabOrderViewDialog", null, new object[] { }) as ACComponent;
+                childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
             if (SelectedProdOrderIntermediateBatch != null)
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
             else
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
             childBSO.Stop();
         }
 
@@ -2291,39 +2427,41 @@ namespace gip.bso.manufacturing
             return false;
         }
 
-        [ACMethodInfo("Dialog", "en{'Lab Report MES View'}de{'Laborbericht MES'}", (short)MISort.QueryPrintDlg)]
-        public void ShowLabOrderMESFromProdOrder()
-        {
-            ACComponent childBSO = ACUrlCommand("?LabOrderMESViewDialog") as ACComponent;
-            if (childBSO == null)
-                childBSO = StartComponent("LabOrderMESViewDialog", null, new object[] { }) as ACComponent;
-            if (childBSO == null)
-                return;
-            if (SelectedProdOrderIntermediateBatch != null)
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
-            else
-                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, true, null);
-            childBSO.Stop();
-        }
+        //[ACMethodInfo("Dialog", "en{'Lab Report MES View'}de{'Laborbericht MES'}", (short)MISort.QueryPrintDlg)]
+        //public void ShowLabOrderMESFromProdOrder()
+        //{
+        //    if (!IsEnabledShowLabOrderMESFromProdOrder())
+        //        return;
+        //    ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
+        //    if (childBSO == null)
+        //        childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
+        //    if (childBSO == null)
+        //        return;
+        //    if (SelectedProdOrderIntermediateBatch != null)
+        //        childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
+        //    else
+        //        childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
+        //    childBSO.Stop();
+        //}
 
-        public bool IsEnabledShowLabOrderMESFromProdOrder()
-        {
-            if (SelectedIntermediate != null)
-            {
-                if (!SelectedIntermediate.LabOrder_ProdOrderPartslistPos.Any() && SelectedProdOrderIntermediateBatch == null)
-                    return false;
-                else if (SelectedProdOrderIntermediateBatch != null)
-                {
-                    if (!SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.Any())
-                        return false;
-                    else
-                        return true;
-                }
-                else
-                    return true;
-            }
-            return false;
-        }
+        //public bool IsEnabledShowLabOrderMESFromProdOrder()
+        //{
+        //    if (SelectedIntermediate != null)
+        //    {
+        //        if (!SelectedIntermediate.LabOrder_ProdOrderPartslistPos.Any() && SelectedProdOrderIntermediateBatch == null)
+        //            return false;
+        //        else if (SelectedProdOrderIntermediateBatch != null)
+        //        {
+        //            if (!SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.Any())
+        //                return false;
+        //            else
+        //                return true;
+        //        }
+        //        else
+        //            return true;
+        //    }
+        //    return false;
+        //}
 
         #endregion
 
@@ -2374,7 +2512,7 @@ namespace gip.bso.manufacturing
             SelectedProdOrderPartslistPos.TargetQuantityUOM = ChangeViaPartslistNewOrderTargetQuantityUOM;
             CloseTopDialog();
             ChangeViaPartslistNewTargetQuantityUOM = 0;
-            OnPropertyChanged("SelectedProdOrderPartslistPos");
+            OnPropertyChanged(nameof(SelectedProdOrderPartslistPos));
             OnPropertyChanged("SelectedProdOrderPartslistPos\\TargetQuantityUOM");
         }
 
@@ -2455,7 +2593,7 @@ namespace gip.bso.manufacturing
                     SelectedProdOrderPartslistPos = _ProdOrderPartslistPosList.FirstOrDefault();
             }
 
-            OnPropertyChanged("ProdOrderPartslistPosList");
+            OnPropertyChanged(nameof(ProdOrderPartslistPosList));
         }
 
         private void OutwardRootPosItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -2536,7 +2674,7 @@ namespace gip.bso.manufacturing
                 if (SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.Material != value)
                 {
                     SelectedProdOrderPartslistPos.Material = value;
-                    OnPropertyChanged("SelectedInputMaterial");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -2572,7 +2710,7 @@ namespace gip.bso.manufacturing
                     _AlternativeSelectedProdOrderPartslistPos = value;
                     if (_AlternativeSelectedProdOrderPartslistPos != null)
                         _AlternativeSelectedProdOrderPartslistPos.PropertyChanged += _AlternativeSelectedProdOrderPartslistPos_PropertyChanged;
-                    OnPropertyChanged("AlternativeSelectedProdOrderPartslistpos");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -2581,7 +2719,7 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == "MaterialID")
             {
-                OnPropertyChanged("AlternativeSelectedProdOrderPartslistPos");
+                OnPropertyChanged(nameof(AlternativeSelectedProdOrderPartslistPos));
             }
         }
 
@@ -2697,7 +2835,7 @@ namespace gip.bso.manufacturing
                 else
                     AlternativeSelectedProdOrderPartslistPos = _AlternativeProdOrderPartslistPosList.FirstOrDefault();
             }
-            OnPropertyChanged("AlternativeProdOrderPartslistPosList");
+            OnPropertyChanged(nameof(AlternativeProdOrderPartslistPosList));
         }
 
         #endregion
@@ -2725,9 +2863,9 @@ namespace gip.bso.manufacturing
                     // Searching components of no batches are there
                     if (SelectedProdOrderIntermediateBatch == null)
                         SearchOutwardPartslistPos();
-                    OnPropertyChanged("SelectedIntermediate");
-                    OnPropertyChanged("InwardFacilityPreBookingList");
-                    OnPropertyChanged("InwardFacilityBookingList");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(InwardFacilityPreBookingList));
+                    OnPropertyChanged(nameof(InwardFacilityBookingList));
                 }
             }
         }
@@ -2788,7 +2926,7 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            OnPropertyChanged("IntermediateList");
+            OnPropertyChanged(nameof(IntermediateList));
         }
 
         public bool IsEnabledRecalcIntermediateSum()
@@ -2823,7 +2961,7 @@ namespace gip.bso.manufacturing
                 else
                     SelectedIntermediate = IntermediateList.FirstOrDefault();
             }
-            OnPropertyChanged("IntermediateList");
+            OnPropertyChanged(nameof(IntermediateList));
         }
 
         #endregion
@@ -2847,7 +2985,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedBatch != value)
                 {
                     _SelectedBatch = value;
-                    OnPropertyChanged("SelectedBatch");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -2987,7 +3125,7 @@ namespace gip.bso.manufacturing
                 else
                     SelectedBatch = _BatchList.FirstOrDefault();
             }
-            OnPropertyChanged("BatchList");
+            OnPropertyChanged(nameof(BatchList));
         }
         #endregion
 
@@ -3019,11 +3157,11 @@ namespace gip.bso.manufacturing
                         _SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.AutoLoad(_SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPosReference, _SelectedProdOrderIntermediateBatch);
                     }
                     SearchOutwardPartslistPos();
-                    OnPropertyChanged("SelectedProdOrderIntermediateBatch");
-                    OnPropertyChanged("InwardFacilityPreBookingList");
-                    OnPropertyChanged("InwardFacilityBookingList");
-                    OnPropertyChanged("ProdOrderIntermediateBatchClearSelectionTitle");
-                    OnPropertyChanged("ProdOrderIntermediateBatchLotList");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(InwardFacilityPreBookingList));
+                    OnPropertyChanged(nameof(InwardFacilityBookingList));
+                    OnPropertyChanged(nameof(ProdOrderIntermediateBatchClearSelectionTitle));
+                    OnPropertyChanged(nameof(ProdOrderIntermediateBatchLotList));
                 }
                 else if (value == null)
                 {
@@ -3125,7 +3263,7 @@ namespace gip.bso.manufacturing
             {
                 SelectedProdOrderIntermediateBatch = null;
             }
-            OnPropertyChanged("ProdOrderIntermediateBatchClearSelectionTitle");
+            OnPropertyChanged(nameof(ProdOrderIntermediateBatchClearSelectionTitle));
             PostExecute("ProdOrderIntermediateBatchClearSelection");
         }
 
@@ -3140,14 +3278,23 @@ namespace gip.bso.manufacturing
             ProdOrderPartslistPos item = SelectedIntermediate;
             if (SelectedProdOrderIntermediateBatch != null)
                 item = SelectedProdOrderIntermediateBatch;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", item.Material);
-            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            string lotNo = null;
+            FacilityLot result = null;
+            this.ProdOrderManager.GetFacilityLotForPos(Database, DatabaseApp, item, false, out result, out lotNo, null);
+            if (result == null)
+            {
+                VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), lotNo, item.Material);
+                if (dlgResult.SelectedCommand == eMsgButton.OK)
+                {
+                    result = dlgResult.ReturnValue as FacilityLot;
+                }
+            }
+
+            if (result != null)
             {
                 item = SelectedIntermediate;
                 if (SelectedProdOrderIntermediateBatch != null)
                     item = SelectedProdOrderIntermediateBatch;
-
-                FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 item.FacilityLot = result;
                 // Clear lot in parent / children sequence from new lot defined membmerd
                 if (SelectedProdOrderIntermediateBatch != null && SelectedIntermediate.FacilityLot != null)
@@ -3158,10 +3305,11 @@ namespace gip.bso.manufacturing
                 {
                     SelectedIntermediate.ProdOrderPartslistPos_ParentProdOrderPartslistPos.ToList().ForEach(x => x.FacilityLot = null);
                 }
-                OnPropertyChanged("IntermediateList");
-                OnPropertyChanged("ProdOrderIntermediateBatchList");
+                OnPropertyChanged(nameof(IntermediateList));
+                OnPropertyChanged(nameof(ProdOrderIntermediateBatchList));
                 Save();
             }
+
             if (childBSO != null)
                 childBSO.Stop();
         }
@@ -3175,7 +3323,7 @@ namespace gip.bso.manufacturing
                 childBSO = StartComponent(ConstApp.BSOFacilityLot_ChildName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", SelectedProdOrderIntermediateBatch.Material);
+            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), "", SelectedProdOrderIntermediateBatch.Material);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot facilityLot = dlgResult.ReturnValue as FacilityLot;
@@ -3183,7 +3331,7 @@ namespace gip.bso.manufacturing
                 item.FacilityLot = facilityLot;
                 SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.Add(item);
                 SelectedProdOrderIntermediateBatchLot = item;
-                OnPropertyChanged("ProdOrderIntermediateBatchLotList");
+                OnPropertyChanged(nameof(ProdOrderIntermediateBatchLotList));
                 Save();
             }
             if (childBSO != null)
@@ -3197,7 +3345,7 @@ namespace gip.bso.manufacturing
             SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.Remove(SelectedProdOrderIntermediateBatchLot);
             SelectedProdOrderIntermediateBatchLot.DeleteACObject(DatabaseApp, false);
             SelectedProdOrderIntermediateBatchLot = ProdOrderIntermediateBatchLotList.FirstOrDefault();
-            OnPropertyChanged("ProdOrderIntermediateBatchLotList");
+            OnPropertyChanged(nameof(ProdOrderIntermediateBatchLotList));
         }
 
         [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Sum bookings to Actual Quantity'}de{'Summiere Buchungen auf Istmenge'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch")]
@@ -3305,7 +3453,7 @@ namespace gip.bso.manufacturing
                 else
                     SelectedProdOrderIntermediateBatch = _ProdOrderIntermediateBatchList.FirstOrDefault();
             }
-            OnPropertyChanged("ProdOrderIntermediateBatchList");
+            OnPropertyChanged(nameof(ProdOrderIntermediateBatchList));
         }
         #endregion
 
@@ -3332,7 +3480,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedProdOrderIntermediateBatchLot != value)
                 {
                     _SelectedProdOrderIntermediateBatchLot = value;
-                    OnPropertyChanged("SelectedProdOrderIntermediateBatchLot");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3378,7 +3526,7 @@ namespace gip.bso.manufacturing
                 if (_BatchCreateAutomaticallyViaBatchSize != value)
                 {
                     _BatchCreateAutomaticallyViaBatchSize = value;
-                    OnPropertyChanged("BatchCreateAutomaticallyViaBatchSize");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3396,7 +3544,7 @@ namespace gip.bso.manufacturing
                 if (_BatchCreateAutomaticallyBatchSize != value)
                 {
                     _BatchCreateAutomaticallyBatchSize = value;
-                    OnPropertyChanged("BatchCreateAutomaticallyBatchSize");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3414,7 +3562,7 @@ namespace gip.bso.manufacturing
                 if (_BatchCreateAutomaticallyBatchCount != value)
                 {
                     _BatchCreateAutomaticallyBatchCount = value;
-                    OnPropertyChanged("BatchCreateAutomaticallyBatchCount");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3433,7 +3581,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _CreateBatchAutomaticallyCalcList = value;
-                OnPropertyChanged("CreateBatchAutomaticallyCalcList");
+                OnPropertyChanged();
             }
         }
 
@@ -3450,7 +3598,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedCreateBatchAutomaticallyCalc != value)
                 {
                     _SelectedCreateBatchAutomaticallyCalc = value;
-                    OnPropertyChanged("SelectedCreateBatchAutomaticallyCalc");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3588,7 +3736,7 @@ namespace gip.bso.manufacturing
                 if (_BatchCreateManuallyBatchCount != value)
                 {
                     _BatchCreateManuallyBatchCount = value;
-                    OnPropertyChanged("BatchCreateManuallyBatchCount");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3606,7 +3754,7 @@ namespace gip.bso.manufacturing
                 if (_BatchCreateManuallyBatchSize != value)
                 {
                     _BatchCreateManuallyBatchSize = value;
-                    OnPropertyChanged("BatchCreateManuallyBatchSize");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3655,7 +3803,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedBatchCreateDepth != value)
                 {
                     _SelectedBatchCreateDepth = value;
-                    OnPropertyChanged("SelectedBatchCreateDepth");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3761,7 +3909,7 @@ namespace gip.bso.manufacturing
                 if (_AddPartslistSequence != value)
                 {
                     _AddPartslistSequence = value;
-                    OnPropertyChanged("AddPartslistSequence");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3779,7 +3927,7 @@ namespace gip.bso.manufacturing
                 if (_AddPartslistTargetQuantity != value)
                 {
                     _AddPartslistTargetQuantity = value;
-                    OnPropertyChanged("AddPartslistTargetQuantity");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -3870,7 +4018,7 @@ namespace gip.bso.manufacturing
                                                                       .FirstOrDefault();
 
                 core.datamodel.ACProgramLog tempProgramLog = programLog;
-                for (int i=0; i < 200; i++)
+                for (int i = 0; i < 200; i++)
                 {
                     if (tempProgramLog == null)
                         break;
@@ -4108,7 +4256,7 @@ namespace gip.bso.manufacturing
                         this.ProcessWorkflowPresenter.Load(null);
                     else
                         this.ProcessWorkflowPresenter.Load(_ProcessWorkflow.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>());
-                    OnPropertyChanged("CurrentProcessWorkflow");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -4119,7 +4267,7 @@ namespace gip.bso.manufacturing
 
         private void LoadProcessWorkflows()
         {
-            OnPropertyChanged("ProcessWorkflowList");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
             if (ProcessWorkflowList != null)
                 this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
             else
@@ -4140,8 +4288,240 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
         public void ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
         {
-            if (AccessPrimary == null)
+            if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
                 return;
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+            _IsEnabledACProgram = true;
+        }
+
+        //private bool InShowDialogOrderInfo = false;
+
+        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            string orderNo = "";
+            Guid prodOrderPartslistID = Guid.Empty;
+            Guid intermPosID = Guid.Empty;
+            Guid intermBatchPosID = Guid.Empty;
+            Guid? facilityBookingID = null;
+            Guid? facilityPreBookingID = null;
+            Guid? planningMRID = null;
+
+            ProdOrderPartslistPosRelation relation = null;
+            ProdOrderBatch batch = null;
+            ProdOrderPartslistPos partslistPos = null;
+            ProdOrderPartslist poPartslist = null;
+            FacilityBooking facilityBooking = null;
+            FacilityPreBooking facilityPreBooking = null;
+            PlanningMR planningMR = null;
+
+            if (!ReadEntitiesFromOrderInfo(paOrderInfo, out orderNo, out prodOrderPartslistID, out intermPosID, out intermBatchPosID, out facilityPreBookingID, out facilityBookingID, out planningMRID,
+                out relation, out batch,
+                out partslistPos, out poPartslist,
+                out facilityBooking, out facilityPreBooking,
+                out planningMR))
+                return;
+
+            ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID);
+            paOrderInfo.DialogResult = this.DialogResult;
+            //InShowDialogOrderInfo = false;
+        }
+
+        protected bool ReadEntitiesFromOrderInfo(PAOrderInfo paOrderInfo, 
+            out string orderNo, out Guid prodOrderPartslistID, out Guid intermPosID, out Guid intermBatchPosID, 
+            out Guid? facilityPreBookingID, out Guid? facilityBookingID, out Guid? planningMRID,
+            out ProdOrderPartslistPosRelation relation, out ProdOrderBatch batch, 
+            out ProdOrderPartslistPos partslistPos, out ProdOrderPartslist poPartslist,
+            out FacilityBooking facilityBooking, out FacilityPreBooking facilityPreBooking,
+            out PlanningMR planningMR)
+        {
+            orderNo = "";
+            prodOrderPartslistID = Guid.Empty;
+            intermPosID = Guid.Empty;
+            intermBatchPosID = Guid.Empty;
+            facilityBookingID = null;
+            facilityPreBookingID = null;
+            planningMRID = null;
+
+            //InShowDialogOrderInfo = true;
+            // Falls Produktionsauftrag
+            relation = null;
+            batch = null;
+            partslistPos = null;
+            poPartslist = null;
+            facilityBooking = null;
+            facilityPreBooking = null;
+            planningMR = null;
+
+            if (paOrderInfo == null)
+                return false;
+
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == ProdOrderPartslistPosRelation.ClassName)
+                {
+                    relation = this.DatabaseApp.ProdOrderPartslistPosRelation
+                        .Include(c => c.TargetProdOrderPartslistPos)
+                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist)
+                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
+                        .Where(c => c.ProdOrderPartslistPosRelationID == entry.EntityID)
+                        .FirstOrDefault();
+                    break;
+                }
+                else if (entry.EntityName == ProdOrderBatch.ClassName)
+                {
+                    batch = this.DatabaseApp.ProdOrderBatch
+                        .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                        .Include(c => c.ProdOrderPartslist)
+                        .Include(c => c.ProdOrderPartslist.ProdOrder)
+                        .Where(c => c.ProdOrderBatchID == entry.EntityID).FirstOrDefault();
+                }
+                else if (entry.EntityName == ProdOrderPartslistPos.ClassName)
+                {
+                    partslistPos = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == entry.EntityID);
+                }
+                else if (entry.EntityName == OrderLog.ClassName)
+                {
+                    _IsEnabledACProgram = false;
+                    OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == entry.EntityID);
+                    if (currentOrderLog == null || (currentOrderLog.ProdOrderPartslistPos == null && currentOrderLog.ProdOrderPartslistPosRelation == null))
+                        return false;
+                    relation = currentOrderLog.ProdOrderPartslistPosRelation;
+                    partslistPos = currentOrderLog.ProdOrderPartslistPos;
+                }
+                else if (entry.EntityName == ProdOrderPartslist.ClassName)
+                {
+                    poPartslist = this.DatabaseApp.ProdOrderPartslist
+                        .Where(c => c.ProdOrderPartslistID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+                else if (entry.EntityName == FacilityBooking.ClassName)
+                {
+                    facilityBooking = DatabaseApp.FacilityBooking.FirstOrDefault(c => c.FacilityBookingID == entry.EntityID);
+                }
+                else if (entry.EntityName == FacilityPreBooking.ClassName)
+                {
+                    facilityPreBooking = DatabaseApp.FacilityPreBooking.FirstOrDefault(c => c.FacilityPreBookingID == entry.EntityID);
+                }
+                else if (entry.EntityName == PlanningMR.ClassName)
+                {
+                    planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == entry.EntityID);
+                }
+            }
+
+            if (batch == null && relation == null && partslistPos == null && poPartslist == null)
+                return false;
+
+            if (planningMR != null)
+                planningMRID = planningMR.PlanningMRID;
+
+            if (facilityBooking != null)
+            {
+                if (facilityBooking.ProdOrderPartslistPosRelationID != null)
+                {
+                    orderNo = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                    else
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                }
+                else if (facilityBooking.ProdOrderPartslistPosID != null)
+                {
+                    orderNo = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                    else
+                    {
+                        intermPosID = facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                }
+                facilityBookingID = facilityBooking.FacilityBookingID;
+            }
+            else if (facilityPreBooking != null)
+            {
+                if (facilityPreBooking.ProdOrderPartslistPosRelationID != null)
+                {
+                    orderNo = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                    else
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
+                    }
+                }
+                else if (facilityPreBooking.ProdOrderPartslistPosID != null)
+                {
+                    orderNo = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
+                    if (facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                    else
+                    {
+                        intermPosID = facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
+                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
+                    }
+                }
+                facilityPreBookingID = facilityPreBooking.FacilityPreBookingID;
+            }
+            else if (relation != null)
+            {
+                intermBatchPosID = relation.TargetProdOrderPartslistPos.ProdOrderPartslistPosID;
+                intermPosID = relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue ? relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
+                prodOrderPartslistID = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistID;
+                orderNo = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+            }
+            else if (batch != null)
+            {
+                var poPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
+                if (poPos != null)
+                {
+                    intermBatchPosID = poPos.ProdOrderPartslistPosID;
+                    intermPosID = poPos.ParentProdOrderPartslistPosID.HasValue ? poPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
+                }
+                prodOrderPartslistID = batch.ProdOrderPartslist.ProdOrderPartslistID;
+                orderNo = batch.ProdOrderPartslist.ProdOrder.ProgramNo;
+            }
+            else
+            {
+                if (partslistPos != null)
+                {
+                    poPartslist = partslistPos.ProdOrderPartslist;
+                    intermPosID = partslistPos.ProdOrderPartslistPosID;
+                }
+                orderNo = poPartslist.ProdOrder.ProgramNo;
+                prodOrderPartslistID = poPartslist.ProdOrderPartslistID;
+            }
+            return true;
+        }
+
+        public bool SetFilterFromOrderInfoIDs(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
+        {
+            if (AccessPrimary == null)
+                return false;
             //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
             ACFilterItem filterItem = null;
             var query = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "ProgramNo");
@@ -4246,194 +4626,9 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
-            _IsEnabledACProgram = true;
+            return true;
         }
 
-        //private bool InShowDialogOrderInfo = false;
-
-        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
-        {
-            if (AccessPrimary == null || paOrderInfo == null)
-                return;
-
-            //InShowDialogOrderInfo = true;
-            // Falls Produktionsauftrag
-            ProdOrderPartslistPosRelation relation = null;
-            ProdOrderBatch batch = null;
-            ProdOrderPartslistPos partslistPos = null;
-            ProdOrderPartslist poPartslist = null;
-            FacilityBooking facilityBooking = null;
-            FacilityPreBooking facilityPreBooking = null;
-            PlanningMR planningMR = null;
-
-            foreach (var entry in paOrderInfo.Entities)
-            {
-                if (entry.EntityName == ProdOrderPartslistPosRelation.ClassName)
-                {
-                    relation = this.DatabaseApp.ProdOrderPartslistPosRelation
-                        .Include(c => c.TargetProdOrderPartslistPos)
-                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist)
-                        .Include(c => c.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
-                        .Where(c => c.ProdOrderPartslistPosRelationID == entry.EntityID)
-                        .FirstOrDefault();
-                    break;
-                }
-                else if (entry.EntityName == ProdOrderBatch.ClassName)
-                {
-                    batch = this.DatabaseApp.ProdOrderBatch
-                        .Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
-                        .Include(c => c.ProdOrderPartslist)
-                        .Include(c => c.ProdOrderPartslist.ProdOrder)
-                        .Where(c => c.ProdOrderBatchID == entry.EntityID).FirstOrDefault();
-                }
-                else if (entry.EntityName == ProdOrderPartslistPos.ClassName)
-                {
-                    partslistPos = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == entry.EntityID);
-                }
-                else if (entry.EntityName == OrderLog.ClassName)
-                {
-                    _IsEnabledACProgram = false;
-                    OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == entry.EntityID);
-                    if (currentOrderLog == null || (currentOrderLog.ProdOrderPartslistPos == null && currentOrderLog.ProdOrderPartslistPosRelation == null))
-                        return;
-                    relation = currentOrderLog.ProdOrderPartslistPosRelation;
-                    partslistPos = currentOrderLog.ProdOrderPartslistPos;
-                }
-                else if (entry.EntityName == ProdOrderPartslist.ClassName)
-                {
-                    poPartslist = this.DatabaseApp.ProdOrderPartslist
-                        .Where(c => c.ProdOrderPartslistID == entry.EntityID)
-                        .FirstOrDefault();
-                }
-                else if (entry.EntityName == FacilityBooking.ClassName)
-                {
-                    facilityBooking = DatabaseApp.FacilityBooking.FirstOrDefault(c => c.FacilityBookingID == entry.EntityID);
-                }
-                else if (entry.EntityName == FacilityPreBooking.ClassName)
-                {
-                    facilityPreBooking = DatabaseApp.FacilityPreBooking.FirstOrDefault(c => c.FacilityPreBookingID == entry.EntityID);
-                }
-                else if (entry.EntityName == PlanningMR.ClassName)
-                {
-                    planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == entry.EntityID);
-                }
-            }
-
-            if (batch == null && relation == null && partslistPos == null && poPartslist == null)
-                return;
-
-            string orderNo = "";
-            Guid prodOrderPartslistID = Guid.Empty;
-            Guid intermPosID = Guid.Empty;
-            Guid intermBatchPosID = Guid.Empty;
-            Guid? facilityBookingID = null;
-            Guid? facilityPreBookingID = null;
-            Guid? planningMRID = null;
-            if (planningMR != null)
-                planningMRID = planningMR.PlanningMRID;
-
-            if (facilityBooking != null)
-            {
-                if (facilityBooking.ProdOrderPartslistPosRelationID != null)
-                {
-                    orderNo = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                    else
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                }
-                else if (facilityBooking.ProdOrderPartslistPosID != null)
-                {
-                    orderNo = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                    else
-                    {
-                        intermPosID = facilityBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                }
-                facilityBookingID = facilityBooking.FacilityBookingID;
-            }
-            else if (facilityPreBooking != null)
-            {
-                if (facilityPreBooking.ProdOrderPartslistPosRelationID != null)
-                {
-                    orderNo = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                    else
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPosID;
-                    }
-                }
-                else if (facilityPreBooking.ProdOrderPartslistPosID != null)
-                {
-                    orderNo = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    prodOrderPartslistID = facilityPreBooking.ProdOrderPartslistPos.ProdOrderPartslistID;
-                    if (facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == null)
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                    else
-                    {
-                        intermPosID = facilityPreBooking.ProdOrderPartslistPos.ParentProdOrderPartslistPosID ?? Guid.Empty;
-                        intermBatchPosID = facilityPreBooking.ProdOrderPartslistPosID ?? Guid.Empty;
-                    }
-                }
-                facilityPreBookingID = facilityPreBooking.FacilityPreBookingID;
-            }
-            else if (relation != null)
-            {
-                intermBatchPosID = relation.TargetProdOrderPartslistPos.ProdOrderPartslistPosID;
-                intermPosID = relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue ? relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
-                prodOrderPartslistID = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistID;
-                orderNo = relation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-            }
-            else if (batch != null)
-            {
-                var poPos = batch.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault();
-                if (poPos != null)
-                {
-                    intermBatchPosID = poPos.ProdOrderPartslistPosID;
-                    intermPosID = poPos.ParentProdOrderPartslistPosID.HasValue ? poPos.ParentProdOrderPartslistPosID.Value : Guid.Empty;
-                }
-                prodOrderPartslistID = batch.ProdOrderPartslist.ProdOrderPartslistID;
-                orderNo = batch.ProdOrderPartslist.ProdOrder.ProgramNo;
-            }
-            else
-            {
-                if (partslistPos != null)
-                {
-                    poPartslist = partslistPos.ProdOrderPartslist;
-                    intermPosID = partslistPos.ProdOrderPartslistPosID;
-                }
-                orderNo = poPartslist.ProdOrder.ProgramNo;
-                prodOrderPartslistID = poPartslist.ProdOrderPartslistID;
-            }
-            ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID);
-            //InShowDialogOrderInfo = false;
-        }
 
         [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
         public void DialogOK()
@@ -4499,7 +4694,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _VisitedMethods = value;
-                OnPropertyChanged("VisitedMethods");
+                OnPropertyChanged();
             }
         }
         public void AddVisitedMethods(core.datamodel.ACClassMethod acClassMethod)
@@ -4610,7 +4805,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedPreBookingAvailableQuants != value)
                 {
                     _SelectedPreBookingAvailableQuants = value;
-                    OnPropertyChanged("SelectedPreBookingAvailableQuants");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -4664,11 +4859,11 @@ namespace gip.bso.manufacturing
                 {
                     case FacilitySelectLoctation.PrebookingInward:
                         SelectedInwardACMethodBooking.InwardFacility = facility;
-                        OnPropertyChanged("SelectedInwardACMethodBooking");
+                        OnPropertyChanged(nameof(SelectedInwardACMethodBooking));
                         break;
                     case FacilitySelectLoctation.PrebookingOutward:
                         SelectedOutwardACMethodBooking.OutwardFacility = facility;
-                        OnPropertyChanged("SelectedOutwardACMethodBooking");
+                        OnPropertyChanged(nameof(SelectedOutwardACMethodBooking));
                         break;
                     default:
                         break;
@@ -4689,7 +4884,7 @@ namespace gip.bso.manufacturing
             SelectedOutwardACMethodBooking.OutwardFacilityCharge = SelectedPreBookingAvailableQuants;
             SelectedOutwardACMethodBooking.OutwardMaterial = null;
             SelectedOutwardACMethodBooking.OutwardFacilityLot = null;
-            OnPropertyChanged("SelectedOutwardACMethodBooking");
+            OnPropertyChanged(nameof(SelectedOutwardACMethodBooking));
             CloseTopDialog();
         }
 
@@ -5157,7 +5352,7 @@ namespace gip.bso.manufacturing
                 if (_FocusView != value)
                 {
                     _FocusView = value;
-                    OnPropertyChanged("FocusView");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -5231,7 +5426,6 @@ namespace gip.bso.manufacturing
                     ProdOrder[] prodOrders = ProdOrderList.Where(c => c.IsSelected).ToArray();
                     e.Result = DoRecalcAllQuantitiesForSelected(DatabaseApp, prodOrders);
                     break;
-
             }
         }
 
@@ -5260,7 +5454,7 @@ namespace gip.bso.manufacturing
                         if (resultMsg == null || resultMsg.IsSucceded())
                         {
                             Load(true);
-                            OnPropertyChanged("CurrentProdOrder");
+                            OnPropertyChanged(nameof(CurrentProdOrder));
                         }
                         else
                         {
@@ -5272,14 +5466,13 @@ namespace gip.bso.manufacturing
                         if (resultMsg == null || resultMsg.IsSucceded())
                         {
                             Load(true);
-                            OnPropertyChanged("CurrentProdOrder");
+                            OnPropertyChanged(nameof(CurrentProdOrder));
                         }
                         else
                         {
                             SendMessage(resultMsg);
                         }
                         break;
-
                 }
             }
         }
@@ -5287,7 +5480,6 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region BackgroundWorker -> DoMehtods
-
 
         private MsgWithDetails RecalcAllQuantities(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
         {
@@ -5314,6 +5506,7 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
     }
 
 }

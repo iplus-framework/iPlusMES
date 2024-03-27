@@ -180,18 +180,14 @@ namespace gip.bso.manufacturing
 
         public virtual bool IsEnabledBookSelectedInwardACMethodBooking()
         {
-            //bool bRetVal = false;
-            //if (_SelectedInwardACMethodBookingDummy != null)
-            //    return false;
-            //if (SelectedInwardACMethodBooking != null)
-            //    bRetVal = SelectedInwardACMethodBooking.IsEnabled();
-            //else
-            //    return false;
-            //if (this.OutwardPartslistPosList == null || this.OutwardPartslistPosList.Where(c => c.ActualQuantityUOM < 0.00001).Any())
-            //    return false;
-            // UpdateBSOMsg();
-            // TODO: @aagincic InwardACMethodBooking(0) - to complicated logic for checking is SelectedInwardACMethodBooking created and selected prebooking not null
-            return SelectedInwardACMethodBooking != null && SelectedInwardFacilityPreBooking != null && SelectedInwardACMethodBooking.InwardFacility != null;
+            return
+                SelectedInwardACMethodBooking != null
+                && SelectedInwardFacilityPreBooking != null
+                && SelectedInwardACMethodBooking.InwardFacility != null
+                && (
+                        SelectedProdOrderIntermediateBatch != null
+                        || (SelectedIntermediate != null && AllowPostingOnIntermediate)
+                );
         }
 
         // GUI #5 BookAllInwardACMBookings
@@ -279,7 +275,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledNewInwardFacilityPreBooking()
         {
-            return SelectedIntermediate != null;
+            return SelectedProdOrderIntermediateBatch != null || (AllowPostingOnIntermediate && SelectedIntermediate != null);
         }
 
         // GUI #2 DeleteInwardFacilityPreBooking

@@ -2,9 +2,6 @@
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -13,8 +10,10 @@ namespace gip.bso.manufacturing
     {
         public FacilityChargeItem(FacilityCharge facilityCharge, double? targetQuantity)
         {
+            FacilityCharge = facilityCharge;
             FacilityChargeID = facilityCharge.FacilityChargeID;
             FacilityChargeNo = facilityCharge.FacilityLot?.LotNo;
+            ExternLotNo = facilityCharge.FacilityLot?.ExternLotNo;
             if (string.IsNullOrEmpty(FacilityChargeNo))
                 FacilityChargeNo = facilityCharge.FacilityChargeSortNo.ToString();
             StockQuantityUOM = facilityCharge.StockQuantityUOM;
@@ -30,7 +29,21 @@ namespace gip.bso.manufacturing
             }
         }
 
+        [ACPropertyInfo(9999)]
+        public FacilityCharge FacilityCharge
+        {
+            get;
+            set;
+        }
+
         public Guid FacilityChargeID
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(9999)]
+        public string ExternLotNo
         {
             get;
             set;

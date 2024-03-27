@@ -58,6 +58,18 @@ namespace gip.mes.facility
 
         #region Public Methods
 
+        #region Checkout
+        public virtual void CheckOut(VisitorVoucher currentVisitorVoucher, DatabaseApp dbApp)
+        {
+            MDVisitorVoucherState state = dbApp.MDVisitorVoucherState.Where(c => c.MDVisitorVoucherStateIndex == (short)MDVisitorVoucherState.VisitorVoucherStates.CheckedOut).FirstOrDefault();
+            if (state != null)
+            {
+                currentVisitorVoucher.MDVisitorVoucherState = state;
+                currentVisitorVoucher.CheckOutDate = DateTime.Now;
+            }
+        }
+        #endregion
+
         #region Deliverynote
 
         [ACMethodInfo("", "en{'Assign Delivery Note'}de{'Lieferschein zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
@@ -286,7 +298,7 @@ namespace gip.mes.facility
         #region Picking
 
         [ACMethodInfo("", "en{'Assign Picking'}de{'Kommissionierplan zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public Msg AssignPicking(VisitorVoucher currentVisitorVoucher, Picking currentPicking, DatabaseApp dbApp,
+        public virtual Msg AssignPicking(VisitorVoucher currentVisitorVoucher, Picking currentPicking, DatabaseApp dbApp,
                                 ACComponent acFacilityManager, ACInDeliveryNoteManager inDeliveryNoteManager, ACOutDeliveryNoteManager outDeliveryNoteManager)
         {
             if (!PreExecute("AssignPicking"))
@@ -493,7 +505,7 @@ namespace gip.mes.facility
         }
 
         [ACMethodInfo("", "en{'Remove Picking'}de{'Entfernen Kommissionierplan'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public Msg UnassignPicking(Picking currentPicking, VisitorVoucher currentVisitorVoucher, DatabaseApp dbApp)
+        public virtual Msg UnassignPicking(Picking currentPicking, VisitorVoucher currentVisitorVoucher, DatabaseApp dbApp)
         {
             if (!PreExecute("UnassignPicking"))
             {

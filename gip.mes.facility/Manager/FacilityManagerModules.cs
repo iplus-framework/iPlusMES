@@ -143,11 +143,23 @@ namespace gip.mes.facility
             if (sourceModule == null || deliveryNotePos == null)
                 return null;
 
-            RoutingResult result = ACRoutingService.FindSuccessors(RoutingService, db, true, 
-                                    sourceModule, C_SiloClass, RouteDirections.Forwards, new object[] { },
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
-                                    null,
-                                    0, true, true, false, false, 3);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = db,
+                AttachRouteItemsToContext = true,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = C_SiloClass,
+                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                DBDeSelector = null,
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 3,
+                ResultMode = RouteResultMode.ShortRoute
+            };
+
+            RoutingResult result = ACRoutingService.FindSuccessors(sourceModule, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
                 return null;
             if (!result.IsDbResult)
@@ -284,6 +296,26 @@ namespace gip.mes.facility
             return null;
         }
 
+        public virtual IList<FacilityReservation> GetSelectedTargets(PickingPos pickingPos)
+        {
+            if (pickingPos == null || pickingPos.Material == null)
+                return null;
+            try
+            {
+                if (!pickingPos.FacilityReservation_PickingPos.Any())
+                    return null;
+                return pickingPos.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue).OrderBy(c => c.Sequence).ToArray();
+            }
+            catch (Exception ec)
+            {
+                string msg = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msg += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException("FacilityManager", "GetSelectedTargets", msg);
+            }
+            return null;
+        }
 
         #endregion
 

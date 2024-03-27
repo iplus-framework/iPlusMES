@@ -548,10 +548,8 @@ namespace gip.mes.processapplication
                         facilityLot = newChildPosForBatch.FacilityLot;
                         if (facilityLot == null)
                         {
-                            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
-                            facilityLot = FacilityLot.NewACObject(dbApp, null, secondaryKey);
-                            facilityLot.UpdateExpirationInfo(newChildPosForBatch.BookingMaterial);
-                            newChildPosForBatch.FacilityLot = facilityLot;
+                            string lotNo = null;
+                            this.ProdOrderManager.GetFacilityLotForPos(Database, dbApp, newChildPosForBatch, true, out facilityLot, out lotNo, null);
                         }
                     }
 
@@ -668,7 +666,7 @@ namespace gip.mes.processapplication
                 ProdOrderBatchPlan nextBatchPlanToStart = batchPlans.FirstOrDefault(c => c.PlanState == GlobalApp.BatchPlanState.Created);
                 if (nextBatchPlanToStart == null)
                     return;
-                PABatchPlanScheduler scheduler = GetScheduler();
+                PAWorkflowSchedulerBase scheduler = GetScheduler();
                 if (scheduler != null
                     && nextBatchPlanToStart.VBiACClassWF != null
                     && nextBatchPlanToStart.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())

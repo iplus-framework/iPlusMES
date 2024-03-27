@@ -21,6 +21,7 @@ using gip.mes.autocomponent;
 using gip.bso.sales;
 using gip.bso.purchasing;
 using gip.mes.facility;
+using System.Data.Objects;
 
 namespace gip.bso.logistics
 {
@@ -101,51 +102,89 @@ namespace gip.bso.logistics
                 if (_AccessUnAssignedPicking == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "PickingUnAssigned", ACType.ACIdentifier);
-                    bool rebuildACQueryDef = false;
-                    if (navACQueryDefinition.ACFilterColumns.Count <= 0)
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "PickingTypeIndex")
-                            {
-                                string pickingTypeNo = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
-                                if ((filterItem.SearchWord == pickingTypeNo) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
-                                    countFoundCorrect++;
-                            }
-                            //else if (filterItem.PropertyName == "PickingStateIndex")
-                            //{
-                            //    string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
-                            //    if ((filterItem.SearchWord == pickingState) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThan)
-                            //        countFoundCorrect++;
-                            //}
-                            else if (filterItem.PropertyName == "VisitorVoucherID")
-                            {
-                                if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
-                                    countFoundCorrect++;
-                            }
-                        }
-                        if (countFoundCorrect < 2)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        navACQueryDefinition.ClearFilter(true);
-                        string pickingType = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, pickingType, true));
-                        //string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
-                        //navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingStateIndex", Global.LogicalOperators.isNull, Global.Operators.and, pickingState, true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
-                        navACQueryDefinition.SaveConfig(true);
-                    }
+                    //bool rebuildACQueryDef = false;
+                    //if (navACQueryDefinition.ACFilterColumns.Count <= 0)
+                    //{
+                    //    rebuildACQueryDef = true;
+                    //}
+                    //else
+                    //{
+                    //    int countFoundCorrect = 0;
+                    //    foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
+                    //    {
+                    //        if (filterItem.PropertyName == "PickingTypeIndex")
+                    //        {
+                    //            string pickingTypeNo = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
+                    //            if ((filterItem.SearchWord == pickingTypeNo) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
+                    //                countFoundCorrect++;
+                    //        }
+                    //        //else if (filterItem.PropertyName == "PickingStateIndex")
+                    //        //{
+                    //        //    string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
+                    //        //    if ((filterItem.SearchWord == pickingState) && filterItem.LogicalOperator == Global.LogicalOperators.greaterThan)
+                    //        //        countFoundCorrect++;
+                    //        //}
+                    //        else if (filterItem.PropertyName == "VisitorVoucherID")
+                    //        {
+                    //            if (String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.LogicalOperator == Global.LogicalOperators.isNull)
+                    //                countFoundCorrect++;
+                    //        }
+                    //    }
+                    //    if (countFoundCorrect < 2)
+                    //        rebuildACQueryDef = true;
+                    //}
+                    //if (rebuildACQueryDef)
+                    //{
+                    //    navACQueryDefinition.ClearFilter(true);
+                    //    string pickingType = System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle);
+                    //    navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, pickingType, true));
+                    //    //string pickingState = System.Convert.ToString((short)GlobalApp.PickingState.New);
+                    //    //navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "PickingStateIndex", Global.LogicalOperators.isNull, Global.Operators.and, pickingState, true));
+                    //    navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true));
+                    //    navACQueryDefinition.SaveConfig(true);
+                    //}
                     _AccessUnAssignedPicking = navACQueryDefinition.NewAccessNav<Picking>("UnAssignedPicking", this);
+                    _AccessUnAssignedPicking.NavSearchExecuting += _Picking_NavSearchExecuting;
                     _AccessUnAssignedPicking.AutoSaveOnNavigation = false;
+                    _AccessUnAssignedPicking.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessUnAssignedPicking_DefaultFilter, AccessUnAssignedPicking_DefaultSort);
                 }
                 return _AccessUnAssignedPicking;
+            }
+        }
+
+        private IQueryable<Picking> _Picking_NavSearchExecuting(IQueryable<Picking> result)
+        {
+            ObjectQuery<Picking> query = result as ObjectQuery<Picking>;
+            if (query != null)
+            {
+                query.Include(c => c.DeliveryCompanyAddress.Company).Include(c => c.MDPickingType);
+            }
+            return query;
+        }
+
+        protected virtual List<ACFilterItem> AccessUnAssignedPicking_DefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.IssueVehicle), true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true)
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> AccessUnAssignedPicking_DefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("PickingNo", Global.SortDirections.descending, true),
+                };
             }
         }
 
@@ -314,6 +353,50 @@ namespace gip.bso.logistics
             OnPropertyChanged("UnAssignedPickingList");
         }
 
+        #endregion
+
+        #region Navigation
+        [ACMethodInteraction("Picking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 632, false, "SelectedPicking")]
+        public void NavigateToAPicking()
+        {
+            if (!IsEnabledNavigateToAPicking())
+                return; 
+            NavigateToPicking(SelectedPicking);
+        }
+
+        public bool IsEnabledNavigateToAPicking()
+        {
+            return SelectedPicking != null;
+        }
+
+        [ACMethodInteraction("UnAssignedPicking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 633, false, "SelectedUnAssignedPicking")]
+        public void NavigateToUPicking()
+        {
+            if (!IsEnabledNavigateToUPicking())
+                return;
+            NavigateToPicking(SelectedUnAssignedPicking);
+        }
+
+        public bool IsEnabledNavigateToUPicking()
+        {
+            return SelectedUnAssignedPicking != null;
+        }
+
+        private void NavigateToPicking(Picking picking)
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = picking.PickingID,
+                    EntityName = Picking.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
         #endregion
 
         #endregion

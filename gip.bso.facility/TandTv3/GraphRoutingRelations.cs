@@ -76,10 +76,21 @@ namespace gip.bso.facility
 
                 // @aagincic: this work for me - search sourceUrl -> targetUrl one by one
                 routes = new List<Route>();
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = database,
+                    Direction = RouteDirections.Forwards,
+                    SelectionRuleID = "",
+                    MaxRouteAlternativesInLoop = 1,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
                 foreach (var tmpTestCombination in allUrlCombinations)
                 {
-                    RoutingResult test = ACRoutingService.MemSelectRoutes(database, tmpTestCombination.FromACUrl, tmpTestCombination.ToACUrl,
-                        RouteDirections.Forwards, "", 1, true, true, null, RoutingService);
+                    RoutingResult test = ACRoutingService.MemSelectRoutes(tmpTestCombination.FromACUrl, tmpTestCombination.ToACUrl, routingParameters);
                     if (test.Routes != null)
                     {
                         routes.AddRange(test.Routes);
@@ -90,13 +101,20 @@ namespace gip.bso.facility
             else
             {
                 // @aagincic: this not working List<string> sourceUrls -> List<string> targetUrls
-                RoutingResult memSelectRoutes =
-                    ACRoutingService
-                    .MemSelectRoutes(
-                        database,
-                        allUrlCombinations.Select(c => c.FromACUrl).ToList(),
-                        allUrlCombinations.Select(c => c.ToACUrl).ToList(),
-                        RouteDirections.Forwards, "", allUrlCombinations.Count(), true, true, null, RoutingService);
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = database,
+                    Direction = RouteDirections.Forwards,
+                    SelectionRuleID = "",
+                    MaxRouteAlternativesInLoop = 0,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
+                RoutingResult memSelectRoutes = ACRoutingService.MemSelectRoutes(allUrlCombinations.Select(c => c.FromACUrl).ToList(), allUrlCombinations.Select(c => c.ToACUrl).ToList(), routingParameters);
+
                 var test1 = memSelectRoutes.Routes != null ? memSelectRoutes.Routes.Count() : 0;
                 routes = memSelectRoutes.Routes.ToList();
             }
@@ -199,7 +217,7 @@ namespace gip.bso.facility
                         {
                             SearchRouteCombination routeCombination = new SearchRouteCombination()
                             {
-                                FromACUrl = inwardFacility.Value.FacilityACClass.ACUrlComponent,
+                                FromACUrl = inwardFacility.Value.FacilityACClass?.ACUrlComponent,
                                 FromType = MDTrackingStartItemTypeEnum.FacilityPreview,
 
                                 ToACUrl = outwardMachine.ACUrlComponent,

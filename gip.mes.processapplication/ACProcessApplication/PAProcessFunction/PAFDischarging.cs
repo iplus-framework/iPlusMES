@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Entleeren'}de{'Entleeren'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWDischarging.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Discharging'}de{'Entleeren'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWDischarging.PWClassName, true)]
     public class PAFDischarging : PAProcessFunction, IPAFuncDeliverMaterial, IPAFuncScaleConfig
     {
         
@@ -269,7 +269,7 @@ namespace gip.mes.processapplication
         }
         #endregion
 
-        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod)
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
             ACValue value = acMethod.ParameterValueList.GetACValue("Route");
             if (value == null)
@@ -277,26 +277,52 @@ namespace gip.mes.processapplication
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
                 return msg;
             }
-            Route route = value.ValueT<Route>().Clone() as Route;
-            RouteItem targetRouteItem = route.LastOrDefault();
+
+            Route newR = value.ValueT<Route>();
+            if (newR == null)
+            {
+                MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Route is null." };
+                return msg;
+            }
+
+            ACValue valuePrev = null;
+            Route prevR = null;
+            if (previousParams != null && IsSimulationOn)
+            {
+                valuePrev = previousParams.ParameterValueList.GetACValue("Route");
+                if (valuePrev != null)
+                    prevR = valuePrev.ValueT<Route>();
+            }
+
+            //Route clonedR = originalR.Clone() as Route;
+            //RouteItem targetRouteItem = clonedR.LastOrDefault();
+            RouteItem targetRouteItem = newR.LastOrDefault();
             if (targetRouteItem == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Last RouteItem is null." };
                 return msg;
             }
 
+            if (newR.IsPredefinedRoute)
+                RoutingService.ExecuteMethod(nameof(ACRoutingService.OnRouteUsed), newR);
+
             using (var db = new Database())
             {
                 try
                 {
-                    route.AttachTo(db); // Global context
+                    newR?.AttachTo(db); // Global context
+                    prevR?.AttachTo(db);
 
-                    MsgWithDetails msg = GetACMethodFromConfig(db, route, acMethod);
+                    MsgWithDetails msg = GetACMethodFromConfig(db, newR, acMethod);
                     if (msg != null)
                         return msg;
 
                     if (IsSimulationOn)
-                        PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
+                    {
+                        if (prevR != null)
+                            PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
+                        PAEControlModuleBase.ActivateRouteOnSimulation(newR, false);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -306,8 +332,12 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    route.Detach(true);
+                    newR?.Detach(true);
+                    prevR?.Detach(true);
                     //targetRouteItem.DetachEntitesFromDbContext();
+                    // Update Route, that Route-serializers can access ACComponent-Properties of RouteItems
+                    //if (!originalR.AreACUrlInfosSet)
+                    //value.Value = clonedR;
                 }
             }
 
@@ -396,7 +426,16 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-                var routes = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatOut1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID, null, RouteDirections.Forwards, true, false);
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    Database = dbIPlus,
+                    Direction = RouteDirections.Forwards,
+                    DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID,
+                    DBIncludeInternalConnections = true,
+                    AutoDetachFromDBContext = false
+                };
+
+                var routes = ACRoutingService.DbSelectRoutesFromPoint(thisACClass, this.PAPointMatOut1.PropertyInfo, routingParameters);
                 if (routes != null && routes.Any())
                 {
                     string virtMethodName = VMethodName_Discharging;
@@ -472,7 +511,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            OnSetRouteItemData(acMethod, targetRouteItem, sourceRouteItem, route);
+            OnSetRouteItemData(acMethod, targetRouteItem, sourceRouteItem, route, isConfigInitialization);
 
 
             List<MaterialConfig> materialConfigList = null;
@@ -591,7 +630,7 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        protected virtual void OnSetRouteItemData(ACMethod acMethod, RouteItem targetItem, RouteItem sourceItem, Route route)
+        protected virtual void OnSetRouteItemData(ACMethod acMethod, RouteItem targetItem, RouteItem sourceItem, Route route, bool isConfigInitialization)
         {
             if (targetItem != null)
             {
@@ -604,6 +643,29 @@ namespace gip.mes.processapplication
         protected override void OnChangingCurrentACMethod(ACMethod currentACMethod, ACMethod newACMethod)
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
+
+            ACValue value = currentACMethod.ParameterValueList.GetACValue("Route");
+            if (value != null)
+            {
+                Route originalR = value.ValueT<Route>();
+                if (originalR != null && !originalR.AreACUrlInfosSet)
+                {
+                    using (var db = new Database())
+                    {
+                        try
+                        {
+                            originalR.AttachTo(db); // Global context
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        finally
+                        {
+                            originalR.Detach(true);
+                        }
+                    }
+                }
+            }
 
             bool unsubscribe = true;
             if (IsMethodChangedFromClient)
@@ -858,7 +920,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("Sieve", typeof(Int16), (Int16)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("Sieve", "en{'Sieve'}de{'Sieb'}");
             method.ParameterValueList.Add(new ACValue("TargetQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
-            paramTranslation.Add("TargetQuantity", "en{'Target quantity'}de{'Sollmenge'}");
+            paramTranslation.Add("TargetQuantity", "en{'Target quantity (Set value if negative)'}de{'Sollmenge (Setze Wert falls negativ)'}");
 
             if (acIdentifier == "DischargingIntake")
             {
@@ -875,6 +937,13 @@ namespace gip.mes.processapplication
             resultTranslation.Add("ScaleTotalWeight", "en{'Total quantity'}de{'Gesamtgewicht'}");
             method.ResultValueList.Add(new ACValue("DischargingTime", typeof(TimeSpan), TimeSpan.Zero, Global.ParamOption.Optional));
             resultTranslation.Add("DischargingTime", "en{'Discharging time'}de{'Entleerzeit'}");
+            method.ResultValueList.Add(new ACValue("GaugeCode", typeof(string), "", Global.ParamOption.Optional));
+            resultTranslation.Add("GaugeCode", "en{'Gauge code/Alibi-No.'}de{'Wägeid/Alibi-No.'}");
+            //method.ResultValueList.Add(new ACValue("GaugeCodeStart", typeof(string), "", Global.ParamOption.Optional));
+            //resultTranslation.Add("GaugeCodeStart", "en{'Gauge code start/Alibi-No.'}de{'Wägeid Start/Alibi-No.'}");
+            //method.ResultValueList.Add(new ACValue("GaugeCodeEnd", typeof(string), "", Global.ParamOption.Optional));
+            //resultTranslation.Add("GaugeCodeEnd", "en{'Gauge code end/Alibi-No.'}de{'Wägeid Ende/Alibi-No.'}");
+
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
         }

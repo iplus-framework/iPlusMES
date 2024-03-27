@@ -65,6 +65,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(36, nameof(SkipPrintQuestion), "en{'Skip print question'}de{'Druckfrage überspringen'}")]
     [ACPropertyEntity(36, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(37, "PostingBehaviourIndex", "en{'Posting behaviour'}de{'Buchungsverhalten'}", typeof(PostingBehaviourEnum), Const.ContextDatabase + "\\PostingBehaviourEnumList", "", true)]
+    [ACPropertyEntity(38, "ClassCode", "en{'Classification code'}de{'Klassifizierungscode'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
     [ACPropertyEntity(38, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
@@ -878,6 +879,13 @@ namespace gip.mes.datamodel
         }
 
         [NotMapped]
+        public static Func<FacilityCharge, bool> FuncHasBlockedQuants =
+            c => c.NotAvailable == false
+               && (c.MDReleaseStateID.HasValue && c.MDReleaseState.MDReleaseStateIndex >= (short)MDReleaseState.ReleaseStates.Locked)
+                   || (c.FacilityLotID.HasValue && c.FacilityLot.MDReleaseStateID.HasValue && c.FacilityLot.MDReleaseState.MDReleaseStateIndex >= (short)MDReleaseState.ReleaseStates.Locked);
+
+
+        [NotMapped]
         public IQueryable<FacilityCharge> QryHasFreeQuants
         {
             get
@@ -888,6 +896,12 @@ namespace gip.mes.datamodel
                                                             && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree));
             }
         }
+
+        [NotMapped]
+        public static Func<FacilityCharge, bool> FuncHasFreeQuants =
+            c => c.NotAvailable == false
+                && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
+                && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree);
 
         [ACPropertyInfo(45, "", "en{'Available Space'}de{'Verfügbarer Platz'}")]
         [NotMapped]

@@ -6,6 +6,10 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using System.Xml;
+using gip.mes.facility;
+using static gip.mes.datamodel.MDReservationMode;
+using static gip.mes.processapplication.PWDosing;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 
@@ -41,30 +45,21 @@ namespace gip.mes.processapplication
         #region c´tors
         static PWGroupVB()
         {
-            ACMethod method;
-            method = new ACMethod(ACStateConst.SMStarting);
-            Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
-            method.ParameterValueList.Add(new ACValue("IgnoreFIFO", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("IgnoreFIFO", "en{'Ignore FIFO for Processmodule-Mapping'}de{'Ignoriere FIFO-Prinzip für Prozessmodul-Belegung'}");
-            method.ParameterValueList.Add(new ACValue("RoutingCheck", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("RoutingCheck", "en{'Only routeable modules from predecessor'}de{'Nur erreichbare Module vom Vorgänger'}");
-            method.ParameterValueList.Add(new ACValue("WithoutPM", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("WithoutPM", "en{'Ignore Processmodule-Mapping'}de{'Ohne Prozessmodul-Belegung'}");
-            method.ParameterValueList.Add(new ACValue("OccupationByScan", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("OccupationByScan", "en{'Processmodule-Mapping manually by user'}de{'Prozessmodulbelegung manuell vom Anwender'}");
-            method.ParameterValueList.Add(new ACValue("Priority", typeof(ushort), 0, Global.ParamOption.Required));
-            paramTranslation.Add("Priority", "en{'Priorization'}de{'Priorisierung'}");
-            method.ParameterValueList.Add(new ACValue("FIFOCheckFirstPM", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("FIFOCheckFirstPM", "en{'FIFO check only for WF-Groups which competes for the same process module'}de{'FIFO-Prüfung nur bei WF-Gruppen die das selbe Prozessmodul konkurrieren.'}");
-            method.ParameterValueList.Add(new ACValue("SkipIfNoComp", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("SkipIfNoComp", "en{'Skip if no material has to be processed'}de{'Überspringe wenn kein Material verarbeitet werden muss'}");
-            method.ParameterValueList.Add(new ACValue("MaxBatchWeight", typeof(double), false, Global.ParamOption.Optional));
-            paramTranslation.Add("MaxBatchWeight", "en{'Max. batch weight [kg]'}de{'Maximales Batchgewicht [kg]'}");
-            method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
-            paramTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
-            var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWGroupVB), paramTranslation, null);
-            ACMethod.RegisterVirtualMethod(typeof(PWGroupVB), ACStateConst.SMStarting, wrapper);
-
+            List<ACMethodWrapper> wrappers = ACMethod.OverrideFromBase(typeof(PWGroupVB), ACStateConst.SMStarting);
+            if (wrappers != null)
+            {
+                foreach (ACMethodWrapper wrapper in wrappers)
+                {
+                    wrapper.Method.ParameterValueList.Add(new ACValue("SkipIfNoComp", typeof(bool), false, Global.ParamOption.Required));
+                    wrapper.ParameterTranslation.Add("SkipIfNoComp", "en{'Skip if no material has to be processed'}de{'Überspringe wenn kein Material verarbeitet werden muss'}");
+                    wrapper.Method.ParameterValueList.Add(new ACValue("MaxBatchWeight", typeof(double), false, Global.ParamOption.Optional));
+                    wrapper.ParameterTranslation.Add("MaxBatchWeight", "en{'Max. batch weight [kg]'}de{'Maximales Batchgewicht [kg]'}");
+                    wrapper.Method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
+                    wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
+                    wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
+                    wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where BOM-materials can be processed'}de{'Nur Prozessmodule wo Stückliste verarbeitet werden kann'}");
+                }
+            }
             RegisterExecuteHandler(typeof(PWGroupVB), HandleExecuteACMethod_PWGroupVB);
 
             ACRoutingService.RegisterSelectionQuery(SelRuleID_ReachableDest, 
@@ -149,6 +144,23 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("SkipIfNoComp");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool DosableOnGroupCheck
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("DosableOnGroupCheck");
                     if (acValue != null)
                     {
                         return acValue.ParamAsBoolean;
@@ -378,6 +390,8 @@ namespace gip.mes.processapplication
 
                         if (targets != null && targets.Any())
                         {
+                            var pwDosings = this.FindChildComponents<IPWNodeReceiveMaterialRouteable>(c => c is IPWNodeReceiveMaterialRouteable);
+
                             // Performance-Optimization:
                             // If targets changed, then recalculate routebale PM List
                             if (PWMethodTransportBase.AreCachedDestinationsDifferent(LastTargets, targets))
@@ -397,16 +411,45 @@ namespace gip.mes.processapplication
                                     if (!LastCalculatedRouteablePMList.Contains(module))
                                     {
                                         Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-                                        RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                            module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
-                                            (c, p, r) => targets.Contains(c.ACClassID),
-                                                            (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+
+                                        ACRoutingParameters routingParameters = new ACRoutingParameters()
+                                        {
+                                            RoutingService = this.RoutingService,
+                                            Database = db,
+                                            SelectionRuleID = SelRuleID_ReachableDest,
+                                            Direction = RouteDirections.Forwards,
+                                            SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                                            DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                                            DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                                                         && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                             || !c.BasedOnACClassID.HasValue
                                                                             || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                                            0, true, true, false, false);
+                                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                                            IncludeReserved = true,
+                                            IncludeAllocated = true
+                                        };
+
+                                        RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
                                         if (rResult.Routes != null && rResult.Routes.Any())
-                                            LastCalculatedRouteablePMList.Add(module);
+                                        {
+                                            bool canAdd = true;
+                                            if (DosableOnGroupCheck)
+                                            {
+                                                if (pwDosings != null && pwDosings.Any())
+                                                {
+                                                    canAdd = false;
+                                                    foreach (IPWNodeReceiveMaterialRouteable pwDosing in pwDosings)
+                                                    {
+                                                        canAdd = pwDosing.HasAndCanProcessAnyMaterial(module);
+                                                        if (canAdd)
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+                                            if (canAdd)
+                                                LastCalculatedRouteablePMList.Add(module);
+                                        }
                                     }
                                 }
                             }
@@ -419,6 +462,7 @@ namespace gip.mes.processapplication
                         }
                         else
                             LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+
                         _LastTargets = targets;
                         return LastCalculatedRouteablePMList.ToList();
                     }
@@ -500,20 +544,32 @@ namespace gip.mes.processapplication
                                         Guid thisMethodID = ContentACClassWF.ACClassMethodID;
                                         IList<gip.core.datamodel.ACClass> selectedModules = pwMethod.ACFacilityManager.GetSelectedModulesAsACClass(notePos, db);
 
+                                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+                                        ACRoutingParameters routingParameters = new ACRoutingParameters()
+                                        {
+                                            RoutingService = this.RoutingService,
+                                            Database = db,
+                                            AttachRouteItemsToContext = false,
+                                            SelectionRuleID = SelRuleID_ReachableDest,
+                                            Direction = RouteDirections.Forwards,
+                                            SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                                            DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                                            DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                                                && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                                                    || !c.BasedOnACClassID.HasValue
+                                                                                    || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                                            IncludeReserved = true,
+                                            IncludeAllocated = true
+                                        };
+
                                         foreach (var module in modulesInAutomaticMode)
                                         {
                                             if (!LastCalculatedRouteablePMList.Contains(module)
                                                 && selectedModules.Where(c => c.ACClassID == module.ComponentClass.ACClassID).Any())
                                             {
-                                                Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-                                                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                                    module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
-                                                                    (c, p, r) => targets.Contains(c.ACClassID),
-                                                                    (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                                                && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                                                    || !c.BasedOnACClassID.HasValue
-                                                                                    || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                                                    0, true, true, false, false);
+                                                RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
                                                 if (rResult.Routes != null && rResult.Routes.Any())
                                                     LastCalculatedRouteablePMList.Add(module);
                                             }
@@ -637,7 +693,8 @@ namespace gip.mes.processapplication
             }
             if (pickingPos != null && pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID.HasValue)
             {
-                bool hasGroupDosings = this.FindChildComponents<PWDosing>(c => c is PWDosing).Any();
+                List<PWDosing> pwDosings = this.FindChildComponents<PWDosing>(c => c is PWDosing);
+                bool hasGroupDosings = pwDosings.Any();
                 Guid[] targets = new Guid[] { pickingPos.ToFacility.VBiFacilityACClassID.Value };
                 var lastTargest = LastTargets;
                 if (lastTargest == null
@@ -655,30 +712,56 @@ namespace gip.mes.processapplication
 
                 Type typeOfSilo = typeof(PAMSilo);
                 Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+                Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = db,
+                    AttachRouteItemsToContext = false,
+                    SelectionRuleID = SelRuleID_ReachableDest,
+                    Direction = RouteDirections.Forwards,
+                    SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                    DBSelector = (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
+                    DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                        && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                            || !c.BasedOnACClassID.HasValue
+                                                            || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
                 foreach (var module in modulesInAutomaticMode)
                 {
                     if (!LastCalculatedRouteablePMList.Contains(module))
                     {
-                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-                        RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                            module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
-                                            (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
-                                            (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                        && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                            || !c.BasedOnACClassID.HasValue
-                                                            || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                            0,true, true, false, false);
+                        string moduleACUrl = module.GetACUrl();
+
+
+                        RoutingResult rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
                         if (rResult.Routes != null && rResult.Routes.Any())
                         {
-                            if (hasGroupDosings && pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+                            if (hasGroupDosings)
                             {
-                                rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
-                                                            module, SelRuleID_ReachableSource, RouteDirections.Backwards, new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value },
-                                                            (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value,
-                                                            (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType))), 
-                                                            0, true, true, false, false);
+                                if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+                                {
+                                    routingParameters.SelectionRuleID = SelRuleID_ReachableSource;
+                                    routingParameters.Direction = RouteDirections.Backwards;
+                                    routingParameters.DBSelector = (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value;
+                                    routingParameters.DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType)));
+                                    routingParameters.SelectionRuleParams = new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value };
+
+                                    rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
+                                }
+                                else if (pickingPos.FromFacility == null)
+                                {
+                                    var pwDosing = pwDosings.FirstOrDefault();
+                                    if (pwDosing != null)
+                                        rResult = pwDosing.HasAndCanProcessAnyMaterialPicking(module, dbApp, db, pickingPos);
+                                }
                             }
-                            if (rResult.Routes != null && rResult.Routes.Any())
+                            if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
                                 LastCalculatedRouteablePMList.Add(module);
                         }
                     }
@@ -851,7 +934,7 @@ namespace gip.mes.processapplication
             ExtraDisTargetDest = null;
             ExtraDisTargetComp = null;
 
-            if (SkipIfNoComp)
+            if (!DosableOnGroupCheck && SkipIfNoComp)
             {
                 if (SkipIfNoDosComp())
                 {
@@ -870,6 +953,16 @@ namespace gip.mes.processapplication
             LastTargets = null;
             _LastCalculatedRouteablePMList = null;
             _SkipGroup = null;
+        }
+
+        protected override bool OnHandleAvailableProcessModule(PAProcessModule processModule)
+        {
+            if (SkipIfNoComp && DosableOnGroupCheck && processModule == null)
+            {
+                CurrentACState = ACStateEnum.SMCompleted;
+                return true;
+            }
+            return base.OnHandleAvailableProcessModule(processModule);
         }
 
         protected override void OnProcessModuleReleased(PAProcessModule module)
@@ -898,6 +991,18 @@ namespace gip.mes.processapplication
                 _SkipGroup = false;
 
             return _SkipGroup.Value;
+        }
+
+        public bool HasAnyMaterialToProcess
+        {
+            get
+            {
+                var relevantPWNodes = FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial).ToArray();
+                if (relevantPWNodes.Any())
+                    return relevantPWNodes.Any(c => c.HasAnyMaterialToProcess);
+                else
+                    return false;
+            }
         }
 
         public bool IsExtraDisTargetEntered(out string acUrlExtraDisDest)
@@ -988,6 +1093,8 @@ namespace gip.mes.processapplication
                     info.Add(DeliveryNotePos.ClassName, notePos.DeliveryNotePosID);
                 if (fBooking != null)
                     info.Add(FacilityBooking.ClassName, fBooking.FacilityBookingID);
+                if (pwMethod.CurrentPickingPos != null)
+                    info.Add(PickingPos.ClassName, pwMethod.CurrentPickingPos.PickingPosID);
             }
             else if (IsRelocation)
             {
@@ -998,6 +1105,8 @@ namespace gip.mes.processapplication
                     info.Add(FacilityBooking.ClassName, fBooking.FacilityBookingID);
                 if (picking != null)
                     info.Add(Picking.ClassName, picking.PickingID);
+                if (pwMethod.CurrentPickingPos != null)
+                    info.Add(PickingPos.ClassName, pwMethod.CurrentPickingPos.PickingPosID);
             }
             else if (IsLoading)
             {
@@ -1008,6 +1117,8 @@ namespace gip.mes.processapplication
                     info.Add(Picking.ClassName, picking.PickingID);
                 if (notePos != null)
                     info.Add(DeliveryNotePos.ClassName, notePos.DeliveryNotePosID);
+                if (pwMethod.CurrentPickingPos != null)
+                    info.Add(PickingPos.ClassName, pwMethod.CurrentPickingPos.PickingPosID);
             }
 
             _PAOrderRecursionLock = true;

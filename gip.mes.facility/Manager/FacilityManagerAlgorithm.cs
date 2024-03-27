@@ -566,6 +566,11 @@ namespace gip.mes.facility
                                         if (BP.DatabaseApp.PartslistPos.Where(c => c.MaterialID == postings.InwardFacilityCharge.MaterialID && c.Partslist.IsEnabled).Any())
                                             continue;
                                     }
+
+                                    bool isValidated = OnValidatePostingBehaviour(booking, postings);
+                                    if (!isValidated)
+                                        continue;
+
                                     //postings.InwardFacilityCharge.Material.PartslistPos_Material.Where(c => c.Partslist.IsEnabled).Any();
                                     if (!quantsForZeroBooking.Contains(postings.InwardFacilityCharge))
                                         quantsForZeroBooking.Add(postings.InwardFacilityCharge);
@@ -612,7 +617,7 @@ namespace gip.mes.facility
         /// 1. [FacilityCharge]:                           
         /// Zur Bestandsveränderung oder Umlagerung einer Facility-Charge
         /// </summary>
-        private Global.ACMethodResultState BookingOn_FacilityCharge(ACMethodBooking BP)
+        protected Global.ACMethodResultState BookingOn_FacilityCharge(ACMethodBooking BP)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             FacilityBooking FB = BP.FacilityBooking != null ? BP.FacilityBooking : NewFacilityBooking(BP);
@@ -1641,7 +1646,7 @@ namespace gip.mes.facility
                         return bookingResult;
                 }
 
-                BP.OutwardFacility.Material = BP.InwardMaterial;
+                BP.OutwardFacility.Material = BP.InwardMaterial?.Material1_ProductionMaterial != null ? BP.InwardMaterial.Material1_ProductionMaterial : BP.InwardMaterial;
                 BP.OutwardFacility.Partslist = BP.InwardPartslist;
             }
             // Falls Abgang oder Zugang:
@@ -2290,21 +2295,24 @@ namespace gip.mes.facility
                         if (!relationForRPost.Backflushing || relationForRPost.Foreflushing)
                             continue;
                         double postingQuantity = relationForRPost.TargetQuantityUOM * factor;
-                        IList<Facility> possibleSourceFacilities;
+                        facility.ACPartslistManager.QrySilosResult possibleSourceFacilities;
                         IEnumerable<Route> routes = PartslistManager.GetRoutes(relationForRPost, BP.DatabaseApp, iPlusDB, workplaceClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSourceFacilities, null, null, null, false);
                         if (routes != null && routes.Any())
                         {
                             Route dosingRoute = null;
                             Facility storeForRetrogradePosting = null;
-                            foreach (var prioSilo in possibleSourceFacilities.OrderBy(c => c.MDFacilityType.MDFacilityTypeIndex)) // First storage place then silo!
+                            if (possibleSourceFacilities != null && possibleSourceFacilities.FilteredResult != null && possibleSourceFacilities.FilteredResult.Any())
                             {
-                                if (!prioSilo.VBiFacilityACClassID.HasValue)
-                                    continue;
-                                dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
-                                if (dosingRoute != null)
+                                foreach (var prioSilo in possibleSourceFacilities.FilteredResult.OrderBy(c => c.StorageBin.MDFacilityType.MDFacilityTypeIndex)) // First storage place then silo!
                                 {
-                                    storeForRetrogradePosting = prioSilo;
-                                    break;
+                                    if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue)
+                                        continue;
+                                    dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
+                                    if (dosingRoute != null)
+                                    {
+                                        storeForRetrogradePosting = prioSilo.StorageBin;
+                                        break;
+                                    }
                                 }
                             }
 

@@ -735,7 +735,13 @@ namespace gip.bso.masterdata
 
                 if (isReferencedInProd)
                 {
-                    SelectedPartslistPos.ProdOrderPartslistPos_BasedOnPartslistPos.Clear();
+                    ProdOrderPartslistPos[] referendedPositions = SelectedPartslistPos.ProdOrderPartslistPos_BasedOnPartslistPos.ToArray();
+                    foreach (ProdOrderPartslistPos refPos in referendedPositions)
+                    {
+                        SelectedIntermediate.ProdOrderPartslistPos_BasedOnPartslistPos.Remove(refPos);
+                        refPos.BasedOnPartslistPosID = null;
+                        refPos.BasedOnPartslistPos = null;
+                    }
                 }
 
                 if (msg.MsgDetailsCount == 0)
@@ -1810,7 +1816,12 @@ namespace gip.bso.masterdata
             {
                 if (CurrentPartslist == null || CurrentPartslist.Material == null)
                     return null;
-                return CurrentPartslist.Material.MDUnitList.OrderBy(x => x.MDUnitName);
+                List<MDUnit> mdUnitList = CurrentPartslist.Material.MDUnitList.OrderBy(x => x.MDUnitName).ToList();
+                if(CurrentPartslist.MDUnit != null && !mdUnitList.Any(c=>c.MDUnitID == CurrentPartslist.MDUnitID))
+                {
+                    mdUnitList.Add(CurrentPartslist.MDUnit);
+                }
+                return mdUnitList;
             }
         }
 
@@ -1828,7 +1839,7 @@ namespace gip.bso.masterdata
                 if (CurrentPartslist != null && value != CurrentPartslist.MDUnit)
                 {
                     CurrentPartslist.MDUnit = value;
-                    if(CurrentPartslist.MDUnit != null  && CurrentPartslist.Material != null && CurrentPartslist.MDUnit != CurrentPartslist.Material.BaseMDUnit)
+                    if (CurrentPartslist.MDUnit != null && CurrentPartslist.Material != null && CurrentPartslist.MDUnit != CurrentPartslist.Material.BaseMDUnit)
                     {
                         CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.Material.BaseMDUnit, CurrentPartslist.MDUnit);
                     }
@@ -1870,7 +1881,7 @@ namespace gip.bso.masterdata
                     return null;
                 }
 
-                List<MaterialUnit> mdUnits =  CurrentPartslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToList();
+                List<MaterialUnit> mdUnits = CurrentPartslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToList();
                 SelectedMaterialUnit = mdUnits.FirstOrDefault();
 
                 return mdUnits;

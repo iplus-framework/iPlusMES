@@ -24,7 +24,7 @@ namespace gip2006.variobatch.processapplication
                 || MethodNameEquals(typeOrACMethodName, "MixingTemperature");
         }
 
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)
@@ -227,7 +227,7 @@ namespace gip2006.variobatch.processapplication
             return this.SendObjectToPLC(s7Session, request, sendPackage1, dbNo, offset, iOffset);
         }
 
-        public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override object ReadObject(object complexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)
@@ -397,14 +397,14 @@ namespace gip2006.variobatch.processapplication
 
                 iOffset = 0;
 
-                var acValue = response.ResultValueList.GetACValue("ActDuration");
+                var acValue = response?.ResultValueList?.GetACValue("ActDuration");
                 if (acValue != null)
                     acValue.Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                acValue = response.ResultValueList.GetACValue("ActTemperature");
+                acValue = response?.ResultValueList?.GetACValue("ActTemperature");
                 if (acValue != null)
-                    response.ResultValueList.GetACValue("ActTemperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);

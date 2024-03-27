@@ -1,15 +1,27 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
-using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
+using gip.core.autocomponent;
+using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 
-namespace gip.bso.test
+namespace gip.mes.facility
 {
+
+    /// <summary>
+    /// TODO: @aagincic: Will be deleted after some comparasion with RemoteFacilityManager
+    /// </summary>
     public class RemoteFMHelper
     {
+        #region const
+        public static string PickingFromRemoteNotPresentInCurrent = @"declare @mdPickingType varchar(10); set @mdPickingType = '{mdPickingType}'; select ROW_NUMBER() OVER ( ORDER BY pp.PickingNo ) RowNr, pp.PickingNo, pp.DeliveryDateFrom, pp.InsertDate, pp.InsertName, (select MIN(pos.InsertDate) from [{RemoteDBName}].[dbo].[PickingPos] pos where pos.PickingID = pp.PickingID) as PosStartUpdate, (select MAX(pos.UpdateDate) from [{RemoteDBName}].[dbo].[PickingPos] pos where pos.PickingID = pp.PickingID) as PosEndUpdate, (select MIN(fb.InsertDate) from [{RemoteDBName}].[dbo].[FacilityBooking] fb inner join  [{RemoteDBName}].[dbo].[PickingPos] pos on fb.PickingPosID = pos.PickingPosID where pos.PickingID = pp.PickingID) as FBStartUpdate, (select MAX(fb.InsertDate) from [{RemoteDBName}].[dbo].[FacilityBooking] fb inner join  [{RemoteDBName}].[dbo].[PickingPos] pos on fb.PickingPosID = pos.PickingPosID where pos.PickingID = pp.PickingID) as FBEndUpdate from [{RemoteDBName}].[dbo].[Picking] pp inner join [{RemoteDBName}].[dbo].[MDPickingType] pt on pt.MDPickingTypeID = pp.MDPickingTypeID where pt.MDKey = @mdPickingType and pp.PickingID not in (select PickingID from [{LocalDBName}].[dbo].[Picking])";
+        #endregion
+
+        #region Methods
 
         public void SynchronizeFacility(IACComponent component, IMessages messages, FacilityManager facilityManager, ACPickingManager pickingManager, string remoteConnString, RemoteStorePostingData remoteStorePosting, bool syncRemoteStore = true, bool LoggingOn = true)
         {
@@ -153,9 +165,147 @@ namespace gip.bso.test
             }
         }
 
+        public RemoteStorePostingData GetRemoteStorePostingData(string pickingNo, string remoteConnString)
+        {
+            RemoteStorePostingData remoteStorePostingData = null;
+
+            Picking picking = null;
+
+            using (DatabaseApp remoteDbApp = new DatabaseApp(remoteConnString))
+            {
+                picking = remoteDbApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
+                if (picking != null)
+                {
+                    remoteStorePostingData = new RemoteStorePostingData();
+                    Guid[] faciltiyBookingIDs = picking.PickingPos_Picking.SelectMany(c => c.FacilityBooking_PickingPos).Select(c => c.FacilityBookingID).ToArray();
+                    Guid facilityID = Guid.Empty;
+                    foreach (PickingPos pickingPos in picking.PickingPos_Picking.ToArray())
+                    {
+                        if (pickingPos.FromFacility != null)
+                        {
+                            facilityID = pickingPos.FromFacility.FacilityID;
+                            break;
+                        }
+                        if (pickingPos.ToFacility != null)
+                        {
+                            facilityID = pickingPos.ToFacility.FacilityID;
+                            break;
+                        }
+                    }
+
+                    remoteStorePostingData.FBIds.Add(
+                        new RSPDEntry()
+                        {
+                            EntityType = nameof(Picking),
+                            KeyId = picking.PickingID
+                        });
+
+                    foreach (Guid id in faciltiyBookingIDs)
+                    {
+                        remoteStorePostingData.FBIds.Add(
+                        new RSPDEntry()
+                        {
+                            EntityType = nameof(FacilityBooking),
+                            KeyId = id
+                        });
+                    }
+                }
+            }
+            return remoteStorePostingData;
+        }
+
+        public List<RemotePickingInfo> GetSyncMissingPickings(DatabaseApp databaseApp, ACComponent aCComponent, string mdPickingType, string remoteConnString)
+        {
+            List<RemotePickingInfo> result = new List<RemotePickingInfo>();
+            string localDatabaseName = GetDatabaseNameFromConnectionString(databaseApp.Connection.ConnectionString);
+            string remoteDatabaseName = GetDatabaseNameFromConnectionString(remoteConnString);
+
+            string sql = PickingFromRemoteNotPresentInCurrent;
+            sql = sql.Replace("{mdPickingType}", mdPickingType);
+            sql = sql.Replace("{LocalDBName}", localDatabaseName);
+            sql = sql.Replace("{RemoteDBName}", remoteDatabaseName);
+
+            List<RemotePickingInfo> remotePickingInfos = databaseApp.ExecuteStoreQuery<RemotePickingInfo>(sql).ToList<RemotePickingInfo>();
+
+
+            FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
+            ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
+
+            if (!string.IsNullOrEmpty(remoteConnString) && facilityManager != null && aCPickingManager != null)
+            {
+                RemoteFMHelper fm = new RemoteFMHelper();
+
+                foreach (RemotePickingInfo remotePickingInfo in remotePickingInfos)
+                {
+                    RemoteStorePostingData remoteStorePostingData = fm.GetRemoteStorePostingData(remotePickingInfo.PickingNo, remoteConnString);
+                    fm.SynchronizeFacility(aCComponent, aCComponent.Messages, facilityManager, aCPickingManager, remoteConnString, remoteStorePostingData);
+                    result.Add(remotePickingInfo);
+                }
+            }
+
+            return result;
+        }
+
+        public List<RemotePickingInfo> CloseMissingPickings(DatabaseApp databaseApp, List<RemotePickingInfo> missingPickings)
+        {
+            FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
+
+            foreach (RemotePickingInfo missingPicking in missingPickings)
+            {
+                missingPicking.IsSuccessfullyClosed = false;
+                Picking picking = databaseApp.Picking.Where(c => c.PickingNo == missingPicking.PickingNo).FirstOrDefault();
+                if (picking != null)
+                {
+                    missingPicking.IsSuccessfullyClosed = true;
+                    PickingPos[] pickingPositions = picking.PickingPos_Picking.ToArray();
+                    foreach (PickingPos position in pickingPositions)
+                    {
+                        if (position.FacilityPreBooking_PickingPos.Any())
+                        {
+                            double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
+                            double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0) + (c.OutwardQuantity ?? 0)).Sum();
+                            if ((missingQuantity - preBookingQuantity) > 0)
+                            {
+                                FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
+                                foreach (FacilityPreBooking preBooking in preBookings)
+                                {
+                                    ACMethodBooking aCMethodBooking = preBooking.ACMethodBooking as ACMethodBooking;
+                                    ACMethodEventArgs resultBooking = facilityManager.BookFacility(aCMethodBooking, databaseApp) as ACMethodEventArgs;
+                                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                    {
+                                        missingPicking.IsSuccessfullyClosed = (missingPicking.IsSuccessfullyClosed ?? false) && false;
+                                    }
+                                    else
+                                    {
+                                        preBooking.DeleteACObject(databaseApp, false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return missingPickings;
+        }
+
+
+        #endregion
+
+        #region Private methods
+
         private void SynchronizeFacilityCharge(DatabaseApp dbLocal, IMessages messages, FacilityCharge changedRemoteFC)
         {
             FacilityCharge localFC = null;
+
+            // sync material
+            Material localMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialID == changedRemoteFC.MaterialID);
+            if (localMaterial == null)
+            {
+                localMaterial = Material.NewACObject(dbLocal, null);
+                localMaterial.MaterialID = changedRemoteFC.MaterialID;
+                localMaterial.CopyFrom(changedRemoteFC.Material, false);
+                dbLocal.Material.AddObject(localMaterial);
+            }
 
             // Search charge with same ID
             localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
@@ -304,7 +454,7 @@ namespace gip.bso.test
                 if (localPos.ToFacility == null && remotePos.PickingMaterialID != null)
                 {
                     PickingPos samplePickingPos = dbLocal.PickingPos.Where(c => c.PickingMaterialID != null && c.PickingMaterialID == remotePos.PickingMaterialID && c.ToFacilityID != null).FirstOrDefault();
-                    if(samplePickingPos != null)
+                    if (samplePickingPos != null)
                     {
                         localPos.ToFacility = samplePickingPos.ToFacility;
                     }
@@ -347,5 +497,22 @@ namespace gip.bso.test
                 }
             }
         }
+
+        private string GetDatabaseNameFromConnectionString(string connectionString)
+        {
+            string tmpConnectionString = connectionString;
+            string searchValue = "connection string=\"";
+            int indexOf = tmpConnectionString.IndexOf(searchValue);
+            indexOf = indexOf + searchValue.Length;
+            tmpConnectionString = tmpConnectionString.Substring(indexOf);
+            indexOf = tmpConnectionString.IndexOf("MultipleActiveResult");
+            tmpConnectionString = tmpConnectionString.Substring(0, indexOf);
+            IDbConnection connection = new SqlConnection(tmpConnectionString);
+            var dbName = connection.Database;
+            return dbName;
+        }
+
+
+        #endregion
     }
 }

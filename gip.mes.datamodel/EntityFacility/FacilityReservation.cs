@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Transactions;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
     // FacilityReservation (ReservArtPlatz)
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Reservation'}de{'Reservierung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "FacilityReservationNo", "en{'FacilityReservationNo'}de{'de-FacilityReservationNo'}", "", "", true)]
     [ACPropertyEntity(2, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(3, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
@@ -25,6 +21,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(11, ProdOrderPartslistPosRelation.ClassName, "en{'Bill of Materials Pos.'}de{'Stücklistenunterposition'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(12, "ReservationStateIndex", "en{'State'}de{'Status'}", typeof(GlobalApp.ReservationState), Const.ContextDatabase + "\\ReservationStateList", "", true)]
     [ACPropertyEntity(13, "Sequence", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
+    [ACPropertyEntity(14, PickingPos.ClassName, "en{'Picking Line'}de{'Kommissionierposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(15, nameof(FacilityReservation.ReservedQuantityUOM), ConstApp.ReservedQuantity, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -69,10 +67,41 @@ namespace gip.mes.datamodel
                 InOrderPos parentPos = parentACObject as InOrderPos;
                 entity.InOrderPos = parentPos;
             }
+            else if (parentACObject != null && parentACObject is PickingPos)
+            {
+                PickingPos pickingPos = parentACObject as PickingPos;
+                entity.PickingPos = pickingPos;
+            }
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 
+        public void CopyFrom(FacilityReservation from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                OutOrderPosID = from.OutOrderPosID;
+                InOrderPosID = from.InOrderPosID;
+                ProdOrderPartslistPosID = from.ProdOrderPartslistPosID;
+                ProdOrderBatchPlanID = from.ProdOrderBatchPlanID;
+                ProdOrderPartslistPosRelationID = from.ProdOrderPartslistPosRelationID;
+                InOrderPosID = from.InOrderPosID;
+                PickingPosID = from.PickingPosID;
+                MaterialID = from.MaterialID;
+                FacilityLotID = from.FacilityLotID;
+                FacilityChargeID = from.FacilityChargeID;
+                FacilityID = from.FacilityID;
+                VBiACClassID = from.VBiACClassID;
+            }
+
+            ReservedQuantityUOM = from.ReservedQuantityUOM;
+            Sequence = from.Sequence;
+            XMLConfig = from.XMLConfig;
+            InsertName = from.InsertName;
+            InsertDate = from.InsertDate;
+            UpdateName = from.UpdateName;
+            UpdateDate = from.UpdateDate;
+        }
         #endregion
 
         #region IACUrl Member
@@ -236,5 +265,83 @@ namespace gip.mes.datamodel
             }
             base.OnPropertyChanged(propertyName);
         }
+
+        [NotMapped]
+        private Route _PredefinedRoute;
+        [NotMapped]
+        [ACPropertyInfo(999, "", "en{'Route'}de{'Route'}")]
+        public Route PredefinedRoute
+        {
+            get
+            {
+                if (_PredefinedRoute != null)
+                    return _PredefinedRoute;
+
+                ACPropertyExt acPropertyExt = this.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
+                if (acPropertyExt != null && acPropertyExt.Value != null)
+                    _PredefinedRoute = acPropertyExt.Value as Route;
+
+                return _PredefinedRoute;
+            }
+            set
+            {
+                ACPropertyExt acPropertyExt = this.ACProperties.Properties.Where(x => x.ACIdentifier == Route.ClassName).FirstOrDefault();
+                if (acPropertyExt == null)
+                {
+                    acPropertyExt = new ACPropertyExt();
+                    acPropertyExt.ACIdentifier = Route.ClassName;
+                    acPropertyExt.ObjectType = typeof(Route);
+                    acPropertyExt.AttachTo(this.ACProperties);
+                }
+
+                Route savedRoute = acPropertyExt.Value as Route;
+                if (savedRoute == null || !savedRoute.SequenceEqual(value))
+                {
+                    _PredefinedRoute = value;
+                    acPropertyExt.Value = value;
+                    this.ACProperties.Properties.Add(acPropertyExt);
+                    this.ACProperties.Serialize();
+                }
+                OnPropertyChanged(nameof(PredefinedRoute));
+            }
+        }
+        #endregion
+
+        #region Query
+        public static Func<FacilityReservation, bool> ProdOrderComponentReservations(Guid materialID, Guid lotID)
+        {
+            return c=>
+                    !c.VBiACClassID.HasValue
+                    && c.MaterialID.HasValue
+                    && c.MaterialID == materialID
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
+                    && c.ProdOrderPartslistPos != null
+                    && c.ProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot;
+        }
+
+        public static Func<FacilityReservation, bool> PickingPosReservations(Guid materialID, Guid lotID)
+        {
+            return c =>
+                    !c.VBiACClassID.HasValue
+                    && c.MaterialID.HasValue
+                    && c.MaterialID == materialID
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
+                    && c.PickingPos != null;
+        }
+
+        public static Func<FacilityReservation, bool> OutOrderPosReservations(Guid materialID, Guid lotID)
+        {
+            return c =>
+                    !c.VBiACClassID.HasValue
+                    && c.MaterialID.HasValue
+                    && c.MaterialID == materialID
+                    && c.FacilityLotID.HasValue
+                    && c.FacilityLotID == lotID
+                    && c.OutOrderPos != null;
+        }
+
+        #endregion
     }
 }

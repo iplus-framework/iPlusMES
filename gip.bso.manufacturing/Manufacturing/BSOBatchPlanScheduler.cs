@@ -1,7 +1,6 @@
 ﻿using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
@@ -9,12 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using VD = gip.mes.datamodel;
-using System.Xml;
 using System.Data;
 using gip.core.media;
 using Microsoft.EntityFrameworkCore;
@@ -23,85 +18,18 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.ProdOrderBatchPlan.ClassName)]
-    public class BSOBatchPlanScheduler : ACBSOvb
+    public class BSOBatchPlanScheduler : BSOWorkflowSchedulerBase
     {
         #region const
-        public const string BGWorkerMehtod_DoBackwardScheduling = @"DoBackwardScheduling";
-        public const string BGWorkerMehtod_DoForwardScheduling = @"DoForwardScheduling";
-        public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
+        public const string BGWorkerMethod_DoBackwardScheduling = @"DoBackwardScheduling";
+        public const string BGWorkerMethod_DoForwardScheduling = @"DoForwardScheduling";
+        public const string BGWorkerMethod_DoCalculateAll = @"DoCalculateAll";
         public const string BGWorkerMehtod_DoGenerateBatchPlans = @"DoGenerateBatchPlans";
         public const string BGWorkerMehtod_DoMergeOrders = @"DoMergeOrders";
         public const string BGWorkerMehtod_DoSearchStockMaterial = @"DoSearchStockMaterial";
-        public const int Const_MaxFilterDaySpan = 10;
-        public const int Const_MaxResultSize = 500;
         #endregion
 
         #region Configuration
-
-        #region Configuration -> ConfigPreselectedLine
-
-        public IACConfig GetSelectedLineConfig()
-        {
-            var configs = ACType.GetConfigByKeyACUrl(Root.Environment.User.GetACUrl());
-            IACConfig config = configs.FirstOrDefault();
-            return config;
-        }
-
-        public string GetSelectedLine()
-        {
-
-            IACConfig config = GetSelectedLineConfig();
-            return config != null ?
-                (config.Value != null ? config.Value.ToString() : "") : "";
-        }
-
-        public void SetSelectedLineConfig(PAScheduleForPWNode line)
-        {
-            IACConfig config = GetSelectedLineConfig();
-            if (config == null && line != null)
-            {
-                config = ACType.ValueTypeACClass.NewACConfig(null, ACType.ValueTypeACClass.Database.GetACType(typeof(string)));
-                config.KeyACUrl = Root.Environment.User.GetACUrl();
-            }
-            if (line != null)
-                config.Value = line.MDSchedulingGroup.MDKey;
-            else if (config != null)
-                (config as VBEntityObject).DeleteACObject(Database, false);
-            Msg msg = DatabaseApp.ContextIPlus.ACSaveChanges();
-        }
-
-        #endregion
-
-        private ACPropertyConfigValue<string> _PABatchPlanSchedulerURL;
-        [ACPropertyConfig("PABatchPlanSchedulerURL")]
-        public string PABatchPlanSchedulerURL
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_PABatchPlanSchedulerURL.ValueT))
-                    _PABatchPlanSchedulerURL.ValueT = LoadPABatchPlanSchedulerURL();
-                return _PABatchPlanSchedulerURL.ValueT;
-            }
-            set
-            {
-                _PABatchPlanSchedulerURL.ValueT = value;
-            }
-        }
-
-        private string LoadPABatchPlanSchedulerURL()
-        {
-            string acUrl = @"\\Planung\BatchPlanScheduler";
-            using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
-            {
-                core.datamodel.ACClass paClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == PABatchPlanScheduler.ClassName && !c.ACProject.IsProduction);
-                while (paClass != null)
-                {
-                    acUrl = paClass.ACURLComponentCached;
-                    paClass = paClass.ACClass_BasedOnACClass.Where(c => c.ACProject.IsProduction).FirstOrDefault();
-                }
-            }
-            return acUrl;
-        }
 
         private ACPropertyConfigValue<int> _AutoRemoveMDSGroupFrom;
         [ACPropertyConfig("en{'Auto delete dependant BOMs if Scheduling-Group-Nr from'}de{'Auto. Löschen von abhängigen Stücklisten wenn Scheduling-Group-Nr von'}")]
@@ -201,6 +129,21 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected override string LoadPABatchPlanSchedulerURL()
+        {
+            string acUrl = @"\Planning\BatchPlanScheduler";
+            using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+            {
+                core.datamodel.ACClass paClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == nameof(PABatchPlanScheduler) && !c.ACProject.IsProduction);
+                while (paClass != null)
+                {
+                    acUrl = paClass.ACURLComponentCached;
+                    paClass = paClass.ACClass_BasedOnACClass.Where(c => c.ACProject.IsProduction).FirstOrDefault();
+                }
+            }
+            return acUrl;
+        }
+
 
         #endregion
 
@@ -215,7 +158,6 @@ namespace gip.bso.manufacturing
             _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
             _ValidateBatchPlanBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBatchPlanBeforeStart), false);
             _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
-            _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, nameof(PABatchPlanSchedulerURL), "");
             _RoundingQuantity = new ACPropertyConfigValue<double>(this, nameof(RoundingQuantity), 0);
         }
 
@@ -223,17 +165,9 @@ namespace gip.bso.manufacturing
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            if (!base.ACInit(startChildMode))
-                return false;
-
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
                 throw new Exception("ProdOrderManager not configured");
-
-            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
-            if (_PickingManager == null)
-                throw new Exception("PickingManager not configured");
-
 
             _SchedulingForecastManager = SchedulingForecastManager.ACRefToServiceInstance(this);
             if (_SchedulingForecastManager == null)
@@ -241,27 +175,19 @@ namespace gip.bso.manufacturing
 
             MediaController = ACMediaController.GetServiceInstance(this);
 
+            if (FilterProdPartslistOrderList != null)
+                SelectedFilterProdPartslistOrder = FilterProdPartslistOrderList.Where(c => (BatchPlanProdOrderSortFilterEnum)c.Value == BatchPlanProdOrderSortFilterEnum.StartTime).FirstOrDefault();
+
+            if (!base.ACInit(startChildMode))
+                return false;
+
             _ = AutoRemoveMDSGroupFrom;
             _ = AutoRemoveMDSGroupTo;
             _ = CreatedBatchState;
             _ = ShowImages;
             _ = ValidateBatchPlanBeforeStart;
-            _ = BSOBatchPlanSchedulerRules;
-            _ = PABatchPlanSchedulerURL;
             _ = RoundingQuantity;
 
-
-            var refBatchPlanSchedulerComponent = ACUrlCommand(PABatchPlanSchedulerURL) as ACComponent;
-            if (refBatchPlanSchedulerComponent != null)
-                _BatchPlanScheduler = new ACRef<ACComponent>(refBatchPlanSchedulerComponent, this);
-
-            InitBatchPlanSchedulerComponent();
-
-            if (FilterProdPartslistOrderList != null)
-                SelectedFilterProdPartslistOrder = FilterProdPartslistOrderList.Where(c => (BatchPlanProdOrderSortFilterEnum)c.Value == BatchPlanProdOrderSortFilterEnum.StartTime).FirstOrDefault();
-
-            string selectedLine = GetSelectedLine();
-            LoadScheduleListForPWNodes(selectedLine);
 
             if (BSOPartslistExplorer_Child != null && BSOPartslistExplorer_Child.Value != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value != null)
                 BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.PropertyChanged += ChildBSO_PropertyChanged;
@@ -269,13 +195,11 @@ namespace gip.bso.manufacturing
             if (BSOPartslistExplorer_Child != null && BSOPartslistExplorer_Child.Value != null)
                 BSOPartslistExplorer_Child.Value.PropertyChanged += ChildBSO_PropertyChanged;
 
-
             if (LocalBSOBatchPlan != null)
             {
                 LocalBSOBatchPlan.PropertyChanged += ChildBSO_PropertyChanged;
                 LocalBSOBatchPlan.PreselectFirstFacilityReservation = true;
             }
-
 
             if (BSOMaterialPreparationChild != null && BSOMaterialPreparationChild.Value != null)
                 BSOMaterialPreparationChild.Value.OnSearchStockMaterial += Value_OnSearchStockMaterial;
@@ -289,21 +213,9 @@ namespace gip.bso.manufacturing
                 ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
 
-            if (_PickingManager != null)
-                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
-            _PickingManager = null;
-
             if (_SchedulingForecastManager != null)
                 SchedulingForecastManager.DetachACRefFromServiceInstance(this, _SchedulingForecastManager);
             _SchedulingForecastManager = null;
-
-            if (_BatchPlanScheduler != null)
-            {
-                if (_SchedulesForPWNodesProp != null)
-                    _SchedulesForPWNodesProp.PropertyChanged -= SchedulesForPWNodesProp_Changed;
-                _BatchPlanScheduler.Detach();
-                _BatchPlanScheduler = null;
-            }
 
             if (BSOPartslistExplorer_Child != null && BSOPartslistExplorer_Child.Value != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value != null)
                 BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.PropertyChanged -= ChildBSO_PropertyChanged;
@@ -321,7 +233,6 @@ namespace gip.bso.manufacturing
             SelectedProdOrderBatchPlan = null;
             IsWizard = false;
 
-            _TempRules = null;
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -372,65 +283,11 @@ namespace gip.bso.manufacturing
                 case nameof(ShowBatchPlansOnTimeline):
                     ShowBatchPlansOnTimeline();
                     return true;
-                case nameof(ConfigureBSO):
-                    ConfigureBSO();
-                    return true;
-                case nameof(IsEnabledConfigureBSO):
-                    result = IsEnabledConfigureBSO();
-                    return true;
-                case nameof(AddRule):
-                    AddRule();
-                    return true;
-                case nameof(IsEnabledAddRule):
-                    result = IsEnabledAddRule();
-                    return true;
-                case nameof(RemoveRule):
-                    RemoveRule();
-                    return true;
-                case nameof(IsEnabledRemoveRule):
-                    result = IsEnabledRemoveRule();
-                    return true;
-                case nameof(ApplyRulesAndClose):
-                    ApplyRulesAndClose();
-                    return true;
-                case nameof(IsEnabledApplyRulesAndClose):
-                    result = IsEnabledApplyRulesAndClose();
-                    return true;
-                case nameof(InitialBuildLines):
-                    InitialBuildLines();
-                    return true;
-                case nameof(IsEnabledInitialBuildLines):
-                    result = IsEnabledInitialBuildLines();
-                    return true;
-                case nameof(ChangeMode):
-                    ChangeMode();
-                    return true;
-                case nameof(IsEnabledChangeMode):
-                    result = IsEnabledChangeMode();
-                    return true;
                 case nameof(MoveToOtherLine):
                     MoveToOtherLine();
                     return true;
                 case nameof(IsEnabledMoveToOtherLine):
                     result = IsEnabledMoveToOtherLine();
-                    return true;
-                case nameof(ResetFilterStartTime):
-                    ResetFilterStartTime();
-                    return true;
-                case nameof(IsEnabledResetFilterStartTime):
-                    result = IsEnabledResetFilterStartTime();
-                    return true;
-                case nameof(ResetFilterEndTime):
-                    ResetFilterEndTime();
-                    return true;
-                case nameof(IsEnabledResetFilterEndTime):
-                    result = IsEnabledResetFilterEndTime();
-                    return true;
-                case nameof(Search):
-                    Search();
-                    return true;
-                case nameof(IsEnabledSearch):
-                    result = IsEnabledSearch();
                     return true;
                 case nameof(New):
                     New();
@@ -449,12 +306,6 @@ namespace gip.bso.manufacturing
                     return true;
                 case nameof(IsEnabledBatchPlanEdit):
                     result = IsEnabledBatchPlanEdit();
-                    return true;
-                case nameof(ItemDrag):
-                    ItemDrag((System.Collections.Generic.Dictionary<System.Int32, System.String>)acParameter[0]);
-                    return true;
-                case nameof(IsEnabledItemDrag):
-                    result = IsEnabledItemDrag();
                     return true;
                 case nameof(NavigateToProdOrder):
                     NavigateToProdOrder();
@@ -549,18 +400,6 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledSearchOrders):
                     result = IsEnabledSearchOrders();
                     return true;
-                case nameof(ResetFilterOrderStartTime):
-                    ResetFilterOrderStartTime();
-                    return true;
-                case nameof(IsEnabledResetFilterOrderStartTime):
-                    result = IsEnabledResetFilterOrderStartTime();
-                    return true;
-                case nameof(ResetFilterOrderEndTime):
-                    ResetFilterOrderEndTime();
-                    return true;
-                case nameof(IsEnabledResetFilterOrderEndTime):
-                    result = IsEnabledResetFilterOrderEndTime();
-                    return true;
                 case nameof(NavigateToProdOrder2):
                     NavigateToProdOrder2();
                     return true;
@@ -627,51 +466,9 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledRemoveSuggestion):
                     result = IsEnabledRemoveSuggestion();
                     return true;
-                case nameof(Save):
-                    Save();
-                    return true;
-                case nameof(IsEnabledUndoSave):
-                    result = IsEnabledUndoSave();
-                    return true;
-                case nameof(IsEnabledSave):
-                    result = IsEnabledSave();
-                    return true;
-                case nameof(UndoSave):
-                    UndoSave();
-                    return true;
-                case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
-                    return true;
-                case nameof(IsEnabledLoad):
-                    result = IsEnabledLoad();
-                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
-
-        #region c´tors -> ACInit -> Scheduler Component
-
-        private void InitBatchPlanSchedulerComponent()
-        {
-            var refBatchPlanSchedulerComponent = ACUrlCommand(PABatchPlanSchedulerURL) as ACComponent;
-            if (refBatchPlanSchedulerComponent != null)
-                _BatchPlanScheduler = new ACRef<ACComponent>(refBatchPlanSchedulerComponent, this);
-
-            if (_BatchPlanScheduler != null)
-            {
-                _SchedulesForPWNodesProp = _BatchPlanScheduler.ValueT.GetPropertyNet(PABatchPlanScheduler.PN_SchedulesForPWNodes) as IACContainerTNet<PAScheduleForPWNodeList>;
-                if (_SchedulesForPWNodesProp != null)
-                    _SchedulesForPWNodesProp.PropertyChanged += SchedulesForPWNodesProp_Changed;
-            }
-        }
-
-        private void SchedulesForPWNodesProp_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            string selectedLine = GetSelectedLine();
-            LoadScheduleListForPWNodes(selectedLine, RefreshBatchListByRecieveChange);
-        }
-
-        #endregion
 
         private void ChildBSO_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -689,6 +486,17 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected override void OnPAScheduleForPWNodeChanged()
+        {
+            OnPropertyChanged(nameof(TargetScheduleForPWNodeList));
+            if (TargetScheduleForPWNodeList != null)
+                SelectedTargetScheduleForPWNode = TargetScheduleForPWNodeList.FirstOrDefault();
+            else
+                SelectedTargetScheduleForPWNode = null;
+
+            SelectedTargetScheduleForPWNode = null;
+        }
+
         #endregion
 
         #endregion
@@ -703,27 +511,6 @@ namespace gip.bso.manufacturing
                 if (_ProdOrderManager == null)
                     return null;
                 return _ProdOrderManager.ValueT;
-            }
-        }
-
-        protected ACRef<ACComponent> _BatchPlanScheduler = null;
-        public ACComponent BatchPlanScheduler
-        {
-            get
-            {
-                if (_BatchPlanScheduler == null) return null;
-                return _BatchPlanScheduler.ValueT;
-            }
-        }
-
-        protected ACRef<ACPickingManager> _PickingManager = null;
-        protected ACPickingManager PickingManager
-        {
-            get
-            {
-                if (_PickingManager == null)
-                    return null;
-                return _PickingManager.ValueT;
             }
         }
 
@@ -809,143 +596,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        /// <summary>
-        /// Flag is network batch list refresh is executed
-        /// </summary>
-        public bool RefreshBatchListByRecieveChange = true;
-
         #endregion
 
         #region Properties -> Explorer
-
-        #region Properties -> Explorer -> ScheduleForPWNode
-
-        private IACContainerTNet<PAScheduleForPWNodeList> _SchedulesForPWNodesProp;
-
-        private PAScheduleForPWNode _SelectedScheduleForPWNode;
-        /// <summary>
-        /// Selected property for BatchStartModeConfiguration
-        /// </summary>
-        /// <value>The selected BatchStartModeConfiguration</value>
-        [ACPropertySelected(501, "ScheduleForPWNode", "en{'Schedule for WF-Batch-Manager'}de{'Zeitplan für WF-Batch-Manager'}")]
-        public PAScheduleForPWNode SelectedScheduleForPWNode
-        {
-            get
-            {
-                return _SelectedScheduleForPWNode;
-            }
-            set
-            {
-                if (_SelectedScheduleForPWNode != value)
-                {
-                    _SelectedScheduleForPWNode = value;
-                    OnPropertyChanged(nameof(SelectedScheduleForPWNode));
-                    if (_SelectedScheduleForPWNode != null)
-                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
-                    else
-                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == BatchPlanStartModeEnum.Off).FirstOrDefault();
-                    LoadProdOrderBatchPlanList();
-
-                    OnPropertyChanged(nameof(TargetScheduleForPWNodeList));
-                    if (TargetScheduleForPWNodeList != null)
-                        SelectedTargetScheduleForPWNode = TargetScheduleForPWNodeList.FirstOrDefault();
-                    else
-                        SelectedTargetScheduleForPWNode = null;
-
-                    SelectedTargetScheduleForPWNode = null;
-
-                    string selectedLinie = GetSelectedLine();
-                    string mdKey = "";
-                    if (value != null)
-                        mdKey = value.MDSchedulingGroup.MDKey;
-                    if (selectedLinie != mdKey)
-                        SetSelectedLineConfig(value);
-                }
-            }
-        }
-
-        bool _SchedulingGroupValidated = false;
-        /// <summary>
-        /// List property for BatchStartModeConfiguration
-        /// </summary>
-        /// <value>The BatchStartModeConfiguration list</value>
-        private PAScheduleForPWNodeList _ScheduleForPWNodeList;
-        [ACPropertyList(502, "ScheduleForPWNode")]
-        public IEnumerable<PAScheduleForPWNode> ScheduleForPWNodeList
-        {
-            get
-            {
-                if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
-                {
-                    if (!_SchedulingGroupValidated && _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).Any())
-                        Messages.Error(this, "A Scheduling-Group was removed. Invoke Reset on Scheduler");
-                    _SchedulingGroupValidated = true;
-
-                    _RulesForCurrentUser = GetRulesForCurrentUser();
-
-                    if (_RulesForCurrentUser != null && _RulesForCurrentUser.Any() && !Root.Environment.User.IsSuperuser)
-                    {
-                        return _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup != null && _RulesForCurrentUser.Any(r => r.RuleParamID == c.MDSchedulingGroupID))
-                                                     .OrderBy(c => c.MDSchedulingGroup.SortIndex)
-                                                     .ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
-                    }
-
-                    return _ScheduleForPWNodeList
-                        .Where(c => c.MDSchedulingGroup != null)
-                        .OrderBy(c => c.MDSchedulingGroup.SortIndex)
-                        .ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
-                }
-                return _ScheduleForPWNodeList;
-            }
-        }
-
-        #endregion
-
-        #region Properties -> Explorer -> FilterBatchPlanStartMode
-
-        private ACValueItem _SelectedFilterBatchPlanStartMode;
-        [ACPropertySelected(510, "FilterBatchPlanStartMode", "en{'Scheduler mode'}de{'Zeitplanermodus'}", "", true)]
-        public ACValueItem SelectedFilterBatchPlanStartMode
-        {
-            get
-            {
-                return _SelectedFilterBatchPlanStartMode;
-            }
-            set
-            {
-                _SelectedFilterBatchPlanStartMode = value;
-                OnPropertyChanged(nameof(SelectedFilterBatchPlanStartMode));
-            }
-        }
-
-        private ACValueItemList _FilterBatchPlanStartModeList;
-        [ACPropertyList(511, "FilterBatchPlanStartMode")]
-        public ACValueItemList FilterBatchPlanStartModeList
-        {
-            get
-            {
-                if (_FilterBatchPlanStartModeList == null)
-                    _FilterBatchPlanStartModeList = DatabaseApp.BatchPlanStartModeEnumList as ACValueItemList;
-                return _FilterBatchPlanStartModeList;
-            }
-        }
-
-        public bool HasUserRoleOfPlanner
-        {
-            get
-            {
-                ClassRightManager rightManager = CurrentRightsOfInvoker;
-                if (rightManager == null)
-                    return true;
-                IACPropertyBase acProperty = this.GetProperty(nameof(SelectedFilterBatchPlanStartMode));
-                if (acProperty == null)
-                    return true;
-                Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
-                return rightMode >= Global.ControlModes.Enabled;
-
-            }
-        }
-        #endregion
 
         #region Properties -> Explorer -> TargetScheduleForPWNode
 
@@ -1052,42 +705,6 @@ namespace gip.bso.manufacturing
                 {
                     _FilterBatchMaterialNo = value;
                     OnPropertyChanged(nameof(FilterBatchMaterialNo));
-                }
-            }
-        }
-
-        private DateTime? _FilterStartTime;
-        [ACPropertyInfo(525, "FilterStartTime", "en{'From'}de{'Von'}")]
-        public DateTime? FilterStartTime
-        {
-            get
-            {
-                return _FilterStartTime;
-            }
-            set
-            {
-                if (_FilterStartTime != value)
-                {
-                    _FilterStartTime = value;
-                    OnPropertyChanged(nameof(FilterStartTime));
-                }
-            }
-        }
-
-        private DateTime? _FilterEndTime;
-        [ACPropertyInfo(526, "FilterEndTime", "en{'To'}de{'Bis'}")]
-        public DateTime? FilterEndTime
-        {
-            get
-            {
-                return _FilterEndTime;
-            }
-            set
-            {
-                if (_FilterEndTime != value)
-                {
-                    _FilterEndTime = value;
-                    OnPropertyChanged(nameof(FilterEndTime));
                 }
             }
         }
@@ -1423,7 +1040,7 @@ namespace gip.bso.manufacturing
                 if (_FilterPlanningMR != value)
                 {
                     _FilterPlanningMR = value;
-                    LoadProdOrderBatchPlanList();
+                    RefreshScheduleForSelectedNode();
                     OnPropertyChanged(nameof(FilterPlanningMR));
                 }
             }
@@ -1726,8 +1343,9 @@ namespace gip.bso.manufacturing
                     FilterOrderMaterialNo) as IQueryable<ProdOrderPartslistPlanWrapper>;
 
             //batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = null;
+            IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = batchQuery;
             if (FilterProdPartslistOrder != null)
+            {
                 switch (FilterProdPartslistOrder)
                 {
                     case BatchPlanProdOrderSortFilterEnum.Material:
@@ -1740,6 +1358,7 @@ namespace gip.bso.manufacturing
                         query = batchQuery.OrderBy(c => c.ProdOrderPartslist.ProdOrder.ProgramNo);
                         break;
                 }
+            }
             return query.Take(Const_MaxResultSize).ToList();
         }
 
@@ -1813,68 +1432,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #endregion
-
-        #region Properties -> Messages
-
-        public void SendMessage(object result)
-        {
-            Msg msg = result as Msg;
-            if (msg != null)
-            {
-                SendMessage(msg);
-            }
-        }
-
-        /// <summary>
-        /// The _ current MSG
-        /// </summary>
-        Msg _CurrentMsg;
-        /// <summary>
-        /// Gets or sets the current MSG.
-        /// </summary>
-        /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
-        public Msg CurrentMsg
-        {
-            get
-            {
-                return _CurrentMsg;
-            }
-            set
-            {
-                _CurrentMsg = value;
-                OnPropertyChanged(nameof(CurrentMsg));
-            }
-        }
-
-        private ObservableCollection<Msg> msgList;
-        /// <summary>
-        /// Gets the MSG list.
-        /// </summary>
-        /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
-        public ObservableCollection<Msg> MsgList
-        {
-            get
-            {
-                if (msgList == null)
-                    msgList = new ObservableCollection<Msg>();
-                return msgList;
-            }
-        }
-
-        public void SendMessage(Msg msg)
-        {
-            MsgList.Add(msg);
-            OnPropertyChanged(nameof(MsgList));
-        }
-
-        public void ClearMessages()
-        {
-            MsgList.Clear();
-            OnPropertyChanged(nameof(MsgList));
-        }
         #endregion
 
         #region Properties -> Wizard
@@ -2453,116 +2010,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<UserRuleItem> _TempRules;
-
-        private List<UserRuleItem> _RulesForCurrentUser;
-
-        private core.datamodel.VBUser _SelectedVBUser;
-        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}")]
-        public core.datamodel.VBUser SelectedVBUser
+        protected override string OnGetWorkflowSchedulerBaseRules()
         {
-            get => _SelectedVBUser;
-            set
-            {
-                _SelectedVBUser = value;
-                OnPropertyChanged(nameof(SelectedVBUser));
-            }
-        }
-
-        private core.datamodel.VBUser[] _VBUserList;
-        [ACPropertyList(605, "VBUser")]
-        public IEnumerable<core.datamodel.VBUser> VBUserList
-        {
-            get
-            {
-                if (_VBUserList == null)
-                {
-                    using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
-                    {
-                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.OrderBy(c => c.VBUserName).ToArray();
-                    }
-                }
-                return _VBUserList;
-            }
-        }
-
-        private core.datamodel.VBGroup _SelectedVBGroup;
-        [ACPropertySelected(604, "VBGroup", "en{'Group'}de{'Gruppe'}")]
-        public core.datamodel.VBGroup SelectedVBGroup
-        {
-            get => _SelectedVBGroup;
-            set
-            {
-                _SelectedVBGroup = value;
-                OnPropertyChanged(nameof(SelectedVBUser));
-            }
-        }
-
-        private core.datamodel.VBGroup[] _VBGroupList;
-        [ACPropertyList(605, "VBGroup")]
-        public IEnumerable<core.datamodel.VBGroup> VBGroupList
-        {
-            get
-            {
-                if (_VBGroupList == null)
-                {
-                    using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
-                    {
-                        _VBGroupList = DatabaseApp.ContextIPlus.VBGroup.OrderBy(c => c.VBGroupName).ToArray();
-                    }
-                }
-                return _VBGroupList;
-            }
-        }
-
-        private UserRuleItem _SelectedAssignedUserRule;
-        [ACPropertySelected(606, "UserRelatedRules", "en{'Assigned user rule'}de{'Assigned user rule'}")]
-        public UserRuleItem SelectedAssignedUserRule
-        {
-            get => _SelectedAssignedUserRule;
-            set
-            {
-
-
-                _SelectedAssignedUserRule = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private IEnumerable<UserRuleItem> _AssignedUserRules;
-        [ACPropertyList(607, "UserRelatedRules")]
-        public IEnumerable<UserRuleItem> AssignedUserRules
-        {
-            get => _AssignedUserRules;
-            set
-            {
-                _AssignedUserRules = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private MDSchedulingGroup _SelectedAvailableSchedulingGroup;
-        [ACPropertySelected(608, "AvailableRules", "en{'Available scheduling groups'}de{'Available scheduling groups'}")]
-        public MDSchedulingGroup SelectedAvailableSchedulingGroup
-        {
-            get => _SelectedAvailableSchedulingGroup;
-            set
-            {
-                _SelectedAvailableSchedulingGroup = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private List<MDSchedulingGroup> _AvailableSchedulingGroupsList;
-        [ACPropertyList(609, "AvailableRules")]
-        public List<MDSchedulingGroup> AvailableSchedulingGroupsList
-        {
-            get => _AvailableSchedulingGroupsList;
-            set
-            {
-                _AvailableSchedulingGroupsList = value;
-                OnPropertyChanged();
-            }
+            return BSOBatchPlanSchedulerRules;
         }
 
         #endregion
@@ -2573,92 +2023,15 @@ namespace gip.bso.manufacturing
 
         #region Methods -> ACMethod
 
-        /// <summary>
-        /// Saves this instance.
-        /// </summary>
-        [ACMethodCommand("BatchPlanList", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
-        {
-            if (!PreExecute("Save")) return;
-            using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
-            {
-                OnSave();
-            }
-            PostExecute("Save");
-        }
-
-        public bool IsEnabledSave()
-        {
-            return OnIsEnabledSave();
-        }
-
-        protected override void OnPostSave()
+        protected override void HandleRefreshServerStateOnPostSave()
         {
             if (SelectedScheduleForPWNode != null && ParentACObject != null && ParentACObject.ACType.ACIdentifier != BSOTemplateSchedule.ClassName)
             {
                 RefreshServerState(SelectedScheduleForPWNode);
             }
-            base.OnPostSave();
         }
 
-
-        public void RefreshServerState(Guid mdSchedulingGroupID)
-        {
-            PAScheduleForPWNode pAScheduleForPWNode = ScheduleForPWNodeList.FirstOrDefault(c => c.MDSchedulingGroupID == mdSchedulingGroupID);
-            if (pAScheduleForPWNode != null)
-                RefreshServerState(pAScheduleForPWNode);
-        }
-
-        public void RefreshServerState(PAScheduleForPWNode pAScheduleForPWNode)
-        {
-            pAScheduleForPWNode.RefreshCounter++;
-            var result = BatchPlanScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { pAScheduleForPWNode });
-            if (result != null)
-            {
-                SendMessage(result);
-            }
-        }
-
-
-        /// <summary>
-        /// Undoes the save.
-        /// </summary>
-        [ACMethodCommand("BatchPlanList", "en{'Undo'}de{'Rückgängig'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
-        public void UndoSave()
-        {
-            if (!PreExecute("UndoSave")) return;
-            using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
-            {
-                OnUndoSave();
-            }
-            PostExecute("UndoSave");
-        }
-
-        /// <summary>
-        /// Determines whether [is enabled undo save].
-        /// </summary>
-        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
-        public bool IsEnabledUndoSave()
-        {
-            return OnIsEnabledUndoSave();
-        }
-
-        [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
-        public void Load(bool requery = false)
-        {
-            if (requery)
-            {
-                OnPropertyChanged(nameof(ScheduleForPWNodeList));
-                LoadProdOrderBatchPlanList();
-            }
-        }
-
-        public bool IsEnabledLoad()
-        {
-            return SelectedScheduleForPWNode != null;
-        }
-
-        public bool LocalSaveChanges()
+        public override bool LocalSaveChanges()
         {
             Msg msg = null;
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
@@ -2731,7 +2104,7 @@ namespace gip.bso.manufacturing
                                 if (InappropriateComponentQuantityOccurrence.IsInappropriate(modifiedPos))
                                 {
                                     msg = new Msg(this, eMsgLevel.Warning, GetACUrl(), nameof(OnPreSave), 2558, "Warning50055");
-                                    ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
+                                    //ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
                                     InappropriateComponentQuantityOccurrence.WriteStackTrace(modifiedPos);
                                 }
                             }
@@ -2747,34 +2120,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Explorer
 
-        #region Methods -> Explorer -> ChangeMode
-
-        [ACMethodCommand("ChangeMode", "en{'Change Mode'}de{'Mode ändern'}", 501, true)]
-        public void ChangeMode()
-        {
-            if (!IsEnabledChangeMode())
-                return;
-            PAScheduleForPWNode updateNode = new PAScheduleForPWNode();
-            updateNode.CopyFrom(SelectedScheduleForPWNode, true);
-            updateNode.StartMode = (VD.BatchPlanStartModeEnum)SelectedFilterBatchPlanStartMode.Value;
-            var result = BatchPlanScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { updateNode });
-            if (result != null)
-            {
-                SendMessage(result);
-            }
-        }
-
-        public bool IsEnabledChangeMode()
-        {
-            return
-                SelectedScheduleForPWNode != null &&
-                BatchPlanScheduler != null &&
-                SelectedFilterBatchPlanStartMode != null &&
-                _SchedulesForPWNodesProp != null;
-        }
-
-        #endregion
-
+ 
         #region Methods -> Explorer -> MoveToOtherLine
 
         [ACMethodInteraction("MoveToOtherLine", "en{'Move'}de{'Verlagern'}", (short)MISort.MovedData, false, "TargetScheduleForPWNode")]
@@ -3122,62 +2468,9 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler
 
-        #region Methods -> (Tab)BatchPlanScheduler -> ResetFilter
-
-        /// <summary>
-        /// Method ResetFilterStartTime
-        /// </summary>
-        [ACMethodInfo("ResetFilterStartTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 700)]
-        public void ResetFilterStartTime()
-        {
-            if (!IsEnabledResetFilterStartTime())
-                return;
-            FilterStartTime = FilterStartTime == null ? (DateTime?)DateTime.Now : null;
-        }
-
-        public bool IsEnabledResetFilterStartTime()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Method ResetFilterEndTime
-        /// </summary>
-        [ACMethodInfo("ResetFilterEndTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 701)]
-        public void ResetFilterEndTime()
-        {
-            if (!IsEnabledResetFilterEndTime())
-                return;
-            if (FilterEndTime != null)
-                FilterEndTime = null;
-            else if (FilterStartTime != null)
-                FilterEndTime = FilterStartTime.Value.AddDays(1);
-            else
-                FilterEndTime = null;
-        }
-
-        public bool IsEnabledResetFilterEndTime()
-        {
-            return true;
-        }
-
-
-        #endregion
-
         #region Methods -> (Tab)BatchPlanScheduler -> New, Delete, Search
-        /// <summary>
-        /// Searches this instance.
-        /// </summary>
-        [ACMethodCommand("Search", "en{'Search'}de{'Suche'}", (short)MISort.Search)]
-        public void Search()
-        {
-            if (!IsEnabledSearch())
-                return;
-            OnPropertyChanged(nameof(ScheduleForPWNodeList));
-            LoadProdOrderBatchPlanList();
-        }
 
-        public bool IsEnabledSearch()
+        public override bool IsEnabledSearch()
         {
             return SelectedScheduleForPWNode != null
                    && (SelectedFilterConnectedLine != null
@@ -3257,10 +2550,10 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> Interaction
 
-        [ACMethodInfo("ItemDrag", "en{'Cancel'}de{'Abbrechen'}", 506, true)]
-        public void ItemDrag(Dictionary<int, string> newOrder)
+        public override void ItemDrag(Dictionary<int, string> newOrder)
         {
-            if (!IsEnabledItemDrag()) return;
+            if (!IsEnabledItemDrag()) 
+                return;
             Dictionary<int, Guid> revisitedNewOrder = newOrder.ToDictionary(key => key.Key, val => new Guid(val.Value));
             var batchPlanList = ProdOrderBatchPlanList.ToList();
             foreach (var item in revisitedNewOrder)
@@ -3275,10 +2568,6 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(ProdOrderBatchPlanList));
         }
 
-        public bool IsEnabledItemDrag()
-        {
-            return SelectedScheduleForPWNode != null;
-        }
 
         [ACMethodInteraction("ProdOrderBatchPlan", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedProdOrderBatchPlan")]
         public void NavigateToProdOrder()
@@ -3437,7 +2726,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledBackwardScheduling() || !IsEnabledBackwardSchedulingOk()) return;
             CloseTopDialog();
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoBackwardScheduling);
+            BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoBackwardScheduling);
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -3464,7 +2753,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledForwardScheduling() || !IsEnabledForwardSchedulingOk()) return;
             CloseTopDialog();
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoForwardScheduling);
+            BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoForwardScheduling);
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -3490,7 +2779,7 @@ namespace gip.bso.manufacturing
         public void SchedulingCalculateAll()
         {
             if (BackgroundWorker.IsBusy) return;
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoCalculateAll);
+            BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoCalculateAll);
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -3845,7 +3134,7 @@ namespace gip.bso.manufacturing
 
         private void DoRefreshLinesAfterBatchDelete(List<Guid> groupsForRefresh)
         {
-            LoadProdOrderBatchPlanList();
+            RefreshScheduleForSelectedNode();
             OnPropertyChanged(nameof(ProdOrderBatchPlanList));
             OnPropertyChanged(nameof(ProdOrderPartslistList));
             if (!IsBSOTemplateScheduleParent)
@@ -4058,41 +3347,6 @@ namespace gip.bso.manufacturing
                 );
         }
 
-        /// <summary>
-        /// Source Property: ResetFilterOrderStartTime
-        /// </summary>
-        [ACMethodInfo("ResetFilterOrderStartTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 999)]
-        public void ResetFilterOrderStartTime()
-        {
-            if (!IsEnabledResetFilterOrderStartTime())
-                return;
-            FilterOrderStartTime = FilterOrderStartTime == null ? (DateTime?)DateTime.Now : null;
-        }
-
-        public bool IsEnabledResetFilterOrderStartTime()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Source Property: ResetFilterOrderEndTime
-        /// </summary>
-        [ACMethodInfo("ResetFilterOrderEndTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 999)]
-        public void ResetFilterOrderEndTime()
-        {
-            if (!IsEnabledResetFilterOrderEndTime())
-                return;
-            if (FilterOrderStartTime != null)
-                FilterOrderEndTime = FilterOrderEndTime == null ? (DateTime?)FilterOrderStartTime.Value.AddDays(1) : null;
-            else
-                FilterOrderEndTime = null;
-        }
-
-        public bool IsEnabledResetFilterOrderEndTime()
-        {
-            return true;
-        }
-
 
         [ACMethodInteraction("NavigateToProdOrder2", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedProdOrderPartslist")]
         public void NavigateToProdOrder2()
@@ -4276,7 +3530,7 @@ namespace gip.bso.manufacturing
             MaintainProdOrderState(prodOrders);
 
             LocalSaveChanges();
-            LoadProdOrderBatchPlanList();
+            RefreshScheduleForSelectedNode();
             if (!IsBSOTemplateScheduleParent)
             {
                 if (groupsForRefresh.Any())
@@ -5033,7 +4287,7 @@ namespace gip.bso.manufacturing
 
             WizardClean();
             OnPropertyChanged(nameof(CurrentLayout));
-            LoadProdOrderBatchPlanList(selectedProdOrderBatchPlanID);
+            RefreshScheduleForSelectedNode(selectedProdOrderBatchPlanID);
             OnPropertyChanged(nameof(SelectedProdOrderBatchPlan));
         }
 
@@ -5061,6 +4315,8 @@ namespace gip.bso.manufacturing
             WizardSolvedTasks.Clear();
             ClearMessages();
         }
+
+        #endregion
 
         #endregion
 
@@ -5095,7 +4351,7 @@ namespace gip.bso.manufacturing
             foreach (PAScheduleForPWNode schedule in ScheduleForPWNodeList)
             {
                 BatchPlanTimelineItem treeViewItem = new BatchPlanTimelineItem();
-                treeViewItem._ACCaption = schedule.ACCaption;
+                treeViewItem.ACCaption = schedule.ACCaption;
                 treeViewItem.DisplayOrder = displayOrder;
                 treeViewItem.TimelineItemType = BatchPlanTimelineItem.BatchPlanTimelineItemType.ContainerItem;
 
@@ -5115,7 +4371,7 @@ namespace gip.bso.manufacturing
                 foreach (ProdOrderBatchPlan batchPlan in batchPlans)
                 {
                     BatchPlanTimelineItem item = new BatchPlanTimelineItem();
-                    item._ACCaption = string.Format(@"[{0}] {1} ({2} {3})",
+                    item.ACCaption = string.Format(@"[{0}] {1} ({2} {3})",
                         batchPlan.ProdOrderPartslist.ProdOrder.ProgramNo,
                         batchPlan.ProdOrderPartslist.Partslist.Material.MaterialName1,
                         batchPlan.TotalSize,
@@ -5164,7 +4420,7 @@ namespace gip.bso.manufacturing
             {
                 switch (vbControl.VBContent)
                 {
-                    case "New":
+                    case nameof(New):
                         if (IsEnabledNew())
                             result = Global.ControlModes.Enabled;
                         else
@@ -5191,31 +4447,7 @@ namespace gip.bso.manufacturing
                         else
                             result = Global.ControlModes.Disabled;
                         break;
-                    case "FilterStartTime":
-                        result = Global.ControlModes.Enabled;
-                        bool filterStartTimeIsRequired =
-                           FilterStartTime == null
-                                    || (
-                                            FilterStartTime != null
-                                            && FilterEndTime != null
-                                            && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
-                                        );
-                        if (filterStartTimeIsRequired)
-                            result = Global.ControlModes.EnabledWrong;
-                        break;
-                    case "FilterEndTime":
-                        result = Global.ControlModes.Enabled;
-                        bool filterEndTimeIsRequired =
-                            FilterEndTime == null
-                                    || (
-                                            FilterStartTime != null
-                                            && FilterEndTime != null
-                                            && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
-                                        );
-                        if (filterEndTimeIsRequired)
-                            result = Global.ControlModes.EnabledWrong;
-                        break;
-                    case "FilterOrderStartTime":
+                    case nameof(FilterOrderStartTime):
                         result = Global.ControlModes.Enabled;
                         bool filterOrderStartTimeIsEnabled =
                            !(FilterOrderIsCompleted ?? true)
@@ -5223,7 +4455,7 @@ namespace gip.bso.manufacturing
                         if (!filterOrderStartTimeIsEnabled)
                             result = Global.ControlModes.EnabledWrong;
                         break;
-                    case "FilterOrderEndTime":
+                    case nameof(FilterOrderEndTime):
                         result = Global.ControlModes.Enabled;
                         bool filterOrderEndTimeIsEnabled =
                              !(FilterOrderIsCompleted ?? true)
@@ -5248,21 +4480,28 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
-        #endregion
-
         #region Methods -> Private (Helper) Mehtods
 
         #region Methods -> Private (Helper) Mehtods -> Load
 
-        private void LoadProdOrderBatchPlanList(Guid? selectedProdOrderBatchPlanID = null)
+        protected override Guid? EntityIDOfSelectedSchedule 
+        {
+            get
+            {
+                return SelectedProdOrderBatchPlan?.ProdOrderBatchPlanID;
+            }
+        }
+
+
+        protected override void RefreshScheduleForSelectedNode(Guid? selectedEntityID = null)
         {
             try
             {
                 using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
                 {
                     ProdOrderBatchPlanList = GetProdOrderBatchPlanList(SelectedScheduleForPWNode?.MDSchedulingGroupID);
-                    if (selectedProdOrderBatchPlanID != null)
-                        SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault(c => c.ProdOrderBatchPlanID == selectedProdOrderBatchPlanID);
+                    if (selectedEntityID != null)
+                        SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault(c => c.ProdOrderBatchPlanID == selectedEntityID);
                     else
                         SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault();
                     ProdOrderPartslistList = GetProdOrderPartslistList();
@@ -5270,76 +4509,18 @@ namespace gip.bso.manufacturing
             }
             catch (Exception e)
             {
-                Messages.LogException(this.GetACUrl(), nameof(LoadProdOrderBatchPlanList), e);
-                Messages.LogException(this.GetACUrl(), nameof(LoadProdOrderBatchPlanList), e.StackTrace);
+                Messages.LogException(this.GetACUrl(), nameof(RefreshScheduleForSelectedNode), e);
+                Messages.LogException(this.GetACUrl(), nameof(RefreshScheduleForSelectedNode), e.StackTrace);
             }
         }
 
-        private void LoadScheduleListForPWNodes(string schedulingGroupMDKey, bool reloadBatchPlanList = true)
+        protected override void OnUpdateScheduleForPWNodeList()
         {
-            PAScheduleForPWNodeList newScheduleForWFNodeList = null;
-            if (_SchedulesForPWNodesProp != null && _SchedulesForPWNodesProp.ValueT != null)
-                newScheduleForWFNodeList = _SchedulesForPWNodesProp.ValueT;
-            else
-                newScheduleForWFNodeList = PABatchPlanScheduler.CreateScheduleListForPWNodes(this, DatabaseApp, null);
-            //int removedCount = newScheduleForWFNodeList.RemoveAll(x => x.MDSchedulingGroupID == Guid.Empty);
-            UpdateScheduleForPWNodeList(newScheduleForWFNodeList, reloadBatchPlanList);
-            if (!string.IsNullOrEmpty(schedulingGroupMDKey))
-                SelectedScheduleForPWNode = ScheduleForPWNodeList.FirstOrDefault(c => c.MDSchedulingGroup.MDKey == schedulingGroupMDKey);
+            if (WizardPhase == NewScheduledBatchWizardPhaseEnum.None)
+                RefreshScheduleForSelectedNode(EntityIDOfSelectedSchedule);
         }
 
-        private void UpdateScheduleForPWNodeList(PAScheduleForPWNodeList newScheduleForWFNodeList, bool reloadBatchPlanList = true)
-        {
-            PAScheduleForPWNodeList.DiffResult diffResult = PAScheduleForPWNodeList.DiffResult.Equal;
-            if (_ScheduleForPWNodeList == null)
-            {
-                _ScheduleForPWNodeList = newScheduleForWFNodeList.Clone() as PAScheduleForPWNodeList;
-                diffResult = PAScheduleForPWNodeList.DiffResult.NewPWNodesDetected;
-            }
-            else
-            {
-                diffResult = _ScheduleForPWNodeList.CompareAndUpdateFrom(newScheduleForWFNodeList, this.SelectedScheduleForPWNode);
-            }
 
-            if (diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.NewPWNodesDetected))
-            {
-                PAScheduleForPWNode[] newNodes = _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).ToArray();
-                if (newNodes != null && newNodes.Any())
-                {
-                    List<MDSchedulingGroup> mDSchedulingGroups = DatabaseApp.MDSchedulingGroup.ToList();
-                    foreach (var newNode in newNodes)
-                    {
-                        newNode.MDSchedulingGroup = mDSchedulingGroups.Where(c => c.MDSchedulingGroupID == newNode.MDSchedulingGroupID).FirstOrDefault();
-                    }
-                }
-            }
-
-            if (diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.NewPWNodesDetected)
-                || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.PWNodesRemoved)
-                || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.StartModeChanged))
-            {
-                if (diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.StartModeChanged)
-                    && !diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.NewPWNodesDetected)
-                    && !diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.PWNodesRemoved))
-                {
-                    OnPropertyChanged(nameof(SelectedScheduleForPWNode));
-                }
-                else
-                {
-                    var selected = SelectedScheduleForPWNode;
-                    OnPropertyChanged(nameof(ScheduleForPWNodeList));
-                    SelectedScheduleForPWNode = selected;
-                    if (SelectedScheduleForPWNode != null)
-                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
-                }
-            }
-
-            if ((diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged))
-                //|| diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
-                && reloadBatchPlanList
-                && WizardPhase == NewScheduledBatchWizardPhaseEnum.None)
-                LoadProdOrderBatchPlanList(SelectedProdOrderBatchPlan?.ProdOrderBatchPlanID);
-        }
 
         #endregion
 
@@ -5493,183 +4674,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Methods => Configuration
-
-        [ACMethodInteraction("", "en{'Configure scheduler rules'}de{'Konfigurieren Regeln für den Zeitplaner'}", 601, true)]
-        public void ConfigureBSO()
-        {
-            if (_TempRules == null)
-                _TempRules = GetStoredRules();
-            AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption);
-
-            if (AvailableSchedulingGroupsList == null)
-                AvailableSchedulingGroupsList =
-                    DatabaseApp
-                    .MDSchedulingGroup.ToArray().OrderBy(c => c.ACCaption).ToList();
-
-            ShowDialog(this, "ConfigurationDialog");
-        }
-
-        public bool IsEnabledConfigureBSO()
-        {
-            return true;//Root.Environment.User.IsSuperuser;
-        }
-
-        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
-        public void AddRule()
-        {
-            UserRuleItem existingRule = null;
-
-            if (SelectedVBUser != null)
-            {
-                existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID
-                                                                  && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
-            }
-            else if (SelectedVBGroup != null)
-            {
-                existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBGroup.VBGroupID
-                                                                  && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
-            }
-
-            if (existingRule != null)
-                return;
-
-            UserRuleItem rule = new UserRuleItem()
-            {
-                VBUserID = SelectedVBUser != null ? SelectedVBUser.VBUserID : SelectedVBGroup.VBGroupID,
-                VBUserName = SelectedVBUser != null ? SelectedVBUser.VBUserName : SelectedVBGroup.VBGroupName,
-                RuleParamID = SelectedAvailableSchedulingGroup.MDSchedulingGroupID,
-                RuleParamCaption = SelectedAvailableSchedulingGroup.ACCaption
-            };
-
-            _TempRules.Add(rule);
-            AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption).ToList();
-        }
-
-        public bool IsEnabledAddRule()
-        {
-            return (SelectedVBUser != null || SelectedVBGroup != null) && SelectedAvailableSchedulingGroup != null;
-        }
-
-        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
-        public void RemoveRule()
-        {
-            UserRuleItem rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedUserRule);
-            if (rule != null)
-            {
-                _TempRules.Remove(rule);
-                AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption).ToList();
-                SelectedAssignedUserRule = null;
-            }
-        }
-
-        public bool IsEnabledRemoveRule()
-        {
-            return SelectedAssignedUserRule != null;
-        }
-
-        [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604)]
-        public void ApplyRulesAndClose()
-        {
-            string xml = "";
-            StringBuilder sb = new StringBuilder();
-            using (StringWriter sw = new StringWriter(sb))
-            using (XmlTextWriter xmlWriter = new XmlTextWriter(sw))
-            {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<UserRuleItem>));
-                serializer.WriteObject(xmlWriter, _TempRules);
-                xml = sw.ToString();
-            }
-            BSOBatchPlanSchedulerRules = xml;
-            LocalSaveChanges();
-
-            _TempRules = GetStoredRules();
-
-            CloseTopDialog();
-        }
-
-        public bool IsEnabledApplyRulesAndClose()
-        {
-            return true;
-        }
-
-        private List<UserRuleItem> GetRulesForCurrentUser()
-        {
-            if (_TempRules == null)
-                _TempRules = GetStoredRules();
-
-            using (Database db = new core.datamodel.Database())
-            {
-                core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserName == Root.Environment.User.VBUserName);
-                if (vbUser == null)
-                    return _TempRules;
-
-                var userGroups = vbUser.VBUserGroup_VBUser.ToArray();
-
-                return _TempRules.Where(c => c.VBUserID == vbUser.VBUserID || userGroups.Any(x => x.VBUserGroupID == c.VBUserID)).ToList();
-            }
-        }
-
-        private List<UserRuleItem> GetStoredRules()
-        {
-            if (string.IsNullOrEmpty(BSOBatchPlanSchedulerRules))
-                return new List<UserRuleItem>();
-
-            try
-            {
-                using (StringReader ms = new StringReader(BSOBatchPlanSchedulerRules))
-                using (XmlTextReader xmlReader = new XmlTextReader(ms))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<UserRuleItem>));
-                    List<UserRuleItem> result = serializer.ReadObject(xmlReader) as List<UserRuleItem>;
-                    if (result == null)
-                        return new List<UserRuleItem>();
-
-                    using (Database db = new core.datamodel.Database())
-                    {
-                        foreach (UserRuleItem item in result)
-                        {
-                            core.datamodel.VBGroup vbGroup = null;
-                            core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserID == item.VBUserID);
-                            if (vbUser == null)
-                            {
-                                vbGroup = db.VBGroup.FirstOrDefault(c => c.VBGroupID == item.VBUserID);
-                            }
-
-                            if (vbUser != null)
-                            {
-                                item.VBUserName = vbUser.VBUserName;
-                            }
-                            else if (vbGroup != null)
-                            {
-                                item.VBUserName = vbGroup.VBGroupName;
-                            }
-
-                            if (string.IsNullOrEmpty(item.VBUserName))
-                                continue;
-
-                            MDSchedulingGroup group = DatabaseApp.MDSchedulingGroup.FirstOrDefault(c => c.MDSchedulingGroupID == item.RuleParamID);
-                            if (group == null)
-                                continue;
-
-                            item.RuleParamCaption = group.ACCaption;
-                        }
-                    }
-
-                    if (result != null)
-                        result = result.OrderBy(c => c.VBUserName).ToList();
-                    return result;
-                }
-            }
-            catch (Exception e)
-            {
-                Messages.LogException(this.GetACUrl(), nameof(GetStoredRules), e);
-                return new List<UserRuleItem>();
-            }
-        }
-
-        #endregion
-
         #endregion
 
         #region BackgroundWorker
@@ -5693,7 +4697,7 @@ namespace gip.bso.manufacturing
 
             switch (command)
             {
-                case BGWorkerMehtod_DoBackwardScheduling:
+                case BGWorkerMethod_DoBackwardScheduling:
                     using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
                     {
                         e.Result =
@@ -5705,7 +4709,7 @@ namespace gip.bso.manufacturing
                                             ScheduledEndDate.Value);
                     }
                     break;
-                case BGWorkerMehtod_DoForwardScheduling:
+                case BGWorkerMethod_DoForwardScheduling:
                     using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
                     {
                         e.Result =
@@ -5717,7 +4721,7 @@ namespace gip.bso.manufacturing
                                             ScheduledStartDate.Value);
                     }
                     break;
-                case BGWorkerMehtod_DoCalculateAll:
+                case BGWorkerMethod_DoCalculateAll:
                     SchedulingForecastManager.UpdateAllBatchPlanDurations(Root.Environment.User.Initials);
                     break;
                 case BGWorkerMehtod_DoGenerateBatchPlans:
@@ -5793,7 +4797,7 @@ namespace gip.bso.manufacturing
                         switch (command)
                         {
                             case BGWorkerMehtod_DoGenerateBatchPlans:
-                                LoadProdOrderBatchPlanList();
+                                RefreshScheduleForSelectedNode();
                                 break;
                         }
                     }
@@ -5837,61 +4841,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Transformation - WFsLines
-
-        /// <summary>
-        /// InitialBuildLines
-        /// </summary>
-        /// <exception cref="Exception"></exception>
-        [ACMethodInfo("InitialBuildLines", "en{'Initial build lines'}de{'Vorbereite Linien'}", 507)]
-        public void InitialBuildLines()
-        {
-            using (DatabaseApp databaseApp = new DatabaseApp())
-            {
-                var query = databaseApp
-               .ACClassWF
-               .Where(c =>
-                   c.RefPAACClassMethodID.HasValue
-                   && c.RefPAACClassID.HasValue
-                   && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                   && c.RefPAACClassMethod.PWACClass != null
-                   && (c.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
-                       || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
-                   && !string.IsNullOrEmpty(c.Comment))
-               .ToArray();
-
-                int nr = 0;
-                foreach (var item in query)
-                {
-                    nr++;
-                    MDSchedulingGroup group = MDSchedulingGroup.NewACObject(databaseApp, null);
-                    string wfName = item.ACCaption;
-                    if (string.IsNullOrEmpty(wfName))
-                        wfName = item.Comment;
-                    group.MDNameTrans = string.Format(@"en{{'{0}'}}de{{'{0}'}}", wfName);
-                    group.MDKey = item.ACIdentifier + nr.ToString("00");
-                    if (group.MDKey.Length > 40)
-                        throw new Exception();
-                    MDSchedulingGroupWF groupWf = MDSchedulingGroupWF.NewACObject(databaseApp, group);
-                    groupWf.VBiACClassWF = item;
-                    databaseApp.MDSchedulingGroup.Add(group);
-                }
-                LocalSaveChanges();
-                OnPropertyChanged(nameof(ScheduleForPWNodeList));
-            }
-        }
-
-        private bool? _IsEnabledInitialBuildLines;
-        public bool IsEnabledInitialBuildLines()
-        {
-            if (_IsEnabledInitialBuildLines == null)
-            {
-                _IsEnabledInitialBuildLines = !DatabaseApp.MDSchedulingGroup.Any();
-            }
-            return _IsEnabledInitialBuildLines ?? false;
-        }
-
-        #endregion
     }
 
 

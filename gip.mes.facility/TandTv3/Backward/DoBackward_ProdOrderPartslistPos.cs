@@ -25,7 +25,20 @@ namespace gip.mes.facility.TandTv3
 
         #endregion
 
+        #region Properties
+
         public bool IsUseLotCheck { get; set; }
+
+        public bool IsMaterialWFNoForFilterLotByTime
+        {
+            get
+            {
+                return 
+                    Result.Filter.MaterialWFNoForFilterLotByTime == (Item.ProdOrderPartslist.Partslist?.MaterialWF?.MaterialWFNo);
+            }
+        }
+
+        #endregion
 
         #region IItemTracking
 
@@ -46,7 +59,7 @@ namespace gip.mes.facility.TandTv3
                     break;
             }
 
-            if (Item.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+            if (Item.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern && !IsMaterialWFNoForFilterLotByTime)
             {
                 List<FacilityBookingCharge> facilityBookingCharges = GetFacilityBookingCharges(IsUseLotCheck);
                 sameStepItems.AddRange(facilityBookingCharges);

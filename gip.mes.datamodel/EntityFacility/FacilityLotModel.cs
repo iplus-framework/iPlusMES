@@ -34,7 +34,21 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(999, "Comment", ConstApp.Comment)]
         public string Comment { get; set; }
 
+        [ACPropertyInfo(9999, "MDUnitName", ConstApp.MDUnit)]
+        public string MDUnitName { get; set; }
+
         public Guid FacilityLotID { get; set; }
+
+
+        #region Mehtods
+        public void RoundActualQuantity(string mdUnitForRounding = null)
+        {
+            if (mdUnitForRounding == null || mdUnitForRounding.Contains(MDUnitName))
+            {
+                ActualQuantity = (int)Math.Round(ActualQuantity);
+            }
+        }
+        #endregion
 
     }
 }

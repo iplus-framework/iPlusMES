@@ -5,6 +5,7 @@ using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
+using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 
 namespace gip.mes.facility
 {
@@ -69,7 +70,7 @@ namespace gip.mes.facility
                                  bool shiftBookingReverse, // false: normal, true: reverse booking
                                  bool negativeStockAllowed,
                                  Double quantityUOM, MDUnit mdUnitUOM,
-                                 IEnumerable<FacilityCharge> facilityCharges,
+                                 FacilityChargeList facilityCharges,
                                  ACMethodBooking BP,
                                  out StackItemList stackItemListInOut,
                                  out MsgBooking msgBookingResult,
@@ -120,7 +121,7 @@ namespace gip.mes.facility
                                 bool shiftBookingReverse, // false: normal, true: reverse booking
                                 bool negativeStockAllowed,
                                 Double quantityUOM, MDUnit mdUnitUOM,
-                                IEnumerable<FacilityCharge> facilityCharges,
+                                FacilityChargeList facilityCharges,
                                 ACMethodBooking BP,
                                 StackItemList stackItemListInOut,
                                 MsgBooking msgBookingResult)
@@ -151,7 +152,7 @@ namespace gip.mes.facility
                         bool negativeStockAllowed,
                         bool restoreLastQuantity,
                         Double quantityUOM, MDUnit mdUnitUOM,
-                        IEnumerable<FacilityCharge> facilityCharges,
+                        FacilityChargeList facilityCharges,
                         ACMethodBooking BP,
                         StackItemList stackItemListInOut,
                         MsgBooking msgBookingResult)
@@ -191,7 +192,7 @@ namespace gip.mes.facility
                                 bool shiftBookingReverse, // false: normal, true: reverse booking
                                 bool negativeStockAllowed,
                                 Double quantityUOM, MDUnit mdUnitUOM,
-                                IEnumerable<FacilityCharge> facilityCharges,
+                                FacilityChargeList facilityCharges,
                                 ACMethodBooking BP,
                                 StackItemList stackItemListInOut,
                                 MsgBooking msgBookingResult)
@@ -219,7 +220,7 @@ namespace gip.mes.facility
                                 bool shiftBookingReverse, // false: normal, true: reverse booking
                                 bool negativeStockAllowed,
                                 Double quantityUOM, MDUnit mdUnitUOM,
-                                IEnumerable<FacilityCharge> facilityCharges,
+                                FacilityChargeList facilityCharges,
                                 ACMethodBooking BP,
                                 StackItemList stackItemListInOut,
                                 MsgBooking msgBookingResult,
@@ -240,34 +241,108 @@ namespace gip.mes.facility
                 return bookingResult;
             }
 
+
+            List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
+            Guid[] reservedLots = null;
+            if (   BP.PartslistPosRelation != null 
+                && BP.PartslistPosRelation.SourceProdOrderPartslistPos != null 
+                && BP.PartslistPosRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
+            {
+                reservations = BP.PartslistPosRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos
+                                    .Select(c => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM })
+                                    .ToList();
+                reservedLots = reservations.Select(c => c.FacilityLotID).ToArray();
+            }
+
             IEnumerable<FacilityCharge> sortedFacilityCharges = null;
+            // .OrderBy(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value))
             // Umsortieren der Liste
             if (shiftBookingReverse)
             {
                 if (isInwardBooking)
-                    sortedFacilityCharges = facilityCharges.OrderBy(c => c.FacilityChargeSortNo);
+                {
+                    if (reservedLots != null)
+                    {
+                        List<FacilityCharge> preSorted = facilityCharges.Where(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo).ToList();
+                        if (BP.TakeOtherLotIfReserved)
+                            preSorted.AddRange(facilityCharges.Where(c => !c.FacilityLotID.HasValue || !reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo));
+                        sortedFacilityCharges = preSorted;
+                    }
+                    else
+                        sortedFacilityCharges = facilityCharges.OrderBy(c => c.FacilityChargeSortNo);
+                }
                 else
-                    sortedFacilityCharges = facilityCharges.OrderByDescending(c => c.FacilityChargeSortNo);
+                {
+                    if (reservedLots != null)
+                    {
+                        List<FacilityCharge> preSorted = facilityCharges.Where(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value)).OrderByDescending(c => c.FacilityChargeSortNo).ToList();
+                        if (BP.TakeOtherLotIfReserved)
+                            preSorted.AddRange(facilityCharges.Where(c => !c.FacilityLotID.HasValue || !reservedLots.Contains(c.FacilityLotID.Value)).OrderByDescending(c => c.FacilityChargeSortNo));
+                        sortedFacilityCharges = preSorted;
+                    }
+                    else
+                        sortedFacilityCharges = facilityCharges.OrderByDescending(c => c.FacilityChargeSortNo);
+                }
             }
             else
             {
                 if (isInwardBooking)
-                    sortedFacilityCharges = facilityCharges.OrderByDescending(c => c.FacilityChargeSortNo);
+                {
+                    if (reservedLots != null)
+                    {
+                        List<FacilityCharge> preSorted = facilityCharges.Where(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value)).OrderByDescending(c => c.FacilityChargeSortNo).ToList();
+                        if (BP.TakeOtherLotIfReserved)
+                            preSorted.AddRange(facilityCharges.Where(c => !c.FacilityLotID.HasValue || !reservedLots.Contains(c.FacilityLotID.Value)).OrderByDescending(c => c.FacilityChargeSortNo));
+                        sortedFacilityCharges = preSorted;
+                    }
+                    else
+                        sortedFacilityCharges = facilityCharges.OrderByDescending(c => c.FacilityChargeSortNo);
+                }
                 else
                 {
                     if (!isRetrogradePosting || SortOrder == SortOrderFIFOEnum.ByFacilityChargeSortNo)
-                        sortedFacilityCharges = facilityCharges.OrderBy(c => c.FacilityChargeSortNo);
+                    {
+                        if (reservedLots != null)
+                        {
+                            List<FacilityCharge> preSorted = facilityCharges.Where(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo).ToList();
+                            if (BP.TakeOtherLotIfReserved)
+                                preSorted.AddRange(facilityCharges.Where(c => !c.FacilityLotID.HasValue || !reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo));
+                            sortedFacilityCharges = preSorted;
+                        }
+                        else
+                            sortedFacilityCharges = facilityCharges.OrderBy(c => c.FacilityChargeSortNo);
+                    }
                     else if (SortOrder == SortOrderFIFOEnum.ByExpirationDate)
                     {
-                        List<FacilityCharge> sortWithExpirationDate = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.ExpirationDate.HasValue).OrderBy(c => c.FacilityLot.ExpirationDate).ToList();
-                        sortWithExpirationDate.AddRange(facilityCharges.Where(c => c.FacilityLot == null || !c.FacilityLot.ExpirationDate.HasValue).OrderBy(c => c.FacilityChargeSortNo));
-                        sortedFacilityCharges = sortWithExpirationDate;
+                        if (reservedLots != null)
+                        {
+                            List<FacilityCharge> preSorted = facilityCharges.Where(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo).ToList();
+                            if (BP.TakeOtherLotIfReserved)
+                                preSorted.AddRange(facilityCharges.Where(c => !c.FacilityLotID.HasValue || !reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo));
+                            sortedFacilityCharges = preSorted;
+                        }
+                        else 
+                        { 
+                            List<FacilityCharge> sortWithExpirationDate = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.ExpirationDate.HasValue).OrderBy(c => c.FacilityLot.ExpirationDate).ToList();
+                            sortWithExpirationDate.AddRange(facilityCharges.Where(c => c.FacilityLot == null || !c.FacilityLot.ExpirationDate.HasValue).OrderBy(c => c.FacilityChargeSortNo));
+                            sortedFacilityCharges = sortWithExpirationDate;
+                        }
                     }
                     else // if (SortOrder == SortOrderFIFOEnum.ByFirstFillingDate)
                     {
-                        List<FacilityCharge> sortWithExpirationDate = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.FillingDate.HasValue).OrderBy(c => c.FacilityLot.FillingDate).ToList();
-                        sortWithExpirationDate.AddRange(facilityCharges.Where(c => c.FacilityLot == null || !c.FacilityLot.FillingDate.HasValue).OrderBy(c => c.FacilityChargeSortNo));
-                        sortedFacilityCharges = sortWithExpirationDate;
+                        if (reservedLots != null)
+                        {
+                            List<FacilityCharge> preSorted = facilityCharges.Where(c => c.FacilityLotID.HasValue && reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo).ToList();
+                            if (BP.TakeOtherLotIfReserved)
+                                preSorted.AddRange(facilityCharges.Where(c => !c.FacilityLotID.HasValue || !reservedLots.Contains(c.FacilityLotID.Value)).OrderBy(c => c.FacilityChargeSortNo));
+                            sortedFacilityCharges = preSorted;
+                        }
+                        else
+                        {
+                            List<FacilityCharge> sortWithExpirationDate = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.FillingDate.HasValue).OrderBy(c => c.FacilityLot.FillingDate).ToList();
+                            sortWithExpirationDate.AddRange(facilityCharges.Where(c => c.FacilityLot == null || !c.FacilityLot.FillingDate.HasValue).OrderBy(c => c.FacilityChargeSortNo));
+                            sortedFacilityCharges = sortWithExpirationDate;
+                        }
                     }
                 }
             }
@@ -556,7 +631,7 @@ namespace gip.mes.facility
         public override Global.ACMethodResultState CalculateRelocation(bool shiftBookingReverse, // false: normal, true: reverse booking
                                 bool negativeStockAllowed,
                                 StackItemList facilityChargesSource,
-                                IEnumerable<FacilityCharge> facilityChargesTarget,
+                                FacilityChargeList facilityChargesTarget,
                                 ACMethodBooking BP,
                                 out StackItemList stackItemListRelocation,
                                 out MsgBooking msgBookingResult)
@@ -691,7 +766,7 @@ namespace gip.mes.facility
         /// The method returns a integer-casted value of FacilityBookingManager.BookingResult
         /// The result of the calculation can be retrieved from the framework over the StackItemList of property StackItemListReOrganize
         /// </summary>
-        public override Global.ACMethodResultState ReOrganize(IEnumerable<FacilityCharge> facilityCharges, out StackItemList stackItemListReOrganize, out MsgBooking msgBookingResult)
+        public override Global.ACMethodResultState ReOrganize(List<FacilityCharge> facilityCharges, out StackItemList stackItemListReOrganize, out MsgBooking msgBookingResult)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             msgBookingResult = new MsgBooking();

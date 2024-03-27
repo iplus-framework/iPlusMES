@@ -609,7 +609,7 @@ namespace gip.bso.manufacturing
 
                 var currentPickingPos = CurrentPicking.FromAppContext<PickingPos>(dbApp);
 
-                FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, currentPickingPos, ScaleActualWeight);
+                FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, currentPickingPos, null, ScaleActualWeight);
 
                 Msg msg = dbApp.ACSaveChanges();
 
@@ -774,8 +774,19 @@ namespace gip.bso.manufacturing
                         return;
                     }
 
-                    RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, true, currentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace,
-                                                                        RouteDirections.Forwards, null, null, null, 0, true, true);
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = this.RoutingService,
+                        Database = db,
+                        AttachRouteItemsToContext = true,
+                        SelectionRuleID = PAMParkingspace.SelRuleID_ParkingSpace,
+                        Direction = RouteDirections.Forwards,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(currentProcessModule.ComponentClass, routingParameters);
 
                     if (rResult == null || rResult.Routes == null)
                     {

@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Objects;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -421,6 +422,25 @@ namespace gip.mes.datamodel
                 return "FacilityLot\\LotNo,SplitNo";
             }
         }
+
+        private bool _IsSelected;
+[NotMapped]
+        [ACPropertyInfo(503, nameof(IsSelected), ConstApp.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
         #endregion
 
         #region IEntityProperty Members
@@ -561,7 +581,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return FinalRootPositionFromFB != null || FinalRootPositionFromFbc != null;
+                return  FinalRootPositionFromFbc != null;
             }
         }
 
@@ -595,53 +615,54 @@ namespace gip.mes.datamodel
             }
         }
 
-        [NotMapped]
-        public ProdOrderPartslistPos FinalRootPositionFromFB
-        {
-            get
-            {
-                //if (!FacilityBooking_OutwardFacilityCharge.Any()) return null;
-                //return FacilityBooking_OutwardFacilityCharge
-                //    .Where(x => x.ProdOrderPartslistPosID != null)
-                //    .Select(x => x.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? x.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : x.ProdOrderPartslistPos).FirstOrDefault(x => x.IsFinallMixure);
-                if (!FacilityBooking_InwardFacilityCharge.Any()) return null;
-                return FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
-                                                 .Select(a => a.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? a.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : a.ProdOrderPartslistPos)
-                                                 .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
-                                                 .FirstOrDefault();
-                //.Select(a => a.ProdOrderPartslist.ProdOrder.ProgramNo);
+        //public ProdOrderPartslistPos FinalRootPositionFromFB
+        //{
+        //    get
+        //    {
+        //        //if (!FacilityBooking_OutwardFacilityCharge.Any()) return null;
+        //        //return FacilityBooking_OutwardFacilityCharge
+        //        //    .Where(x => x.ProdOrderPartslistPosID != null)
+        //        //    .Select(x => x.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? x.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : x.ProdOrderPartslistPos).FirstOrDefault(x => x.IsFinallMixure);
+        //        if (!FacilityBooking_InwardFacilityCharge.Any()) 
+        //            return null;
+        //        return FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
+        //                                         .Select(a => a.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? a.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : a.ProdOrderPartslistPos)
+        //                                         .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
+        //                                         .FirstOrDefault();
+        //        //.Select(a => a.ProdOrderPartslist.ProdOrder.ProgramNo);
 
-            }
-        }
+        //    }
+        //}
 
-        [NotMapped]
-        public ProdOrderPartslistPos FinalPositionFromFB
-        {
-            get
-            {
-                if (!FacilityBooking_InwardFacilityCharge.Any()) return null;
-                return FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
-                                                 .Select(a => a.ProdOrderPartslistPos)
-                                                 .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
-                                                 .FirstOrDefault();
-            }
-        }
-
+        //public ProdOrderPartslistPos FinalPositionFromFB
+        //{
+        //    get
+        //    {
+        //        //if (!FacilityBooking_InwardFacilityCharge.Any()) 
+        //        //    return null;
+        //        return FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
+        //                                         .Select(a => a.ProdOrderPartslistPos)
+        //                                         .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
+        //                                         .FirstOrDefault();
+        //    }
+        //}
         [NotMapped]
         public ProdOrderPartslistPos FinalRootPositionFromFbc
         {
             get
             {
-                if (!FacilityBookingCharge_InwardFacilityCharge.Any()) return null;
-                //return FacilityBookingCharge_InwardFacilityCharge
-                //     .Select(x => x.FacilityBooking)
-                //     .Where(x => x.ProdOrderPartslistPosID != null)
-                //        .Select(x => x.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? x.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : x.ProdOrderPartslistPos).FirstOrDefault(x => x.IsFinallMixure);
-                return FacilityBookingCharge_InwardFacilityCharge.Select(a => a.FacilityBooking)
-                                                .Where(a => a.ProdOrderPartslistPosID != null)
-                                                .Select(a => a.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? a.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : a.ProdOrderPartslistPos)
-                                                .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
-                                                .FirstOrDefault();
+
+                if (_FinalRootPositionFromFbc != null)
+                    return _FinalRootPositionFromFbc;
+
+                if (FinalPositionFromFbc != null)
+                {
+                    if (FinalPositionFromFbc.ProdOrderPartslistPos1_ParentProdOrderPartslistPos != null)
+                        _FinalRootPositionFromFbc = FinalPositionFromFbc.ProdOrderPartslistPos1_ParentProdOrderPartslistPos;
+                    else
+                        _FinalRootPositionFromFbc = FinalPositionFromFbc;
+                }
+                return _FinalRootPositionFromFbc;
             }
         }
 
@@ -650,18 +671,21 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (!FacilityBookingCharge_InwardFacilityCharge.Any()) return null;
-                return FacilityBookingCharge_InwardFacilityCharge.Select(a => a.FacilityBooking)
-                                                .Where(a => a.ProdOrderPartslistPosID != null)
-                                                .Select(a => a.ProdOrderPartslistPos)
-                                                .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
-                                                .FirstOrDefault();
+                if (_FinalPositionFromFbc != null)
+                    return _FinalPositionFromFbc;
+
+                _FinalPositionFromFbc = FacilityBookingCharge_InwardFacilityCharge
+                    .Where(c => c.ProdOrderPartslistPosID != null)
+                    .Select(c => c.ProdOrderPartslistPos)
+                    .FirstOrDefault();
+
+                return _FinalPositionFromFbc;
             }
         }
 
         #endregion
 
-        [ACPropertyInfo(999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
+        [ACPropertyInfo(9999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
         [NotMapped]
         public string ProdOrderProgramNo
         {
@@ -670,10 +694,7 @@ namespace gip.mes.datamodel
                 string programNo = "";
                 if (IsFinalOutput)
                 {
-                    ProdOrderPartslistPos pos = null;
-                    pos = FinalRootPositionFromFB;
-                    if (pos == null)
-                        pos = FinalRootPositionFromFbc;
+                    ProdOrderPartslistPos pos = FinalPositionFromFbc;
                     if (pos != null)
                         programNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo;
                 }
@@ -681,7 +702,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999, "BatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
+        [ACPropertyInfo(9999, "BatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
         [NotMapped]
         public string BatchNo
         {
@@ -690,14 +711,31 @@ namespace gip.mes.datamodel
                 string programNo = "";
                 if (IsFinalOutput)
                 {
-                    ProdOrderPartslistPos pos = null;
-                    pos = FinalPositionFromFB;
-                    if (pos == null)
-                        pos = FinalPositionFromFbc;
+                    ProdOrderPartslistPos pos = FinalPositionFromFbc;
                     if (pos != null && pos.ProdOrderBatchID.HasValue)
                         programNo = String.Format("{0} ({1})", pos.ProdOrderBatch.BatchSeqNo, pos.ProdOrderBatch.ProdOrderBatchNo);
                 }
                 return programNo;
+            }
+        }
+
+        [ACPropertyInfo(9999, "", "en{'Prod. order position sequence'}de{'Reihenfolge der PA positionen'}")]
+        [NotMapped]
+        public int ProdOrderPosSequence
+        {
+            get
+            {
+                int seq = 1;
+
+                if (IsFinalOutput)
+                {
+                    FacilityBookingCharge fbc = FacilityBookingCharge_InwardFacilityCharge.FirstOrDefault();
+                    if (fbc != null && fbc.ProdOrderPartslistPos != null)
+                    {
+                        seq = fbc.ProdOrderPartslistPos.Sequence;
+                    }
+                }
+                return seq;
             }
         }
 

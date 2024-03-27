@@ -646,7 +646,7 @@ namespace gip.mes.facility
                                         {
                                             foreach (var acClassPM in pwGroup2Check.ProcessModuleList)
                                             {
-                                                IList<Facility> possibleSilos;
+                                                facility.ACPartslistManager.QrySilosResult possibleSilos;
                                                 routes = GetRoutes(mat4Dosing, dbApp, dbIPlus, acClassPM, SearchMode.AllSilos, null, out possibleSilos, null, null);
                                                 if (routes != null && routes.Any())
                                                 {

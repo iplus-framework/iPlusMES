@@ -120,6 +120,7 @@ namespace gip.bso.logistics
             }
             if (_AccessUnAssignedPicking != null)
             {
+                _AccessUnAssignedPicking.NavSearchExecuting -= _Picking_NavSearchExecuting;
                 _AccessUnAssignedPicking.ACDeInit(false);
                 _AccessUnAssignedPicking = null;
             }
@@ -766,6 +767,93 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Weighing
+        private core.datamodel.ACClass _SelectedScale;
+        [ACPropertySelected(611, "Scales", "en{'Vehicle scale'}de{'Fahrzeugwaage'}")]
+        public core.datamodel.ACClass SelectedScale
+        {
+            get
+            {
+                return _SelectedScale;
+            }
+            set
+            {
+                if (_SelectedScale != value)
+                {
+                    _SelectedScale = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<core.datamodel.ACClass> _ScalesList;
+        [ACPropertyList(610, "Scales")]
+        public List<core.datamodel.ACClass> ScalesList
+        {
+            get
+            {
+                if (_ScalesList != null)
+                    return _ScalesList;
+                _ScalesList = core.datamodel.Database.s_cQry_FindInstancesOfClass(DatabaseApp.ContextIPlus, "PAEScaleCalibratable").ToList();
+                return _ScalesList;
+            }
+            set
+            {
+                _ScalesList = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        Weighing _SelectedWeighing;
+        [ACPropertySelected(658, "Weighings")]
+        public Weighing SelectedWeighing
+        {
+            get
+            {
+                return _SelectedWeighing;
+            }
+            set
+            {
+                if (_SelectedWeighing != value)
+                {
+                    _SelectedWeighing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        IEnumerable<Weighing> _WeighingList = null;
+
+        [ACPropertyList(659, "Weighings")]
+        public IEnumerable<Weighing> WeighingList
+        {
+            get
+            {
+                if (   this.SelectedVisitorVoucher == null
+                    || this.SelectedVisitorVoucher.EntityState == EntityState.Added
+                    || this.SelectedVisitorVoucher.EntityState == EntityState.Detached)
+                    return null;
+                if (_WeighingList != null)
+                    return _WeighingList;
+                _WeighingList = SelectedVisitorVoucher.Weighing_VisitorVoucher.OrderBy(c => c.StartDate).ToList();
+                return _WeighingList;
+            }
+        }
+
+        protected void RefreshWeighingList(bool forceRefresh = false)
+        {
+            if (forceRefresh && SelectedVisitorVoucher !=  null)
+            {
+                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoLoad();
+                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoRefresh();
+            }
+            _WeighingList = null;
+            OnPropertyChanged(nameof(WeighingList));
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -837,6 +925,7 @@ namespace gip.bso.logistics
             LoadEntity<VisitorVoucher>(requery, () => SelectedVisitorVoucher, () => CurrentVisitorVoucher, c => CurrentVisitorVoucher = c,
                         DatabaseApp.VisitorVoucher
                         .Include(c => c.DeliveryNote_VisitorVoucher)
+                        .Include(c => c.Weighing_VisitorVoucher)
                         .Where(c => c.VisitorVoucherID == SelectedVisitorVoucher.VisitorVoucherID));
             if (CurrentVisitorVoucher != null)
             {
@@ -1104,13 +1193,11 @@ namespace gip.bso.logistics
         [ACMethodCommand(Visitor.ClassName, "en{'Check Out'}de{'Abmelden'}", (short)601, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void CheckOut()
         {
-            if (!PreExecute("CheckOut")) return;
-            MDVisitorVoucherState state = DatabaseApp.MDVisitorVoucherState.Where(c => c.MDVisitorVoucherStateIndex == (short)MDVisitorVoucherState.VisitorVoucherStates.CheckedOut).FirstOrDefault();
-            if (state != null)
-            {
-                CurrentVisitorVoucher.MDVisitorVoucherState = state;
-                CurrentVisitorVoucher.CheckOutDate = DateTime.Now;
-            }
+            if (!PreExecute("CheckOut")) 
+                return;
+            if (this.VisitorVoucherManager == null)
+                return;
+            this.VisitorVoucherManager.CheckOut(CurrentVisitorVoucher, DatabaseApp);
             PostExecute("CheckOut");
         }
 
@@ -1120,7 +1207,7 @@ namespace gip.bso.logistics
         /// <returns><c>true</c> if [is enabled check out]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledCheckOut()
         {
-            if (CurrentVisitorVoucher == null)
+            if (CurrentVisitorVoucher == null || VisitorVoucherManager == null)
                 return false;
             if (CurrentVisitorVoucher.MDVisitorVoucherState == null)
                 return false;
@@ -1148,6 +1235,78 @@ namespace gip.bso.logistics
             if (!String.IsNullOrEmpty(FindVisitorCardNo))
                 FindVisitorCardNo = "";
         }
+
+        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(int visitorVoucherNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "VisitorVoucherNo").FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherNo", Global.LogicalOperators.contains, Global.Operators.and, visitorVoucherNo.ToString(), false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = visitorVoucherNo.ToString();
+
+            filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "MDVisitorVoucherState\\MDVisitorVoucherStateIndex").FirstOrDefault();
+            if (filterItem != null)
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItem);
+
+            this.Search();
+            if (VisitorVoucherList != null && VisitorVoucherList.Count() > 1)
+                CurrentVisitorVoucher = VisitorVoucherList.FirstOrDefault(c => c.VisitorVoucherNo == visitorVoucherNo);
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+
+        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            // Falls Produktionsauftrag
+            VisitorVoucher visitorVoucher = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == VisitorVoucher.ClassName)
+                {
+                    visitorVoucher = this.DatabaseApp.VisitorVoucher
+                        .Where(c => c.VisitorVoucherID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+            }
+
+            if (visitorVoucher == null)
+                return;
+
+            ShowDialogOrder(visitorVoucher.VisitorVoucherNo);
+            paOrderInfo.DialogResult = this.DialogResult;
+        }
+
+
+        public VBDialogResult DialogResult { get; set; }
+
+        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        public void DialogOK()
+        {
+            DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.OK;
+            CloseTopDialog();
+        }
+
+        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        public void DialogCancel()
+        {
+            DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.Cancel;
+            CloseTopDialog();
+        }
+
         #endregion
 
         #region Refresh Lists
@@ -1155,15 +1314,51 @@ namespace gip.bso.logistics
         public void RefreshLists(bool forceQueryFromDb = false)
         {
             RefreshUnAssignedDeliveryNoteList(forceQueryFromDb);
-            OnPropertyChanged("DeliveryNoteList");
+            OnPropertyChanged(nameof(DeliveryNoteList));
 
             RefreshUnAssignedTourplanList(forceQueryFromDb);
-            OnPropertyChanged("TourplanList");
+            OnPropertyChanged(nameof(TourplanList));
 
             RefreshUnAssignedPickingList(forceQueryFromDb);
-            OnPropertyChanged("PickingList");
+            OnPropertyChanged(nameof(PickingList));
+
+            RefreshWeighingList();
         }
 
+        #endregion
+
+        #region Weighing
+        [ACMethodInfo("Dialog", "en{'Register Weight'}de{'Registriere Gewicht'}", (short)500)]
+        public void RegisterWeight()
+        {
+            if (!IsEnabledRegisterWeight())
+                return;
+            string acUrl = SelectedScale.GetACUrlComponent();
+            if (String.IsNullOrEmpty(acUrl))
+                return;
+            ACComponent scaleComp = Root.ACUrlCommand(acUrl) as ACComponent;
+            if (scaleComp == null || scaleComp.ConnectionState == ACObjectConnectionState.DisConnected)
+            {
+                // TODO Message
+                Messages.Error(this, "No connection", true);
+                return;
+            }
+            Msg result = scaleComp.ACUrlCommand("!RegisterAlibiWeightEntity", new PAOrderInfoEntry() { EntityName = nameof(VisitorVoucher), EntityID = CurrentVisitorVoucher.VisitorVoucherID }) as Msg;
+            if (result == null)
+                return;
+            if (result.MessageLevel > eMsgLevel.Info)
+            {
+                Messages.Msg(result);
+                return;
+            }
+
+            RefreshWeighingList(true);
+        }
+
+        public bool IsEnabledRegisterWeight()
+        {
+            return SelectedScale != null;
+        }
         #endregion
 
         #endregion
@@ -1175,107 +1370,161 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "IsEnabledSearch":
+                case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
-                case "NewInDeliveryNote":
+                case nameof(NewInDeliveryNote):
                     NewInDeliveryNote();
                     return true;
-                case "IsEnabledNewInDeliveryNote":
+                case nameof(IsEnabledNewInDeliveryNote):
                     result = IsEnabledNewInDeliveryNote();
                     return true;
-                case "NewOutDeliveryNote":
+                case nameof(NewOutDeliveryNote):
                     NewOutDeliveryNote();
                     return true;
-                case "IsEnabledNewOutDeliveryNote":
+                case nameof(IsEnabledNewOutDeliveryNote):
                     result = IsEnabledNewOutDeliveryNote();
                     return true;
-                case "NewVisitor":
+                case nameof(NewVisitor):
                     NewVisitor();
                     return true;
-                case "IsEnabledNewVisitor":
+                case nameof(IsEnabledNewVisitor):
                     result = IsEnabledNewVisitor();
                     return true;
-                case "CheckIn":
+                case nameof(CheckIn):
                     CheckIn();
                     return true;
-                case "IsEnabledCheckIn":
+                case nameof(IsEnabledCheckIn):
                     result = IsEnabledCheckIn();
                     return true;
-                case "CheckOut":
+                case nameof(CheckOut):
                     CheckOut();
                     return true;
-                case "IsEnabledCheckOut":
+                case nameof(IsEnabledCheckOut):
                     result = IsEnabledCheckOut();
                     return true;
-                case "AssignDeliveryNote":
+                case nameof(AssignDeliveryNote):
                     AssignDeliveryNote();
                     return true;
-                case "IsEnabledAssignDeliveryNote":
+                case nameof(IsEnabledAssignDeliveryNote):
                     result = IsEnabledAssignDeliveryNote();
                     return true;
-                case "UnassignDeliveryNote":
+                case nameof(UnassignDeliveryNote):
                     UnassignDeliveryNote();
                     return true;
-                case "IsEnabledUnassignDeliveryNote":
+                case nameof(IsEnabledUnassignDeliveryNote):
                     result = IsEnabledUnassignDeliveryNote();
                     return true;
-                case "AssignTourplan":
+                case nameof(AssignTourplan):
                     AssignTourplan();
                     return true;
-                case "IsEnabledAssignTourplan":
+                case nameof(IsEnabledAssignTourplan):
                     result = IsEnabledAssignTourplan();
                     return true;
-                case "UnassignTourplan":
+                case nameof(UnassignTourplan):
                     UnassignTourplan();
                     return true;
-                case "IsEnabledUnassignTourplan":
+                case nameof(IsEnabledUnassignTourplan):
                     result = IsEnabledUnassignTourplan();
                     return true;
-                case "AssignPicking":
+                case nameof(AssignPicking):
                     AssignPicking();
                     return true;
-                case "IsEnabledAssignPicking":
+                case nameof(IsEnabledAssignPicking):
                     result = IsEnabledAssignPicking();
                     return true;
-                case "UnassignPicking":
+                case nameof(UnassignPicking):
                     UnassignPicking();
                     return true;
-                case "IsEnabledUnassignPicking":
+                case nameof(IsEnabledUnassignPicking):
                     result = IsEnabledUnassignPicking();
+                    return true;
+                case nameof(RegisterWeight):
+                    RegisterWeight();
+                    return true;
+                case nameof(IsEnabledRegisterWeight):
+                    result = IsEnabledRegisterWeight();
+                    return true;
+                case nameof(NavigateToAPicking):
+                    NavigateToAPicking();
+                    return true;
+                case nameof(IsEnabledNavigateToAPicking):
+                    result = IsEnabledNavigateToAPicking();
+                    return true;
+                case nameof(NavigateToUPicking):
+                    NavigateToUPicking();
+                    return true;
+                case nameof(IsEnabledNavigateToUPicking):
+                    result = IsEnabledNavigateToUPicking();
+                    return true;
+                case nameof(NavigateToADeliveryNote):
+                    NavigateToADeliveryNote();
+                    return true;
+                case nameof(IsEnabledNavigateToADeliveryNote):
+                    result = IsEnabledNavigateToADeliveryNote();
+                    return true;
+                case nameof(NavigateToUDeliveryNote):
+                    NavigateToUDeliveryNote();
+                    return true;
+                case nameof(IsEnabledNavigateToUDeliveryNote):
+                    result = IsEnabledNavigateToUDeliveryNote();
+                    return true;
+                case nameof(NavigateToATourplan):
+                    NavigateToATourplan();
+                    return true;
+                case nameof(IsEnabledNavigateToATourplan):
+                    result = IsEnabledNavigateToATourplan();
+                    return true;
+                case nameof(NavigateToUTourplan):
+                    NavigateToUTourplan();
+                    return true;
+                case nameof(IsEnabledNavigateToUTourplan):
+                    result = IsEnabledNavigateToUTourplan();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((int)acParameter[0]);
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

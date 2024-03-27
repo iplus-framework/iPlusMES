@@ -30,6 +30,8 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
+        public const string Const_ACClassWFID = "PickingACClassWFID";
+
         #endregion
 
         #region Properties
@@ -164,7 +166,7 @@ namespace gip.bso.manufacturing
         #region Methods => Start workflow picking
 
         public bool RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
-                                bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict)
+                                bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict, bool onlyPreparePicking = false)
         {
             bool wfRunsBatches = false;
             ACComponent appManager = null;
@@ -234,12 +236,30 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
+            List<IACConfigStore> configStores = null;
+
+            var configManager = ConfigManagerIPlus.GetServiceInstance(this);
+            if (configManager != null)
+                configStores = configManager.GetACConfigStores(new List<IACConfigStore>() { picking, workflow.ACClassMethod, workflow.RefPAACClassMethod });
+
+            msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, configStores, validationBehaviour, workflow);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
                 Messages.Msg(msgDetails);
                 ClearBookingData();
                 return false;
+            }
+
+            if (onlyPreparePicking)
+            {
+                PickingConfig pConfig = PickingConfig.NewACObject(dbApp, picking);
+                pConfig.KeyACUrl = Const_ACClassWFID;
+                pConfig.VBiValueTypeACClassID = dbApp.ContextIPlus.GetACType(typeof(string)).ACClassID;
+                pConfig.XMLConfig = workflow.ACClassWFID.ToString();
+
+                dbApp.ACSaveChanges();
+
+                return true;
             }
 
             processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo), picking.PickingNo);
@@ -324,7 +344,7 @@ namespace gip.bso.manufacturing
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
-            return "PWMethodSingleDosing";
+            return nameof(PWMethodSingleDosing);
         }
 
         protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, Picking picking, ACComponent selectedAppManager, Guid allowedWFNode)
@@ -398,11 +418,22 @@ namespace gip.bso.manufacturing
                 return msg;
             }
 
-            RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
-                                    fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
-                                    (c, p, r) => c.ACClassID == toClass.ACClassID,
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
-                                    10, true, true, false, false, 10);
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                AttachRouteItemsToContext = false,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = "",
+                DBSelector = (c, p, r) => c.ACClassID == toClass.ACClassID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 10
+            };
+
+            RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
             {
                 //Error50122: No route found for this transport.

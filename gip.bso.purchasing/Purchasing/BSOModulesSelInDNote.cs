@@ -529,8 +529,19 @@ namespace gip.bso.purchasing
             }
 
             string targetCompACUrl = SelectedTarget.Module.ACUrlComponent;
-            var sources = ACRoutingService.MemFindSuccessors(RoutingService, Database.ContextIPlus, targetCompACUrl, PAProcessModule.SelRuleID_ProcessModule, RouteDirections.Backwards, 1,
-                                                             true, true);
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                Direction = RouteDirections.Backwards,
+                SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                MaxRouteAlternativesInLoop = 1,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+            };
+
+            var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
             if (sources == null)
             {
                 Messages.Info(this, string.Format("Successors are not found for the component with ACUrl", targetCompACUrl), true);
@@ -543,13 +554,16 @@ namespace gip.bso.purchasing
                 return;
             }
 
-            IEnumerable<string> sourceCompsACUrl = sources.Routes.Select(c => c.FirstOrDefault().Source.ACUrlComponent);
+            //IEnumerable<string> sourceCompsACUrl = sources.Routes.Select(c => c.FirstOrDefault().Source.ACUrlComponent);
 
-            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module });
+            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module }, null, null, true, SelectedModule?.Module);
 
             if (routeSelector.RouteResult != null)
             {
-                SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
+                if (routeSelector.RouteResult.Count() > 1)
+                    SelectedTarget.CurrentRoute = Route.MergeRoutes(routeSelector.RouteResult);
+                else
+                    SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
             }
 
         }
@@ -570,13 +584,17 @@ namespace gip.bso.purchasing
             }
 
             //set flag to true if route is read only
-            routeSelector.EditRoutes(SelectedTarget.CurrentRoute, false, true, true);
+            routeSelector.EditRoutesWithAttach(SelectedTarget.CurrentRoute, false, true, true);
 
-            if (routeSelector.RouteResult != null)
+            if (routeSelector.RouteResult != null && SelectedTarget.CurrentRoute == null)
             {
-                Route result = routeSelector.RouteResult.FirstOrDefault();
-                if (result != SelectedTarget.CurrentRoute)
-                    SelectedTarget.CurrentRoute = result;
+                if (routeSelector.RouteResult != null)
+                {
+                    if (routeSelector.RouteResult.Count() > 1)
+                        SelectedTarget.CurrentRoute = Route.MergeRoutes(routeSelector.RouteResult);
+                    else
+                        SelectedTarget.CurrentRoute = routeSelector.RouteResult.FirstOrDefault();
+                }
             }
         }
 

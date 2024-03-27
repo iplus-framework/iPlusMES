@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace gip.mes.facility.TandTv3
 {
-    public interface IItemTracking<out T> where T: IACObjectEntity
+    public interface IItemTracking<out T> where T : IACObjectEntity
     {
         T Item { get; }
         DatabaseApp DatabaseApp { get; }
@@ -21,8 +21,12 @@ namespace gip.mes.facility.TandTv3
 
         #region Tree
 
-        string SameStepParent { get; set; }
-        string NextStepParent { get; set; }
+        IItemTracking<IACObjectEntity> SameStepParent { get; set; }
+        IItemTracking<IACObjectEntity> NextStepParent { get; set; }
+
+        string GetMDLink();
+        string GetMDString();
+        string ToMDString();
 
         #endregion
     }

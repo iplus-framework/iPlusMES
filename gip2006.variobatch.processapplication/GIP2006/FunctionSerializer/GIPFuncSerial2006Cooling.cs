@@ -22,7 +22,7 @@ namespace gip2006.variobatch.processapplication
             return MethodNameEquals(typeOrACMethodName, "Cooling");
         }
 
-        public override bool SendObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override bool SendObject(object complexObj, object prevComplexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)
@@ -40,6 +40,7 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // HoldTemperature
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // HoldTime
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeightSwitchOn
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Tare 0:Off    1:On
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
             if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -73,12 +74,16 @@ namespace gip2006.variobatch.processapplication
                 0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
+            Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("Tare")),
+                0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
             OnSendObjectAppend(request, dbNo, offset, miscParams, ref sendPackage1, ref iOffset);
 
             return this.SendObjectToPLC(s7Session, request, sendPackage1, dbNo, offset, iOffset);
         }
 
-        public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override object ReadObject(object complexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             S7TCPSession s7Session = ParentACComponent as S7TCPSession;
             if (s7Session == null || complexObj == null)
@@ -143,6 +148,9 @@ namespace gip2006.variobatch.processapplication
 
                 response.ParameterValueList.GetACValue("MinWeightSwitchOn").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                response.ParameterValueList.GetACValue("Tare").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
 

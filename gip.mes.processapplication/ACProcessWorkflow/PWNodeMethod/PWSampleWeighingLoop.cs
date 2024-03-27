@@ -49,8 +49,31 @@ namespace gip.mes.processapplication
             if (_IsInCompleteState)
                 return;
 
-            var samplingNode = sender?.ParentACComponent?.FindChildComponents<PWSampleWeighing>(c => c is PWSampleWeighing, null, 2).FirstOrDefault();
-            if (samplingNode != null)
+            PWSampleWeighing sampleWeighing = null;
+
+            PWBaseInOut senderComp = sender?.ParentACComponent as PWBaseInOut;
+            if (senderComp is PWGroup)
+            {
+                sampleWeighing = senderComp.FindChildComponents<PWSampleWeighing>(c => c is PWSampleWeighing).FirstOrDefault();
+            }
+
+            if (sampleWeighing == null)
+            {
+                var possiblePWGroups = senderComp.FindPredecessors<PWGroup>(false, c => c.ACComponentChilds.Any(x => x is PWSampleWeighing), null);
+                if (possiblePWGroups.Count > 1)
+                {
+                    RaiseOutEventAndComplete();
+                    return;
+                }
+
+                var targetGroup = possiblePWGroups.FirstOrDefault();
+                if (targetGroup != null)
+                {
+                    sampleWeighing = targetGroup.FindChildComponents<PWSampleWeighing>(c => c is PWSampleWeighing).FirstOrDefault();
+                }
+            }
+
+            if (sampleWeighing != null)
                 RaiseElseEventAndComplete();
             else
                 CompleteSampleWeighing();

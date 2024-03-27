@@ -402,7 +402,8 @@ namespace gip.mes.facility
                                                                             .OrderByDescending(c => c.InsertDate)
                                                                             .FirstOrDefault();
 
-                            inwardQuantity = fbc.InwardQuantity * (-1);
+                            if (fbc != null)
+                                inwardQuantity = fbc.InwardQuantity * (-1);
                         }
 
                         floatVal = 0;
