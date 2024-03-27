@@ -33,13 +33,14 @@ namespace gip.mes.processapplication
 
         public static bool GetRelatedProdOrderPosForWFNode(PWBase pwNode, Database dbIPlus, DatabaseApp dbApp, PWMethodProduction pwMethodProduction,
             out ProdOrderPartslistPos intermediateChildPos, out ProdOrderPartslistPos intermediatePosition, out ProdOrderPartslistPos endBatchPos,
-            out MaterialWFConnection matWFConnection, out ProdOrderBatch batch, out ProdOrderBatchPlan batchPlan)
+            out MaterialWFConnection matWFConnection, out ProdOrderBatch batch, out ProdOrderBatchPlan batchPlan, out MaterialWFConnection[] matWFConnections)
         {
             intermediateChildPos = null;
             matWFConnection = null;
             batch = null;
             batchPlan = null;
             intermediatePosition = null;
+            matWFConnections = null;
 
             endBatchPos = pwMethodProduction.CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
             if (pwMethodProduction.CurrentProdOrderBatch == null)
@@ -52,20 +53,23 @@ namespace gip.mes.processapplication
             if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
             {
                 ProdOrderBatchPlan batchPlan2 = batchPlan;
-                matWFConnection = dbApp.MaterialWFConnection
+
+                matWFConnections = dbApp.MaterialWFConnection
                                         .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan2.MaterialWFACClassMethodID.Value
-                                                && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                        .FirstOrDefault();
+                                                && c.ACClassWFID == contentACClassWFVB.ACClassWFID).ToArray();
+
+                matWFConnection = matWFConnections.FirstOrDefault();
             }
             else
             {
                 PartslistACClassMethod plMethod = endBatchPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
                 if (plMethod != null)
                 {
-                    matWFConnection = dbApp.MaterialWFConnection
+                    matWFConnections = dbApp.MaterialWFConnection
                                             .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
-                                                    && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                            .FirstOrDefault();
+                                                    && c.ACClassWFID == contentACClassWFVB.ACClassWFID).ToArray();
+
+                    matWFConnection = matWFConnections.FirstOrDefault();
                 }
                 else
                 {
@@ -121,8 +125,10 @@ namespace gip.mes.processapplication
                         ProdOrderBatchPlan batchPlan;
                         ProdOrderPartslistPos intermediatePos;
                         ProdOrderPartslistPos endBatchPos;
+                        MaterialWFConnection[] matWFConnections;
+
                         bool posFound = GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos, 
-                            out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                            out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                         if (!posFound)
                             return true;
 
@@ -270,8 +276,9 @@ namespace gip.mes.processapplication
                     ProdOrderBatch batch;
                     ProdOrderBatchPlan batchPlan;
                     ProdOrderPartslistPos endBatchPos;
+                    MaterialWFConnection[] matWFConnections;
                     bool posFound = GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, 
-                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                     if (batch == null)
                     {
                         // Error50060: No batch assigned to last intermediate material of this workflow-process

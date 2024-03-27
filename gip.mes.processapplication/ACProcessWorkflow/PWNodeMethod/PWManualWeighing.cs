@@ -800,8 +800,9 @@ namespace gip.mes.processapplication
                         ProdOrderBatchPlan batchPlan;
                         ProdOrderPartslistPos intermediatePos;
                         ProdOrderPartslistPos endBatchPos;
+                        MaterialWFConnection[] matWFConnections;
                         bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
-                            out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                            out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                         if (!posFound)
                             return true;
 
@@ -2090,8 +2091,9 @@ namespace gip.mes.processapplication
                     ProdOrderBatch batch;
                     ProdOrderBatchPlan batchPlan;
                     ProdOrderPartslistPos endBatchPos;
+                    MaterialWFConnection[] matWFConnections;
                     bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction,
-                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                     if (batch == null)
                     {
                         // Error50276: No batch assigned to last intermediate material of this workflow

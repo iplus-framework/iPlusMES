@@ -99,8 +99,9 @@ namespace gip.mes.processapplication
                     ProdOrderBatchPlan batchPlan;
                     ProdOrderPartslistPos intermediatePos;
                     ProdOrderPartslistPos endBatchPos;
+                    MaterialWFConnection[] matWFConnections;
                     bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
-                        out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
                     if (posFound)
                     {
                         intermediatePosID = intermediatePos.ProdOrderPartslistPosID;
@@ -123,8 +124,9 @@ namespace gip.mes.processapplication
             ProdOrderBatch batch;
             ProdOrderBatchPlan batchPlan;
             ProdOrderPartslistPos endBatchPos;
+            MaterialWFConnection[] matWFConnections;
             return PWDosing.GetRelatedProdOrderPosForWFNode(this, dbApp.ContextIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
-                out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
         }
 
         public virtual Msg OnGetMessageAfterOccupyingProcessModule(PAFWorkTaskScanBase invoker)
