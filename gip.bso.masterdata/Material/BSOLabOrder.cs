@@ -7,7 +7,6 @@ using gip.core.autocomponent;
 using System.Reflection;
 using static gip.core.datamodel.Global;
 using gip.mes.facility;
-using System.Net;
 
 namespace gip.bso.masterdata
 {

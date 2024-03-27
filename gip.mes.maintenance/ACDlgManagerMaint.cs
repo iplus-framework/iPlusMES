@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using gip.core.autocomponent;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using gip.mes.datamodel;
 
 namespace gip.mes.maintenance
 {
@@ -17,7 +17,7 @@ namespace gip.mes.maintenance
             RegisterExecuteHandler(typeof(ACDlgManagerMaint), HandleExecuteACMethod_ACDlgManagerMaint);
         }
 
-        public ACDlgManagerMaint(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="") : 
+        public ACDlgManagerMaint(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
@@ -128,7 +128,7 @@ namespace gip.mes.maintenance
             if (_this.Database is mes.datamodel.DatabaseApp)
             {
                 Guid componentClassID = _this.ComponentClass.ACClassID;
-                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+                DatabaseApp dbApp = _this.Database as DatabaseApp;
 
                 using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                 {
@@ -171,15 +171,15 @@ namespace gip.mes.maintenance
             if (maintService == null)
                 return false;
 
-            if (_this.Database is vd.DatabaseApp)
+            if (_this.Database is DatabaseApp)
             {
                 Guid componentClassID = _this.ComponentClass.ACClassID;
-                vd.DatabaseApp dbApp = _this.Database as vd.DatabaseApp;
+                DatabaseApp dbApp = _this.Database as DatabaseApp;
 
                 using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                 {
                     if (dbApp.MaintOrder.Any(c => c.VBiPAACClassID == componentClassID
-                   && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)vd.MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
+                   && c.MDMaintOrderState.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceCompleted))
                         return true;
                 }
             }
@@ -192,7 +192,7 @@ namespace gip.mes.maintenance
             ACComponent _this = acComponent as ACComponent;
             if (_this == null)
                 return;
-            //if (_this.Database is vd.DatabaseApp)
+            //if (_this.Database is DatabaseApp)
             //{
                 ACComponent appManager = _this.FindParentComponent<ACComponent>(c => c is ApplicationManager || c is ApplicationManagerProxy);
                 if (appManager == null)

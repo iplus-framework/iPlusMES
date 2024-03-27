@@ -5,10 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Data.Objects;
 using System.Linq;
-using System.Transactions;
 using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.facility
