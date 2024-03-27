@@ -322,6 +322,8 @@ namespace gip.mes.processapplication
             double tolPlus = 0;
             double tolMinus = 0;
             double setPoint = 0;
+            List<Tuple<double, double, double>> setPoints = new List<Tuple<double, double, double>>();
+
             ProdOrderPartslistPos intermediateChildPos;
             ProdOrderPartslistPos intermediatePosition;
             MaterialWFConnection matWFConnection;
@@ -362,20 +364,31 @@ namespace gip.mes.processapplication
                     return;
                 }
 
-                if (matWFConnections.Count() > 1)
-                {
-                    GetReleatedIntermediates(matWFConnections, endBatchPos, intermediateChildPos, intermediatePosition);
-
-
-
-
-
-
-
-                }
-
                 tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
                 tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
+
+                
+                setPoints.Add(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus));
+
+                if (matWFConnections.Count() > 1)
+                {
+                    List<ProdOrderPartslistPos> relatedIntermediateChildren =  GetReleatedIntermediates(matWFConnections, endBatchPos, intermediateChildPos, intermediatePosition);
+
+                    foreach (ProdOrderPartslistPos relatedPos in relatedIntermediateChildren)
+                    {
+                        if (relatedPos == endBatchPos || relatedPos.MDUnit == null || relatedPos.MDUnit.SIDimension != GlobalApp.SIDimensions.Mass)
+                            continue;
+
+                        setPoint = relatedPos.TargetQuantityUOM / endBatchPos.TargetQuantityUOM;
+                        tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
+                        tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
+
+                        setPoints.Insert(0,(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus)));
+                    }
+                    
+                }
+
+
             }
 
             string labOrderTemplateName = LabOrderTemplateName;
@@ -440,11 +453,16 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
+                    string acUrl = this.GetACUrl();
+
                     foreach (PAESamplePiLightBox box in boxes)
                     {
-                        if (!box.SetParamsAndStartOrder(setPoint, tolPlus, tolMinus, this.GetACUrl()))
+                        foreach (var setPointParam in setPoints)
                         {
-                            // TODO: Error
+                            if (!box.SetParamsAndStartOrder(setPoint, tolPlus, tolMinus, acUrl))
+                            {
+                                // TODO: Error
+                            }
                         }
                     }
                 }
@@ -539,7 +557,7 @@ namespace gip.mes.processapplication
                 resultList.Add(currentPos);
             }
 
-            foreach (ProdOrderPartslistPos sourcePos in currentPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Select(x => x.SourceProdOrderPartslistPos))
+            foreach (ProdOrderPartslistPos sourcePos in currentPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Select(x => x.SourceProdOrderPartslistPos))
             {
                 GetRelatedMatWFConn(connectionList, sourcePos, resultList);
             }
