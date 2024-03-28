@@ -349,6 +349,13 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _SkipPrintQuestion, value); }
     }
 
+    short _ClassCode;
+    public short ClassCode 
+    {
+        get { return _ClassCode; }
+        set { SetProperty<short>(ref _ClassCode, value); }
+    }
+
     private Company _Company;
     public virtual Company Company
     { 

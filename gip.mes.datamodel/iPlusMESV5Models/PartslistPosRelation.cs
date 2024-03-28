@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PartslistPosRelation : VBEntityObject, ISequence, ITargetQuantity
+public partial class PartslistPosRelation : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence, ITargetQuantity
 {
 
     public PartslistPosRelation()
@@ -81,6 +81,34 @@ public partial class PartslistPosRelation : VBEntityObject, ISequence, ITargetQu
     {
         get { return _Anterograde; }
         set { SetProperty<bool?>(ref _Anterograde, value); }
+    }
+
+    string _InsertName;
+    public string InsertName 
+    {
+        get { return _InsertName; }
+        set { SetProperty<string>(ref _InsertName, value); }
+    }
+
+    DateTime _InsertDate;
+    public DateTime InsertDate 
+    {
+        get { return _InsertDate; }
+        set { SetProperty<DateTime>(ref _InsertDate, value); }
+    }
+
+    string _UpdateName;
+    public string UpdateName 
+    {
+        get { return _UpdateName; }
+        set { SetProperty<string>(ref _UpdateName, value); }
+    }
+
+    DateTime _UpdateDate;
+    public DateTime UpdateDate 
+    {
+        get { return _UpdateDate; }
+        set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
     private MaterialWFRelation _MaterialWFRelation;

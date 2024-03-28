@@ -236,33 +236,6 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
-        private VD.DatabaseApp _DatabaseApp;
-        public override VD.DatabaseApp DatabaseApp
-        {
-            get
-            {
-                if (_DatabaseApp != null)
-                    return _DatabaseApp;
-                if (ParentACComponent is Businessobjects
-                    || !(ParentACComponent is ACBSOvb || ParentACComponent is ACBSOvbNav))
-                {
-                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<VD.DatabaseApp>(this.GetACUrl());
-                    return _DatabaseApp;
-                }
-                else
-                {
-                    ACBSOvbNav parentNav = ParentACComponent as ACBSOvbNav;
-                    if (parentNav != null)
-                        return parentNav.DatabaseApp;
-                    ACBSOvb parent = ParentACComponent as ACBSOvb;
-                    if (parent != null)
-                        return parent.DatabaseApp;
-                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<VD.DatabaseApp>(this.GetACUrl());
-                    return _DatabaseApp;
-                }
-            }
-        }
-
         private void Value_OnSearchStockMaterial(object sender, EventArgs e)
         {
             if (!BackgroundWorker.IsBusy)
@@ -1328,7 +1301,7 @@ namespace gip.bso.manufacturing
                     maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            IQueryable<ProdOrderPartslistPlanWrapper> batchQuery =
+            IEnumerable<ProdOrderPartslistPlanWrapper> batchQuery =
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
@@ -1340,22 +1313,22 @@ namespace gip.bso.manufacturing
                     FilterOnlyOnThisLine,
                     FilterDepartmentUserName,
                     FilterOrderProgramNo,
-                    FilterOrderMaterialNo) as IQueryable<ProdOrderPartslistPlanWrapper>;
+                    FilterOrderMaterialNo) as IEnumerable<ProdOrderPartslistPlanWrapper>;
 
             //batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = batchQuery;
+            IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = batchQuery as IOrderedQueryable<ProdOrderPartslistPlanWrapper>;
             if (FilterProdPartslistOrder != null)
             {
                 switch (FilterProdPartslistOrder)
                 {
                     case BatchPlanProdOrderSortFilterEnum.Material:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.Partslist.Material.MaterialNo).ThenBy(c => c.ProdOrderPartslist.StartDate);
+                        query = query.OrderBy(c => c.ProdOrderPartslist.Partslist.Material.MaterialNo).ThenBy(c => c.ProdOrderPartslist.StartDate);
                         break;
                     case BatchPlanProdOrderSortFilterEnum.StartTime:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.StartDate);
+                        query = query.OrderBy(c => c.ProdOrderPartslist.StartDate);
                         break;
                     case BatchPlanProdOrderSortFilterEnum.ProgramNo:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.ProdOrder.ProgramNo);
+                        query = query.OrderBy(c => c.ProdOrderPartslist.ProdOrder.ProgramNo);
                         break;
                 }
             }

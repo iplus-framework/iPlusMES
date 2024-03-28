@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
+public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence
 {
 
     public MaintOrderTask()
@@ -104,13 +104,6 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _UpdateName, value); }
     }
 
-    int _Sequence;
-    public int Sequence
-    {
-        get { return _Sequence; }
-        set { SetProperty<int>(ref _Sequence, value); }
-    }
-
     DateTime _UpdateDate;
     public DateTime UpdateDate 
     {
@@ -123,6 +116,13 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return _TaskName; }
         set { SetProperty<string>(ref _TaskName, value); }
+    }
+
+    int _Sequence;
+    public int Sequence 
+    {
+        get { return _Sequence; }
+        set { SetProperty<int>(ref _Sequence, value); }
     }
 
     private MDMaintTaskState _MDMaintTaskState;

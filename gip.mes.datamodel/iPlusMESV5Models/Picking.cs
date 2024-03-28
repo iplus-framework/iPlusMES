@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
+public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, IScheduledOrder
 {
 
     public Picking()
@@ -48,13 +48,6 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _TourplanID, value); }
     }
 
-    Guid? _VBiACClassWFID;
-    public Guid? VBiACClassWFID
-    {
-        get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
-    }
-
     string _PickingNo;
     public string PickingNo 
     {
@@ -81,13 +74,6 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return _DeliveryDateTo; }
         set { SetProperty<DateTime>(ref _DeliveryDateTo, value); }
-    }
-
-    int? _ScheduledOrder;
-    public int? ScheduledOrder
-    {
-        get { return _ScheduledOrder; }
-        set { SetProperty<int?>(ref _ScheduledOrder, value); }
     }
 
     string _Comment;
@@ -165,6 +151,48 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return _Comment2; }
         set { SetProperty<string>(ref _Comment2, value); }
+    }
+
+    int? _ScheduledOrder;
+    public int? ScheduledOrder 
+    {
+        get { return _ScheduledOrder; }
+        set { SetProperty<int?>(ref _ScheduledOrder, value); }
+    }
+
+    DateTime? _ScheduledStartDate;
+    public DateTime? ScheduledStartDate 
+    {
+        get { return _ScheduledStartDate; }
+        set { SetProperty<DateTime?>(ref _ScheduledStartDate, value); }
+    }
+
+    DateTime? _ScheduledEndDate;
+    public DateTime? ScheduledEndDate 
+    {
+        get { return _ScheduledEndDate; }
+        set { SetProperty<DateTime?>(ref _ScheduledEndDate, value); }
+    }
+
+    DateTime? _CalculatedStartDate;
+    public DateTime? CalculatedStartDate 
+    {
+        get { return _CalculatedStartDate; }
+        set { SetProperty<DateTime?>(ref _CalculatedStartDate, value); }
+    }
+
+    DateTime? _CalculatedEndDate;
+    public DateTime? CalculatedEndDate 
+    {
+        get { return _CalculatedEndDate; }
+        set { SetProperty<DateTime?>(ref _CalculatedEndDate, value); }
+    }
+
+    Guid? _VBiACClassWFID;
+    public Guid? VBiACClassWFID 
+    {
+        get { return _VBiACClassWFID; }
+        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
     }
 
     private ACClassMethod _ACClassMethod;
@@ -305,6 +333,26 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ReferenceEntry TourplanReference 
     {
         get { return Context.Entry(this).Reference("Tourplan"); }
+    }
+    
+    private ACClassWF _VBiACClassWF;
+    public virtual ACClassWF VBiACClassWF
+    { 
+        get { return LazyLoader.Load(this, ref _VBiACClassWF); } 
+        set { SetProperty<ACClassWF>(ref _VBiACClassWF, value); }
+    }
+
+    public bool VBiACClassWF_IsLoaded
+    {
+        get
+        {
+            return VBiACClassWF != null;
+        }
+    }
+
+    public virtual ReferenceEntry VBiACClassWFReference 
+    {
+        get { return Context.Entry(this).Reference("VBiACClassWF"); }
     }
     
     private VisitorVoucher _VisitorVoucher;

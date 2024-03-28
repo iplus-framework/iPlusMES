@@ -8,18 +8,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System.Xml;
 using System.Data;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Worfklow scheduler base'}de{'Workflow Zeitplaner Basis'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.ProdOrderBatchPlan.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Worfklow scheduler base'}de{'Workflow Zeitplaner Basis'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.ProdOrderBatchPlan.ClassName)]
     public abstract class BSOWorkflowSchedulerBase : ACBSOvb
     {
         #region const
@@ -183,8 +182,8 @@ namespace gip.mes.processapplication
             return base.ACDeInit(deleteACClassTask);
         }
 
-        private vd.DatabaseApp _DatabaseApp;
-        public override vd.DatabaseApp DatabaseApp
+        private VD.DatabaseApp _DatabaseApp;
+        public override VD.DatabaseApp DatabaseApp
         {
             get
             {
@@ -193,7 +192,7 @@ namespace gip.mes.processapplication
                 if (ParentACComponent is Businessobjects
                     || !(ParentACComponent is ACBSOvb || ParentACComponent is ACBSOvbNav))
                 {
-                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
+                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<VD.DatabaseApp>(this.GetACUrl());
                     return _DatabaseApp;
                 }
                 else
@@ -204,7 +203,7 @@ namespace gip.mes.processapplication
                     ACBSOvb parent = ParentACComponent as ACBSOvb;
                     if (parent != null)
                         return parent.DatabaseApp;
-                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
+                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<VD.DatabaseApp>(this.GetACUrl());
                     return _DatabaseApp;
                 }
             }
@@ -859,7 +858,7 @@ namespace gip.mes.processapplication
                 return;
             PAScheduleForPWNode updateNode = new PAScheduleForPWNode();
             updateNode.CopyFrom(SelectedScheduleForPWNode, true);
-            updateNode.StartMode = (vd.BatchPlanStartModeEnum)SelectedFilterBatchPlanStartMode.Value;
+            updateNode.StartMode = (VD.BatchPlanStartModeEnum)SelectedFilterBatchPlanStartMode.Value;
             updateNode.UpdateName = Root.CurrentInvokingUser.Initials;
             var result = PAWorkflowScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { updateNode });
             if (result != null)
@@ -1303,7 +1302,7 @@ namespace gip.mes.processapplication
                         throw new Exception();
                     MDSchedulingGroupWF groupWf = MDSchedulingGroupWF.NewACObject(databaseApp, group);
                     groupWf.VBiACClassWF = item;
-                    databaseApp.MDSchedulingGroup.AddObject(group);
+                    databaseApp.MDSchedulingGroup.Add(group);
                 }
                 LocalSaveChanges();
                 OnPropertyChanged(nameof(ScheduleForPWNodeList));

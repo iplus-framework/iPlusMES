@@ -500,10 +500,11 @@ namespace gip.mes.datamodel
             FacilityReservationEntityType.CreateForeignKey5(facilityReservation, material);
             FacilityReservationEntityType.CreateForeignKey6(facilityReservation, outOrderPos);
             FacilityReservationEntityType.CreateForeignKey7(facilityReservation, facilityReservation);
-            FacilityReservationEntityType.CreateForeignKey8(facilityReservation, prodOrderBatchPlan);
-            FacilityReservationEntityType.CreateForeignKey9(facilityReservation, prodOrderPartslistPos);
-            FacilityReservationEntityType.CreateForeignKey10(facilityReservation, prodOrderPartslistPosRelation);
-            FacilityReservationEntityType.CreateForeignKey11(facilityReservation, aCClass);
+            FacilityReservationEntityType.CreateForeignKey8(facilityReservation, pickingPos);
+            FacilityReservationEntityType.CreateForeignKey9(facilityReservation, prodOrderBatchPlan);
+            FacilityReservationEntityType.CreateForeignKey10(facilityReservation, prodOrderPartslistPos);
+            FacilityReservationEntityType.CreateForeignKey11(facilityReservation, prodOrderPartslistPosRelation);
+            FacilityReservationEntityType.CreateForeignKey12(facilityReservation, aCClass);
             FacilityStockEntityType.CreateForeignKey1(facilityStock, facility);
             FacilityStockEntityType.CreateForeignKey2(facilityStock, mDReleaseState);
             HistoryConfigEntityType.CreateForeignKey1(historyConfig, history);
@@ -587,7 +588,8 @@ namespace gip.mes.datamodel
             LabOrderEntityType.CreateForeignKey4(labOrder, mDLabOrderState);
             LabOrderEntityType.CreateForeignKey5(labOrder, material);
             LabOrderEntityType.CreateForeignKey6(labOrder, outOrderPos);
-            LabOrderEntityType.CreateForeignKey7(labOrder, prodOrderPartslistPos);
+            LabOrderEntityType.CreateForeignKey7(labOrder, pickingPos);
+            LabOrderEntityType.CreateForeignKey8(labOrder, prodOrderPartslistPos);
             LabOrderPosEntityType.CreateForeignKey1(labOrderPos, labOrder);
             LabOrderPosEntityType.CreateForeignKey2(labOrderPos, mDLabOrderPosState);
             LabOrderPosEntityType.CreateForeignKey3(labOrderPos, mDLabTag);
@@ -780,7 +782,8 @@ namespace gip.mes.datamodel
             PickingEntityType.CreateForeignKey2(picking, companyAddress);
             PickingEntityType.CreateForeignKey3(picking, mDPickingType);
             PickingEntityType.CreateForeignKey4(picking, tourplan);
-            PickingEntityType.CreateForeignKey5(picking, visitorVoucher);
+            PickingEntityType.CreateForeignKey5(picking, aCClassWF);
+            PickingEntityType.CreateForeignKey6(picking, visitorVoucher);
             PickingConfigEntityType.CreateForeignKey1(pickingConfig, material);
             PickingConfigEntityType.CreateForeignKey2(pickingConfig, pickingConfig);
             PickingConfigEntityType.CreateForeignKey3(pickingConfig, picking);
@@ -942,6 +945,7 @@ namespace gip.mes.datamodel
             WeighingEntityType.CreateForeignKey2(weighing, labOrderPos);
             WeighingEntityType.CreateForeignKey3(weighing, outOrderPos);
             WeighingEntityType.CreateForeignKey4(weighing, pickingPos);
+            WeighingEntityType.CreateForeignKey5(weighing, visitorVoucher);
 
             ACAssemblyEntityType.CreateAnnotations(aCAssembly);
             ACChangeLogEntityType.CreateAnnotations(aCChangeLog);

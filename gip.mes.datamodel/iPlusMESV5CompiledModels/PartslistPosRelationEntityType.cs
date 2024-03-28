@@ -36,6 +36,21 @@ namespace gip.mes.datamodel
                 nullable: true);
             anterograde.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var insertDate = runtimeEntityType.AddProperty(
+                "InsertDate",
+                typeof(DateTime),
+                propertyInfo: typeof(PartslistPosRelation).GetProperty("InsertDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PartslistPosRelation).GetField("_InsertDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var insertName = runtimeEntityType.AddProperty(
+                "InsertName",
+                typeof(string),
+                propertyInfo: typeof(PartslistPosRelation).GetProperty("InsertName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PartslistPosRelation).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var materialWFRelationID = runtimeEntityType.AddProperty(
                 "MaterialWFRelationID",
                 typeof(Guid?),
@@ -86,6 +101,21 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(PartslistPosRelation).GetProperty("TargetQuantityUOM", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PartslistPosRelation).GetField("_TargetQuantityUOM", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
             targetQuantityUOM.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var updateDate = runtimeEntityType.AddProperty(
+                "UpdateDate",
+                typeof(DateTime),
+                propertyInfo: typeof(PartslistPosRelation).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PartslistPosRelation).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var updateName = runtimeEntityType.AddProperty(
+                "UpdateName",
+                typeof(string),
+                propertyInfo: typeof(PartslistPosRelation).GetProperty("UpdateName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PartslistPosRelation).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(
                 "LazyLoader",

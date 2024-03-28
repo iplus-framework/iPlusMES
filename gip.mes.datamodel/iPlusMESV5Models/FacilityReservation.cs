@@ -139,25 +139,11 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
         set { SetProperty<Guid?>(ref _VBiACClassID, value); }
     }
 
-    Guid? _PickingPosID;
-    public Guid? PickingPosID
-    {
-        get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
-    }
-
     int _Sequence;
     public int Sequence 
     {
         get { return _Sequence; }
         set { SetProperty<int>(ref _Sequence, value); }
-    }
-
-    double? _ReservedQuantityUOM;
-    public double? ReservedQuantityUOM
-    {
-        get { return _ReservedQuantityUOM; }
-        set { SetProperty<double?>(ref _ReservedQuantityUOM, value); }
     }
 
     short _ReservationStateIndex;
@@ -172,6 +158,20 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get { return _ProdOrderPartslistPosRelationID; }
         set { SetProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value); }
+    }
+
+    Guid? _PickingPosID;
+    public Guid? PickingPosID 
+    {
+        get { return _PickingPosID; }
+        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+    }
+
+    double? _ReservedQuantityUOM;
+    public double? ReservedQuantityUOM 
+    {
+        get { return _ReservedQuantityUOM; }
+        set { SetProperty<double?>(ref _ReservedQuantityUOM, value); }
     }
 
     private Facility _Facility;
@@ -334,6 +334,26 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
         get { return Context.Entry(this).Reference("FacilityReservation1_ParentFacilityReservation"); }
     }
     
+    private PickingPos _PickingPos;
+    public virtual PickingPos PickingPos
+    { 
+        get { return LazyLoader.Load(this, ref _PickingPos); } 
+        set { SetProperty<PickingPos>(ref _PickingPos, value); }
+    }
+
+    public bool PickingPos_IsLoaded
+    {
+        get
+        {
+            return PickingPos != null;
+        }
+    }
+
+    public virtual ReferenceEntry PickingPosReference 
+    {
+        get { return Context.Entry(this).Reference("PickingPos"); }
+    }
+    
     private ProdOrderBatchPlan _ProdOrderBatchPlan;
     public virtual ProdOrderBatchPlan ProdOrderBatchPlan
     { 
@@ -413,24 +433,4 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get { return Context.Entry(this).Reference("VBiACClass"); }
     }
-
-    private PickingPos _PickingPos;
-    public virtual PickingPos PickingPos
-    {
-        get { return LazyLoader.Load(this, ref _PickingPos); }
-        set { SetProperty<PickingPos>(ref _PickingPos, value); }
     }
-
-    public bool PickingPos_IsLoaded
-    {
-        get
-        {
-            return PickingPos != null;
-        }
-    }
-
-    public virtual ReferenceEntry PickingPosReference
-    {
-        get { return Context.Entry(this).Reference("PickingPos"); }
-    }
-}

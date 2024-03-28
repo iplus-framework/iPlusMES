@@ -384,6 +384,11 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="DbScripts\iPlusMES\info.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <PropertyGroup />
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(OutDir)\iPlusMESV4.csdl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />

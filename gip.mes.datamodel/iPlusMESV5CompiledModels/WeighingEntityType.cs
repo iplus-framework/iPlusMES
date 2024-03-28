@@ -104,6 +104,28 @@ namespace gip.mes.datamodel
             startDate.AddAnnotation("Relational:ColumnType", "datetime");
             startDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var stateIndex = runtimeEntityType.AddProperty(
+                "StateIndex",
+                typeof(short),
+                propertyInfo: typeof(Weighing).GetProperty("StateIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_StateIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            stateIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var updateDate = runtimeEntityType.AddProperty(
+                "UpdateDate",
+                typeof(DateTime),
+                propertyInfo: typeof(Weighing).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var updateName = runtimeEntityType.AddProperty(
+                "UpdateName",
+                typeof(string),
+                propertyInfo: typeof(Weighing).GetProperty("UpdateName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var vBiACClassID = runtimeEntityType.AddProperty(
                 "VBiACClassID",
                 typeof(Guid?),
@@ -111,6 +133,14 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Weighing).GetField("_VBiACClassID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             vBiACClassID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var visitorVoucherID = runtimeEntityType.AddProperty(
+                "VisitorVoucherID",
+                typeof(Guid?),
+                propertyInfo: typeof(Weighing).GetProperty("VisitorVoucherID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_VisitorVoucherID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            visitorVoucherID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var weighingNo = runtimeEntityType.AddProperty(
                 "WeighingNo",
@@ -120,6 +150,12 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             weighingNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var weighingState = runtimeEntityType.AddProperty(
+                "WeighingState",
+                typeof(WeighingStateEnum),
+                propertyInfo: typeof(Weighing).GetProperty("WeighingState", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            weighingState.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var weighingTotalXML = runtimeEntityType.AddProperty(
                 "WeighingTotalXML",
@@ -164,6 +200,9 @@ namespace gip.mes.datamodel
 
             var index2 = runtimeEntityType.AddIndex(
                 new[] { pickingPosID });
+
+            var index3 = runtimeEntityType.AddIndex(
+                new[] { visitorVoucherID });
 
             var nCI_FK_Weighing_ACClassID = runtimeEntityType.AddIndex(
                 new[] { vBiACClassID },
@@ -278,6 +317,31 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.Field);
 
             runtimeForeignKey.AddAnnotation("Relational:Name", "FK_Weighing_PickingPosID");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VisitorVoucherID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("VisitorVoucherID") }),
+                principalEntityType);
+
+            var visitorVoucher = declaringEntityType.AddNavigation("VisitorVoucher",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(VisitorVoucher),
+                propertyInfo: typeof(Weighing).GetProperty("VisitorVoucher", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_VisitorVoucher", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var weighing_VisitorVoucher = principalEntityType.AddNavigation("Weighing_VisitorVoucher",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<Weighing>),
+                propertyInfo: typeof(VisitorVoucher).GetProperty("Weighing_VisitorVoucher", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(VisitorVoucher).GetField("_Weighing_VisitorVoucher", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
             return runtimeForeignKey;
         }
 

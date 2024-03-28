@@ -2824,7 +2824,7 @@ namespace gip.bso.manufacturing
                 if (facilityIDs == null)
                     return null;
 
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
                     //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
 
@@ -2846,7 +2846,7 @@ namespace gip.bso.manufacturing
                             Guid? materialID = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.MaterialID;
                             if (materialID.HasValue)
                             {
-                                IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                IEnumerable<VD.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
                                 if (!ShowAllQuants)
                                 {
                                     ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
@@ -2863,7 +2863,7 @@ namespace gip.bso.manufacturing
                             Guid? materialID = SelectedWeighingMaterial?.PickingPosition?.Material?.MaterialID;
                             if (materialID.HasValue)
                             {
-                                IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                IEnumerable<VD.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
                                 if (!ShowAllQuants)
                                 {
                                     ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);

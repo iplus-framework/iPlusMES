@@ -111,6 +111,14 @@ namespace gip.mes.datamodel
                 nullable: true);
             parentFacilityReservationID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var pickingPosID = runtimeEntityType.AddProperty(
+                "PickingPosID",
+                typeof(Guid?),
+                propertyInfo: typeof(FacilityReservation).GetProperty("PickingPosID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(FacilityReservation).GetField("_PickingPosID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            pickingPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var prodOrderBatchPlanID = runtimeEntityType.AddProperty(
                 "ProdOrderBatchPlanID",
                 typeof(Guid?),
@@ -141,6 +149,14 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(FacilityReservation).GetProperty("ReservationStateIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityReservation).GetField("_ReservationStateIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
             reservationStateIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var reservedQuantityUOM = runtimeEntityType.AddProperty(
+                "ReservedQuantityUOM",
+                typeof(double?),
+                propertyInfo: typeof(FacilityReservation).GetProperty("ReservedQuantityUOM", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(FacilityReservation).GetField("_ReservedQuantityUOM", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            reservedQuantityUOM.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sequence = runtimeEntityType.AddProperty(
                 "Sequence",
@@ -190,6 +206,9 @@ namespace gip.mes.datamodel
             var key = runtimeEntityType.AddKey(
                 new[] { facilityReservationID });
             runtimeEntityType.SetPrimaryKey(key);
+
+            var index = runtimeEntityType.AddIndex(
+                new[] { pickingPosID });
 
             var nCI_FK_FacilityReservation_FacilityChargeID = runtimeEntityType.AddIndex(
                 new[] { facilityChargeID },
@@ -435,6 +454,31 @@ namespace gip.mes.datamodel
 
         public static RuntimeForeignKey CreateForeignKey8(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PickingPosID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PickingPosID") }),
+                principalEntityType);
+
+            var pickingPos = declaringEntityType.AddNavigation("PickingPos",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(PickingPos),
+                propertyInfo: typeof(FacilityReservation).GetProperty("PickingPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(FacilityReservation).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var facilityReservation_PickingPos = principalEntityType.AddNavigation("FacilityReservation_PickingPos",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<FacilityReservation>),
+                propertyInfo: typeof(PickingPos).GetProperty("FacilityReservation_PickingPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PickingPos).GetField("_FacilityReservation_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey9(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderBatchPlanID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderBatchPlanID") }),
                 principalEntityType);
@@ -459,7 +503,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey9(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey10(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosID") }),
@@ -485,7 +529,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey10(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey11(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistPosRelationID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosRelationID") }),
@@ -511,7 +555,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey11(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey12(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiACClassID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassID") }),

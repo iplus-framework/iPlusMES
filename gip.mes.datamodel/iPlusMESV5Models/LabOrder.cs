@@ -153,6 +153,13 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _RefACClassID, value); }
     }
 
+    Guid? _PickingPosID;
+    public Guid? PickingPosID 
+    {
+        get { return _PickingPosID; }
+        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+    }
+
     private LabOrder _LabOrder1_BasedOnTemplate;
     public virtual LabOrder LabOrder1_BasedOnTemplate
     { 
@@ -311,6 +318,26 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ReferenceEntry OutOrderPosReference 
     {
         get { return Context.Entry(this).Reference("OutOrderPos"); }
+    }
+    
+    private PickingPos _PickingPos;
+    public virtual PickingPos PickingPos
+    { 
+        get { return LazyLoader.Load(this, ref _PickingPos); } 
+        set { SetProperty<PickingPos>(ref _PickingPos, value); }
+    }
+
+    public bool PickingPos_IsLoaded
+    {
+        get
+        {
+            return PickingPos != null;
+        }
+    }
+
+    public virtual ReferenceEntry PickingPosReference 
+    {
+        get { return Context.Entry(this).Reference("PickingPos"); }
     }
     
     private ProdOrderPartslistPos _ProdOrderPartslistPos;

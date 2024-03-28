@@ -800,6 +800,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(15, "", "en{'Is Lot reservation obligatory'}de{'Chargenreservierungspflichtig'}")]
+        [NotMapped]
         public bool IsLotReservationNeeded
         {
             get

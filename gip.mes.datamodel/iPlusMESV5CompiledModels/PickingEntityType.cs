@@ -37,6 +37,22 @@ namespace gip.mes.datamodel
                 nullable: true);
             aCClassMethodID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var calculatedEndDate = runtimeEntityType.AddProperty(
+                "CalculatedEndDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(Picking).GetProperty("CalculatedEndDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_CalculatedEndDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            calculatedEndDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var calculatedStartDate = runtimeEntityType.AddProperty(
+                "CalculatedStartDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(Picking).GetProperty("CalculatedStartDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_CalculatedStartDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            calculatedStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var comment = runtimeEntityType.AddProperty(
                 "Comment",
                 typeof(string),
@@ -96,6 +112,13 @@ namespace gip.mes.datamodel
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var isSelected = runtimeEntityType.AddProperty(
+                "IsSelected",
+                typeof(bool),
+                propertyInfo: typeof(Picking).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var keyOfExtSys = runtimeEntityType.AddProperty(
                 "KeyOfExtSys",
                 typeof(string),
@@ -137,6 +160,30 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_PickingStateIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
             pickingStateIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var scheduledEndDate = runtimeEntityType.AddProperty(
+                "ScheduledEndDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(Picking).GetProperty("ScheduledEndDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_ScheduledEndDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            scheduledEndDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var scheduledOrder = runtimeEntityType.AddProperty(
+                "ScheduledOrder",
+                typeof(int?),
+                propertyInfo: typeof(Picking).GetProperty("ScheduledOrder", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_ScheduledOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            scheduledOrder.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var scheduledStartDate = runtimeEntityType.AddProperty(
+                "ScheduledStartDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(Picking).GetProperty("ScheduledStartDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_ScheduledStartDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            scheduledStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var tourplanID = runtimeEntityType.AddProperty(
                 "TourplanID",
                 typeof(Guid?),
@@ -161,6 +208,14 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var vBiACClassWFID = runtimeEntityType.AddProperty(
+                "VBiACClassWFID",
+                typeof(Guid?),
+                propertyInfo: typeof(Picking).GetProperty("VBiACClassWFID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_VBiACClassWFID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            vBiACClassWFID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var visitorVoucherID = runtimeEntityType.AddProperty(
                 "VisitorVoucherID",
@@ -195,6 +250,9 @@ namespace gip.mes.datamodel
 
             var index1 = runtimeEntityType.AddIndex(
                 new[] { mDPickingTypeID });
+
+            var index2 = runtimeEntityType.AddIndex(
+                new[] { vBiACClassWFID });
 
             var nCI_FK_Picking_TourplanID = runtimeEntityType.AddIndex(
                 new[] { tourplanID },
@@ -318,6 +376,31 @@ namespace gip.mes.datamodel
         }
 
         public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiACClassWFID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassWFID") }),
+                principalEntityType);
+
+            var vBiACClassWF = declaringEntityType.AddNavigation("VBiACClassWF",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(ACClassWF),
+                propertyInfo: typeof(Picking).GetProperty("VBiACClassWF", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Picking).GetField("_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var picking_VBiACClassWF = principalEntityType.AddNavigation("Picking_VBiACClassWF",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<Picking>),
+                propertyInfo: typeof(ACClassWF).GetProperty("Picking_VBiACClassWF", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClassWF).GetField("_Picking_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VisitorVoucherID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("VisitorVoucherID") }),

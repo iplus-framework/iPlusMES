@@ -1897,21 +1897,19 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
 
-        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_Quants =
-        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
-            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
-                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityCharge>> s_cQry_Quants =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityCharge>>(
+            (ctx, facilityID) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue)
                                                 .OrderByDescending(c => c.FillingDate)
         );
 
-        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
-        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
-            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
-                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityCharge>> s_cQry_QuantsReverse =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityCharge>>(
+            (ctx, facilityID) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue)
                                                 .OrderBy(c => c.FillingDate)
         );
-        #endregion
-
         #endregion
 
         #endregion

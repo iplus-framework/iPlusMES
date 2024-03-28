@@ -94,8 +94,8 @@ namespace gip.mes.facility
         );
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>> s_cQry_PickingForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>>(
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, string, string, IEnumerable<Picking>> s_cQry_PickingForPWNode =
+        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, string, string, IEnumerable<Picking>>(
             (ctx, mdSchedulingGroupID, greaterEqualState, lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) =>
                                     ctx.Picking
                                     .Include("PickingPos_Picking.PickingMaterial")
@@ -130,7 +130,7 @@ namespace gip.mes.facility
         );
 
 
-        public ObjectQuery<Picking> GetScheduledPickings(
+        public IEnumerable<Picking> GetScheduledPickings(
             DatabaseApp databaseApp,
             Guid? mdSchedulingGroupID,
             PickingStateEnum greaterEqualState,
@@ -140,9 +140,9 @@ namespace gip.mes.facility
             string pickingNo,
             string materialNo)
         {
-            ObjectQuery<Picking> query = s_cQry_PickingForPWNode(databaseApp, mdSchedulingGroupID, (short)greaterEqualState,
-                (short)lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) as ObjectQuery<Picking>;
-            query.MergeOption = MergeOption.OverwriteChanges;
+            IEnumerable<Picking> query = s_cQry_PickingForPWNode(databaseApp, mdSchedulingGroupID, (short)greaterEqualState,
+                (short)lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) as IEnumerable<Picking>;
+            //query.AutoMergeOption();
             return query;
         }
 
@@ -1130,7 +1130,7 @@ namespace gip.mes.facility
                         reservation.ReservedQuantityUOM = reservationQ;
                         reservation.FacilityLot = flGroup.Key;
                         reservation.PickingPos = pickingPos;
-                        dbApp.FacilityReservation.AddObject(reservation);
+                        dbApp.FacilityReservation.Add(reservation);
                     }
                 }
             }
@@ -2208,8 +2208,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, bool, IQueryable<FacilityCharge>> s_cQry_PickingSilosWithMaterial =
-        CompiledQuery.Compile<DatabaseApp, Material, bool, bool, IQueryable<FacilityCharge>>(
+        protected static readonly Func<DatabaseApp, Material, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PickingSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, Material, bool, bool, IEnumerable<FacilityCharge>>(
             (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
@@ -2236,8 +2236,8 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IQueryable<FacilityCharge>> s_cQry_PickingSilosWithMaterialTime =
-        CompiledQuery.Compile<DatabaseApp, Material, bool, DateTime, bool, IQueryable<FacilityCharge>>(
+        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IEnumerable<FacilityCharge>> s_cQry_PickingSilosWithMaterialTime =
+        EF.CompileQuery<DatabaseApp, Material, bool, DateTime, bool, IEnumerable<FacilityCharge>>(
             (ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
@@ -2344,14 +2344,14 @@ namespace gip.mes.facility
                 {
                     FacilityReservation[] selectedModules = new FacilityReservation[] { };
                     if (
-                            pickingPos.EntityState != System.Data.EntityState.Added
-                            && !pickingPos.FacilityReservation_PickingPos.Any(c => c.VBiACClassID.HasValue && c.EntityState != System.Data.EntityState.Unchanged)
+                            pickingPos.EntityState != EntityState.Added
+                            && !pickingPos.FacilityReservation_PickingPos.Any(c => c.VBiACClassID.HasValue && c.EntityState != EntityState.Unchanged)
                         )
                     {
-                        pickingPos.FacilityReservation_PickingPos.AutoRefresh();
-                        selectedModules = pickingPos
-                            .FacilityReservation_PickingPos
-                            .CreateSourceQuery()
+                        //pickingPos.FacilityReservation_PickingPos.AutoRefresh();
+                        selectedModules = pickingPos.Context.Entry(pickingPos)
+                            .Collection(c => c.FacilityReservation_PickingPos)
+                            .Query()
                             .Include(c => c.Facility)
                             .Include(c => c.Facility.Material)
                             .Where(c => c.VBiACClassID.HasValue)
@@ -2411,8 +2411,8 @@ namespace gip.mes.facility
 
                     // select first if only one is present
                     if (preselectFirstReservation
-                        && ((pickingPos.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
-                            || ((pickingPos.EntityState == System.Data.EntityState.Unchanged || pickingPos.EntityState == System.Data.EntityState.Modified)
+                        && ((pickingPos.EntityState == EntityState.Added && reservationCollection.Count() == 1)
+                            || ((pickingPos.EntityState == EntityState.Unchanged || pickingPos.EntityState == EntityState.Modified)
                                     && reservationCollection.Count() == 1
                                     && !reservationCollection.Any(c => c.IsChecked))))
                         reservationCollection[0].IsChecked = true;
@@ -2546,7 +2546,7 @@ namespace gip.mes.facility
             gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(databaseApp.ContextIPlus, null, secondaryKey);
             program.ProgramACClassMethod = acClassMethod;
             program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
-            databaseApp.ContextIPlus.ACProgram.AddObject(program);
+            databaseApp.ContextIPlus.ACProgram.Add(program);
             //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
             picking.PickingState = PickingStateEnum.WFActive;
             MsgWithDetails saveMsg = databaseApp.ACSaveChanges();

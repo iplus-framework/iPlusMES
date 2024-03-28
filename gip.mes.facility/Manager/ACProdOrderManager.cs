@@ -72,17 +72,17 @@ namespace gip.mes.facility
 
         #region PrecompiledQueries
         //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
-        //CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
         //);
 
         //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
-        //CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
         //);
 
         //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
-        //CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         //);
 

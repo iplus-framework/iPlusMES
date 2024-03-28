@@ -108,6 +108,14 @@ namespace gip.mes.datamodel
                 nullable: true);
             outOrderPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var pickingPosID = runtimeEntityType.AddProperty(
+                "PickingPosID",
+                typeof(Guid?),
+                propertyInfo: typeof(LabOrder).GetProperty("PickingPosID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(LabOrder).GetField("_PickingPosID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            pickingPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var prodOrderPartslistPosID = runtimeEntityType.AddProperty(
                 "ProdOrderPartslistPosID",
                 typeof(Guid?),
@@ -183,6 +191,9 @@ namespace gip.mes.datamodel
             var key = runtimeEntityType.AddKey(
                 new[] { labOrderID });
             runtimeEntityType.SetPrimaryKey(key);
+
+            var index = runtimeEntityType.AddIndex(
+                new[] { pickingPosID });
 
             var nCI_FK_LabOrder_BasedOnTemplateID = runtimeEntityType.AddIndex(
                 new[] { basedOnTemplateID },
@@ -383,6 +394,31 @@ namespace gip.mes.datamodel
         }
 
         public static RuntimeForeignKey CreateForeignKey7(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PickingPosID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PickingPosID") }),
+                principalEntityType);
+
+            var pickingPos = declaringEntityType.AddNavigation("PickingPos",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(PickingPos),
+                propertyInfo: typeof(LabOrder).GetProperty("PickingPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(LabOrder).GetField("_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var labOrder_PickingPos = principalEntityType.AddNavigation("LabOrder_PickingPos",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<LabOrder>),
+                propertyInfo: typeof(PickingPos).GetProperty("LabOrder_PickingPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PickingPos).GetField("_LabOrder_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey8(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosID") }),

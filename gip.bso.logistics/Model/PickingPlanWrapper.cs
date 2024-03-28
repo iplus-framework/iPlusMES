@@ -7,6 +7,7 @@ using System.Text;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
@@ -381,7 +382,7 @@ namespace gip.bso.logistics
         {
             _Reservations = new List<PickingPlanReservWrapper>();
             _Targets = new List<PickingPlanTargetWrapper>();
-            PickingPos.FacilityReservation_PickingPos.AutoRefresh();
+            PickingPos.FacilityReservation_PickingPos.AutoRefresh(PickingPos.FacilityReservation_PickingPosReference, PickingPos);
             foreach (FacilityReservation reservation in PickingPos.FacilityReservation_PickingPos)
             {
                 if (!reservation.VBiACClassID.HasValue && reservation.FacilityLot != null)

@@ -472,6 +472,26 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PickingConfig_VBiACClassWF); }
     }
 
+    private ICollection<Picking> _Picking_VBiACClassWF;
+    public virtual ICollection<Picking> Picking_VBiACClassWF
+    {
+        get { return LazyLoader.Load(this, ref _Picking_VBiACClassWF); }
+        set { _Picking_VBiACClassWF = value; }
+    }
+
+    public bool Picking_VBiACClassWF_IsLoaded
+    {
+        get
+        {
+            return Picking_VBiACClassWF != null;
+        }
+    }
+
+    public virtual CollectionEntry Picking_VBiACClassWFReference
+    {
+        get { return Context.Entry(this).Collection(c => c.Picking_VBiACClassWF); }
+    }
+
     private ICollection<ProdOrderBatchPlan> _ProdOrderBatchPlan_VBiACClassWF;
     public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWF
     {

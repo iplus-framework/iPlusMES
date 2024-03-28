@@ -38,6 +38,12 @@ public partial class IPCDrivesV5Context : DbContext
 
     public virtual DbSet<ACClassPropertyRelation> ACClassPropertyRelation { get; set; }
 
+    public virtual DbSet<ACClassRouteUsage> ACClassRouteUsage { get; set; }
+
+    public virtual DbSet<ACClassRouteUsageGroup> ACClassRouteUsageGroup { get; set; }
+
+    public virtual DbSet<ACClassRouteUsagePos> ACClassRouteUsagePos { get; set; }
+
     public virtual DbSet<ACClassTask> ACClassTask { get; set; }
 
     public virtual DbSet<ACClassTaskValue> ACClassTaskValue { get; set; }
@@ -1025,6 +1031,45 @@ public partial class IPCDrivesV5Context : DbContext
            entity.HasOne(d => d.TargetACClassProperty).WithMany(p => p.ACClassPropertyRelation_TargetACClassProperty)
                 .HasForeignKey(d => d.TargetACClassPropertyID)
                 .HasConstraintName("FK_ACClassPropertyRelation_TargetACClassPropertyID");
+        });
+
+        modelBuilder.Entity<ACClassRouteUsage>(entity =>
+        {
+            entity.ToTable("ACClassRouteUsage");
+
+            entity.Property(e => e.ACClassRouteUsageID).ValueGeneratedNever();
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<ACClassRouteUsageGroup>(entity =>
+        {
+            entity.ToTable("ACClassRouteUsageGroup");
+
+            entity.Property(e => e.ACClassRouteUsageGroupID).ValueGeneratedNever();
+
+           entity.HasOne(d => d.ACClassRouteUsage).WithMany(p => p.ACClassRouteUsageGroup_ACClassRouteUsage)
+                .HasForeignKey(d => d.ACClassRouteUsageID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ACClassRouteUsageGroup_ACClassRouteUsage");
+        });
+
+        modelBuilder.Entity<ACClassRouteUsagePos>(entity =>
+        {
+            entity.Property(e => e.ACClassRouteUsagePosID).ValueGeneratedNever();
+
+           entity.HasOne(d => d.ACClassRouteUsage).WithMany(p => p.ACClassRouteUsagePos_ACClassRouteUsage)
+                .HasForeignKey(d => d.ACClassRouteUsageID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ACClassRouteUsagePos_ACClassRouteUsage");
         });
 
         modelBuilder.Entity<ACClassTask>(entity =>
@@ -3525,6 +3570,10 @@ public partial class IPCDrivesV5Context : DbContext
                 .HasForeignKey(d => d.ParentFacilityReservationID)
                 .HasConstraintName("FK_FacilityReservation_ParentFacilityReservationID");
 
+           entity.HasOne(d => d.PickingPos).WithMany(p => p.FacilityReservation_PickingPos)
+                .HasForeignKey(d => d.PickingPosID)
+                .HasConstraintName("FK_FacilityReservation_PickingPos");
+
            entity.HasOne(d => d.ProdOrderBatchPlan).WithMany(p => p.FacilityReservation_ProdOrderBatchPlan)
                 .HasForeignKey(d => d.ProdOrderBatchPlanID)
                 .HasConstraintName("FK_FacilityReservation_ProdOrderBatchPlanID");
@@ -4377,6 +4426,10 @@ public partial class IPCDrivesV5Context : DbContext
            entity.HasOne(d => d.OutOrderPos).WithMany(p => p.LabOrder_OutOrderPos)
                 .HasForeignKey(d => d.OutOrderPosID)
                 .HasConstraintName("FK_LabOrder_OutOrderPosID");
+
+           entity.HasOne(d => d.PickingPos).WithMany(p => p.LabOrder_PickingPos)
+                .HasForeignKey(d => d.PickingPosID)
+                .HasConstraintName("FK_LabOrder_PickingPosID");
 
            entity.HasOne(d => d.ProdOrderPartslistPos).WithMany(p => p.LabOrder_ProdOrderPartslistPos)
                 .HasForeignKey(d => d.ProdOrderPartslistPosID)
@@ -8244,6 +8297,16 @@ public partial class IPCDrivesV5Context : DbContext
             entity.HasIndex(e => e.TargetPartslistPosID, "NCI_FK_PartslistPosRelation_TargetPartslistPosID");
 
             entity.Property(e => e.PartslistPosRelationID).ValueGeneratedNever();
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
 
            entity.HasOne(d => d.MaterialWFRelation).WithMany(p => p.PartslistPosRelation_MaterialWFRelation)
                 .HasForeignKey(d => d.MaterialWFRelationID)
@@ -8329,6 +8392,8 @@ public partial class IPCDrivesV5Context : DbContext
             entity.HasIndex(e => e.PickingNo, "UIX_Picking_PickingNo").IsUnique();
 
             entity.Property(e => e.PickingID).ValueGeneratedNever();
+            entity.Property(e => e.CalculatedEndDate).HasColumnType("datetime");
+            entity.Property(e => e.CalculatedStartDate).HasColumnType("datetime");
             entity.Property(e => e.Comment).IsUnicode(false);
             entity.Property(e => e.Comment2).IsUnicode(false);
             entity.Property(e => e.DeliveryDateFrom).HasColumnType("datetime");
@@ -8345,6 +8410,8 @@ public partial class IPCDrivesV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(30)
                 .IsUnicode(false);
+            entity.Property(e => e.ScheduledEndDate).HasColumnType("datetime");
+            entity.Property(e => e.ScheduledStartDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateName)
                 .IsRequired()
@@ -8368,6 +8435,10 @@ public partial class IPCDrivesV5Context : DbContext
            entity.HasOne(d => d.Tourplan).WithMany(p => p.Picking_Tourplan)
                 .HasForeignKey(d => d.TourplanID)
                 .HasConstraintName("FK_Picking_TourplanID");
+
+           entity.HasOne(d => d.VBiACClassWF).WithMany(p => p.Picking_VBiACClassWF)
+                .HasForeignKey(d => d.VBiACClassWFID)
+                .HasConstraintName("FK_Picking_ACClassWFID");
 
            entity.HasOne(d => d.VisitorVoucher).WithMany(p => p.Picking_VisitorVoucher)
                 .HasForeignKey(d => d.VisitorVoucherID)
@@ -10071,7 +10142,7 @@ public partial class IPCDrivesV5Context : DbContext
             entity.Property(e => e.MandatoryACURLCached).IsUnicode(false);
             entity.Property(e => e.TableName)
                 .IsRequired()
-                .HasMaxLength(248)
+                .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.TranslationValue).IsUnicode(false);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
@@ -10416,6 +10487,11 @@ public partial class IPCDrivesV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .IsUnicode(false);
             entity.Property(e => e.WeighingNo)
                 .IsRequired()
                 .HasMaxLength(20)
@@ -10440,6 +10516,10 @@ public partial class IPCDrivesV5Context : DbContext
            entity.HasOne(d => d.PickingPos).WithMany(p => p.Weighing_PickingPos)
                 .HasForeignKey(d => d.PickingPosID)
                 .HasConstraintName("FK_Weighing_PickingPosID");
+
+           entity.HasOne(d => d.VisitorVoucher).WithMany(p => p.Weighing_VisitorVoucher)
+                .HasForeignKey(d => d.VisitorVoucherID)
+                .HasConstraintName("FK_Weighing_VisitorVoucherID");
         });
 
         OnModelCreatingPartial(modelBuilder);

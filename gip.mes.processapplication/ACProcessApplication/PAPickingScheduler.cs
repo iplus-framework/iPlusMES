@@ -1,13 +1,11 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.mes.datamodel;
-using System.Data.Objects;
-using System.Data.Common.CommandTrees;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
 {
@@ -65,8 +63,8 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Precompiled Queries
-        protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<Picking>> s_cQry_ReadyPickingsForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<Picking>>(
+        protected static readonly Func<DatabaseApp, Guid, Guid, IEnumerable<Picking>> s_cQry_ReadyPickingsForPWNode =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IEnumerable<Picking>>(
                 (ctx, mdSchedulingGroupID, appDefManagerID) => ctx.Picking
                                     .Where(c => c.ACClassMethodID.HasValue
                                                 && c.PickingStateIndex == (short)PickingStateEnum.WFReadyToStart
@@ -90,7 +88,7 @@ namespace gip.mes.processapplication
 
             if (startMode == BatchPlanStartModeEnum.AutoTime)
             {
-                IQueryable<Picking> readyPickings = s_cQry_ReadyPickingsForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
+                IEnumerable<Picking> readyPickings = s_cQry_ReadyPickingsForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
                 DateTime dateTimeIfNull = DateTime.Now.AddDays(1);
                 startablePickings = readyPickings.Where(c => (c.ScheduledStartDate ?? dateTimeIfNull) <= DateTime.Now).ToArray().Distinct().ToList();
             }
@@ -105,7 +103,7 @@ namespace gip.mes.processapplication
                                                 .Any())
                         return;
                 }
-                IQueryable<Picking> readyPickings = s_cQry_ReadyPickingsForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
+                IEnumerable<Picking> readyPickings = s_cQry_ReadyPickingsForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
                 if (!readyPickings.Any())
                     return;
                 Picking nextPicking = null;

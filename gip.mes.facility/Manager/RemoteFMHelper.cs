@@ -225,23 +225,24 @@ namespace gip.mes.facility
             sql = sql.Replace("{LocalDBName}", localDatabaseName);
             sql = sql.Replace("{RemoteDBName}", remoteDatabaseName);
 
-            List<RemotePickingInfo> remotePickingInfos = databaseApp.ExecuteStoreQuery<RemotePickingInfo>(sql).ToList<RemotePickingInfo>();
+            // TODO:
+            //List<RemotePickingInfo> remotePickingInfos = databaseApp.ExecuteStoreQuery<RemotePickingInfo>(sql).ToList<RemotePickingInfo>();
 
 
-            FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
-            ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
+            //FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
+            //ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
 
-            if (!string.IsNullOrEmpty(remoteConnString) && facilityManager != null && aCPickingManager != null)
-            {
-                RemoteFMHelper fm = new RemoteFMHelper();
+            //if (!string.IsNullOrEmpty(remoteConnString) && facilityManager != null && aCPickingManager != null)
+            //{
+            //    RemoteFMHelper fm = new RemoteFMHelper();
 
-                foreach (RemotePickingInfo remotePickingInfo in remotePickingInfos)
-                {
-                    RemoteStorePostingData remoteStorePostingData = fm.GetRemoteStorePostingData(remotePickingInfo.PickingNo, remoteConnString);
-                    fm.SynchronizeFacility(aCComponent, aCComponent.Messages, facilityManager, aCPickingManager, remoteConnString, remoteStorePostingData);
-                    result.Add(remotePickingInfo);
-                }
-            }
+            //    foreach (RemotePickingInfo remotePickingInfo in remotePickingInfos)
+            //    {
+            //        RemoteStorePostingData remoteStorePostingData = fm.GetRemoteStorePostingData(remotePickingInfo.PickingNo, remoteConnString);
+            //        fm.SynchronizeFacility(aCComponent, aCComponent.Messages, facilityManager, aCPickingManager, remoteConnString, remoteStorePostingData);
+            //        result.Add(remotePickingInfo);
+            //    }
+            //}
 
             return result;
         }
@@ -304,7 +305,7 @@ namespace gip.mes.facility
                 localMaterial = Material.NewACObject(dbLocal, null);
                 localMaterial.MaterialID = changedRemoteFC.MaterialID;
                 localMaterial.CopyFrom(changedRemoteFC.Material, false);
-                dbLocal.Material.AddObject(localMaterial);
+                dbLocal.Material.Add(localMaterial);
             }
 
             // Search charge with same ID

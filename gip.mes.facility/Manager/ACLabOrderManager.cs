@@ -1,11 +1,11 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace gip.mes.facility
 {
@@ -173,7 +173,7 @@ namespace gip.mes.facility
                 template.MDLabOrderState = dbApp.MDLabOrderState.FirstOrDefault(c => c.IsDefault);
                 template.TemplateName = templateName;
                 template.Material = material;
-                dbApp.LabOrder.AddObject(template);
+                dbApp.LabOrder.Add(template);
 
             }
 
@@ -189,7 +189,7 @@ namespace gip.mes.facility
                     resultItemTag.MDKey = resultItem.ACIdentifier;
                     resultItemTag.MDLabTagIndex = (short)MDLabTag.LabTags.Maesure;
                     resultItemTag.MDNameTrans = resultItem.ACCaptionTrans;
-                    dbApp.MDLabTag.AddObject(resultItemTag);
+                    dbApp.MDLabTag.Add(resultItemTag);
                 }
 
                 LabOrderPos pos = template.LabOrderPos_LabOrder.FirstOrDefault(c => c.MDLabTagID == resultItemTag.MDLabTagID);
@@ -197,7 +197,7 @@ namespace gip.mes.facility
                 {
                     pos = LabOrderPos.NewACObject(dbApp, template);
                     pos.MDLabTag = resultItemTag;
-                    dbApp.LabOrderPos.AddObject(pos);
+                    dbApp.LabOrderPos.Add(pos);
                 }
             }
 

@@ -240,6 +240,26 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_PickingPos); }
     }
 
+    private ICollection<FacilityReservation> _FacilityReservation_PickingPos;
+    public virtual ICollection<FacilityReservation> FacilityReservation_PickingPos
+    {
+        get { return LazyLoader.Load(this, ref _FacilityReservation_PickingPos); }
+        set { _FacilityReservation_PickingPos = value; }
+    }
+
+    public bool FacilityReservation_PickingPos_IsLoaded
+    {
+        get
+        {
+            return FacilityReservation_PickingPos != null;
+        }
+    }
+
+    public virtual CollectionEntry FacilityReservation_PickingPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.FacilityReservation_PickingPos); }
+    }
+
     private Facility _FromFacility;
     public virtual Facility FromFacility
     { 
@@ -280,6 +300,26 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("InOrderPos"); }
     }
     
+    private ICollection<LabOrder> _LabOrder_PickingPos;
+    public virtual ICollection<LabOrder> LabOrder_PickingPos
+    {
+        get { return LazyLoader.Load(this, ref _LabOrder_PickingPos); }
+        set { _LabOrder_PickingPos = value; }
+    }
+
+    public bool LabOrder_PickingPos_IsLoaded
+    {
+        get
+        {
+            return LabOrder_PickingPos != null;
+        }
+    }
+
+    public virtual CollectionEntry LabOrder_PickingPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.LabOrder_PickingPos); }
+    }
+
     private MDDelivPosLoadState _MDDelivPosLoadState;
     public virtual MDDelivPosLoadState MDDelivPosLoadState
     { 
@@ -458,26 +498,5 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual CollectionEntry Weighing_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_PickingPos); }
-    }
-
-
-    private ICollection<FacilityReservation> _FacilityReservation_PickingPos;
-    public virtual ICollection<FacilityReservation> FacilityReservation_PickingPos
-    {
-        get { return LazyLoader.Load(this, ref _FacilityReservation_PickingPos); }
-        set { _FacilityReservation_PickingPos = value; }
-    }
-
-    public bool FacilityReservation_PickingPos_IsLoaded
-    {
-        get
-        {
-            return FacilityReservation_PickingPos != null;
-        }
-    }
-
-    public virtual CollectionEntry FacilityReservation_PickingPosReference
-    {
-        get { return Context.Entry(this).Collection(c => c.FacilityReservation_PickingPos); }
     }
 }

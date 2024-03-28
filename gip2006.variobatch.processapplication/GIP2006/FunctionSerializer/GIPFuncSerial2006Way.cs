@@ -703,9 +703,8 @@ namespace gip2006.variobatch.processapplication
                     stringBuilder.AppendLine(item.ToString());
                 }
                 this.Messages.LogDebug(this.GetACUrl(), nameof(CreateSendPackages), stringBuilder.ToString());
-                //Clipboard.SetText(testResult);
+                //TextCopy.ClipboardService.SetText(testResult);
             }
-            TextCopy.ClipboardService.SetText(testResult);
 #endif
 
             errorMessage = null;

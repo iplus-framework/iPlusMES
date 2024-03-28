@@ -9,20 +9,19 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System.Xml;
 using System.Data;
 using gip.core.media;
-using System.Windows.Interop;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking scheduler'}de{'Kommission Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.Picking.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking scheduler'}de{'Kommission Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.Picking.ClassName)]
     public class BSOPickingScheduler : BSOWorkflowSchedulerBase
     {
         #region const
@@ -478,7 +477,7 @@ namespace gip.bso.logistics
                 return new ObservableCollection<PickingPlanWrapper>();
 
             PickingStateEnum lessEqualState = PickingStateEnum.InProcess;
-            vd.PickingStateEnum greaterEqualState = PickingStateEnum.WFReadyToStart;
+            VD.PickingStateEnum greaterEqualState = PickingStateEnum.WFReadyToStart;
             ObservableCollection<PickingPlanWrapper> scheduledPickings = null;
             try
             {
@@ -878,7 +877,7 @@ namespace gip.bso.logistics
         //}
 
         //protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        //CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
+        //EF.CompileQuery<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
         //    (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo, materialNo) =>
         //        ctx
         //        .ProdOrderPartslist
@@ -1089,7 +1088,7 @@ namespace gip.bso.logistics
         {
             //if (prodOrderBatchPlan.VBiACClassWF == null)
             //    return false;
-            //vd.ACClassWF tempACClassWFItem = selectedTargetScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup
+            //VD.ACClassWF tempACClassWFItem = selectedTargetScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup
             //                                    .Where(c => c.VBiACClassWF.ACClassMethodID == prodOrderBatchPlan.VBiACClassWF.ACClassMethodID)
             //                                    .Select(c => c.VBiACClassWF)
             //                                    .FirstOrDefault();
@@ -1416,7 +1415,7 @@ namespace gip.bso.logistics
                         }
                     }
 
-                    picking.PickingState = vd.PickingStateEnum.WFReadyToStart;
+                    picking.PickingState = VD.PickingStateEnum.WFReadyToStart;
                 }
 
                 if (msgWithDetails.MsgDetails.Any())
@@ -1489,7 +1488,7 @@ namespace gip.bso.logistics
         //            maintainOrderInfos.Add(maintainOrderInfo);
         //        }
 
-        //        if (batchPlan.PlanState >= vd.PickingStateEnum.Paused
+        //        if (batchPlan.PlanState >= VD.PickingStateEnum.Paused
         //            || batchPlan.ProdOrderBatch_Picking.Any())
         //        {
         //            batchPlan.PlanState = PickingStateEnum.Cancelled;
@@ -1872,10 +1871,10 @@ namespace gip.bso.logistics
             //List<PickingTimelineItem> treeViewItems = new List<PickingTimelineItem>();
             //List<PickingTimelineItem> timelineItems = new List<PickingTimelineItem>();
 
-            //vd.PickingStateEnum startState = PickingStateEnum.Created;
-            //vd.PickingStateEnum endState = PickingStateEnum.Paused;
+            //VD.PickingStateEnum startState = PickingStateEnum.Created;
+            //VD.PickingStateEnum endState = PickingStateEnum.Paused;
             //MDProdOrderState.ProdOrderStates? prodOrderState = null;
-            //ObservableCollection<vd.Picking> prodOrderBatchPlans =
+            //ObservableCollection<VD.Picking> prodOrderBatchPlans =
             //    PickingManager
             //    .GetProductionLinieBatchPlans(
             //        DatabaseApp,

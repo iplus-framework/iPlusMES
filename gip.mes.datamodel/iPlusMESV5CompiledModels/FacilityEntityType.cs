@@ -29,6 +29,13 @@ namespace gip.mes.datamodel
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             facilityID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var classCode = runtimeEntityType.AddProperty(
+                "ClassCode",
+                typeof(short),
+                propertyInfo: typeof(Facility).GetProperty("ClassCode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Facility).GetField("_ClassCode", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            classCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var comment = runtimeEntityType.AddProperty(
                 "Comment",
                 typeof(string),

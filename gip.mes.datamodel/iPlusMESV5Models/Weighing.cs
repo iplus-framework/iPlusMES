@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class Weighing : VBEntityObject
+public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
 {
 
     public Weighing()
@@ -97,13 +97,6 @@ public partial class Weighing : VBEntityObject
         set { SetProperty<string>(ref _IdentNr, value); }
     }
 
-    short _StateIndex;
-    public short StateIndex
-    {
-        get { return _StateIndex; }
-        set { SetProperty<short>(ref _StateIndex, value); }
-    }
-
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
@@ -130,6 +123,34 @@ public partial class Weighing : VBEntityObject
     {
         get { return _LabOrderPosID; }
         set { SetProperty<Guid?>(ref _LabOrderPosID, value); }
+    }
+
+    Guid? _VisitorVoucherID;
+    public Guid? VisitorVoucherID 
+    {
+        get { return _VisitorVoucherID; }
+        set { SetProperty<Guid?>(ref _VisitorVoucherID, value); }
+    }
+
+    string _UpdateName;
+    public string UpdateName 
+    {
+        get { return _UpdateName; }
+        set { SetProperty<string>(ref _UpdateName, value); }
+    }
+
+    DateTime _UpdateDate;
+    public DateTime UpdateDate 
+    {
+        get { return _UpdateDate; }
+        set { SetProperty<DateTime>(ref _UpdateDate, value); }
+    }
+
+    short _StateIndex;
+    public short StateIndex 
+    {
+        get { return _StateIndex; }
+        set { SetProperty<short>(ref _StateIndex, value); }
     }
 
     private InOrderPos _InOrderPos;
@@ -210,5 +231,25 @@ public partial class Weighing : VBEntityObject
     public virtual ReferenceEntry PickingPosReference 
     {
         get { return Context.Entry(this).Reference("PickingPos"); }
+    }
+    
+    private VisitorVoucher _VisitorVoucher;
+    public virtual VisitorVoucher VisitorVoucher
+    { 
+        get { return LazyLoader.Load(this, ref _VisitorVoucher); } 
+        set { SetProperty<VisitorVoucher>(ref _VisitorVoucher, value); }
+    }
+
+    public bool VisitorVoucher_IsLoaded
+    {
+        get
+        {
+            return VisitorVoucher != null;
+        }
+    }
+
+    public virtual ReferenceEntry VisitorVoucherReference 
+    {
+        get { return Context.Entry(this).Reference("VisitorVoucher"); }
     }
     }

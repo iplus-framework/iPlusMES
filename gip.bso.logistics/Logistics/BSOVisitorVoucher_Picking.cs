@@ -15,13 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using gip.mes.datamodel; using gip.core.datamodel;
+using gip.mes.datamodel; 
+using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.bso.sales;
 using gip.bso.purchasing;
 using gip.mes.facility;
-using System.Data.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
@@ -154,7 +155,7 @@ namespace gip.bso.logistics
 
         private IQueryable<Picking> _Picking_NavSearchExecuting(IQueryable<Picking> result)
         {
-            ObjectQuery<Picking> query = result as ObjectQuery<Picking>;
+            IQueryable<Picking> query = result as IQueryable<Picking>;
             if (query != null)
             {
                 query.Include(c => c.DeliveryCompanyAddress.Company).Include(c => c.MDPickingType);

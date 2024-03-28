@@ -366,4 +366,24 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Reference("VisitorCompanyPerson"); }
     }
+    
+    private ICollection<Weighing> _Weighing_VisitorVoucher;
+    public virtual ICollection<Weighing> Weighing_VisitorVoucher
+    {
+        get { return LazyLoader.Load(this, ref _Weighing_VisitorVoucher); }
+        set { _Weighing_VisitorVoucher = value; }
     }
+
+    public bool Weighing_VisitorVoucher_IsLoaded
+    {
+        get
+        {
+            return Weighing_VisitorVoucher != null;
+        }
+    }
+
+    public virtual CollectionEntry Weighing_VisitorVoucherReference
+    {
+        get { return Context.Entry(this).Collection(c => c.Weighing_VisitorVoucher); }
+    }
+}

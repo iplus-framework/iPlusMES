@@ -21,7 +21,6 @@ using System.Linq;
 using System.Text;
 using gip.mes.facility;
 using System.Runtime.InteropServices;
-using System.Data.Objects;
 using static gip.core.datamodel.Global;
 using System.Runtime.CompilerServices;
 

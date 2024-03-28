@@ -845,8 +845,7 @@ namespace gip.bso.logistics
         {
             if (forceRefresh && SelectedVisitorVoucher !=  null)
             {
-                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoLoad();
-                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoRefresh();
+                SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoLoad(SelectedVisitorVoucher.Weighing_VisitorVoucherReference, SelectedVisitorVoucher);
             }
             _WeighingList = null;
             OnPropertyChanged(nameof(WeighingList));

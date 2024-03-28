@@ -15,6 +15,7 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -104,8 +105,7 @@ namespace gip.bso.logistics
         {
             if (forceRefresh && SelectedPickingPos != null)
             {
-                SelectedPickingPos.Weighing_PickingPos.AutoLoad();
-                SelectedPickingPos.Weighing_PickingPos.AutoRefresh();
+                SelectedPickingPos.Weighing_PickingPos.AutoLoad(SelectedPickingPos.Weighing_PickingPosReference, SelectedPickingPos);
             }
             _WeighingList = null;
             OnPropertyChanged(nameof(WeighingList));

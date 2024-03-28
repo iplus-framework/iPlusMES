@@ -82,6 +82,22 @@ namespace gip.mes.datamodel
                 unicode: false);
             itemSystemNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var materialWFNoForFilterLotByTime = runtimeEntityType.AddProperty(
+                "MaterialWFNoForFilterLotByTime",
+                typeof(string),
+                propertyInfo: typeof(TandTv3FilterTracking).GetProperty("MaterialWFNoForFilterLotByTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(TandTv3FilterTracking).GetField("<MaterialWFNoForFilterLotByTime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            materialWFNoForFilterLotByTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var maxOrderCount = runtimeEntityType.AddProperty(
+                "MaxOrderCount",
+                typeof(int?),
+                propertyInfo: typeof(TandTv3FilterTracking).GetProperty("MaxOrderCount", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(TandTv3FilterTracking).GetField("<MaxOrderCount>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            maxOrderCount.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var primaryKeyID = runtimeEntityType.AddProperty(
                 "PrimaryKeyID",
                 typeof(Guid),
