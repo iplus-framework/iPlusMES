@@ -190,7 +190,7 @@ namespace tcat.mes.processapplication
             return true;
         }
 
-        public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
+        public override object ReadObject(object complexObj, int dbNo, int offset, int? routeOffset, object miscParams)
         {
             TCSession session = ParentACComponent as TCSession;
             if (session == null && complexObj == null)
