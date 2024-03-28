@@ -2,7 +2,6 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Objects;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -646,6 +645,9 @@ namespace gip.mes.datamodel
         //                                         .FirstOrDefault();
         //    }
         //}
+
+        [NotMapped]
+        private ProdOrderPartslistPos _FinalRootPositionFromFbc;
         [NotMapped]
         public ProdOrderPartslistPos FinalRootPositionFromFbc
         {
@@ -666,6 +668,8 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
+        private ProdOrderPartslistPos _FinalPositionFromFbc;
         [NotMapped]
         public ProdOrderPartslistPos FinalPositionFromFbc
         {

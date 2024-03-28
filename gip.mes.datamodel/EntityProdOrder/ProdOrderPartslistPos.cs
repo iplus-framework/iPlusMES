@@ -709,8 +709,6 @@ namespace gip.mes.datamodel
             base.OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
-        [NotMapped]
-        private bool _OnMDUnitChanging = false;
         protected void OnMDUnitIDChanged()
         {
             _OnTargetQuantityUOMChanging = true;

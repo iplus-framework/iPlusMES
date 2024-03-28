@@ -3803,7 +3803,7 @@ namespace gip.mes.datamodel
             {
                 if (_WeighingStateList == null)
                 {
-                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(WeighingStateEnum));
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(WeighingStateEnum));
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _WeighingStateList = enumClass.ACValueListForEnum;
                     else

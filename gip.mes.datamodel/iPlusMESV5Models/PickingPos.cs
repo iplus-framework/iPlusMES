@@ -459,4 +459,25 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_PickingPos); }
     }
+
+
+    private ICollection<FacilityReservation> _FacilityReservation_PickingPos;
+    public virtual ICollection<FacilityReservation> FacilityReservation_PickingPos
+    {
+        get { return LazyLoader.Load(this, ref _FacilityReservation_PickingPos); }
+        set { _FacilityReservation_PickingPos = value; }
+    }
+
+    public bool FacilityReservation_PickingPos_IsLoaded
+    {
+        get
+        {
+            return FacilityReservation_PickingPos != null;
+        }
+    }
+
+    public virtual CollectionEntry FacilityReservation_PickingPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.FacilityReservation_PickingPos); }
+    }
 }

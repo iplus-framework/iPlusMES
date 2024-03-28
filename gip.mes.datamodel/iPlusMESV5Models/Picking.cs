@@ -48,6 +48,13 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _TourplanID, value); }
     }
 
+    Guid? _VBiACClassWFID;
+    public Guid? VBiACClassWFID
+    {
+        get { return _VBiACClassWFID; }
+        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+    }
+
     string _PickingNo;
     public string PickingNo 
     {
@@ -74,6 +81,13 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return _DeliveryDateTo; }
         set { SetProperty<DateTime>(ref _DeliveryDateTo, value); }
+    }
+
+    int? _ScheduledOrder;
+    public int? ScheduledOrder
+    {
+        get { return _ScheduledOrder; }
+        set { SetProperty<int?>(ref _ScheduledOrder, value); }
     }
 
     string _Comment;

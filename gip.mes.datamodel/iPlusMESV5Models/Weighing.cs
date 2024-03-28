@@ -97,6 +97,13 @@ public partial class Weighing : VBEntityObject
         set { SetProperty<string>(ref _IdentNr, value); }
     }
 
+    short _StateIndex;
+    public short StateIndex
+    {
+        get { return _StateIndex; }
+        set { SetProperty<short>(ref _StateIndex, value); }
+    }
+
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
