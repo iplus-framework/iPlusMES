@@ -1,6 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.core.processapplication;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System;
 using gip.core.autocomponent;
 using gip.mes.facility;
@@ -83,10 +83,10 @@ namespace gip.mes.processapplication
 
 
             using (Database db = new Database())
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
-                string secondaryKey = _this.Root.NoManager.GetNewNo(db, typeof(vd.Weighing), vd.Weighing.NoColumnName, vd.Weighing.FormatNewNo, _this);
-                vd.Weighing weighing = vd.Weighing.NewACObject(dbApp, null, secondaryKey);
+                string secondaryKey = _this.Root.NoManager.GetNewNo(db, typeof(VD.Weighing), VD.Weighing.NoColumnName, VD.Weighing.FormatNewNo, _this);
+                VD.Weighing weighing = VD.Weighing.NewACObject(dbApp, null, secondaryKey);
                 weighing.Weight = _this.AlibiWeight.ValueT;
                 weighing.IdentNr = _this.AlibiNo.ValueT;
 
@@ -94,19 +94,19 @@ namespace gip.mes.processapplication
                 {
                     switch (entity.EntityName) 
                     {
-                        case nameof(vd.VisitorVoucher):
+                        case nameof(VD.VisitorVoucher):
                             weighing.VisitorVoucherID = entity.EntityID;
                             break;
-                        case nameof(vd.PickingPos):
+                        case nameof(VD.PickingPos):
                             weighing.PickingPosID = entity.EntityID;
                             break;
-                        case nameof(vd.LabOrderPos):
+                        case nameof(VD.LabOrderPos):
                             weighing.LabOrderPosID = entity.EntityID;
                             break;
-                        case nameof(vd.OutOrderPos):
+                        case nameof(VD.OutOrderPos):
                             weighing.OutOrderPosID = entity.EntityID;
                             break;
-                        case nameof(vd.InOrderPos):
+                        case nameof(VD.InOrderPos):
                             weighing.InOrderPosID = entity.EntityID;
                             break;
                     }

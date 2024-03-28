@@ -3,7 +3,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using gip.mes.processapplication;
 using System.ComponentModel;
 using System.Data;
@@ -52,13 +52,13 @@ namespace gip.bso.manufacturing
 
         #region Database
 
-        private vd.DatabaseApp _DatabaseApp;
-        public override vd.DatabaseApp DatabaseApp
+        private VD.DatabaseApp _DatabaseApp;
+        public override VD.DatabaseApp DatabaseApp
         {
             get
             {
                 if (_DatabaseApp == null)
-                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
+                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<VD.DatabaseApp>(this.GetACUrl());
                 return _DatabaseApp;
             }
         }
@@ -426,9 +426,9 @@ namespace gip.bso.manufacturing
         #region Properties => OrderInfo
 
         //TODO: check if this necessary
-        private vd.ProdOrderPartslistPos _EndBatchPos;
+        private VD.ProdOrderPartslistPos _EndBatchPos;
         [ACPropertyInfo(613)]
-        public vd.ProdOrderPartslistPos EndBatchPos
+        public VD.ProdOrderPartslistPos EndBatchPos
         {
             get => _EndBatchPos;
             set
@@ -494,9 +494,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private vd.FacilityCharge _SelectedLastUsedLot;
+        private VD.FacilityCharge _SelectedLastUsedLot;
         [ACPropertySelected(690, "LastUsedLot")]
-        public vd.FacilityCharge SelectedLastUsedLot
+        public VD.FacilityCharge SelectedLastUsedLot
         {
             get => _SelectedLastUsedLot;
             set
@@ -506,9 +506,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<vd.FacilityCharge> _LastUsedLotList;
+        private List<VD.FacilityCharge> _LastUsedLotList;
         [ACPropertyList(690, "LastUsedLot")]
-        public List<vd.FacilityCharge> LastUsedLotList
+        public List<VD.FacilityCharge> LastUsedLotList
         {
             get => _LastUsedLotList;
             set
@@ -1842,7 +1842,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public List<WeighingMaterial> GetWeighingMaterials(IACComponentPWNode pwNode, vd.DatabaseApp db, ACClassDesign iconDesign = null)
+        public List<WeighingMaterial> GetWeighingMaterials(IACComponentPWNode pwNode, VD.DatabaseApp db, ACClassDesign iconDesign = null)
         {
             if (pwNode == null)
                 return null;
@@ -1860,7 +1860,7 @@ namespace gip.bso.manufacturing
                 {
                     using (ACMonitor.Lock(db.QueryLock_1X000))
                     {
-                        vd.ProdOrderPartslistPosRelation[] queryOpenDosings = new vd.ProdOrderPartslistPosRelation[0];
+                        VD.ProdOrderPartslistPosRelation[] queryOpenDosings = new VD.ProdOrderPartslistPosRelation[0];
                         try
                         {
                             queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
@@ -1878,7 +1878,7 @@ namespace gip.bso.manufacturing
                             }
                         }
 
-                        foreach (vd.ProdOrderPartslistPosRelation rel in queryOpenDosings)
+                        foreach (VD.ProdOrderPartslistPosRelation rel in queryOpenDosings)
                         {
                             try
                             {
@@ -1912,7 +1912,7 @@ namespace gip.bso.manufacturing
                                 {
                                     if (ParentBSOWCS != null && ParentBSOWCS.CurrentPicking != null)
                                     {
-                                        vd.PickingPos pickingPos = db.PickingPos.Include(c => c.PickingMaterial).FirstOrDefault(c => c.PickingPosID == PLPosRel);
+                                        VD.PickingPos pickingPos = db.PickingPos.Include(c => c.PickingMaterial).FirstOrDefault(c => c.PickingPosID == PLPosRel);
                                         if (pickingPos != null)
                                         {
                                             try
@@ -1928,7 +1928,7 @@ namespace gip.bso.manufacturing
                                     }
                                     else
                                     {
-                                        vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
+                                        VD.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
                                                                                      .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
                                         if (posRelation != null)
                                         {
@@ -2670,19 +2670,19 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
                 var lastUsedLotConfigs = dbApp.MaterialConfig.Where(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl
                                                                       && c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
 
-                List<vd.FacilityCharge> lastUsedLots = new List<vd.FacilityCharge>();
+                List<VD.FacilityCharge> lastUsedLots = new List<VD.FacilityCharge>();
 
-                foreach (vd.MaterialConfig lotConfig in lastUsedLotConfigs)
+                foreach (VD.MaterialConfig lotConfig in lastUsedLotConfigs)
                 {
                     Guid? fcID = lotConfig.Value as Guid?;
                     if (fcID.HasValue)
                     {
-                        vd.FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fcID);
+                        VD.FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fcID);
                         if (fc != null)
                         {
                             lastUsedLots.Add(fc);
@@ -2719,7 +2719,7 @@ namespace gip.bso.manufacturing
             if (lastUsedLotConfig == null)
                 return;
 
-            vd.DatabaseApp dbApp = lastUsedLotConfig.GetObjectContext<vd.DatabaseApp>();
+            VD.DatabaseApp dbApp = lastUsedLotConfig.GetObjectContext<VD.DatabaseApp>();
             if (dbApp != null)
                 dbApp.DeleteObject(lastUsedLotConfig);
 
@@ -2823,7 +2823,7 @@ namespace gip.bso.manufacturing
                 if (facilityIDs == null)
                     return null;
 
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
                     //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
 
@@ -2845,7 +2845,7 @@ namespace gip.bso.manufacturing
                             Guid? materialID = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.MaterialID;
                             if (materialID.HasValue)
                             {
-                                IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                IEnumerable<VD.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
                                 if (!ShowAllQuants)
                                 {
                                     ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
@@ -2862,7 +2862,7 @@ namespace gip.bso.manufacturing
                             Guid? materialID = SelectedWeighingMaterial?.PickingPosition?.Material?.MaterialID;
                             if (materialID.HasValue)
                             {
-                                IEnumerable<vd.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
+                                IEnumerable<VD.FacilityCharge> quants = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, materialID);
                                 if (!ShowAllQuants)
                                 {
                                     ACPartslistManager.QrySilosResult silosResult = new ACPartslistManager.QrySilosResult(quants);
@@ -3092,10 +3092,10 @@ namespace gip.bso.manufacturing
                 return;
 
             using (Database db = new core.datamodel.Database())
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp(db))
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp(db))
             {
 
-                vd.Facility inwardFacility = dbApp.Facility.FirstOrDefault(c => c.VBiFacilityACClassID == SelectedSingleDosTargetStorage.ACClassID);
+                VD.Facility inwardFacility = dbApp.Facility.FirstOrDefault(c => c.VBiFacilityACClassID == SelectedSingleDosTargetStorage.ACClassID);
 
                 if (inwardFacility == null)
                 {
@@ -3104,7 +3104,7 @@ namespace gip.bso.manufacturing
                     return;
                 }
 
-                vd.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
+                VD.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
                 if (material == null)
                 {
                     //Error50436: The material with MaterialNo: {0} can not be found in database.
@@ -3119,7 +3119,7 @@ namespace gip.bso.manufacturing
                     return;
                 }
 
-                var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.PWMethodNodeConfigKeyACUrl);
+                var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == VD.MaterialConfig.PWMethodNodeConfigKeyACUrl);
 
                 if (wfConfigs == null || !wfConfigs.Any())
                 {

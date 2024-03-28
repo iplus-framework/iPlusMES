@@ -1114,7 +1114,7 @@ namespace gip.mes.processapplication
 
             using (var dbApp = new DatabaseApp())
             {
-                var quants = s_cQry_Quants(dbApp, facilitySilo);
+                var quants = s_cQry_Quants(dbApp, facilitySilo.FacilityID);
                 FacilityCharge fc = quants.FirstOrDefault();
                 if (fc == null)
                 {
@@ -1126,7 +1126,7 @@ namespace gip.mes.processapplication
                 else
                 {
                     StartTime.ValueT = fc.FillingDate.Value;
-                    quants = s_cQry_QuantsReverse(dbApp, facilitySilo);
+                    quants = s_cQry_QuantsReverse(dbApp, facilitySilo.FacilityID);
                     FacilityCharge fcOldest = quants.FirstOrDefault();
                     if (fcOldest == null)
                         FillingDate.ValueT = DateTime.Now;
@@ -1899,17 +1899,17 @@ namespace gip.mes.processapplication
 
         #region Precompiled Queries
 
-        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_Quants =
-        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
-            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
-                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_Quants =
+        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+            (ctx, facilityID) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue)
                                                 .OrderByDescending(c => c.FillingDate)
         );
 
-        public static readonly Func<DatabaseApp, Facility, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
-        CompiledQuery.Compile<DatabaseApp, Facility, IQueryable<FacilityCharge>>(
-            (ctx, facility) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
-                                                .Where(c => c.FacilityID == facility.FacilityID && c.NotAvailable == false && c.FillingDate.HasValue)
+        public static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_QuantsReverse =
+        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+            (ctx, facilityID) => ctx.FacilityCharge.Include("Material.MDFacilityManagementType")
+                                                .Where(c => c.FacilityID == facilityID && c.NotAvailable == false && c.FillingDate.HasValue)
                                                 .OrderBy(c => c.FillingDate)
         );
         #endregion

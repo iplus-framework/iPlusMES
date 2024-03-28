@@ -1321,13 +1321,13 @@ namespace gip.bso.manufacturing
                 switch (FilterProdPartslistOrder)
                 {
                     case BatchPlanProdOrderSortFilterEnum.Material:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.Partslist.Material.MaterialNo).ThenBy(c => c.ProdOrderPartslist.StartDate);
+                        query = query.OrderBy(c => c.ProdOrderPartslist.Partslist.Material.MaterialNo).ThenBy(c => c.ProdOrderPartslist.StartDate);
                         break;
                     case BatchPlanProdOrderSortFilterEnum.StartTime:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.StartDate);
+                        query = query.OrderBy(c => c.ProdOrderPartslist.StartDate);
                         break;
                     case BatchPlanProdOrderSortFilterEnum.ProgramNo:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.ProdOrder.ProgramNo);
+                        query = query.OrderBy(c => c.ProdOrderPartslist.ProdOrder.ProgramNo);
                         break;
                 }
             }

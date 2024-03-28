@@ -1,6 +1,5 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
