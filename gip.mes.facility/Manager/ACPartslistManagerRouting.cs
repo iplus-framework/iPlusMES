@@ -355,9 +355,9 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithMaterialTime =
-        EF.CompileQuery<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PlSilosWithMaterialTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Include("MDReleaseState")
                                                                     .Include("FacilityLot.MDReleaseState")
@@ -366,11 +366,11 @@ namespace gip.mes.facility
                                                                            && ( (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               ||(!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (   (!onlyContainer 
-                                                                                    && (   (pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                                        || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                                    && (   (posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                                        || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                                                || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                                    && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                                        || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                                    && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                                        || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                                               )
                                                                            && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
@@ -396,13 +396,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithMaterialTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithMaterialTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -429,9 +429,9 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithIntermediateMaterialTime =
-        EF.CompileQuery<DatabaseApp, PartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PlSilosWithIntermediateMaterialTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posPartslistId, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Include("MDReleaseState")
                                                                     .Include("FacilityLot.MDReleaseState")
@@ -440,14 +440,14 @@ namespace gip.mes.facility
                                                                            && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (  (!onlyContainer
-                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                                        || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                                    && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                                        || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                                                || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                                        || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                                    && ((posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                                        || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                                               )
                                                                            && (c.Facility.PartslistID.HasValue
-                                                                              && c.Facility.PartslistID == pos.PartslistID)
+                                                                              && c.Facility.PartslistID == posPartslistId)
                                                                            && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
                                                                            && ((c.Facility.MinStockQuantity.HasValue && c.Facility.MinStockQuantity.Value < -0.1)
@@ -473,13 +473,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterialTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithIntermediateMaterialTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithIntermediateMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -513,9 +513,9 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PlSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
                                                 .Include("FacilityLot.MDReleaseState")
@@ -524,11 +524,11 @@ namespace gip.mes.facility
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (   (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                    || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                           || (  onlyContainer &&  c.Facility.MaterialID.HasValue
-                                                                && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                    || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
@@ -551,13 +551,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithMaterial(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithMaterial(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -585,9 +585,9 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PlSilosWithIntermediateMaterial =
-        EF.CompileQuery<DatabaseApp, PartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PlSilosWithIntermediateMaterial =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posPartslistId, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
                                                 .Include("FacilityLot.MDReleaseState")
@@ -596,14 +596,14 @@ namespace gip.mes.facility
                                                       && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (( !onlyContainer
-                                                            && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                            && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                          || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                             && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                 || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                             && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                 || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                             )
                                                       && (  !onlyContainer
-                                                         || (c.Facility.PartslistID.HasValue && c.Facility.PartslistID == pos.PartslistID))
+                                                         || (c.Facility.PartslistID.HasValue && c.Facility.PartslistID == posPartslistId))
                                                       && (  (checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                          || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
@@ -627,13 +627,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterial(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.PartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithIntermediateMaterial(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithIntermediateMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -671,9 +671,9 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithMaterialTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosWithMaterialTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                             .Include("Facility.FacilityStock_Facility")
                                                                             .Include("MDReleaseState")
                                                                             .Include("FacilityLot.MDReleaseState")
@@ -682,11 +682,11 @@ namespace gip.mes.facility
                                                                                        && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                                           || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                                        && (   (!onlyContainer
-                                                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                                                && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                                                    || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                                                            || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                                                && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                                                && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                                                    || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                                                             )
                                                                                        && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                                           || !checkOutwardEnabled)
@@ -712,13 +712,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosWithMaterialTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosWithMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithMaterialTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -745,9 +745,9 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithIntermediateMaterialTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosWithIntermediateMaterialTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posProdOrderPartsListID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Include("MDReleaseState")
                                                                     .Include("FacilityLot.MDReleaseState")
@@ -756,16 +756,16 @@ namespace gip.mes.facility
                                                                            && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                               || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (   (!onlyContainer
-                                                                                    && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                                        || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                                    && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                                        || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                                                 || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                                    && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                                        || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                                    && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                                        || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                                                 )
                                                                            && (     !onlyContainer
                                                                                 || (   c.Facility.PartslistID.HasValue
-                                                                                    && pos.ProdOrderPartslist.PartslistID.HasValue
-                                                                                    && c.Facility.PartslistID == pos.ProdOrderPartslist.PartslistID)
+                                                                                    && posProdOrderPartsListID.HasValue
+                                                                                    && c.Facility.PartslistID == posProdOrderPartsListID)
                                                                               )
                                                                            && (  (checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
@@ -792,13 +792,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosWithIntermediateMaterialTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosWithIntermediateMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslist.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithIntermediateMaterialTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithIntermediateMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslist.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -828,29 +828,29 @@ namespace gip.mes.facility
         /// AND must pe produced form the same order in a previous stage
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevStageTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosFromPrevStageTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posSourceProdOrderPartslistId, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Include("InwardFacilityCharge.MDReleaseState")
                                                                     .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
                                                                     .Include("InwardFacility.MDFacilityType")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue
-                                                                            && pos.SourceProdOrderPartslistID.HasValue
-                                                                            && pos.MaterialID.HasValue
-                                                                            && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
+                                                                            && posSourceProdOrderPartslistId.HasValue
+                                                                            && posMaterialId.HasValue
+                                                                            && c.ProdOrderPartslistPos.ProdOrderPartslistID == posSourceProdOrderPartslistId
                                                                             && c.InwardFacilityID.HasValue 
                                                                             && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                                 || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                             && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
-                                                                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                                                               || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
+                                                                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                                                               || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId))
                                                                             && (   (!onlyContainer
-                                                                                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID)))
+                                                                                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                                                                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId)))
                                                                                 || (onlyContainer 
-                                                                                            && (   (pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.MaterialID)))
+                                                                                            && (   (posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posProdMaterialId)
+                                                                                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posMaterialId)))
                                                                                 )
                                                                             && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
                                                                                 || !checkOutwardEnabled)
@@ -878,13 +878,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevStageTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevStageTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevStageTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevStageTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -912,20 +912,20 @@ namespace gip.mes.facility
         /// AND must pe produced form the same order in a previous stage
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevIntermediateTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosFromPrevIntermediateTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posProdOrderPartslistPosId, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Include("InwardFacilityCharge.MDReleaseState")
                                                                     .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
                                                                     .Include("InwardFacility.MDFacilityType")
-                                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
+                                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == posProdOrderPartslistPosId
                                                                             && c.InwardFacilityID.HasValue
                                                                             && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                                                 || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                           && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
-                                                                          && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                                                               || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
+                                                                          && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                                                               || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId))
                                                                            && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
                                                                            && ((c.InwardFacilityCharge.Facility.MinStockQuantity.HasValue && c.InwardFacilityCharge.Facility.MinStockQuantity.Value < -0.1)
@@ -952,13 +952,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediateTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediateTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslistPosID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevIntermediateTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevIntermediateTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslistPosID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -986,9 +986,9 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>> s_cQry_SilosFromLotsOfPrevStageTime =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, DateTime, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) =>
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>> s_cQry_SilosFromLotsOfPrevStageTime =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, DateTime, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posSourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) =>
             ctx
             .FacilityBookingCharge
             .Include("InwardFacility.FacilityStock_Facility")
@@ -998,7 +998,7 @@ namespace gip.mes.facility
             .Where(c =>
                         c.ProdOrderPartslistPosID.HasValue
                         && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                        && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
+                        && c.ProdOrderPartslistPos.ProdOrderPartslistID == posSourceProdOrderPartslistID
                   )
             .Select(c => c.InwardFacilityLot)
             .SelectMany(c => c.FacilityBookingCharge_InwardFacilityLot)
@@ -1011,14 +1011,14 @@ namespace gip.mes.facility
                             )
                         && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
 
-                        && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                            || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
+                        && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                            || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId))
                         && ((!onlyContainer
-                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID)))
+                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId)))
                         || (onlyContainer
-                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.MaterialID))))
+                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posProdMaterialId)
+                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posMaterialId))))
 
                         && c.InwardFacilityCharge.FillingDate.HasValue
                         && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
@@ -1048,13 +1048,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStageTime(ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStageTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_SilosFromLotsOfPrevStageTime(ctx, altPos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_SilosFromLotsOfPrevStageTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1088,9 +1088,9 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
                                                 .Include("FacilityLot.MDReleaseState")
@@ -1099,11 +1099,11 @@ namespace gip.mes.facility
                                                         && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && (    (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                    || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                    || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
@@ -1126,13 +1126,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosWithMaterial(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosWithMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithMaterial(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1160,9 +1160,9 @@ namespace gip.mes.facility
         /// AND which also could be produced from another order 
         /// AND is older than the filter-Date
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosWithIntermediateMaterial =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosWithIntermediateMaterial =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posProdOrderPartsListID, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
                                                 .Include("FacilityLot.MDReleaseState")
@@ -1171,16 +1171,16 @@ namespace gip.mes.facility
                                                         && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && (    (!onlyContainer
-                                                                && ((pos.Material.ProductionMaterialID.HasValue && (c.MaterialID == pos.Material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == pos.Material.ProductionMaterialID)))
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
+                                                                && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                    || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                && (   (pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                    || (!pos.Material.ProductionMaterialID.HasValue && c.Facility.MaterialID == pos.MaterialID)))
+                                                                && (   (posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                    || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                             )
                                                       && (     !onlyContainer
                                                             || (    c.Facility.PartslistID.HasValue
-                                                                 && pos.ProdOrderPartslist.PartslistID.HasValue
-                                                                 && c.Facility.PartslistID == pos.ProdOrderPartslist.PartslistID))
+                                                                 && posProdOrderPartsListID.HasValue
+                                                                 && c.Facility.PartslistID == posProdOrderPartsListID))
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                          || !checkOutwardEnabled)
                                                       && c.FillingDate.HasValue)
@@ -1204,14 +1204,14 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray();
+                    var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslist.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                     return new QrySilosResult(result);
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslist.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1240,26 +1240,26 @@ namespace gip.mes.facility
         /// which contains this material 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevStage =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosFromPrevStage =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posSourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Include("InwardFacilityCharge.MDReleaseState")
                                                 .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
                                                 .Include("InwardFacility.MDFacilityType")
-                                                .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
+                                                .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == posSourceProdOrderPartslistID
                                                     && c.InwardFacilityID.HasValue
                                                     && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                         || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                      && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
-                                                     && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                                          || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
+                                                     && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                                          || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId))
                                                      && ( (!onlyContainer
-                                                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID)))
+                                                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId)))
                                                        || (onlyContainer
-                                                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.MaterialID))))
+                                                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posProdMaterialId)
+                                                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posMaterialId))))
                                                      && c.InwardFacilityCharge.FillingDate.HasValue
                                                      && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
                                                           || !checkOutwardEnabled))
@@ -1283,13 +1283,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevStage(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevStage(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevStage(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1316,20 +1316,20 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_PoSilosFromPrevIntermediate =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PoSilosFromPrevIntermediate =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer) => ctx.FacilityBookingCharge
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Include("InwardFacilityCharge.MDReleaseState")
                                                 .Include("InwardFacilityCharge.FacilityLot.MDReleaseState")
                                                 .Include("InwardFacility.MDFacilityType")
-                                                .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
+                                                .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == posProdOrderPartslistPosID
                                                     && c.InwardFacilityID.HasValue
                                                     && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                         || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                      && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
-                                                     && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                                          || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
+                                                     && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                                          || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId))
                                                      && c.InwardFacilityCharge.FillingDate.HasValue
                                                      && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
                                                           || !checkOutwardEnabled))
@@ -1353,13 +1353,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediate(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediate(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevIntermediate(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevIntermediate(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1387,9 +1387,9 @@ namespace gip.mes.facility
         /// which contains this intermediate product 
         /// AND which also could be produced from another order 
         /// </summary>
-        protected static readonly Func<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>> s_cQry_SilosFromLotsOfPrevStage =
-        EF.CompileQuery<DatabaseApp, ProdOrderPartslistPos, bool, bool, IQueryable<FacilityCharge>>(
-            (ctx, pos, checkOutwardEnabled, onlyContainer) =>
+        protected static readonly Func<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_SilosFromLotsOfPrevStage =
+        EF.CompileQuery<DatabaseApp, Guid?, Guid?, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, posMaterialId, posProdMaterialId, posSourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer) =>
             ctx
             .FacilityBookingCharge
             .Include("InwardFacility.FacilityStock_Facility")
@@ -1399,7 +1399,7 @@ namespace gip.mes.facility
             .Where(c =>
                         c.ProdOrderPartslistPosID.HasValue
                         && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                        && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
+                        && c.ProdOrderPartslistPos.ProdOrderPartslistID == posSourceProdOrderPartslistID
                   )
             .Select(c => c.InwardFacilityLot)
             .SelectMany(c => c.FacilityBookingCharge_InwardFacilityLot)
@@ -1412,14 +1412,14 @@ namespace gip.mes.facility
                             )
                         && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
 
-                        && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                            || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
+                        && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                            || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId))
                         && ((!onlyContainer
-                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
-                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID)))
+                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posProdMaterialId)
+                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.MaterialID == posMaterialId)))
                         || (onlyContainer
-                            && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.Material.ProductionMaterialID)
-                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.MaterialID))))
+                            && ((posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posProdMaterialId)
+                                || (!posProdMaterialId.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == posMaterialId))))
 
                         && c.InwardFacilityCharge.FillingDate.HasValue
                         && (
@@ -1450,13 +1450,13 @@ namespace gip.mes.facility
 
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStage(ctx, pos, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_SilosFromLotsOfPrevStage(ctx, altPos, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_SilosFromLotsOfPrevStage(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
