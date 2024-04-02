@@ -153,4 +153,7 @@
     <Copy SourceFiles="..\..\..\packages\Matrix\MATRIX64.dll" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
     <Copy SourceFiles="..\..\..\packages\Matrix\matrix.ini" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
+	<Target Name="CopyToNet7Windows" AfterTargets="Build">
+		<Exec Command="xcopy &quot;$(SolutionDir)bin\Debug\net7.0\*.*&quot; &quot;$(SolutionDir)bin\Debug\net7.0-windows\&quot; /Y /I /E" />
+	</Target>
 </Project>
