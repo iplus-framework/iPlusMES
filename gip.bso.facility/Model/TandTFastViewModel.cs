@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
+using System;
 
 namespace gip.bso.facility
 {
@@ -8,43 +9,48 @@ namespace gip.bso.facility
     public class TandTFastViewModel
     {
         #region Order info
-        [ACPropertyInfo(100, "OrderNo", "en{'Program'}de{'AuftragNo.'}")]
+        public Guid ProdOrderPartslistID { get; set; }
+
+        [ACPropertyInfo(50, nameof(ProductionDate), ConstApp.ProductionDate)]
+        public DateTime ProductionDate { get; set; }
+
+        [ACPropertyInfo(100, nameof(OrderNo), "en{'Program'}de{'AuftragNo.'}")]
         public string OrderNo { get; set; }
 
-        [ACPropertyInfo(101, "ConsumptionActualQuantity", "en{'Consumption Act. Quantity'}de{'Verbrauchsgesetz. Menge'}")]
+        [ACPropertyInfo(101, nameof(ConsumptionActualQuantity), "en{'Consumption Act. Quantity'}de{'Verbrauchsgesetz. Menge'}")]
         public double ConsumptionActualQuantity { get; set; }
 
-        [ACPropertyInfo(102, "ConsMDUnit", ConstApp.MDUnit)]
+        [ACPropertyInfo(102, nameof(ConsMDUnit), ConstApp.MDUnit)]
         public MDUnit ConsMDUnit { get; set; }
         #endregion
 
         #region ProdOrderPartslist info
 
-        [ACPropertyInfo(200, "MaterialNo", "en{'MaterialNo'}de{'MaterialNo.'}")]
+        [ACPropertyInfo(200, nameof(MaterialNo), "en{'MaterialNo'}de{'MaterialNo.'}")]
         public string MaterialNo { get; set; }
 
         [ACPropertyInfo(201, "en{'Material name'}de{'Materialname'}")]
         public string MaterialName { get; set; }
 
-        [ACPropertyInfo(202, "TargetActualQuantityUOM", "en{'Actual Output'}de{'Ist Ergebnis'}")]
+        [ACPropertyInfo(202, nameof(TargetActualQuantityUOM), "en{'Actual Output'}de{'Ist Ergebnis'}")]
         public double TargetActualQuantityUOM { get; set; }
 
-        [ACPropertyInfo(203, "MDUnit", ConstApp.MDUnit)]
+        [ACPropertyInfo(203, nameof(MDUnit), ConstApp.MDUnit)]
         public MDUnit MDUnit { get; set; }
         #endregion
 
         #region Final product info
 
-        [ACPropertyInfo(300, "FinalMaterialNo", "en{'Final MaterialNo'}de{'Finale MaterialNo.'}")]
+        [ACPropertyInfo(300, nameof(FinalMaterialNo), "en{'Final MaterialNo'}de{'Finale MaterialNo.'}")]
         public string FinalMaterialNo { get; set; }
 
-        [ACPropertyInfo(301, "FinalMaterialName", "en{'Final Material name'}de{'Finale Materialname'}")]
+        [ACPropertyInfo(301, nameof(FinalMaterialName), "en{'Final Material name'}de{'Finale Materialname'}")]
         public string FinalMaterialName { get; set; }
 
-        [ACPropertyInfo(302, "FinalTargetActualQuantityUOM", "en{'Final Actual Output'}de{'Finale Ist Ergebnis'}")]
+        [ACPropertyInfo(302, nameof(FinalTargetActualQuantityUOM), "en{'Final Actual Output'}de{'Finale Ist Ergebnis'}")]
         public double FinalTargetActualQuantityUOM { get; set; }
 
-        [ACPropertyInfo(303, "FinalMDUnit", ConstApp.MDUnit)]
+        [ACPropertyInfo(303, nameof(FinalMDUnit), ConstApp.MDUnit)]
         public MDUnit FinalMDUnit { get; set; }
         #endregion
 
