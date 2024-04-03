@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
@@ -6,8 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.facility
@@ -259,6 +258,27 @@ namespace gip.bso.facility
             return FilterFacilityCharge != null || FilterFacilityLot != null;
         }
 
+        [ACMethodInteraction(nameof(NavigateToProdOrder), "en{'Show ProdOrder'}de{'Zum Produktionauftrag'}", 110, true, nameof(SelectedFastView))]
+        public void NavigateToProdOrder()
+        {
+            if (!IsEnabledNavigateToProdOrder())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslist),
+                    SelectedFastView.ProdOrderPartslistID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToProdOrder()
+        {
+            return SelectedFastView != null;
+        }
+
         #region Methods -> Load
 
         private object DoSearchFacilityCharge(Guid facilityChargeID)
@@ -374,6 +394,8 @@ namespace gip.bso.facility
                         .DefaultIfEmpty()
                         .FirstOrDefault(),
 
+                    ProdOrderPartslistID = c.ProdOrderPartslistID,
+                    ProductionDate = (c.StartDate != null ? c.StartDate.Value : c.InsertDate),
                     MaterialNo = c.Partslist.Material.MaterialNo,
                     MaterialName = c.Partslist.Material.MaterialName1,
                     TargetActualQuantityUOM = c.ActualQuantity,
