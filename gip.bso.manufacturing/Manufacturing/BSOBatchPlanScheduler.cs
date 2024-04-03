@@ -1316,7 +1316,7 @@ namespace gip.bso.manufacturing
                     FilterOrderMaterialNo) as IEnumerable<ProdOrderPartslistPlanWrapper>;
 
             //batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = batchQuery as IOrderedQueryable<ProdOrderPartslistPlanWrapper>;
+            IOrderedEnumerable<ProdOrderPartslistPlanWrapper> query = batchQuery as IOrderedEnumerable<ProdOrderPartslistPlanWrapper>;
             if (FilterProdPartslistOrder != null)
             {
                 switch (FilterProdPartslistOrder)

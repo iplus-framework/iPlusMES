@@ -167,6 +167,7 @@ namespace gip.mes.datamodel
 
         #region Additional properties
 
+        [NotMapped]
         public MaintOrder MaintOrderTemplate
         {
             get;

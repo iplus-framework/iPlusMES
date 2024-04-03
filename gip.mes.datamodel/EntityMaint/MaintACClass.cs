@@ -107,7 +107,8 @@ namespace gip.mes.datamodel
         //    }
         //}
 
-        //private DateTime? _NextMaintTerm;
+        [NotMapped]
+        private DateTime? _NextMaintTerm;
         [ACPropertyInfo(999, "", "en{'Next Maintenance on'}de{'Nächste Wartung am'}")]
         [NotMapped]
         public DateTime? NextMaintTerm
@@ -116,11 +117,11 @@ namespace gip.mes.datamodel
             {
                 //if (LastMaintTerm.HasValue && MaintInterval.HasValue)
                 //    return LastMaintTerm + TimeSpan.FromDays(MaintInterval.Value);
-                return null;
+                return _NextMaintTerm;
             }
             set
             {
-                //_NextMaintTerm = value;
+                _NextMaintTerm = value;
                 //OnPropertyChanged("NextMaintTerm");
             }
         }
