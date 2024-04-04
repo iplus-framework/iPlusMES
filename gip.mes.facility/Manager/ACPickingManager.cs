@@ -1582,7 +1582,11 @@ namespace gip.mes.facility
             if (validationBehaviour == PARole.ValidationBehaviour.Strict
                     && pos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
-                if (pos.PickingMaterialID.HasValue && pos.ToFacility.MaterialID.HasValue && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.FromFacility.Material))
+                if (pos.PickingMaterialID.HasValue 
+                    && pos.ToFacility.MaterialID.HasValue 
+                    && pos.FromFacility != null 
+                    && pos.FromFacility.Material != null 
+                    && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.FromFacility.Material))
                 {
                     //Error50115: No Material assigned to Bin/Silo/Container {0}.
                     msg = new Msg
