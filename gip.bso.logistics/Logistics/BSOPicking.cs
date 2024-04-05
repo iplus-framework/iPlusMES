@@ -21,6 +21,7 @@ using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Data.Objects;
@@ -5022,6 +5023,57 @@ namespace gip.bso.logistics
         {
             return CurrentPicking.InsertDate;
         }
+
+        #endregion
+
+        #region Messages
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        #region Messages -> Properties
+
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged(nameof(CurrentMsg));
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        #endregion
 
         #endregion
 
