@@ -524,8 +524,10 @@ namespace gip.mes.facility
                         .Include(MDUnit.ClassName)
                         .Where(c => c.Facility.ParentFacilityID.HasValue
                                     && c.Facility.ParentFacilityID == facilityID
-                                    && (   c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                    && (c.MaterialID == materialID
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     && (!partslistID.HasValue || c.PartslistID == partslistID)
                                     && c.NotAvailable == notAvailable)
                         .OrderByDescending(c => c.FillingDate)
@@ -561,7 +563,9 @@ namespace gip.mes.facility
                                     && c.Facility.ParentFacilityID == facilityID
                                     && (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
                                     && (c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     && (!partslistID.HasValue || c.PartslistID == partslistID)
                                     && c.NotAvailable == notAvailable)
                         .OrderByDescending(c => c.FillingDate)
@@ -593,7 +597,9 @@ namespace gip.mes.facility
                         .Where(c => c.FacilityID == facilityID
                                     && (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
                                     && (c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     && (!partslistID.HasValue || c.PartslistID == partslistID)
                                     && c.NotAvailable == notAvailable)
                         .OrderByDescending(c => c.FillingDate)
@@ -611,7 +617,9 @@ namespace gip.mes.facility
                         .Where(c => c.FacilityID == facilityID
                                     && (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
                                     && (c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     && (!partslistID.HasValue || c.PartslistID == partslistID)
                                     && c.NotAvailable == notAvailable
                                     && c.SplitNo == splitNo)
@@ -692,8 +700,10 @@ namespace gip.mes.facility
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
-                                    && (c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                    && (   c.MaterialID == materialID
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     && (!partslistID.HasValue || c.PartslistID == partslistID)
                                     && c.NotAvailable == notAvailable)
                         .OrderByDescending(c => c.FillingDate)
@@ -763,7 +773,9 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => (c.MaterialID == materialID
-                                || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                             && c.FacilityLotID == facilityLotID
                             && c.NotAvailable == notAvailable)
                 .OrderByDescending(c => c.FillingDate)
@@ -782,7 +794,9 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         .Where(c => c.Facility.ParentFacilityID.HasValue
                                     && c.Facility.ParentFacilityID == facilityID
                                     && (c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     && c.NotAvailable == notAvailable)
                         .OrderByDescending(c => c.FillingDate)
                         .ThenByDescending(c => c.FacilityChargeSortNo)
@@ -797,8 +811,10 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
-                                    && (c.MaterialID == materialID
-                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                    && (   c.MaterialID == materialID
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
+                                        || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
+                                        )
                                     //&& c.IsEnabled
                                     && c.NotAvailable == notAvailable
                                     && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
