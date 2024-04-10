@@ -672,6 +672,23 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
 
     }
 }
