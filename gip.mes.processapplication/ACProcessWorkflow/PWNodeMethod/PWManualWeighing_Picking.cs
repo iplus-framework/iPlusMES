@@ -809,7 +809,7 @@ namespace gip.mes.processapplication
                         }
                         //}
 
-                        if (facilityCharge != null && facilityCharge.MaterialID != pickingPos.Material.MaterialID)
+                        if (facilityCharge != null && facilityCharge.MaterialID != pickingPos.Material.MaterialID && facilityCharge.Material.ProductionMaterialID != pickingPos.Material.MaterialID)
                         {
                             msg = new Msg(this, eMsgLevel.Error, nameof(PWManualWeighing), nameof(DoManualWeighingBookingPicking) + "(32)", 2809,
                                            "The material of quant is different than weighing material. The quant ID: " + facilityCharge.FacilityChargeID + " The material ID: " +

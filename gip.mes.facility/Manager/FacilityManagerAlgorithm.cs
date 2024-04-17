@@ -2327,7 +2327,7 @@ namespace gip.mes.facility
                                 s_cQry_FCList_Fac_ProdMat_NotAvailable_Retro(BP.DatabaseApp,
                                                                             storeForRetrogradePosting.FacilityID,
                                                                             relationForRPost.SourceProdOrderPartslistPos.MaterialID,
-                                                                            relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID,
+                                                                            relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID != null ? relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID : relationForRPost.SourceProdOrderPartslistPos.Material.MaterialID,
                                                                             false), BP);
 
                             ProdOrder prodOrder = relationForRPost?.SourceProdOrderPartslistPos?.ProdOrderPartslist?.ProdOrder;
