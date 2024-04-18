@@ -328,6 +328,14 @@ namespace gip.mes.processapplication
                         if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
                             acValueTargetQ.Value = currentBatchPos.TargetQuantityUOM;
 
+                        gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+                        if (IsAutomaticContinousWeighing && totalizingScale != null)
+                        {
+                            acValue = acMethod.ParameterValueList.GetACValue("ScaleBatchWeight");
+                            if (acValue != null)
+                                acValue.Value = totalizingScale.SWTTipWeight;
+                        }
+
                         NoTargetWait = null;
                         if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
@@ -558,6 +566,15 @@ namespace gip.mes.processapplication
                                     if (acValue != null)
                                         acValue.Value = (double)targetWeight;
                                 }
+
+                                gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+                                if (IsAutomaticContinousWeighing && totalizingScale != null)
+                                {
+                                    acValue = acMethod.ParameterValueList.GetACValue("ScaleBatchWeight");
+                                    if (acValue != null)
+                                        acValue.Value = totalizingScale.SWTTipWeight;
+                                }
+
                                 if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
@@ -1175,6 +1192,14 @@ namespace gip.mes.processapplication
                             || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
                     {
                         acValue.Value = (Int16)1;
+                    }
+
+                    gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+                    if (IsAutomaticContinousWeighing && totalizingScale != null)
+                    {
+                        acValue = acMethod.ParameterValueList.GetACValue("ScaleBatchWeight");
+                        if (acValue != null)
+                            acValue.Value = totalizingScale.SWTTipWeight;
                     }
 
                     if (isNewACMethod)

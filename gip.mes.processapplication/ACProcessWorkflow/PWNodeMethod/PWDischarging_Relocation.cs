@@ -178,6 +178,14 @@ namespace gip.mes.processapplication
             if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
                 acValueTargetQ.Value = facilityBooking.OutwardQuantity;
 
+            gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+            if (IsAutomaticContinousWeighing && totalizingScale != null)
+            {
+                acValue = acMethod.ParameterValueList.GetACValue("ScaleBatchWeight");
+                if (acValue != null)
+                    acValue.Value = totalizingScale.SWTTipWeight;
+            }
+
             NoTargetWait = null;
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, facilityBooking, targetModule))
                 return StartDisResult.CycleWait;

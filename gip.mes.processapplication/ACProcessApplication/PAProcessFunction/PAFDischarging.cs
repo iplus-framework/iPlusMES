@@ -920,12 +920,12 @@ namespace gip.mes.processapplication
             paramTranslation.Add("Sieve", "en{'Sieve'}de{'Sieb'}");
             method.ParameterValueList.Add(new ACValue("TargetQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("TargetQuantity", "en{'Target quantity (Set value if negative)'}de{'Sollmenge (Setze Wert falls negativ)'}");
+            method.ParameterValueList.Add(new ACValue("ScaleBatchWeight", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
+            paramTranslation.Add("ScaleBatchWeight", "en{'Scale batch weight (SWT tip weight)'}de{'Kippgewicht Waage (SWT)'}");
 
             if (acIdentifier == "DischargingIntake")
             {
-                method.ParameterValueList.Add(new ACValue("ScaleBatchWeight", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
-                paramTranslation.Add("ScaleBatchWeight", "en{'Scale batch weight'}de{'Batchgewicht'}");
-                method.ParameterValueList.Add(new ACValue("Scale", typeof(Int16), (Int16)0.0, Global.ParamOption.Optional));
+                method.ParameterValueList.Add(new ACValue("Scale", typeof(Int16), (Int16)0, Global.ParamOption.Optional));
                 paramTranslation.Add("Scale", "en{'Scale'}de{'Waage'}");
             }
 

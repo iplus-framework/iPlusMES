@@ -503,6 +503,14 @@ namespace gip.mes.processapplication
             if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
                 acValueTargetQ.Value = pickingPos.RemainingDosingQuantityUOM > 0 ? 0.001 : pickingPos.RemainingDosingQuantityUOM * -1;
 
+            gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+            if (IsAutomaticContinousWeighing && totalizingScale != null)
+            {
+                acValue = acMethod.ParameterValueList.GetACValue("ScaleBatchWeight");
+                if (acValue != null)
+                    acValue.Value = totalizingScale.SWTTipWeight;
+            }
+
             NoTargetWait = null;
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
                 return StartDisResult.CycleWait;
@@ -1015,6 +1023,14 @@ namespace gip.mes.processapplication
                             acValue.Value = (Int16)routeItemIDProvider.RouteItemIDAsNum;
                     }
                 }
+            }
+
+            gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+            if (IsAutomaticContinousWeighing && totalizingScale != null)
+            {
+                acValue = acMethod.ParameterValueList.GetACValue("ScaleBatchWeight");
+                if (acValue != null)
+                    acValue.Value = totalizingScale.SWTTipWeight;
             }
 
             if (isNewACMethod)

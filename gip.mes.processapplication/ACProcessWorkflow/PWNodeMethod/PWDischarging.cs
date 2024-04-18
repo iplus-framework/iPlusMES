@@ -56,6 +56,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("LossCorrectionFactor", "en{'Loss correction factor 0 = bill of material factor, n=%'}de{'Verlustfaktor 0 = Rezept Faktor, n=%'}");
             method.ParameterValueList.Add(new ACValue("ClassCode", typeof(short), 0, Global.ParamOption.Optional));
             paramTranslation.Add("ClassCode", "en{'Classification allowed destinations'}de{'Klassifizierung erlaubte Ziele'}");
+            method.ParameterValueList.Add(new ACValue("SWTOn", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("SWTOn", "en{'SWT On'}de{'SWT An'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
@@ -534,6 +536,46 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool SWTOn
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("SWTOn");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool IsAutomaticContinousWeighing
+        {
+            get
+            {
+                PAEScaleTotalizing scale = TotalizingScaleIfSWT;
+                if (scale == null)
+                    return false;
+                return scale.SWTTipWeight >= 0.0001;
+            }
+        }
+
+        private PAEScaleTotalizing TotalizingScaleIfSWT
+        {
+            get
+            {
+                if (!SWTOn)
+                    return null;
+                IPAMContScale pamScale = this.ParentPWGroup.AccessedProcessModule as IPAMContScale;
+                if (pamScale == null)
+                    return null;
+                return pamScale.Scale as PAEScaleTotalizing;
+            }
+        }
         #endregion
 
         #region Methods
