@@ -67,6 +67,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // TargetWeight -
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // LastBatch
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Sieve
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ScaleBatchWeight (SWT)
 
                 OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
                 if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -150,6 +151,14 @@ namespace gip2006.variobatch.processapplication
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("Sieve")),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                acValue = request.ParameterValueList.GetACValue("ScaleBatchWeight");
+                if (acValue != null)
+                {
+                    Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(acValue.ParamAsDouble),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                }
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 //Array.Copy(gip.core.communication.ISOonTCP.Types.String.ToByteArray(request.ParameterValueList.GetString(""), 30, 32), 0, sendPackage1, 2, 32);
                 //iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
@@ -253,6 +262,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // TargetWeight -
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // LastBatch
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Sieve
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ScaleBatchWeight (SWT)
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
@@ -304,18 +314,19 @@ namespace gip2006.variobatch.processapplication
 
                 var acValue = response.ParameterValueList.GetACValue("TargetQuantity");
                 if (acValue != null)
-                {
                     acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
-                    iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
-                }
-                else
-                    iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 response.ParameterValueList.GetACValue(PWMethodVBBase.IsLastBatchParamName).Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 response.ParameterValueList.GetACValue("Sieve").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                acValue = response.ParameterValueList.GetACValue("ScaleBatchWeight");
+                if (acValue != null)
+                    acValue.Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
             }

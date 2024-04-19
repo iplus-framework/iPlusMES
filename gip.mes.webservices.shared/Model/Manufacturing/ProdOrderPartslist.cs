@@ -80,6 +80,19 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "xMWFCM")]
+        public short MaterialWFConnectionMode
+        {
+            get; set;
+        }
+
+
+        [DataMember(Name = "xPOPPIBS")]
+        public IEnumerable<Guid> IntermediateBatchIDs
+        {
+            get; set;
+        }
+
         [DataMember]
         public string ACUrlWF
         {
