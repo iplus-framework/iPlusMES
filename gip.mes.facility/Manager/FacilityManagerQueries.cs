@@ -850,7 +850,7 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
                                                         .Include(c => c.FacilityLot)
                                                         .Include(c => c.Material)
                                                         .Include(c => c.Facility)
-                                                        .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
+                                                        .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID || x.Material.ProductionMaterialID == matID)
                                                                                     && facility.Contains(x.FacilityID)
                                                                                     && (x.MDReleaseStateID == null || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
                                                         .ToArray()
