@@ -287,6 +287,17 @@ namespace gip.mes.facility
             return missingPickings;
         }
 
+        public string GetRemoteFacilityManagerConnectionString(ACComponent remoteFacilityManager)
+        {
+            List<string> hierarchy = ACUrlHelper.ResolveParents(remoteFacilityManager.ACUrl);
+            string remoteProxyACurl = hierarchy.FirstOrDefault();
+            if (String.IsNullOrEmpty(remoteProxyACurl))
+                return null;
+            ACComponent remoteAppManager = remoteFacilityManager.Root.ACUrlCommand(remoteProxyACurl) as ACComponent;
+            if (remoteAppManager == null)
+                return null;
+            return remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
+        }
 
         #endregion
 
