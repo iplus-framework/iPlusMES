@@ -26,6 +26,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.Objects;
 using System.Linq;
+using System.Windows.Controls;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
@@ -2793,7 +2794,7 @@ namespace gip.bso.logistics
         /// Searches the delivery note.
         /// </summary>
         [ACMethodCommand("Picking", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search(bool refreshList = true)
+        public virtual void Search(bool refreshList = true)
         {
             if (AccessPrimary == null)
                 return;
