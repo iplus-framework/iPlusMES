@@ -62,6 +62,18 @@ namespace gip.mes.processapplication
         }
 
         [DataMember]
+        public short MaterialWFConnectionMode
+        {
+            get; set;
+        }
+
+        [DataMember]
+        public IEnumerable<Guid>IntermediateChildPOPosIDs
+        {
+            get; set;
+        }
+
+        [DataMember]
         public Guid ACClassWFId
         {
             get; set;
@@ -413,11 +425,15 @@ namespace gip.mes.processapplication
             if (pwNode == null || activeWorkflow == null || activeWorkflow.CurrentProdOrderPartslistPos == null)
                 return;
             Guid intermediatePosID, intermediateChildPosID;
-            pwNode.GetAssignedIntermediate(out intermediatePosID, out intermediateChildPosID);
-            infoList.Add(OnCreateNewWFInfo(infoList, activeWorkflow, pwNode, forRelease, intermediatePosID, intermediateChildPosID)); 
+            short connMode = 0;
+            IEnumerable<Guid> intermediateChildPosIDs;
+
+            pwNode.GetAssignedIntermediate(out intermediatePosID, out intermediateChildPosID, out connMode, out intermediateChildPosIDs);
+            infoList.Add(OnCreateNewWFInfo(infoList, activeWorkflow, pwNode, forRelease, intermediatePosID, intermediateChildPosID, connMode, intermediateChildPosIDs)); 
         }
 
-        protected virtual PAProdOrderPartslistWFInfo OnCreateNewWFInfo(List<PAProdOrderPartslistWFInfo> infoList, PWMethodProduction activeWorkflow, PWWorkTaskScanBase pwNode, bool forRelease, Guid intermediatePosID, Guid intermediateChildPosID)
+        protected virtual PAProdOrderPartslistWFInfo OnCreateNewWFInfo(List<PAProdOrderPartslistWFInfo> infoList, PWMethodProduction activeWorkflow, PWWorkTaskScanBase pwNode, bool forRelease, 
+                                                                       Guid intermediatePosID, Guid intermediateChildPosID, short materialWFConnectionMode, IEnumerable<Guid> intermediateChildPosIDs)
         {
             return new PAProdOrderPartslistWFInfo()
             {
@@ -429,7 +445,9 @@ namespace gip.mes.processapplication
                 ACUrlWF = pwNode.GetACUrl(),
                 ForRelease = forRelease,
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
-                WFMethod = pwNode.CurrentACMethod.ValueT
+                WFMethod = pwNode.CurrentACMethod.ValueT,
+                MaterialWFConnectionMode = materialWFConnectionMode,
+                IntermediateChildPOPosIDs = intermediateChildPosIDs
             };
         }
 

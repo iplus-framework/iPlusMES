@@ -253,7 +253,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility lot.
         /// </summary>
         /// <value>The selected facility lot.</value>
-        [ACPropertySelected(801, FacilityLot.ClassName)]
+        [ACPropertySelected(801, nameof(FacilityLot), ConstApp.LotNo)]
         public FacilityLot SelectedFacilityLot
         {
             get
@@ -275,7 +275,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility lot.
         /// </summary>
         /// <value>The current facility lot.</value>
-        [ACPropertyCurrent(802, FacilityLot.ClassName)]
+        [ACPropertyCurrent(802, nameof(FacilityLot), ConstApp.LotNo)]
         public FacilityLot CurrentFacilityLot
         {
             get
@@ -330,7 +330,7 @@ namespace gip.bso.facility
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
-        [ACPropertyList(803, FacilityLot.ClassName)]
+        [ACPropertyList(803, nameof(FacilityLot), ConstApp.LotNo)]
         public List<FacilityLot> FacilityLotList
         {
             get

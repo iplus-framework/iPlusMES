@@ -1505,7 +1505,7 @@ namespace gip.bso.manufacturing
         /// Searches the delivery note.
         /// </summary>
         [ACMethodCommand(ProdOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search(ProdOrder selectedProdOrder = null, ProdOrderPartslist selectedProdOrderPartslist = null)
+        public virtual void Search(ProdOrder selectedProdOrder = null, ProdOrderPartslist selectedProdOrderPartslist = null)
         {
             if (AccessPrimary == null)
                 return;
