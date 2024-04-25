@@ -25,11 +25,12 @@ namespace gip.mes.processapplication
             if (scale != null)
             {
                 DosedQuantity = scale.ActualWeight.ValueT;
-                if (!dosing.IsSimulationOn)
+                PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
+                if (totalizingScale != null)
                 {
-                    PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
-                    if (totalizingScale != null)
-                        DosedQuantity = totalizingScale.TotalActualWeight.ValueT;
+                    double totalDosedWeight = totalizingScale.ActualWeight.ValueT;
+                    if (!dosing.IsSimulationOn || Math.Abs(totalDosedWeight) > Double.Epsilon)
+                        DosedQuantity = totalDosedWeight;
                 }
             }
             else
