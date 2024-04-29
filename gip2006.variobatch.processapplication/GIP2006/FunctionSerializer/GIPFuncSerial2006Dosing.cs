@@ -83,7 +83,8 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Density
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // MaxDosingTime
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // AdjustmentFlowRate
-            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; //EndlessDosing
+            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // EndlessDosing
+            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // SWTWeight
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
             if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -292,9 +293,8 @@ namespace gip2006.variobatch.processapplication
             {
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Byte.ToByteArray(Convert.ToByte(acValue.ParamAsBoolean)),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Byte.Length);
-                iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
             }
-
+            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
 
             acValue = request.ParameterValueList.GetACValue("SWTWeight");
             if (acValue != null)
@@ -392,6 +392,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // MaxDosingTime
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // AdjustmentFlowRate
                 iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // EndlessDosing
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // SWTWeight
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
