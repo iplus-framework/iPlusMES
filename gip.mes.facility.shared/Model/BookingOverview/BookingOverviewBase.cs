@@ -1,5 +1,7 @@
 ﻿#if NETFRAMEWORK
 using gip.core.datamodel;
+using gip.mes.datamodel;
+
 #endif
 using System;
 using System.Runtime.Serialization;
@@ -86,6 +88,18 @@ namespace gip.mes.facility
         public string OutwardFacilityName { get; set; }
 
 #if NETFRAMEWORK
+        [ACPropertyInfo(801, "OutwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
+#endif
+        [DataMember(Name = "OFCELNo")]
+        public string OutwardFacilityChargeExternLotNo { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(901, "OutwardFacilityChargeExternLotNo2", ConstApp.ExternLotNo2)]
+#endif
+        [DataMember(Name = "OFCELNo2")]
+        public string OutwardFacilityChargeExternLotNo2 { get; set; }
+
+#if NETFRAMEWORK
         [ACPropertyInfo(9999, "OutwardFacilityChargeLotNo", "en{'O. Lot No.'}de{'A. Los-Nr.'}")]
 #endif
         [DataMember(Name = "OFCLNo")]
@@ -129,6 +143,18 @@ namespace gip.mes.facility
 #endif
         [DataMember(Name = "IFCLNo")]
         public string InwardFacilityChargeLotNo { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(802, "InwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
+#endif
+        [DataMember(Name = "IFCELNo")]
+        public string InwardFacilityChargeExternLotNo { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(902, "InwardFacilityChargeExternLotNo2", ConstApp.ExternLotNo2)]
+#endif
+        [DataMember(Name = "IFCELNo2")]
+        public string InwardFacilityChargeExternLotNo2 { get; set; }
 
         #endregion
 

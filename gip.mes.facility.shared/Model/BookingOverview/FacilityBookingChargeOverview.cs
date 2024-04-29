@@ -27,18 +27,6 @@ namespace gip.mes.facility
         public Guid? OutwardFacilityChargeID { get; set; }
 
 #if NETFRAMEWORK
-        [ACPropertyInfo(801, "OutwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
-#endif
-        [DataMember(Name = "OFCELNo")]
-        public string OutwardFacilityChargeExternLotNo { get; set; }
-
-#if NETFRAMEWORK
-        [ACPropertyInfo(802, "InwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
-#endif
-        [DataMember(Name = "IFCELNo")]
-        public string InwardFacilityChargeExternLotNo { get; set; }
-
-#if NETFRAMEWORK
         [ACPropertyInfo(803, "InwardFacilityChargeFillingDate", ConstApp.FillingDate)]
 #endif
         [DataMember(Name = "IFCFDt")]
@@ -56,6 +44,7 @@ namespace gip.mes.facility
             get;
             set;
         }
+
 
     }
 }
