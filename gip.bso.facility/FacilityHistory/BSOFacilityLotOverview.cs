@@ -735,6 +735,53 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region BSO->ACMethod->DialogOrderInfo
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            // Falls Produktionsauftrag
+            FacilityLot facilityLot = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == FacilityLot.ClassName)
+                {
+                    facilityLot = this.DatabaseApp.FacilityLot
+                        .Where(c => c.FacilityLotID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+            }
+
+            if (facilityLot == null)
+                return;
+
+            ShowDialogOrder(facilityLot.LotNo);
+        }
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(string lotNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == nameof(FacilityLot.LotNo)).FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, Global.Operators.and, lotNo, false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            filterItem.SearchWord = lotNo;
+
+            this.Search();
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -744,26 +791,32 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((String)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -813,6 +866,11 @@ namespace gip.bso.facility
                     fb.InOutSumUOM = sum;
                 }
             }
+        }
+
+        public override bool IsEnabledShowFacilityLot()
+        {
+            return false;
         }
 
         #endregion

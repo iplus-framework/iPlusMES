@@ -2063,6 +2063,32 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region ShowFacilityLot
+
+        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 902, true, nameof(SelectedFacilityCharge))]
+        public void ShowFacilityLot()
+        {
+            if (!IsEnabledShowFacilityLot())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowFacilityLot()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+        #endregion
+
         #region BSO->ACMethod Filter ExpirationDate
 
         /// <summary>

@@ -6,7 +6,6 @@ using System;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
-using System.Text;
 
 namespace gip.mes.facility
 {
@@ -28,6 +27,7 @@ namespace gip.mes.facility
             _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOrder), "");
             _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowComponent), "");
             _C_BSONameForShowVisitorVoucher = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowVisitorVoucher), "");
+            _C_BSONameForFacilityLotOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForFacilityLotOverview), "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -35,31 +35,18 @@ namespace gip.mes.facility
         #endregion
 
         #region Configuration
+
         private ACPropertyConfigValue<string> _C_BSONameForShowOrder;
         [ACPropertyConfig("en{'Classname and ACIdentifier for Prod.-Order'}de{'Klassenname und ACIdentifier für Produktionsauftrag'}")]
         public string BSONameForShowOrder
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
-                    return _C_BSONameForShowOrder.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOProdOrder");
-                if (classOfBso != null)
+                if(string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowOrder.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOProdOrder", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
-                    _C_BSONameForShowOrder.ValueT = "BSOProdOrder(Dialog)";
                 return _C_BSONameForShowOrder.ValueT;
             }
             set
@@ -74,25 +61,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowComponent.ValueT))
-                    return _C_BSONameForShowComponent.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOProdOrderBatchComponents");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowComponent.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOProdOrderBatchComponents", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowComponent.ValueT))
-                    _C_BSONameForShowComponent.ValueT = "BSOProdOrderBatchComponents(Dialog)";
                 return _C_BSONameForShowComponent.ValueT;
             }
             set
@@ -107,25 +80,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowReservation.ValueT))
-                    return _C_BSONameForShowReservation.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOComponentReservation");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowReservation.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOComponentReservation", "Dialog");
                 }
-
-                if (String.IsNullOrEmpty(_C_BSONameForShowReservation.ValueT))
-                    _C_BSONameForShowReservation.ValueT = "BSOComponentReservation(Dialog)";
+               
                 return _C_BSONameForShowReservation.ValueT;
             }
             set
@@ -138,25 +97,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowProgramLog.ValueT))
-                    return _C_BSONameForShowProgramLog.ValueT;
-                gip.core.datamodel.ACClass classOfBso = typeof(PresenterProgramLogVB).GetACType() as gip.core.datamodel.ACClass;
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowProgramLog.ValueT = derivation.ACIdentifier;
+                    _C_BSONameForShowOrder.ValueT = GetBSOName(nameof(PresenterProgramLogVB), typeof(PresenterProgramLogVB).GetACType() as gip.core.datamodel.ACClass, null);
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowProgramLog.ValueT))
-                    _C_BSONameForShowProgramLog.ValueT = "PresenterProgramLogVB";
                 return _C_BSONameForShowProgramLog.ValueT;
             }
             set
@@ -186,25 +131,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowPicking.ValueT))
-                    return _C_BSONameForShowPicking.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOPicking");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowPicking.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOPicking", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowPicking.ValueT))
-                    _C_BSONameForShowPicking.ValueT = "BSOPicking(Dialog)";
                 return _C_BSONameForShowPicking.ValueT;
             }
             set
@@ -219,25 +150,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowInDeliveryNote.ValueT))
-                    return _C_BSONameForShowInDeliveryNote.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOInDeliveryNote");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowInDeliveryNote.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOInDeliveryNote", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowInDeliveryNote.ValueT))
-                    _C_BSONameForShowInDeliveryNote.ValueT = "BSOInDeliveryNote(Dialog)";
                 return _C_BSONameForShowInDeliveryNote.ValueT;
             }
             set
@@ -252,25 +169,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowOutDeliveryNote.ValueT))
-                    return _C_BSONameForShowOutDeliveryNote.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOOutDeliveryNote");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowOutDeliveryNote.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOOutDeliveryNote", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowOutDeliveryNote.ValueT))
-                    _C_BSONameForShowOutDeliveryNote.ValueT = "BSOOutDeliveryNote(Dialog)";
                 return _C_BSONameForShowOutDeliveryNote.ValueT;
             }
             set
@@ -285,25 +188,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
-                    return _C_BSONameForShowLabOrder.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOLabOrderMES");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowLabOrder.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOLabOrderMES", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
-                    _C_BSONameForShowLabOrder.ValueT = "BSOLabOrderMES(Dialog)";
                 return _C_BSONameForShowLabOrder.ValueT;
             }
             set
@@ -318,25 +207,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowFacilityBookCell.ValueT))
-                    return _C_BSONameForShowFacilityBookCell.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOFacilityBookCell");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowFacilityBookCell.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOFacilityBookCell", "Dialog");
                 }
-
-                if (String.IsNullOrEmpty(_C_BSONameForShowFacilityBookCell.ValueT))
-                    _C_BSONameForShowFacilityBookCell.ValueT = "BSOFacilityBookCell(Dialog)";
+                
                 return _C_BSONameForShowFacilityBookCell.ValueT;
             }
             set
@@ -351,25 +226,11 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowFacilityOverview.ValueT))
-                    return _C_BSONameForShowFacilityOverview.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOFacilityOverview");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowFacilityOverview.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOFacilityOverview", "Dialog");
                 }
-
-                if (String.IsNullOrEmpty(_C_BSONameForShowFacilityOverview.ValueT))
-                    _C_BSONameForShowFacilityOverview.ValueT = "BSOFacilityOverview(Dialog)";
+                
                 return _C_BSONameForShowFacilityOverview.ValueT;
             }
             set
@@ -386,30 +247,35 @@ namespace gip.mes.facility
         {
             get
             {
-                if (!String.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
-                    return _C_BSONameForShowVisitorVoucher.ValueT;
-                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOVisitorVoucher");
-                if (classOfBso != null)
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
-                    gip.core.datamodel.ACClass derivation = null;
-                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-                    {
-                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
-                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
-                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
-                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
-                    }
-                    if (derivation != null)
-                        _C_BSONameForShowVisitorVoucher.ValueT = derivation.ACIdentifier + "(Dialog)";
+                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOVisitorVoucher", "Dialog");
                 }
 
-                if (String.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
-                    _C_BSONameForShowVisitorVoucher.ValueT = "BSOVisitorVoucher(Dialog)";
                 return _C_BSONameForShowVisitorVoucher.ValueT;
             }
             set
             {
                 _C_BSONameForShowVisitorVoucher.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _C_BSONameForFacilityLotOverview;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for Lot Overview'}de{'Klassenname und ACIdentifier für Losübersicht'}")]
+        public string BSONameForFacilityLotOverview
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_C_BSONameForFacilityLotOverview.ValueT))
+                {
+                    _C_BSONameForFacilityLotOverview.ValueT = GetBSOName("BSOFacilityLotOverview", "Dialog");
+                }
+
+                return _C_BSONameForFacilityLotOverview.ValueT;
+            }
+            set
+            {
+                _C_BSONameForFacilityLotOverview.ValueT = value;
             }
         }
 
@@ -568,6 +434,18 @@ namespace gip.mes.facility
                     string bsoName = BSONameForShowVisitorVoucher;
                     if (String.IsNullOrEmpty(bsoName))
                         bsoName = "BSOVisitorVoucher(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
+                else if(orderInfo.Entities.Where(c=>c.EntityName == nameof(FacilityLot)).Any())
+                {
+                    string bsoName = BSONameForFacilityLotOverview;
                     ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
                     if (childBSO == null)
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
