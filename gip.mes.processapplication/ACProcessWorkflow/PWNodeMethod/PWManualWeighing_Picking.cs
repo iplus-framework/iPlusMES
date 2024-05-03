@@ -144,7 +144,7 @@ namespace gip.mes.processapplication
 
                     using (ACMonitor.Lock(_65050_WeighingCompLock))
                     {
-                        WeighingComponents = openPickings.Select(c => new WeighingComponent(c, DetermineWeighingComponentState(c.MDDelivPosLoadState.MDDelivPosLoadStateIndex))).ToList();
+                        WeighingComponents = openPickings.Select(c => new WeighingComponent(c, DetermineWeighingComponentState(c.MDDelivPosLoadState.MDDelivPosLoadStateIndex, true))).ToList();
                     }
 
                     AvailableRoutes = GetAvailableStorages(module);
@@ -440,8 +440,11 @@ namespace gip.mes.processapplication
                             if (availableFC != null && availableFC.Count() > 1 && MultipleLotsSelectionRule.HasValue)
                             {
                                 if (MultipleLotsSelectionRule.Value != LotSelectionRuleEnum.None)
-                                    return availableFC.Any();
+                                    return availableFC != null && availableFC.Any();
                             }
+
+                            if (availableFC == null)
+                                return false;
 
                             switch (AutoSelectLotPriority)
                             {
