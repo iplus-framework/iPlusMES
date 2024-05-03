@@ -3728,7 +3728,7 @@ namespace gip.mes.processapplication
                         }
                         //}
 
-                        if (facilityCharge != null && facilityCharge.MaterialID != weighingPosRelation.SourceProdOrderPartslistPos.MaterialID 
+                        if (facilityCharge != null && facilityCharge.MaterialID != weighingPosRelation.SourceProdOrderPartslistPos.MaterialID
                                                    && facilityCharge.Material.ProductionMaterialID != weighingPosRelation.SourceProdOrderPartslistPos.MaterialID)
                         {
                             msg = new Msg(this, eMsgLevel.Error, nameof(PWManualWeighing), nameof(DoManualWeighingBooking) + "(32)", 2809,
