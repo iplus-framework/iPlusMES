@@ -616,8 +616,7 @@ namespace gip.mes.datamodel
             MDVisitorCardEntityType.CreateForeignKey1(mDVisitorCard, mDVisitorCardState);
             MaintACClassEntityType.CreateForeignKey1(maintACClass, aCClass);
             MaintACClassPropertyEntityType.CreateForeignKey1(maintACClassProperty, maintACClass);
-            MaintACClassPropertyEntityType.CreateForeignKey2(maintACClassProperty, maintOrder);
-            MaintACClassPropertyEntityType.CreateForeignKey3(maintACClassProperty, aCClassProperty);
+            MaintACClassPropertyEntityType.CreateForeignKey2(maintACClassProperty, aCClassProperty);
             MaintOrderEntityType.CreateForeignKey1(maintOrder, maintOrder);
             MaintOrderEntityType.CreateForeignKey2(maintOrder, facility);
             MaintOrderEntityType.CreateForeignKey3(maintOrder, mDMaintOrderState);

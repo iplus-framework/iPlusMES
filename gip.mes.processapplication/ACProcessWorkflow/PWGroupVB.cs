@@ -57,7 +57,7 @@ namespace gip.mes.processapplication
                     wrapper.Method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
                     wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
-                    wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where BOM-materials can be processed'}de{'Nur Prozessmodule wo Stückliste verarbeitet werden kann'}");
+                    wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where Materials can be processed'}de{'Nur Prozessmodule wo Material verarbeitet werden kann'}");
                 }
             }
             RegisterExecuteHandler(typeof(PWGroupVB), HandleExecuteACMethod_PWGroupVB);
@@ -321,7 +321,7 @@ namespace gip.mes.processapplication
                     if (modulesInAutomaticMode == null
                         || !modulesInAutomaticMode.Any()
                         // Falls Gruppe keine Materialweiterleitungsschritte besitzt, dann keine Überpüfung der Routen:
-                        || !this.FindChildComponents<IPWNodeDeliverMaterial>(c => c is IPWNodeDeliverMaterial).Any())
+                        || (!this.FindChildComponents<IPWNodeDeliverMaterial>(c => c is IPWNodeDeliverMaterial).Any() && !DosableOnGroupCheck))
                         return modulesInAutomaticMode;
 
                     List<PAProcessModule> removedModules = null;

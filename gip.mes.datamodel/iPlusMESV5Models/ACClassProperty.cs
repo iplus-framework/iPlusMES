@@ -391,6 +391,13 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _IsStatic, value); }
     }
 
+    bool _IsCaptionCustomized;
+    public bool IsCaptionCustomized 
+    {
+        get { return _IsCaptionCustomized; }
+        set { SetProperty<bool>(ref _IsCaptionCustomized, value); }
+    }
+
     private ICollection<ACChangeLog> _ACChangeLog_ACClassProperty;
     public virtual ICollection<ACChangeLog> ACChangeLog_ACClassProperty
     {

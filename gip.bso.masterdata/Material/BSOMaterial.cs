@@ -130,7 +130,7 @@ namespace gip.bso.masterdata
 
         private void Value_OnDefaultImageDelete(object sender, EventArgs e)
         {
-            OnPropertyChanged("MaterialList");
+            OnPropertyChanged(nameof(MaterialList));
         }
 
         #endregion
@@ -165,26 +165,26 @@ namespace gip.bso.masterdata
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
         [ACPropertyInfo(600)]
-        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        [ACChildInfo(nameof(BSOFacilityExplorer_Child), typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
             get
             {
                 if (_BSOFacilityExplorer_Child == null)
-                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, nameof(BSOFacilityExplorer_Child));
                 return _BSOFacilityExplorer_Child;
             }
         }
 
         ACChildItem<BSOMedia> _BSOMedia_Child;
         [ACPropertyInfo(9999)]
-        [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
+        [ACChildInfo(nameof(BSOMedia_Child), typeof(BSOMedia))]
         public ACChildItem<BSOMedia> BSOMedia_Child
         {
             get
             {
                 if (_BSOMedia_Child == null)
-                    _BSOMedia_Child = new ACChildItem<BSOMedia>(this, "BSOMedia_Child");
+                    _BSOMedia_Child = new ACChildItem<BSOMedia>(this, nameof(BSOMedia_Child));
                 return _BSOMedia_Child;
             }
         }
@@ -293,14 +293,14 @@ namespace gip.bso.masterdata
                         Messages.Exception(this, e.Message, true);
                     }
 
-                    OnPropertyChanged("CurrentMaterial");
-                    OnPropertyChanged("ACConfigList");
-                    OnPropertyChanged("FacilityChargeList");
-                    OnPropertyChanged("MaterialUnitList");
-                    OnPropertyChanged("ConvertableUnits");
-                    OnPropertyChanged("TranslationList");
-                    OnPropertyChanged("AvailablePWMethodNodes");
-                    OnPropertyChanged("AssignedPWMethodNodes");
+                    OnPropertyChanged(nameof(CurrentMaterial));
+                    OnPropertyChanged(nameof(ACConfigList));
+                    OnPropertyChanged(nameof(FacilityChargeList));
+                    OnPropertyChanged(nameof(MaterialUnitList));
+                    OnPropertyChanged(nameof(ConvertableUnits));
+                    OnPropertyChanged(nameof(TranslationList));
+                    OnPropertyChanged(nameof(AvailablePWMethodNodes));
+                    OnPropertyChanged(nameof(AssignedPWMethodNodes));
                     if (value != null
                         && !String.IsNullOrEmpty(RemoteMaterialForwarder))
                     {
@@ -353,7 +353,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current material unit.
         /// </summary>
         /// <value>The current material unit.</value>
-        [ACPropertyCurrent(9999, "MaterialUnit")]
+        [ACPropertyCurrent(9999, nameof(MaterialUnit))]
         public MaterialUnit CurrentMaterialUnit
         {
             get
@@ -365,7 +365,7 @@ namespace gip.bso.masterdata
                 if (_CurrentMaterialUnit != value)
                 {
                     _CurrentMaterialUnit = value;
-                    OnPropertyChanged("CurrentMaterialUnit");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -374,7 +374,7 @@ namespace gip.bso.masterdata
         /// Gets the material unit list.
         /// </summary>
         /// <value>The material unit list.</value>
-        [ACPropertyList(9999, "MaterialUnit")]
+        [ACPropertyList(9999, nameof(MaterialUnit))]
         public IEnumerable<MaterialUnit> MaterialUnitList
         {
             get
@@ -391,7 +391,7 @@ namespace gip.bso.masterdata
         }
 
         MaterialUnit _CurrentNewMaterialUnit;
-        [ACPropertyCurrent(9999, "NewMaterialUnit")]
+        [ACPropertyCurrent(9999, nameof(NewMaterialUnit))]
         public MaterialUnit CurrentNewMaterialUnit
         {
             get
@@ -401,11 +401,11 @@ namespace gip.bso.masterdata
             set
             {
                 _CurrentNewMaterialUnit = value;
-                OnPropertyChanged("CurrentNewMaterialUnit");
+                OnPropertyChanged();
             }
         }
 
-        [ACPropertyList(9999, "ConvertableUnits")]
+        [ACPropertyList(9999, nameof(ConvertableUnits))]
         public IEnumerable<MDUnit> ConvertableUnits
         {
             get
@@ -473,7 +473,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current material calculation.
         /// </summary>
         /// <value>The current material calculation.</value>
-        [ACPropertyCurrent(9999, "MaterialCalculation")]
+        [ACPropertyCurrent(9999, nameof(MaterialCalculation))]
         public MaterialCalculation CurrentMaterialCalculation
         {
             get
@@ -485,7 +485,7 @@ namespace gip.bso.masterdata
                 if (_CurrentMaterialCalculation != value)
                 {
                     _CurrentMaterialCalculation = value;
-                    OnPropertyChanged("CurrentMaterialCalculation");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -498,7 +498,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected material calculation.
         /// </summary>
         /// <value>The selected material calculation.</value>
-        [ACPropertySelected(9999, "MaterialCalculation")]
+        [ACPropertySelected(9999, nameof(MaterialCalculation))]
         public MaterialCalculation SelectedMaterialCalculation
         {
             get
@@ -510,7 +510,7 @@ namespace gip.bso.masterdata
                 if (_SelectedMaterialCalculation != value)
                 {
                     _SelectedMaterialCalculation = value;
-                    OnPropertyChanged("SelectedMaterialCalculation");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -519,7 +519,7 @@ namespace gip.bso.masterdata
         /// Gets the material calculation list.
         /// </summary>
         /// <value>The material calculation list.</value>
-        [ACPropertyList(9999, "MaterialCalculation")]
+        [ACPropertyList(9999, nameof(MaterialCalculation))]
         public IEnumerable<MaterialCalculation> MaterialCalculationList
         {
             get
@@ -553,7 +553,7 @@ namespace gip.bso.masterdata
             set
             {
                 _CurrentACConfig = value;
-                OnPropertyChanged("CurrentACConfig");
+                OnPropertyChanged();
             }
         }
 
@@ -588,7 +588,7 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedACConfig = value;
-                OnPropertyChanged("SelectedACConfig");
+                OnPropertyChanged();
             }
         }
 
@@ -627,7 +627,7 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedFacilityCharge = value;
-                OnPropertyChanged("SelectedFacilityCharge");
+                OnPropertyChanged();
             }
         }
 
@@ -649,7 +649,7 @@ namespace gip.bso.masterdata
             set
             {
                 _CurrentFacilityCharge = value;
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged();
             }
         }
 
@@ -681,7 +681,7 @@ namespace gip.bso.masterdata
             set
             {
                 _ConvertTestInput = value;
-                OnPropertyChanged("ConvertTestInput");
+                OnPropertyChanged();
             }
         }
 
@@ -696,7 +696,7 @@ namespace gip.bso.masterdata
             set
             {
                 _ConvertTestOutput = value;
-                OnPropertyChanged("ConvertTestOutput");
+                OnPropertyChanged();
             }
         }
 
@@ -711,7 +711,7 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedUnitConvertTest = value;
-                OnPropertyChanged("SelectedUnitConvertTest");
+                OnPropertyChanged();
             }
         }
 
@@ -726,7 +726,7 @@ namespace gip.bso.masterdata
             set
             {
                 _CurrentUnitConvertTest = value;
-                OnPropertyChanged("CurrentUnitConvertTest");
+                OnPropertyChanged();
             }
         }
 
@@ -760,7 +760,7 @@ namespace gip.bso.masterdata
                 if (_SelectedFacilityMaterial != value)
                 {
                     _SelectedFacilityMaterial = value;
-                    OnPropertyChanged(nameof(SelectedFacilityMaterial));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -783,7 +783,7 @@ namespace gip.bso.masterdata
             set
             {
                 _FacilityMaterialList = value;
-                OnPropertyChanged(nameof(FacilityMaterialList));
+                OnPropertyChanged();
             }
         }
 
@@ -828,49 +828,49 @@ namespace gip.bso.masterdata
                             return Global.ControlModes.Disabled;
                         return result;
                     }
-                case "AmbientTemperature":
+                case nameof(AmbientTemperature):
                     {
                         if (!AmbientTemperature.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "ConvertTestDensity":
+                case nameof(ConvertTestDensity):
                     {
                         if (!ConvertTestDensity.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "ConvertTest2AmbVol":
+                case nameof(ConvertTest2AmbVol):
                     {
                         if (!ConvertTest2AmbVol.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "ConvertTest2Ref15Vol":
+                case nameof(ConvertTest2Ref15Vol):
                     {
                         if (!ConvertTest2Ref15Vol.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "ConvertTest2Mass":
+                case nameof(ConvertTest2Mass):
                     {
                         if (!ConvertTest2Mass.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "AmbientTemperature3":
+                case nameof(AmbientTemperature3):
                     {
                         if (!AmbientTemperature3.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "ConvertTestRef15Vol3":
+                case nameof(ConvertTestRef15Vol3):
                     {
                         if (!ConvertTestRef15Vol3.HasValue)
                             return Global.ControlModes.EnabledRequired;
                         return result;
                     }
-                case "ConvertTestMass3":
+                case nameof(ConvertTestMass3):
                     {
                         if (!ConvertTestMass3.HasValue)
                             return Global.ControlModes.EnabledRequired;
@@ -925,7 +925,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -949,7 +949,7 @@ namespace gip.bso.masterdata
             {
                 CurrentMaterial.MaterialUnit_Material.AutoRefresh(CurrentMaterial.MaterialUnit_MaterialReference, CurrentMaterial);
                 //CurrentMaterial.MaterialUnit_Material.AutoLoad();
-                OnPropertyChanged("MaterialUnitList");
+                OnPropertyChanged(nameof(MaterialUnitList));
             }
 
             if (SelectedMaterial != null)
@@ -968,7 +968,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -994,7 +994,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterial), Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -1035,7 +1035,7 @@ namespace gip.bso.masterdata
         public override void Search()
         {
             AccessPrimary.NavSearch(DatabaseApp, DatabaseApp.RecommendedMergeOption);
-            OnPropertyChanged("MaterialList");
+            OnPropertyChanged(nameof(MaterialList));
         }
 
         private List<Material> _VisitedMaterials = null;
@@ -1089,14 +1089,14 @@ namespace gip.bso.masterdata
         /// Diese ist immer zuerst zu aktualisieren.
         /// Anschließend werden alle Steuerelemente aktualisiert, welche das Current... darstellen.
         /// </summary>
-        [ACMethodInteraction("MaterialUnit", "en{'New Material Unit'}de{'Neue Materialeinheit'}", (short)MISort.New, true, "CurrentMaterialUnit", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MaterialUnit", "en{'New Material Unit'}de{'Neue Materialeinheit'}", (short)MISort.New, true, nameof(CurrentMaterialUnit), Global.ACKinds.MSMethodPrePost)]
         public void NewMaterialUnit()
         {
             if (!PreExecute("NewMaterialUnit")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             CurrentNewMaterialUnit = MaterialUnit.NewACObject(DatabaseApp, CurrentMaterial);
             ShowDialog(this, "MaterialUnitNew");
-            OnPropertyChanged("MaterialUnitList");
+            OnPropertyChanged(nameof(MaterialUnitList));
 
             PostExecute("NewMaterialUnit");
         }
@@ -1113,7 +1113,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the material unit.
         /// </summary>
-        [ACMethodInteraction("MaterialUnit", "en{'Delete Material Unit'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, "CurrentMaterialUnit", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MaterialUnit", "en{'Delete Material Unit'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterialUnit), Global.ACKinds.MSMethodPrePost)]
         public void DeleteMaterialUnit()
         {
             if (CurrentMaterialUnit == null)
@@ -1127,7 +1127,7 @@ namespace gip.bso.masterdata
                 Messages.Msg(msg);
                 return;
             }
-            OnPropertyChanged("MaterialUnitList");
+            OnPropertyChanged(nameof(MaterialUnitList));
 
             PostExecute("DeleteMaterialUnit");
         }
@@ -1152,8 +1152,8 @@ namespace gip.bso.masterdata
             CurrentMaterialUnit = CurrentNewMaterialUnit;
             MDUnit toUnit = CurrentNewMaterialUnit.ToMDUnit;
             CurrentMaterial.MaterialUnit_Material.Add(CurrentMaterialUnit);
-            OnPropertyChanged("MaterialUnitList");
-            OnPropertyChanged("ConvertableUnits");
+            OnPropertyChanged(nameof(MaterialUnitList));
+            OnPropertyChanged(nameof(ConvertableUnits));
             CurrentMaterialUnit.ToMDUnit = toUnit;
         }
 
@@ -1197,7 +1197,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the material calculation.
         /// </summary>
-        [ACMethodInteraction("MaterialCalculation", "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedMaterialCalculation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MaterialCalculation), "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, nameof(SelectedMaterialCalculation), Global.ACKinds.MSMethodPrePost)]
         public void LoadMaterialCalculation()
         {
             if (!IsEnabledLoadMaterialCalculation())
@@ -1220,7 +1220,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the material calculation.
         /// </summary>
-        [ACMethodInteraction("MaterialCalculation", "en{'New MaterialCalculation'}de{'Neue Materialeinheit'}", (short)MISort.New, true, "SelectedMaterialCalculation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MaterialCalculation", "en{'New MaterialCalculation'}de{'Neue Materialeinheit'}", (short)MISort.New, true, nameof(SelectedMaterialCalculation), Global.ACKinds.MSMethodPrePost)]
         public void NewMaterialCalculation()
         {
             if (!PreExecute("NewMaterialCalculation")) return;
@@ -1244,7 +1244,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the material calculation.
         /// </summary>
-        [ACMethodInteraction("MaterialCalculation", "en{'Delete MaterialCalculation'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, "CurrentMaterialCalculation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MaterialCalculation), "en{'Delete MaterialCalculation'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterialCalculation), Global.ACKinds.MSMethodPrePost)]
         public void DeleteMaterialCalculation()
         {
             if (CurrentMaterialCalculation == null)
@@ -1312,7 +1312,7 @@ namespace gip.bso.masterdata
         /// Die Load-Methode lädt den aktuell selektierten Datensatz (Selected...) auf den
         /// Datenhalter (Current...)
         /// </summary>
-        [ACMethodInteraction("ACConfig", "en{'Load Attribute'}de{'Attribut laden'}", (short)MISort.Load, false, "SelectedACConfig", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ACConfig", "en{'Load Attribute'}de{'Attribut laden'}", (short)MISort.Load, false, nameof(SelectedACConfig), Global.ACKinds.MSMethodPrePost)]
         public void LoadACConfig()
         {
             if (!IsEnabledLoadACConfig())
@@ -1341,15 +1341,15 @@ namespace gip.bso.masterdata
         /// Diese ist immer zuerst zu aktualisieren.
         /// Anschließend werden alle Steuerelemente aktualisiert, welche das Current... darstellen.
         /// </summary>
-        [ACMethodInteraction("ACConfig", "en{'New Attribute'}de{'Neues Attribut'}", (short)MISort.New, true, "SelectedACConfig", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ACConfig", "en{'New Attribute'}de{'Neues Attribut'}", (short)MISort.New, true, nameof(SelectedACConfig), Global.ACKinds.MSMethodPrePost)]
         public void NewACConfig()
         {
             if (!PreExecute("NewACConfig")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             //TODO: VBConfig stimmt was von Logik nicht, da MaterialConfig zurückkommt und neu erzeugte Objekt sowieso in anderem Context gar nicht existiert:
             CurrentACConfig = CurrentMaterial.NewACConfig() as MaterialConfig;
-            OnPropertyChanged("ACConfigList");
-            OnPropertyChanged("CurrentACConfig");
+            OnPropertyChanged(nameof(ACConfigList));
+            OnPropertyChanged(nameof(CurrentACConfig));
             PostExecute("NewACConfig");
         }
 
@@ -1365,7 +1365,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the AC config.
         /// </summary>
-        [ACMethodInteraction("ACConfig", "en{'Delete Attribute'}de{'Attribut löschen'}", (short)MISort.Delete, true, "CurrentACConfig", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ACConfig", "en{'Delete Attribute'}de{'Attribut löschen'}", (short)MISort.Delete, true, nameof(CurrentACConfig), Global.ACKinds.MSMethodPrePost)]
         public void DeleteACConfig()
         {
             try
@@ -1384,8 +1384,8 @@ namespace gip.bso.masterdata
                 Messages.Error(this, "Message00001", false, e.Message);
             }
             PostExecute("DeleteACConfig");
-            OnPropertyChanged("ACConfigList");
-            OnPropertyChanged("CurrentACConfig");
+            OnPropertyChanged(nameof(ACConfigList));
+            OnPropertyChanged(nameof(CurrentACConfig));
         }
 
         /// <summary>
@@ -1751,7 +1751,7 @@ namespace gip.bso.masterdata
             {
                 if (_AccessAssociatedPartslistPos == null)
                 {
-                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(this, Const.QueryPrefix + "AssociatedPartslistPos", "PartslistPos");
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(this, Const.QueryPrefix + "AssociatedPartslistPos", nameof(PartslistPos));
                     if (navACQueryDefinition.TakeCount == 0)
                         navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(AccessAssociatedPartslistPosDefaultSort);
@@ -1898,7 +1898,7 @@ namespace gip.bso.masterdata
         /// Doc  FilterAssociatedPosTargetQFrom
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterAssociatedPosTargetQFrom", "en{'Quantity from'}de{'Menge von'}")]
+        [ACPropertyInfo(999, nameof(FilterAssociatedPosTargetQFrom), "en{'Quantity from'}de{'Menge von'}")]
         public double? FilterAssociatedPosTargetQFrom
         {
             get
@@ -1911,7 +1911,7 @@ namespace gip.bso.masterdata
                 {
                     _FilterAssociatedPosTargetQFrom = value;
                     SetQuantitySearchFilter();
-                    OnPropertyChanged("FilterAssociatedPosTargetQFrom");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1921,7 +1921,7 @@ namespace gip.bso.masterdata
         /// Doc  FilterAssociatedPosTargetQTo
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterAssociatedPosTargetQTo", "en{'Quantity to'}de{'Menge bis'}")]
+        [ACPropertyInfo(999, nameof(FilterAssociatedPosTargetQTo), "en{'Quantity to'}de{'Menge bis'}")]
         public double? FilterAssociatedPosTargetQTo
         {
             get
@@ -1934,7 +1934,7 @@ namespace gip.bso.masterdata
                 {
                     _FilterAssociatedPosTargetQTo = value;
                     SetQuantitySearchFilter();
-                    OnPropertyChanged("FilterAssociatedPosTargetQTo");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1944,7 +1944,7 @@ namespace gip.bso.masterdata
         /// Doc  FilterAssociatedPosIntermMatNo
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterAssociatedPosIntermMatNo", "en{'Mix product N'}de{'Zwischenprodukt Nr.'}")]
+        [ACPropertyInfo(999, nameof(FilterAssociatedPosIntermMatNo), "en{'Mix product N'}de{'Zwischenprodukt Nr.'}")]
         public string FilterAssociatedPosIntermMatNo
         {
             get
@@ -1956,7 +1956,7 @@ namespace gip.bso.masterdata
                 if (_FilterAssociatedPosIntermMatNo != value)
                 {
                     _FilterAssociatedPosIntermMatNo = value;
-                    OnPropertyChanged("FilterAssociatedPosIntermMatNo");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1965,7 +1965,7 @@ namespace gip.bso.masterdata
         /// Doc  FilterAssociatedPosIntermMatNo
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterIsEnabled", "en{'Enabled'}de{'Freigegeben'}")]
+        [ACPropertyInfo(999, nameof(FilterIsPartslistEnabled), "en{'Enabled'}de{'Freigegeben'}")]
         public bool? FilterIsPartslistEnabled
         {
             get
@@ -2015,8 +2015,8 @@ namespace gip.bso.masterdata
         {
             List<ACFilterItem> list = new List<ACFilterItem>();
             list.Add(new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
-            list.Add(new ACFilterItem(Global.FilterTypes.filter, "TargetQuantityUOM", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, FilterAssociatedPosTargetQFrom?.ToString(), true, true));
-            list.Add(new ACFilterItem(Global.FilterTypes.filter, "TargetQuantityUOM", Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, FilterAssociatedPosTargetQTo?.ToString(), true, true));
+            list.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(PartslistPos.TargetQuantityUOM), Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, FilterAssociatedPosTargetQFrom?.ToString(), true, true));
+            list.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(PartslistPos.TargetQuantityUOM), Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, FilterAssociatedPosTargetQTo?.ToString(), true, true));
             list.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
             return list;
         }
@@ -2039,7 +2039,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Method SearchAssociatedPos
         /// </summary>
-        [ACMethodInfo("SearchAssociatedPos", "en{'Search'}de{'Suchen'}", 9999, false, false, true)]
+        [ACMethodInfo(nameof(SearchAssociatedPos), "en{'Search'}de{'Suchen'}", 9999, false, false, true)]
         public void SearchAssociatedPos()
         {
             if (!IsEnabledSearchAssociatedPos())
@@ -2047,7 +2047,7 @@ namespace gip.bso.masterdata
             if (_AccessAssociatedPartslistPos != null)
                 _AccessAssociatedPartslistPos.NavSearch();
 
-            OnPropertyChanged("AssociatedPartslistPosList");
+            OnPropertyChanged(nameof(AssociatedPartslistPosList));
         }
 
         public bool IsEnabledSearchAssociatedPos()
@@ -2055,7 +2055,7 @@ namespace gip.bso.masterdata
             return _AccessAssociatedPartslistPos != null;
         }
 
-        [ACMethodInfo("OpenQueryDialog", "en{'Query dialog'}de{'Abfragedialog'}", 503, false)]
+        [ACMethodInfo(nameof(OpenQueryDialog), "en{'Query dialog'}de{'Abfragedialog'}", 503, false)]
         public bool OpenQueryDialog()
         {
             if (!IsEnabledSearchAssociatedPos())
@@ -2089,9 +2089,9 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedPWMethodNode = value;
-                OnPropertyChanged("SelectedPWMethodNode");
-                OnPropertyChanged("AvailablePWMethodNodes");
-                OnPropertyChanged("AssignedPWMethodNodes");
+                OnPropertyChanged(nameof(SelectedPWMethodNode));
+                OnPropertyChanged(nameof(AvailablePWMethodNodes));
+                OnPropertyChanged(nameof(AssignedPWMethodNodes));
             }
         }
 
@@ -2142,8 +2142,8 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedAvailablePWMethodNode = value;
-                OnPropertyChanged("SelectedAvailablePWMethodNode");
-                OnPropertyChanged("AvailableMachineList");
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(AvailableMachineList));
             }
         }
 
@@ -2211,8 +2211,8 @@ namespace gip.bso.masterdata
             CurrentMaterial.MaterialConfig_Material.Add(singleDosConfig);
             //DatabaseApp.MaterialConfig.AddObject(singleDosConfig);
 
-            OnPropertyChanged("AssignedPWMethodNodes");
-            OnPropertyChanged("AvailablePWMethodNodes");
+            OnPropertyChanged(nameof(AssignedPWMethodNodes));
+            OnPropertyChanged(nameof(AvailablePWMethodNodes));
             CloseTopDialog();
 
             SelectedAvailablePWMethodNode = null;
@@ -2229,8 +2229,8 @@ namespace gip.bso.masterdata
         {
             SelectedMaterial.MaterialConfig_Material.Remove(SelectedAssignedPWMethodNode);
             DatabaseApp.Remove(SelectedAssignedPWMethodNode);
-            OnPropertyChanged("AssignedPWMethodNodes");
-            OnPropertyChanged("AvailablePWMethodNodes");
+            OnPropertyChanged(nameof(AssignedPWMethodNodes));
+            OnPropertyChanged(nameof(AvailablePWMethodNodes));
         }
 
         public bool IsEnabledDeletePWMethodNodeConfig()

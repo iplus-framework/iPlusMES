@@ -396,13 +396,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -473,13 +473,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithIntermediateMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithIntermediateMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -551,13 +551,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -627,13 +627,13 @@ namespace gip.mes.facility
                 PartslistPos pos = relation.SourcePartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.PartslistID, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PlSilosWithIntermediateMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.PartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.PartslistPos_AlternativePartslistPos.Any())
                 {
                     foreach (PartslistPos altPos in pos.PartslistPos_AlternativePartslistPos)
                     {
-                        var result = s_cQry_PlSilosWithIntermediateMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PlSilosWithIntermediateMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -712,13 +712,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosWithMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosWithMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -792,13 +792,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosWithIntermediateMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslist.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosWithIntermediateMaterialTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.ProdOrderPartslist.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithIntermediateMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslist.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithIntermediateMaterialTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.ProdOrderPartslist.PartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -878,13 +878,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevStageTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevStageTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevStageTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevStageTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -952,13 +952,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediateTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslistPosID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediateTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.ProdOrderPartslistPosID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevIntermediateTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslistPosID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevIntermediateTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.ProdOrderPartslistPosID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1048,13 +1048,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStageTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStageTime(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_SilosFromLotsOfPrevStageTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_SilosFromLotsOfPrevStageTime(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.SourceProdOrderPartslistID, filterTimeOlderThan, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1126,13 +1126,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosWithMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosWithMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1204,14 +1204,14 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslist.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
+                    var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.ProdOrderPartslist.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                     return new QrySilosResult(result);
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslist.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosWithIntermediateMaterial(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.ProdOrderPartslist.PartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1283,13 +1283,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevStage(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevStage(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1353,13 +1353,13 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediate(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.ProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_PoSilosFromPrevIntermediate(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.ProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_PoSilosFromPrevIntermediate(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.ProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_PoSilosFromPrevIntermediate(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.ProdOrderPartslistPosID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);
@@ -1450,13 +1450,13 @@ namespace gip.mes.facility
 
                 if (!searchForAlternativeMaterials)
                 {
-                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
+                    return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                 {
                     foreach (ProdOrderPartslistPos altPos in pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos)
                     {
-                        var result = s_cQry_SilosFromLotsOfPrevStage(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID, altPos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray();
+                        var result = s_cQry_SilosFromLotsOfPrevStage(ctx, altPos.MaterialID, altPos.Material.ProductionMaterialID != null ? altPos.Material.ProductionMaterialID : altPos.Material.MaterialID, altPos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray();
                         if (result.Any())
                         {
                             return new QrySilosResult(result, altPos);

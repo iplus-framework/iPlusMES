@@ -2,7 +2,6 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using gip.mes.manager;
 using System;
 using System.Data;
 using System.Linq;

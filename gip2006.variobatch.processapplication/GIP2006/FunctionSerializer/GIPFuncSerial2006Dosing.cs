@@ -1,4 +1,5 @@
-﻿using gip.core.communication;
+﻿using gip.core.autocomponent;
+using gip.core.communication;
 using gip.core.communication.ISOonTCP;
 using gip.core.datamodel;
 using gip.mes.processapplication;
@@ -82,7 +83,8 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Density
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // MaxDosingTime
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // AdjustmentFlowRate
-            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; //EndlessDosing
+            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // EndlessDosing
+            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // SWTWeight
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
             if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -291,9 +293,16 @@ namespace gip2006.variobatch.processapplication
             {
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Byte.ToByteArray(Convert.ToByte(acValue.ParamAsBoolean)),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Byte.Length);
-                iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
             }
+            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
 
+            acValue = request.ParameterValueList.GetACValue("SWTWeight");
+            if (acValue != null)
+            {
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(acValue.ParamAsDouble),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+            }
+            iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
             //Array.Copy(gip.core.communication.ISOonTCP.Types.String.ToByteArray(request.ParameterValueList.GetString(""), 30, 32), 0, sendPackage1, 2, 32);
             //iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
@@ -383,6 +392,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // MaxDosingTime
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // AdjustmentFlowRate
                 iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // EndlessDosing
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // SWTWeight
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
@@ -540,6 +550,12 @@ namespace gip2006.variobatch.processapplication
                 }
                 iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
 
+
+                acValue = response.ParameterValueList.GetACValue("SWTWeight");
+                if (acValue != null)
+                    acValue.Value =  gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
+                iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
             }
             else
@@ -550,9 +566,9 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Afterflow
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DosingTime
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Temperature
-                iOffset += 23; // GaugeCode
-                iOffset += 23; // GaugeCodeStart
-                iOffset += 23; // GaugeCodeEnd
+                iOffset += 20; // GaugeCode/Alibi
+                //iOffset += 23; // GaugeCodeStart
+                //iOffset += 23; // GaugeCodeEnd
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // FlowRate
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ImpulseCounter
 
@@ -581,13 +597,13 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 response.ResultValueList.GetACValue("GaugeCode").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
-                iOffset += 23;
+                iOffset += 20;
 
-                response.ResultValueList.GetACValue("GaugeCodeStart").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
-                iOffset += 23;
+                //response.ResultValueList.GetACValue("GaugeCodeStart").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
+                //iOffset += 23;
 
-                response.ResultValueList.GetACValue("GaugeCodeEnd").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
-                iOffset += 23;
+                //response.ResultValueList.GetACValue("GaugeCodeEnd").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
+                //iOffset += 23;
 
                 response.ResultValueList.GetACValue("FlowRate").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;

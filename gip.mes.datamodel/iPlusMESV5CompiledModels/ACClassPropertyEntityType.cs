@@ -217,6 +217,13 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassProperty).GetField("_IsBroadcast", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
             isBroadcast.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var isCaptionCustomized = runtimeEntityType.AddProperty(
+                "IsCaptionCustomized",
+                typeof(bool),
+                propertyInfo: typeof(ACClassProperty).GetProperty("IsCaptionCustomized", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClassProperty).GetField("_IsCaptionCustomized", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            isCaptionCustomized.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var isContent = runtimeEntityType.AddProperty(
                 "IsContent",
                 typeof(bool),

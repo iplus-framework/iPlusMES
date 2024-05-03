@@ -80,10 +80,12 @@ namespace gip.mes.processapplication
             return pafClass.ObjectType.IsAssignableFrom(pafTSC.ComponentClass.ObjectType);
         }
 
-        public void GetAssignedIntermediate(out Guid intermediatePosID, out Guid intermediateChildPosID)
+        public void GetAssignedIntermediate(out Guid intermediatePosID, out Guid intermediateChildPosID, out short materialWFConnectionMode, out IEnumerable<Guid> intermediateChildPosIDs)
         {
             intermediatePosID = Guid.Empty;
             intermediateChildPosID = Guid.Empty;
+            materialWFConnectionMode = 0;
+            intermediateChildPosIDs = null;
 
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
@@ -106,9 +108,59 @@ namespace gip.mes.processapplication
                     {
                         intermediatePosID = intermediatePos.ProdOrderPartslistPosID;
                         intermediateChildPosID = intermediateChildPos.ProdOrderPartslistPosID;
+                        
+                        materialWFConnectionMode = OnDetermineMaterialWFConnectionMode(dbApp, matWFConnections, endBatchPos, pwMethodProduction, out intermediateChildPosIDs);
+
+                        if (materialWFConnectionMode == 1 && intermediateChildPosIDs != null)
+                        {
+                            if (intermediateChildPosIDs.Contains(endBatchPos.ProdOrderPartslistPosID))
+                            {
+                                intermediateChildPosID = endBatchPos.ProdOrderPartslistPosID;
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        public virtual short OnDetermineMaterialWFConnectionMode(DatabaseApp dbApp, MaterialWFConnection[] matWFConnections, ProdOrderPartslistPos endBatchPos, PWMethodProduction pwMethodProduction, out IEnumerable<Guid> intermediateChildPosIDs)
+        {
+            short mode = 0;
+            intermediateChildPosIDs = null;
+
+            if (matWFConnections.Count() > 1)
+            {
+                List<Guid> intermediateItems = new List<Guid>();
+
+                var currentProdOrderPartslist = endBatchPos.ProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
+
+                foreach (MaterialWFConnection matWFConn in matWFConnections)
+                {
+                    var intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                        .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConn.MaterialID
+                            && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                            && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
+
+                    if (intermediatePosition == null)
+                        continue;
+
+                    var intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
+                    .Where(c => c.ProdOrderBatchID.HasValue
+                                && c.ProdOrderBatchID.Value == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID)
+                    .FirstOrDefault();
+
+                    if (intermediateChildPos == null)
+                        continue;
+
+                    intermediateItems.Add(intermediateChildPos.ProdOrderPartslistPosID);
+                }
+
+                intermediateChildPosIDs = intermediateItems;
+
+                mode = 1;
+            }
+
+            return mode;
         }
 
         public bool GetAssignedIntermediate(DatabaseApp dbApp, out ProdOrderPartslistPos intermediatePos, out ProdOrderPartslistPos intermediateChildPos)

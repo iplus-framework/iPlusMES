@@ -1872,6 +1872,31 @@ namespace gip.bso.facility
         }
         #endregion
 
+        #region ShowFacilityLotForQuant
+
+        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 903, true, nameof(SelectedFacilityCharge))]
+        public void ShowFacilityLotForQuant()
+        {
+            if (!IsEnabledShowFacilityLotForQuant())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowFacilityLotForQuant()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+        #endregion
 
         #endregion
 

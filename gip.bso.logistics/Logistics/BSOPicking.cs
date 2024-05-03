@@ -27,6 +27,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Windows.Controls;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
@@ -1033,13 +1034,13 @@ namespace gip.bso.logistics
 
             if (SelectedFilterFromFacility != null)
             {
-                result = 
+                result =
                     result
                     .Where(c =>
                                 !c.PickingPos_Picking.Any()// show picking without positions
                                 || c.PickingPos_Picking
-                                .Any(x => 
-                                            x.FromFacility != null 
+                                .Any(x =>
+                                            x.FromFacility != null
                                             && x.FromFacility.FacilityID == SelectedFilterFromFacility.FacilityID
                                     )
                           );
@@ -1047,13 +1048,13 @@ namespace gip.bso.logistics
 
             if (SelectedFilterToFacility != null)
             {
-                result = 
+                result =
                     result
                     .Where(c =>
                                 !c.PickingPos_Picking.Any() // show picking without positions
                                 || c.PickingPos_Picking
-                                .Any(x => 
-                                            x.ToFacility != null 
+                                .Any(x =>
+                                            x.ToFacility != null
                                             && x.ToFacility.FacilityID == SelectedFilterToFacility.FacilityID
                                     )
                             );
@@ -2794,7 +2795,7 @@ namespace gip.bso.logistics
         /// Searches the delivery note.
         /// </summary>
         [ACMethodCommand("Picking", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search(bool refreshList = true)
+        public virtual void Search(bool refreshList = true)
         {
             if (AccessPrimary == null)
                 return;
@@ -3482,7 +3483,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACMethodCommand("PickingPos", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel)]
+        [ACMethodInfo(nameof(BookAllACMethodBookings), "en{'Post All'}de{'Buche alle'}", 101, true)]
         public void BookAllACMethodBookings()
         {
             if (!IsEnabledBookAllACMethodBookings())
@@ -3500,6 +3501,30 @@ namespace gip.bso.logistics
             if (CurrentPickingPos == null || FacilityPreBookingList == null || !FacilityPreBookingList.Any())
                 return false;
             return true;
+        }
+
+        /// <summary>
+        /// Loop trough all picking lines and book prepared pre-bookings
+        /// </summary>
+        [ACMethodInfo(nameof(BookAllPositions), "en{'Post all positions'}de{'Buche alle line'}", 102, true)]
+        public void BookAllPositions()
+        {
+            if (!IsEnabledBookAllPositions())
+                return;
+            PickingPos[] lines = PickingPosList.ToArray();
+            foreach(PickingPos pos in lines)
+            {
+                CurrentPickingPos = pos;
+                if(IsEnabledBookAllACMethodBookings())
+                {
+                    BookAllACMethodBookings();
+                }
+            }
+        }
+
+        public bool IsEnabledBookAllPositions()
+        {
+            return PickingPosList != null && PickingList.Any();
         }
 
 

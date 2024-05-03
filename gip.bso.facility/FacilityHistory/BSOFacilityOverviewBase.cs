@@ -197,7 +197,7 @@ namespace gip.bso.facility
                 if (_SelectedFacilityBookingChargeOverview != value)
                 {
                     _SelectedFacilityBookingChargeOverview = value;
-                    OnPropertyChanged("SelectedFacilityBookingChargeOverview");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -227,7 +227,7 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region Tracking
+        #region Mehtods -> Tracking
 
         public override ACMenuItemList GetMenu(string vbContent, string vbControl)
         {
@@ -337,7 +337,7 @@ namespace gip.bso.facility
                                     .FirstOrDefault();
                             }
                             PresenterMenuItems menuItemType = PresenterMenuItems.ProdOrderPartslist;
-                            if(Enum.TryParse<PresenterMenuItems>(menuItemTypeStr, out menuItemType))
+                            if (Enum.TryParse<PresenterMenuItems>(menuItemTypeStr, out menuItemType))
                             {
                                 PAOrderInfo pAOrderInfo = GetPAOrderInfo(databaseApp, manager, facilityBooking, menuItemType);
                                 if (pAOrderInfo.Entities.Any())
@@ -407,13 +407,13 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region FacilityBooking(Charge)Overview methods
+        #region Mehtods -> FacilityBooking(Charge)Overview methods
 
-        #region FacilityBooking(Charge)Overview methods -> precompiled queries
+        #region Mehtods -> FacilityBooking(Charge)Overview methods -> precompiled queries
 
         #endregion
 
-        #region FacilityBooking(Charge)Overview methods -> Executive methods
+        #region Mehtods -> FacilityBooking(Charge)Overview methods -> Executive methods
         public virtual List<FacilityBookingOverview> GroupFacilityBookingOverviewList(IEnumerable<FacilityBookingOverview> query)
         {
             if (ACFacilityManager == null)
@@ -430,7 +430,7 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region FacilityBooking(Charge)Overview methods -> Guiding methods
+        #region Mehtods -> FacilityBooking(Charge)Overview methods -> Guiding methods
         public virtual FacilityQueryFilter GetFacilityBookingFilter()
         {
             FacilityQueryFilter filter = new FacilityQueryFilter();
@@ -471,6 +471,53 @@ namespace gip.bso.facility
         }
 
         #endregion
+
+        #endregion
+
+
+        #region Methods -> ShowFacilityLot
+
+        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 902, true, nameof(SelectedFacilityBookingChargeOverview))]
+        public void ShowFacilityLot()
+        {
+            if (!IsEnabledShowFacilityLot())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                string lotNo = "";
+                if (!string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.OutwardFacilityChargeLotNo))
+                {
+                    lotNo = SelectedFacilityBookingChargeOverview.OutwardFacilityChargeLotNo;
+                }
+                else
+                {
+                    lotNo = SelectedFacilityBookingChargeOverview.InwardFacilityChargeLotNo;
+                }
+                if(!string.IsNullOrEmpty(lotNo))
+                {
+                    FacilityLot facilityLot = DatabaseApp.FacilityLot.Where(c => c.LotNo == lotNo).FirstOrDefault();
+                    if(facilityLot != null)
+                    {
+                        PAOrderInfo info = new PAOrderInfo();
+                        info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), facilityLot.FacilityLotID));
+                        service.ShowDialogOrder(this, info);
+                    }
+                }
+            }
+        }
+
+        public virtual bool IsEnabledShowFacilityLot()
+        {
+            return
+                SelectedFacilityBookingChargeOverview != null
+                &&
+                (
+                    !string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.OutwardFacilityChargeLotNo)
+                    || !string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.InwardFacilityChargeLotNo)
+                );
+        }
 
         #endregion
 

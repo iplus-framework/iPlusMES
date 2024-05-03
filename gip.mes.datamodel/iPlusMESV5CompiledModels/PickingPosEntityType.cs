@@ -79,6 +79,13 @@ namespace gip.mes.datamodel
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var isSelected = runtimeEntityType.AddProperty(
+                "IsSelected",
+                typeof(bool),
+                propertyInfo: typeof(PickingPos).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PickingPos).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var keyOfExtSys = runtimeEntityType.AddProperty(
                 "KeyOfExtSys",
                 typeof(string),

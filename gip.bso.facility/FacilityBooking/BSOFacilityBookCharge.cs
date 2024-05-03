@@ -701,7 +701,7 @@ namespace gip.bso.facility
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
-        [ACPropertyList(711, nameof(FacilityLot))]
+        [ACPropertyList(200, nameof(FacilityLot), ConstApp.LotNo)]
         public IEnumerable<FacilityLot> FacilityLotList
         {
             get
@@ -712,7 +712,7 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyCurrent(712, nameof(FacilityLot))]
+        [ACPropertyCurrent(201, nameof(FacilityLot), ConstApp.LotNo)]  
         public FacilityLot CurrentFacilityLot
         {
             get
@@ -1834,7 +1834,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Facilities the relocation.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 711, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 811, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityReassign()
         {
             if (!PreExecute(nameof(FacilityReassign))) 
@@ -1955,7 +1955,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News the split charge no.
         /// </summary>
-        [ACMethodCommand(FacilityCharge.ClassName, "en{'New Split No.'}de{'Neue Splitnr.'}", 713, true)]
+        [ACMethodCommand(FacilityCharge.ClassName, "en{'New Split No.'}de{'Neue Splitnr.'}", 740, true)]
         public void NewSplitChargeNo()
         {
             //CurrentBookParamReleaseAndLock.InwardFacilityCharge.FacilityLot.LotNo = FacilityManager.GenerateSplitChargeNo(CurrentBookParamReleaseAndLock.InwardFacilityCharge);
@@ -2058,6 +2058,32 @@ namespace gip.bso.facility
         public bool IsEnabledShowOrder()
         {
             if (SelectedFacilityCharge != null && !string.IsNullOrEmpty(SelectedFacilityCharge.ProdOrderProgramNo))
+                return true;
+            return false;
+        }
+
+        #endregion
+
+        #region ShowFacilityLot
+
+        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 902, true, nameof(SelectedFacilityCharge))]
+        public void ShowFacilityLot()
+        {
+            if (!IsEnabledShowFacilityLot())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowFacilityLot()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
                 return true;
             return false;
         }

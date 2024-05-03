@@ -129,7 +129,16 @@ namespace gip.mes.webservices
                 {
                     var poPLIDs = paOrderWFInfos.Select(c => c.POPId);
                     var intermPoPLPosIDs = paOrderWFInfos.Select(c => c.IntermPOPPosId);
-                    var intermChildPoPLPosIDs = paOrderWFInfos.Select(c => c.IntermChildPOPPosId);
+
+                    List<Guid> intermChildPoPLPosIDs = new List<Guid>();
+
+                    foreach (var paOrderWFInfo in paOrderWFInfos)
+                    {
+                        if (paOrderWFInfo.IntermediateChildPOPosIDs != null && paOrderWFInfo.IntermediateChildPOPosIDs.Any())
+                            intermChildPoPLPosIDs.AddRange(paOrderWFInfo.IntermediateChildPOPosIDs);
+                        else
+                            intermChildPoPLPosIDs.Add(paOrderWFInfo.IntermChildPOPPosId);
+                    }
 
                     var intermChildPLPos = dbApp.ProdOrderPartslistPos.Include("Material")
                                                        .Include("ProdOrderBatch")
@@ -195,7 +204,10 @@ namespace gip.mes.webservices
                             infoState = POPartslistInfoState.Release;
                         }
 
-                        ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { InfoState = infoState, ACUrlWF = orderWFInfo.ACUrlWF };
+                        ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { InfoState = infoState, 
+                                                                                           ACUrlWF = orderWFInfo.ACUrlWF, 
+                                                                                           MaterialWFConnectionMode = orderWFInfo.MaterialWFConnectionMode,
+                                                                                           IntermediateBatchIDs = orderWFInfo.IntermediateChildPOPosIDs};
                         if (orderWFInfo.WFMethod != null)
                         {
                             pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;
@@ -221,7 +233,13 @@ namespace gip.mes.webservices
                         if (orderWFInfo.IntermPOPPosId != Guid.Empty)
                             pwInfo.Intermediate = vbWebService.ConvertToWSProdOrderPLIntermediates(intermPOPLPos.Where(c => c.ProdOrderPartslistPosID == orderWFInfo.IntermPOPPosId).AsQueryable()).FirstOrDefault();
                         if (orderWFInfo.IntermChildPOPPosId != Guid.Empty)
+                        {
                             pwInfo.IntermediateBatch = vbWebService.ConvertToWSProdOrderIntermBatches(intermChildPLPos.Where(c => c.ProdOrderPartslistPosID == orderWFInfo.IntermChildPOPPosId).AsQueryable()).FirstOrDefault();
+                            if (pwInfo.MaterialWFConnectionMode > 0 && !pwInfo.IntermediateBatch.HasInputMaterials)
+                            {
+                                pwInfo.IntermediateBatch.HasInputMaterials = intermChildPLPos.Any(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Where(x => !x.SourceProdOrderPartslistPos.Material.IsIntermediate).Any());
+                            }
+                        }
                         orderWFList2Fill.Add(pwInfo);
                     }
                 }
