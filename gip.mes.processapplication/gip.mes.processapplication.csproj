@@ -129,7 +129,11 @@
     </None>
     <None Include="VBControlScripts\2024-02-08 19-51_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>  </ItemGroup>
+    </None>  
+    <None Include="VBControlScripts\2024-04-19 16-12_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.1" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />

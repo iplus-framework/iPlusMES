@@ -27,7 +27,6 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Windows.Controls;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
