@@ -2400,12 +2400,13 @@ namespace gip.mes.facility
                                     continue;
                                 bool ifMaterialMatch =
                                         unselFacility != null
-                                        && unselFacility.Material != null
-                                        && (
-                                                pickingPos.Material != null
-                                            && ((unselFacility.MaterialID == pickingPos.Material.MaterialID)
-                                                || (pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID.Value == unselFacility.MaterialID))
-                                         );
+                                        && Material.IsMaterialEqual(pickingPos.Material, unselFacility.Material);
+                                        //&& unselFacility.Material != null
+                                        //&& (
+                                        //        pickingPos.Material != null
+                                        //    && ((unselFacility.MaterialID == pickingPos.Material.MaterialID)
+                                        //        || (pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID.Value == unselFacility.MaterialID))
+                                        //);
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                             }

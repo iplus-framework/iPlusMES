@@ -1513,12 +1513,13 @@ namespace gip.mes.facility
                                     continue;
                                 bool ifMaterialMatch =
                                         unselFacility != null
-                                        && unselFacility.Material != null
-                                        && (
-                                               intermediatePos.BookingMaterial != null
-                                            && ((unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID)
-                                                || (intermediatePos.BookingMaterial.ProductionMaterialID.HasValue && intermediatePos.BookingMaterial.ProductionMaterialID.Value == unselFacility.MaterialID))
-                                         );
+                                        && Material.IsMaterialEqual(intermediatePos.BookingMaterial, unselFacility.Material);
+                                        //&& unselFacility.Material != null
+                                        //&& (
+                                        //       intermediatePos.BookingMaterial != null
+                                        //    && ((unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID)
+                                        //        || (intermediatePos.BookingMaterial.ProductionMaterialID.HasValue && intermediatePos.BookingMaterial.ProductionMaterialID.Value == unselFacility.MaterialID))
+                                        // );
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                                 if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
