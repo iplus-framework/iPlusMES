@@ -3605,12 +3605,17 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    SetCanStartFromBSO(true);
-                    CurrentOpenMaterial = null;
-                    CurrentFacilityCharge = null;
-                    SubscribeToProjectWorkCycle();
+                    OnDeletedTaskCompleted();
                 }
             }
+        }
+
+        protected virtual void OnDeletedTaskCompleted()
+        {
+            SetCanStartFromBSO(true);
+            CurrentOpenMaterial = null;
+            CurrentFacilityCharge = null;
+            SubscribeToProjectWorkCycle();
         }
 
         protected Msg SetRelationState(Guid? plPosRelationID, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates targetState, bool setOnTopRelation = false)

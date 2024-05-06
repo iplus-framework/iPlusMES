@@ -694,10 +694,7 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    SetCanStartFromBSO(true);
-                    CurrentOpenMaterial = null;
-                    CurrentFacilityCharge = null;
-                    SubscribeToProjectWorkCycle();
+                    OnDeletedTaskCompleted();
                 }
             }
         }
