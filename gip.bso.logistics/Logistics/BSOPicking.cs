@@ -38,6 +38,7 @@ namespace gip.bso.logistics
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "OutOrderPosOpen", "en{'Open Sales Order Pos.'}de{'Offene Auftragsposition'}", typeof(OutOrderPos), OutOrderPos.ClassName, "MDDelivPosState\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "ProdOrderPartslistPosOpen", "en{'Open Prod. Order Pos.'}de{'Offene Prod.-auftragsposition'}", typeof(ProdOrderPartslistPos), ProdOrderPartslistPos.ClassName, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", "Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "BookingFacility", ConstApp.Facility, typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
+    [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "PositionFacilityFrom", ConstApp.Facility, typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "BookingFacilityLot", ConstApp.Lot, typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
     [ACClassConstructorInfo(
        new object[]
@@ -1313,6 +1314,58 @@ namespace gip.bso.logistics
         #endregion
 
         #region PickingPos
+
+        #region PickingPos -> PositionFacilityFrom
+
+        private bool _FilterPositionFacilityFrom = true;
+        [ACPropertyInfo(814, "", "en{'Only show source bins with material'}de{'Zeige Quelle-Lagerplätze mit Material'}")]
+        public bool FilterPositionFacilityFrom
+        {
+            get
+            {
+                return _FilterPositionFacilityFrom;
+            }
+            set
+            {
+                if(_FilterPositionFacilityFrom != value)
+                {
+                    _FilterPositionFacilityFrom = value;
+                    OnPropertyChanged();
+                    RefreshFilterFacilityAccess(AccessPositionFacilityFrom, value);
+                    OnPropertyChanged(nameof(PositionFacilityFromList));
+                }
+            }
+        }
+
+        ACAccessNav<Facility> _AccessPositionFacilityFrom;
+        [ACPropertyAccess(815, "PositionFacilityFrom")]
+        public ACAccessNav<Facility> AccessPositionFacilityFrom
+        {
+            get
+            {
+                if (_AccessPositionFacilityFrom == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(this, Const.QueryPrefix + "PositionFacilityFrom", ACType.ACIdentifier);
+                    _AccessPositionFacilityFrom = navACQueryDefinition.NewAccessNav<Facility>("PositionFacilityFrom", this);
+                    _AccessPositionFacilityFrom.AutoSaveOnNavigation = false;
+                    RefreshFilterFacilityAccess(_AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                }
+                return _AccessBookingFacilityTarget;
+            }
+        }
+
+
+        [ACPropertyList(817, "PositionFacilityFrom")]
+        public IList<Facility> PositionFacilityFromList
+        {
+            get
+            {
+                return AccessPositionFacilityFrom?.NavList;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// The _ access delivery note pos
         /// </summary>
@@ -1383,8 +1436,9 @@ namespace gip.bso.logistics
                         SelectedFacilityPreBooking = FacilityPreBookingList.First();
                     else
                         SelectedFacilityPreBooking = null;
-                    RefreshFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
-                    RefreshFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+                    RefreshBookingFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
+                    RefreshBookingFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+                    RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
                     if (AccessBookingFacilityLot != null)
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                     OnPropertyChanged(nameof(BookingFacilityList));
@@ -1409,6 +1463,10 @@ namespace gip.bso.logistics
             {
                 case nameof(CurrentPickingPos.PickingMaterialID):
                     OnPropertyChanged(nameof(MDUnitList));
+                    if(FilterPositionFacilityFrom)
+                    {
+                        RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                    }
                     break;
             }
         }
@@ -1541,8 +1599,8 @@ namespace gip.bso.logistics
                     OnPropertyChanged(nameof(CurrentACMethodBooking));
                     OnPropertyChanged(nameof(CurrentACMethodBookingLayout));
                     //OnPropertyChanged(nameof(BookableFacilityLots));
-                    RefreshFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
-                    RefreshFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+                    RefreshBookingFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
+                    RefreshBookingFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
                     if (AccessBookingFacilityLot != null)
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
 
@@ -1732,7 +1790,7 @@ namespace gip.bso.logistics
             {
                 _BookingFilterMaterial = value;
                 OnPropertyChanged(nameof(BookingFilterMaterial));
-                RefreshFilterFacilityAccess(AccessBookingFacility, value);
+                RefreshBookingFilterFacilityAccess(AccessBookingFacility, value);
                 OnPropertyChanged(nameof(BookingFacilityList));
                 OnPropertyChanged(nameof(OutwardFacilityChargeList));
                 OnPropertyChanged(nameof(InwardFacilityChargeList));
@@ -1776,7 +1834,7 @@ namespace gip.bso.logistics
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "BookingFacility", ACType.ACIdentifier);
                     _AccessBookingFacility = navACQueryDefinition.NewAccessNav<Facility>("BookingFacility", this);
                     _AccessBookingFacility.AutoSaveOnNavigation = false;
-                    RefreshFilterFacilityAccess(_AccessBookingFacility, BookingFilterMaterial);
+                    RefreshBookingFilterFacilityAccess(_AccessBookingFacility, BookingFilterMaterial);
                 }
                 return _AccessBookingFacility;
             }
@@ -1794,7 +1852,7 @@ namespace gip.bso.logistics
             {
                 _BookingFilterMaterialTarget = value;
                 OnPropertyChanged(nameof(BookingFilterMaterialTarget));
-                RefreshFilterFacilityAccess(AccessBookingFacilityTarget, value);
+                RefreshBookingFilterFacilityAccess(AccessBookingFacilityTarget, value);
                 OnPropertyChanged(nameof(BookingFacilityListTarget));
             }
         }
@@ -1810,7 +1868,7 @@ namespace gip.bso.logistics
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "BookingFacility", ACType.ACIdentifier);
                     _AccessBookingFacilityTarget = navACQueryDefinition.NewAccessNav<Facility>("BookingFacility", this);
                     _AccessBookingFacilityTarget.AutoSaveOnNavigation = false;
-                    RefreshFilterFacilityAccess(_AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+                    RefreshBookingFilterFacilityAccess(_AccessBookingFacilityTarget, BookingFilterMaterialTarget);
                 }
                 return _AccessBookingFacilityTarget;
             }
@@ -1874,7 +1932,7 @@ namespace gip.bso.logistics
             }
         }
 
-        private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool bookingFilterMaterial)
+        private void RefreshBookingFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool bookingFilterMaterial)
         {
             if (accessNavFacility == null
                 || accessNavFacility.NavACQueryDefinition == null
@@ -1882,7 +1940,12 @@ namespace gip.bso.logistics
                 || FacilityPreBookingList == null
                 || !FacilityPreBookingList.Any())
                 return;
-            if (bookingFilterMaterial)
+            RefreshFilterFacilityAccess(accessNavFacility, bookingFilterMaterial);
+        }
+
+        private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool filterMaterial)
+        {
+            if (filterMaterial)
             {
                 accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
                 var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
