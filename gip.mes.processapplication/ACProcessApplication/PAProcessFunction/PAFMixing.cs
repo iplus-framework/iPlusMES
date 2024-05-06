@@ -7,6 +7,8 @@ using System.Runtime.Serialization;
 using System.ComponentModel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
+using gip.core.processapplication;
+using System.Web.Routing;
 
 namespace gip.mes.processapplication
 {
@@ -44,6 +46,56 @@ namespace gip.mes.processapplication
         public override ACMethodEventArgs Start(ACMethod acMethod)
         {
             return base.Start(acMethod);
+        }
+
+        protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
+        {
+            if (IsSimulationOn)
+            {
+                foreach (PAEEMotorBase motor in ParentACComponent?.FindChildComponents<PAEEMotorBase>(c => c is PAEEMotorBase))
+                {
+                    motor.ActivateRouteItemOnSimulation(null, false);
+                }
+            }
+
+            return base.CompleteACMethodOnSMStarting(acMethod, previousParams);
+        }
+
+        protected override CompleteResult AnalyzeACMethodResult(ACMethod acMethod, out MsgWithDetails msg, CompleteResult completeResult)
+        {
+            if (IsSimulationOn)
+            {
+                bool switchOff = true;
+                ACValue acValue = acMethod.ParameterValueList.GetACValue("LeaveOn");
+                if (acValue != null && acValue.ValueT<bool>())
+                    switchOff = false;
+                if (switchOff)
+                {
+                    acValue = acMethod.ParameterValueList.GetACValue("SwitchOff");
+                    if (acValue == null || !acValue.ValueT<bool>())
+                    {
+                        acValue = acMethod.ParameterValueList.GetACValue("Duration");
+                        if (acValue == null || acValue.ValueT<TimeSpan>().TotalSeconds <= 0.000001)
+                        {
+                            acValue = acMethod.ParameterValueList.GetACValue("Temperature");
+                            if (acValue == null || Math.Abs(acValue.ValueT<double>()) <= Double.Epsilon)
+                            {
+                                switchOff = false;
+                            }
+                        }
+                    }
+                }
+
+                if (switchOff)
+                {
+                    foreach (PAEEMotorBase motor in ParentACComponent?.FindChildComponents<PAEEMotorBase>(c => c is PAEEMotorBase))
+                    {
+                        motor.ActivateRouteItemOnSimulation(null, true);
+                    }
+                }
+            }
+
+            return base.AnalyzeACMethodResult(acMethod, out msg, completeResult);
         }
         #endregion
 
