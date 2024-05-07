@@ -1,7 +1,5 @@
-﻿using gip.bso.masterdata;
-using gip.core.autocomponent;
+﻿using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
@@ -9,13 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Objects;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using VD = gip.mes.datamodel;
-using System.Xml;
 using System.Data;
 using gip.core.media;
 
@@ -263,7 +256,6 @@ namespace gip.bso.logistics
 
         #endregion
 
-
         #region Properties
 
         #region Properties -> Explorer
@@ -293,13 +285,32 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (SelectedScheduleForPWNode == null) 
+                PickingStateEnum lessEqualState = PickingStateEnum.InProcess;
+                
+                if (
+                        SelectedScheduleForPWNode == null 
+                        || PickingList == null 
+                        || !PickingList.Any(c => c.IsSelected && c.PickingState <= lessEqualState)
+                   )
                     return null;
-                //var connections = PartslistMDSchedulerGroupConnections.Where(c => c.SchedulingGroups.Any(x => x.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID));
-                //Guid[] mdSchedulerOtherGroups = connections.SelectMany(c => c.SchedulingGroups).Select(c => c.MDSchedulingGroupID).Where(c => c != SelectedScheduleForPWNode.MDSchedulingGroupID).Distinct().ToArray();
-                //return
-                //    ScheduleForPWNodeList.Where(c => mdSchedulerOtherGroups.Contains(c.MDSchedulingGroupID)).ToList();
-                return null;
+                
+                Guid[] matchedSchedunlingGroups =
+                    PickingList
+                    .Where(c => c.IsSelected && c.PickingState <= lessEqualState)
+                    .Select(c=>c.ACClassMethod)
+                    .SelectMany(c=>c.ACClassWF_ACClassMethod)
+                    .SelectMany(c=>c.MDSchedulingGroupWF_VBiACClassWF)
+                    .Select(c=>c.MDSchedulingGroupID)
+                    .Distinct()
+                    .ToArray();
+                
+                return
+                    ScheduleForPWNodeList
+                    .Where(c =>
+                                c.MDSchedulingGroupID != SelectedScheduleForPWNode.MDSchedulingGroupID
+                                && matchedSchedunlingGroups.Contains(c.MDSchedulingGroupID)
+                           )
+                    .ToList();
             }
         }
 
@@ -425,32 +436,12 @@ namespace gip.bso.logistics
             }
         }
 
-        private void _SelectedPicking_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void _SelectedPicking_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            //if (e.PropertyName == "PartialTargetCount"
-            //    && SelectedScheduleForPWNode != null
-            //    && SelectedScheduleForPWNode.StartMode == BatchPlanStartModeEnum.SemiAutomatic
-            //    && !_IsRefreshingBatchPlan)
-            //{
-            //    if (SelectedPicking.PartialTargetCount.HasValue && SelectedPicking.PartialTargetCount > 0)
-            //    {
-            //        if (
-            //                (SelectedPicking.ProdOrderPartslist != null && SelectedPicking.ProdOrderPartslist.Partslist.IsEnabled)
-            //                && (SelectedPicking.PlanState <= PickingStateEnum.Created
-            //                || SelectedPicking.PlanState >= PickingStateEnum.Paused)
-            //            )
-            //            SetReadyToStart(new Picking[] { SelectedPicking });
-            //        else
-            //            Save();
-            //    }
-            //    else if (SelectedPicking.PartialTargetCount.HasValue && SelectedPicking.PartialTargetCount <= 0)
-            //    {
-            //        SelectedPicking.PartialTargetCount = null;
-            //        if (SelectedPicking.PlanState == PickingStateEnum.ReadyToStart)
-            //            SelectedPicking.PlanState = PickingStateEnum.Paused;
-            //        Save();
-            //    }
-            //}
+            if (e.PropertyName == nameof(PickingPlanWrapper.IsSelected))
+            {
+                OnPropertyChanged(nameof(TargetScheduleForPWNodeList));
+            }
         }
 
         private ObservableCollection<PickingPlanWrapper> _PickingList;
@@ -560,7 +551,6 @@ namespace gip.bso.logistics
         }
 
         #endregion
-
 
         #endregion
 
@@ -1039,44 +1029,65 @@ namespace gip.bso.logistics
             if (!IsEnabledMoveToOtherLine())
                 return;
             ClearMessages();
-            bool isMovingValueValid = false;
-            bool isMove = false;
-            if (isMovingValueValid)
+            bool isSaveValid = false;
+            bool saveBeforeMove = LocalSaveChanges();
+            PickingPlanWrapper[] selectedPickingPlans = new PickingPlanWrapper[] { };
+            if (saveBeforeMove)
             {
-                bool isSaveValid = LocalSaveChanges();
-                if (isSaveValid)
+                PickingPlanWrapper[] notSelectedPickingPlans = PickingList.Where(c => !c.IsSelected).ToArray();
+                ObservableCollection<PickingPlanWrapper> itemsOnTargetLineP = GetPickingList(SelectedTargetScheduleForPWNode.MDSchedulingGroupID);
+                List<PickingPlanWrapper> itemsOnTargetLine = itemsOnTargetLineP.ToArray().ToList();
+                selectedPickingPlans = PickingList.Where(c => c.IsSelected).ToArray();
+                foreach (PickingPlanWrapper selectedPickingPlan in selectedPickingPlans)
                 {
-                    // Correct the SortOrder from Picking
-                    PickingList = GetPickingList(SelectedScheduleForPWNode?.MDSchedulingGroupID);
-                    if (PickingList != null && PickingList.Any() && isMove)
+                    VD.ACClassWF matchWf =
+                        selectedPickingPlan
+                        .Picking
+                        .ACClassMethod
+                        .ACClassWF_ACClassMethod
+                        .SelectMany(c=>c.MDSchedulingGroupWF_VBiACClassWF)
+                        .Where(c => c.MDSchedulingGroupID == SelectedTargetScheduleForPWNode.MDSchedulingGroupID)
+                        .Select(c=>c.VBiACClassWF)
+                        .FirstOrDefault();
+
+                    if(matchWf != null)
                     {
-                        MoveBatchSortOrderCorrect(PickingList);
-                        isSaveValid = LocalSaveChanges();
-                        if (!isSaveValid)
-                        {
-                            DatabaseApp.ACUndoChanges();
-                        }
+                        selectedPickingPlan.Picking.VBiACClassWF = matchWf;
                     }
                 }
-                else
+
+                // Correct sort order on original place
+                MoveBatchSortOrderCorrect(notSelectedPickingPlans);
+
+                itemsOnTargetLine.AddRange(selectedPickingPlans);
+                MoveBatchSortOrderCorrect(itemsOnTargetLine);
+
+                isSaveValid = LocalSaveChanges();
+            }
+            else
+            {
+                DatabaseApp.ACUndoChanges();
+            }
+            if (isSaveValid)
+            {
+                RefreshServerState(SelectedScheduleForPWNode.MDSchedulingGroupID);
+                RefreshServerState(SelectedTargetScheduleForPWNode.MDSchedulingGroupID);
+                PickingList = GetPickingList(SelectedScheduleForPWNode.MDSchedulingGroupID);
+                SelectedPicking = PickingList.FirstOrDefault();
+                OnPropertyChanged(nameof(PickingList));
+                foreach (PickingPlanWrapper selectedPickingPlan in selectedPickingPlans)
                 {
-                    DatabaseApp.ACUndoChanges();
-                }
-                if (isSaveValid)
-                {
-                    RefreshServerState(SelectedScheduleForPWNode.MDSchedulingGroupID);
-                    SelectedPicking = PickingList.FirstOrDefault();
-                    OnPropertyChanged(nameof(PickingList));
+                    selectedPickingPlan.IsSelected = false;
                 }
             }
         }
 
-
         public bool IsEnabledMoveToOtherLine()
         {
+            PickingStateEnum lessEqualState = PickingStateEnum.InProcess;
             return
-                    SelectedPicking != null
-                    && SelectedPicking.PickingState <= PickingStateEnum.InProcess
+                PickingList != null
+                && PickingList.Where(c => c.PickingState <= lessEqualState && c.IsSelected).Any()
                 && SelectedTargetScheduleForPWNode != null
                 && SelectedTargetScheduleForPWNode.MDSchedulingGroup != null;
         }
@@ -1128,7 +1139,7 @@ namespace gip.bso.logistics
         private void MoveBatchSortOrderCorrect(IEnumerable<PickingPlanWrapper> prodOrderBatchPlans)
         {
             int nr = 0;
-            foreach (var item in prodOrderBatchPlans)
+            foreach (PickingPlanWrapper item in prodOrderBatchPlans)
             {
                 nr++;
                 item.ScheduledOrder = nr;
@@ -1159,7 +1170,7 @@ namespace gip.bso.logistics
 
         public override void ItemDrag(Dictionary<int, string> newOrder)
         {
-            if (!IsEnabledItemDrag()) 
+            if (!IsEnabledItemDrag())
                 return;
             Dictionary<int, Guid> revisitedNewOrder = newOrder.ToDictionary(key => key.Key, val => new Guid(val.Value));
             var batchPlanList = PickingList.ToList();
@@ -1431,7 +1442,7 @@ namespace gip.bso.logistics
         [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
         public void SetBatchStateCreated()
         {
-            if (!IsEnabledSetBatchStateCreated()) 
+            if (!IsEnabledSetBatchStateCreated())
                 return;
             List<PickingPlanWrapper> selectedBatches = PickingList.Where(c => c.IsSelected).ToList();
             foreach (PickingPlanWrapper batchPlan in selectedBatches)
@@ -1963,32 +1974,32 @@ namespace gip.bso.logistics
             {
                 //switch (vbControl.VBContent)
                 //{
-                    //case "SelectedPicking\\ScheduledStartDate":
-                    //case "SelectedPicking\\ScheduledEndDate":
-                    //    if (SelectedPicking != null
-                    //        && (SelectedPicking.PlanState <= PickingStateEnum.ReadyToStart || SelectedPicking.PlanState == PickingStateEnum.Paused)
-                    //        && (SelectedPicking.PlanMode != BatchPlanMode.UseBatchCount
-                    //           || SelectedPicking.BatchTargetCount > SelectedPicking.BatchActualCount))
-                    //        result = Global.ControlModes.Enabled;
-                    //    else
-                    //        result = Global.ControlModes.Disabled;
-                    //    break;
-                    //case nameof(FilterTabPickingStartTime):
-                    //    result = Global.ControlModes.Enabled;
-                    //    bool filterOrderStartTimeIsEnabled =
-                    //       !(FilterTabPickingIsCompleted ?? true)
-                    //       || (FilterTabPickingStartTime != null && FilterTabPickingEndTime != null);
-                    //    if (!filterOrderStartTimeIsEnabled)
-                    //        result = Global.ControlModes.EnabledWrong;
-                    //    break;
-                    //case nameof(FilterTabPickingEndTime):
-                    //    result = Global.ControlModes.Enabled;
-                    //    bool filterOrderEndTimeIsEnabled =
-                    //         !(FilterTabPickingIsCompleted ?? true)
-                    //       || (FilterTabPickingStartTime != null && FilterTabPickingEndTime != null);
-                    //    if (!filterOrderEndTimeIsEnabled)
-                    //        result = Global.ControlModes.EnabledWrong;
-                    //    break;
+                //case "SelectedPicking\\ScheduledStartDate":
+                //case "SelectedPicking\\ScheduledEndDate":
+                //    if (SelectedPicking != null
+                //        && (SelectedPicking.PlanState <= PickingStateEnum.ReadyToStart || SelectedPicking.PlanState == PickingStateEnum.Paused)
+                //        && (SelectedPicking.PlanMode != BatchPlanMode.UseBatchCount
+                //           || SelectedPicking.BatchTargetCount > SelectedPicking.BatchActualCount))
+                //        result = Global.ControlModes.Enabled;
+                //    else
+                //        result = Global.ControlModes.Disabled;
+                //    break;
+                //case nameof(FilterTabPickingStartTime):
+                //    result = Global.ControlModes.Enabled;
+                //    bool filterOrderStartTimeIsEnabled =
+                //       !(FilterTabPickingIsCompleted ?? true)
+                //       || (FilterTabPickingStartTime != null && FilterTabPickingEndTime != null);
+                //    if (!filterOrderStartTimeIsEnabled)
+                //        result = Global.ControlModes.EnabledWrong;
+                //    break;
+                //case nameof(FilterTabPickingEndTime):
+                //    result = Global.ControlModes.Enabled;
+                //    bool filterOrderEndTimeIsEnabled =
+                //         !(FilterTabPickingIsCompleted ?? true)
+                //       || (FilterTabPickingStartTime != null && FilterTabPickingEndTime != null);
+                //    if (!filterOrderEndTimeIsEnabled)
+                //        result = Global.ControlModes.EnabledWrong;
+                //    break;
                 //}
             }
             return result;
@@ -1999,7 +2010,7 @@ namespace gip.bso.logistics
 
         #region Methods -> Private (Helper) Mehtods -> Load
 
-        protected override Guid? EntityIDOfSelectedSchedule 
+        protected override Guid? EntityIDOfSelectedSchedule
         {
             get
             {
