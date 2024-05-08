@@ -426,6 +426,12 @@ namespace gip.mes.datamodel
 
         void OnContextACChangesExecuted(object sender, ACChangesEventArgs e)
         {
+            IACEntityObjectContext context = this.GetObjectContext();
+            if(context != null && context.PreventOnContextACChangesExecuted)
+            {
+                return;
+            }
+
             if (e.Succeeded && e.ChangeType == ACChangesEventArgs.ACChangesType.ACSaveChanges)
             {
                 CallRefreshFacility(false, null);

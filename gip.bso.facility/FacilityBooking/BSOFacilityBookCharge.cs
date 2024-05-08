@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 
 namespace gip.bso.facility
 {
@@ -302,11 +303,11 @@ namespace gip.bso.facility
         {
             get
             {
-                if(_SetFilterExpirationDateNextDaysCaption == null)
+                if (_SetFilterExpirationDateNextDaysCaption == null)
                 {
-                    
-                    gip.core.datamodel.ACClassMethod method = this.ACType.ValueTypeACClass.Methods.Where(c=>c.ACIdentifier == nameof(SetFilterExpirationDateNextDays)).FirstOrDefault();
-                    if(method != null)
+
+                    gip.core.datamodel.ACClassMethod method = this.ACType.ValueTypeACClass.Methods.Where(c => c.ACIdentifier == nameof(SetFilterExpirationDateNextDays)).FirstOrDefault();
+                    if (method != null)
                     {
                         _SetFilterExpirationDateNextDaysCaption = method.ACCaption;
                         _SetFilterExpirationDateNextDaysCaption = _SetFilterExpirationDateNextDaysCaption.Replace("[0]", ExpirationDateDayPeriod.ToString());
@@ -581,14 +582,14 @@ namespace gip.bso.facility
 
                     RefreshFilterFacilityLotAccess();
 
-                    if (value !=null && value.FacilityLot != null)
+                    if (value != null && value.FacilityLot != null)
                     {
                         if (!AccessFacilityLot.NavList.Any(c => c.FacilityLotID == value.FacilityLotID))
                         {
                             AccessFacilityLot.NavList.Add(value.FacilityLot);
                             OnPropertyChanged(nameof(FacilityLotList));
                         }
-                        if(AccessPrimary.Current != null)
+                        if (AccessPrimary.Current != null)
                         {
                             AccessPrimary.Current.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
                         }
@@ -596,7 +597,7 @@ namespace gip.bso.facility
 
                     AccessPrimary.CurrentNavObject = value;
 
-                    if(AccessPrimary.Current != null)
+                    if (AccessPrimary.Current != null)
                     {
                         AccessPrimary.Current.PropertyChanged += CurrentFacilityCharge_PropertyChanged;
                     }
@@ -618,13 +619,13 @@ namespace gip.bso.facility
             {
                 OnPropertyChanged(nameof(StorageUnitTestList));
                 OnPropertyChanged(nameof(ContractualPartnerList));
-                if(CurrentFacilityCharge.MDUnit == null)
+                if (CurrentFacilityCharge.MDUnit == null)
                 {
                     CurrentFacilityCharge.MDUnit = CurrentFacilityCharge.Material.BaseMDUnit;
                 }
             }
 
-            if(new string[] { nameof(FacilityCharge.MaterialID), nameof(FacilityCharge.FacilityID), nameof(FacilityCharge.FacilityLotID) }.Contains(e.PropertyName))
+            if (new string[] { nameof(FacilityCharge.MaterialID), nameof(FacilityCharge.FacilityID), nameof(FacilityCharge.FacilityLotID) }.Contains(e.PropertyName))
             {
                 OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
@@ -712,18 +713,18 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyCurrent(201, nameof(FacilityLot), ConstApp.LotNo)]  
+        [ACPropertyCurrent(201, nameof(FacilityLot), ConstApp.LotNo)]
         public FacilityLot CurrentFacilityLot
         {
             get
             {
-                if(CurrentFacilityCharge == null)
-                    return null;    
+                if (CurrentFacilityCharge == null)
+                    return null;
                 return CurrentFacilityCharge.FacilityLot;
             }
             set
             {
-                if(CurrentFacilityCharge != null && CurrentFacilityCharge.FacilityLot != value)
+                if (CurrentFacilityCharge != null && CurrentFacilityCharge.FacilityLot != value)
                 {
                     CurrentFacilityCharge.FacilityLot = value;
                     OnPropertyChanged();
@@ -1162,7 +1163,7 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost)]
         public void InwardFacilityChargeMovement()
         {
-            if (!PreExecute(nameof(InwardFacilityChargeMovement))) 
+            if (!PreExecute(nameof(InwardFacilityChargeMovement)))
                 return;
 
             CurrentBookParamInwardMovement.AutoRefresh = true;
@@ -1203,7 +1204,7 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Post Outward Movement'}de{'Buche Lagerabgang'}", 703, true, Global.ACKinds.MSMethodPrePost)]
         public void OutwardFacilityChargeMovement()
         {
-            if (!PreExecute(nameof(OutwardFacilityChargeMovement))) 
+            if (!PreExecute(nameof(OutwardFacilityChargeMovement)))
                 return;
 
             CurrentBookParamOutwardMovement.AutoRefresh = true;
@@ -1397,7 +1398,7 @@ namespace gip.bso.facility
             {
                 ClearBookingData();
             }
-            
+
             return true;
         }
 
@@ -1482,7 +1483,7 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Lock absolute'}de{'Absolut sperren'}", 706, true, Global.ACKinds.MSMethodPrePost)]
         public void LockFacilityChargeAbsolute()
         {
-            if (!PreExecute(nameof(LockFacilityChargeAbsolute))) 
+            if (!PreExecute(nameof(LockFacilityChargeAbsolute)))
                 return;
 
 
@@ -1503,7 +1504,7 @@ namespace gip.bso.facility
                 ClearBookingData();
                 OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
-            
+
             PostExecute(nameof(LockFacilityChargeAbsolute));
         }
 
@@ -1534,7 +1535,7 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Unlock'}de{'Freigeben'}", 707, true, Global.ACKinds.MSMethodPrePost)]
         public void ReleaseFacilityCharge()
         {
-            if (!PreExecute(nameof(ReleaseFacilityCharge))) 
+            if (!PreExecute(nameof(ReleaseFacilityCharge)))
                 return;
 
 
@@ -1554,7 +1555,7 @@ namespace gip.bso.facility
                 ClearBookingData();
                 OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
-            
+
             PostExecute(nameof(ReleaseFacilityCharge));
         }
 
@@ -1585,7 +1586,7 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Unlock absolute'}de{'Absolut freigeben'}", 708, true, Global.ACKinds.MSMethodPrePost)]
         public void ReleaseFacilityChargeAbsolute()
         {
-            if (!PreExecute(nameof(ReleaseFacilityChargeAbsolute))) 
+            if (!PreExecute(nameof(ReleaseFacilityChargeAbsolute)))
                 return;
 
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.AbsFree);
@@ -1698,29 +1699,19 @@ namespace gip.bso.facility
             if (FacilityChargeList == null)
                 return;
 
-            MDMovementReason movementReason = CurrentBookParamNotAvailable?.MDMovementReason;
+            FacilityCharge[] facilityCharges = FacilityChargeList.ToArray();
 
-            foreach (FacilityCharge fc in FacilityChargeList.ToArray())
+            ACMethodBooking[] bookingMethods = GetMethodBookingsForNotAvailable(facilityCharges);
+            Dictionary<ACMethodBooking, ACMethodEventArgs> results = ACFacilityManager.BookFacilities(bookingMethods, this.DatabaseApp);
+
+            MsgWithDetails msgWithDetails = GetBookingMessages(results);
+
+            if (msgWithDetails.MessageLevel >= eMsgLevel.Warning)
             {
-                if (fc.NotAvailable)
-                    continue;
-                SelectedFacilityCharge = fc;
-                CurrentFacilityCharge = fc;
-
-                if (movementReason != CurrentBookParamNotAvailable.MDMovementReason)
-                {
-                    CurrentBookParamNotAvailable.MDMovementReason = movementReason;
-                }
-
-                if (!BookNotAvailableFacilityCharge(false))
-                {
-                    break;
-                }
-
-                Save();
+                Messages.Msg(msgWithDetails);
             }
-            AccessNav.NavSearch();
-            OnPropertyChanged(nameof(FacilityChargeList));
+
+            Search();
         }
 
         public bool IsEnabledNotAvailableFacilityChargeAll()
@@ -1746,7 +1737,7 @@ namespace gip.bso.facility
                                                               .OrderByDescending(c => c.InsertDate)
                                                               .FirstOrDefault();
 
-            //Question50097: Do you want to restore a last stock?
+            //Question50098: Do you want to restore a last stock?
             if (fbc != null && Messages.Question(this, "Question50098") == Global.MsgResult.Yes)
             {
                 CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable);
@@ -1755,7 +1746,7 @@ namespace gip.bso.facility
             {
                 CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailable);
             }
-            
+
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);
@@ -1807,19 +1798,22 @@ namespace gip.bso.facility
                 return;
             if (FacilityChargeList == null)
                 return;
-            foreach (FacilityCharge fc in FacilityChargeList.ToArray())
+
+            //Question50098: Do you want to restore a last stock?
+            bool restoreLastStock = Messages.Question(this, "Question50098") == Global.MsgResult.Yes;
+            FacilityCharge[] facilityCharges = FacilityChargeList.ToArray();
+
+            ACMethodBooking[] bookingMethods = GetMethodBookingsForAvailable(facilityCharges, restoreLastStock);
+            Dictionary<ACMethodBooking, ACMethodEventArgs> results = ACFacilityManager.BookFacilities(bookingMethods, this.DatabaseApp);
+
+            MsgWithDetails msgWithDetails = GetBookingMessages(results);
+
+            if(msgWithDetails.MessageLevel >= eMsgLevel.Warning)
             {
-                if (!fc.NotAvailable)
-                    continue;
-                SelectedFacilityCharge = fc;
-                CurrentFacilityCharge = fc;
-                if (!BookAvailableFacilityCharge(false))
-                {
-                    break;
-                }
+                Messages.Msg(msgWithDetails);
             }
-            AccessNav.NavSearch();
-            OnPropertyChanged(nameof(FacilityChargeList));
+
+            Search();
         }
 
         public bool IsEnabledAvailableFacilityChargeAll()
@@ -1836,7 +1830,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 811, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityReassign()
         {
-            if (!PreExecute(nameof(FacilityReassign))) 
+            if (!PreExecute(nameof(FacilityReassign)))
                 return;
 
             CurrentBookParamReassignMat.AutoRefresh = true;
@@ -1876,7 +1870,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Split Quant'}de{'Quant Splitten'}", 712, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void SplitQuant()
         {
-            if (!PreExecute(nameof(SplitQuant))) 
+            if (!PreExecute(nameof(SplitQuant)))
                 return;
 
 
@@ -1894,7 +1888,7 @@ namespace gip.bso.facility
             {
                 ClearBookingData();
             }
-            
+
             PostExecute(nameof(SplitQuant));
         }
 
@@ -2020,7 +2014,7 @@ namespace gip.bso.facility
             {
                 if (CurrentBookParamRelocation == null)
                     return false;
-                return  CurrentBookParamRelocation.OutwardFacilityCharge != null
+                return CurrentBookParamRelocation.OutwardFacilityCharge != null
                         && CurrentBookParamRelocation.OutwardFacilityCharge.Facility != null
                         && CurrentBookParamRelocation.InwardFacility != null
                         && CurrentBookParamRelocation.InwardFacility.VBiFacilityACClassID.HasValue
@@ -2486,6 +2480,116 @@ namespace gip.bso.facility
         //        return true;
         //    }
         //}
+        #endregion
+
+        #region All FacilityCharge availability
+
+        #region All FacilityCharge availability -> Not available
+
+        private ACMethodBooking[] GetMethodBookingsForNotAvailable(FacilityCharge[] facilityCharges)
+        {
+            List<ACMethodBooking> result = new List<ACMethodBooking>();
+            foreach (FacilityCharge facilityCharge in facilityCharges)
+            {
+                if (!facilityCharge.NotAvailable)
+                {
+                    ACMethodBooking aCMethodBooking = GetMethodBookingForNotAvailable(facilityCharge);
+                    result.Add(aCMethodBooking);
+                }
+            }
+            return result.ToArray();
+        }
+
+        private ACMethodBooking GetMethodBookingForNotAvailable(FacilityCharge facilityCharge)
+        {
+            ACMethodBooking bookParamNotAvailable = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            bookParamNotAvailable.InwardFacilityCharge = facilityCharge;
+            bookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+            bookParamNotAvailable.AutoRefresh = true;
+            return bookParamNotAvailable;
+        }
+
+        #endregion
+        #region All FacilityCharge availability -> Available
+
+        private ACMethodBooking[] GetMethodBookingsForAvailable(FacilityCharge[] facilityCharges, bool restoreLastStock)
+        {
+            List<ACMethodBooking> result = new List<ACMethodBooking>();
+            foreach (FacilityCharge facilityCharge in facilityCharges)
+            {
+                if (facilityCharge.NotAvailable)
+                {
+                    ACMethodBooking aCMethodBooking = GetMethodBookingForAvailable(facilityCharge, restoreLastStock);
+                    result.Add(aCMethodBooking);
+                }
+            }
+            return result.ToArray();
+        }
+
+        private ACMethodBooking GetMethodBookingForAvailable(FacilityCharge facilityCharge, bool restoreLastStock)
+        {
+            FacilityBookingCharge fbc =
+                facilityCharge?.FacilityBookingCharge_InwardFacilityCharge
+                                .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                .OrderByDescending(c => c.InsertDate)
+                                .FirstOrDefault();
+
+            ACMethodBooking bookParamNotAvailable = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            bookParamNotAvailable.InwardFacilityCharge = facilityCharge;
+            bookParamNotAvailable.AutoRefresh = true;
+
+            if (fbc != null && restoreLastStock)
+            {
+                bookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable);
+            }
+            else
+            {
+                bookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailable);
+            }
+
+            return bookParamNotAvailable;
+        }
+
+
+        #endregion
+
+        #region All FacilityCharge availability -> Messages
+
+        private MsgWithDetails GetBookingMessages(Dictionary<ACMethodBooking, ACMethodEventArgs> results)
+        {
+            MsgWithDetails msgWithDetails  = new MsgWithDetails();
+            foreach(KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
+            {
+                MsgWithDetails msg = GetBookingMessage(item.Key, item.Value);
+                if(msg!= null)
+                {
+                    msgWithDetails.AddDetailMessage(msg);
+                }
+            }
+            return msgWithDetails;
+        }
+
+        private MsgWithDetails GetBookingMessage(ACMethodBooking aCMethodBooking, ACMethodEventArgs result)
+        {
+            MsgWithDetails msgWithDetails = null;
+            if (!aCMethodBooking.ValidMessage.IsSucceded() || aCMethodBooking.ValidMessage.HasWarnings())
+            {
+                msgWithDetails = aCMethodBooking.ValidMessage;
+            }
+            else if (result != null && (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible))
+            {
+                if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                {
+                    result.ValidMessage.Message = result.ResultState.ToString();
+                }
+                msgWithDetails = result.ValidMessage;
+            }
+
+            return msgWithDetails;
+        }
+
+        #endregion
+
         #endregion
     }
 
