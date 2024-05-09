@@ -213,6 +213,24 @@ namespace gip.mes.datamodel
             }
         }
 
+        string _ConnectedOrders;
+        [ACPropertyInfo(999, "", "en{'Connected orders'}de{'Verbundene Aufträge'}")]
+        public string ConnectedOrders
+        {
+            get
+            {
+                return _ConnectedOrders;
+            }
+            set
+            {
+                if(_ConnectedOrders != value)
+                {
+                    _ConnectedOrders = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public override bool IsChecked
         {
             get
