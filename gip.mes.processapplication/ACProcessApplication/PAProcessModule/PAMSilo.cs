@@ -239,7 +239,7 @@ namespace gip.mes.processapplication
         }
 
         private ACPropertyConfigValue<bool> _LeaveMaterialOccupation;
-        [ACPropertyConfig("en{'Leave Material Occupation on zero posting'}de{'Materialbelegung belassen bei Leerbuchung'}")]
+        [ACPropertyConfig(ConstApp.LeaveMaterialOccupation)]
         public bool LeaveMaterialOccupation
         {
             get

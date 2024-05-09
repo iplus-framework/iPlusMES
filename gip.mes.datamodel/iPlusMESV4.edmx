@@ -1044,6 +1044,7 @@
           <Property Name="PostingBehaviourIndex" Type="smallint" Nullable="false" />
           <Property Name="SkipPrintQuestion" Type="bit" Nullable="false" />
           <Property Name="ClassCode" Type="smallint" Nullable="false" />
+          <Property Name="LeaveMaterialOccupation" Type="bit" Nullable="true" />
         </EntityType>
         <EntityType Name="FacilityBooking">
           <Key>
@@ -32175,6 +32176,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PostingBehaviourIndex" Type="Int16" Nullable="false" />
           <Property Name="SkipPrintQuestion" Type="Boolean" Nullable="false" />
+		  <Property Name="ClassCode" Type="Int16" Nullable="false" />
+		  <Property Name="LeaveMaterialOccupation" Type="Boolean" Nullable="true" />
           <NavigationProperty Name="VBiFacilityACClass" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID" FromRole="Facility" ToRole="ACClass" />
           <NavigationProperty Name="VBiStackCalculatorACClass" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" FromRole="Facility" ToRole="ACClass" />
           <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Facility" ToRole="Company" />
@@ -32219,7 +32222,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PickingPos_ToFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID" FromRole="Facility" ToRole="PickingPos" />
           <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
           <NavigationProperty Name="FacilityReservation_Facility" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="Facility" ToRole="FacilityReservation" />
-          <Property Name="ClassCode" Type="Int16" Nullable="false" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -39492,6 +39494,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Facility">
               <MappingFragment StoreEntitySet="Facility">
                 <ScalarProperty Name="ClassCode" ColumnName="ClassCode" />
+                <ScalarProperty Name="LeaveMaterialOccupation" ColumnName="LeaveMaterialOccupation" />
                 <ScalarProperty Name="SkipPrintQuestion" ColumnName="SkipPrintQuestion" />
                 <ScalarProperty Name="PostingBehaviourIndex" ColumnName="PostingBehaviourIndex" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />

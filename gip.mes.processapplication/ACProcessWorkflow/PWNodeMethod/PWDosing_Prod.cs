@@ -1852,12 +1852,16 @@ namespace gip.mes.processapplication
                                                 }
                                             }
                                         }
+
+                                        // #iP-T-24-05-08-002
+                                        // LeaveMaterialOccupation
                                         if (!disChargingActive
                                             && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
                                         {
                                             outwardFacility.Material = null; // Automatisches Löschen der Belegung?
                                             outwardFacility.Partslist = null;
                                         }
+
                                     }
 
                                     msg = dbApp.ACSaveChangesWithRetry();

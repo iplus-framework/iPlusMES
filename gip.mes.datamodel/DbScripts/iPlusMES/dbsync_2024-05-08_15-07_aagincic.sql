@@ -1,0 +1,1 @@
+alter table [dbo].[Facility] add LeaveMaterialOccupation bit null;

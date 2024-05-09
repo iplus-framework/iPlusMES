@@ -1737,14 +1737,26 @@ namespace gip.mes.facility
 
                         // Falls Nullbestand und die Summe der Facility-Charge-Abbuchungen nicht dazu geführt haben, dass der Facility-Bestand 0 ergibt,
                         // setze Facility-Bestand auf 0
+                        // #iP-T-24-05-08-002
+                        // LeaveMaterialOccupation
                         if ((BP.ParamsAdjusted.MDZeroStockState != null)
                                 && ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.BookToZeroStock)
                                     || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable)))
                         {
+                            Facility facility = BP.InwardFacility;
+
+                            if(facility != null && !facility.ShouldLeaveMaterialOccupation)
+                            {
+                                facility.Material = null;
+                                facility.Partslist = null;
+                            }
+
                             if (BP.ParamsAdjusted.InwardFacility.CurrentFacilityStock != null)
                             {
                                 if (Math.Abs(0 - BP.ParamsAdjusted.InwardFacility.CurrentFacilityStock.StockQuantity) > Double.Epsilon)
+                                {
                                     BP.ParamsAdjusted.InwardFacility.CurrentFacilityStock.StockQuantity = 0;
+                                }
                             }
                         }
 
@@ -1834,17 +1846,28 @@ namespace gip.mes.facility
 
                         // Falls Nullbestand und die Summe der Facility-Charge-Abbuchungen nicht dazu geführt haben, dass der Facility-Bestand 0 ergibt,
                         // setze Facility-Bestand auf 0
+                        // #iP-T-24-05-08-002
+                        // LeaveMaterialOccupation
                         if ((BP.ParamsAdjusted.MDZeroStockState != null)
                                 && ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.BookToZeroStock)
                                     || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable)))
                         {
+                            Facility facility = BP.InwardFacility;
+
+                            if (facility != null && !facility.ShouldLeaveMaterialOccupation)
+                            {
+                                facility.Material = null;
+                                facility.Partslist = null;
+                            }
+
                             if (BP.ParamsAdjusted.OutwardFacility.CurrentFacilityStock != null)
                             {
                                 if (Math.Abs(0 - BP.ParamsAdjusted.OutwardFacility.CurrentFacilityStock.StockQuantity) > Double.Epsilon)
+                                {
                                     BP.ParamsAdjusted.OutwardFacility.CurrentFacilityStock.StockQuantity = 0;
+                                }
                             }
                         }
-
                     }
                 }
             }

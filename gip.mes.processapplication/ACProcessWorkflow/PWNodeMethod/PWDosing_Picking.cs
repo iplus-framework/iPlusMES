@@ -1367,6 +1367,8 @@ namespace gip.mes.processapplication
                                                 }
                                             }
                                         }
+
+                                        // #iP-T-24-05-08-002
                                         if (!disChargingActive
                                             && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
                                         {

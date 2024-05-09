@@ -64,6 +64,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(36, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(37, "PostingBehaviourIndex", "en{'Posting behaviour'}de{'Buchungsverhalten'}", typeof(PostingBehaviourEnum), Const.ContextDatabase + "\\PostingBehaviourEnumList", "", true)]
     [ACPropertyEntity(38, "ClassCode", "en{'Classification code'}de{'Klassifizierungscode'}", "", "", true)]
+    [ACPropertyEntity(39, nameof(LeaveMaterialOccupation), ConstApp.LeaveMaterialOccupation, "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
     [ACPropertyEntity(38, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
@@ -427,7 +428,7 @@ namespace gip.mes.datamodel
         void OnContextACChangesExecuted(object sender, ACChangesEventArgs e)
         {
             IACEntityObjectContext context = this.GetObjectContext();
-            if(context != null && context.PreventOnContextACChangesExecuted)
+            if (context != null && context.PreventOnContextACChangesExecuted)
             {
                 return;
             }
@@ -658,7 +659,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (  !VBiFacilityACClassID.HasValue 
+                if (!VBiFacilityACClassID.HasValue
                     || FacilityACClass == null
                     || FacilityACClass.ObjectType == null)
                     return false;
@@ -903,6 +904,39 @@ namespace gip.mes.datamodel
                 PostingBehaviourIndex = (short)value;
             }
         }
+
+
+        private bool? _ShouldLeaveMaterialOccupation;
+        /// <summary>
+        /// Check if LeaveMaterialOccupation is there in Facility or any parent Facility defined and return value
+        /// if not returns default value (false)
+        /// </summary>
+        public bool ShouldLeaveMaterialOccupation
+        {
+            get
+            {
+                if(_ShouldLeaveMaterialOccupation == null)
+                {
+                    Facility facility = this;
+                    while(facility != null)
+                    {
+                        if(facility.LeaveMaterialOccupation != null)
+                        {
+                            _ShouldLeaveMaterialOccupation = facility.LeaveMaterialOccupation.Value;
+                            break;
+                        }
+                        facility = facility.Facility1_ParentFacility;
+                    }
+
+                    if(_ShouldLeaveMaterialOccupation == null)
+                    {
+                        _ShouldLeaveMaterialOccupation = false;
+                    }
+                }
+                return _ShouldLeaveMaterialOccupation ?? false;
+            }
+        }
+
         #endregion
 
         /// <summary>
