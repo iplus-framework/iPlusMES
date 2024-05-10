@@ -69,6 +69,35 @@ namespace gip.bso.logistics
         }
 
 
+        protected ACPropertyConfigValue<PickingStateEnum> _FilterPickingStateLess;
+        [ACPropertyConfig("en{'Filter state less equal than'}de{'Filter Status klein gleich'}")]
+        public virtual PickingStateEnum FilterPickingStateLess
+        {
+            get
+            {
+                return _FilterPickingStateLess.ValueT;
+            }
+            set
+            {
+                _FilterPickingStateLess.ValueT = value;
+            }
+        }
+
+
+        protected ACPropertyConfigValue<PickingStateEnum> _FilterPickingStateGreater;
+        [ACPropertyConfig("en{'Filter state greater'}de{'Filter Status größer'}")]
+        public virtual PickingStateEnum FilterPickingStateGreater
+        {
+            get
+            {
+                return _FilterPickingStateGreater.ValueT;
+            }
+            set
+            {
+                _FilterPickingStateGreater.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region c´tors
@@ -78,6 +107,8 @@ namespace gip.bso.logistics
         {
             _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
             _ValidateBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBeforeStart), false);
+            _FilterPickingStateLess = new ACPropertyConfigValue<PickingStateEnum>(this, nameof(FilterPickingStateLess), PickingStateEnum.InProcess);
+            _FilterPickingStateGreater = new ACPropertyConfigValue<PickingStateEnum>(this, nameof(FilterPickingStateGreater), PickingStateEnum.WaitOnManualClosing);
         }
 
         #region c´tors -> ACInit
@@ -467,8 +498,8 @@ namespace gip.bso.logistics
             if (!mdSchedulingGroupID.HasValue)
                 return new ObservableCollection<PickingPlanWrapper>();
 
-            PickingStateEnum lessEqualState = PickingStateEnum.InProcess;
-            VD.PickingStateEnum greaterEqualState = PickingStateEnum.WFReadyToStart;
+            PickingStateEnum lessEqualState = FilterPickingStateLess;
+            VD.PickingStateEnum greaterEqualState = FilterPickingStateGreater;
             ObservableCollection<PickingPlanWrapper> scheduledPickings = null;
             try
             {
