@@ -1745,7 +1745,7 @@ namespace gip.mes.facility
                         {
                             Facility facility = BP.InwardFacility;
 
-                            if(facility != null && !facility.ShouldLeaveMaterialOccupation)
+                            if (facility != null && !facility.ShouldLeaveMaterialOccupation)
                             {
                                 facility.Material = null;
                                 facility.Partslist = null;

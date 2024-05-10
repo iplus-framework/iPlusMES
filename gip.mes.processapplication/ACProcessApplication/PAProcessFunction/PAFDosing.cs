@@ -831,6 +831,26 @@ namespace gip.mes.processapplication
         }
         #endregion
 
+        #region Resert Abort Reason
+        [ACMethodInteraction("", "en{'Reset Abortreason'}de{'Abbruchgrund zurücksetzen'}", 805, true)]
+        public virtual void ResetAbortReason()
+        {
+            if (!IsEnabledResetAbortReason())
+                return;
+            DosingAbortReason.ValueT = PADosingAbortReason.NotSet;
+            if (_LackOfMaterialForced && StateLackOfMaterial.ValueT != PANotifyState.Off)
+            {
+                StateLackOfMaterial.ValueT = PANotifyState.Off;
+                AcknowledgeAlarms();
+            }
+        }
+
+        public virtual bool IsEnabledResetAbortReason()
+        {
+            return DosingAbortReason != null && DosingAbortReason.ValueT != PADosingAbortReason.NotSet;
+        }
+        #endregion
+
         #endregion
 
 
@@ -995,6 +1015,10 @@ namespace gip.mes.processapplication
                     else if (action == PADosingAbortReason.EndTolErrorDosingThenDisThenEnd)
                         EndDosDisEndOnTolForced();
                 }
+                else if (outwardEnabled && DosingAbortReason.ValueT != PADosingAbortReason.NotSet && DosingAbortReason.ValueT == AutoAbortActionEnumOnBlockedSilo)
+                {
+                    ResetAbortReason();
+                }
             }
         }
 
@@ -1049,80 +1073,86 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "SetAbortReasonEmpty":
+                case nameof(SetAbortReasonEmpty):
                     SetAbortReasonEmpty();
                     return true;
-                case "SetAbortReasonMalfunction":
+                case nameof(SetAbortReasonMalfunction):
                     SetAbortReasonMalfunction();
                     return true;
-                case "EndDosDisNextComp":
+                case nameof(EndDosDisNextComp):
                     EndDosDisNextComp();
                     return true;
-                case "EndDosDisEnd":
+                case nameof(EndDosDisEnd):
                     EndDosDisEnd();
                     return true;
-                case "EndDosEndOrder":
+                case nameof(EndDosEndOrder):
                     EndDosEndOrder();
                     return true;
-                case "EndDosDisNextCompOnTol":
+                case nameof(EndDosDisNextCompOnTol):
                     EndDosDisNextCompOnTol();
                     return true;
-                case "EndDosDisEndOnTol":
+                case nameof(EndDosDisEndOnTol):
                     EndDosDisEndOnTol();
                     return true;
-                case "EndDosAdjustRestWait":
+                case nameof(EndDosAdjustRestWait):
                     EndDosAdjustRestWait();
                     return true;
-                case "ZeroQAccept":
+                case nameof(ZeroQAccept):
                     ZeroQAccept();
                     return true;
-                case "ZeroQNotAccept":
+                case nameof(ZeroQNotAccept):
                     ZeroQNotAccept();
                     return true;
-                case "ForceSetLackOfMaterial":
+                case nameof(ForceSetLackOfMaterial):
                     ForceSetLackOfMaterial();
                     return true;
-                case "InheritParamsFromConfig":
+                case nameof(InheritParamsFromConfig):
                     InheritParamsFromConfig(acParameter[0] as ACMethod, acParameter[1] as ACMethod, (bool)acParameter[2]);
                     return true;
-                case "SetDefaultACMethodValues":
+                case nameof(SetDefaultACMethodValues):
                     SetDefaultACMethodValues(acParameter[0] as ACMethod);
                     return true;
-                case Const.IsEnabledPrefix + "SetAbortReasonEmpty":
+                case nameof(IsEnabledSetAbortReasonEmpty):
                     result = IsEnabledSetAbortReasonEmpty();
                     return true;
-                case Const.IsEnabledPrefix + "SetAbortReasonMalfunction":
+                case nameof(IsEnabledSetAbortReasonMalfunction):
                     result = IsEnabledSetAbortReasonMalfunction();
                     return true;
-                case Const.IsEnabledPrefix + "EndDosDisNextComp":
+                case nameof(IsEnabledEndDosDisNextComp):
                     result = IsEnabledEndDosDisNextComp();
                     return true;
-                case Const.IsEnabledPrefix + "EndDosDisEnd":
+                case nameof(IsEnabledEndDosDisEnd):
                     result = IsEnabledEndDosDisEnd();
                     return true;
-                case Const.IsEnabledPrefix + "EndDosEndOrder":
+                case nameof(IsEnabledEndDosEndOrder):
                     result = IsEnabledEndDosEndOrder();
                     return true;
-                case Const.IsEnabledPrefix + "EndDosDisNextCompOnTol":
+                case nameof(IsEnabledEndDosDisNextCompOnTol):
                     result = IsEnabledEndDosDisNextCompOnTol();
                     return true;
-                case Const.IsEnabledPrefix + "EndDosDisEndOnTol":
+                case nameof(IsEnabledEndDosDisEndOnTol):
                     result = IsEnabledEndDosDisEndOnTol();
                     return true;
-                case Const.IsEnabledPrefix + "EndDosAdjustRestWait":
+                case nameof(IsEnabledEndDosAdjustRestWait):
                     result = IsEnabledEndDosAdjustRestWait();
                     return true;
-                case Const.IsEnabledPrefix + "ZeroQAccept":
+                case nameof(IsEnabledZeroQAccept):
                     result = IsEnabledZeroQAccept();
                     return true;
-                case Const.IsEnabledPrefix + "ZeroQNotAccept":
+                case nameof(IsEnabledZeroQNotAccept):
                     result = IsEnabledZeroQNotAccept();
                     return true;
-                case Const.IsEnabledPrefix + "ForceSetLackOfMaterial":
+                case nameof(IsEnabledForceSetLackOfMaterial):
                     result = IsEnabledForceSetLackOfMaterial();
                     return true;
-                case "GetDosingRestInfo":
+                case nameof(GetDosingRestInfo):
                     result = GetDosingRestInfo();
+                    return true;
+                case nameof(ResetAbortReason):
+                    ResetAbortReason();
+                    return true;
+                case nameof(IsEnabledResetAbortReason):
+                    result = IsEnabledResetAbortReason();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -1133,25 +1163,25 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case Const.AskUserPrefix + "EndDosDisEnd":
+                case nameof(AskUserEndDosDisEnd):
                     result = AskUserEndDosDisEnd(acComponent);
                     return true;
-                case Const.AskUserPrefix + "EndDosEndOrder":
+                case nameof(AskUserEndDosEndOrder):
                     result = AskUserEndDosEndOrder(acComponent);
                     return true;
-                case Const.AskUserPrefix + "EndDosDisNextCompOnTol":
+                case nameof(AskUserEndDosDisNextCompOnTol):
                     result = AskUserEndDosDisNextCompOnTol(acComponent);
                     return true;
-                case Const.AskUserPrefix + "EndDosDisEndOnTol":
+                case nameof(AskUserEndDosDisEndOnTol):
                     result = AskUserEndDosDisEndOnTol(acComponent);
                     return true;
-                case Const.AskUserPrefix + "EndDosDisNextComp":
+                case nameof(AskUserEndDosDisNextComp):
                     result = AskUserEndDosDisNextComp(acComponent);
                     return true;
-                case Const.AskUserPrefix + "EndDosAdjustRestWait":
+                case nameof(AskUserEndDosAdjustRestWait):
                     result = AskUserEndDosAdjustRestWait(acComponent);
                     return true;
-                case Const.AskUserPrefix + "SetAbortReasonEmpty":
+                case nameof(AskUserSetAbortReasonEmpty):
                     result = AskUserSetAbortReasonEmpty(acComponent);
                     return true;
             }

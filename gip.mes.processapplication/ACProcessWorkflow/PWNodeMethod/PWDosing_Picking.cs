@@ -1303,11 +1303,25 @@ namespace gip.mes.processapplication
                                             {
                                                 if (activeDosingFunct != dosing
                                                     && activeDosingFunct.CurrentACState != ACStateEnum.SMIdle
-                                                    && activeDosingFunct.IsTransportActive
-                                                    && activeDosingFunct.DosingAbortReason.ValueT == PADosingAbortReason.NotSet)
+                                                    && activeDosingFunct.IsTransportActive)
+                                                {
+                                                    if (activeDosingFunct.DosingAbortReason.ValueT == PADosingAbortReason.NotSet)
+                                                    {
+                                                        // This Method invokes normally an Abort or Stop, an then this function is called rekursively again!
+                                                        activeDosingFunct.SetAbortReasonEmptyForced();
+                                                    }
+                                                }
+                                            }
+
+                                            // Check again if one of those functions are active, beacuse function didn't complete. Therfore the stock mustn't be set to zero!
+                                            foreach (PAFDosing activeDosingFunct in dosingList)
+                                            {
+                                                if (activeDosingFunct != dosing
+                                                    && activeDosingFunct.CurrentACState != ACStateEnum.SMIdle
+                                                    && activeDosingFunct.IsTransportActive)
                                                 {
                                                     anyOtherFunctionActiveFromThisSilo = true;
-                                                    activeDosingFunct.SetAbortReasonEmptyForced();
+                                                    break;
                                                 }
                                             }
                                         }
@@ -1316,12 +1330,13 @@ namespace gip.mes.processapplication
 
                                 if (!anyOtherFunctionActiveFromThisSilo)
                                 {
-                                    bool hasQuants = outwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any();
+                                    // Querytest, if antoher function has already posted silo to zero
+                                    bool hasQuants = dbApp.FacilityCharge.Where(c => c.FacilityID ==  outwardFacility.FacilityID && c.NotAvailable == false).Any();
 
-                                    bool zeroBookSucceeded = false;
+                                    //bool zeroBookSucceeded = false;
                                     if (hasQuants)
                                     {
-                                        zeroBookSucceeded = true;
+                                        //zeroBookSucceeded = true;
                                         ACMethodBooking zeroBooking = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
                                         zeroBooking = zeroBooking.Clone() as ACMethodBooking;
                                         zeroBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
@@ -1334,7 +1349,7 @@ namespace gip.mes.processapplication
                                         if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                                         {
                                             collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                                            zeroBookSucceeded = false;
+                                            //zeroBookSucceeded = false;
                                             OnNewAlarmOccurred(ProcessAlarm, new Msg(zeroBooking.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1140), true);
                                         }
                                         else
@@ -1346,36 +1361,38 @@ namespace gip.mes.processapplication
                                                 Messages.LogError(this.GetACUrl(), "DoDosingBookingPicking(9)", zeroBooking.ValidMessage.InnerMessage);
                                                 OnNewAlarmOccurred(ProcessAlarm, new Msg(zeroBooking.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1130), true);
                                             }
-                                            else
-                                                zeroBookSucceeded = true;
+                                            //else
+                                                //zeroBookSucceeded = true;
                                         }
                                     }
-                                    if (!hasQuants || zeroBookSucceeded)
-                                    {
-                                        PAMSilo sourceSilo = null;
-                                        bool disChargingActive = false;
-                                        if (outwardFacility.FacilityACClass != null)
-                                        {
-                                            string url = outwardFacility.FacilityACClass.GetACUrlComponent();
-                                            if (!String.IsNullOrEmpty(url))
-                                            {
-                                                sourceSilo = ACUrlCommand(url) as PAMSilo;
-                                                if (sourceSilo != null)
-                                                {
-                                                    IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
-                                                    disChargingActive = activeDischargings != null && activeDischargings.Any();
-                                                }
-                                            }
-                                        }
 
-                                        // #iP-T-24-05-08-002
-                                        if (!disChargingActive
-                                            && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
-                                        {
-                                            outwardFacility.Material = null; // Automatisches Löschen der Belegung?
-                                            outwardFacility.Partslist = null;
-                                        }
-                                    }
+                                    // Unnecessary since new Property in Facility-Table and handeled in FacilityManager
+                                    //if (!hasQuants || zeroBookSucceeded)
+                                    //{
+                                    //    PAMSilo sourceSilo = null;
+                                    //    bool disChargingActive = false;
+                                    //    if (outwardFacility.FacilityACClass != null)
+                                    //    {
+                                    //        string url = outwardFacility.FacilityACClass.GetACUrlComponent();
+                                    //        if (!String.IsNullOrEmpty(url))
+                                    //        {
+                                    //            sourceSilo = ACUrlCommand(url) as PAMSilo;
+                                    //            if (sourceSilo != null)
+                                    //            {
+                                    //                IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
+                                    //                disChargingActive = activeDischargings != null && activeDischargings.Any();
+                                    //            }
+                                    //        }
+                                    //    }
+
+                                    //    // #iP-T-24-05-08-002
+                                    //    if (!disChargingActive
+                                    //        && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
+                                    //    {
+                                    //        outwardFacility.Material = null; // Automatisches Löschen der Belegung?
+                                    //        outwardFacility.Partslist = null;
+                                    //    }
+                                    //}
 
                                     if (ParentPWMethodVBBase != null && ParentPWMethodVBBase.IsLastBatch == PADosingLastBatchEnum.LastBatch)
                                     {
