@@ -704,6 +704,7 @@ namespace gip.bso.logistics
                             && c.PickingPos.Picking.PickingStateIndex <= (short)PickingStateEnum.InProcess
                             && c.PickingPos.Picking.VBiACClassWFID != null
                             && c.PickingPos.Picking.VBiACClassWFID == VBCurrentACClassWF.ACClassWFID
+                            && c.PickingPos.Picking.PickingID != CurrentPicking.PickingID
                          )
                         .ToArray();
 

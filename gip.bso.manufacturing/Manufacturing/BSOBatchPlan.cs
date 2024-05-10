@@ -714,6 +714,36 @@ namespace gip.bso.manufacturing
                SelectedIntermediate, SelectedBatchPlanForIntermediate, CurrentConfigACUrl,
                ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
             }
+
+            if (currentProdOrderPartslist != null && SelectedBatchPlanForIntermediate != null && VBCurrentACClassWF != null && result != null && result.Any())
+            {
+                FacilityReservation[] relatedReservations =
+                        DatabaseApp
+                        .FacilityReservation
+                        .Where(c =>
+                            c.VBiACClassID != null
+                            && c.ProdOrderBatchPlan != null
+                            && c.ProdOrderBatchPlan.VBiACClassWFID != null
+                            && c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrderID != currentProdOrderPartslist.ProdOrderID
+                            && c.ProdOrderBatchPlan.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.InProduction
+                         )
+                        .ToArray();
+
+                if (relatedReservations.Any())
+                {
+                    foreach (POPartslistPosReservation item in result)
+                    {
+                        var relatedProdOrderNos = relatedReservations
+                            .Where(c => c.VBiACClassID == item.Module?.ACClassID)
+                            .Select(c => c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo)
+                            .Distinct()
+                            .OrderBy(c => c);
+
+                        item.ConnectedOrders = string.Join(",", relatedProdOrderNos);
+                    }
+                }
+            }
+
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
         }

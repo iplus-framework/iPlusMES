@@ -214,7 +214,7 @@ namespace gip.mes.datamodel
         }
 
         string _ConnectedOrders;
-        [ACPropertyInfo(999, "", "en{'Connected orders'}de{'Verbundene Aufträge'}")]
+        [ACPropertyInfo(999, "", "en{'Reserved from'}de{'Reserviert von'}")]
         public string ConnectedOrders
         {
             get
