@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Data.Metadata.Edm;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
 using System.Linq;
@@ -310,6 +311,31 @@ namespace gip.mes.processapplication
             }
             return result;
         }
+        #endregion
+
+
+        #region Planning
+
+        public override bool HasPlanning(IACEntityObjectContext db, IACConfigStore configStore, Guid acClassWFID)
+        {
+            bool havePlanning = false;
+            var dbApp = db as DatabaseApp;
+            if (dbApp != null && configStore != null)
+            {
+                if (configStore is ProdOrderPartslist)
+                {
+                    ProdOrderPartslist prodOrderPartslist = configStore as ProdOrderPartslist;
+                    havePlanning = dbApp.ProdOrderBatchPlan.Where(c => c.VBiACClassWFID == acClassWFID && c.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID).Any();
+                }
+                else if (configStore is Picking)
+                {
+                    Picking picking = configStore as Picking;
+                    havePlanning = dbApp.Picking.Where(c => c.VBiACClassWFID == acClassWFID && c.PickingID == picking.PickingID).Any();
+                }
+            }
+            return havePlanning;
+        }
+
         #endregion
 
     }

@@ -1949,11 +1949,15 @@ namespace gip.bso.logistics
             {
                 accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
                 var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
-                if (acFilter != null)
-                    acFilter.SearchWord = CurrentPickingPos.Material.MaterialNo;
-                var acFilter2 = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo" && c != acFilter).FirstOrDefault();
-                if (acFilter2 != null)
-                    acFilter2.SearchWord = CurrentPickingPos.Material.Material1_ProductionMaterial != null ? CurrentPickingPos.Material.Material1_ProductionMaterial.MaterialNo : "";
+                
+                if(CurrentPickingPos != null && CurrentPickingPos.Material != null)
+                {
+                    if (acFilter != null)
+                        acFilter.SearchWord = CurrentPickingPos.Material.MaterialNo;
+                    var acFilter2 = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo" && c != acFilter).FirstOrDefault();
+                    if (acFilter2 != null)
+                        acFilter2.SearchWord = CurrentPickingPos.Material.Material1_ProductionMaterial != null ? CurrentPickingPos.Material.Material1_ProductionMaterial.MaterialNo : "";
+                }
             }
             else
             {
