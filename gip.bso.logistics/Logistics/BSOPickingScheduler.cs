@@ -1125,37 +1125,6 @@ namespace gip.bso.logistics
 
         #region Methods -> Explorer -> MoveToOtherLine -> Helper methods
 
-
-        private bool MoveBatchToOtherProdLine(Picking prodOrderBatchPlan, PAScheduleForPWNode selectedTargetScheduleForPWNode)
-        {
-            //if (prodOrderBatchPlan.VBiACClassWF == null)
-            //    return false;
-            //VD.ACClassWF tempACClassWFItem = selectedTargetScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup
-            //                                    .Where(c => c.VBiACClassWF.ACClassMethodID == prodOrderBatchPlan.VBiACClassWF.ACClassMethodID)
-            //                                    .Select(c => c.VBiACClassWF)
-            //                                    .FirstOrDefault();
-            //if (tempACClassWFItem == null)
-            //    return false;
-            //prodOrderBatchPlan.VBiACClassWF = tempACClassWFItem;
-
-            //List<SchedulingMaxBPOrder> maxSchedulerOrders = PickingManager.GetMaxScheduledOrder(DatabaseApp, FilterPlanningMR?.PlanningMRNo);
-            //int scheduledOrderNo =
-            //    maxSchedulerOrders
-            //    .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == selectedTargetScheduleForPWNode.MDSchedulingGroupID)
-            //    .SelectMany(c => c.WFs)
-            //    .Where(c => c.ACClassWF.ACClassWFID == tempACClassWFItem.ACClassWFID)
-            //    .Select(c => c.MaxScheduledOrder)
-            //    .DefaultIfEmpty()
-            //    .Max();
-            //scheduledOrderNo++;
-            //prodOrderBatchPlan.ScheduledOrder = scheduledOrderNo;
-            //foreach (var reservation in prodOrderBatchPlan.FacilityReservation_Picking.ToArray())
-            //{
-            //    prodOrderBatchPlan.FacilityReservation_Picking.Remove(reservation);
-            //}
-            return true;
-        }
-
         private void MoveBatchSortOrderCorrect()
         {
             List<PickingPlanWrapper> notSelected =

@@ -1327,7 +1327,7 @@ namespace gip.bso.logistics
             }
             set
             {
-                if(_FilterPositionFacilityFrom != value)
+                if (_FilterPositionFacilityFrom != value)
                 {
                     _FilterPositionFacilityFrom = value;
                     OnPropertyChanged();
@@ -1463,7 +1463,7 @@ namespace gip.bso.logistics
             {
                 case nameof(CurrentPickingPos.PickingMaterialID):
                     OnPropertyChanged(nameof(MDUnitList));
-                    if(FilterPositionFacilityFrom)
+                    if (FilterPositionFacilityFrom)
                     {
                         RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
                     }
@@ -1949,8 +1949,8 @@ namespace gip.bso.logistics
             {
                 accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
                 var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
-                
-                if(CurrentPickingPos != null && CurrentPickingPos.Material != null)
+
+                if (CurrentPickingPos != null && CurrentPickingPos.Material != null)
                 {
                     if (acFilter != null)
                         acFilter.SearchWord = CurrentPickingPos.Material.MaterialNo;
@@ -2704,12 +2704,19 @@ namespace gip.bso.logistics
             _UnSavedUnAssignedInOrderPos = new List<InOrderPos>();
             _UnSavedUnAssignedOutOrderPos = new List<OutOrderPos>();
             _UnSavedUnAssignedProdOrderPartslistPos = new List<ProdOrderPartslistPos>();
-            RefreshInOrderPosList(true);
-            RefreshOutOrderPosList(true);
-            RefreshProdOrderPartslistPosList(true);
-            if (CurrentPicking != null && CurrentPicking.EntityState != System.Data.EntityState.Detached)
-                CurrentPicking.PickingPos_Picking.Load();
-            OnPropertyChanged(nameof(PickingPosList));
+            if(CurrentPicking.EntityState == EntityState.Modified)
+            {
+                RefreshInOrderPosList(true);
+                RefreshOutOrderPosList(true);
+                RefreshProdOrderPartslistPosList(true);
+                if (CurrentPicking != null && CurrentPicking.EntityState != System.Data.EntityState.Detached)
+                    CurrentPicking.PickingPos_Picking.Load();
+                OnPropertyChanged(nameof(PickingPosList));
+            }
+            else
+            {
+                Search();
+            }
             base.OnPostUndoSave();
         }
 
@@ -2807,6 +2814,12 @@ namespace gip.bso.logistics
             if (SelectedFilterDeliveryAddress != null)
                 newPicking.DeliveryCompanyAddress = SelectedFilterDeliveryAddress;
             CurrentPicking = newPicking;
+            if (PickingList == null)
+            {
+                PickingList = new List<Picking>();
+            }
+            PickingList.Insert(0, newPicking);
+            SelectedPicking = newPicking;
             ACState = Const.SMNew;
             PostExecute("New");
         }
@@ -2843,8 +2856,11 @@ namespace gip.bso.logistics
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentPicking);
-            SelectedPicking = AccessPrimary.NavList.FirstOrDefault();
-            Load();
+            _PickingList = AccessPrimary.NavList.ToList();
+            Picking firstPicking = AccessPrimary.NavList.FirstOrDefault();
+            OnPropertyChanged(nameof(PickingList));
+            CurrentPicking = firstPicking;
+            SelectedPicking = firstPicking;
             PostExecute("Delete");
         }
 
@@ -3578,10 +3594,10 @@ namespace gip.bso.logistics
             if (!IsEnabledBookAllPositions())
                 return;
             PickingPos[] lines = PickingPosList.ToArray();
-            foreach(PickingPos pos in lines)
+            foreach (PickingPos pos in lines)
             {
                 CurrentPickingPos = pos;
-                if(IsEnabledBookAllACMethodBookings())
+                if (IsEnabledBookAllACMethodBookings())
                 {
                     BookAllACMethodBookings();
                 }
