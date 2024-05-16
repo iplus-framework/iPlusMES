@@ -1185,6 +1185,7 @@ namespace gip.bso.manufacturing
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
             base.OnPostSave();
+            LoadProcessWorkflows();
         }
 
 

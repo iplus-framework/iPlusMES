@@ -2678,6 +2678,8 @@ namespace gip.bso.logistics
             RefreshInOrderPosList(false);
             RefreshOutOrderPosList(false);
             RefreshProdOrderPartslistPosList(false);
+
+            LoadProcessWorkflowPresenter();
         }
 
 
@@ -2704,7 +2706,7 @@ namespace gip.bso.logistics
             _UnSavedUnAssignedInOrderPos = new List<InOrderPos>();
             _UnSavedUnAssignedOutOrderPos = new List<OutOrderPos>();
             _UnSavedUnAssignedProdOrderPartslistPos = new List<ProdOrderPartslistPos>();
-            if(CurrentPicking.EntityState == EntityState.Modified)
+            if (CurrentPicking.EntityState == EntityState.Modified)
             {
                 RefreshInOrderPosList(true);
                 RefreshOutOrderPosList(true);
@@ -4886,10 +4888,7 @@ namespace gip.bso.logistics
                     {
                         if (CurrentPicking != null)
                         {
-                            gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ?
-                                                           CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
-                                                           null;
-                            ProcessWorkflowPresenter.Load(method);
+                            LoadProcessWorkflowPresenter();
                         }
                     }
                     OnPropertyChanged(nameof(SelectedProcessWorkflow));
@@ -4986,14 +4985,19 @@ namespace gip.bso.logistics
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
 
+            LoadProcessWorkflowPresenter();
+            CloseTopDialog();
+        }
+
+        private void LoadProcessWorkflowPresenter()
+        {
             if (ProcessWorkflowPresenter != null)
             {
-                gipCoreData.ACClassMethod method = CurrentPicking.ACClassMethod != null ?
+                gipCoreData.ACClassMethod method = (CurrentPicking != null && CurrentPicking.ACClassMethod != null) ?
                                                    CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
                                                    null;
                 ProcessWorkflowPresenter.Load(method);
             }
-            CloseTopDialog();
         }
 
         public bool IsEnabledProcessWorkflowAssignOk()
