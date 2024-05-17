@@ -3,9 +3,9 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Objects;
+using System.Data.SqlClient;
 using System.Linq;
 using static gip.mes.facility.ACPartslistManager;
 
@@ -1582,10 +1582,10 @@ namespace gip.mes.facility
             if (validationBehaviour == PARole.ValidationBehaviour.Strict
                     && pos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
-                if (pos.PickingMaterialID.HasValue 
-                    && pos.ToFacility.MaterialID.HasValue 
-                    && pos.FromFacility != null 
-                    && pos.FromFacility.Material != null 
+                if (pos.PickingMaterialID.HasValue
+                    && pos.ToFacility.MaterialID.HasValue
+                    && pos.FromFacility != null
+                    && pos.FromFacility.Material != null
                     && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.FromFacility.Material))
                 {
                     //Error50115: No Material assigned to Bin/Silo/Container {0}.
@@ -1708,16 +1708,16 @@ namespace gip.mes.facility
         #region FinishOrder
 
         public MsgWithDetails FinishOrder(
-            DatabaseApp dbApp, Picking picking,
-            ACInDeliveryNoteManager inDeliveryNoteManager, ACOutDeliveryNoteManager outDeliveryNoteManager, FacilityManager facilityManager,
-            out DeliveryNote deliveryNote,
-            out InOrder inOrder,
-            out OutOrder outOrder,
-        bool skipCheck = false)
+            DatabaseApp dbApp, 
+            Picking picking,
+            ACInDeliveryNoteManager inDeliveryNoteManager, 
+            ACOutDeliveryNoteManager outDeliveryNoteManager, 
+            FacilityManager facilityManager,
+            bool skipCheck = false)
         {
-            deliveryNote = null;
-            inOrder = null;
-            outOrder = null;
+
+            MsgWithDetails result = null;
+
             if (dbApp == null)
             {
                 return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "dbApp is null.") });
@@ -1727,8 +1727,6 @@ namespace gip.mes.facility
             {
                 return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "picking is null.") });
             }
-
-            MsgWithDetails result = null;
 
             MDDelivPosLoadState posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
             MDInOrderPosState inPosState = dbApp.MDInOrderPosState.FirstOrDefault(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed);
@@ -1852,15 +1850,28 @@ namespace gip.mes.facility
             picking.PickingStateIndex = (short)PickingStateEnum.Finished;
 
             // Close related documents
-            if (HasRelatedDocuments(picking, out deliveryNote, out inOrder, out outOrder))
+            (bool success, List<DeliveryNote> deliveryNotes, List<InOrder> inOrders, List<OutOrder> outOrders) = HasRelatedDocuments(picking);
+            if (success)
             {
-                if (inOrder != null)
+                if (inOrders != null)
                 {
-                    inDeliveryNoteManager.CompleteInDeliveryNote(dbApp, deliveryNote, inOrder);
+                    foreach(InOrder tmpInOrder in inOrders)
+                    {
+                        foreach(DeliveryNote tempDeliveryNote in deliveryNotes)
+                        {
+                            inDeliveryNoteManager.CompleteInDeliveryNote(dbApp, tempDeliveryNote, tmpInOrder);
+                        }
+                    }
                 }
-                else if (outOrder != null)
+                else if (outOrders != null)
                 {
-                    outDeliveryNoteManager.CompleteOutDeliveryNote(dbApp, deliveryNote, outOrder);
+                    foreach (OutOrder tempOutOrder in outOrders)
+                    {
+                        foreach (DeliveryNote tempDeliveryNote in deliveryNotes)
+                        {
+                            outDeliveryNoteManager.CompleteOutDeliveryNote(dbApp, tempDeliveryNote, tempOutOrder);
+                        }
+                    }
                 }
             }
 
@@ -1873,43 +1884,39 @@ namespace gip.mes.facility
             else
                 OnOrderFinished(dbApp, picking, facilityManager);
 
-            return null;
+            return result;
         }
 
         public virtual void OnOrderFinished(DatabaseApp dbApp, Picking picking, FacilityManager facilityManager)
         {
         }
 
-        public bool HasRelatedDocuments(Picking picking, out DeliveryNote deliveryNote, out InOrder inOrder, out OutOrder outOrder)
+        public (bool success, List<DeliveryNote> deliveryNotes, List<InOrder> inOrders, List<OutOrder> outOrders) HasRelatedDocuments(Picking picking)
         {
             bool isRelated = false;
-            deliveryNote = null;
-            inOrder = null;
-            outOrder = null;
+            List<DeliveryNote> deliveryNotes = null;
+            List<InOrder> inOrders = null;
+            List<OutOrder> outOrders = null;
 
             // Search InOrder
             IEnumerable<InOrder> queryInOrder = picking.PickingPos_Picking.Where(c => c.InOrderPos != null).Select(c => c.InOrderPos).Select(c => c.InOrder).Distinct();
-            if (queryInOrder.Any() && queryInOrder.Count() == 1)
+            if (queryInOrder.Any())
             {
-                inOrder = queryInOrder.FirstOrDefault();
-                if (inOrder.InOrderNo == picking.PickingNo)
-                    isRelated = true;
-
-                deliveryNote = inOrder.InOrderPos_InOrder.SelectMany(c => c.DeliveryNotePos_InOrderPos).Select(c => c.DeliveryNote).FirstOrDefault();
+                isRelated = true;
+                inOrders = queryInOrder.ToList();
+                deliveryNotes = inOrders.SelectMany(c => c.InOrderPos_InOrder).SelectMany(c => c.DeliveryNotePos_InOrderPos).Select(c => c.DeliveryNote).Distinct().ToList();
             }
 
             // Search OutOrder
             IEnumerable<OutOrder> queryOutOrder = picking.PickingPos_Picking.Where(c => c.OutOrderPos != null).Select(c => c.OutOrderPos).Select(c => c.OutOrder).Distinct();
-            if (queryOutOrder.Any() && queryOutOrder.Count() == 1)
+            if (queryOutOrder.Any())
             {
-                outOrder = queryOutOrder.FirstOrDefault();
-                if (outOrder.OutOrderNo == picking.PickingNo)
-                    isRelated = true;
-
-                deliveryNote = outOrder.OutOrderPos_OutOrder.SelectMany(c => c.DeliveryNotePos_OutOrderPos).Select(c => c.DeliveryNote).FirstOrDefault();
+                isRelated = true;
+                outOrders = queryOutOrder.ToList();
+                deliveryNotes = outOrders.SelectMany(c => c.OutOrderPos_OutOrder).SelectMany(c => c.DeliveryNotePos_OutOrderPos).Select(c => c.DeliveryNote).Distinct().ToList();
             }
 
-            return isRelated;
+            return (isRelated, deliveryNotes, inOrders, outOrders);
         }
 
 
@@ -2401,12 +2408,12 @@ namespace gip.mes.facility
                                 bool ifMaterialMatch =
                                         unselFacility != null
                                         && Material.IsMaterialEqual(pickingPos.Material, unselFacility.Material);
-                                        //&& unselFacility.Material != null
-                                        //&& (
-                                        //        pickingPos.Material != null
-                                        //    && ((unselFacility.MaterialID == pickingPos.Material.MaterialID)
-                                        //        || (pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID.Value == unselFacility.MaterialID))
-                                        //);
+                                //&& unselFacility.Material != null
+                                //&& (
+                                //        pickingPos.Material != null
+                                //    && ((unselFacility.MaterialID == pickingPos.Material.MaterialID)
+                                //        || (pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID.Value == unselFacility.MaterialID))
+                                //);
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                             }

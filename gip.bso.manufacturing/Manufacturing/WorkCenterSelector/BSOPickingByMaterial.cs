@@ -999,10 +999,6 @@ namespace gip.bso.manufacturing
                 ACRef<ACInDeliveryNoteManager> inManagerRef = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
                 ACRef<ACOutDeliveryNoteManager> outManagerRef = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
 
-                DeliveryNote delNote = null;
-                InOrder inOrder = null;
-                OutOrder outOrder = null;
-
                 if (ACPickingManager == null)
                 {
                     _ACPickingManager = ACRefToPickingManager();
@@ -1020,7 +1016,7 @@ namespace gip.bso.manufacturing
                 foreach (var picking in _PickingItems)
                 {
                     CurrentProgressInfo.TotalProgress.ProgressText = picking.PickingNo;
-                    ACPickingManager.FinishOrder(DatabaseApp, picking, inManagerRef.ValueT, outManagerRef.ValueT, ACFacilityManager, out delNote, out inOrder, out outOrder, true);
+                    ACPickingManager.FinishOrder(DatabaseApp, picking, inManagerRef.ValueT, outManagerRef.ValueT, ACFacilityManager, true);
                     
                     CurrentProgressInfo.TotalProgress.ProgressCurrent = CurrentProgressInfo.TotalProgress.ProgressCurrent + 1;
                 }

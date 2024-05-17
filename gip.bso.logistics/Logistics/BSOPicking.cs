@@ -1289,18 +1289,15 @@ namespace gip.bso.logistics
             if (PickingManager == null)
                 return;
 
-            DeliveryNote deliveryNote = null;
-            InOrder inOrder = null;
-            OutOrder outOrder = null;
-            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager, out deliveryNote, out inOrder, out outOrder);
-            if (msg != null)
+            MsgWithDetails msgWithDetails = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager);
+            if (msgWithDetails != null)
             {
-                if (Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
+                if (Messages.Msg(msgWithDetails, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
                 {
-                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager, out deliveryNote, out inOrder, out outOrder, true);
-                    if (msg != null)
+                    msgWithDetails = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager, true);
+                    if (msgWithDetails != null)
                     {
-                        Messages.Msg(msg);
+                        Messages.Msg(msgWithDetails);
                     }
                 }
             }
