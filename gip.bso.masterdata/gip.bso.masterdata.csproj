@@ -96,6 +96,7 @@
     <Compile Include="Facility\BSOPrinterSettingsMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
+    <Compile Include="PreferredParameters\BSOPreferredParameters.cs" />
     <Compile Include="Logistics\MDBSOBatchPlanGroup.cs" />
     <Compile Include="Logistics\MDBSOPickingType.cs" />
     <Compile Include="Logistics\MDBSOTransportMode.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="SourceSelectionRules\RuleGroup.cs" />
     <Compile Include="SourceSelectionRules\RuleSelection.cs" />
     <Compile Include="SourceSelectionRules\SourceSelectionRulesResult.cs" />
+    <Compile Include="SourceSelectionRules\WFGroupStartData.cs" />
     <Compile Include="System\BSOCompany.cs" />
     <Compile Include="System\BSOCtrlUpdateMessageInfo.cs" />
     <Compile Include="System\BSOUserSettings.cs" />
