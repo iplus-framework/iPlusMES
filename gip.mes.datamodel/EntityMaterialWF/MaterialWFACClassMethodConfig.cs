@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using gip.core.datamodel;
 using gipCoreData = gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, "en{'MaterialWFACClassMethod.config'}de{'MaterialWFACClassMethod.config'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, Const.PN_PreConfigACUrl, "en{'Parent WF URL'}de{'WF Eltern-URL'}", "", "", true)]
-    [ACPropertyEntity(2, Const.PN_LocalConfigACUrl, "en{'Property URL'}de{'Eigenschafts-URL'}", "" , "", true)]
+    [ACPropertyEntity(1, Const.PN_PreConfigACUrl, Const.PreConfigACUrl, "", "", true)]
+    [ACPropertyEntity(2, Const.PN_LocalConfigACUrl, Const.LocalConfigACUrl, "" , "", true)]
     [ACPropertyEntity(3, "XMLValue", "en{'Value'}de{'Wert'}")]
     [ACPropertyEntity(4, "Expression", "en{'Expression'}de{'Ausdruck'}", "", "", true)]
     [ACPropertyEntity(5, "Comment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]

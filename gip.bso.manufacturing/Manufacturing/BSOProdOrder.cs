@@ -245,7 +245,7 @@ namespace gip.bso.manufacturing
 
 
         ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(601)]
         [ACChildInfo(nameof(BSOSourceSelectionRules_Child), typeof(BSOSourceSelectionRules))]
         public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
         {
@@ -258,7 +258,7 @@ namespace gip.bso.manufacturing
         }
 
         ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(602)]
         [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
         public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
         {
@@ -267,6 +267,19 @@ namespace gip.bso.manufacturing
                 if (_BSOFacilityReservation_Child == null)
                     _BSOFacilityReservation_Child = new ACChildItem<BSOFacilityReservation>(this, nameof(BSOFacilityReservation_Child));
                 return _BSOFacilityReservation_Child;
+            }
+        }
+
+        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        [ACPropertyInfo(603)]
+        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
+        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
+        {
+            get
+            {
+                if (_BSOPreferredParameters == null)
+                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
+                return _BSOPreferredParameters;
             }
         }
 
@@ -5364,7 +5377,7 @@ namespace gip.bso.manufacturing
 
         #region ShowDialogSelectSources
 
-        [ACMethodCommand("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
+        [ACMethodCommand(nameof(ShowDialogSelectSources), "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
         public void ShowDialogSelectSources()
         {
             if (!IsEnabledShowDialogSelectSources())
@@ -5395,6 +5408,31 @@ namespace gip.bso.manufacturing
             if (typeOfSelectedNode == null)
                 return false;
             return TypeOfPWNodeProcessWorkflow.IsAssignableFrom(typeOfSelectedNode);
+        }
+
+        #endregion
+
+
+        #region ShowParamDialog
+
+        [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
+        public void ShowParamDialog()
+        {
+            if (!IsEnabledShowParamDialog())
+                return;
+
+            BSOPreferredParameters_Child.Value.ShowParamDialog(
+                ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
+                SelectedProdOrderPartslist.Partslist.PartslistID,
+                SelectedProdOrderPartslist.ProdOrderPartslistID);
+        }
+
+        public bool IsEnabledShowParamDialog()
+        {
+            return 
+                ProcessWorkflowPresenter != null
+                && ProcessWorkflowPresenter.SelectedWFNode != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
         }
 
         #endregion
