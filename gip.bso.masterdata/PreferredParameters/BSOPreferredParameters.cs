@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
@@ -99,6 +100,15 @@ namespace gip.bso.masterdata
                     OnPropertyChanged(nameof(PWNodeMachineList));
                     OnPropertyChanged(nameof(HistoryPWNodeParamValueList));
                     OnPropertyChanged(nameof(PWNodeMethodEditorVisible));
+
+                    if(PWNodeMachineList != null)
+                    {
+                        SelectedPWNodeMachine = PWNodeMachineList.Where(c=>c.ACClassID ==  (SelectedPWNodeParamValue?.VBiACClassID ?? Guid.Empty)).FirstOrDefault();
+                    }
+                    else
+                    {
+                        SelectedPWNodeMachine = null;
+                    }
                 }
             }
         }
@@ -239,6 +249,15 @@ namespace gip.bso.masterdata
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(PAFunctionMachineList));
                     OnPropertyChanged(nameof(HistoryPAFunctionParamValueList));
+
+                    if (PAFunctionMachineList != null)
+                    {
+                        SelectedPAFunctionMachine = PAFunctionMachineList.Where(c => c.ACClassID == (_SelectedPAFunctionParamValue?.VBiACClassID ?? Guid.Empty)).FirstOrDefault();
+                    }
+                    else
+                    {
+                        SelectedPAFunctionMachine = null;
+                    }
                 }
             }
         }
@@ -400,7 +419,13 @@ namespace gip.bso.masterdata
             if (SelectedPWNodeMachine != null && (SelectedPWNodeParamValue.VBiACClassID == null
                 || SelectedPWNodeParamValue.VBiACClassID != SelectedPWNodeMachine.ACClassID))
             {
-                AddPWNodeParamValueWithMachine();
+                var tmpParamList = PWNodeParamValueList.ToList();
+                int currentIndex = tmpParamList.IndexOf(SelectedPWNodeParamValue);
+                ACConfigParam additionalParam = GetConfigParamWithMachine(SelectedPWNodeParamValue, SelectedPWNodeMachine);
+                tmpParamList.Insert(++currentIndex, additionalParam);
+                _PWNodeParamValueList = tmpParamList;
+                OnPropertyChanged(nameof(PWNodeParamValueList));
+                SelectedPWNodeParamValue = additionalParam;
             }
             Guid? vbiACClassID = SelectedPWNodeMachine != null ? SelectedPWNodeMachine.ACClassID : (Guid?)null;
             if (vbiACClassID == null && SelectedPWNodeParamValue.VBiACClassID != null)
@@ -478,7 +503,13 @@ namespace gip.bso.masterdata
             if (SelectedPAFunctionMachine != null && (SelectedPAFunctionParamValue.VBiACClassID == null
                || SelectedPAFunctionParamValue.VBiACClassID != SelectedPAFunctionMachine.ACClassID))
             {
-                AddPAFunctionParamValueWithMachine();
+                var tmpParamList = PAFunctionParamValueList.ToList();
+                int currentIndex = tmpParamList.IndexOf(SelectedPAFunctionParamValue);
+                ACConfigParam additionalParam = GetConfigParamWithMachine(SelectedPAFunctionParamValue, SelectedPAFunctionMachine);
+                tmpParamList.Insert(++currentIndex, additionalParam);
+                _PAFunctionParamValueList = tmpParamList;
+                OnPropertyChanged(nameof(PAFunctionParamValueList));
+                SelectedPAFunctionParamValue = additionalParam;
             }
             Guid? vbiACClassID = SelectedPAFunctionMachine != null ? SelectedPAFunctionMachine.ACClassID : (Guid?)null;
             if (vbiACClassID == null && SelectedPAFunctionParamValue.VBiACClassID != null)
@@ -568,6 +599,7 @@ namespace gip.bso.masterdata
             {
                 Dictionary<ACClass, List<Guid>> machines = new Dictionary<ACClass, List<Guid>>();
                 FillMachines(wFWrapper, machines);
+                AllMachines = machines;
             }
 
             return (pwNodeParams, paFunctionParams);
@@ -617,10 +649,10 @@ namespace gip.bso.masterdata
             if (wFWrapper.MatchedConfigs.Any())
             {
                 (ACClassMethod pwNodeMehtod, ACClassMethod paFunctionMethod) = GetWFMethods(wFWrapper.WF);
-                wFWrapper.PWNodeParams = GetACConfigParams(pwNodeMehtod.ACMethod, wFWrapper.PreConfigACUrl, wFWrapper.LocalConfigACUrl, wFWrapper.MatchedConfigs, allConfigs);
+                wFWrapper.PWNodeParams = GetACConfigParams(wFWrapper.WF, pwNodeMehtod.ACMethod, wFWrapper.PreConfigACUrl, wFWrapper.LocalConfigACUrl, wFWrapper.MatchedConfigs, allConfigs);
                 if (paFunctionMethod != null)
                 {
-                    wFWrapper.PAFunctionParams = GetACConfigParams(paFunctionMethod.ACMethod, wFWrapper.PreConfigACUrl, wFWrapper.LocalConfigACUrl, wFWrapper.MatchedConfigs, allConfigs);
+                    wFWrapper.PAFunctionParams = GetACConfigParams(wFWrapper.WF, paFunctionMethod.ACMethod, wFWrapper.PreConfigACUrl, wFWrapper.LocalConfigACUrl, wFWrapper.MatchedConfigs, allConfigs);
                 }
             }
 
@@ -678,7 +710,7 @@ namespace gip.bso.masterdata
 
 
 
-        private List<ACConfigParam> GetACConfigParams(ACMethod acMethod, string preConfigACUrl, string localConfigACUrl, List<IACConfig> matchedConfigs, List<IACConfig> allConfigs)
+        private List<ACConfigParam> GetACConfigParams(ACClassWF acClassWF, ACMethod acMethod, string preConfigACUrl, string localConfigACUrl, List<IACConfig> matchedConfigs, List<IACConfig> allConfigs)
         {
             List<ACConfigParam> aCConfigParams = new List<ACConfigParam>();
 
@@ -700,13 +732,14 @@ namespace gip.bso.masterdata
                     aCConfigParam.ACMehtodACIdentifier = acMethod.ACIdentifier;
                     aCConfigParam.ACCaption = acMethod.GetACCaptionForACIdentifier(aCValue.ACIdentifier);
                     aCConfigParam.ValueTypeACClassID = aCValue.ValueTypeACClass != null ? aCValue.ValueTypeACClass.ACClassID : Guid.Empty;
-
+                    aCConfigParam.ACClassWF  = acClassWF;
                     aCConfigParam.ConfigurationList =
                         allConfigs
                         .Where(c => 
                                 //c.PreConfigACUrl == preConfigACUrl 
                                 //&& 
-                                c.LocalConfigACUrl == localParamConfigACUrl
+                                c.VBiACClassID == null
+                                && c.LocalConfigACUrl == localParamConfigACUrl
                          )
                         .OrderByDescending(c => c.ConfigStore.OverridingOrder)
                         .ToList();
@@ -714,6 +747,15 @@ namespace gip.bso.masterdata
                     aCConfigParam.DefaultConfiguration = aCConfigParam.ConfigurationList.OrderByDescending(x => x.ConfigStore.OverridingOrder).FirstOrDefault();
 
                     aCConfigParams.Add(aCConfigParam);
+
+                    var machineConfigs = allConfigs.Where(c => c.LocalConfigACUrl == localParamConfigACUrl && c.VBiACClassID != null);
+
+                    foreach(IACConfig machineConfig in machineConfigs)
+                    {
+                        ACConfigParam additionalParam = GetConfigParamWithMachine(aCConfigParam, machineConfig.VBACClass);
+                        additionalParam.DefaultConfiguration = machineConfig;
+                        aCConfigParams.Add(additionalParam);
+                    }
                 }    
             }
 
@@ -768,26 +810,14 @@ namespace gip.bso.masterdata
             return pwNodeMachineList;
         }
 
-        private void AddPWNodeParamValueWithMachine()
+        private ACConfigParam GetConfigParamWithMachine(ACConfigParam aCConfigParam, ACClass machine)
         {
-            var tmpParamList = PWNodeParamValueList.ToList();
-            int currentIndex = tmpParamList.IndexOf(SelectedPWNodeParamValue);
-            ACConfigParam additionalParam = ACConfigHelper.FactoryMachineParam(SelectedPWNodeParamValue, SelectedPWNodeMachine);
-            tmpParamList.Insert(++currentIndex, additionalParam);
-            _PWNodeParamValueList = tmpParamList;
-            OnPropertyChanged(nameof(PWNodeParamValueList));
-            SelectedPWNodeParamValue = additionalParam;
-        }
-
-        private void AddPAFunctionParamValueWithMachine()
-        {
-            var tmpParamList = PAFunctionParamValueList.ToList();
-            int currentIndex = tmpParamList.IndexOf(SelectedPAFunctionParamValue);
-            ACConfigParam additionalParam = ACConfigHelper.FactoryMachineParam(SelectedPAFunctionParamValue, SelectedPAFunctionMachine);
-            tmpParamList.Insert(++currentIndex, additionalParam);
-            _PAFunctionParamValueList = tmpParamList;
-            OnPropertyChanged(nameof(PAFunctionParamValueList));
-            SelectedPAFunctionParamValue = additionalParam;
+            ACConfigParam additionalParam = ACConfigHelper.FactoryMachineParam(aCConfigParam, machine);
+            additionalParam.ACClassWF = aCConfigParam.ACClassWF;
+            additionalParam.LocalConfigACUrl = aCConfigParam.LocalConfigACUrl;
+            additionalParam.PreConfigACUrl = aCConfigParam.PreConfigACUrl;
+            additionalParam.ACMehtodACIdentifier = aCConfigParam.ACMehtodACIdentifier;
+            return additionalParam;
         }
 
         private void Clear()
