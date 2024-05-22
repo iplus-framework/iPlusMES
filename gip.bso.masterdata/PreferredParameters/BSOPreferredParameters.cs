@@ -100,9 +100,9 @@ namespace gip.bso.masterdata
                     OnPropertyChanged(nameof(HistoryPWNodeParamValueList));
                     OnPropertyChanged(nameof(PWNodeMethodEditorVisible));
 
-                    if(PWNodeMachineList != null)
+                    if (PWNodeMachineList != null)
                     {
-                        SelectedPWNodeMachine = PWNodeMachineList.Where(c=>c.ACClassID ==  (SelectedPWNodeParamValue?.VBiACClassID ?? Guid.Empty)).FirstOrDefault();
+                        SelectedPWNodeMachine = PWNodeMachineList.Where(c => c.ACClassID == (SelectedPWNodeParamValue?.VBiACClassID ?? Guid.Empty)).FirstOrDefault();
                     }
                     else
                     {
@@ -379,22 +379,27 @@ namespace gip.bso.masterdata
         #region Methods
 
         [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
-        public void ShowParamDialog(Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
+        public void ShowParamDialog(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
             Clear();
-            
+
             VD.DatabaseApp databaseApp = Database as VD.DatabaseApp;
 
+            if (partslistID != null)
+            {
+                CurrentConfigStore = databaseApp.Partslist.Where(c => c.PartslistID == partslistID).FirstOrDefault();
+            }
             if (prodOrderPartslistID != null)
             {
                 CurrentConfigStore = databaseApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID).FirstOrDefault();
             }
-            else if (partslistID != null)
+            if (pickingID != null)
             {
-                CurrentConfigStore = databaseApp.Partslist.Where(c => c.PartslistID == partslistID).FirstOrDefault();
+                CurrentConfigStore = databaseApp.Picking.Where(c => c.PickingID == pickingID).FirstOrDefault();
             }
 
-            (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(databaseApp, acClassWFID, partslistID, prodOrderPartslistID);
+
+            (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(databaseApp, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
 
 
             _PWNodeParamValueList = pwNodeParams;
@@ -577,9 +582,9 @@ namespace gip.bso.masterdata
 
         #region Private methods
 
-        private (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) DoACConfigParams(VD.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
+        private (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) DoACConfigParams(VD.DatabaseApp databaseApp, Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
-            WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, VarioConfigManager, acClassWFID, partslistID, prodOrderPartslistID);
+            WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, VarioConfigManager, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
 
             List<IACConfig> allConfigs = wFGroupStartData.ConfigStores.SelectMany(c => c.ConfigurationEntries).ToList();
             List<IACConfig> configsWithExpression = allConfigs.Where(c => !string.IsNullOrEmpty(c.Expression)).ToList();
@@ -719,8 +724,8 @@ namespace gip.bso.masterdata
             {
                 string localParamConfigACUrl = localConfigACUrl + @"\" + acMethod.ACIdentifier + @"\" + aCValue.ACIdentifier;
                 bool existConfig = matchedConfigs.Where(c => c.LocalConfigACUrl == localParamConfigACUrl).Any();
-                
-                if(existConfig)
+
+                if (existConfig)
                 {
                     ACConfigParam aCConfigParam = new ACConfigParam();
 
@@ -731,10 +736,10 @@ namespace gip.bso.masterdata
                     aCConfigParam.ACMehtodACIdentifier = acMethod.ACIdentifier;
                     aCConfigParam.ACCaption = acMethod.GetACCaptionForACIdentifier(aCValue.ACIdentifier);
                     aCConfigParam.ValueTypeACClassID = aCValue.ValueTypeACClass != null ? aCValue.ValueTypeACClass.ACClassID : Guid.Empty;
-                    aCConfigParam.ACClassWF  = acClassWF;
+                    aCConfigParam.ACClassWF = acClassWF;
                     aCConfigParam.ConfigurationList =
                         allConfigs
-                        .Where(c => 
+                        .Where(c =>
                                 //c.PreConfigACUrl == preConfigACUrl 
                                 //&& 
                                 c.VBiACClassID == null
@@ -749,13 +754,13 @@ namespace gip.bso.masterdata
 
                     var machineConfigs = allConfigs.Where(c => c.LocalConfigACUrl == localParamConfigACUrl && c.VBiACClassID != null);
 
-                    foreach(IACConfig machineConfig in machineConfigs)
+                    foreach (IACConfig machineConfig in machineConfigs)
                     {
                         ACConfigParam additionalParam = GetConfigParamWithMachine(aCConfigParam, machineConfig.VBACClass);
                         additionalParam.DefaultConfiguration = machineConfig;
                         aCConfigParams.Add(additionalParam);
                     }
-                }    
+                }
             }
 
             return aCConfigParams;

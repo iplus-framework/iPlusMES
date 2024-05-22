@@ -287,11 +287,11 @@ namespace gip.bso.masterdata
 
         private SourceSelectionRulesResult DoShowDialogSelectSources(VD.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
-            WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, iPlusMESConfigManager, acClassWFID, partslistID, prodOrderPartslistID);
+            WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, iPlusMESConfigManager, acClassWFID, partslistID, prodOrderPartslistID, null);
             
             SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
             LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, wFGroupStartData.ConfigStores, wFGroupStartData.Partslist, wFGroupStartData.InvokerPWNode);
-            sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist);
+            sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist, null);
 
             // Load Subs (level 1)
             List<ACClassWF> allSubWf = wFGroupStartData.InvokerPWNode.RefPAACClassMethod.ACClassWF_ACClassMethod.ToList();
@@ -345,13 +345,18 @@ namespace gip.bso.masterdata
             return configStores;
         }
 
-        private IACConfigStore GetCurrentConfigStore(VD.Partslist partslist, VD.ProdOrderPartslist prodOrderPartslist)
+        private IACConfigStore GetCurrentConfigStore(VD.Partslist partslist, VD.ProdOrderPartslist prodOrderPartslist, VD.Picking picking)
         {
             IACConfigStore currentConfigStore = partslist;
 
             if (prodOrderPartslist != null)
             {
                 currentConfigStore = prodOrderPartslist;
+            }
+
+            if (picking != null)
+            {
+                currentConfigStore = picking;
             }
 
             return currentConfigStore;

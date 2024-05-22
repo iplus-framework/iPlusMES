@@ -5424,7 +5424,8 @@ namespace gip.bso.manufacturing
             BSOPreferredParameters_Child.Value.ShowParamDialog(
                 ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
                 SelectedProdOrderPartslist.Partslist.PartslistID,
-                SelectedProdOrderPartslist.ProdOrderPartslistID);
+                SelectedProdOrderPartslist.ProdOrderPartslistID,
+                null);
         }
 
         public bool IsEnabledShowParamDialog()
