@@ -316,6 +316,9 @@
         public const string UOM_ISOCode_kg = "KGM";
         public const string UOM_ISOCode_t = "TNE";
 
+
+        public const string PrefParam = "en{'Preferred parameters'}de{'Bevorzugte Parameter'}";
+
         #region BSO Dialog Names
 
         #region BSOFacilityLot

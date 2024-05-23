@@ -325,6 +325,19 @@ namespace gip.bso.logistics
             }
         }
 
+        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        [ACPropertyInfo(603)]
+        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
+        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
+        {
+            get
+            {
+                if (_BSOPreferredParameters == null)
+                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
+                return _BSOPreferredParameters;
+            }
+        }
+
         #endregion
 
         #region BSO->ACProperty
@@ -4505,6 +4518,31 @@ namespace gip.bso.logistics
         public bool IsEnabledNavigateToVisitorVoucher()
         {
             return SelectedPicking != null && SelectedPicking.VisitorVoucher != null;
+        }
+
+        #endregion
+
+        #region ShowParamDialog
+
+        [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
+        public void ShowParamDialog()
+        {
+            if (!IsEnabledShowParamDialog())
+                return;
+
+            BSOPreferredParameters_Child.Value.ShowParamDialog(
+                ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
+                null,
+                null,
+                CurrentPicking.PickingID);
+        }
+
+        public bool IsEnabledShowParamDialog()
+        {
+            return
+                ProcessWorkflowPresenter != null
+                && ProcessWorkflowPresenter.SelectedWFNode != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
         }
 
         #endregion

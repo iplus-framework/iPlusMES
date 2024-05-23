@@ -10,8 +10,8 @@ namespace gip.mes.datamodel
     /// OutOfferConfig
     /// </summary>
     [ACClassInfo(Const.PackName_VarioSales, "en{'Program.config'}de{'Programm.config'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, Const.PN_PreConfigACUrl, "en{'Parent WF URL'}de{'WF Eltern-URL'}", "", "", true)]
-    [ACPropertyEntity(2, Const.PN_LocalConfigACUrl, "en{'Property URL'}de{'Eigenschafts-URL'}", "", "", true)]
+    [ACPropertyEntity(1, Const.PN_PreConfigACUrl, Const.PreConfigACUrl, "", "", true)]
+    [ACPropertyEntity(2, Const.PN_LocalConfigACUrl, Const.LocalConfigACUrl, "", "", true)]
     [ACPropertyEntity(3, "XMLValue", "en{'Value'}de{'Wert'}")]
     [ACPropertyEntity(4, "Expression", "en{'Expression'}de{'Ausdruck'}", "", "", true)]
     [ACPropertyEntity(5, "Comment", ConstApp.Comment, "", "", true)]
