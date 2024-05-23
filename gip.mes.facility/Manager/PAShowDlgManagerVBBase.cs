@@ -820,6 +820,10 @@ namespace gip.mes.facility
                     if (!String.IsNullOrEmpty(firstModule))
                         orderInfo = caller.ACUrlCommand(accessedFromVBGroupACUrl[0] + ACUrlHelper.Delimiter_InvokeMethod + nameof(PWBase.GetPAOrderInfo)) as PAOrderInfo;
                 }
+                else
+                {
+                    orderInfo = caller.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PAProcessModule.GetPAOrderInfo)) as PAOrderInfo;
+                }
             }
             return orderInfo;
         }

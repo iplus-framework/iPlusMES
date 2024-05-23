@@ -330,10 +330,11 @@ namespace gip.mes.processapplication
 
         public override bool IsEnabledShowDialogOrder(IACComponent caller)
         {
-            bool result =  base.IsEnabledShowDialogOrder(caller);
+            bool result = base.IsEnabledShowDialogOrder(caller);
             if (result)
                 return result;
 
+            ACComponentProxy compProxy = caller as ACComponentProxy;
             PWNodeProxy pwNode = caller as PWNodeProxy;
             if (pwNode != null)
             {
@@ -341,12 +342,25 @@ namespace gip.mes.processapplication
                 if (orderInfo != null)
                     return true;
             }
+            else if (compProxy != null)
+            {
+                var orderInfo = compProxy.ACUrlCommand("!GetPAOrderInfo") as PAOrderInfo;
+                if (orderInfo != null)
+                    return true;
+            }
             else
             {
-                PWBaseExecutable baseExe = caller as PWBaseExecutable;
+                PWBase baseExe = caller as PWBase;
                 if (baseExe != null)
                 {
                     var orderInfo = baseExe.GetPAOrderInfo();
+                    if (orderInfo != null)
+                        return true;
+                }
+                PAProcessModule pAProcessModule = caller as PAProcessModule;
+                if (pAProcessModule != null)
+                {
+                    var orderInfo = pAProcessModule.GetPAOrderInfo();
                     if (orderInfo != null)
                         return true;
                 }
