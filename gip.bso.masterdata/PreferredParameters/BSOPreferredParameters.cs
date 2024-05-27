@@ -248,6 +248,7 @@ namespace gip.bso.masterdata
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(PAFunctionMachineList));
                     OnPropertyChanged(nameof(HistoryPAFunctionParamValueList));
+                    OnPropertyChanged(nameof(PAFunctionMethodEditorVisible));
 
                     if (PAFunctionMachineList != null)
                     {
@@ -378,6 +379,8 @@ namespace gip.bso.masterdata
 
         #region Methods
 
+        #region Methods -> ACMehtods
+
         [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
         public void ShowParamDialog(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
@@ -410,6 +413,21 @@ namespace gip.bso.masterdata
 
             ShowDialog(this, "ParamDlg");
         }
+
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        public void DialogOK()
+        {
+            ACSaveOrUndoChanges();
+            CloseTopDialog();
+        }
+
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        public void DialogCancel()
+        {
+            CloseTopDialog();
+        }
+
+        #endregion
 
         #region Methods -> PWNode
 
