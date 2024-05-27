@@ -1366,33 +1366,32 @@ namespace gip.mes.processapplication
                                         }
                                     }
 
-                                    // Unnecessary since new Property in Facility-Table and handeled in FacilityManager
-                                    //if (!hasQuants || zeroBookSucceeded)
-                                    //{
-                                    //    PAMSilo sourceSilo = null;
-                                    //    bool disChargingActive = false;
-                                    //    if (outwardFacility.FacilityACClass != null)
-                                    //    {
-                                    //        string url = outwardFacility.FacilityACClass.GetACUrlComponent();
-                                    //        if (!String.IsNullOrEmpty(url))
-                                    //        {
-                                    //            sourceSilo = ACUrlCommand(url) as PAMSilo;
-                                    //            if (sourceSilo != null)
-                                    //            {
-                                    //                IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
-                                    //                disChargingActive = activeDischargings != null && activeDischargings.Any();
-                                    //            }
-                                    //        }
-                                    //    }
+                                    // Handle ShouldLeaveMaterialOccupation when is not handled in FacilityManager
+                                    if (!hasQuants && outwardFacility != null && outwardFacility.Material != null && !outwardFacility.ShouldLeaveMaterialOccupation)
+                                    {
+                                        PAMSilo sourceSilo = null;
+                                        bool disChargingActive = false;
+                                        if (outwardFacility.FacilityACClass != null)
+                                        {
+                                            string url = outwardFacility.FacilityACClass.GetACUrlComponent();
+                                            if (!String.IsNullOrEmpty(url))
+                                            {
+                                                sourceSilo = ACUrlCommand(url) as PAMSilo;
+                                                if (sourceSilo != null)
+                                                {
+                                                    IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
+                                                    disChargingActive = activeDischargings != null && activeDischargings.Any();
+                                                }
+                                            }
+                                        }
 
-                                    //    // #iP-T-24-05-08-002
-                                    //    if (!disChargingActive
-                                    //        && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
-                                    //    {
-                                    //        outwardFacility.Material = null; // Automatisches Löschen der Belegung?
-                                    //        outwardFacility.Partslist = null;
-                                    //    }
-                                    //}
+                                        // #iP-T-24-05-08-002
+                                        if (!disChargingActive)
+                                        {
+                                            outwardFacility.Material = null; // Automatisches Löschen der Belegung?
+                                            outwardFacility.Partslist = null;
+                                        }
+                                    }
 
                                     if (ParentPWMethodVBBase != null && ParentPWMethodVBBase.IsLastBatch == PADosingLastBatchEnum.LastBatch)
                                     {
