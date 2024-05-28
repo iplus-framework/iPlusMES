@@ -342,7 +342,6 @@ namespace gip.bso.masterdata
             }
         }
 
-        private List<ACClass> _PAFunctionMachineList;
         /// <summary>
         /// List property for ACClass
         /// </summary>
