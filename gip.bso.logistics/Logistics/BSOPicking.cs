@@ -1314,6 +1314,8 @@ namespace gip.bso.logistics
                     }
                 }
             }
+
+            OnPropertyChanged(nameof(CurrentPicking));
         }
 
         public virtual bool IsEnabledFinishOrder()
