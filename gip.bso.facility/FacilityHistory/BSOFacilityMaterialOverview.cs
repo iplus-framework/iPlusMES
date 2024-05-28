@@ -754,7 +754,7 @@ namespace gip.bso.facility
             return DialogResult;
         }
 
-        [ACMethodCommand(nameof(ShowLotDlg), "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand(nameof(ShowLotDlg), Const.Ok, (short)MISort.Okay)]
         public void ShowLotDlgOk()
         {
             if (DialogResult != null)
@@ -771,7 +771,7 @@ namespace gip.bso.facility
             return SelectedFacilityChargeSumLotHelper != null;
         }
 
-        [ACMethodCommand(nameof(ShowLotDlg), "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand(nameof(ShowLotDlg), Const.Cancel, (short)MISort.Cancel)]
         public void ShowLotDlgCancel()
         {
             if (DialogResult != null)

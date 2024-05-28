@@ -1783,7 +1783,7 @@ namespace gip.bso.masterdata
             ShowDialog(this, "DlgApplyAllStandardPartslistConfigParams");
         }
 
-        [ACMethodInfo("ConfigurationTransfer", "en{'Ok'}de{'Ok'}", 999)]
+        [ACMethodInfo("ConfigurationTransfer", Const.Ok, 999)]
         public void InitAllStandardPartslistConfigParamsOK()
         {
             if (!IsEnabledInitAllStandardPartslistConfigParams()) return;
@@ -1792,7 +1792,7 @@ namespace gip.bso.masterdata
                 PartslistManager.InitStandardPartslistConfigParams(partsList, false);
         }
 
-        [ACMethodInfo("ConfigurationTransfer", "en{'Cancel'}de{'Abbrechen'}", 999)]
+        [ACMethodInfo("ConfigurationTransfer", Const.Cancel, 999)]
         public void InitAllStandardPartslistConfigParamsCancel()
         {
             CloseTopDialog();
@@ -2155,7 +2155,7 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodCommand("NewProcessWorkflow", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("NewProcessWorkflow", Const.Ok, (short)MISort.Okay)]
         public void NewProcessWorkflowOk()
         {
             if (!IsEnabledNewProcessWorkflowOk())
@@ -2177,7 +2177,7 @@ namespace gip.bso.masterdata
             return this.NewProcessWorkflow != null && !ProcessWorkflowList.Contains(NewProcessWorkflow);
         }
 
-        [ACMethodCommand("NewProcessWorkflow", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("NewProcessWorkflow", Const.Cancel, (short)MISort.Cancel)]
         public void NewProcessWorkflowCancel()
         {
             CloseTopDialog();

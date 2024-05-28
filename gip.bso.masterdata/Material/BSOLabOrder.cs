@@ -914,7 +914,7 @@ namespace gip.bso.masterdata
         /// <summary xml:lang="de">
         /// Bricht das Anlegen einer Planstelle ab.
         /// </summary>
-        [ACMethodInteraction("Dialog", "en{'Cancel'}de{'Abbrechen'}", 703, true, "DialogCancelPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", Const.Cancel, 703, true, "DialogCancelPos", Global.ACKinds.MSMethodPrePost)]
         public void DialogCancelPos()
         {
             CloseTopDialog();

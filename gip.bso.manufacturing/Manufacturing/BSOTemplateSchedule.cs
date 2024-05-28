@@ -364,7 +364,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method GeneratePlan
         /// </summary>
-        [ACMethodInfo("GeneratePlan", "en{'Ok'}de{'Ok'}", 100)]
+        [ACMethodInfo("GeneratePlan", Const.Ok, 100)]
         public void GeneratePlanOK()
         {
             if (!IsEnabledGeneratePlanOk())
@@ -423,7 +423,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method GeneratePlan
         /// </summary>
-        [ACMethodInfo("GeneratePlan", "en{'Cancel'}de{'Abbrechen'}", 100)]
+        [ACMethodInfo("GeneratePlan", Const.Cancel, 100)]
         public void GeneratePlanCancel()
         {
             CloseTopDialog();

@@ -557,13 +557,13 @@ namespace gip.bso.masterdata
             ShowDialog(this, "AddMaterialDlg");
         }
 
-        [ACMethodInfo("Materials", "en{'Cancel'}de{'Abbrechen'}", 602, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("Materials", Const.Cancel, 602, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public void AddMaterialDlgCancel()
         {
             CloseTopDialog();
         }
 
-        [ACMethodInteraction("Materials", "en{'Ok'}de{'Ok'}", 603, true, "SelectedMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Materials", Const.Ok, 603, true, "SelectedMaterial", Global.ACKinds.MSMethodPrePost)]
         public void AddMaterialOK()
         {
             if (!IsEnabledAddMaterialOK()) return;
@@ -1020,7 +1020,7 @@ namespace gip.bso.masterdata
             set;
         }
 
-        [ACMethodCommand("NewProcessWorkflow", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("NewProcessWorkflow", Const.Ok, (short)MISort.Okay)]
         public void NewProcessWorkflowOk()
         {
             MaterialWFACClassMethod item;
@@ -1044,7 +1044,7 @@ namespace gip.bso.masterdata
             return this.NewProcessWorkflow != null;
         }
 
-        [ACMethodCommand("NewProcessWorkflow", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("NewProcessWorkflow", Const.Cancel, (short)MISort.Cancel)]
         public void NewProcessWorkflowCancel()
         {
             CloseTopDialog();

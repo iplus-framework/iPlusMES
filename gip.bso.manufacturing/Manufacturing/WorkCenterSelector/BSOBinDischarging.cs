@@ -447,7 +447,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodInfo("", Const.Cancel, (short)MISort.Cancel)]
         public void Cancel()
         {
             CloseTopDialog();

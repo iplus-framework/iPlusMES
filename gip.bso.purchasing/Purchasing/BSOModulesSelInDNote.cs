@@ -472,7 +472,7 @@ namespace gip.bso.purchasing
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -482,7 +482,7 @@ namespace gip.bso.purchasing
             SelectedAppManager = selected;
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -494,7 +494,7 @@ namespace gip.bso.purchasing
         #endregion
 
         #region Dialog select Workflow
-        [ACMethodCommand("DialogWorkflow", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("DialogWorkflow", Const.Ok, (short)MISort.Okay)]
         public void DialogWorkflowOK()
         {
             var selectedWF = _SelectedWorkflow;
@@ -502,7 +502,7 @@ namespace gip.bso.purchasing
             _SelectedWorkflow = selectedWF;
         }
 
-        [ACMethodCommand("DialogWorkflow", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("DialogWorkflow", Const.Cancel, (short)MISort.Cancel)]
         public void DialogWorkflowCancel()
         {
             SelectedWorkflow = null;
