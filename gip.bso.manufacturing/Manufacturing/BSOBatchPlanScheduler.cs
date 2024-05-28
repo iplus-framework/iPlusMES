@@ -2654,7 +2654,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderBatchPlan != null;
         }
 
-        [ACMethodInfo("ShowPartslistOK", "en{'Ok'}de{'Ok'}", 999)]
+        [ACMethodInfo("ShowPartslistOK", Const.Ok, 999)]
         public void ShowPartslistOK()
         {
             CloseTopDialog();
@@ -2692,7 +2692,7 @@ namespace gip.bso.manufacturing
             return IsEnabledScheduling();
         }
 
-        [ACMethodCommand("BackwardSchedulingOk", "en{'Ok'}de{'Ok'}", 507, true)]
+        [ACMethodCommand("BackwardSchedulingOk", Const.Ok, 507, true)]
         public void BackwardSchedulingOk()
         {
             if (!IsEnabledBackwardScheduling() || !IsEnabledBackwardSchedulingOk()) return;
@@ -2719,7 +2719,7 @@ namespace gip.bso.manufacturing
             return IsEnabledScheduling();
         }
 
-        [ACMethodInfo("ForwardSchedulingOk", "en{'Ok'}de{'Ok'}", 509)]
+        [ACMethodInfo("ForwardSchedulingOk", Const.Ok, 509)]
         public void ForwardSchedulingOk()
         {
             if (!IsEnabledForwardScheduling() || !IsEnabledForwardSchedulingOk()) return;
@@ -2733,7 +2733,7 @@ namespace gip.bso.manufacturing
             return !BackgroundWorker.IsBusy && ScheduledStartDate != null && IsEnabledScheduling();
         }
 
-        [ACMethodInfo("SchedulingCancel", "en{'Cancel'}de{'Abbrechen'}", 510)]
+        [ACMethodInfo("SchedulingCancel", Const.Cancel, 510)]
         public void SchedulingCancel()
         {
             CloseTopDialog();

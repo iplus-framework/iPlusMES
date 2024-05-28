@@ -427,7 +427,7 @@ namespace gip.mes.maintenance
             CurrentComponentFilter = null;
         }
 
-        [ACMethodInfo("", "en{'OK'}de{'OK'}", 9999)]
+        [ACMethodInfo("", Const.Ok, 9999)]
         public void ChooseComponentOK()
         {
             CloseTopDialog();
