@@ -110,7 +110,7 @@ namespace gip.bso.logistics
 
             if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
-                BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
+                BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityReservation_Changed;
             }
 
             return true;
@@ -268,7 +268,7 @@ namespace gip.bso.logistics
 
             if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
-                BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityRservation_ReservationChanged;
+                BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityReservation_Changed;
             }
 
             return b;
@@ -286,7 +286,7 @@ namespace gip.bso.logistics
         }
 
 
-        private void BSOFacilityRservation_ReservationChanged()
+        private void BSOFacilityReservation_Changed()
         {
             if (CurrentPickingPos != null)
             {
