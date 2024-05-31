@@ -448,7 +448,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the currency exchange OK.
         /// </summary>
-        [ACMethodCommand("NewMDCurrencyExchange", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("NewMDCurrencyExchange", Const.Ok, (short)MISort.Okay)]
         public void NewCurrencyExchangeOK()
         {
             CloseTopDialog();
@@ -472,7 +472,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the currency exchange cancel.
         /// </summary>
-        [ACMethodCommand("NewMDCurrencyExchange", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("NewMDCurrencyExchange", Const.Cancel, (short)MISort.Cancel)]
         public void NewCurrencyExchangeCancel()
         {
             CloseTopDialog();

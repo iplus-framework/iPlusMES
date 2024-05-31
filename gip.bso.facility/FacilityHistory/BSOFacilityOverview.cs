@@ -638,14 +638,14 @@ namespace gip.bso.facility
             this.ParentACComponent.StopComponent(this);
         }
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = true;
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             DialogResult = false;

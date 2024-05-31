@@ -221,7 +221,7 @@ namespace gip.mes.datamodel
         }
 
         private string _UserName;
-        public string UserName 
+        public string UserName
         {
             get
             {
@@ -275,6 +275,8 @@ namespace gip.mes.datamodel
         }
 
         public event ACChangesEventHandler ACChangesExecuted;
+
+        public bool PreventOnContextACChangesExecuted { get; set; }
 
         #endregion
 

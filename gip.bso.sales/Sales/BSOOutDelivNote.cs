@@ -2150,7 +2150,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Source Property: DlgAvailableQuantsOk
         /// </summary>
-        [ACMethodInfo("DlgAvailableQuantsOk", "en{'Ok'}de{'Ok'}", 999)]
+        [ACMethodInfo("DlgAvailableQuantsOk", Const.Ok, 999)]
         public void DlgAvailableQuantsOk()
         {
             if (!IsEnabledDlgAvailableQuantsOk())
@@ -2280,7 +2280,7 @@ namespace gip.bso.sales
             return DialogResult;
         }
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -2289,7 +2289,7 @@ namespace gip.bso.sales
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             Delete();

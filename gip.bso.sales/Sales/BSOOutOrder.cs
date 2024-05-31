@@ -1976,7 +1976,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -1985,7 +1985,7 @@ namespace gip.bso.sales
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             if (CurrentOutOrder != null && CurrentOutOrder.EntityState == EntityState.Added)

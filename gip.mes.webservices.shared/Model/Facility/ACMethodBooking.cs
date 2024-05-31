@@ -429,6 +429,14 @@ namespace gip.mes.webservices
             get { return _PropertyACUrl; }
             set { SetProperty<string>(ref _PropertyACUrl, value); }
         }
+
+        string _ExternLotNo;
+        [DataMember(Name = "ExtLNo")]
+        public string ExternLotNo
+        {
+            get { return _ExternLotNo; }
+            set { SetProperty<string>(ref _ExternLotNo, value); }
+        }
         #endregion
 
     }

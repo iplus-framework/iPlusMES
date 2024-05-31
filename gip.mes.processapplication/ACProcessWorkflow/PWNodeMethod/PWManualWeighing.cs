@@ -173,7 +173,7 @@ namespace gip.mes.processapplication
         private readonly ACMonitorObject _65500_LotChangeLock = new ACMonitorObject(65500);
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
-        private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
+        protected readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
 
         //TODO: _IsAborted and _ScaleComp change with PAF paramter AbortType
         protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false, _ScaleComp = false;
@@ -3060,7 +3060,10 @@ namespace gip.mes.processapplication
                 ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.None;
                 acMethod["TargetQuantity"] = weighingComponent.TargetWeight;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
-                acMethod["PLPosRelation"] = weighingComponent.PLPosRelation.ProdOrderPartslistPosRelationID;
+                if (weighingComponent.PLPosRelation != null)
+                    acMethod["PLPosRelation"] = weighingComponent.PLPosRelation.ProdOrderPartslistPosRelationID;
+                else if (weighingComponent.PickingPosition != null)
+                    acMethod["PLPosRelation"] = weighingComponent.PickingPosition.PickingPosID;
 
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
 
@@ -3602,12 +3605,17 @@ namespace gip.mes.processapplication
                 }
                 finally
                 {
-                    SetCanStartFromBSO(true);
-                    CurrentOpenMaterial = null;
-                    CurrentFacilityCharge = null;
-                    SubscribeToProjectWorkCycle();
+                    OnDeletedTaskCompleted();
                 }
             }
+        }
+
+        protected virtual void OnDeletedTaskCompleted()
+        {
+            SetCanStartFromBSO(true);
+            CurrentOpenMaterial = null;
+            CurrentFacilityCharge = null;
+            SubscribeToProjectWorkCycle();
         }
 
         protected Msg SetRelationState(Guid? plPosRelationID, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates targetState, bool setOnTopRelation = false)

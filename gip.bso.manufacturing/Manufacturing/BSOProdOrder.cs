@@ -245,7 +245,7 @@ namespace gip.bso.manufacturing
 
 
         ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(601)]
         [ACChildInfo(nameof(BSOSourceSelectionRules_Child), typeof(BSOSourceSelectionRules))]
         public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
         {
@@ -258,7 +258,7 @@ namespace gip.bso.manufacturing
         }
 
         ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(602)]
         [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
         public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
         {
@@ -267,6 +267,19 @@ namespace gip.bso.manufacturing
                 if (_BSOFacilityReservation_Child == null)
                     _BSOFacilityReservation_Child = new ACChildItem<BSOFacilityReservation>(this, nameof(BSOFacilityReservation_Child));
                 return _BSOFacilityReservation_Child;
+            }
+        }
+
+        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        [ACPropertyInfo(603)]
+        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
+        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
+        {
+            get
+            {
+                if (_BSOPreferredParameters == null)
+                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
+                return _BSOPreferredParameters;
             }
         }
 
@@ -1185,6 +1198,7 @@ namespace gip.bso.manufacturing
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
             base.OnPostSave();
+            LoadProcessWorkflows();
         }
 
 
@@ -1706,7 +1720,7 @@ namespace gip.bso.manufacturing
             return CurrentProdOrder != null && CurrentProdOrder.EntityState != EntityState.Added;
         }
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'OK'}de{'Ok'}", (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void AddPartslistDlgOk()
         {
             if (!IsEnabledAddPartslistDlgOk()) return;
@@ -1864,7 +1878,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Ok'}de{'Ok'}", (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void PartslistChangeTargetQuantityDlgOk()
         {
             if (RecalculateQuantities)
@@ -2054,7 +2068,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrder != null;
         }
 
-        [ACMethodInteraction("ProdOrderPartListExpand", "en{'OK'}de{'OK'}", (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderPartListExpand", Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void BOMExplosionDlgOk()
         {
             List<ExpandResult> treeResult = rootProdOrderPartListExpand.BuildTreeList();
@@ -2504,7 +2518,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// ChangeViaPartslistDlg
         /// </summary>
-        [ACMethodInfo("ChangeViaPartslistOk", "en{'Ok'}de{'Ok'}", 999)]
+        [ACMethodInfo("ChangeViaPartslistOk", Const.Ok, 999)]
         public void ChangeViaPartslistOk()
         {
             if (!IsEnabledChangeViaPartslistOk())
@@ -2529,7 +2543,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// ChangeViaPartslistDlg
         /// </summary>
-        [ACMethodInfo("ChangeViaPartslistCancel", "en{'Cancel'}de{'Abbrechen'}", 999)]
+        [ACMethodInfo("ChangeViaPartslistCancel", Const.Cancel, 999)]
         public void ChangeViaPartslistCancel()
         {
             CloseTopDialog();
@@ -3613,7 +3627,7 @@ namespace gip.bso.manufacturing
             CreateBatchAutomaticallyCalcList = CreateBatchAutomaticallyGetDefinitionList();
         }
 
-        [ACMethodInfo("BatchCreateAutomaticallyCreateDlgOk", "en{'Ok'}de{'Ok'}", (short)MISort.Okay)]
+        [ACMethodInfo("BatchCreateAutomaticallyCreateDlgOk", Const.Ok, (short)MISort.Okay)]
         public void BatchCreateAutomaticallyCreateDlgOk()
         {
             if (!IsEnabledBatchCreateAutomaticallyCreateDlgOk()) return;
@@ -3763,7 +3777,7 @@ namespace gip.bso.manufacturing
 
         #region BatchCreate -> Manually -> Methods
 
-        [ACMethodCommand("BatchCreateManuallyCmd", "en{'Ok'}de{'Ok'}", (short)MISort.Okay)]
+        [ACMethodCommand("BatchCreateManuallyCmd", Const.Ok, (short)MISort.Okay)]
         public void BatchCreateManuallyCmd()
         {
             if (!IsEnabledBatchCreateManuallyCmd()) return;
@@ -4630,7 +4644,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -4638,7 +4652,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -4875,7 +4889,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: DlgAvailableQuantsOk
         /// </summary>
-        [ACMethodInfo("DlgAvailableQuantsOk", "en{'Ok'}de{'Ok'}", 999)]
+        [ACMethodInfo("DlgAvailableQuantsOk", Const.Ok, 999)]
         public void DlgAvailableQuantsOk()
         {
             if (!IsEnabledDlgAvailableQuantsOk())
@@ -5363,7 +5377,7 @@ namespace gip.bso.manufacturing
 
         #region ShowDialogSelectSources
 
-        [ACMethodCommand("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
+        [ACMethodCommand(nameof(ShowDialogSelectSources), "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
         public void ShowDialogSelectSources()
         {
             if (!IsEnabledShowDialogSelectSources())
@@ -5394,6 +5408,32 @@ namespace gip.bso.manufacturing
             if (typeOfSelectedNode == null)
                 return false;
             return TypeOfPWNodeProcessWorkflow.IsAssignableFrom(typeOfSelectedNode);
+        }
+
+        #endregion
+
+
+        #region ShowParamDialog
+
+        [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
+        public void ShowParamDialog()
+        {
+            if (!IsEnabledShowParamDialog())
+                return;
+
+            BSOPreferredParameters_Child.Value.ShowParamDialog(
+                ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
+                SelectedProdOrderPartslist.Partslist.PartslistID,
+                SelectedProdOrderPartslist.ProdOrderPartslistID,
+                null);
+        }
+
+        public bool IsEnabledShowParamDialog()
+        {
+            return 
+                ProcessWorkflowPresenter != null
+                && ProcessWorkflowPresenter.SelectedWFNode != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
         }
 
         #endregion

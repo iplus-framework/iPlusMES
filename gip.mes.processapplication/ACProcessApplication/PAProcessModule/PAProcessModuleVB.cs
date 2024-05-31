@@ -102,10 +102,10 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "GetBSONameForShowOrder":
+                case nameof(GetBSONameForShowOrder):
                     result = GetBSONameForShowOrder(acParameter[0] as string);
                     return true;
-                case "GetBSONameForShowReservation":
+                case nameof(GetBSONameForShowReservation):
                     result = GetBSONameForShowReservation(acParameter[0] as string);
                     return true;
             }
@@ -118,28 +118,28 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "ShowOrderDialog":
+                case nameof(ShowOrderDialog):
                     ShowOrderDialog(acComponent);
                     return true;
-                case "ShowReservationDialog":
+                case nameof(ShowReservationDialog):
                     ShowReservationDialog(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowOrderDialog":
+                case nameof(IsEnabledShowOrderDialog):
                     result = IsEnabledShowOrderDialog(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowReservationDialog":
+                case nameof(IsEnabledShowReservationDialog):
                     result = IsEnabledShowReservationDialog(acComponent);
                     return true;
-                case "ShowLabOrderDialog":
+                case nameof(ShowLabOrderDialog):
                     ShowLabOrderDialog(acComponent);
                     return true;
-                case "NewLabOrderDialog":
+                case nameof(NewLabOrderDialog):
                     NewLabOrderDialog(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowLabOrderDialog":
+                case nameof(IsEnabledShowLabOrderDialog):
                     result = IsEnabledShowLabOrderDialog(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "NewLabOrderDialog":
+                case nameof(IsEnabledNewLabOrderDialog):
                     result = IsEnabledNewLabOrderDialog(acComponent);
                     return true;
             }

@@ -809,7 +809,7 @@ namespace gip.bso.facility
 
 
         #region Workflow-Dialog's
-        [ACMethodCommand("DialogIntakeModule", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("DialogIntakeModule", Const.Ok, (short)MISort.Okay)]
         public void DialogSourceModuleOK()
         {
             var selectedWF = _SelectedSourceModule;
@@ -817,14 +817,14 @@ namespace gip.bso.facility
             _SelectedSourceModule = selectedWF;
         }
 
-        [ACMethodCommand("DialogIntakeModule", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("DialogIntakeModule", Const.Cancel, (short)MISort.Cancel)]
         public void DialogSourceModuleCancel()
         {
             SelectedSourceModule = null;
             CloseTopDialog();
         }
 
-        [ACMethodCommand("DialogWorkflow", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("DialogWorkflow", Const.Ok, (short)MISort.Okay)]
         public void DialogWorkflowOK()
         {
             var selectedWF = _SelectedWorkflow;
@@ -832,14 +832,14 @@ namespace gip.bso.facility
             _SelectedWorkflow = selectedWF;
         }
 
-        [ACMethodCommand("DialogWorkflow", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("DialogWorkflow", Const.Cancel, (short)MISort.Cancel)]
         public void DialogWorkflowCancel()
         {
             SelectedWorkflow = null;
             CloseTopDialog();
         }
 
-        [ACMethodCommand("DialogAppManager", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("DialogAppManager", Const.Ok, (short)MISort.Okay)]
         public void DialogAppManagerOK()
         {
             var selectedWF = _SelectedAppManager;
@@ -847,7 +847,7 @@ namespace gip.bso.facility
             _SelectedAppManager = selectedWF;
         }
 
-        [ACMethodCommand("DialogAppManager", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("DialogAppManager", Const.Cancel, (short)MISort.Cancel)]
         public void DialogAppManagerCancel()
         {
             SelectedAppManager = null;

@@ -1561,7 +1561,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodCommand("AssignAlternativeCurrency", "en{'OK'}de{'OK'}", (short)301)]
+        [ACMethodCommand("AssignAlternativeCurrency", Const.Ok, (short)301)]
         public void DialogAssignAlternativeCurrencyOK()
         {
             if (CurrentInvoice != null)
@@ -1570,7 +1570,7 @@ namespace gip.bso.sales
             _SelectedAlternativeCurrExch = null;
         }
 
-        [ACMethodCommand("AssignAlternativeCurrency", "en{'Cancel'}de{'Abbrechen'}", (short)302)]
+        [ACMethodCommand("AssignAlternativeCurrency", Const.Cancel, (short)302)]
         public void DialogAssignAlternativeCurrencyCancel()
         {
             _SelectedAlternativeCurrExch = null;

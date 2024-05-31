@@ -20,8 +20,9 @@ namespace gip.mes.datamodel
         InProcess = 1,
         Finished = 2,
         Cancelled = 3,
-        WFReadyToStart = 4,
-        WFActive = 5,
+        WaitOnManualClosing = 4,
+        WFReadyToStart = 5,
+        WFActive = 6,
     }
 
 
@@ -36,6 +37,7 @@ namespace gip.mes.datamodel
             AddEntry(PickingStateEnum.WFActive, "en{'Workflow Active'}de{'Workflow Aktiv'}");
             AddEntry(PickingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
             AddEntry(PickingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
+            AddEntry(PickingStateEnum.WaitOnManualClosing, "en{'Evaluating and completing'}de{'Bewerten und Abschließen'}");
         }
     }
 }

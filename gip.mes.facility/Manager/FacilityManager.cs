@@ -4,6 +4,7 @@ using gip.core.reporthandler;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
@@ -412,6 +413,164 @@ namespace gip.mes.facility
                     }
                 }
             }
+        }
+
+        public Dictionary<ACMethodBooking, ACMethodEventArgs>  BookFacilities(ACMethodBooking[] bps, DatabaseApp dbApp)
+        {
+            Dictionary<ACMethodBooking, ACMethodEventArgs> result = new Dictionary<ACMethodBooking, ACMethodEventArgs>();
+            IRuntimeDump vbDump = Root?.VBDump;
+            
+            dbApp.PreventOnContextACChangesExecuted = true;
+
+            foreach(ACMethodBooking BP in bps)
+            {
+                ACMethodEventArgs acMethodEventArgs = null;
+
+                PerformanceEvent performanceEvent = null;
+                if (vbDump != null)
+                    performanceEvent = vbDump.PerfLoggerStart("\\LocalServiceObjects\\FacilityManager!BookFacility", 100);
+                else
+                    performanceEvent = new PerformanceEvent(true);
+
+                try
+                {
+                    if (BP == null || dbApp == null)
+                    {
+                        acMethodEventArgs = new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
+                    }
+                    else
+                    {
+                        BP.Database = dbApp;
+
+                        if (BP.PartslistPos != null && BP.InwardFacility != null
+                                                    && BP.InwardAutoSplitQuant != null
+                                                    && BP.InwardMaterial != null
+                                                    && BP.InwardSplitNo != null
+                                                    && BP.InwardFacilityLot != null
+                                                    && BP.InwardAutoSplitQuant > 0)
+                        {
+                            int splitNo = 1;
+                            int i = 1;
+
+                            if (BP.InwardAutoSplitQuant > 0)
+                            {
+                                i = BP.InwardAutoSplitQuant.Value;
+                            }
+
+                            var query = s_cQry_FCList_Fac_Lot_Mat(dbApp, BP.InwardFacility.FacilityID, BP.InwardFacilityLot.FacilityLotID, BP.InwardMaterial.MaterialID, null)
+                                                                 .OrderByDescending(x => x.SplitNo);
+
+                            if (query != null && query.Any())
+                            {
+                                splitNo = query.FirstOrDefault().SplitNo + i;
+                            }
+
+                            BP.InwardSplitNo = splitNo;
+                        }
+
+                        ACMethodBooking bp = null;
+                        ACMethodEventArgs validResult = OnValidateBooking(dbApp, BP, out bp);
+                        if (validResult != null)
+                        {
+                            acMethodEventArgs = validResult;
+                        }
+                        else
+                        {
+                            if (bp == null)
+                            {
+                                acMethodEventArgs = new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
+                            }
+                            else
+                            {
+                                bp.Database = dbApp;
+
+                                // Kundenspezifiche Funktion vor eigentlicher Buchung ausführen (Quellcode wird in der Datenbank hinterlegt)
+                                if (!PreFacilityBooking(bp))
+                                {
+                                    dbApp.ACUndoChanges();
+                                    acMethodEventArgs = new ACMethodEventArgs(bp, Global.ACMethodResultState.Notpossible);
+                                }
+                                else
+                                {
+                                    // Standard-Buchungsfunktion ausführen
+                                    Global.ACMethodResultState doBookingResult = DoFacilityBooking(bp);
+                                    if (doBookingResult == Global.ACMethodResultState.Notpossible || doBookingResult == Global.ACMethodResultState.Failed)
+                                    {
+                                        dbApp.ACUndoChanges();
+                                        acMethodEventArgs = new ACMethodEventArgs(bp, doBookingResult);
+                                    }
+                                    else
+                                    {
+                                        // Kundenspezifiche Funktion nach eigentlicher Buchung ausführen (Quellcode wird in der Datenbank hinterlegt)
+                                        if (!PostFacilityBooking(bp))
+                                        {
+                                            dbApp.ACUndoChanges();
+                                            acMethodEventArgs = new ACMethodEventArgs(bp, Global.ACMethodResultState.Failed);
+                                        }
+                                        else
+                                        {
+                                            if (doBookingResult != Global.ACMethodResultState.Succeeded)
+                                            {
+                                                dbApp.ACUndoChanges();
+                                                acMethodEventArgs = new ACMethodEventArgs(bp, doBookingResult);
+                                            }
+                                            else
+                                            {
+                                                // Commit auf Datenbank
+                                                MsgWithDetails saveMsg = dbApp.ACSaveChanges();
+                                                if (saveMsg != null)
+                                                {
+                                                    BP.AddBookingMessage(ACMethodBooking.eResultCodes.TransactionError, saveMsg.InnerMessage);
+                                                    doBookingResult = Global.ACMethodResultState.Failed;
+                                                    acMethodEventArgs = new ACMethodEventArgs(bp, doBookingResult);
+                                                }
+
+                                                PostFacilityBookingSaved(bp);
+
+                                                acMethodEventArgs = new ACMethodEventArgs(bp, doBookingResult);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    dbApp.ACUndoChanges();
+                    BP.AddBookingMessage(ACMethodBooking.eResultCodes.TransactionError, e.Message);
+                    if (e.InnerException != null && !String.IsNullOrEmpty(e.InnerException.Message))
+                    {
+                        BP.AddBookingMessage(ACMethodBooking.eResultCodes.TransactionError, e.InnerException.Message);
+                    }
+                    acMethodEventArgs =  new ACMethodEventArgs(BP, Global.ACMethodResultState.Failed);
+                }
+                finally
+                {
+                    if (performanceEvent != null)
+                    {
+                        if (vbDump != null)
+                            vbDump.PerfLoggerStop("\\LocalServiceObjects\\FacilityManager!BookFacility", 100, performanceEvent);
+                        else
+                        {
+                            performanceEvent.Stop();
+                            performanceEvent.CalculateTimeout(vbDump != null ? vbDump.PerfTimeoutStackTrace : 2000);
+                        }
+                        if (performanceEvent.IsTimedOut)
+                        {
+                            string bpSerialized = ACConvert.ObjectToXML(BP, true);
+                            Messages.LogDebug("\\LocalServiceObjects\\FacilityManager", "BookFacility(Duration)", bpSerialized);
+                        }
+                    }
+                }
+
+                result.Add(BP, acMethodEventArgs);
+            }
+
+            dbApp.PreventOnContextACChangesExecuted = false;
+
+            return result;
         }
 
 

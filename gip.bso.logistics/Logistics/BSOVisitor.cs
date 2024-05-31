@@ -638,7 +638,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the visitor card OK.
         /// </summary>
-        [ACMethodCommand("NewACClass", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("NewACClass", Const.Ok, (short)MISort.Okay)]
         public void AssignVisitorCardOK()
         {
             CloseTopDialog();
@@ -661,7 +661,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the visitor card cancel.
         /// </summary>
-        [ACMethodCommand("NewACClass", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("NewACClass", Const.Cancel, (short)MISort.Cancel)]
         public void AssignVisitorCardCancel()
         {
             CloseTopDialog();
@@ -709,7 +709,7 @@ namespace gip.bso.logistics
             return DialogResult;
         }
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -718,7 +718,7 @@ namespace gip.bso.logistics
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             Delete();

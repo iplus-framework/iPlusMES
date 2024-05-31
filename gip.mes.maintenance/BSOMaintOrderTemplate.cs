@@ -689,6 +689,12 @@ namespace gip.mes.maintenance
             return true;
         }
 
+        protected override void OnPostSave()
+        {
+            base.OnPostSave();
+            RefreshOnSave();
+        }
+
         [ACMethodInfo("", "en{'Next'}de{'Weiter'}", 9999, true)]
         public void WizzardNext()
         {
@@ -733,7 +739,6 @@ namespace gip.mes.maintenance
 
             else if (CurrentWizzardStep == MaintenanceWizzardStepsEnum.Task)
             {
-
                 CurrentWizzardStep = MaintenanceWizzardStepsEnum.Performer;
             }
             else if (CurrentWizzardStep == MaintenanceWizzardStepsEnum.Performer)
@@ -749,6 +754,7 @@ namespace gip.mes.maintenance
 
                 AccessPrimary.NavList.Add(CurrentMaintOrder);
                 OnPropertyChanged(nameof(MaintOrderList));
+                RefreshOnSave();
             }
         }
 
@@ -1177,18 +1183,8 @@ namespace gip.mes.maintenance
 
         private void RefreshOnSave(bool forceRefresh = false)
         {
-            //if (_IsRefreshNeeded || forceRefresh)
-            //{
-            //    if (ComponentSelector != null)
-            //    {
-            //        ACClassInfoWithItems root = ComponentSelector.ACUrlCommand("CurrentProjectItemRoot") as ACClassInfoWithItems;
-            //        if (root != null)
-            //        {
-            //            CheckIcons(root);
-            //        }
-            //    }
-            //    _IsRefreshNeeded = false;
-            //}
+            if (MaintServices != null)
+                MaintServices.ForEach(c => c.ValueT.ExecuteMethod(nameof(ACMaintService.RebuildMaintCache)));
         }
 
         private void FacilityExplorer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -547,7 +547,7 @@ namespace gip.mes.facility
 
                 PostingBehaviourEnum postingBehaviour = BP.ParamsAdjusted.PostingBehaviour;
                 // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
-                if (   postingBehaviour == PostingBehaviourEnum.ZeroStockOnRelocation
+                if (postingBehaviour == PostingBehaviourEnum.ZeroStockOnRelocation
                     || postingBehaviour == PostingBehaviourEnum.ZeroStockOnProduction
                     || postingBehaviour == PostingBehaviourEnum.ZeroStockOnProductionIfNoBOMUsage
                     || postingBehaviour == PostingBehaviourEnum.ZeroStockAlways)
@@ -611,7 +611,7 @@ namespace gip.mes.facility
             return bookingResult;
         }
 
-        
+
         #region Booking on Lot-Managed Materials / Entity-Combinations
         /// <summary>
         /// 1. [FacilityCharge]:                           
@@ -1019,9 +1019,9 @@ namespace gip.mes.facility
                 /// Local.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
                 int nCount = 0;
                 Guid? guidNull = null;
-                nCount = s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(BP.DatabaseApp, 
-                                BP.ParamsAdjusted.InwardFacilityLocation.FacilityID, 
-                                BP.ParamsAdjusted.InwardMaterial.MaterialID, 
+                nCount = s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                BP.ParamsAdjusted.InwardFacilityLocation.FacilityID,
+                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
                                 BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
                                 false)
@@ -1347,7 +1347,7 @@ namespace gip.mes.facility
                     {
                         // Falls FacilityChargen vorhanden sind
                         // Autokorrektur Belegung mit Local-Material wenn Erlaubt (Aus Konfig-Parameter und FacilityChargen-Plausibilität)
-                        bookingResult = SetMaterialAssignmentOnFacility(BP, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardMaterial, 
+                        bookingResult = SetMaterialAssignmentOnFacility(BP, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardMaterial,
                                                                         BP.ParamsAdjusted.InwardPartslist);
                         if (bookingResult != Global.ACMethodResultState.Succeeded)
                             return bookingResult;
@@ -1362,7 +1362,7 @@ namespace gip.mes.facility
                         return Global.ACMethodResultState.Notpossible;
                     }
                     // Belegung mit Local-Material (Local MAterial wird aus FacilityLot gebildet, wenn übergeben) stimmen (Check wurde bereits durch Aufruf von CheckAndAdjustFacility() gemacht!)
-                    if (!Material.IsMaterialEqual(BP.ParamsAdjusted.InwardFacility.Material,BP.ParamsAdjusted.InwardMaterial))
+                    if (!Material.IsMaterialEqual(BP.ParamsAdjusted.InwardFacility.Material, BP.ParamsAdjusted.InwardMaterial))
                     {
                         BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                             Root.Environment.TranslateMessage(this, "Error00090",
@@ -1417,7 +1417,7 @@ namespace gip.mes.facility
                     {
                         Guid? guidNull = null;
 
-                        if (BP.MDZeroStockState != null && (BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility 
+                        if (BP.MDZeroStockState != null && (BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility
                                                          || BP.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable))
                         {
                             facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_LastAvailable(BP.DatabaseApp,
@@ -1478,7 +1478,7 @@ namespace gip.mes.facility
                     {
                         // Falls FacilityChargen vorhanden sind
                         // Autokorrektur Belegung mit Local-Material wenn Erlaubt (Aus Konfig-Parameter und FacilityChargen-Plausibilität)
-                        bookingResult = SetMaterialAssignmentOnFacility(BP, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardMaterial, 
+                        bookingResult = SetMaterialAssignmentOnFacility(BP, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardMaterial,
                                                                         BP.ParamsAdjusted.OutwardPartslist);
                         if (bookingResult != Global.ACMethodResultState.Succeeded)
                             return bookingResult;
@@ -1493,7 +1493,7 @@ namespace gip.mes.facility
                         return Global.ACMethodResultState.Notpossible;
                     }
                     // Belegung mit Local-Material (Local MAterial wird aus FacilityLot gebildet, wenn übergeben) stimmen (Check wurde bereits durch Aufruf von CheckAndAdjustFacility() gemacht!)
-                    if (!Material.IsMaterialEqual(BP.ParamsAdjusted.OutwardFacility.Material,BP.ParamsAdjusted.OutwardMaterial))
+                    if (!Material.IsMaterialEqual(BP.ParamsAdjusted.OutwardFacility.Material, BP.ParamsAdjusted.OutwardMaterial))
                     {
                         BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                             Root.Environment.TranslateMessage(this, "Error00104",
@@ -1738,14 +1738,30 @@ namespace gip.mes.facility
 
                         // Falls Nullbestand und die Summe der Facility-Charge-Abbuchungen nicht dazu geführt haben, dass der Facility-Bestand 0 ergibt,
                         // setze Facility-Bestand auf 0
+                        // #iP-T-24-05-08-002
+                        // LeaveMaterialOccupation
                         if ((BP.ParamsAdjusted.MDZeroStockState != null)
                                 && ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.BookToZeroStock)
                                     || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable)))
                         {
+                            Facility facility = BP.InwardFacility;
+
+                            if (facility != null && !facility.ShouldLeaveMaterialOccupation)
+                            {
+                                bool isFacilityInUse = CheckIsFacilityInUse(facility);
+                                if (!isFacilityInUse)
+                                {
+                                    facility.Material = null;
+                                    facility.Partslist = null;
+                                }
+                            }
+
                             if (BP.ParamsAdjusted.InwardFacility.CurrentFacilityStock != null)
                             {
                                 if (Math.Abs(0 - BP.ParamsAdjusted.InwardFacility.CurrentFacilityStock.StockQuantity) > Double.Epsilon)
+                                {
                                     BP.ParamsAdjusted.InwardFacility.CurrentFacilityStock.StockQuantity = 0;
+                                }
                             }
                         }
 
@@ -1835,17 +1851,32 @@ namespace gip.mes.facility
 
                         // Falls Nullbestand und die Summe der Facility-Charge-Abbuchungen nicht dazu geführt haben, dass der Facility-Bestand 0 ergibt,
                         // setze Facility-Bestand auf 0
+                        // #iP-T-24-05-08-002
+                        // LeaveMaterialOccupation
                         if ((BP.ParamsAdjusted.MDZeroStockState != null)
                                 && ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.BookToZeroStock)
                                     || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable)))
                         {
+                            Facility facility = BP.InwardFacility;
+
+                            if (facility != null && !facility.ShouldLeaveMaterialOccupation)
+                            {
+                                bool isFacilityInUse = CheckIsFacilityInUse(facility);
+                                if(!isFacilityInUse)
+                                {
+                                    facility.Material = null;
+                                    facility.Partslist = null;
+                                }
+                            }
+
                             if (BP.ParamsAdjusted.OutwardFacility.CurrentFacilityStock != null)
                             {
                                 if (Math.Abs(0 - BP.ParamsAdjusted.OutwardFacility.CurrentFacilityStock.StockQuantity) > Double.Epsilon)
+                                {
                                     BP.ParamsAdjusted.OutwardFacility.CurrentFacilityStock.StockQuantity = 0;
+                                }
                             }
                         }
-
                     }
                 }
             }
@@ -2104,10 +2135,10 @@ namespace gip.mes.facility
                 return Global.ACMethodResultState.Failed;
             if (BP.OutwardFacilityLot != null)
             {
-                if (!s_cQry_FCList_Lot_ProdMat_NotAvailable(BP.DatabaseApp, 
-                    BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID, 
-                    BP.ParamsAdjusted.OutwardMaterial.MaterialID, 
-                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID, 
+                if (!s_cQry_FCList_Lot_ProdMat_NotAvailable(BP.DatabaseApp,
+                    BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                    BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
                     false).Any())
                 {
                     return Global.ACMethodResultState.Failed;
@@ -2170,10 +2201,10 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Local.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                if (!s_cQry_FCList_FacLoc_ProdMat_NotAvailable(BP.DatabaseApp, 
-                    BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID, 
-                    BP.ParamsAdjusted.OutwardMaterial.MaterialID, 
-                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID, 
+                if (!s_cQry_FCList_FacLoc_ProdMat_NotAvailable(BP.DatabaseApp,
+                    BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID,
+                    BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
                     false)
                     .Any())
                 {
@@ -2264,7 +2295,7 @@ namespace gip.mes.facility
 
             if (queryRelationsForRetrogPosting == null || !queryRelationsForRetrogPosting.Any())
                 return Global.ACMethodResultState.Succeeded;
-            
+
             ACComponent workplace = null;
             core.datamodel.ACClass workplaceClass = null;
             if (!String.IsNullOrEmpty(BP.PropertyACUrl))
@@ -2333,7 +2364,7 @@ namespace gip.mes.facility
 
                             ProdOrder prodOrder = relationForRPost?.SourceProdOrderPartslistPos?.ProdOrderPartslist?.ProdOrder;
                             ProdOrderPartslist plMat = prodOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID);
-                            
+
                             if (plMat != null && !relationForRPost.SourceProdOrderPartslistPos.TakeMatFromOtherOrder)
                             {
                                 facilityOutwardChargeSubList = new FacilityChargeList(facilityOutwardChargeSubList.Where(c => c.ProdOrderProgramNo == prodOrder.ProgramNo), BP);
@@ -2478,8 +2509,8 @@ namespace gip.mes.facility
                     .FirstOrDefault();
             }
 
-            if (   posForInwardPosting != null 
-                && posForInwardPosting.ProdOrderBatchID.HasValue 
+            if (posForInwardPosting != null
+                && posForInwardPosting.ProdOrderBatchID.HasValue
                 && posForInwardPosting.ProdOrderBatchID == BP.PartslistPosRelation.ProdOrderBatchID
                 && posForInwardPosting.ProdOrderBatch.ProdOrderBatchPlanID.HasValue)
             {
@@ -2493,7 +2524,7 @@ namespace gip.mes.facility
                     if (plannedDestinations != null && plannedDestinations.Any())
                     {
                         FacilityReservation facilityReservation = GetNextFreeDestination(plannedDestinations, posForInwardPosting, false, null);
-                        if (facilityReservation != null 
+                        if (facilityReservation != null
                             && (!posForInwardPosting.BookingMaterial.IsLotManaged || posForInwardPosting.FacilityLot != null))
                         {
                             //PerformAnterogradePosting
@@ -2552,7 +2583,7 @@ namespace gip.mes.facility
             return null;
         }
 
-        protected virtual bool CheckPlannedDestination(FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, 
+        protected virtual bool CheckPlannedDestination(FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos,
             bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
         {
             if (plannedSilo == null || (ignoreFullSilo != null && ignoreFullSilo == plannedSilo))
@@ -2605,7 +2636,7 @@ namespace gip.mes.facility
             return false;
         }
 
-        public ACMethodBooking NewBookParamInwardMovement(ACMethodBooking BP, DatabaseApp dbApp, ProdOrderPartslistPos batchPos, 
+        public ACMethodBooking NewBookParamInwardMovement(ACMethodBooking BP, DatabaseApp dbApp, ProdOrderPartslistPos batchPos,
                                                         double postingQuantity, Facility inwardFacility, FacilityLot facilityLot)
         {
             ACMethodBooking inwardMethod = GetBookParamInwardMovementClone();
@@ -2619,7 +2650,7 @@ namespace gip.mes.facility
             inwardMethod.InwardFacilityLot = facilityLot;
             inwardMethod.Database = dbApp;
             inwardMethod.CheckAndAdjustPropertiesForBooking(dbApp);
-            if(BP != null)
+            if (BP != null)
             {
                 inwardMethod.AutoRefresh = BP.AutoRefresh;
             }
@@ -2642,6 +2673,32 @@ namespace gip.mes.facility
             }
         }
 
+        #endregion
+
+        #region Check is Facility in use
+        public bool CheckIsFacilityInUse(Facility facility)
+        {
+            bool isFacilityInUse = false;
+            if (facility != null && facility.FacilityACClass != null)
+            {
+                string url = facility.FacilityACClass.GetACUrlComponent();
+                if (!String.IsNullOrEmpty(url))
+                {
+                    ACComponent component = ACUrlCommand(url) as ACComponent;
+                    if(component != null && component.ConnectionState != ACObjectConnectionState.DisConnected)
+                    {
+                        object result = component.ACUrlCommand("!IsDischargingToThisSiloActive", null);
+                        if (result != null
+                            && result is string[]
+                            && (result as string[]).Any())
+                        {
+                            isFacilityInUse = true;
+                        }
+                    }
+                }
+            }
+            return isFacilityInUse;
+        }
         #endregion
     }
 }

@@ -193,6 +193,7 @@
         public const string Number = "en{'No.'}de{'Nr.'}";
 
         public const string Facility = "en{'Storage Bin'}de{'Lagerplatz'}";
+        public const string LeaveMaterialOccupation = "en{'Leave Material Occupation on zero posting'}de{'Materialbelegung belassen bei Leerbuchung'}";
         public const string FacilityMaterial = "en{'Storage Bin Material'}de{'Lagerplatz Material'}";
         public const string FacilityMDSchedulingGroup = "en{'Storage Bin Scheduling Group'}de{'Lagerplatz Scheduling Group'}";
         public const string FacilityNo = "en{'Storage Bin No.'}de{'Lagerplatznummer'}";
@@ -314,6 +315,9 @@
         public const string UOM_ISOCode_g = "GRM";
         public const string UOM_ISOCode_kg = "KGM";
         public const string UOM_ISOCode_t = "TNE";
+
+
+        public const string PrefParam = "en{'Preferred parameters'}de{'Bevorzugte Parameter'}";
 
         #region BSO Dialog Names
 

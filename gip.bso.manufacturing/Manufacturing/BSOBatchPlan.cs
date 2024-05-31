@@ -714,6 +714,36 @@ namespace gip.bso.manufacturing
                SelectedIntermediate, SelectedBatchPlanForIntermediate, CurrentConfigACUrl,
                ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
             }
+
+            if (currentProdOrderPartslist != null && SelectedBatchPlanForIntermediate != null && VBCurrentACClassWF != null && result != null && result.Any())
+            {
+                FacilityReservation[] relatedReservations =
+                        DatabaseApp
+                        .FacilityReservation
+                        .Where(c =>
+                            c.VBiACClassID != null
+                            && c.ProdOrderBatchPlan != null
+                            && c.ProdOrderBatchPlan.VBiACClassWFID != null
+                            && c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrderID != currentProdOrderPartslist.ProdOrderID
+                            && c.ProdOrderBatchPlan.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.InProduction
+                         )
+                        .ToArray();
+
+                if (relatedReservations.Any())
+                {
+                    foreach (POPartslistPosReservation item in result)
+                    {
+                        var relatedProdOrderNos = relatedReservations
+                            .Where(c => c.VBiACClassID == item.Module?.ACClassID)
+                            .Select(c => c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo)
+                            .Distinct()
+                            .OrderBy(c => c);
+
+                        item.ConnectedOrders = string.Join(",", relatedProdOrderNos);
+                    }
+                }
+            }
+
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
         }
@@ -978,7 +1008,7 @@ namespace gip.bso.manufacturing
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -988,7 +1018,7 @@ namespace gip.bso.manufacturing
             SelectedAppManager = selected;
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();

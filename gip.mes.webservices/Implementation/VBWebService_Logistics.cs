@@ -464,7 +464,7 @@ namespace gip.mes.webservices
                 .Include("OutwardFacilityCharge.FacilityLot")
 
                 // Where cause
-                .Where(fbc => 
+                .Where(fbc =>
                             fbc.PickingPosID == pickingPos.PickingPosID
                             || (pickingPos.InOrderPosID.HasValue && fbc.InOrderPosID == pickingPos.InOrderPosID)
                             || (pickingPos.OutOrderPosID.HasValue && fbc.OutOrderPosID == pickingPos.OutOrderPosID))
@@ -598,10 +598,7 @@ namespace gip.mes.webservices
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "ACPickingManager == null || ACInDeliveryNoteManager == null || ACOutDeliveryNoteManager == null || FacilityManager == null"));
 
 
-                    DeliveryNote deliveryNote = null;
-                    InOrder inOrder = null;
-                    OutOrder outOrder = null;
-                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, out deliveryNote, out inOrder, out outOrder, false);
+                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, false);
                 }
             }
             catch (Exception e)
@@ -651,10 +648,7 @@ namespace gip.mes.webservices
                     if (pickingManger == null || inDeliveryNoteManager == null || outDeliveryNoteManager == null || facManager == null)
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "ACPickingManager == null || ACInDeliveryNoteManager == null || ACOutDeliveryNoteManager == null || FacilityManager == null"));
 
-                    DeliveryNote deliveryNote = null;
-                    InOrder inOrder = null;
-                    OutOrder outOrder = null;
-                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, out deliveryNote, out inOrder, out outOrder, true);
+                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, true);
                 }
             }
             catch (Exception e)
@@ -700,15 +694,11 @@ namespace gip.mes.webservices
 
                     foreach (datamodel.Picking picking in pickings)
                     {
-                        DeliveryNote deliveryNote = null;
-                        InOrder inOrder = null;
-                        OutOrder outOrder = null;
-                        var result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, 
-                                                               out deliveryNote, out inOrder, out outOrder, false);
+                        MsgWithDetails msgWithDetails = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, false);
 
-                        if (result != null && result.MsgDetailsCount > 0)
+                        if (msgWithDetails != null && msgWithDetails.MsgDetailsCount > 0)
                         {
-                            mainResult.AddDetailMessage(new Msg(eMsgLevel.Error, result.DetailsAsText));
+                            mainResult.AddDetailMessage(new Msg(eMsgLevel.Error, msgWithDetails.DetailsAsText));
                         }
                     }
 
@@ -746,7 +736,7 @@ namespace gip.mes.webservices
 
             try
             {
-                using(Database db = new Database())
+                using (Database db = new Database())
                 using (DatabaseApp dbApp = new DatabaseApp(db))
                 {
                     var subResponse = SetDatabaseUserName<MsgWithDetails>(dbApp);
@@ -768,7 +758,7 @@ namespace gip.mes.webservices
                     if (picking.PickingType != GlobalApp.PickingType.Issue)
                     {
                         //Error50546 :This picking option is only available for a issue.
-                        var msg = new Msg(pickingManger, eMsgLevel.Error, nameof(ACPickingManager), nameof(BookAndFinishPickingOrder)+"(10)", 688, "Error50546");
+                        var msg = new Msg(pickingManger, eMsgLevel.Error, nameof(ACPickingManager), nameof(BookAndFinishPickingOrder) + "(10)", 688, "Error50546");
                         return new WSResponse<MsgWithDetails>(null, msg);
                     }
 
@@ -834,10 +824,7 @@ namespace gip.mes.webservices
                         return new WSResponse<MsgWithDetails>(result);
                     }
 
-                    DeliveryNote deliveryNote = null;
-                    InOrder inOrder = null;
-                    OutOrder outOrder = null;
-                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, out deliveryNote, out inOrder, out outOrder, false);
+                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, false);
                 }
             }
             catch (Exception e)

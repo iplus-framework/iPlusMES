@@ -153,7 +153,7 @@ namespace gip.mes.processapplication
                     if (EndProdOrderPartslistMode > EndPListMode.DoNothing)
                         picking.PickingState = PickingStateEnum.Finished;
                     else
-                        picking.PickingState = PickingStateEnum.InProcess;
+                        picking.PickingState = PickingStateEnum.WaitOnManualClosing;
                     dbApp.ACSaveChanges();
                 }
                 else if (pFirstReadyToLoad != null)

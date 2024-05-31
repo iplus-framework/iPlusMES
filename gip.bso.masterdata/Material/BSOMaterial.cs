@@ -1145,7 +1145,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the unit conversion OK.
         /// </summary>
-        [ACMethodCommand("NewMaterialUnit", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("NewMaterialUnit", Const.Ok, (short)MISort.Okay)]
         public void NewMaterialUnitOK()
         {
             CloseTopDialog();
@@ -1174,7 +1174,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the unit conversion cancel.
         /// </summary>
-        [ACMethodCommand("NewMaterialUnit", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("NewMaterialUnit", Const.Cancel, (short)MISort.Cancel)]
         public void NewMaterialUnitCancel()
         {
             CloseTopDialog();

@@ -8,6 +8,8 @@ using gip.core.autocomponent;
 using gip.core.manager;
 using gip.mes.facility;
 using gip.mes.processapplication;
+using System.Reflection;
+using System.Windows.Controls;
 
 namespace gip.bso.logistics
 {
@@ -685,10 +687,42 @@ namespace gip.bso.logistics
             PickingPos pickingPos = CurrentPickingPos;
             if (currentPicking != null && PickingManager != null)
             {
-               result = PickingManager.GetTargets(DatabaseApp, VarioConfigManager, RoutingService, VBCurrentACClassWF,
-               currentPicking, pickingPos, CurrentConfigACUrl,               
-               ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
+                result = PickingManager.GetTargets(DatabaseApp, VarioConfigManager, RoutingService, VBCurrentACClassWF,
+                currentPicking, pickingPos, CurrentConfigACUrl,
+                ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
             }
+
+            if (CurrentPicking != null && VBCurrentACClassWF != null && result != null && result.Any())
+            {
+
+                FacilityReservation[] relatedReservations =
+                        DatabaseApp
+                        .FacilityReservation
+                        .Where(c =>
+                            c.VBiACClassID != null
+                            && c.PickingPos != null
+                            && c.PickingPos.Picking.PickingStateIndex <= (short)PickingStateEnum.InProcess
+                            && c.PickingPos.Picking.VBiACClassWFID != null
+                            && c.PickingPos.Picking.VBiACClassWFID == VBCurrentACClassWF.ACClassWFID
+                            && c.PickingPos.Picking.PickingID != CurrentPicking.PickingID
+                         )
+                        .ToArray();
+
+                if(relatedReservations.Any())
+                {
+                    foreach (POPartslistPosReservation item in result)
+                    {
+                        var relatedPickingNos = relatedReservations
+                            .Where(c => c.VBiACClassID == item.Module?.ACClassID)
+                            .Select(c => c.PickingPos.Picking.PickingNo)
+                            .Distinct()
+                            .OrderBy(c => c);
+
+                        item.ConnectedOrders = string.Join(",", relatedPickingNos);
+                    }
+                }
+            }
+
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
         }
@@ -729,7 +763,7 @@ namespace gip.bso.logistics
         [ACMethodCommand("", "en{'Start Workflow'}de{'Starte Workflow'}", (short)MISort.Start)]
         public void StartWorkflow()
         {
-            if (!IsEnabledStartWorkflow()) 
+            if (!IsEnabledStartWorkflow())
                 return;
             //_IsStartingBatchPlan = true;
             try
@@ -857,7 +891,7 @@ namespace gip.bso.logistics
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -867,7 +901,7 @@ namespace gip.bso.logistics
             SelectedAppManager = selected;
         }
 
-        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
