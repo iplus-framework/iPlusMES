@@ -356,6 +356,13 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<short>(ref _ClassCode, value); }
     }
 
+    bool? _LeaveMaterialOccupation;
+    public bool? LeaveMaterialOccupation 
+    {
+        get { return _LeaveMaterialOccupation; }
+        set { SetProperty<bool?>(ref _LeaveMaterialOccupation, value); }
+    }
+
     private Company _Company;
     public virtual Company Company
     { 

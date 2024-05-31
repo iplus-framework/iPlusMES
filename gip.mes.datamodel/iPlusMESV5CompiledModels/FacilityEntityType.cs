@@ -200,6 +200,14 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Facility).GetField("_LastFCSortNoReverse", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
             lastFCSortNoReverse.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var leaveMaterialOccupation = runtimeEntityType.AddProperty(
+                "LeaveMaterialOccupation",
+                typeof(bool?),
+                propertyInfo: typeof(Facility).GetProperty("LeaveMaterialOccupation", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Facility).GetField("_LeaveMaterialOccupation", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            leaveMaterialOccupation.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var lockedFacilityID = runtimeEntityType.AddProperty(
                 "LockedFacilityID",
                 typeof(Guid?),
