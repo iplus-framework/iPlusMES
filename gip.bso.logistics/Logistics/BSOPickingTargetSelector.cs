@@ -9,7 +9,6 @@ using gip.core.manager;
 using gip.mes.facility;
 using gip.mes.processapplication;
 using System.Reflection;
-using System.Windows.Controls;
 
 namespace gip.bso.logistics
 {
