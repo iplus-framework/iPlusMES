@@ -481,7 +481,7 @@ namespace gip.mes.processapplication
             return false;
         }
 
-        private IEnumerable<FacilityCharge> GetFacilityChargesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos)
+        protected virtual IEnumerable<FacilityCharge> GetFacilityChargesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos)
         {
             QrySilosResult qrySilosResult = null;
             IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> result = GetAvailableFacilitiesForMaterialPicking(dbApp, pickingPos, out qrySilosResult).ToArray();
@@ -495,7 +495,7 @@ namespace gip.mes.processapplication
             //return ACFacilityManager.ManualWeighingFacilityChargeListQuery(dbApp, facilities, pickingPos.Material.MaterialID);
         }
 
-        public IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> GetAvailableFacilitiesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos, out QrySilosResult qrySilosResult)
+        public virtual IEnumerable<facility.ACPartslistManager.QrySilosResult.FacilitySumByLots> GetAvailableFacilitiesForMaterialPicking(DatabaseApp dbApp, PickingPos pickingPos, out QrySilosResult qrySilosResult)
         {
             if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PickingManager == null)
             {
