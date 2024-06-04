@@ -126,7 +126,7 @@ namespace gip.bso.facility
         #region Properties -> Filter -> Inventory
 
         private DateTime _FilterInventoryStartDate;
-        [ACPropertyInfo(90, "FilterInventoryStartDate", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(90, "FilterInventoryStartDate", Const.From)]
         public DateTime FilterInventoryStartDate
         {
             get
