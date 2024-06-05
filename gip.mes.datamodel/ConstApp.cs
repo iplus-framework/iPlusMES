@@ -199,6 +199,7 @@
         public const string FacilityNo = "en{'Storage Bin No.'}de{'Lagerplatznummer'}";
         public const string FacilityStock = "en{'Stock'}de{'Lagerbestand'}";
         public const string FacilityReservation = "en{'Reservation'}de{'Reservierung'}";
+        public const string SiloTitleMode = "en{'Silo title mode'}de{'Silo title mode'}";
 
         public const string Material = "en{'Material'}de{'Material'}";
         public const string MaterialNo = "en{'Material No.'}de{'Material-Nr.'}";
