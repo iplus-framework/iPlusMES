@@ -1317,7 +1317,7 @@ namespace gip.bso.logistics
 
         public virtual bool IsEnabledFinishOrder()
         {
-            return CurrentPicking != null && CurrentPicking.PickingStateIndex < (short)PickingStateEnum.Finished;
+            return CurrentPicking != null && (CurrentPicking.PickingState < PickingStateEnum.Finished || CurrentPicking.PickingState == PickingStateEnum.WaitOnManualClosing);
         }
 
         #endregion
