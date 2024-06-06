@@ -40,6 +40,7 @@ namespace gip.mes.facility
             _BookingParameterQuantityIsAbsolute = new ACPropertyConfigValue<bool>(this, "BookingParameterQuantityIsAbsolute", false);
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
             _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
+            _SiloTitleMode = new ACPropertyConfigValue<SiloTitleModeEnum>(this, nameof(SiloTitleMode), SiloTitleModeEnum.DoNothing);
             CreateModuleConstants();
         }
 
@@ -384,6 +385,20 @@ namespace gip.mes.facility
         {
             get { return _RootStoreForVehicles.ValueT; }
             set { _RootStoreForVehicles.ValueT = value; }
+        }
+
+        private ACPropertyConfigValue<SiloTitleModeEnum> _SiloTitleMode;
+        [ACPropertyConfig(ConstApp.SiloTitleMode)]
+        public SiloTitleModeEnum SiloTitleMode
+        {
+            get
+            {
+                return _SiloTitleMode.ValueT;
+            }
+            set
+            {
+                _SiloTitleMode.ValueT = value;
+            }
         }
 
         public Facility GetRootStoreForVehicles(DatabaseApp dbApp)

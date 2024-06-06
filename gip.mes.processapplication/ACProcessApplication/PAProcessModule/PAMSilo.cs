@@ -62,13 +62,14 @@ namespace gip.mes.processapplication
         }
 
 
-        public PAMSilo(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public PAMSilo(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
             _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
-            _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, "InvertMatSensorValue", true);
-            _LeaveMaterialOccupation = new ACPropertyConfigValue<bool>(this, "LeaveMaterialOccupation", false);
+            _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, nameof(InvertMatSensorValue), true);
+            _LeaveMaterialOccupation = new ACPropertyConfigValue<bool>(this, nameof(LeaveMaterialOccupation), false);
+            _SiloTitleMode = new ACPropertyConfigValue<SiloTitleModeEnum>(this, nameof(SiloTitleMode), SiloTitleModeEnum.DoNothing);
             _Dimensions = new ACPropertyConfigValue<string>(this, nameof(Dimensions), "");
         }
 
@@ -161,7 +162,7 @@ namespace gip.mes.processapplication
             if (FillLevelRaw != null)
                 (FillLevelRaw as IACPropertyNetTarget).ValueUpdatedOnReceival += ChildProperties_ValueUpdatedOnReceival;
 
-            bool result =  base.ACPostInit();
+            bool result = base.ACPostInit();
 
             //CurrentTransportFunction = null;
 
@@ -252,6 +253,40 @@ namespace gip.mes.processapplication
             }
         }
 
+        private ACPropertyConfigValue<SiloTitleModeEnum> _SiloTitleMode;
+        [ACPropertyConfig(ConstApp.SiloTitleMode)]
+        public SiloTitleModeEnum SiloTitleMode
+        {
+            get
+            {
+                return _SiloTitleMode.ValueT;
+            }
+            set
+            {
+                _SiloTitleMode.ValueT = value;
+            }
+        }
+
+        public SiloTitleModeEnum? _SiloTitleModeCalc;
+        public SiloTitleModeEnum SiloTitleModeCalc
+        {
+            get
+            {
+                if (_SiloTitleModeCalc == null)
+                {
+                    _SiloTitleModeCalc = SiloTitleMode;
+                    if (_SiloTitleModeCalc == SiloTitleModeEnum.DoNothing)
+                    {
+                        FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
+                        if (facManager != null)
+                        {
+                            _SiloTitleModeCalc = facManager.SiloTitleMode;
+                        }
+                    }
+                }
+                return _SiloTitleModeCalc.Value;
+            }
+        }
 
         public const string C_DimLength_1 = "L1";
         public const string C_DimWidth_1 = "W1";
@@ -318,7 +353,7 @@ namespace gip.mes.processapplication
         {
             get
             {
-                if (   MatSensorFilling == null
+                if (MatSensorFilling == null
                     || MatSensorFilling.SensorState == null)
                     return false;
                 if (InvertMatSensorValue)
@@ -428,8 +463,8 @@ namespace gip.mes.processapplication
                 }
             }
         }
-        
-        
+
+
         public IEnumerable<IPAFuncScaleConfig> CurrentScaleFunctions
         {
             get
@@ -555,7 +590,7 @@ namespace gip.mes.processapplication
                 return FillLevel.ValueT - FillLevelScale.ValueT;
             }
         }
-        
+
         [ACPropertyBindingSource(450, "Error", "en{'Validation error'}de{'Validierungsfehler'}", "", false, false)]
         public IACContainerTNet<PANotifyState> ValidationError { get; set; }
         public const string PropNameValidationError = "ValidationError";
@@ -604,7 +639,6 @@ namespace gip.mes.processapplication
 
         #endregion
 
-
         #region Methods
 
         #region Execute-Helper-Handlers
@@ -638,7 +672,7 @@ namespace gip.mes.processapplication
                     result = IsDosingActiveFromThisSilo();
                     return true;
                 case nameof(CalculateFillingVolume):
-                    result = CalculateFillingVolume((double[]) acParameter[0], acParameter[1] as Dictionary<string, double>);
+                    result = CalculateFillingVolume((double[])acParameter[0], acParameter[1] as Dictionary<string, double>);
                     return true;
                 case nameof(CalculateFillingWeight):
                     result = CalculateFillingWeight((double[])acParameter[0], acParameter[1] as Dictionary<string, double>);
@@ -800,7 +834,7 @@ namespace gip.mes.processapplication
                 return;
             if (this.ApplicationManager.ApplicationQueue != null)
             {
-                this.ApplicationManager.ApplicationQueue.Add(() => 
+                this.ApplicationManager.ApplicationQueue.Add(() =>
                 {
                     UnSubscribeAllTransportFunctions();
                     List<PAFDosing> dosings = RebuildDosingsFromThisSilo();
@@ -959,11 +993,11 @@ namespace gip.mes.processapplication
         protected virtual void OnBuildMaterialInfo(Facility facilitySilo)
         {
             Material material = null;
-            RootDbOpQueue.AppContextQueue.ProcessAction(() =>                
+            RootDbOpQueue.AppContextQueue.ProcessAction(() =>
             {
                 try
                 {
-                    material = facilitySilo.Material;
+                    material = GetFacilitySiloMaterial(facilitySilo, SiloTitleModeCalc);
                 }
                 catch (Exception qEx)
                 {
@@ -983,6 +1017,56 @@ namespace gip.mes.processapplication
                 _CurrentDensity = 0.0;
             }
             OnRecalculateFillingWeight();
+        }
+
+        protected virtual Material GetFacilitySiloMaterial(Facility facilitySilo, SiloTitleModeEnum siloTitleMode)
+        {
+            Material material = null;
+
+            if (siloTitleMode == SiloTitleModeEnum.DoNothing)
+            {
+                // use declared material for facility
+                material = facilitySilo.Material;
+            }
+            else
+            {
+                using (DatabaseApp databaseApp = new DatabaseApp())
+                {
+                    var quants = s_cQry_Quants(databaseApp, facilitySilo.FacilityID);
+                    FacilityCharge lastQuant = quants.FirstOrDefault();
+                    if (lastQuant != null)
+                    {
+                        FacilityBookingCharge lastProductionFbc = lastQuant.FacilityBookingCharge_InwardFacilityCharge.Where(c => c.ProdOrderPartslistPos != null).FirstOrDefault();
+                        if (lastProductionFbc != null)
+                        {
+                            if (siloTitleMode == SiloTitleModeEnum.ShowPartslistMaterial)
+                            {
+                                // SiloTitleModeEnum.ShowPartslistMaterial - use current partslist product nameSiloTitleModeEnum.ShowPartslistMaterial
+                                material = lastProductionFbc.ProdOrderPartslistPos?.ProdOrderPartslist?.Partslist?.Material;
+                            }
+                            else if (siloTitleMode == SiloTitleModeEnum.ShowProductMaterial)
+                            {
+                                // SiloTitleModeEnum.ShowPartslistMaterial - use final partslist product nameSiloTitleModeEnum.ShowPartslistMaterial
+                                ProdOrderPartslist finalPartslist =
+                                lastProductionFbc
+                                .ProdOrderPartslistPos?
+                                .ProdOrderPartslist?
+                                .ProdOrder
+                                .ProdOrderPartslist_ProdOrder
+                                .AsEnumerable()
+                                .Where(c => c.IsFinalProdOrderPartslist)
+                                .FirstOrDefault();
+
+                                if(finalPartslist != null)
+                                {
+                                    material = finalPartslist.Partslist?.Material;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return material;
         }
 
         protected virtual void OnRefreshFacility(Facility facilitySilo, bool preventBroadcast, Guid? fbID)
@@ -1510,7 +1594,7 @@ namespace gip.mes.processapplication
                     // Prüfung nur, wenn nicht herausdosiert wird, weil manchmal der Leerlmelder kommen kann
                     // und wenn nicht erstmalige Zugangsbuchung auf dem Silo und das Material noch nicht angekommen ist, weil der Transport noch läuft.
                     var activeDosings = GetActiveDosingsFromThisSilo();
-                    if (   (activeDosings == null || !activeDosings.Any())
+                    if ((activeDosings == null || !activeDosings.Any())
                         && !(invoker == VSSInvoker.OnRefreshFacility && _LastStock <= 0.00001))
                     {
                         //Error50179: The empty message indicates that the silo {0} is empty, but the stock is higher than the empty tolerance is set.
@@ -1618,8 +1702,8 @@ namespace gip.mes.processapplication
 
         protected virtual void OnRecalculateFillingWeight()
         {
-            if (   HasBoundFillLevelScale 
-                || DictDimensions == null 
+            if (HasBoundFillLevelScale
+                || DictDimensions == null
                 || !DictDimensions.Any()
                 || _CurrentDensity <= double.Epsilon)
                 return;
@@ -1643,8 +1727,8 @@ namespace gip.mes.processapplication
         public virtual double CalculateFillingVolume(double[] measuredFillLevel, Dictionary<string, double> dimensions)
         {
             double volume = 0.0;
-            if (   measuredFillLevel == null 
-                || !measuredFillLevel.Any() 
+            if (measuredFillLevel == null
+                || !measuredFillLevel.Any()
                 || dimensions == null
                 || !dimensions.Any())
                 return volume;
@@ -1662,7 +1746,7 @@ namespace gip.mes.processapplication
                     return GetVolumeOfVerticalCylinder(dimensions[C_DimDiameter_1], h);
             }
             // couboid
-            else if (  dimensions.ContainsKey(C_DimLength_1)
+            else if (dimensions.ContainsKey(C_DimLength_1)
                     && dimensions.ContainsKey(C_DimWidth_1))
             {
                 double l = dimensions[C_DimLength_1];
@@ -1710,7 +1794,7 @@ namespace gip.mes.processapplication
         [ACMethodInfo("Function", "en{'Calculate filling volume [kg]'}de{'Füllvolumen berechnen [kg]'}", 9999)]
         public virtual double CalculateFillingWeight(double[] measuredFillLevel, Dictionary<string, double> dimensions)
         {
-            double volume = (double) ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingVolume), measuredFillLevel, dimensions);
+            double volume = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingVolume), measuredFillLevel, dimensions);
             if (volume > 0.000001)
             {
                 double density = CurrentDensity; // g/dm³
@@ -1738,7 +1822,7 @@ namespace gip.mes.processapplication
                     {
                         ACMethodBooking bookingParam = null;
                         double currentStock = facility.CurrentFacilityStock.StockQuantity;
-                        double currentLevel =  this.FillLevelScale.ValueT;
+                        double currentLevel = this.FillLevelScale.ValueT;
                         double diff = currentLevel - currentStock;
                         if (Math.Abs(diff) <= double.Epsilon)
                             return;
@@ -1771,7 +1855,7 @@ namespace gip.mes.processapplication
         public virtual bool IsEnabledSyncStockWithFillLevelScale()
         {
             double currentLevel = this.FillLevelScale.ValueT;
-            if (   currentLevel <= double.Epsilon
+            if (currentLevel <= double.Epsilon
                 || Facility.ValueT == null
                 || Facility.ValueT.ValueT == null
                )

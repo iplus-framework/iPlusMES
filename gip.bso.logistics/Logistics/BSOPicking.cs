@@ -1225,11 +1225,8 @@ namespace gip.bso.logistics
                     return;
                 AccessPrimary.Current = value;
 
-                if (ProcessWorkflowList != null && ProcessWorkflowList.Any() && value != null && value.ACClassMethodID != null)
-                    SelectedProcessWorkflow = ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == CurrentPicking.ACClassMethodID);
-                else
-                    SelectedProcessWorkflow = null;
-                CurrentProcessWorkflow = SelectedProcessWorkflow;
+                LoadSelectedProcessWorkflow(CurrentPicking);
+                LoadProcessWorkflowPresenter(CurrentPicking);
 
                 OnPropertyChanged(nameof(CurrentPicking));
                 if (value != null && _InLoad)
@@ -2691,7 +2688,7 @@ namespace gip.bso.logistics
             RefreshOutOrderPosList(false);
             RefreshProdOrderPartslistPosList(false);
 
-            LoadProcessWorkflowPresenter();
+            LoadProcessWorkflowPresenter(CurrentPicking);
         }
 
 
@@ -4921,13 +4918,7 @@ namespace gip.bso.logistics
                 if (_SelectedProcessWorkflow != value)
                 {
                     _SelectedProcessWorkflow = value;
-                    if (ProcessWorkflowPresenter != null)
-                    {
-                        if (CurrentPicking != null)
-                        {
-                            LoadProcessWorkflowPresenter();
-                        }
-                    }
+                    LoadProcessWorkflowPresenter(CurrentPicking);
                     OnPropertyChanged(nameof(SelectedProcessWorkflow));
                 }
             }
@@ -5022,17 +5013,29 @@ namespace gip.bso.logistics
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
 
-            LoadProcessWorkflowPresenter();
+            LoadProcessWorkflowPresenter(CurrentPicking);
             CloseTopDialog();
         }
 
-        private void LoadProcessWorkflowPresenter()
+        private void LoadSelectedProcessWorkflow(Picking picking)
+        {
+            if (ProcessWorkflowList != null && ProcessWorkflowList.Any() && picking != null && picking.ACClassMethodID != null)
+            {
+                _SelectedProcessWorkflow = ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == picking.ACClassMethodID);
+            }
+            else
+            {
+                _SelectedProcessWorkflow = null;
+            }
+            OnPropertyChanged(nameof(SelectedProcessWorkflow));
+            CurrentProcessWorkflow = SelectedProcessWorkflow;
+        }
+
+        private void LoadProcessWorkflowPresenter(Picking picking)
         {
             if (ProcessWorkflowPresenter != null)
             {
-                gipCoreData.ACClassMethod method = (CurrentPicking != null && CurrentPicking.ACClassMethod != null) ?
-                                                   CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
-                                                   null;
+                gipCoreData.ACClassMethod method = (picking != null && picking.ACClassMethod != null) ? picking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) : null;
                 ProcessWorkflowPresenter.Load(method);
             }
         }
