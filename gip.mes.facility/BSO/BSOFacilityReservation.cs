@@ -255,10 +255,10 @@ namespace gip.mes.facility
         /// <summary>
         /// Source Property: MethodName
         /// </summary>
-        [ACMethodInfo(nameof(AddFaciltiyReservation), Const.Add, 400)]
-        public void AddFaciltiyReservation()
+        [ACMethodInfo(nameof(AddFacilityReservation), Const.Add, 400, true)]
+        public void AddFacilityReservation()
         {
-            if (!IsEnabledAddFaciltiyReservation())
+            if (!IsEnabledAddFacilityReservation())
                 return;
             double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
             if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
@@ -276,12 +276,12 @@ namespace gip.mes.facility
             else
             {
                 ForReservationQuantityUOM = NeededQuantityUOM;
-                BackgroundWorker.RunWorkerAsync(nameof(AddFaciltiyReservation));
+                BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
                 ShowDialog(this, DesignNameProgressBar);
             }
         }
 
-        public bool IsEnabledAddFaciltiyReservation()
+        public virtual bool IsEnabledAddFacilityReservation()
         {
             return
                 FacilityReservationOwner != null
@@ -291,7 +291,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Source Property: MethodName
         /// </summary>
-        [ACMethodInfo(nameof(RemoveFacilityReservation), Const.Remove, 401)]
+        [ACMethodInfo(nameof(RemoveFacilityReservation), Const.Remove, 401, true)]
         public void RemoveFacilityReservation()
         {
             if (!IsEnabledRemoveFacilityReservation())
@@ -311,7 +311,7 @@ namespace gip.mes.facility
             }
         }
 
-        public bool IsEnabledRemoveFacilityReservation()
+        public virtual bool IsEnabledRemoveFacilityReservation()
         {
             return SelectedFacilityReservation != null;
         }
@@ -803,7 +803,7 @@ namespace gip.mes.facility
                 case nameof(LoadFacilityReservationList):
                     e.Result = GetFacilityReservationList();
                     break;
-                case nameof(AddFaciltiyReservation):
+                case nameof(AddFacilityReservation):
                     e.Result = LoadFacilityLotList(DatabaseApp, Material, FacilityReservationList);
                     break;
             }
@@ -832,7 +832,7 @@ namespace gip.mes.facility
                         List<FacilityReservationModel> reservationModels = e.Result as List<FacilityReservationModel>;
                         LoadFacilityReservationList(reservationModels);
                         break;
-                    case nameof(AddFaciltiyReservation):
+                    case nameof(AddFacilityReservation):
                         List<FacilityReservationModel> reservations = e.Result as List<FacilityReservationModel>;
                         DoFinishLoadFacilityLotList(reservations);
                         if (OnReservationChanged != null)

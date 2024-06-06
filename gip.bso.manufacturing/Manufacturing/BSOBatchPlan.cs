@@ -753,6 +753,23 @@ namespace gip.bso.manufacturing
             return false;
         }
 
+        protected override void _Targets_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            //if (SelectedTarget != null && ProdOrderManager != null)
+            //{
+            //    ProdOrderManager.ValidateChangedPosReservation(this.DatabaseApp, SelectedTarget);
+            //}
+        }
+
+        protected override void _SelectedTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base._SelectedTarget_PropertyChanged(sender, e);
+            if (SelectedTarget != null && ProdOrderManager != null && e != null && e.PropertyName == nameof(POPartslistPosReservation.SelectedReservation))
+            {
+                ProdOrderManager.ValidateChangedPosReservation(this, this.DatabaseApp, SelectedTarget, sender, e);
+            }
+        }
+
         /// <summary>Called inside the GetControlModes-Method to get the Global.ControlModes from derivations.
         /// This method should be overriden in the derivations to dynmically control the presentation mode depending on the current value which is bound via VBContent</summary>
         /// <param name="vbControl">A WPF-Control that implements IVBContent</param>

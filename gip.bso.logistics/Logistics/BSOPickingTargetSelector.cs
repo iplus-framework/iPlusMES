@@ -707,7 +707,7 @@ namespace gip.bso.logistics
                          )
                         .ToArray();
 
-                if(relatedReservations.Any())
+                if (relatedReservations.Any())
                 {
                     foreach (POPartslistPosReservation item in result)
                     {
@@ -1067,6 +1067,23 @@ namespace gip.bso.logistics
         public bool IsEnabledOpenRoute()
         {
             return SelectedTarget != null && SelectedTarget.CurrentRoute != null;
+        }
+
+        protected override void _Targets_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            //if (SelectedTarget != null && PickingManager != null)
+            //{
+            //    PickingManager.ValidateChangedPosReservation(this.DatabaseApp, SelectedTarget);
+            //}
+        }
+
+        protected override void _SelectedTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base._SelectedTarget_PropertyChanged(sender, e);
+            if (SelectedTarget != null && PickingManager != null && e != null && e.PropertyName == nameof(POPartslistPosReservation.SelectedReservation))
+            {
+                PickingManager.ValidateChangedPosReservation(this, this.DatabaseApp, SelectedTarget, sender, e);
+            }
         }
 
         #endregion

@@ -1602,6 +1602,9 @@ namespace gip.mes.facility
             }
         }
 
+        public virtual void ValidateChangedPosReservation(VBBSOModulesSelector selector, DatabaseApp databaseApp, POPartslistPosReservation poReservation, object sender, PropertyChangedEventArgs e)
+        {
+        }
         #endregion
 
         #region ProdOrder -> Batch

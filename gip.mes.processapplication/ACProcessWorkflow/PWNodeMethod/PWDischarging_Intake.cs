@@ -102,16 +102,17 @@ namespace gip.mes.processapplication
         }
 
 
-        protected bool CheckPlannedDestinationSilo(FacilityReservation plannedSilo, DeliveryNotePos dnPos, double targetQuantity, bool changeReservationStateIfFull = false, FacilityReservation ignoreFullSilo = null)
+        protected virtual bool CheckPlannedDestinationSilo(FacilityReservation plannedSilo, DeliveryNotePos dnPos, double targetQuantity, bool changeReservationStateIfFull = false, FacilityReservation ignoreFullSilo = null)
         {
             if (plannedSilo == null || (ignoreFullSilo != null && ignoreFullSilo == plannedSilo))
                 return false;
             if (plannedSilo != null
                 && plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled
-                && (!plannedSilo.Facility.MaterialID.HasValue
-                    || ((dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.ProductionMaterialID)
-                        || (!dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.MaterialID))
+                && (  plannedSilo.Facility.Material == null
+                    || dnPos.InOrderPos.Material.IsMaterialEqual(plannedSilo.Facility.Material)
+                    //((dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.ProductionMaterialID)
+                    //    || (!dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.MaterialID))
                     ))
             {
                 // Prüfe ob rechnerisch die Charge reinpassen würde
@@ -137,9 +138,10 @@ namespace gip.mes.processapplication
             if (plannedSilo != null
                 && plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled
-                && (!plannedSilo.Facility.MaterialID.HasValue
-                    || ((dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.ProductionMaterialID)
-                        || (!dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.MaterialID))
+                && (plannedSilo.Facility.Material == null
+                    || dnPos.InOrderPos.Material.IsMaterialEqual(plannedSilo.Facility.Material)
+                    //|| ((dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.ProductionMaterialID)
+                    //    || (!dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.MaterialID))
                     ))
             {
                 // Prüfe ob rechnerisch die Charge reinpassen würde

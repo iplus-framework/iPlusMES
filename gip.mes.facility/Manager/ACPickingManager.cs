@@ -2511,6 +2511,10 @@ namespace gip.mes.facility
             return acClassWFDischarging;
         }
 
+        public virtual void ValidateChangedPosReservation(VBBSOModulesSelector selector, DatabaseApp databaseApp, POPartslistPosReservation poReservation, object sender, PropertyChangedEventArgs e)
+        {
+        }
+
         #endregion
 
         #region Start Workflow

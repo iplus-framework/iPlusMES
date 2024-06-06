@@ -223,7 +223,7 @@ namespace gip.mes.datamodel
             }
             set
             {
-                if(_ConnectedOrders != value)
+                if (_ConnectedOrders != value)
                 {
                     _ConnectedOrders = value;
                     OnPropertyChanged();

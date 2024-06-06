@@ -1286,6 +1286,7 @@ namespace gip.mes.datamodel
             New = 0,
             Active = 1,
             Finished = 2,
+            Validation = 3
         }
 
 #if NETFRAMEWORK
@@ -1305,6 +1306,7 @@ namespace gip.mes.datamodel
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.New, "en{'New'}de{'Neu'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Active, "en{'Active'}de{'Aktiv'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
+                    GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Validation, "en{'Validation needed'}de{'Validierung erforderlich'}");
                 }
                 return GlobalApp._ReservationStateList;
             }

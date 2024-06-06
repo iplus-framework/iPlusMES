@@ -1211,6 +1211,8 @@ namespace gip.bso.facility
                             {
                                 lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
                             }
+                            if (!OnFacilityRelocationLotsSelected(booking, lotsForReservation))
+                                return;
                         }
 
                         MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
@@ -1286,6 +1288,11 @@ namespace gip.bso.facility
             bool bRetVal = CurrentBookParamRelocation.IsEnabled();
             UpdateBSOMsg();
             return bRetVal;
+        }
+
+        protected virtual bool OnFacilityRelocationLotsSelected(ACMethodBooking relocationBooking, List<FacilityCharge> lotsForReservation)
+        {
+            return true;
         }
 
         /// <summary>

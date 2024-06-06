@@ -1732,9 +1732,10 @@ namespace gip.mes.processapplication
                     // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
                     // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (!plannedSilo.Facility.MaterialID.HasValue
-                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                    if (        plannedSilo.Facility.Material == null
+                        || (   batchPos.Material.IsMaterialEqual(batchPos.BookingMaterial)
+                                //((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                                // || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
                              && (batchPos.IsFinalMixure
                                  || (!batchPos.IsFinalMixure
                                      && (!plannedSilo.Facility.PartslistID.HasValue
@@ -1784,9 +1785,10 @@ namespace gip.mes.processapplication
                     // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
                     // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (!plannedSilo.Facility.MaterialID.HasValue
-                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                    if (plannedSilo.Facility.Material == null
+                        || (batchPos.Material.IsMaterialEqual(batchPos.BookingMaterial)
+                        //|| (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                        //         || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
                              && (batchPos.IsFinalMixure
                                  || (!batchPos.IsFinalMixure
                                      && (!plannedSilo.Facility.PartslistID.HasValue
