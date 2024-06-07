@@ -4,6 +4,7 @@ using gip.mes.autocomponent;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -140,6 +141,12 @@ namespace gip.bso.manufacturing
                             if (pafMethod != null)
                             {
                                 double targetQuantity = pafMethod.ParameterValueList.GetDouble("TargetQuantity");
+
+                                if (WeighingMaterialsFSM)
+                                {
+                                    targetQuantity = diff;
+                                }
+
                                 diff = targetQuantity - ScaleActualWeight;
                             }
 

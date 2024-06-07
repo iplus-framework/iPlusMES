@@ -101,11 +101,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public vd.PickingPos _PickingPosition;
         [ACPropertyInfo(100)]
         public vd.PickingPos PickingPosition
         {
-            get;
-            set;
+            get => _PickingPosition;
+            set
+            {
+                _PickingPosition = value;
+
+                if (_PickingPosition != null)
+                {
+                    TargetQuantity = _PickingPosition.TargetQuantity;
+                }
+                else if (_PosRelation == null)
+                {
+                    MaterialName = null;
+                    MaterialNo = null;
+                    IsLotManaged = false;
+                    TargetQuantity = 0;
+                    ActualQuantity = 0;
+                }
+            }
         }
 
         [ACPropertyInfo(100)]
