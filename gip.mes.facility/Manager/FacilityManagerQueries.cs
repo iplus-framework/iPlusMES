@@ -862,6 +862,11 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
             return null;
         }
 
+        public virtual Msg IsAllowedReassignLot(DatabaseApp dbApp, FacilityLot currentLot, FacilityLot newLot)
+        {
+            return null;
+        }
+
         #endregion
 
 
