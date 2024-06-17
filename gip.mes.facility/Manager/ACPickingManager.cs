@@ -18,6 +18,7 @@ namespace gip.mes.facility
         public ACPickingManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _CheckIsRouteAllocated = new ACPropertyConfigValue<bool>(this, nameof(CheckIsRouteAllocated), false);
         }
 
         protected override void Construct(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -27,7 +28,11 @@ namespace gip.mes.facility
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            return base.ACInit(startChildMode);
+            bool result = base.ACInit(startChildMode);
+
+            _ = CheckIsRouteAllocated;
+
+            return result;
         }
 
         public override bool ACPostInit()
@@ -183,6 +188,27 @@ namespace gip.mes.facility
             _BookParamZeroStockFacilityChargeClone.Database = dbApp;
 
             return _BookParamZeroStockFacilityChargeClone;
+        }
+
+        private ACPropertyConfigValue<bool> _CheckIsRouteAllocated;
+        [ACPropertyConfig("en{'Check is route allocated'}de{'Prüfen, ob Route zugewiesen ist'}")]
+        public bool CheckIsRouteAllocated
+        {
+            get
+            {
+                return _CheckIsRouteAllocated.ValueT;
+            }
+            set
+            {
+                _CheckIsRouteAllocated.ValueT = value;
+            }
+        }
+
+        public enum CheckIsRouteAllocatedModeEnum : short
+        {
+            Off = 0,
+            On = 10,
+            SkipOn = 20
         }
 
         #endregion
@@ -1519,7 +1545,6 @@ namespace gip.mes.facility
             RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
             {
-                //Error50120: No route found for transport from {0} to {1}
                 msg = new Msg
                 {
                     Source = GetACUrl(),
@@ -1530,6 +1555,25 @@ namespace gip.mes.facility
                 detailMessages.AddDetailMessage(msg);
                 return;
             }
+
+            if (CheckIsRouteAllocated)
+            {
+                Route freeRoute = result.Routes.FirstOrDefault(c => c.HasAnyAllocated == null || !c.HasAnyAllocated.Value);
+                if (freeRoute == null)
+                {
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Warning,
+                        ACIdentifier = "CheckResourcesAndRouting(90)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+            }
+
+
         }
 
         private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
