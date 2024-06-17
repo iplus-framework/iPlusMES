@@ -130,7 +130,7 @@ namespace gip.mes.facility
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualSplitFacilityChargeMethod(GlobalApp.FBT_Split_FacilityCharge, GlobalApp.FacilityBookingType.Split_FacilityCharge));
 
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualReassignFacilityChargeMethod(GlobalApp.FBT_Reassign_FacilityCharge, GlobalApp.FacilityBookingType.Reassign_FacilityCharge));
-
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualReassignFacilityChargeLotMethod(GlobalApp.FBT_Reassign_FacilityChargeLot, GlobalApp.FacilityBookingType.Reassign_FacilityChargeLot));
             #endregion
 
             #region BulkMaterial
@@ -855,6 +855,26 @@ namespace gip.mes.facility
             TMP.ParameterValueList.Add(new ACValue("OutwardFacilityCharge", typeof(FacilityCharge), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardMaterial", typeof(Material), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardPartslist", typeof(Partslist), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("OutwardQuantity", typeof(Nullable<double>), null, Global.ParamOption.Optional));
+            //TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), false, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue("Comment", typeof(string), null, Global.ParamOption.Optional));
+            TMP.ResultValueList.Add(new ACValue("BookingResult", typeof(ACMethodEventArgs), null, Global.ParamOption.Required));
+
+            return new ACMethodWrapper(TMP, GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)BookingType).ACCaptionTranslation, null);
+        }
+
+
+        private static ACMethodWrapper CreateVirtualReassignFacilityChargeLotMethod(string AcIdentitifer, GlobalApp.FacilityBookingType BookingType)
+        {
+            ACMethodBooking TMP = new ACMethodBooking();
+
+            TMP.ACIdentifier = AcIdentitifer;
+
+            TMP.ParameterValueList.Add(new ACValue("BookingType", typeof(GlobalApp.FacilityBookingType), BookingType, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue(MDMovementReason.ClassName, typeof(MDMovementReason), null, Global.ParamOption.Optional));
+
+            TMP.ParameterValueList.Add(new ACValue("OutwardFacilityCharge", typeof(FacilityCharge), null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue("InwardFacilityLot", typeof(Material), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("OutwardQuantity", typeof(Nullable<double>), null, Global.ParamOption.Optional));
             //TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), false, Global.ParamOption.Fix));
             TMP.ParameterValueList.Add(new ACValue("Comment", typeof(string), null, Global.ParamOption.Optional));

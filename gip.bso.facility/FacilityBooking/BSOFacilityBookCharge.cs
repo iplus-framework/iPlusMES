@@ -80,6 +80,8 @@ namespace gip.bso.facility
             this._BookParamOutwardMovementClone = null;
             this._BookParamReassignMat = null;
             this._BookParamReassignMatClone = null;
+            this._BookParamReassignLot = null;
+            this._BookParamReassignLotClone = null;
             this._BookParamReleaseAndLock = null;
             this._BookParamReleaseAndLockClone = null;
             this._BookParamRelocation = null;
@@ -460,6 +462,25 @@ namespace gip.bso.facility
             protected set
             {
                 _BookParamSplit = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the current book param matching.
+        /// </summary>
+        /// <value>The current book param matching.</value>
+        [ACPropertyCurrent(708, "CurrentBookParamReassignLot")]
+        public ACMethodBooking CurrentBookParamReassignLot
+        {
+            get
+            {
+                return _BookParamReassignLot;
+            }
+            protected set
+            {
+                _BookParamReassignLot = value;
                 OnPropertyChanged();
             }
         }
@@ -1080,6 +1101,16 @@ namespace gip.bso.facility
                 clone.OutwardFacilityCharge = CurrentFacilityCharge;
             }
             CurrentBookParamSplit = clone;
+
+
+            if (_BookParamReassignLotClone == null)
+                _BookParamReassignLotClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Reassign_FacilityChargeLot, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            clone = _BookParamReassignLotClone.Clone() as ACMethodBooking;
+            if (CurrentFacilityCharge != null)
+            {
+                clone.OutwardFacilityCharge = CurrentFacilityCharge;
+            }
+            CurrentBookParamReassignLot = clone;
 
         }
 
@@ -1863,6 +1894,46 @@ namespace gip.bso.facility
         }
         #endregion
 
+        #region Lostneuzuordnung (Reassignment Lot)
+        /// <summary>
+        /// Facilities the relocation.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Reassign Lot'}de{'Los neu zuordnen'}", 811, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void FacilityLotReassign()
+        {
+            if (!PreExecute(nameof(FacilityLotReassign)))
+                return;
+
+            CurrentBookParamReassignLot.AutoRefresh = true;
+            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReassignLot, this.DatabaseApp) as ACMethodEventArgs;
+            if (!CurrentBookParamReassignLot.ValidMessage.IsSucceded() || CurrentBookParamReassignLot.ValidMessage.HasWarnings())
+                Messages.Msg(CurrentBookParamReassignLot.ValidMessage);
+            else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                    result.ValidMessage.Message = result.ResultState.ToString();
+                Messages.Msg(result.ValidMessage);
+            }
+            else
+            {
+                ClearBookingData();
+            }
+
+            PostExecute(nameof(FacilityLotReassign));
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled facility relocation].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledFacilityLotReassign()
+        {
+            bool bRetVal = CurrentBookParamReassignLot.IsEnabled();
+            UpdateBSOMsg();
+            return bRetVal;
+        }
+        #endregion
+
         #region SplitQuant
         /// <summary>
         /// Facilities the relocation.
@@ -2203,6 +2274,10 @@ namespace gip.bso.facility
             {
                 CurrentBookParam = CurrentBookParamSplit;
             }
+            else if (page == "ActivateReassignLot" || page == "ReassignLotTab" || page == "*ReassignLotTab")
+            {
+                CurrentBookParam = CurrentBookParamReassignLot;
+            }
             PostExecute("OnActivate");
 
         }
@@ -2263,6 +2338,8 @@ namespace gip.bso.facility
         ACMethodBooking _BookParamSplit;
         ACMethodBooking _BookParamSplitClone;
 
+        ACMethodBooking _BookParamReassignLot;
+        ACMethodBooking _BookParamReassignLotClone;
 
         /// <summary>
         /// The _ act booking param
@@ -2376,6 +2453,12 @@ namespace gip.bso.facility
                     return true;
                 case nameof(IsEnabledFacilityReassign):
                     result = IsEnabledFacilityReassign();
+                    return true;
+                case nameof(FacilityLotReassign):
+                    FacilityLotReassign();
+                    return true;
+                case nameof(IsEnabledFacilityLotReassign):
+                    result = IsEnabledFacilityLotReassign();
                     return true;
                 case nameof(SplitQuant):
                     SplitQuant();

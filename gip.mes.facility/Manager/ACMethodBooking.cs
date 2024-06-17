@@ -2615,7 +2615,8 @@ namespace gip.mes.facility
             //        AddBookingMessage(eResultCodes.DependingParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00042"));
             //}
             if ((this.BookingType == GlobalApp.FacilityBookingType.Reassign_FacilityCharge
-                    || this.BookingType == GlobalApp.FacilityBookingType.Reassign_Facility_BulkMaterial)
+                    || this.BookingType == GlobalApp.FacilityBookingType.Reassign_Facility_BulkMaterial
+                    || this.BookingType == GlobalApp.FacilityBookingType.Reassign_FacilityChargeLot)
                     && !this.IsLotManaged)
                 AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error50056"));
 
