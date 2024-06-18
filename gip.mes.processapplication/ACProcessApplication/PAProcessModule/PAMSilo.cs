@@ -275,14 +275,14 @@ namespace gip.mes.processapplication
                 if (_SiloTitleModeCalc == null)
                 {
                     _SiloTitleModeCalc = SiloTitleMode;
-                    if (_SiloTitleModeCalc == SiloTitleModeEnum.DoNothing)
-                    {
-                        FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
-                        if (facManager != null)
-                        {
-                            _SiloTitleModeCalc = facManager.SiloTitleMode;
-                        }
-                    }
+                    //if (_SiloTitleModeCalc == SiloTitleModeEnum.DoNothing)
+                    //{
+                    //    FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
+                    //    if (facManager != null)
+                    //    {
+                    //        _SiloTitleModeCalc = facManager.SiloTitleMode;
+                    //    }
+                    //}
                 }
                 return _SiloTitleModeCalc.Value;
             }
