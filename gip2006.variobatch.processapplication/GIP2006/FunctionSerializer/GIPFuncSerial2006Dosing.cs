@@ -84,6 +84,7 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // MaxDosingTime
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // AdjustmentFlowRate
             iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // EndlessDosing
+            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // Additional Byte because S7 only allows 2Byte-Blocks
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // SWTWeight
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
@@ -295,6 +296,7 @@ namespace gip2006.variobatch.processapplication
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Byte.Length);
             }
             iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
+            iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // Additional Byte because S7 only allows 2Byte-Blocks
 
             acValue = request.ParameterValueList.GetACValue("SWTWeight");
             if (acValue != null)
@@ -392,6 +394,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // MaxDosingTime
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // AdjustmentFlowRate
                 iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // EndlessDosing
+                iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // Additional Byte because S7 only allows 2Byte-Blocks
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // SWTWeight
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
@@ -549,7 +552,7 @@ namespace gip2006.variobatch.processapplication
                     }
                 }
                 iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length;
-
+                iOffset += gip.core.communication.ISOonTCP.Types.Byte.Length; // Additional Byte because S7 only allows 2Byte-Blocks
 
                 acValue = response.ParameterValueList.GetACValue("SWTWeight");
                 if (acValue != null)
