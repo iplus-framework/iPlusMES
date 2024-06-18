@@ -4078,7 +4078,8 @@ namespace gip.bso.logistics
                 {
                     msg = this.PickingManager.ValidateStart(this.DatabaseApp, dbIPlus, CurrentPicking,
                                                                 MandatoryConfigStores,
-                                                                PARole.ValidationBehaviour.Strict);
+                                                                PARole.ValidationBehaviour.Strict,
+                                                                SelectedPWNodeProcessWorkflow, true);
                     if (msg != null)
                     {
                         if (!msg.IsSucceded())
@@ -4086,7 +4087,7 @@ namespace gip.bso.logistics
                             if (String.IsNullOrEmpty(msg.Message))
                             {
                                 // Der Auftrag kann nicht gestartet werden weil:
-                                msg.Message = Root.Environment.TranslateMessage(this, "Question50027");
+                                msg.Message = Root.Environment.TranslateMessage(this, "Error50642");
                             }
                             Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
                             return;
@@ -4096,7 +4097,7 @@ namespace gip.bso.logistics
                             if (String.IsNullOrEmpty(msg.Message))
                             {
                                 //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
-                                msg.Message = Root.Environment.TranslateMessage(this, "Question50028");
+                                msg.Message = Root.Environment.TranslateMessage(this, "Question50107");
                             }
                             var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
                             if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)

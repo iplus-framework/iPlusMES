@@ -1329,12 +1329,29 @@ namespace gip.bso.facility
                             return;
                         }
                         Save();
-                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
-                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+
+                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
+                        if (!msgDetails.IsSucceded())
                         {
-                            Messages.Msg(msgDetails);
+                            if (String.IsNullOrEmpty(msgDetails.Message))
+                            {
+                                // Der Auftrag kann nicht gestartet werden weil:
+                                msgDetails.Message = Root.Environment.TranslateMessage(this, "Error50643");
+                            }
+                            Messages.Msg(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
                             ClearBookingData();
                             return;
+                        }
+                        else if (msgDetails.HasWarnings())
+                        {
+                            if (String.IsNullOrEmpty(msgDetails.Message))
+                            {
+                                //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
+                                msgDetails.Message = Root.Environment.TranslateMessage(this, "Question50108");
+                            }
+                            var userResult = Messages.Msg(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
+                            if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
+                                return;
                         }
 
                         Global.MsgResult openPicking = Global.MsgResult.No;

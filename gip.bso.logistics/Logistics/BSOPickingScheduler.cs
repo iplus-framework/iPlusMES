@@ -1404,7 +1404,7 @@ namespace gip.bso.logistics
                     List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { picking.Picking };
                     msg = this.PickingManager.ValidateStart(this.DatabaseApp, dbIPlus, picking.Picking,
                                             listOfSelectedStores,
-                                            PARole.ValidationBehaviour.Strict);
+                                            PARole.ValidationBehaviour.Strict, picking.Picking.IplusVBiACClassWF, true);
                     if (msg != null)
                     {
                         if (!msg.IsSucceded())

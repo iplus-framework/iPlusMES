@@ -1733,7 +1733,7 @@ namespace gip.mes.processapplication
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
                     // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
                     if (        plannedSilo.Facility.Material == null
-                        || (   batchPos.Material.IsMaterialEqual(batchPos.BookingMaterial)
+                        || (   batchPos.BookingMaterial.IsMaterialEqual(plannedSilo.Facility.Material)
                                 //((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
                                 // || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
                              && (batchPos.IsFinalMixure
@@ -1786,7 +1786,7 @@ namespace gip.mes.processapplication
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
                     // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
                     if (plannedSilo.Facility.Material == null
-                        || (batchPos.Material.IsMaterialEqual(batchPos.BookingMaterial)
+                        || (batchPos.BookingMaterial.IsMaterialEqual(plannedSilo.Facility.Material)
                         //|| (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
                         //         || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
                              && (batchPos.IsFinalMixure

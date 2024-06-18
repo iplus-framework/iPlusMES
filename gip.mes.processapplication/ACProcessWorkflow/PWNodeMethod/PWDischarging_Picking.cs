@@ -113,7 +113,7 @@ namespace gip.mes.processapplication
                 && plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled
                 && (   plannedSilo.Facility.Material == null
-                    || dnPos.Material.IsMaterialEqual(plannedSilo.Material)
+                    || dnPos.Material.IsMaterialEqual(plannedSilo.Facility.Material)
                     // ((dnPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.Material.ProductionMaterialID)
                     //    || (!dnPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.Material.MaterialID))
                     )
@@ -143,7 +143,7 @@ namespace gip.mes.processapplication
                 && plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled
                 && (plannedSilo.Facility.Material == null
-                    || dnPos.Material.IsMaterialEqual(plannedSilo.Material)
+                    || dnPos.Material.IsMaterialEqual(plannedSilo.Facility.Material)
                     //|| ((dnPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.Material.ProductionMaterialID)
                     //    || (!dnPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.Material.MaterialID))
                     ))
