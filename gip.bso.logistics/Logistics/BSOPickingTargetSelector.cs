@@ -856,7 +856,8 @@ namespace gip.bso.logistics
             {
                 msg = this.PickingManager.ValidateStart(databaseApp, dbIPlus, CurrentPicking,
                                                             configStores,
-                                                            PARole.ValidationBehaviour.Strict);
+                                                            PARole.ValidationBehaviour.Strict,
+                                                            CurrentACClassWF, true);
 
                 if (msg != null)
                 {

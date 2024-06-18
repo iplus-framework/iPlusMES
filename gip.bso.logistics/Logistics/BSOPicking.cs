@@ -4078,7 +4078,8 @@ namespace gip.bso.logistics
                 {
                     msg = this.PickingManager.ValidateStart(this.DatabaseApp, dbIPlus, CurrentPicking,
                                                                 MandatoryConfigStores,
-                                                                PARole.ValidationBehaviour.Strict);
+                                                                PARole.ValidationBehaviour.Strict,
+                                                                SelectedPWNodeProcessWorkflow, true);
                     if (msg != null)
                     {
                         if (!msg.IsSucceded())

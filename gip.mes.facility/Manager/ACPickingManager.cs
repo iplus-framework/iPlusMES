@@ -1227,7 +1227,8 @@ namespace gip.mes.facility
         public virtual MsgWithDetails ValidateStart(DatabaseApp dbApp, Database dbiPlus,
             Picking picking, List<IACConfigStore> configStores,
             PARole.ValidationBehaviour validationBehaviour,
-            core.datamodel.ACClassWF planningNode = null)
+            core.datamodel.ACClassWF planningNode = null,
+            bool checkOnStart = false)
         {
             Msg msg = null;
             MsgWithDetails detailMessages = new MsgWithDetails();
@@ -1247,6 +1248,15 @@ namespace gip.mes.facility
                 detailMessages.AddDetailMessage(msg);
 
                 return detailMessages;
+            }
+
+            if (checkOnStart && planningNode == null)
+            {
+                var workflow = picking.ACClassMethod;
+                if (workflow != null)
+                {
+                    planningNode = workflow.ACClassWF_ACClassMethod.FirstOrDefault(c => c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeMethod)?.FromIPlusContext<core.datamodel.ACClassWF>(dbiPlus);
+                }
             }
 
             string selectionRuleID = "PAMSilo.Deselector";
@@ -1293,7 +1303,6 @@ namespace gip.mes.facility
                                         ruleParams.Add(acClass.ACClassID);
                                     }
                                 }
-
                             }
                         }
                     }
@@ -1306,7 +1315,7 @@ namespace gip.mes.facility
                 }
             }
 
-            CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams);
+            CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams, checkOnStart);
 
             return detailMessages;
         }
@@ -1329,7 +1338,7 @@ namespace gip.mes.facility
         #region Virtual and protected
         public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, string selectionRuleID = "PAMSilo.Deselector",
-                                        object[] selectionRuleParams = null)
+                                        object[] selectionRuleParams = null, bool checkOnStart = false)
         {
             //if (configStores == null)
             //return;
@@ -1372,7 +1381,7 @@ namespace gip.mes.facility
                 }
                 if (pos.FromFacility != null)
                 {
-                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams);
+                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams, checkOnStart);
                 }
                 else
                 {
@@ -1383,7 +1392,7 @@ namespace gip.mes.facility
 
         private void CheckResourcesAndRoutingKnownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                                          PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType,
-                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null, bool checkOnStart = false)
         {
             Msg msg;
 
@@ -1539,7 +1548,8 @@ namespace gip.mes.facility
                 MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true,
-                DBRecursionLimit = 10
+                DBRecursionLimit = 10,
+                IgnorePreferences = true
             };
 
             RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
@@ -1556,10 +1566,12 @@ namespace gip.mes.facility
                 return;
             }
 
-            if (CheckIsRouteAllocated)
+            if (checkOnStart && CheckIsRouteAllocated)
             {
-                Route freeRoute = result.Routes.FirstOrDefault(c => c.HasAnyAllocated == null || !c.HasAnyAllocated.Value);
-                if (freeRoute == null)
+                routingParameters.IncludeAllocated = false;
+                result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
+
+                if (result.Routes == null || !result.Routes.Any())
                 {
                     msg = new Msg
                     {
@@ -1572,8 +1584,6 @@ namespace gip.mes.facility
                     return;
                 }
             }
-
-
         }
 
         private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
