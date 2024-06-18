@@ -91,6 +91,7 @@ namespace gip.mes.processapplication
                 }
             }
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             _ = InvertMatSensorValue;
             _ = Dimensions;
             _ = LeaveMaterialOccupation;
@@ -111,12 +112,16 @@ namespace gip.mes.processapplication
             if (FillLevelRaw != null)
                 (FillLevelRaw as IACPropertyNetTarget).ValueUpdatedOnReceival -= ChildProperties_ValueUpdatedOnReceival;
             UnSubscribeAllTransportFunctions();
+
             return base.ACPreDeInit(deleteACClassTask);
         }
 
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
             if (_MatSensorFilling != null)
             {
                 _MatSensorFilling.Detach();
@@ -196,6 +201,17 @@ namespace gip.mes.processapplication
 
 
         #region References to Objects
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
         public IEnumerable<PAESensorDigital> MaterialSensors
         {
             get
@@ -275,14 +291,14 @@ namespace gip.mes.processapplication
                 if (_SiloTitleModeCalc == null)
                 {
                     _SiloTitleModeCalc = SiloTitleMode;
-                    //if (_SiloTitleModeCalc == SiloTitleModeEnum.DoNothing)
-                    //{
-                    //    FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
-                    //    if (facManager != null)
-                    //    {
-                    //        _SiloTitleModeCalc = facManager.SiloTitleMode;
-                    //    }
-                    //}
+                    if (_SiloTitleModeCalc == SiloTitleModeEnum.DoNothing)
+                    {
+                        FacilityManager facManager = this.ACFacilityManager;
+                        if (facManager != null)
+                        {
+                            _SiloTitleModeCalc = facManager.SiloTitleMode;
+                        }
+                    }
                 }
                 return _SiloTitleModeCalc.Value;
             }
@@ -1810,7 +1826,7 @@ namespace gip.mes.processapplication
         {
             if (!IsEnabledSyncStockWithFillLevelScale())
                 return;
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
+            FacilityManager facManager = this.ACFacilityManager;
             if (facManager != null)
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
