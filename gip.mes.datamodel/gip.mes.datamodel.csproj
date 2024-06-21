@@ -133,7 +133,6 @@
     <Compile Include="Enums\MovementReasonsEnum.cs" />
     <Compile Include="Enums\OperationLogEnum.cs" />
     <Compile Include="Enums\OperationLogStateEnum.cs" />
-    <Compile Include="Enums\SiloTitleModeEnum.cs" />
     <Compile Include="Enums\WeighingStateEnum.cs" />
     <Compile Include="Enums\PickingStateEnum.cs" />
     <Compile Include="Enums\PostingBehaviourEnum.cs" />
