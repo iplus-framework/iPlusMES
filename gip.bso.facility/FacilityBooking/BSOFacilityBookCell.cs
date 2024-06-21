@@ -1942,6 +1942,33 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Navigation BSOFaciltiyBookCharge
+
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Navigate to quant'}de{'Zum Quant navigieren'}", 603, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityCharge()
+        {
+            if(!IsEnabledNavigateToFacilityCharge())
+            {
+                return;
+            }
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityCharge), SelectedFacilityCharge.FacilityChargeID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityCharge()
+        {
+            return SelectedFacilityCharge != null;
+        }
+
+
+        #endregion
+
         #endregion
 
         #region Eventhandling

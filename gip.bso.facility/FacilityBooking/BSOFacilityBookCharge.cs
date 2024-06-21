@@ -1856,7 +1856,7 @@ namespace gip.bso.facility
 
             MsgWithDetails msgWithDetails = GetBookingMessages(results);
 
-            if(msgWithDetails.MessageLevel >= eMsgLevel.Warning)
+            if (msgWithDetails.MessageLevel >= eMsgLevel.Warning)
             {
                 Messages.Msg(msgWithDetails);
             }
@@ -2222,6 +2222,34 @@ namespace gip.bso.facility
         }
 
         #endregion
+
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            PAOrderInfoEntry facilityChargeEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
+
+            if (facilityChargeEntry != null)
+            {
+                FacilityCharge facilityCharge = DatabaseApp.FacilityCharge.Where(c => c.FacilityChargeID == facilityChargeEntry.EntityID).FirstOrDefault();
+                if(FacilityChargeList == null)
+                {
+                    FacilityChargeList = new List<FacilityCharge>();
+                }
+                
+                if(!FacilityChargeList.Contains(facilityCharge))
+                {
+                    FacilityChargeList.Add(facilityCharge);
+                }
+                CurrentFacilityCharge = FacilityChargeList.Where(c => c.FacilityChargeID == facilityChargeEntry.EntityID).FirstOrDefault();
+            }
+
+            ShowDialog(this, "FacilityBookCharge");
+            this.ParentACComponent.StopComponent(this);
+        }
 
         #endregion
 
@@ -2657,11 +2685,11 @@ namespace gip.bso.facility
 
         private MsgWithDetails GetBookingMessages(Dictionary<ACMethodBooking, ACMethodEventArgs> results)
         {
-            MsgWithDetails msgWithDetails  = new MsgWithDetails();
-            foreach(KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            foreach (KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
             {
                 MsgWithDetails msg = GetBookingMessage(item.Key, item.Value);
-                if(msg!= null)
+                if (msg != null)
                 {
                     msgWithDetails.AddDetailMessage(msg);
                 }

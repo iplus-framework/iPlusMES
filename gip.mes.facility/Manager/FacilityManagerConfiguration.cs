@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using System.Threading;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -40,7 +36,7 @@ namespace gip.mes.facility
             _BookingParameterQuantityIsAbsolute = new ACPropertyConfigValue<bool>(this, "BookingParameterQuantityIsAbsolute", false);
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
             _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
-            _SiloTitleMode = new ACPropertyConfigValue<SiloTitleModeEnum>(this, nameof(SiloTitleMode), SiloTitleModeEnum.DoNothing);
+            _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
             CreateModuleConstants();
         }
 
@@ -387,17 +383,17 @@ namespace gip.mes.facility
             set { _RootStoreForVehicles.ValueT = value; }
         }
 
-        private ACPropertyConfigValue<SiloTitleModeEnum> _SiloTitleMode;
-        [ACPropertyConfig(ConstApp.SiloTitleMode)]
-        public SiloTitleModeEnum SiloTitleMode
+        private ACPropertyConfigValue<bool> _DisplayMaterialOfQuant;
+        [ACPropertyConfig(ConstApp.DisplayMaterialOfQuant)]
+        public bool DisplayMaterialOfQuant
         {
             get
             {
-                return _SiloTitleMode.ValueT;
+                return _DisplayMaterialOfQuant.ValueT;
             }
             set
             {
-                _SiloTitleMode.ValueT = value;
+                _DisplayMaterialOfQuant.ValueT = value;
             }
         }
 

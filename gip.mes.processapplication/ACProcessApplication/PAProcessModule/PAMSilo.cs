@@ -11,8 +11,6 @@ using System.Collections.Specialized;
 using System.Web;
 using gip.mes.facility;
 using System.Globalization;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Wordprocessing;
 using System.Data.Objects;
 
 namespace gip.mes.processapplication
@@ -37,7 +35,6 @@ namespace gip.mes.processapplication
         public const string SelRuleID_DosingFunc = "PAMSilo.DosingFunc";
         public const string SelRuleID_DischargingFunc = "PAMSilo.DischargingFunc";
         #endregion
-
 
         #region c'tors
         static PAMSilo()
@@ -69,7 +66,7 @@ namespace gip.mes.processapplication
             _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
             _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, nameof(InvertMatSensorValue), true);
             _LeaveMaterialOccupation = new ACPropertyConfigValue<bool>(this, nameof(LeaveMaterialOccupation), false);
-            _SiloTitleMode = new ACPropertyConfigValue<SiloTitleModeEnum>(this, nameof(SiloTitleMode), SiloTitleModeEnum.DoNothing);
+            _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
             _Dimensions = new ACPropertyConfigValue<string>(this, nameof(Dimensions), "");
         }
 
@@ -176,7 +173,6 @@ namespace gip.mes.processapplication
         }
         #endregion
 
-
         #region Points
         PAPoint _PAPointMatIn1;
         [ACPropertyConnectionPoint(9999, "PointMaterial")]
@@ -198,7 +194,6 @@ namespace gip.mes.processapplication
             }
         }
         #endregion
-
 
         #region References to Objects
         protected ACRef<ACComponent> _ACFacilityManager = null;
@@ -269,40 +264,20 @@ namespace gip.mes.processapplication
             }
         }
 
-        private ACPropertyConfigValue<SiloTitleModeEnum> _SiloTitleMode;
-        [ACPropertyConfig(ConstApp.SiloTitleMode)]
-        public SiloTitleModeEnum SiloTitleMode
+        private ACPropertyConfigValue<bool> _DisplayMaterialOfQuant;
+        [ACPropertyConfig(ConstApp.DisplayMaterialOfQuant)]
+        public bool DisplayMaterialOfQuant
         {
             get
             {
-                return _SiloTitleMode.ValueT;
+                return _DisplayMaterialOfQuant.ValueT;
             }
             set
             {
-                _SiloTitleMode.ValueT = value;
+                _DisplayMaterialOfQuant.ValueT = value;
             }
         }
 
-        public SiloTitleModeEnum? _SiloTitleModeCalc;
-        public SiloTitleModeEnum SiloTitleModeCalc
-        {
-            get
-            {
-                if (_SiloTitleModeCalc == null)
-                {
-                    _SiloTitleModeCalc = SiloTitleMode;
-                    if (_SiloTitleModeCalc == SiloTitleModeEnum.DoNothing)
-                    {
-                        FacilityManager facManager = this.ACFacilityManager;
-                        if (facManager != null)
-                        {
-                            _SiloTitleModeCalc = facManager.SiloTitleMode;
-                        }
-                    }
-                }
-                return _SiloTitleModeCalc.Value;
-            }
-        }
 
         public const string C_DimLength_1 = "L1";
         public const string C_DimWidth_1 = "W1";
@@ -494,7 +469,6 @@ namespace gip.mes.processapplication
             }
         }
         #endregion
-
 
         #region Properties, Range 400
         [ACPropertyBindingTarget(400, "Read from PLC", "en{'Fill level'}de{'Füllstand'}", "", false, false, RemotePropID = 20)]
@@ -1013,7 +987,7 @@ namespace gip.mes.processapplication
             {
                 try
                 {
-                    material = GetFacilitySiloMaterial(facilitySilo, SiloTitleModeCalc);
+                    material = GetFacilitySiloMaterial(facilitySilo);
                 }
                 catch (Exception qEx)
                 {
@@ -1035,53 +1009,36 @@ namespace gip.mes.processapplication
             OnRecalculateFillingWeight();
         }
 
-        protected virtual Material GetFacilitySiloMaterial(Facility facilitySilo, SiloTitleModeEnum siloTitleMode)
+        protected virtual Material GetFacilitySiloMaterial(Facility facilitySilo)
         {
-            Material material = null;
-
-            if (siloTitleMode == SiloTitleModeEnum.DoNothing)
+            bool displayMaterialOfQuant = ACFacilityManager.DisplayMaterialOfQuant;
+            if (!displayMaterialOfQuant)
             {
-                // use declared material for facility
-                material = facilitySilo.Material;
+                displayMaterialOfQuant = DisplayMaterialOfQuant;
+            }
+
+            Material material = facilitySilo.Material;
+
+            if(facilitySilo.Partslist != null)
+            {
+                material = facilitySilo.Partslist.Material;
             }
             else
             {
-                using (DatabaseApp databaseApp = new DatabaseApp())
+                if (material != null && material.Material_ProductionMaterial.Any() && displayMaterialOfQuant)
                 {
-                    var quants = s_cQry_Quants(databaseApp, facilitySilo.FacilityID);
-                    FacilityCharge lastQuant = quants.FirstOrDefault();
-                    if (lastQuant != null)
+                    using (DatabaseApp databaseApp = new DatabaseApp())
                     {
-                        FacilityBookingCharge lastProductionFbc = lastQuant.FacilityBookingCharge_InwardFacilityCharge.Where(c => c.ProdOrderPartslistPos != null).FirstOrDefault();
-                        if (lastProductionFbc != null)
+                        var quants = s_cQry_Quants(databaseApp, facilitySilo.FacilityID);
+                        FacilityCharge lastQuant = quants.FirstOrDefault();
+                        if (lastQuant != null)
                         {
-                            if (siloTitleMode == SiloTitleModeEnum.ShowPartslistMaterial)
-                            {
-                                // SiloTitleModeEnum.ShowPartslistMaterial - use current partslist product nameSiloTitleModeEnum.ShowPartslistMaterial
-                                material = lastProductionFbc.ProdOrderPartslistPos?.ProdOrderPartslist?.Partslist?.Material;
-                            }
-                            else if (siloTitleMode == SiloTitleModeEnum.ShowProductMaterial)
-                            {
-                                // SiloTitleModeEnum.ShowPartslistMaterial - use final partslist product nameSiloTitleModeEnum.ShowPartslistMaterial
-                                ProdOrderPartslist finalPartslist =
-                                lastProductionFbc
-                                .ProdOrderPartslistPos?
-                                .ProdOrderPartslist?
-                                .ProdOrder
-                                .ProdOrderPartslist_ProdOrder
-                                .AsEnumerable()
-                                .Where(c => c.IsFinalProdOrderPartslist)
-                                .FirstOrDefault();
-
-                                if(finalPartslist != null)
-                                {
-                                    material = finalPartslist.Partslist?.Material;
-                                }
-                            }
+                            material = lastQuant.Material;
                         }
                     }
                 }
             }
+            
             return material;
         }
 

@@ -23,6 +23,7 @@ namespace gip.mes.facility
             _C_BSONameForShowOutDeliveryNote = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOutDeliveryNote), "");
             _C_BSONameForShowLabOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowLabOrder), "");
             _C_BSONameForShowFacilityBookCell = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityBookCell), "");
+            _C_BSONameForShowFacilityBookCharge = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityBookCharge), "");
             _C_BSONameForShowFacilityOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowFacilityOverview), "");
             _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOrder), "");
             _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowComponent), "");
@@ -42,7 +43,7 @@ namespace gip.mes.facility
         {
             get
             {
-                if(string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
                 {
                     _C_BSONameForShowOrder.ValueT = GetBSOName("BSOProdOrder", "Dialog");
                 }
@@ -84,7 +85,7 @@ namespace gip.mes.facility
                 {
                     _C_BSONameForShowOrder.ValueT = GetBSOName("BSOComponentReservation", "Dialog");
                 }
-               
+
                 return _C_BSONameForShowReservation.ValueT;
             }
             set
@@ -211,12 +212,31 @@ namespace gip.mes.facility
                 {
                     _C_BSONameForShowOrder.ValueT = GetBSOName("BSOFacilityBookCell", "Dialog");
                 }
-                
+
                 return _C_BSONameForShowFacilityBookCell.ValueT;
             }
             set
             {
                 _C_BSONameForShowFacilityBookCell.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowFacilityBookCharge;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for Cellfacility'}de{'Klassenname und ACIdentifier für Silobestandsführung'}")]
+        public string BSONameForShowFacilityBookCharge
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_C_BSONameForShowFacilityBookCharge.ValueT))
+                {
+                    _C_BSONameForShowFacilityBookCharge.ValueT = GetBSOName("BSOFacilityBookCharge", "Dialog");
+                }
+
+                return _C_BSONameForShowFacilityBookCharge.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowFacilityBookCharge.ValueT = value;
             }
         }
 
@@ -230,7 +250,7 @@ namespace gip.mes.facility
                 {
                     _C_BSONameForShowOrder.ValueT = GetBSOName("BSOFacilityOverview", "Dialog");
                 }
-                
+
                 return _C_BSONameForShowFacilityOverview.ValueT;
             }
             set
@@ -383,7 +403,7 @@ namespace gip.mes.facility
                     return;
                 }
                 // Lieferschein WE/WA
-                else if (orderInfo.Entities.Where(c => c.EntityName == DeliveryNote.ClassName 
+                else if (orderInfo.Entities.Where(c => c.EntityName == DeliveryNote.ClassName
                                                     || c.EntityName == DeliveryNotePos.ClassName).Any())
                 {
                     var notePosEntry = orderInfo.Entities.Where(c => c.EntityName == DeliveryNotePos.ClassName).FirstOrDefault();
@@ -443,7 +463,23 @@ namespace gip.mes.facility
                     childBSO.Stop();
                     return;
                 }
-                else if(orderInfo.Entities.Where(c=>c.EntityName == nameof(FacilityLot)).Any())
+                else if (orderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).Any())
+                {
+                    string bsoName = BSONameForShowFacilityBookCharge;
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                    {
+                        ACValueList acValueList = new ACValueList();
+                        acValueList.Add(new ACValue(Const.SkipSearchOnStart, typeof(bool), true));
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { acValueList }) as ACComponent;
+                    }
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
+                else if (orderInfo.Entities.Where(c => c.EntityName == nameof(FacilityLot)).Any())
                 {
                     string bsoName = BSONameForFacilityLotOverview;
                     ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
