@@ -204,7 +204,29 @@ namespace gip.mes.facility
             }
         }
 
+        private bool _CanStartIfRouteAllocated;
+        [ACPropertyInfo(9999, "", "en{'Can start if route allocated'}de{'Kann starten, wenn Route zugewiesen ist'}", "", true)]
+        public bool CanStartIfRouteAllocated
+        {
+            get => _CanStartIfRouteAllocated;
+            set => _CanStartIfRouteAllocated = value;
+        }
 
+        public bool CanUserStartIfRouteAllocated
+        {
+            get
+            {
+                ClassRightManager rightManager = CurrentRightsOfInvoker;
+                if (rightManager == null)
+                    return true;
+                IACPropertyBase acProperty = this.GetProperty(nameof(CanStartIfRouteAllocated));
+                if (acProperty == null)
+                    return true;
+                Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
+                return rightMode >= Global.ControlModes.Enabled;
+
+            }
+        }
 
         #endregion
 
@@ -1569,10 +1591,14 @@ namespace gip.mes.facility
 
                 if (result.Routes == null || !result.Routes.Any())
                 {
+                    eMsgLevel errorLevel = eMsgLevel.Error;
+                    if (CanUserStartIfRouteAllocated)
+                        errorLevel = eMsgLevel.Warning;
+
                     msg = new Msg
                     {
                         Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Warning,
+                        MessageLevel = errorLevel,
                         ACIdentifier = "CheckResourcesAndRouting(90)",
                         Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
                     };
