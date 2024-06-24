@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication
 {
@@ -52,6 +53,23 @@ namespace gip.mes.processapplication
             (TolMinus as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
             TolPlus.ForceBroadcast = true;
             (ActualValue as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+
+            (SetPoint2 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            SetPoint2.ForceBroadcast = true;
+            (TolPlus2 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus2.ForceBroadcast = true;
+            (TolMinus2 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus2.ForceBroadcast = true;
+            (ActualValue2 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+
+            (SetPoint3 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            SetPoint3.ForceBroadcast = true;
+            (TolPlus3 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus3.ForceBroadcast = true;
+            (TolMinus3 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus3.ForceBroadcast = true;
+            (ActualValue3 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+
             if (ApplicationManager != null)
                 ApplicationManager.ProjectWorkCycleR5min += ApplicationManager_ProjectWorkCycleR5min;
             return base.ACPostInit();
@@ -76,6 +94,8 @@ namespace gip.mes.processapplication
         private const string C_WeightSetpointString = "SetP";
         private const string C_ToleranceAboveString = "TolA";
         private const string C_ToleranceBelowString = "TolB";
+        private const string C_UpdateDateTime = "UpdateTime";
+        private const string C_CurrrentTime = "CurrentTime";
 
         private ACRef<ACRestClient> _Client;
         public ACRestClient Client
@@ -96,16 +116,38 @@ namespace gip.mes.processapplication
         #endregion
 
         [ACPropertyBindingSource(200, "Values", "en{'Racording is active'}de{'Aufnahme aktiv'}", "", false, true)]
-        public IACContainerTNet<bool> IsRecording { get; set; }
+        public IACContainerTNet<int> IsRecording { get; set; }
+
+        [ACPropertyBindingSource(200, "Values", "en{'Setpoint sequence'}de{'Sollwertfolge'}", "", false, true)]
+        public IACContainerTNet<int> SetPointSequence { get; set; }
 
         [ACPropertyBindingSource(201, "Values", "en{'Setpoint'}de{'Sollwert'}", "", false, true)]
         public IACContainerTNet<double> SetPoint { get; set; }
 
+        [ACPropertyBindingSource(201, "Values", "en{'Setpoint 2'}de{'Sollwert 2'}", "", false, true)]
+        public IACContainerTNet<double> SetPoint2 { get; set; }
+
+        [ACPropertyBindingSource(201, "Values", "en{'Setpoint 3'}de{'Sollwert 3'}", "", false, true)]
+        public IACContainerTNet<double> SetPoint3 { get; set; }
+
         [ACPropertyBindingSource(202, "Values", "en{'Tolerance +'}de{'Toleranz +'}", "", false, true)]
         public IACContainerTNet<double> TolPlus { get; set; }
 
+        [ACPropertyBindingSource(202, "Values", "en{'Tolerance 2 +'}de{'Toleranz 2 +'}", "", false, true)]
+        public IACContainerTNet<double> TolPlus2 { get; set; }
+
+        [ACPropertyBindingSource(202, "Values", "en{'Tolerance 3 +'}de{'Toleranz 3 +'}", "", false, true)]
+        public IACContainerTNet<double> TolPlus3 { get; set; }
+
+
         [ACPropertyBindingSource(203, "Values", "en{'Tolerance -'}de{'Toleranz -'}", "", false, true)]
         public IACContainerTNet<double> TolMinus { get; set; }
+
+        [ACPropertyBindingSource(203, "Values", "en{'Tolerance 2 -'}de{'Toleranz 2 -'}", "", false, true)]
+        public IACContainerTNet<double> TolMinus2 { get; set; }
+
+        [ACPropertyBindingSource(203, "Values", "en{'Tolerance 3 -'}de{'Toleranz 3 -'}", "", false, true)]
+        public IACContainerTNet<double> TolMinus3 { get; set; }
 
         private string _LastResultValues;
         [ACPropertyInfo(true, 204, "", "en{'Last results'}de{'Letztes Ergebnis'}", "", false)]
@@ -141,12 +183,32 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(206, "Values", "en{'Actual Value'}de{'Aktueller Wert'}", "", false, true)]
         public IACContainerTNet<double> ActualValue { get; set; }
 
+        [ACPropertyBindingSource(206, "Values", "en{'Actual Value 2'}de{'Aktueller Wert 2'}", "", false, true)]
+        public IACContainerTNet<double> ActualValue2 { get; set; }
+
+        [ACPropertyBindingSource(206, "Values", "en{'Actual Value 3'}de{'Aktueller Wert 3'}", "", false, true)]
+        public IACContainerTNet<double> ActualValue3 { get; set; }
+
         [ACPropertyBindingSource(207, "Values", "en{'Average Value'}de{'Mittelwert'}", "", false, true)]
         public IACContainerTNet<double> AverageValue { get; set; }
+
+        [ACPropertyBindingSource(207, "Values", "en{'Average Value 2'}de{'Mittelwert 2'}", "", false, true)]
+        public IACContainerTNet<double> AverageValue2 { get; set; }
+
+        [ACPropertyBindingSource(207, "Values", "en{'Average Value 3'}de{'Mittelwert 3'}", "", false, true)]
+        public IACContainerTNet<double> AverageValue3 { get; set; }
 
         [ACPropertyBindingSource(208, "Values", "en{'Average-State'}de{'Mittelwert-Status'}", "", false, true)]
         public IACContainerTNet<short> AverageState { get; set; }
 
+        [ACPropertyBindingSource(208, "Values", "en{'Average-State 2'}de{'Mittelwert-Status 2'}", "", false, true)]
+        public IACContainerTNet<short> AverageState2 { get; set; }
+
+        [ACPropertyBindingSource(208, "Values", "en{'Average-State 3'}de{'Mittelwert-Status 3'}", "", false, true)]
+        public IACContainerTNet<short> AverageState3 { get; set; }
+
+        [ACPropertyBindingSource(208, "Values", "en{'Update time'}de{'Updatezeit'}", "", true, true)]
+        public IACContainerTNet<bool> UpdateTime { get; set; }
 
         private string _PWSampleNode;
         [ACPropertyInfo(true, 201, "", "en{'Actual Workflownode'}de{'Aktueller Workflowknoten'}", "", false)]
@@ -169,27 +231,46 @@ namespace gip.mes.processapplication
 
         private void ApplicationManager_ProjectWorkCycleR5min(object sender, EventArgs e)
         {
-            if (IsRecording.ValueT)
+            if (IsRecording.ValueT > 0)
             {
                 this.ApplicationManager.ApplicationQueue.Add(() => { GetValues(); });
             }
         }
 
         [ACMethodInfo("", "en{'Send paramas an start order'}de{'Sende Parameter und starte Auftrag'}", 200)]
-        public bool SetParamsAndStartOrder(double setPoint, double tolPlus, double tolMinus, string pwSampleNode)
+        public bool SetParamsAndStartOrder(double setPoint, double tolPlus, double tolMinus, string pwSampleNode, int sequence)
         {
             if (!IsEnabledStartOrder())
                 return false;
             if (setPoint <= 0.000001 || tolPlus <= 0.000001 || tolMinus <= 0.000001)
                 return false;
-            if (IsRecording.ValueT)
+            if (sequence < IsRecording.ValueT )
             {
                 GetValues();
                 StopOrder();
             }
-            SetPoint.ValueT = setPoint;
-            TolPlus.ValueT = tolPlus;
-            TolMinus.ValueT = tolMinus;
+
+            SetPointSequence.ValueT = sequence;
+
+            if (sequence == 1)
+            {
+                SetPoint.ValueT = setPoint;
+                TolPlus.ValueT = tolPlus;
+                TolMinus.ValueT = tolMinus;
+            }
+            else if (sequence == 2)
+            {
+                SetPoint2.ValueT = setPoint;
+                TolPlus2.ValueT = tolPlus;
+                TolMinus2.ValueT = tolMinus;
+            }
+            else if (sequence == 3)
+            {
+                SetPoint3.ValueT = setPoint;
+                TolPlus3.ValueT = tolPlus;
+                TolMinus3.ValueT = tolMinus;
+            }
+            
             bool started = StartOrder();
             if (started)
                 PWSampleNode = pwSampleNode;
@@ -201,25 +282,78 @@ namespace gip.mes.processapplication
         {
             if (!IsEnabledStartOrder())
                 return false;
-            if (IsRecording.ValueT)
+            if ((SetPointSequence.ValueT == 1 && IsRecording.ValueT > 0))
             {
                 GetValues();
                 StopOrder();
             }
 
-            AverageValue.ValueT = 0;
-            AverageState.ValueT = 0;
+            if (UpdateTime.ValueT)
+            {
+                UriBuilder uriBuilderDT = new UriBuilder(C_UpdateDateTime + "?");
+                NameValueCollection parametersDT = HttpUtility.ParseQueryString(uriBuilderDT.Query);
+                parametersDT[C_CurrrentTime] = DateTime.Now.ToString();
+                uriBuilderDT.Query = parametersDT.ToString();
+                string relativeReqUrl = String.Format("{0}{1}", C_UpdateDateTime, uriBuilderDT.Query.ToString());
+
+                WSResponse<string> responseDT = this.Client.Get(relativeReqUrl);
+                if (!responseDT.Suceeded)
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(StartOrder), "Update DateTime is not performed!");
+                    return false;
+                }
+            }
+
+            if (SetPointSequence.ValueT == 1)
+            {
+                AverageValue.ValueT = 0;
+                AverageState.ValueT = 0;
+            }
+            else if (SetPointSequence.ValueT == 2)
+            {
+                AverageValue2.ValueT = 0;
+                AverageState.ValueT = 0;
+            }
+            else if (SetPointSequence.ValueT == 3)
+            {
+                AverageValue3.ValueT = 0;
+                AverageState3.ValueT = 0;
+            }
+
             UriBuilder uriBuilder = new UriBuilder(C_ActivateOrderString + "?");
             NameValueCollection parameters = HttpUtility.ParseQueryString(uriBuilder.Query);
-            parameters[C_WeightSetpointString] = SetPoint.ValueT.ToString("0.######").Replace(",",".");
-            parameters[C_ToleranceAboveString] = TolPlus.ValueT.ToString("0.######").Replace(",", ".");
-            parameters[C_ToleranceBelowString] = TolMinus.ValueT.ToString("0.######").Replace(",", ".");
+
+            if (SetPointSequence.ValueT == 1)
+            {
+                parameters[C_WeightSetpointString] = SetPoint.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceAboveString] = TolPlus.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceBelowString] = TolMinus.ValueT.ToString("0.######").Replace(",", ".");
+            }
+            else if (SetPointSequence.ValueT == 2)
+            {
+                parameters[C_WeightSetpointString] = SetPoint2.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceAboveString] = TolPlus2.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceBelowString] = TolMinus2.ValueT.ToString("0.######").Replace(",", ".");
+            }
+            else if (SetPointSequence.ValueT == 3)
+            {
+                parameters[C_WeightSetpointString] = SetPoint3.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceAboveString] = TolPlus3.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceBelowString] = TolMinus3.ValueT.ToString("0.######").Replace(",", ".");
+            }
+
             uriBuilder.Query = parameters.ToString();
             string relativeRequestUrl = String.Format("{0}{1}", C_ActivateOrderString, uriBuilder.Query.ToString());
+
             WSResponse<string> response = this.Client.Get(relativeRequestUrl);
             if (!response.Suceeded)
                 return false;
-            IsRecording.ValueT = true;
+
+            int recordingSequence = 1;
+            if (SetPointSequence.ValueT > 0)
+                recordingSequence = SetPointSequence.ValueT;
+
+            IsRecording.ValueT = recordingSequence;
             return true;
         }
 
@@ -238,7 +372,7 @@ namespace gip.mes.processapplication
             WSResponse<string> response = this.Client.Get(C_StopOrderString);
             if (!response.Suceeded)
                 return false;
-            IsRecording.ValueT = false;
+            IsRecording.ValueT = 0;
             PWSampleNode = null;
             return true;
         }
@@ -251,7 +385,7 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "en{'Read collected values'}de{'Lese protokollierte Werte'}", 203, true)]
-        public SamplePiStats GetValues()
+        public SamplePiStatsCollection GetValues()
         {
             if (!IsEnabledGetValues())
                 return null;
@@ -259,48 +393,86 @@ namespace gip.mes.processapplication
             if (!response.Suceeded)
                 return null;
             LastResultValues = response.Data;
-            SamplePiStats result = ParseValues(response.Data, SetPoint.ValueT, TolPlus.ValueT, TolMinus.ValueT);
-            if (result != null && result.Values.Any())
+
+            SamplePiStatsCollection result = new SamplePiStatsCollection();
+
+            SamplePiStats resultStats = ParseValues(response.Data, SetPoint.ValueT, TolPlus.ValueT, TolMinus.ValueT);
+
+            if (resultStats == null)
+                return null;
+
+            var resultsBySetPoint = resultStats.Values.GroupBy(c => c.SetPoint);
+
+            foreach (var resultBySetPoint in resultsBySetPoint)
             {
-                ACPropertyNetSource<double> actValueProp = ActualValue as ACPropertyNetSource<double>;
-                if (actValueProp.PropertyLog != null)
+                if (resultBySetPoint.Any())
                 {
-                    foreach (SamplePiValue value in result.Values)
+                    SamplePiStats resStats = new SamplePiStats();
+
+                    if (resultBySetPoint.Key == SetPoint.ValueT)
                     {
-                        actValueProp.PropertyLog.AddValue(value.Value, value.DTStamp);
+                        LogPropertyValues(resStats, resultBySetPoint.ToList(), ActualValue, SetPoint, TolPlus, TolMinus, AverageValue, AverageState);
                     }
-                    actValueProp.PropertyLog.SaveChanges();
-                }
-                var logProp = (SetPoint as ACPropertyNetServerBase<double>);
-                if (logProp != null && logProp.PropertyLog != null)
-                {
-                    logProp.PropertyLog.AddValue(this.SetPoint.ValueT, DateTime.Now);
-                    logProp.PropertyLog.SaveChanges();
-                }
+                    else if (resultBySetPoint.Key == SetPoint2.ValueT)
+                    {
+                        LogPropertyValues(resStats, resultBySetPoint.ToList(), ActualValue2, SetPoint2, TolPlus2, TolMinus2, AverageValue2, AverageState2);
+                    }
+                    else if (resultBySetPoint.Key == SetPoint3.ValueT)
+                    {
+                        LogPropertyValues(resStats, resultBySetPoint.ToList(), ActualValue3, SetPoint3, TolPlus3, TolMinus3, AverageValue3, AverageState3);
+                    }
 
-                logProp = (TolPlus as ACPropertyNetServerBase<double>);
-                if (logProp != null && logProp.PropertyLog != null)
-                {
-                    logProp.PropertyLog.AddValue(this.SetPoint.ValueT + this.TolPlus.ValueT, DateTime.Now);
-                    logProp.PropertyLog.SaveChanges();
+                    result.Add(resStats);
                 }
-
-                logProp = (TolMinus as ACPropertyNetServerBase<double>);
-                if (logProp != null && logProp.PropertyLog != null)
-                {
-                    logProp.PropertyLog.AddValue(this.SetPoint.ValueT - this.TolMinus.ValueT, DateTime.Now);
-                    logProp.PropertyLog.SaveChanges();
-                }
-
-                this.AverageValue.ValueT = result.AverageValue;
-                if (result.CountInTol > result.CountAbove + result.CountBelow)
-                    this.AverageState.ValueT = 0;
-                else if (result.CountAbove > result.CountBelow)
-                    this.AverageState.ValueT = 1;
-                else if (result.CountAbove <= result.CountBelow)
-                    this.AverageState.ValueT = -1;
             }
             return result;
+        }
+
+        private void LogPropertyValues(SamplePiStats stats, List<SamplePiValue> tolValues, IACContainerTNet<double> actualValue, IACContainerTNet<double> setPoint, IACContainerTNet<double> tolPlus, IACContainerTNet<double> tolMinus,
+                                       IACContainerTNet<double> averageValue, IACContainerTNet<short> averageState)
+        {
+            stats.SetPoint = setPoint.ValueT;
+            stats.TolPlus = tolPlus.ValueT;
+            stats.TolMinus = tolMinus.ValueT;
+            stats.Values = tolValues;
+
+            ACPropertyNetSource<double> actValueProp = actualValue as ACPropertyNetSource<double>;
+            if (actValueProp.PropertyLog != null)
+            {
+                foreach (SamplePiValue value in tolValues)
+                {
+                    actValueProp.PropertyLog.AddValue(value.Value, value.DTStamp);
+                }
+                actValueProp.PropertyLog.SaveChanges();
+            }
+            var logProp = (setPoint as ACPropertyNetServerBase<double>);
+            if (logProp != null && logProp.PropertyLog != null)
+            {
+                logProp.PropertyLog.AddValue(setPoint.ValueT, DateTime.Now);
+                logProp.PropertyLog.SaveChanges();
+            }
+
+            logProp = (tolPlus as ACPropertyNetServerBase<double>);
+            if (logProp != null && logProp.PropertyLog != null)
+            {
+                logProp.PropertyLog.AddValue(setPoint.ValueT + tolPlus.ValueT, DateTime.Now);
+                logProp.PropertyLog.SaveChanges();
+            }
+
+            logProp = (tolMinus as ACPropertyNetServerBase<double>);
+            if (logProp != null && logProp.PropertyLog != null)
+            {
+                logProp.PropertyLog.AddValue(setPoint.ValueT - tolMinus.ValueT, DateTime.Now);
+                logProp.PropertyLog.SaveChanges();
+            }
+
+            averageValue.ValueT = stats.AverageValue;
+            if (stats.CountInTol > stats.CountAbove + stats.CountBelow)
+                averageState.ValueT = 0;
+            else if (stats.CountAbove > stats.CountBelow)
+                averageState.ValueT = 1;
+            else if (stats.CountAbove <= stats.CountBelow)
+                averageState.ValueT = -1;
         }
 
         public static SamplePiStats ParseValues(string values, double setPoint, double tolPlus, double tolMinus)
@@ -308,6 +480,8 @@ namespace gip.mes.processapplication
             //0.240;Below;19/03/2022 07:07:54
             //0.505;Above;19/03/2022 07:08:33
             //0.240;Within;19/03/2022 07:22:54
+            //0.240;Within;19/03/2022 07:22:55;0.250
+
             SamplePiStats result = new SamplePiStats(setPoint, tolPlus, tolMinus);
             if (String.IsNullOrEmpty(values))
                 return result;
@@ -320,6 +494,15 @@ namespace gip.mes.processapplication
                     string[] valArr = line.Split(';');
                     if (valArr == null || valArr.Length < 3)
                         continue;
+
+                    double setPointRes = 0;
+
+                    if (valArr.Length == 4)
+                    {
+                        if (!Double.TryParse(valArr[3], NumberStyles.AllowDecimalPoint, cultureInfo, out setPointRes))
+                            continue;
+                    }
+
                     double weight = 0;
                     if (!Double.TryParse(valArr[0], NumberStyles.AllowDecimalPoint, cultureInfo, out weight))
                         continue;
@@ -327,7 +510,7 @@ namespace gip.mes.processapplication
                     if (!DateTime.TryParseExact(valArr[2], "dd/MM/yyyy HH:mm:ss", cultureInfo, System.Globalization.DateTimeStyles.None, out stamp))
                         continue;
                     //stamp = stamp.ToLocalTime();
-                    SamplePiValue piValue = new SamplePiValue() { DTStamp = stamp, Value = weight };
+                    SamplePiValue piValue = new SamplePiValue() { DTStamp = stamp, Value = weight, SetPoint = setPointRes };
                     if (valArr[1] == "Above")
                         piValue.TolState = 1;
                     else if (valArr[1] == "Below")
@@ -342,46 +525,104 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "en{'Read archived values'}de{'Lese archivierte Werte'}", 209, true)]
-        public SamplePiStats GetArchivedValues(DateTime from, DateTime to, bool useCurrentSetPoints)
+        public SamplePiStatsCollection GetArchivedValues(DateTime from, DateTime to, bool useCurrentSetPoints)
         {
             double setPoint = 0.0;
             double tolPlus = 0.0;
             double tolMinus = 0.0;
+
+            double setPoint2 = 0.0;
+            double tolPlus2 = 0.0;
+            double tolMinus2 = 0.0;
+
+            double setPoint3 = 0.0;
+            double tolPlus3 = 0.0;
+            double tolMinus3 = 0.0;
+
             if (useCurrentSetPoints)
             {
                 setPoint = SetPoint.ValueT;
                 tolPlus = TolPlus.ValueT;
                 tolMinus = TolMinus.ValueT;
+
+                setPoint2 = SetPoint2.ValueT;
+                tolPlus2 = TolPlus2.ValueT;
+                tolMinus2 = TolMinus2.ValueT;
+
+                setPoint3 = SetPoint3.ValueT;
+                tolPlus3 = TolPlus3.ValueT;
+                tolMinus3 = TolMinus3.ValueT;
             }
             if (!useCurrentSetPoints || setPoint <= double.Epsilon || tolPlus <= double.Epsilon || tolMinus <= double.Epsilon)
             {
-                var setPointSeries = (SetPoint as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
-                if (setPointSeries == null || setPointSeries.PropertyLogList == null || !setPointSeries.PropertyLogList.Any())
+                bool result = GetValuesFromArchive(SetPoint, TolPlus, TolMinus, from, to, ref setPoint, ref tolPlus, ref tolMinus);
+                if (!result)
                     return null;
-                setPoint = (double) setPointSeries.PropertyLogList.FirstOrDefault().Value;
-
-                var tolPlusSeries = (TolPlus as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
-                if (tolPlusSeries == null || tolPlusSeries.PropertyLogList == null || !tolPlusSeries.PropertyLogList.Any())
-                    return null;
-                tolPlus = (double)tolPlusSeries.PropertyLogList.FirstOrDefault().Value;
-
-                var tolMinusSeries = (TolMinus as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
-                if (tolMinusSeries == null || tolMinusSeries.PropertyLogList == null || !tolMinusSeries.PropertyLogList.Any())
-                    return null;
-                tolMinus = (double)tolMinusSeries.PropertyLogList.FirstOrDefault().Value;
             }
+
+            if (!useCurrentSetPoints || setPoint2 <= double.Epsilon || tolPlus2 <= double.Epsilon || tolMinus2 <= double.Epsilon)
+            {
+                GetValuesFromArchive(SetPoint2, TolPlus2, TolMinus2, from, to, ref setPoint2, ref tolPlus2, ref tolMinus2);
+            }
+
+            if (!useCurrentSetPoints || setPoint3 <= double.Epsilon || tolPlus3 <= double.Epsilon || tolMinus3 <= double.Epsilon)
+            {
+                GetValuesFromArchive(SetPoint3, TolPlus3, TolMinus3, from, to, ref setPoint3, ref tolPlus3, ref tolMinus3);
+            }
+
+            SamplePiStatsCollection resultStats = new SamplePiStatsCollection();
 
             SamplePiStats stats = new SamplePiStats(setPoint, tolPlus, tolMinus);
             var actValueSeries =  (ActualValue as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
             if (actValueSeries != null && actValueSeries.PropertyLogList != null && actValueSeries.PropertyLogList.Any())
                 stats.Values.AddRange(actValueSeries.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
-            return stats;
+            resultStats.Add(stats);
+
+            if (setPoint2 > double.Epsilon)
+            {
+                SamplePiStats stats2 = new SamplePiStats(setPoint2, tolPlus2, tolMinus2);
+                var actValueSeries2 = (ActualValue2 as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
+                if (actValueSeries2 != null && actValueSeries2.PropertyLogList != null && actValueSeries2.PropertyLogList.Any())
+                    stats2.Values.AddRange(actValueSeries2.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
+                resultStats.Add(stats2);
+            }
+
+            if (setPoint3 > double.Epsilon)
+            {
+                SamplePiStats stats3 = new SamplePiStats(setPoint3, tolPlus3, tolMinus3);
+                var actValueSeries3 = (ActualValue3 as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
+                if (actValueSeries3 != null && actValueSeries3.PropertyLogList != null && actValueSeries3.PropertyLogList.Any())
+                    stats3.Values.AddRange(actValueSeries3.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
+                resultStats.Add(stats3);
+            }
+
+            return resultStats;
         }
 
         public bool IsEnabledGetValues()
         {
             if (!CanSend())
                 return false;
+            return true;
+        }
+
+        private bool GetValuesFromArchive(IACContainerTNet<double> setPointProp, IACContainerTNet<double> tolPlusProp, IACContainerTNet<double> tolMinusProp, DateTime from, DateTime to, ref double setPoint, ref double tolPlus, ref double tolMinus)
+        {
+            var setPointSeries = (setPointProp as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
+            if (setPointSeries == null || setPointSeries.PropertyLogList == null || !setPointSeries.PropertyLogList.Any())
+                return false;
+            setPoint = (double)setPointSeries.PropertyLogList.FirstOrDefault().Value;
+
+            var tolPlusSeries = (tolPlusProp as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
+            if (tolPlusSeries == null || tolPlusSeries.PropertyLogList == null || !tolPlusSeries.PropertyLogList.Any())
+                return false;
+            tolPlus = (double)tolPlusSeries.PropertyLogList.FirstOrDefault().Value;
+
+            var tolMinusSeries = (tolMinusProp as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
+            if (tolMinusSeries == null || tolMinusSeries.PropertyLogList == null || !tolMinusSeries.PropertyLogList.Any())
+                return false;
+            tolMinus = (double)tolMinusSeries.PropertyLogList.FirstOrDefault().Value;
+
             return true;
         }
 
@@ -476,7 +717,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(SetParamsAndStartOrder):
-                    result = SetParamsAndStartOrder((double)acParameter[0], (double)acParameter[1], (double)acParameter[2], (string)acParameter[3]);
+                    result = SetParamsAndStartOrder((double)acParameter[0], (double)acParameter[1], (double)acParameter[2], (string)acParameter[3], (int)acParameter[4]);
                     return true;
                 case nameof(StartOrder):
                     result = StartOrder();
@@ -518,6 +759,25 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'SamplePiValue'}de{'SamplePiValue'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class SamplePiValue : INotifyPropertyChanged, IVBChartTupleT<DateTime, double>
     {
+        double _SetPoint;
+        [DataMember(Name = "SP")]
+        [ACPropertyInfo(200, "", "en{'SetPoint'}de{'Sollwert'}", "", false)]
+        public double SetPoint
+        {
+            get
+            {
+                return _SetPoint;
+            }
+            set
+            {
+                if (_SetPoint != value)
+                {
+                    _SetPoint = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         double _Value;
         [DataMember(Name = "V")]
         [ACPropertyInfo(201, "", "en{'Weight'}de{'Gewicht'}", "", false)]
@@ -886,6 +1146,15 @@ namespace gip.mes.processapplication
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+
+    }
+
+
+    [CollectionDataContract(Name = "PiSC")]
+    [ACSerializeableInfo]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'SamplePiStatsCollection'}de{'SamplePiStatsCollection'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
+    public class SamplePiStatsCollection : List<SamplePiStats>
+    {
 
     }
 
