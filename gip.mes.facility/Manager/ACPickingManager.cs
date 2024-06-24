@@ -204,12 +204,7 @@ namespace gip.mes.facility
             }
         }
 
-        public enum CheckIsRouteAllocatedModeEnum : short
-        {
-            Off = 0,
-            On = 10,
-            SkipOn = 20
-        }
+
 
         #endregion
 
@@ -1334,6 +1329,7 @@ namespace gip.mes.facility
 
             return detailMessages;
         }
+
 
         #region Virtual and protected
         public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
