@@ -1543,17 +1543,23 @@ namespace gip.mes.webservices
                 }
 
                 if (acParam != null && acParam.InwardFacilityLot == null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_PickingInward 
-                                    && bpParam.ExpirationDate != null && !string.IsNullOrEmpty(bpParam.ExternLotNo))
+                                    && (bpParam.ExpirationDate != null || !string.IsNullOrEmpty(bpParam.ExternLotNo)))
                 {
-                    //facility.ACMethodBooking tempParamClone = facManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as facility.ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-                    //tempParamClone.Database = dbApp;
-
-                    //acParam = tempParamClone.Clone() as facility.ACMethodBooking;
-
                     string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
                     mes.datamodel.FacilityLot lot = mes.datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
-                    lot.ExpirationDate = bpParam.ExpirationDate;
-                    lot.ExternLotNo = bpParam.ExternLotNo;
+                    if (bpParam.ExpirationDate != null)
+                        lot.ExpirationDate = bpParam.ExpirationDate;
+                    else if (bpParam.InwardMaterialID.HasValue)
+                    {
+                        datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == bpParam.InwardMaterialID.Value);
+                        if (material != null && material.StorageLife > 0)
+                            lot.ExpirationDate = DateTime.Now.AddDays(material.StorageLife);
+                    }
+
+                    if (string.IsNullOrEmpty(bpParam.ExternLotNo))
+                        lot.ExternLotNo = bpParam.ExternLotNo;
+                    else
+                        lot.ExternLotNo = DateTime.Now.ToShortDateString();
 
                     acParam.InwardFacilityLot = lot;
                 }
