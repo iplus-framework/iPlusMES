@@ -1542,7 +1542,7 @@ namespace gip.mes.webservices
                     }
                 }
 
-                if (acParam != null && acParam.InwardFacilityLot == null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_PickingInward 
+                if (acParam != null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_PickingInward 
                                     && (bpParam.ExpirationDate != null || !string.IsNullOrEmpty(bpParam.ExternLotNo)))
                 {
                     string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
