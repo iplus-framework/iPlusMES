@@ -1,10 +1,5 @@
 ﻿using gip.core.datamodel;
-using vd = gip.mes.datamodel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using VD = gip.mes.datamodel;
 
 namespace gip.mes.maintenance
 {
@@ -17,7 +12,7 @@ namespace gip.mes.maintenance
 
         }
 
-        public vd.VBGroup VBGroup
+        public VD.VBGroup VBGroup
         {
             get;
             set;
