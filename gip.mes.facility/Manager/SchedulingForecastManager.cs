@@ -7,7 +7,6 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using vd = gip.mes.datamodel;
 
 namespace gip.mes.facility
 {

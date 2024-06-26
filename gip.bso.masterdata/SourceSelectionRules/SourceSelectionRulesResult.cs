@@ -1,4 +1,4 @@
-﻿using dbMes = gip.mes.datamodel;
+﻿using VD = gip.mes.datamodel;
 using gip.core.datamodel;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +12,8 @@ namespace gip.bso.masterdata
 
         public List<RuleGroup> RuleGroups { get; set; } = new List<RuleGroup>();
         public List<MachineItem> MachineItems { get; set; } = new List<MachineItem>();
-        public List<dbMes.Material> DosableMaterials { get; set; } = new List<dbMes.Material>();
-        public List<dbMes.Material> NotDosableMaterials { get; set; } = new List<dbMes.Material>();
+        public List<VD.Material> DosableMaterials { get; set; } = new List<VD.Material>();
+        public List<VD.Material> NotDosableMaterials { get; set; } = new List<VD.Material>();
 
         public IACConfigStore CurrentConfigStore { get; set; }
 
@@ -21,7 +21,7 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        public void AddDosableMaterial(dbMes.Material material)
+        public void AddDosableMaterial(VD.Material material)
         {
             if (!DosableMaterials.Select(c => c.MaterialNo).Contains(material.MaterialNo))
             {
@@ -30,7 +30,7 @@ namespace gip.bso.masterdata
         }
 
 
-        public void AddNotDosableMaterial(dbMes.Material material)
+        public void AddNotDosableMaterial(VD.Material material)
         {
             if (!NotDosableMaterials.Select(c => c.MaterialNo).Contains(material.MaterialNo))
             {

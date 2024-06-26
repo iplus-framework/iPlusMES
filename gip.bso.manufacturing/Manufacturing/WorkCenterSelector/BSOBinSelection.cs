@@ -1,7 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using System.Linq;
-using vb = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -234,12 +234,12 @@ namespace gip.bso.manufacturing
 
         private void LoadBinFacilityList()
         {
-            using (vb.DatabaseApp dbApp = new vb.DatabaseApp())
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
                 List<BinSelectionItem> binSelectionList =
                     dbApp
                     .Facility
-                    .Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)vb.FacilityTypesEnum.PreparationBin)
+                    .Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)VD.FacilityTypesEnum.PreparationBin)
                    .OrderBy(c => c.FacilityNo)
                    .AsEnumerable()
                    .Select(c => new BinSelectionItem()
@@ -258,7 +258,7 @@ namespace gip.bso.manufacturing
 
         private void LoadBinFacilityChargeList()
         {
-            using (vb.DatabaseApp dbApp = new vb.DatabaseApp())
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
                 // c.FacilityLot == null - Charge recive LotNo from production
                 List<BinSelectionItem> binSelectionList =
@@ -290,9 +290,9 @@ namespace gip.bso.manufacturing
 
         #region Properties => OrderInfo
 
-        private vb.ProdOrderPartslistPos _EndBatchPos;
+        private VD.ProdOrderPartslistPos _EndBatchPos;
         [ACPropertyInfo(604)]
-        public vb.ProdOrderPartslistPos EndBatchPos
+        public VD.ProdOrderPartslistPos EndBatchPos
         {
             get => _EndBatchPos;
             set
@@ -619,7 +619,7 @@ namespace gip.bso.manufacturing
 
         #region private methods
 
-        internal void GetEndBatchPos(vb.DatabaseApp db, Guid posID)
+        internal void GetEndBatchPos(VD.DatabaseApp db, Guid posID)
         {
             using (ACMonitor.Lock(db.QueryLock_1X000))
             {

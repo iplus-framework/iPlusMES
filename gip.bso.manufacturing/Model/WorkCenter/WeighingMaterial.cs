@@ -1,19 +1,12 @@
 ﻿using System.Runtime.CompilerServices;
-using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using vd = gip.mes.datamodel;
-using System.Text;
-using System.Threading.Tasks;
+using VD = gip.mes.datamodel;
 using gip.mes.processapplication;
 using System.ComponentModel;
 using System.Data;
-using gip.core.processapplication;
-using System.Threading;
-using gip.mes.facility;
 using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
@@ -23,7 +16,7 @@ namespace gip.bso.manufacturing
     {
         #region c'tors
 
-        public WeighingMaterial(vd.ProdOrderPartslistPosRelation posRelation, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign, IACObject parent)
+        public WeighingMaterial(VD.ProdOrderPartslistPosRelation posRelation, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign, IACObject parent)
         {
             PosRelation = posRelation;
             MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
@@ -33,7 +26,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(MaterialUnitList));
         }
 
-        public WeighingMaterial(vd.PickingPos pickingPos, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign)
+        public WeighingMaterial(VD.PickingPos pickingPos, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign)
         {
             PickingPosition = pickingPos;
 
@@ -54,9 +47,9 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
-        private vd.ProdOrderPartslistPosRelation _PosRelation;
+        private VD.ProdOrderPartslistPosRelation _PosRelation;
         [ACPropertyInfo(100)]
-        public vd.ProdOrderPartslistPosRelation PosRelation
+        public VD.ProdOrderPartslistPosRelation PosRelation
         {
             get => _PosRelation;
             set
@@ -78,8 +71,8 @@ namespace gip.bso.manufacturing
                                    _PosRelation.SourceProdOrderPartslistPos.Material.IsLotManaged : false;
                     UnitName = _PosRelation.SourceProdOrderPartslistPos?.Material?.BaseMDUnit?.MDUnitName;
 
-                    if (_PosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)vd.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed ||
-                        _PosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)vd.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
+                    if (_PosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)VD.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed ||
+                        _PosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)VD.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
                     {
                         TargetQuantity = _PosRelation.TargetWeight;
                         ActualQuantity = _PosRelation.ActualWeight;
@@ -101,9 +94,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public vd.PickingPos _PickingPosition;
+        public VD.PickingPos _PickingPosition;
         [ACPropertyInfo(100)]
-        public vd.PickingPos PickingPosition
+        public VD.PickingPos PickingPosition
         {
             get => _PickingPosition;
             set
@@ -385,9 +378,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private vd.MaterialUnit _SelectedMaterialUnit;
+        private VD.MaterialUnit _SelectedMaterialUnit;
         [ACPropertySelected(109, "ManAddMaterialUnit", "en{'Material unit to add'}de{'Materialeinheit zum Hinzufügen'}")]
-        public vd.MaterialUnit SelectedMaterialUnit
+        public VD.MaterialUnit SelectedMaterialUnit
         {
             get => _SelectedMaterialUnit;
             set
@@ -397,9 +390,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private IEnumerable<vd.MaterialUnit> _MaterialUnitList;
+        private IEnumerable<VD.MaterialUnit> _MaterialUnitList;
         [ACPropertyList(110, "ManAddMaterialUnit")]
-        public IEnumerable<vd.MaterialUnit> MaterialUnitList
+        public IEnumerable<VD.MaterialUnit> MaterialUnitList
         {
             get
             {
@@ -464,7 +457,7 @@ namespace gip.bso.manufacturing
             return calcWeight--;
         }
 
-        public void ChangeComponentState(WeighingComponentState newState, vd.DatabaseApp dbApp)
+        public void ChangeComponentState(WeighingComponentState newState, VD.DatabaseApp dbApp)
         {
             if (_WeighingMaterialState == WeighingComponentState.InWeighing && newState >= WeighingComponentState.WeighingCompleted)
             {
