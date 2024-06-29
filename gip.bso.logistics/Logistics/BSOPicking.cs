@@ -3078,10 +3078,10 @@ namespace gip.bso.logistics
         }
 
 
-        [ACMethodInteraction(nameof(RecalcAcutalQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking))]
-        public void RecalcAcutalQuantity()
+        [ACMethodInteraction(nameof(RecalcActualQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking))]
+        public void RecalcActualQuantity()
         {
-            if(!IsEnabledRecalcAcutalQuantity())
+            if(!IsEnabledRecalcActualQuantity())
             {
                 return;
             }
@@ -3093,7 +3093,7 @@ namespace gip.bso.logistics
             }
         }
 
-        public bool IsEnabledRecalcAcutalQuantity()
+        public bool IsEnabledRecalcActualQuantity()
         {
             return 
                 SelectedPicking != null 
@@ -4908,6 +4908,12 @@ namespace gip.bso.logistics
                     return true;
                 case nameof(IsEnabledNavigateToVisitorVoucher):
                     result = IsEnabledNavigateToVisitorVoucher();
+                    return true;
+                case nameof(RecalcActualQuantity):
+                    RecalcActualQuantity();
+                    return true;
+                case nameof(IsEnabledRecalcActualQuantity):
+                    result = IsEnabledRecalcActualQuantity();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
