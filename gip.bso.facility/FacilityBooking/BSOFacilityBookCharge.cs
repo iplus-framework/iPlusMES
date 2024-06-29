@@ -22,7 +22,6 @@ using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Policy;
 
 namespace gip.bso.facility
 {
@@ -1856,7 +1855,7 @@ namespace gip.bso.facility
 
             MsgWithDetails msgWithDetails = GetBookingMessages(results);
 
-            if(msgWithDetails.MessageLevel >= eMsgLevel.Warning)
+            if (msgWithDetails.MessageLevel >= eMsgLevel.Warning)
             {
                 Messages.Msg(msgWithDetails);
             }
@@ -2219,6 +2218,66 @@ namespace gip.bso.facility
         public bool IsEnabledResetFilterExpirationDate()
         {
             return true;
+        }
+
+        #endregion
+
+        #region Method -> ShowDialogOrderInfo
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+            DialogOrderInfoPrepareFilter(paOrderInfo);
+
+            Search();
+
+            DialogOrderInfoPreSelectCharge(paOrderInfo);
+
+            ShowDialog(this, "ShowDialogOrderInfoDlg");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+        public virtual void DialogOrderInfoPrepareFilter(PAOrderInfo paOrderInfo)
+        {
+            PAOrderInfoEntry materialEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Material)).FirstOrDefault();
+            PAOrderInfoEntry facilityLotEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityLot)).FirstOrDefault();
+
+            if (materialEntry != null)
+            {
+                Material material = DatabaseApp.Material.Where(c => c.MaterialID == materialEntry.EntityID).FirstOrDefault();
+                AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CMaterialNoProperty, material.MaterialNo);
+            }
+
+            if (facilityLotEntry != null)
+            {
+                FacilityLot facilityLot = DatabaseApp.FacilityLot.Where(c => c.FacilityLotID == facilityLotEntry.EntityID).FirstOrDefault();
+                AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CLotNoProperty, facilityLot.LotNo);
+            }
+        }
+
+        public virtual void DialogOrderInfoPreSelectCharge(PAOrderInfo paOrderInfo)
+        {
+            PAOrderInfoEntry facilityChargeEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
+
+            if (facilityChargeEntry != null)
+            {
+                FacilityCharge facilityCharge = DatabaseApp.FacilityCharge.Where(c => c.FacilityChargeID == facilityChargeEntry.EntityID).FirstOrDefault();
+                if (FacilityChargeList == null)
+                {
+                    FacilityChargeList = new List<FacilityCharge>();
+                }
+
+                if (!FacilityChargeList.Contains(facilityCharge))
+                {
+                    FacilityChargeList.Add(facilityCharge);
+                }
+
+                SelectedFacilityCharge = facilityCharge;
+                CurrentFacilityCharge = facilityCharge;
+
+            }
         }
 
         #endregion
@@ -2657,11 +2716,11 @@ namespace gip.bso.facility
 
         private MsgWithDetails GetBookingMessages(Dictionary<ACMethodBooking, ACMethodEventArgs> results)
         {
-            MsgWithDetails msgWithDetails  = new MsgWithDetails();
-            foreach(KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            foreach (KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
             {
                 MsgWithDetails msg = GetBookingMessage(item.Key, item.Value);
-                if(msg!= null)
+                if (msg != null)
                 {
                     msgWithDetails.AddDetailMessage(msg);
                 }

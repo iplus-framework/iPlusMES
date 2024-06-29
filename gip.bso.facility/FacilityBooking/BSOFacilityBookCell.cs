@@ -20,9 +20,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Windows.Interop;
 
 namespace gip.bso.facility
 {
@@ -1035,7 +1032,7 @@ namespace gip.bso.facility
 
                         bool startWorkflow = true;
                         if (openPicking == Global.MsgResult.Yes)
-                        { 
+                        {
                             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
                             if (service != null)
                             {
@@ -1939,6 +1936,41 @@ namespace gip.bso.facility
                 return true;
             return false;
         }
+
+        #endregion
+
+        #region Navigation BSOFaciltiyBookCharge
+
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Navigate to quant'}de{'Zum Quant navigieren'}", 603, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityCharge()
+        {
+            if (!IsEnabledNavigateToFacilityCharge())
+            {
+                return;
+            }
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityCharge), SelectedFacilityCharge.FacilityChargeID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+
+                if (SelectedFacilityCharge.FacilityLotID != null)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                }
+
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityCharge()
+        {
+            return SelectedFacilityCharge != null;
+        }
+
 
         #endregion
 

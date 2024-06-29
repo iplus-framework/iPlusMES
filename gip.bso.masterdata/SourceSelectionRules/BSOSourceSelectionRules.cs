@@ -382,17 +382,18 @@ namespace gip.bso.masterdata
                         ruleGroup = new RuleGroup(result, groupItem.Key);
                     }
 
+                    string preConfigACUrl = invokerPWNode.ConfigACUrl;
+                    if (!preConfigACUrl.EndsWith("\\"))
+                    {
+                        preConfigACUrl = preConfigACUrl + "\\";
+                    }
+                    if (!string.IsNullOrEmpty(outPreConfigACUrl))
+                    {
+                        preConfigACUrl = outPreConfigACUrl + preConfigACUrl;
+                    }
+
                     foreach (MapPosToWFConnSubItem mapPosToWFConnSub in mapPosToWFConnSubs)
                     {
-                        string preConfigACUrl = invokerPWNode.ConfigACUrl;
-                        if (!preConfigACUrl.EndsWith("\\"))
-                        {
-                            preConfigACUrl = preConfigACUrl + "\\";
-                        }
-                        if (!string.IsNullOrEmpty(outPreConfigACUrl))
-                        {
-                            preConfigACUrl = outPreConfigACUrl + preConfigACUrl;
-                        }
 
                         List<ACClass> excludedProcessModules = GetExcludedProcessModules(database, configStores, preConfigACUrl, mapPosToWFConnSub.PWNode);
 
@@ -421,7 +422,7 @@ namespace gip.bso.masterdata
                         }
 
                         bool? help = false;
-                        List<ACClass> allProcessModules = RulesCommand.GetProcessModules(mapPosToWFConnSub.PWNode, database, out help)?.Item1?.ToList();
+                        List<ACClass> allProcessModules = RulesCommand.GetProcessModules(mapPosToWFConnSub.PWNode, database, out help, null, RouteResultMode.ShortRoute)?.Item1?.ToList();
                         result.FillMachineItems(allProcessModules, excludedProcessModules, preConfigACUrl, mapPosToWFConnSub.PWNode);
                     }
                 }

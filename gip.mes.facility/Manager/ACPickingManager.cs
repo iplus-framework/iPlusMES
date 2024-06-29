@@ -204,11 +204,28 @@ namespace gip.mes.facility
             }
         }
 
-        public enum CheckIsRouteAllocatedModeEnum : short
+        private bool _CanStartIfRouteAllocated;
+        [ACPropertyInfo(9999, "", "en{'Can start if route allocated'}de{'Kann starten, wenn Route zugewiesen ist'}", "", true)]
+        public bool CanStartIfRouteAllocated
         {
-            Off = 0,
-            On = 10,
-            SkipOn = 20
+            get => _CanStartIfRouteAllocated;
+            set => _CanStartIfRouteAllocated = value;
+        }
+
+        public bool CanUserStartIfRouteAllocated
+        {
+            get
+            {
+                ClassRightManager rightManager = CurrentRightsOfInvoker;
+                if (rightManager == null)
+                    return true;
+                IACPropertyBase acProperty = this.GetProperty(nameof(CanStartIfRouteAllocated));
+                if (acProperty == null)
+                    return true;
+                Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
+                return rightMode >= Global.ControlModes.Enabled;
+
+            }
         }
 
         #endregion
@@ -1335,6 +1352,7 @@ namespace gip.mes.facility
             return detailMessages;
         }
 
+
         #region Virtual and protected
         public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, string selectionRuleID = "PAMSilo.Deselector",
@@ -1385,7 +1403,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams);
+                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams, checkOnStart);
                 }
             }
         }
@@ -1573,10 +1591,14 @@ namespace gip.mes.facility
 
                 if (result.Routes == null || !result.Routes.Any())
                 {
+                    eMsgLevel errorLevel = eMsgLevel.Error;
+                    if (CanUserStartIfRouteAllocated)
+                        errorLevel = eMsgLevel.Warning;
+
                     msg = new Msg
                     {
                         Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Warning,
+                        MessageLevel = errorLevel,
                         ACIdentifier = "CheckResourcesAndRouting(90)",
                         Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
                     };
@@ -1588,7 +1610,7 @@ namespace gip.mes.facility
 
         private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                                          PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType,
-                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null, bool checkOnStart = false)
         {
             Msg msg;
 
@@ -1683,11 +1705,34 @@ namespace gip.mes.facility
                 {
                     Source = GetACUrl(),
                     MessageLevel = eMsgLevel.Error,
-                    ACIdentifier = "CheckResourcesAndRouting(90)",
+                    ACIdentifier = nameof(CheckResourcesAndRoutingUnknownSource) + "(90)",
                     Message = Root.Environment.TranslateMessage(this, "Error50120", "", pos.ToFacility.FacilityNo)
                 };
                 detailMessages.AddDetailMessage(msg);
                 return;
+            }
+
+            if (checkOnStart && CheckIsRouteAllocated)
+            {
+                routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos,
+                                                  null, null, null, true, 0, selectionRuleID, selectionRuleParams, false);
+
+                if (routes == null || !routes.Any())
+                {
+                    eMsgLevel errorLevel = eMsgLevel.Error;
+                    if (CanUserStartIfRouteAllocated)
+                        errorLevel = eMsgLevel.Warning;
+
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = errorLevel,
+                        ACIdentifier = nameof(CheckResourcesAndRoutingUnknownSource) + "(95)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50120", "", pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
             }
         }
 
@@ -2084,7 +2129,8 @@ namespace gip.mes.facility
                                 bool onlyContainer = true,
                                 short reservationMode = 0,
                                 string selectionRuleID = "PAMSilo.Deselector",
-                                object[] selectionRuleParams = null)
+                                object[] selectionRuleParams = null,
+                                bool includeAllocated = true)
         {
             if (currentProcessModule == null)
             {
@@ -2120,7 +2166,7 @@ namespace gip.mes.facility
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
                     MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
-                    IncludeAllocated = true,
+                    IncludeAllocated = includeAllocated,
                     DBRecursionLimit = 10
                 };
 
@@ -2149,7 +2195,7 @@ namespace gip.mes.facility
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
                     MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
-                    IncludeAllocated = true,
+                    IncludeAllocated = includeAllocated,
                     DBRecursionLimit = 10
                 };
 

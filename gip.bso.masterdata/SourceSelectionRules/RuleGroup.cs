@@ -1,9 +1,8 @@
 ﻿using gip.core.datamodel;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using dbMes = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 
 namespace gip.bso.masterdata
 {
@@ -94,7 +93,7 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        public RuleSelection AddRuleSelection(ACClassWF pwNode, dbMes.Material material, ACClass source, ACClass target, string preConfigACUrl)
+        public RuleSelection AddRuleSelection(ACClassWF pwNode, VD.Material material, ACClass source, ACClass target, string preConfigACUrl)
         {
             RuleSelection ruleSelection =
                 RuleSelectionList

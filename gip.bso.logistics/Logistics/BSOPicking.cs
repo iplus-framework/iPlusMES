@@ -3078,6 +3078,29 @@ namespace gip.bso.logistics
         }
 
 
+        [ACMethodInteraction(nameof(RecalcAcutalQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking))]
+        public void RecalcAcutalQuantity()
+        {
+            if(!IsEnabledRecalcAcutalQuantity())
+            {
+                return;
+            }
+
+            PickingPos[] pickingPositions = SelectedPicking.PickingPos_Picking.ToArray();
+            foreach(PickingPos pos in pickingPositions)
+            {
+                pos.RecalcActualQuantity();
+            }
+        }
+
+        public bool IsEnabledRecalcAcutalQuantity()
+        {
+            return 
+                SelectedPicking != null 
+                && SelectedPicking.PickingPos_Picking.Any();
+        }
+
+
         public virtual string GetPWClassNameOfRoot()
         {
             if (this.ACFacilityManager != null)
@@ -3548,7 +3571,7 @@ namespace gip.bso.logistics
                 OnPropertyChanged(nameof(FacilityBookingList));
                 ACFacilityManager.RecalcAfterPosting(DatabaseApp, currentPickingPos, changedQuantity, isCancellation, true);
                 Save();
-
+                
                 Msg msg = null;
                 if (autoSetQuantToZero == SetQuantToZeroMode.CheckIfZeroAskUser)
                     msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);

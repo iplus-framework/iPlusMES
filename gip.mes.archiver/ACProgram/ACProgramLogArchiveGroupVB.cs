@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.datamodel;
-using vd = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.Serialization;
@@ -60,11 +60,11 @@ namespace gip.mes.archiver
 
         protected override string OnProgramLogArchive(ACProgram acProgram, string exportPath)
         {
-            IEnumerable<vd.OrderLog> orderLogList;
-            IEnumerable<vd.OperationLog> operationLogList;
-            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            IEnumerable<VD.OrderLog> orderLogList;
+            IEnumerable<VD.OperationLog> operationLogList;
+            using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
             {
-                vd.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
+                VD.ACProgram acProgramVB = dbApp.ACProgram.FirstOrDefault(c => c.ACProgramID == acProgram.ACProgramID);
 
                 //DeleteOperationLog(dbApp, acProgram);
 
@@ -104,7 +104,7 @@ namespace gip.mes.archiver
         {
             string exportPathWithDate = exportPath;
 
-            vd.ACProgram acProgramVB = acProgram as vd.ACProgram;
+            VD.ACProgram acProgramVB = acProgram as VD.ACProgram;
             if (acProgramVB == null && acProgram is ACProgram)
                 return base.CreateACProgramDirectory(acProgram, exportPath);
 
@@ -138,9 +138,9 @@ namespace gip.mes.archiver
             return acProgramDirPath;
         }
 
-        private Tuple<string, DateTime> GetProdOrderProgramNoAndInsertDate(vd.ACProgram acProgram)
+        private Tuple<string, DateTime> GetProdOrderProgramNoAndInsertDate(VD.ACProgram acProgram)
         {
-            vd.ProdOrder prodOrder = acProgram.ACProgramLog_ACProgram.Where(c => c.OrderLog_VBiACProgramLog != null && c.OrderLog_VBiACProgramLog.ProdOrderPartslistPos != null)
+            VD.ProdOrder prodOrder = acProgram.ACProgramLog_ACProgram.Where(c => c.OrderLog_VBiACProgramLog != null && c.OrderLog_VBiACProgramLog.ProdOrderPartslistPos != null)
                                                         .Select(x => x.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder).Distinct().FirstOrDefault();
 
             if (prodOrder == null)
@@ -156,7 +156,7 @@ namespace gip.mes.archiver
             return null;
         }
 
-        private void ArchiveOrderLog(IEnumerable<vd.OrderLog> orderLogList, ACProgram acProgram, string exportPath, vd.DatabaseApp dbApp)
+        private void ArchiveOrderLog(IEnumerable<VD.OrderLog> orderLogList, ACProgram acProgram, string exportPath, VD.DatabaseApp dbApp)
         {
             if (exportPath == null)
                 return;
@@ -189,7 +189,7 @@ namespace gip.mes.archiver
                 return;
             }
 
-            DataContractSerializer serializer = new DataContractSerializer(typeof(List<vd.OrderLog>));
+            DataContractSerializer serializer = new DataContractSerializer(typeof(List<VD.OrderLog>));
             try
             {
                 using (FileStream fs = File.Open(filePath, FileMode.Create))
@@ -232,7 +232,7 @@ namespace gip.mes.archiver
             }
         }
 
-        private void ArchiveOperationLog(IEnumerable<vd.OperationLog> operationLoglist, ACProgram acProgram, string exportPath, vd.DatabaseApp dbApp)
+        private void ArchiveOperationLog(IEnumerable<VD.OperationLog> operationLoglist, ACProgram acProgram, string exportPath, VD.DatabaseApp dbApp)
         {
             if (exportPath == null)
                 return;
@@ -265,7 +265,7 @@ namespace gip.mes.archiver
                 return;
             }
 
-            DataContractSerializer serializer = new DataContractSerializer(typeof(List<vd.OperationLog>));
+            DataContractSerializer serializer = new DataContractSerializer(typeof(List<VD.OperationLog>));
             try
             {
                 using (FileStream fs = File.Open(filePath, FileMode.Create))
@@ -404,13 +404,13 @@ namespace gip.mes.archiver
 
         public void DeserializeOrderLog(string orderLogPath)
         {
-            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<vd.OrderLog>));
+            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<VD.OrderLog>));
             using (FileStream fs = File.Open(orderLogPath, FileMode.Open))
             {
-                List<vd.OrderLog> orders = serializerOrder.ReadObject(fs) as List<vd.OrderLog>;
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                List<VD.OrderLog> orders = serializerOrder.ReadObject(fs) as List<VD.OrderLog>;
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
-                    foreach (vd.OrderLog log in orders)
+                    foreach (VD.OrderLog log in orders)
                     {
                         if (!dbApp.OrderLog.Any(c => c.VBiACProgramLogID == log.VBiACProgramLogID))
                         {
@@ -433,13 +433,13 @@ namespace gip.mes.archiver
 
         public void DeserializeOperationLog(string operationLogPath)
         {
-            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<vd.OperationLog>));
+            DataContractSerializer serializerOrder = new DataContractSerializer(typeof(List<VD.OperationLog>));
             using (FileStream fs = File.Open(operationLogPath, FileMode.Open))
             {
-                List<vd.OperationLog> operationLogs = serializerOrder.ReadObject(fs) as List<vd.OperationLog>;
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                List<VD.OperationLog> operationLogs = serializerOrder.ReadObject(fs) as List<VD.OperationLog>;
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                 {
-                    foreach (vd.OperationLog log in operationLogs)
+                    foreach (VD.OperationLog log in operationLogs)
                     {
                         if (!dbApp.OperationLog.Any(c => c.ACProgramLogID == log.ACProgramLogID))
                         {
@@ -496,12 +496,12 @@ namespace gip.mes.archiver
 
             string pathWithDate = String.Format("{0}\\{1}\\{2:00}", paFileCyclicExport.Path, prodOrderInsertDate.Year, prodOrderInsertDate.Month);
             ACProgram acProgram = null;
-            vd.ACProgram acProgramVB = null;
+            VD.ACProgram acProgramVB = null;
             using (Database db = new core.datamodel.Database())
             {
-                using (vd.DatabaseApp dbApp = new vd.DatabaseApp(db))
+                using (VD.DatabaseApp dbApp = new VD.DatabaseApp(db))
                 {
-                    vd.ProdOrder prodOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == prodOrderProgramNo);
+                    VD.ProdOrder prodOrder = dbApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == prodOrderProgramNo);
                     acProgramVB = dbApp.OrderLog.Where(c => (c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProdOrderID == prodOrder.ProdOrderID)
                                                     || (c.ProdOrderPartslistPosRelation != null
                                                     && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProdOrderID == prodOrder.ProdOrderID)

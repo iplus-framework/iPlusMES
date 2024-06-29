@@ -309,7 +309,7 @@ where
                         double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0)).Sum();
                         if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
                         {
-                            saveChanges = true;
+                            saveChanges = true || saveChanges;
                             FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
                             foreach (FacilityPreBooking preBooking in preBookings)
                             {
@@ -328,6 +328,7 @@ where
                                     else
                                     {
                                         preBooking.DeleteACObject(databaseApp, false);
+                                        position.RecalcActualQuantity();
                                     }
                                 }
                             }

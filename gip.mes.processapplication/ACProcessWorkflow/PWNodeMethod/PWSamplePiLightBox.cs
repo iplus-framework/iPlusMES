@@ -317,7 +317,7 @@ namespace gip.mes.processapplication
                 || !ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.HasValue)
                 return;
 
-            DateTime startTimeFrom = ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.Value;
+            DateTime startTimeFrom = ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.Value.GetDateTimeDSTCorrected();
 
             double tolPlus = 0;
             double tolMinus = 0;
@@ -379,16 +379,16 @@ namespace gip.mes.processapplication
                         if (relatedPos == endBatchPos || relatedPos.MDUnit == null || relatedPos.MDUnit.SIDimension != GlobalApp.SIDimensions.Mass)
                             continue;
 
-                        setPoint = relatedPos.TargetQuantityUOM / endBatchPos.TargetQuantityUOM;
-                        tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
-                        tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
+                        if (relatedPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any(x => !x.SourceProdOrderPartslistPos.Material.IsIntermediate))
+                        {
+                            setPoint = relatedPos.TargetQuantityUOM / endBatchPos.TargetQuantityUOM;
+                            tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
+                            tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
 
-                        setPoints.Insert(0,(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus)));
+                            setPoints.Insert(0, (new Tuple<double, double, double>(setPoint, tolPlus, tolMinus)));
+                        }
                     }
-                    
                 }
-
-
             }
 
             string labOrderTemplateName = LabOrderTemplateName;
@@ -403,7 +403,7 @@ namespace gip.mes.processapplication
                     using (var dbIPlus = new Database())
                     using (var dbApp = new DatabaseApp(dbIPlus))
                     {
-                        Msg msg;
+                        Msg msg = null;
                         ProdOrderPartslistPos plPos = dbApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID);
                         if (plPos == null)
                         {
@@ -417,34 +417,40 @@ namespace gip.mes.processapplication
                             box.GetValues();
                             if (box.StopOrder())
                             {
-                                SamplePiStats stats = box.GetArchivedValues(startTimeFrom, DateTime.Now, true);
-                                if (stats != null)
+                                SamplePiStatsCollection statsCollection = box.GetArchivedValues(startTimeFrom, DateTime.Now, true);
+                                if (statsCollection != null)
                                 {
-                                    stats.SetToleranceAndRecalc(setPoint, tolPlus, tolMinus);
-
-                                    LabOrderPos labOrderPos;
-                                    msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.AsSamplePiStatsInOnePos, out labOrderPos);
-                                    if (msg == null && labOrderPos == null)
+                                    foreach (SamplePiStats stats in statsCollection)
                                     {
-                                        //Error50323: The LabOrder position Sample weight not exist.
-                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
-                                    }
-                                    if (msg != null)
-                                    {
-                                        AddAlarm(msg, true);
-                                        return;
-                                    }
-                                    labOrderPos.ReferenceValue = setPoint;
-                                    labOrderPos.ValueMax = setPoint + tolPlus;
-                                    labOrderPos.ValueMin = setPoint - tolMinus;
-                                    labOrderPos[C_LabOrderExtFieldStats] = stats;
+                                        if (!stats.Values.Any())
+                                            continue;
 
-                                    gip.core.datamodel.ACClass machine =  ParentPWGroup?.AccessedProcessModule?.ComponentClass;
-                                    if (machine != null)
-                                    {
-                                        labOrderPos.LabOrder.RefACClassID = machine.ACClassID;
-                                    }
+                                        stats.SetToleranceAndRecalc(stats.SetPoint, stats.TolPlus, stats.TolMinus);
 
+                                        LabOrderPos labOrderPos = null;
+                                        msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.PositionForEachWeighing, out labOrderPos);
+                                        
+                                        if (msg == null && labOrderPos == null)
+                                        {
+                                            //Error50323: The LabOrder position Sample weight not exist.
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
+                                        }
+                                        if (msg != null)
+                                        {
+                                            AddAlarm(msg, true);
+                                            return;
+                                        }
+                                        labOrderPos.ReferenceValue = stats.SetPoint;
+                                        labOrderPos.ValueMax = stats.SetPoint + stats.TolPlus;
+                                        labOrderPos.ValueMin = stats.SetPoint - stats.TolMinus;
+                                        labOrderPos[C_LabOrderExtFieldStats] = stats;
+
+                                        gip.core.datamodel.ACClass machine = ParentPWGroup?.AccessedProcessModule?.ComponentClass;
+                                        if (machine != null)
+                                        {
+                                            labOrderPos.LabOrder.RefACClassID = machine.ACClassID;
+                                        }
+                                    }
                                     msg = dbApp.ACSaveChanges();
                                 }
                             }
@@ -457,12 +463,38 @@ namespace gip.mes.processapplication
 
                     foreach (PAESamplePiLightBox box in boxes)
                     {
-                        foreach (var setPointParam in setPoints)
+                        int sequence = 0;
+                        int tryCounter = 0;
+
+                        for (int i = 0; i < setPoints.Count; i++)
                         {
-                            if (!box.SetParamsAndStartOrder(setPoint, tolPlus, tolMinus, acUrl))
+                            sequence++;
+
+                            var setPointItem = setPoints[i];
+
+                            if (!box.SetParamsAndStartOrder(setPointItem.Item1, setPointItem.Item2, setPointItem.Item3, acUrl, sequence))
                             {
-                                // TODO: Error
+                                bool result = box.StopOrder();
+                                if (!result)
+                                {
+                                    Messages.LogError(this.GetACUrl(), nameof(StartAndStopLightBoxes)+"(10)", "Error with stop order!");
+                                    result = box.StopOrder();
+                                    if (!result)
+                                    {
+                                        Messages.LogError(this.GetACUrl(), nameof(StartAndStopLightBoxes) + "(11)", "Error with stop order!");
+                                        break;
+                                    }
+                                }
+                                i = 0; //Start again
+                                tryCounter++;
+                                if (tryCounter > 5)
+                                {
+                                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(PWSamplePiLightBox), nameof(StartAndStopLightBoxes) + "(12)", 486, "Error50636");
+                                    AddAlarm(msg, true);
+                                    break;
+                                }
                             }
+                            
                         }
                     }
                 }
