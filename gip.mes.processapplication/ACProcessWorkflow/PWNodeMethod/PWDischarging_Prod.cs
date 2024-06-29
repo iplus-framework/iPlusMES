@@ -542,6 +542,10 @@ namespace gip.mes.processapplication
                                 if (acValue != null)
                                     OnSetLastBatchParam(acValue, acMethod, dischargeToModule, dbApp, batchPlan, currentBatchPos);
 
+                                ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                                if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
+                                    acValueTargetQ.Value = currentBatchPos.TargetQuantityUOM;
+
                                 acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
                                 if (acValue != null
                                     && ParentPWGroup != null

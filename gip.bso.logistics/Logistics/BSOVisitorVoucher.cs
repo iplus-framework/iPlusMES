@@ -80,6 +80,10 @@ namespace gip.bso.logistics
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
             if (!base.ACInit(startChildMode))
                 return false;
 
@@ -97,6 +101,8 @@ namespace gip.bso.logistics
             _VisitorVoucherManager = null;
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+            ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+            _PickingManager = null;
 
             this._AccessUnAssignedDeliveryNote = null;
             this._AccessUnAssignedPicking = null;
@@ -187,6 +193,16 @@ namespace gip.bso.logistics
             }
         }
 
+        protected ACRef<ACPickingManager> _PickingManager = null;
+        protected ACPickingManager PickingManager
+        {
+            get
+            {
+                if (_PickingManager == null)
+                    return null;
+                return _PickingManager.ValueT;
+            }
+        }
         #endregion
 
         #region VisitorVoucher
@@ -1198,7 +1214,7 @@ namespace gip.bso.logistics
                 return;
             if (this.VisitorVoucherManager == null)
                 return;
-            this.VisitorVoucherManager.CheckOut(CurrentVisitorVoucher, DatabaseApp);
+            this.VisitorVoucherManager.CheckOut(CurrentVisitorVoucher, DatabaseApp, PickingManager, this.InDeliveryNoteManager, this.OutDeliveryNoteManager, this.ACFacilityManager as FacilityManager);
             PostExecute("CheckOut");
         }
 

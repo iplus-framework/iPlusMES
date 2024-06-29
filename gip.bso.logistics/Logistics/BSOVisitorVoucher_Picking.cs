@@ -287,8 +287,8 @@ namespace gip.bso.logistics
                 return false;
             if (CurrentUnAssignedPicking.VisitorVoucher != null)
                 return false;
-            if (CurrentVisitorVoucher.Picking_VisitorVoucher.Count > 0)
-                return false;
+            //if (CurrentVisitorVoucher.Picking_VisitorVoucher.Count > 0)
+                //return false;
             if (CurrentVisitorVoucher.Visitor == null)
                 return false;
             return true;

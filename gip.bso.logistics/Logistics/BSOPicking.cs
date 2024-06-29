@@ -68,6 +68,7 @@ namespace gip.bso.logistics
         {
             //DatabaseMode = DatabaseModes.OwnDB;
             _ForwardToRemoteStores = new ACPropertyConfigValue<bool>(this, nameof(ForwardToRemoteStores), false);
+            _NavigateOnGenRelated = new ACPropertyConfigValue<bool>(this, nameof(NavigateOnGenRelated), false);
         }
 
         /// <summary>
@@ -174,7 +175,8 @@ namespace gip.bso.logistics
                 ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
             _OutDeliveryNoteManager = null;
 
-            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            if (_ACFacilityManager != null)
+                FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
 
             this._AccessBookingFacility = null;
@@ -2285,6 +2287,20 @@ namespace gip.bso.logistics
             }
         }
 
+        protected ACPropertyConfigValue<bool> _NavigateOnGenRelated;
+        [ACPropertyConfig("en{'Navigate to ne generated picking order'}de{'Navigiere zu generiertem Kommissionierauftrag'}")]
+        public bool NavigateOnGenRelated
+        {
+            get
+            {
+                return _NavigateOnGenRelated.ValueT;
+            }
+            set
+            {
+                _NavigateOnGenRelated.ValueT = value;
+            }
+        }
+
 
         protected ACRef<ACInDeliveryNoteManager> _InDeliveryNoteManager = null;
         public ACInDeliveryNoteManager InDeliveryNoteManager
@@ -2825,6 +2841,7 @@ namespace gip.bso.logistics
             if (SelectedFilterDeliveryAddress != null)
                 newPicking.DeliveryCompanyAddress = SelectedFilterDeliveryAddress;
             CurrentPicking = newPicking;
+            OnNewPicking(newPicking);
             if (PickingList == null)
             {
                 PickingList = new List<Picking>();
@@ -2833,6 +2850,10 @@ namespace gip.bso.logistics
             SelectedPicking = newPicking;
             ACState = Const.SMNew;
             PostExecute("New");
+        }
+
+        protected virtual void OnNewPicking(Picking newPicking)
+        {
         }
 
         /// <summary>
@@ -2994,11 +3015,20 @@ namespace gip.bso.logistics
         {
             if (!IsEnabledMirrorPicking())
                 return;
+            Picking currentPicking = CurrentPicking;
             Picking mirroredPicking = PickingManager.MirrorPicking(DatabaseApp, CurrentPicking);
             AccessPrimary.NavList.Add(mirroredPicking);
             OnPropertyChanged(nameof(PickingList));
-            CurrentPicking = mirroredPicking;
-            SelectedPicking = mirroredPicking;
+            if (NavigateOnGenRelated && mirroredPicking != null)
+            {
+                CurrentPicking = mirroredPicking;
+                SelectedPicking = mirroredPicking;
+            }
+            else
+            {
+                CurrentPicking = currentPicking;
+                CurrentPicking = currentPicking;
+            }
         }
 
         public bool IsEnabledMirrorPicking()
@@ -3013,7 +3043,8 @@ namespace gip.bso.logistics
             if (!IsEnabledGenerateSubPickingsForSupply())
                 return;
             Picking mirroredPicking = null;
-            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, CurrentPicking);
+            Picking currentPicking = CurrentPicking;
+            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, currentPicking);
             if (mirroredPickings != null && mirroredPickings.Any())
             {
                 foreach (var picking in mirroredPickings)
@@ -3024,10 +3055,15 @@ namespace gip.bso.logistics
                 }
             }
             OnPropertyChanged(nameof(PickingList));
-            if (mirroredPicking != null)
+            if (NavigateOnGenRelated && mirroredPicking != null)
             {
                 CurrentPicking = mirroredPicking;
                 SelectedPicking = mirroredPicking;
+            }
+            else
+            {
+                CurrentPicking = currentPicking;
+                CurrentPicking = currentPicking;
             }
         }
 
@@ -3039,6 +3075,15 @@ namespace gip.bso.logistics
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.InternalRelocation
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.Receipt
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.ReceiptVehicle;
+        }
+
+
+        public virtual string GetPWClassNameOfRoot()
+        {
+            if (this.ACFacilityManager != null)
+                return this.ACFacilityManager.C_PWMethodRelocClass;
+            else
+                return nameof(PWMethodRelocation);
         }
 
         #endregion
