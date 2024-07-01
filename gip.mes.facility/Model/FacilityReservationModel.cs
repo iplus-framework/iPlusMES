@@ -4,6 +4,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static gip.mes.datamodel.GlobalApp;
 
 namespace gip.mes.facility
 {
@@ -66,7 +67,7 @@ namespace gip.mes.facility
                 if (_AssignedQuantity != value)
                 {
                     double difference = value - _AssignedQuantity;
-                    if(!IsOnlyStockMovement)
+                    if (!IsOnlyStockMovement)
                     {
                         FreeQuantity = FreeQuantity - difference;
                     }
@@ -114,6 +115,43 @@ namespace gip.mes.facility
 
         [ACPropertyInfo(6, "", "en{'Oldest charge date'}de{'Ältestes Quant-Datum'}")]
         public DateTime? OldestFacilityChargeDate { get; set; }
+
+
+        private bool _IsObserveQuantity;
+        [ACPropertyInfo(7, "", "en{'Observe quantity'}de{'Menge beachten'}")]
+        public bool IsObserveQuantity
+        {
+            get
+            {
+                if(FacilityReservation != null)
+                {
+                    if(FacilityReservation.ReservationStateIndex == (short)ReservationState.ObserveQuantity)
+                    {
+                        _IsObserveQuantity = true;
+                    }
+                    else
+                    {
+                        _IsObserveQuantity = false;
+                    }
+                }
+                return _IsObserveQuantity;
+            }
+            set
+            {
+                _IsObserveQuantity = value;
+                if (FacilityReservation != null)
+                {
+                    if (value)
+                    {
+                        FacilityReservation.ReservationStateIndex = (short)ReservationState.ObserveQuantity;
+                    }
+                    else
+                    {
+                        FacilityReservation.ReservationStateIndex = (short)ReservationState.New;
+                    }
+                }
+            }
+        }
 
         #endregion
 

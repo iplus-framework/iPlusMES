@@ -1512,6 +1512,14 @@ namespace gip.mes.facility
             facilityReservation.Material = facilityReservationModel.Material;
             facilityReservation.FacilityLot = facilityReservationModel.FacilityLot;
             facilityReservation.ReservedQuantityUOM = facilityReservationModel.AssignedQuantity;
+            if(facilityReservationModel.IsObserveQuantity)
+            {
+                facilityReservation.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
+            }
+            else
+            {
+                facilityReservation.ReservationState = GlobalApp.ReservationState.New;
+            }
             facilityReservationModel.FacilityReservation = facilityReservation;
 
             return facilityReservationModel;
