@@ -51,6 +51,32 @@ namespace gip.mes.facility
             {
                 public Guid FacilityLotID { get; internal set; }
                 public double? Quantity { get; internal set; }
+                public short ReservationStateIndex { get; internal set; }
+                public GlobalApp.ReservationState State { get { return (GlobalApp.ReservationState)ReservationStateIndex; } }
+                public bool IsQuantityObservable { get { return State != GlobalApp.ReservationState.New; } }
+                public double? ActualQuantity { get; set; }
+                public double? RestQuantity
+                {
+                    get
+                    {
+                        if (Quantity.HasValue && ActualQuantity.HasValue)
+                            return ActualQuantity - Quantity;
+                        else if (Quantity.HasValue)
+                            return 0.0 - Quantity.Value;
+                        return null;
+                    }
+                }
+                public static void UpdateActualQFromResCollection(IEnumerable<ReservationInfo> reservationsToUpdate, IEnumerable<ReservationInfo> fromCollection)
+                {
+                    if (reservationsToUpdate == null || fromCollection == null)
+                        return;
+                    foreach (ReservationInfo from in fromCollection)
+                    {
+                        ReservationInfo to = reservationsToUpdate.FirstOrDefault(c => c.FacilityLotID == from.FacilityLotID);
+                        if (to != null)
+                            to.ActualQuantity = from.ActualQuantity;
+                    }
+                }
             }
 
             public class FacilityChargeInfo
@@ -207,7 +233,7 @@ namespace gip.mes.facility
                 {
                     _ReservationInfos = poRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos
                         .Where(c => c.FacilityLotID.HasValue)
-                        .Select(c => new ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM })
+                        .Select(c => new ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM, ReservationStateIndex = c.ReservationStateIndex })
                         .ToArray();
                 }
                 if (_ReservationInfos != null && _ReservationInfos.Any())
@@ -274,7 +300,7 @@ namespace gip.mes.facility
                 {
                     _ReservationInfos = pickingPos.FacilityReservation_PickingPos
                         .Where(c => c.FacilityLotID.HasValue)
-                        .Select(c => new ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM })
+                        .Select(c => new ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM, ReservationStateIndex = c.ReservationStateIndex })
                         .ToArray();
                 }
                 BuildFilteredResultFromReservationInfo(reservationMode);

@@ -2103,6 +2103,8 @@ namespace gip.mes.facility
                     FacilityReservation mirroredReservation = FacilityReservation.NewACObject(databaseApp, mirroredPos, secondaryKey);
                     mirroredReservation.CopyFrom(reservation, true);
                     mirroredReservation.PickingPos = mirroredPos;
+                    if (reservation.ReservationState == GlobalApp.ReservationState.ObserveQuantity)
+                        mirroredReservation.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
 
                     mirroredPos.FacilityReservation_PickingPos.Add(mirroredReservation);
                 }

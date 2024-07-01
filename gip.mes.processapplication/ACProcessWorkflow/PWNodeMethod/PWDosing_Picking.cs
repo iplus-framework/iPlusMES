@@ -125,6 +125,7 @@ namespace gip.mes.processapplication
                         facility.ACPartslistManager.QrySilosResult possibleSilos = null;
                         IEnumerable<Route> routes = null;
 
+                        // If Picking is not explicit Relocation from a selected Silo, then dosigns from more Silos could be possible to reach the quantity
                         if (pickingPos.FromFacility == null)
                         {
                             RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
@@ -132,6 +133,7 @@ namespace gip.mes.processapplication
                                                                                 null, null, ExcludedSilos, ReservationMode);
                             routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, module, out possibleSilos);
                         }
+                        // Picking is a relocation from an explicitly selected Silo
                         else
                         {
                             ACRoutingParameters rParameters = new ACRoutingParameters()
@@ -357,6 +359,8 @@ namespace gip.mes.processapplication
                     facility.ACPartslistManager.QrySilosResult possibleSilos = null;
                     IEnumerable<Route> routes = null;
 
+                    // + TODO in Bookingmanger book explicitly from lot
+                    // If Picking is not explicit Relocation from a selected Silo, then dosigns from more Silos could be possible to reach the quantity
                     if (pickingPos.FromFacility == null)
                     {
                         RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
@@ -364,6 +368,7 @@ namespace gip.mes.processapplication
                                                                             null, null, ExcludedSilos, ReservationMode);
                         routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     }
+                    // Picking is a relocation from an explicitly selected Silo
                     else
                     {
                         ACRoutingParameters rParameters = new ACRoutingParameters()

@@ -111,6 +111,7 @@ namespace gip.mes.facility
 
         #region Additional members
 
+        [ACPropertyInfo(8, "", "en{'Reservation'}de{'Reservierung'}")]
         public FacilityReservation FacilityReservation { get; set; }
 
         [ACPropertyInfo(6, "", "en{'Oldest charge date'}de{'Ältestes Quant-Datum'}")]
@@ -123,9 +124,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if(FacilityReservation != null)
+                if (FacilityReservation != null)
                 {
-                    if(FacilityReservation.ReservationStateIndex == (short)ReservationState.ObserveQuantity)
+                    if (FacilityReservation.ReservationState != ReservationState.New)
                     {
                         _IsObserveQuantity = true;
                     }
@@ -139,15 +140,15 @@ namespace gip.mes.facility
             set
             {
                 _IsObserveQuantity = value;
-                if (FacilityReservation != null)
+                if (FacilityReservation != null && FacilityReservation.ReservationState <= ReservationState.New)
                 {
                     if (value)
                     {
-                        FacilityReservation.ReservationStateIndex = (short)ReservationState.ObserveQuantity;
+                        FacilityReservation.ReservationState = ReservationState.ObserveQuantity;
                     }
                     else
                     {
-                        FacilityReservation.ReservationStateIndex = (short)ReservationState.New;
+                        FacilityReservation.ReservationState = ReservationState.New;
                     }
                 }
             }

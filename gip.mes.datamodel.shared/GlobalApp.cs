@@ -1308,6 +1308,7 @@ namespace gip.mes.datamodel
                 {
 
                     GlobalApp._ReservationStateList = new ACValueItemList("ReservationStateIndex");
+                    GlobalApp._ReservationStateList.AddEntry((short)ReservationState.ObserveQuantity, "en{'Observe Quantity'}de{'Mengen einhalten'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.New, "en{'New'}de{'Neu'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Active, "en{'Active'}de{'Aktiv'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
