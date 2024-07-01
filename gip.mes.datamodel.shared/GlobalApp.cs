@@ -1287,6 +1287,7 @@ namespace gip.mes.datamodel
 
         public enum ReservationState : short
         {
+            ObserveQuantity = -1,
             New = 0,
             Active = 1,
             Finished = 2,
