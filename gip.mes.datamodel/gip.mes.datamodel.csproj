@@ -96,6 +96,7 @@
     <Compile Include="EntityACProgram\OrderLogPosMachines.cs" />
     <Compile Include="EntityACProgram\OrderLogPosView.cs" />
     <Compile Include="EntityACProgram\OrderLogRelView.cs" />
+    <Compile Include="EntityFacility\Extensions.cs" />
     <Compile Include="EntityFacility\FacilityLotModel.cs" />
     <Compile Include="EntityFacility\FacilityMaterialOEE.cs" />
     <Compile Include="EntityFacility\FacilityMaterial.cs" />

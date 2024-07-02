@@ -39,16 +39,5 @@ namespace gip.mes.datamodel
 
         public Guid FacilityLotID { get; set; }
 
-
-        #region Mehtods
-        public void RoundActualQuantity(string mdUnitForRounding = null)
-        {
-            if (mdUnitForRounding == null || mdUnitForRounding.Contains(MDUnitName))
-            {
-                ActualQuantity = (int)Math.Round(ActualQuantity);
-            }
-        }
-        #endregion
-
     }
 }
