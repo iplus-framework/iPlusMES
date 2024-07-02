@@ -451,65 +451,9 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        #region additional properties
+        #region Additional Properties
 
-        /// <summary>
-        /// There are no comments for Property ReservedInwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedInwardQuantity()
-        {
-            if (this.Material == null)
-                return;
-
-            this.ReservedInwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.InOrderPosID.HasValue);
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch geliefert wird
-                // TODO: Zugänge von Produktionsaufträge mit einrechnen
-                // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
-                //this.ReservedInwardQuantity +=
-                //        this.Material.QuantityToQuantity(facilityReservation.InOrderPos.TargetQuantity,
-                //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit)
-                //        - this.Material.QuantityToQuantity(facilityReservation.InOrderPos.ActualQuantity,
-                //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit);
-
-            }
-        }
-
-        /// <summary>
-        /// There are no comments for Property ReservedOutwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedOutwardQuantity()
-        {
-            if (this.Material == null)
-                return;
-
-            this.ReservedOutwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.OutOrderPosID.HasValue);
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch abgebucht wird
-                // TODO: Abgänge von Produktionsaufträgen mit einrechnen
-                // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
-                //this.ReservedOutwardQuantity +=
-                //        this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.TargetQuantity,
-                //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit)
-                //        - this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.ActualQuantity,
-                //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit);
-
-            }
-        }
+        #region Additional Properties -> Quantities
 
         /// <summary>
         /// There are no comments for Property ReservedQuantity in the schema.
@@ -535,7 +479,9 @@ namespace gip.mes.datamodel
             }
         }
 
-        #region FacilityCharge Origin
+        #endregion
+
+        #region Additional Properties -> FacilityCharge Origin
 
         /// <summary>
         /// Charge is direct input into stock from outside
@@ -559,7 +505,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return  FinalRootPositionFromFbc != null;
+                return FinalRootPositionFromFbc != null;
             }
         }
 
@@ -662,6 +608,8 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Additional Properties -> Order (ProdOrder, InOrder)
+
         [ACPropertyInfo(9999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
         public string ProdOrderProgramNo
         {
@@ -735,6 +683,126 @@ namespace gip.mes.datamodel
                         inOrderNo = fb.InOrderPos.InOrder.InOrderNo;
                 }
                 return inOrderNo;
+            }
+        }
+
+        #endregion
+
+        #region Additional Properties -> Related Company 
+
+        private bool _relatedCompanyLoaded;
+        private Company _RelatedCompany;
+        protected Company RelatedCompany
+        {
+            get
+            {
+                if (!_relatedCompanyLoaded)
+                {
+                    _relatedCompanyLoaded = true;
+                    _RelatedCompany = Material.CompanyMaterial_Material.OrderByDescending(c => c.InsertDate).Select(c => c.Company).FirstOrDefault();
+                }
+                return _RelatedCompany;
+            }
+        }
+
+        private string _CompanyNo;
+        [ACPropertyInfo(500, nameof(CompanyNo), ConstApp.CompanyNo)]
+        public string CompanyNo
+        {
+            get
+            {
+                if (_CompanyNo == null)
+                {
+                    _CompanyNo = "";
+                    if (RelatedCompany != null)
+                    {
+                        _CompanyNo = RelatedCompany.CompanyNo;
+                    }
+                }
+                return _CompanyNo;
+            }
+        }
+
+        private string _CompanyName;
+        [ACPropertyInfo(501, nameof(CompanyName), ConstApp.CompanyName)]
+        public string CompanyName
+        {
+            get
+            {
+                if (_CompanyName == null)
+                {
+                    _CompanyName = "";
+                    if (RelatedCompany != null)
+                    {
+                        _CompanyName = RelatedCompany.CompanyName;
+                    }
+                }
+                return _CompanyName;
+            }
+        }
+
+        #endregion
+
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// There are no comments for Property ReservedInwardQuantity in the schema.
+        /// </summary>
+        public void RecalcReservedInwardQuantity()
+        {
+            if (this.Material == null)
+                return;
+
+            this.ReservedInwardQuantity = 0;
+            // TODO: OR-Klausel einfügen für Produktionsaufträge
+            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.InOrderPosID.HasValue);
+            foreach (FacilityReservation facilityReservation in facilityReservationList)
+            {
+                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+                // Die TargetQuantity gibt an, wieviel Reserviert ist
+                // Die Differenz gibt an, wieviel noch geliefert wird
+                // TODO: Zugänge von Produktionsaufträge mit einrechnen
+                // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
+                //this.ReservedInwardQuantity +=
+                //        this.Material.QuantityToQuantity(facilityReservation.InOrderPos.TargetQuantity,
+                //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
+                //                                    this.MaterialUnit.MDQuantityUnit)
+                //        - this.Material.QuantityToQuantity(facilityReservation.InOrderPos.ActualQuantity,
+                //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
+                //                                    this.MaterialUnit.MDQuantityUnit);
+
+            }
+        }
+
+        /// <summary>
+        /// There are no comments for Property ReservedOutwardQuantity in the schema.
+        /// </summary>
+        public void RecalcReservedOutwardQuantity()
+        {
+            if (this.Material == null)
+                return;
+
+            this.ReservedOutwardQuantity = 0;
+            // TODO: OR-Klausel einfügen für Produktionsaufträge
+            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.OutOrderPosID.HasValue);
+            foreach (FacilityReservation facilityReservation in facilityReservationList)
+            {
+                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+                // Die TargetQuantity gibt an, wieviel Reserviert ist
+                // Die Differenz gibt an, wieviel noch abgebucht wird
+                // TODO: Abgänge von Produktionsaufträgen mit einrechnen
+                // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
+                //this.ReservedOutwardQuantity +=
+                //        this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.TargetQuantity,
+                //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
+                //                                    this.MaterialUnit.MDQuantityUnit)
+                //        - this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.ActualQuantity,
+                //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
+                //                                    this.MaterialUnit.MDQuantityUnit);
+
             }
         }
 
@@ -860,6 +928,7 @@ namespace gip.mes.datamodel
 
             return queryStep2;
         }
+
 
         #endregion
 

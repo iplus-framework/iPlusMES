@@ -94,6 +94,11 @@
         #endregion
 
         #region Labels
+        // Company
+        public const string Company = "en{'Company'}de{'Unternehmen'}";
+        public const string CompanyNo = "en{'Company No.'}de{'Unternehmensnr.'}";
+        public const string CompanyName = "en{'Company Name'}de{'Name des Unternehmens'}";
+
         // Quantity
         public const string InwardQuantity = "en{'Inward Quantity'}de{'Zugangsmenge'}";
         public const string InwardTargetQuantity = "en{'Target Inward Qty.'}de{'Zugangsmenge Soll'}";
@@ -210,8 +215,6 @@
         public const string Lot = "en{'Lot'}de{'Los'}";
         public const string LotNo = "en{'Lot No.'}de{'Los-Nr.'}";
         public const string SplitNo = "en{'Split No.'}de{'Splitnr'}";
-
-        public const string Company = "en{'Company'}de{'Unternehmen'}";
 
         public const string BOM = "en{'Bill of Materials'}de{'Stückliste'}";
 

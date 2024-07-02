@@ -5,9 +5,9 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioCompany, "en{'Company'}de{'Unternehmen'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOCompany")]
-    [ACPropertyEntity(1, "CompanyName", "en{'Company Name'}de{'Name des Unternehmens'}", "", "Name of Company", MinLength = 1)]
-    [ACPropertyEntity(2, "CompanyNo", "en{'Company No.'}de{'Unternehmensnr.'}", "", "Number of Company", MinLength = 1)]
+    [ACClassInfo(Const.PackName_VarioCompany, ConstApp.Company, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOCompany")]
+    [ACPropertyEntity(1, nameof(CompanyName), ConstApp.CompanyNo, "", "Name of Company", MinLength = 1)]
+    [ACPropertyEntity(2, nameof(CompanyNo), ConstApp.CompanyName, "", "Number of Company", MinLength = 1)]
     [ACPropertyEntity(3, "IsCustomer", "en{'Customer'}de{'Kunde'}", "", "", true)]
     [ACPropertyEntity(4, "IsDistributor", "en{'Distributor'}de{'Lieferant'}", "", "", true)]
     [ACPropertyEntity(5, "IsDistributorLead", "en{'Lead Distributor'}de{'Hauptlieferant'}", "", "", true)]
