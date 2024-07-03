@@ -32,7 +32,7 @@ namespace gip.mes.webservices
 
         protected IEnumerable<MDPickingType> ConvertToWSPickingType(IQueryable<gip.mes.datamodel.MDPickingType> query)
         {
-            return query.AsEnumerable().Select(c => new MDPickingType()
+            return query.OrderBy(c => c.SortIndex).AsEnumerable().Select(c => new MDPickingType()
             {
                 MDPickingTypeID = c.MDPickingTypeID,
                 MDPickingTypeTrans = c.MDNameTrans
