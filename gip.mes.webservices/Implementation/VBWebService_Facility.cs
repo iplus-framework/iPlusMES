@@ -1556,7 +1556,7 @@ namespace gip.mes.webservices
                             lot.ExpirationDate = DateTime.Now.AddDays(material.StorageLife);
                     }
 
-                    if (string.IsNullOrEmpty(bpParam.ExternLotNo))
+                    if (!string.IsNullOrEmpty(bpParam.ExternLotNo))
                         lot.ExternLotNo = bpParam.ExternLotNo;
                     else
                         lot.ExternLotNo = DateTime.Now.ToShortDateString();
