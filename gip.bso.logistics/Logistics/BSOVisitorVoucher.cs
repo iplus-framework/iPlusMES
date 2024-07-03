@@ -858,7 +858,7 @@ namespace gip.bso.logistics
             }
         }
 
-        protected void RefreshWeighingList(bool forceRefresh = false)
+        public virtual void RefreshWeighingList(bool forceRefresh = false)
         {
             if (forceRefresh && SelectedVisitorVoucher !=  null)
             {
