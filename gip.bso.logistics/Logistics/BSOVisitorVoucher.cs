@@ -21,6 +21,7 @@ using gip.mes.autocomponent;
 using gip.mes.facility;
 using System.Data.Objects;
 using System.Data;
+using gip.bso.masterdata;
 
 namespace gip.bso.logistics
 {
@@ -847,7 +848,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (   this.SelectedVisitorVoucher == null
+                if (this.SelectedVisitorVoucher == null
                     || this.SelectedVisitorVoucher.EntityState == EntityState.Added
                     || this.SelectedVisitorVoucher.EntityState == EntityState.Detached)
                     return null;
@@ -860,7 +861,7 @@ namespace gip.bso.logistics
 
         public virtual void RefreshWeighingList(bool forceRefresh = false)
         {
-            if (forceRefresh && SelectedVisitorVoucher !=  null)
+            if (forceRefresh && SelectedVisitorVoucher != null)
             {
                 SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoLoad();
                 SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoRefresh();
@@ -868,6 +869,65 @@ namespace gip.bso.logistics
             _WeighingList = null;
             OnPropertyChanged(nameof(WeighingList));
         }
+
+
+        private Weighing _FirstWeighing;
+
+        [ACPropertyInfo(500, nameof(FirstWeighing), "en{'First weighing'}de{'Erstes Wiegen'}")]
+        public Weighing FirstWeighing
+        {
+            get
+            {
+                return _FirstWeighing;
+            }
+            set
+            {
+                if (_FirstWeighing != value)
+                {
+                    _FirstWeighing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Weighing _LastWeighing;
+
+        [ACPropertyInfo(501, nameof(LastWeighing), "en{'Second weighing'}de{'Zweite Wiegen'}")]
+        public Weighing LastWeighing
+        {
+            get
+            {
+                return _LastWeighing;
+            }
+            set
+            {
+                if (_LastWeighing != value)
+                {
+                    _LastWeighing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private double _FLWeigDiff;
+
+        [ACPropertyInfo(502, nameof(FLWeigDiff), "en{'Weighing difference'}de{'Wiegeunterschied'}")]
+        public double FLWeigDiff
+        {
+            get
+            {
+                return _FLWeigDiff;
+            }
+            set
+            {
+                if (_FLWeigDiff != value)
+                {
+                    _FLWeigDiff = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         #endregion
 
@@ -1085,6 +1145,20 @@ namespace gip.bso.logistics
             return base.ExecuteNavSearch(acAccess);
         }
 
+        public override object Clone()
+        {
+            object clonedObject = base.Clone();
+
+            if (clonedObject != null && clonedObject is BSOVisitorVoucher)
+            {
+                BSOVisitorVoucher bSOVisitorVoucher = clonedObject as BSOVisitorVoucher;
+                bSOVisitorVoucher.SelectedVisitorVoucher = SelectedVisitorVoucher;
+                LoadFirstLastWeighting(bSOVisitorVoucher);
+            }
+
+            return clonedObject;
+        }
+
         #endregion
 
         #region New Deliverynote's
@@ -1210,7 +1284,7 @@ namespace gip.bso.logistics
         [ACMethodCommand(Visitor.ClassName, "en{'Check Out'}de{'Abmelden'}", (short)601, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void CheckOut()
         {
-            if (!PreExecute("CheckOut")) 
+            if (!PreExecute("CheckOut"))
                 return;
             if (this.VisitorVoucherManager == null)
                 return;
@@ -1375,6 +1449,28 @@ namespace gip.bso.logistics
         public bool IsEnabledRegisterWeight()
         {
             return SelectedScale != null;
+        }
+
+        private void LoadFirstLastWeighting(BSOVisitorVoucher bSOVisitorVoucher)
+        {
+            if (bSOVisitorVoucher.WeighingList == null || !bSOVisitorVoucher.WeighingList.Any())
+            {
+                bSOVisitorVoucher.FirstWeighing = null;
+                bSOVisitorVoucher.LastWeighing = null;
+                bSOVisitorVoucher.FLWeigDiff = 0;
+            }
+            else
+            {
+                Dictionary<long, Weighing> weighings = new Dictionary<long, Weighing>();
+                foreach (Weighing weighing in bSOVisitorVoucher.WeighingList)
+                {
+                    long key = long.Parse(string.Join("", weighing.WeighingNo.Where(c => char.IsDigit(c))));
+                    weighings.Add(key, weighing);
+                }
+                bSOVisitorVoucher.FirstWeighing = weighings.OrderBy(c => c.Key).FirstOrDefault().Value;
+                bSOVisitorVoucher.LastWeighing = weighings.OrderByDescending(c => c.Key).FirstOrDefault().Value;
+                bSOVisitorVoucher.FLWeigDiff = Math.Abs(bSOVisitorVoucher.FirstWeighing.Weight - bSOVisitorVoucher.LastWeighing.Weight);
+            }
         }
         #endregion
 
