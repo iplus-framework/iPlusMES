@@ -88,6 +88,8 @@ namespace gip.bso.logistics
             if (!base.ACInit(startChildMode))
                 return false;
 
+            CleanFilterPicking();
+
             Search();
             return true;
         }
