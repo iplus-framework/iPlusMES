@@ -105,22 +105,21 @@ namespace gip.bso.logistics
             }
         }
 
-        private string _FilterPickingExternLotNo2;
-        [ACPropertyInfo(305, nameof(FilterPickingExternLotNo2), "en{'Extern Lot No.2'}de{'Kundenreferenz'}")]
-        public string FilterPickingExternLotNo2
+        [ACPropertyInfo(305, nameof(FilterPickingKeyOfExternalSys), ConstApp.EntityTranslateKeyOfExtSys)]
+        public virtual string FilterPickingKeyOfExternalSys
         {
             get
             {
-                return _FilterPickingExternLotNo2;
+                string tmp = AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<string>(nameof(Picking.KeyOfExtSys));
+                if (String.IsNullOrEmpty(tmp))
+                    return null;
+                return AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<string>(nameof(Picking.KeyOfExtSys));
             }
             set
             {
-                if (_FilterPickingExternLotNo2 != value)
-                {
-                    _FilterPickingExternLotNo2 = value;
-                    OnPropertyChanged();
-                    RefreshUnAssignedPickingList();
-                }
+                AccessUnAssignedPicking.NavACQueryDefinition.SetSearchValue(nameof(Picking.KeyOfExtSys), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+                RefreshUnAssignedPickingList();
             }
         }
 
@@ -284,19 +283,6 @@ namespace gip.bso.logistics
                         );
                 }
 
-                if (!string.IsNullOrEmpty(FilterPickingExternLotNo2))
-                {
-                    result =
-                        result
-                        .Where(c =>
-                            c.PickingPos_Picking
-                            .Any(x =>
-                                   x.FacilityBookingCharge_PickingPos.Any(y => y.InwardFacilityLot.ExternLotNo2.Contains(FilterPickingExternLotNo2))
-                                   || x.FacilityBookingCharge_PickingPos.Any(y => y.OutwardFacilityLot.ExternLotNo2.Contains(FilterPickingExternLotNo2))
-                            )
-                        );
-                }
-
 
             }
             return result;
@@ -309,8 +295,9 @@ namespace gip.bso.logistics
                 return new List<ACFilterItem>()
                 {
                     new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.VisitorVoucherID), Global.LogicalOperators.isNull, Global.Operators.and, "", true),
-                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.DeliveryDateFrom), Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, null, true),
-                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.DeliveryDateTo), Global.LogicalOperators.lessThan, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.DeliveryDateFrom), Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.DeliveryDateTo), Global.LogicalOperators.lessThan, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.KeyOfExtSys), Global.LogicalOperators.contains, Global.Operators.and, "", true),
                     new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
                     new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle), true),
                     new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.IssueVehicle), true),
