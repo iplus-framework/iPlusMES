@@ -49,9 +49,9 @@ namespace gip.mes.facility
             #region Internal Classes
             public class ReservationInfo
             {
-                public Guid FacilityLotID { get; internal set; }
-                public double? Quantity { get; internal set; }
-                public short ReservationStateIndex { get; internal set; }
+                public Guid FacilityLotID { get; set; }
+                public double? Quantity { get; set; }
+                public short ReservationStateIndex { get; set; }
                 public GlobalApp.ReservationState State { get { return (GlobalApp.ReservationState)ReservationStateIndex; } }
                 public bool IsQuantityObservable { get { return State != GlobalApp.ReservationState.New; } }
                 public double? ActualQuantity { get; set; }
@@ -141,6 +141,23 @@ namespace gip.mes.facility
                                 _StockFree = 0.0;
                             _StockFree += fcInfo.Quant.StockQuantityUOM;
                         }
+                    }
+                }
+
+                private List<Tuple<Guid, double>> _StockPerLot;
+                public IEnumerable<Tuple<Guid, double>> StockPerLot
+                {
+                    get
+                    {
+                        if (_StockPerLot != null)
+                            return _StockPerLot;
+                        _StockPerLot = FacilityCharges
+                            .Where(c => c.IsReservedLot)
+                            .Select(c => new { LotID = c.Quant.FacilityLotID, Q = c.Quant.StockQuantityUOM })
+                            .GroupBy(c => c.LotID.Value)
+                            .Select(g => new Tuple<Guid, double>(g.Key, g.Sum(e => e.Q)))
+                            .ToList();
+                        return _StockPerLot;
                     }
                 }
             }

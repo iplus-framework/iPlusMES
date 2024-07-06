@@ -1929,7 +1929,7 @@ namespace gip.mes.facility
                             if (facility != null && !facility.ShouldLeaveMaterialOccupation)
                             {
                                 bool isFacilityInUse = CheckIsFacilityInUse(facility);
-                                if(!isFacilityInUse)
+                                if (!isFacilityInUse)
                                 {
                                     facility.Material = null;
                                     facility.Partslist = null;

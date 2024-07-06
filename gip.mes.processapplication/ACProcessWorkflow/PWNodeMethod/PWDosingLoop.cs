@@ -3,6 +3,8 @@ using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Xml;
 using System;
+using gip.mes.datamodel;
+using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication
 {
@@ -109,7 +111,11 @@ namespace gip.mes.processapplication
                         double dosedQuantity;
                         if (pwDosing.HasOpenDosings(out dosedQuantity))
                         {
-                            hasOpenDosings = true;
+                            PWDosing pwDosing2 = pwDosing as PWDosing;
+                            if (pwDosing2 != null)
+                                hasOpenDosings = pwDosing2.HasAndCanProcessAnyMaterialPicking(ParentPWGroup.AccessedProcessModule);
+                            else
+                                hasOpenDosings = true;
                             break;
                         }
                     }

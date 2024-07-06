@@ -154,26 +154,35 @@ namespace gip.mes.processapplication
                             rResult = ACRoutingService.SelectRoutes(scaleACClass, pickingPos.FromFacility.FacilityACClass, rParameters);
                         }
 
+                        bool observeQuantity = false;
+                        double? dosingQuantityFromSilo = null;
                         Route dosingRoute = null;
+                        ACPartslistManager.QrySilosResult.FacilitySumByLots dosingSilo = null;
+                        int remainingSilos = 0;
+                        List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
                         if (pickingPos.FromFacility == null && possibleSilos != null && possibleSilos.FilteredResult != null)
                         {
-                            foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
-                            {
-                                if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue
-                                    || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
-                                    continue;
-                                dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
-                                if (dosingRoute != null)
-                                    break;
-                            }
+                            ApplyReservationFilter(pickingPos, possibleSilos, routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
                         }
                         else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any())
                             continue;
                         else
                         {
-                            //return true;
-                            dosingRoute = rResult.Routes.FirstOrDefault();
-                            //CurrentDosingRoute = dosingRoute;
+                            if (pickingPos.FromFacility != null)
+                            {
+                                var facilityCharges = dbApp.FacilityCharge
+                                    .Include("Facility.FacilityStock_Facility")
+                                    .Include("MDReleaseState")
+                                    .Include("FacilityLot.MDReleaseState")
+                                    .Include("Facility.MDFacilityType")
+                                    .Where(c => c.FacilityID == pickingPos.FromFacilityID && !c.NotAvailable).ToArray();
+                                possibleSilos = new ACPartslistManager.QrySilosResult(facilityCharges);
+                                possibleSilos.ApplyLotReservationFilter(pickingPos, 0);
+                                possibleSilos.ApplyBlockedQuantsFilter();
+                                ApplyReservationFilter(pickingPos, possibleSilos, rResult.Routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
+                            }
+                            else
+                                dosingRoute = rResult.Routes.FirstOrDefault();
                         }
 
                         if (dosingRoute == null)
@@ -391,74 +400,18 @@ namespace gip.mes.processapplication
 
                     Route dosingRoute = null;
                     ACPartslistManager.QrySilosResult.FacilitySumByLots dosingSilo = null;
-
+                    bool observeQuantity = false;
+                    double? dosingQuantityFromSilo = null;
+                    int remainingSilos = 0;
+                    List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
                     if (pickingPos.FromFacility == null && possibleSilos != null && possibleSilos.FilteredResult != null)
                     {
-                        foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
-                        {
-                            if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue 
-                                || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
-                                continue;
-                            dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
-                            if (dosingRoute != null)
-                            {
-                                dosingSilo = prioSilo;
-                                break;
-                            }
-                        }
-                        if (dosingRoute == null)
-                        {
-                            if (ComponentsSkippable)
-                                continue;
-                            if (NoSourceFoundForDosing.ValueT == 0)
-                            {
-                                NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
-                                NoSourceFoundForDosing.ValueT = 1;
-
-                                // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
-                                                                         pickingPos.Material.MaterialNo,
-                                                                         picking.PickingNo,
-                                                                         "");
-
-                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                return StartNextCompResult.CycleWait;
-                            }
-                            else if (NoSourceFoundForDosing.ValueT == 2)
-                            {
-                                MDDelivPosLoadState posLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
-
-                                if (posLoadState == null)
-                                {
-                                    // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
-                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(30)", 181, "Error50062",
-                                                    pickingPos.Picking.PickingNo,
-                                                    "-",
-                                                    pickingPos.PickingMaterial.MaterialNo);
-
-                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                    return StartNextCompResult.CycleWait;
-
-                                }
-                                pickingPos.MDDelivPosLoadState = posLoadState;
-                                dbApp.ACSaveChanges();
-                                continue;
-                            }
-                            else if (NoSourceFoundForDosing.ValueT == 1)
-                            {
-                                return StartNextCompResult.CycleWait;
-                            }
-                        }
-                        else if (NoSourceFoundForDosing.ValueT == 1)
-                        {
-                            NoSourceFoundForDosing.ValueT = 0;
-                            AcknowledgeAlarms();
-                        }
-
+                        ApplyReservationFilter(pickingPos, possibleSilos, routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
+                        ValidateDosingRouteEnum validResult = ValidateDosingRoute(dbApp, pickingPos, dosingRoute, remainingSilos, observeQuantity, dosingQuantityFromSilo, reservations, out msg);
+                        if (validResult == ValidateDosingRouteEnum.CycleWait)
+                            return StartNextCompResult.CycleWait;
+                        else if (validResult == ValidateDosingRouteEnum.ContinueNextComp)
+                            continue;
                         CurrentDosingRoute = dosingRoute;
                         NoSourceFoundForDosing.ValueT = 0;
                     }
@@ -504,8 +457,6 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
-                        dosingRoute = rResult.Routes.FirstOrDefault();
-
                         if (pickingPos.FromFacility != null)
                         {
                             var facilityCharges = dbApp.FacilityCharge
@@ -517,21 +468,44 @@ namespace gip.mes.processapplication
                             possibleSilos = new ACPartslistManager.QrySilosResult(facilityCharges);
                             possibleSilos.ApplyLotReservationFilter(pickingPos, 0);
                             possibleSilos.ApplyBlockedQuantsFilter();
-                            dosingSilo = possibleSilos.FilteredResult.FirstOrDefault();
+                            ApplyReservationFilter(pickingPos, possibleSilos, rResult.Routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
+                            ValidateDosingRouteEnum validResult = ValidateDosingRoute(dbApp, pickingPos, dosingRoute, remainingSilos, observeQuantity, dosingQuantityFromSilo, reservations, out msg);
+                            if (validResult == ValidateDosingRouteEnum.CycleWait)
+                                return StartNextCompResult.CycleWait;
+                            else if (validResult == ValidateDosingRouteEnum.ContinueNextComp)
+                                continue;
                         }
+                        else
+                            dosingRoute = rResult.Routes.FirstOrDefault();
 
                         CurrentDosingRoute = dosingRoute;
                         NoSourceFoundForDosing.ValueT = 0;
                     }
 
-                    // If Dosing by Reservations
-                    if (dosingSilo != null 
-                        && dosingSilo.StockOfReservations.HasValue 
-                        && targetWeight > dosingSilo.StockOfReservations.Value 
+                    // If Dosing exaclty by given quantities in reservations
+                    if (observeQuantity && dosingQuantityFromSilo.HasValue)
+                    {
+                        // If max dosingcapacitity is larger than silo, take max quantity of silo accaording to the allowed lots
+                        if (targetWeight > dosingQuantityFromSilo.Value)
+                            targetWeight = dosingQuantityFromSilo.Value;
+                    }
+                    // If Dosing by Reservations but flexible, so that a larger amount of on reservation could be used
+                    else if (dosingSilo != null
+                        && dosingSilo.StockOfReservations.HasValue
+                        && targetWeight > dosingSilo.StockOfReservations.Value
                         && dosingSilo.StockFree.HasValue) // Has other quants, then dose exactly
                     {
-                        targetWeight = dosingSilo.StockOfReservations.Value;
+                        if (targetWeight > dosingSilo.StockOfReservations.Value)
+                            targetWeight = dosingSilo.StockOfReservations.Value;
                     }
+
+                    newRemainingQ = pickingPos.RemainingDosingWeight + targetWeight;
+                    if (newRemainingQ >= -0.000001 && MinDosQuantity > -0.0000001)
+                        lastBatchMode = PADosingLastBatchEnum.LastBatch;
+                    else
+                        lastBatchMode = PADosingLastBatchEnum.None;
+                    if (ParentPWMethodVBBase != null)
+                        ParentPWMethodVBBase.IsLastBatch = lastBatchMode;
 
                     // 4. Starte Dosierung von diesem Silo aus
                     PAMSilo sourceSilo = CurrentDosingSilo(null);
@@ -976,18 +950,167 @@ namespace gip.mes.processapplication
                             OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                             null, null, ExcludedSilos, ReservationMode);
             IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, db, queryParams, module, out possibleSilos);
+            bool observeQuantity = false;
+            double? dosingQuantityFromSilo = null;
+            Route dosingRoute = null;
+            ACPartslistManager.QrySilosResult.FacilitySumByLots dosingSilo = null;
+            int remainingSilos = 0;
+            List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
             if (possibleSilos != null && possibleSilos.FoundSilos != null && possibleSilos.FoundSilos.Any())
             {
-                foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
-                {
-                    if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue
-                        || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
-                        continue;
+                ApplyReservationFilter(pickingPos, possibleSilos, routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
+                if (dosingSilo != null)
                     return new RoutingResult(routes, false, null, null);
-                }
             }
             return null;
         }
+
+        public virtual void ApplyReservationFilter(PickingPos pickingPos, facility.ACPartslistManager.QrySilosResult possibleSilos, IEnumerable<Route> routes,
+            out Route dosingRoute, out ACPartslistManager.QrySilosResult.FacilitySumByLots dosingSilo, 
+            out List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations,
+            out double? dosingQuantityFromSilo, out bool observeQuantity,
+            out int remainingSilos)
+        {
+            dosingQuantityFromSilo = null;
+            dosingRoute = null;
+            dosingSilo = null;
+            reservations =
+                pickingPos.FacilityReservation_PickingPos.Where(c => c.FacilityLotID.HasValue && !c.VBiACClassID.HasValue)
+                .Select(c => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM, ReservationStateIndex = c.ReservationStateIndex })
+                .ToList();
+            observeQuantity = reservations.Any(c => c.IsQuantityObservable);
+            if (observeQuantity)
+            {
+                ACPartslistManager.QrySilosResult.ReservationInfo.UpdateActualQFromResCollection(reservations,
+                pickingPos.FacilityBookingCharge_PickingPos
+                    .Where(c => c.OutwardFacilityLotID.HasValue)
+                    .Select(c => new { LotID = c.OutwardFacilityLotID.Value, Q = c.OutwardQuantityUOM })
+                    .GroupBy(c => c.LotID)
+                    .Select(d => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = d.Key, ActualQuantity = d.Sum(e => e.Q) })
+                    .ToArray());
+            }
+
+            remainingSilos = possibleSilos.FilteredResult.Count;
+            foreach (ACPartslistManager.QrySilosResult.FacilitySumByLots prioSilo in possibleSilos.FilteredResult)
+            {
+                remainingSilos--;
+                if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue
+                    || (pickingPos.ToFacilityID.HasValue && prioSilo.StorageBin.FacilityID == pickingPos.ToFacilityID))
+                    continue;
+                dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
+                if (dosingRoute != null)
+                {
+                    if (observeQuantity)
+                    {
+                        dosingQuantityFromSilo = null;
+                        foreach (Tuple<Guid, double> lotStock in prioSilo.StockPerLot)
+                        {
+                            ReservationInfo reservation = reservations.Where(c => c.FacilityLotID == lotStock.Item1).FirstOrDefault();
+                            if (reservation == null
+                                || !reservation.RestQuantity.HasValue
+                                || reservation.RestQuantity.Value >= (MinDosQuantity * -1))
+                                continue;
+                            double restQuantity = Math.Abs(reservation.RestQuantity.Value);
+                            if (lotStock.Item2 > restQuantity)
+                                dosingQuantityFromSilo = !dosingQuantityFromSilo.HasValue ? restQuantity : dosingQuantityFromSilo.Value + restQuantity;
+                            else if (lotStock.Item2 > double.Epsilon)
+                                dosingQuantityFromSilo = !dosingQuantityFromSilo.HasValue ? lotStock.Item2 : dosingQuantityFromSilo.Value + lotStock.Item2;
+                        }
+                        if (dosingQuantityFromSilo == null)
+                            continue;
+                    }
+
+                    dosingSilo = prioSilo;
+                    return;
+                }
+            }
+            dosingRoute = null;
+        }
+
+        protected enum ValidateDosingRouteEnum
+        {
+            CanStart = 0,
+            ContinueNextComp = 1,
+            CycleWait = 2
+        }
+
+        protected virtual ValidateDosingRouteEnum ValidateDosingRoute(DatabaseApp dbApp, PickingPos pickingPos, Route dosingRoute, int remainingSilos, bool observeQuantity, double? dosingQuantityFromSilo, List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations, out Msg msg)
+        {
+            msg = null;
+            if (remainingSilos == 0 && observeQuantity)
+            {
+                double restQuantity = Math.Abs(reservations.Where(c => c.RestQuantity.HasValue).Sum(c => c.RestQuantity.Value));
+                if (!dosingQuantityFromSilo.HasValue || restQuantity > dosingQuantityFromSilo.Value)
+                {
+                    // Warning50073: The remaining quantity {4} of reserved Lots in the last Silo ist not sufficient to meet the reserved quantity {5} of component {2} at Order {0}, bill of material{1}. {6} are missing.
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1081, "Warning50073",
+                                                            pickingPos.Picking.PickingNo,
+                                                            "-",
+                                                            pickingPos.PickingMaterial.MaterialNo,
+                                                            restQuantity,
+                                                            dosingQuantityFromSilo.Value,
+                                                            restQuantity - dosingQuantityFromSilo.Value);
+                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                }
+            }
+
+            if (dosingRoute == null)
+            {
+                if (ComponentsSkippable)
+                    return ValidateDosingRouteEnum.ContinueNextComp;
+                if (NoSourceFoundForDosing.ValueT == 0)
+                {
+                    NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
+                    NoSourceFoundForDosing.ValueT = 1;
+
+                    // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
+                                                             pickingPos.Picking.PickingNo,
+                                                            "-",
+                                                            pickingPos.PickingMaterial.MaterialNo);
+
+                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    return ValidateDosingRouteEnum.CycleWait;
+                }
+                else if (NoSourceFoundForDosing.ValueT == 2)
+                {
+                    MDDelivPosLoadState posLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+
+                    if (posLoadState == null)
+                    {
+                        // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(30)", 181, "Error50062",
+                                        pickingPos.Picking.PickingNo,
+                                        "-",
+                                        pickingPos.PickingMaterial.MaterialNo);
+
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        return ValidateDosingRouteEnum.CycleWait;
+
+                    }
+                    pickingPos.MDDelivPosLoadState = posLoadState;
+                    dbApp.ACSaveChanges();
+                    return ValidateDosingRouteEnum.ContinueNextComp;
+                }
+                else if (NoSourceFoundForDosing.ValueT == 1)
+                {
+                    return ValidateDosingRouteEnum.CycleWait;
+                }
+            }
+            else if (NoSourceFoundForDosing.ValueT == 1)
+            {
+                NoSourceFoundForDosing.ValueT = 0;
+                AcknowledgeAlarms();
+            }
+            return ValidateDosingRouteEnum.CanStart;
+        }
+
 
         public virtual Msg CanResumeDosingPicking()
         {

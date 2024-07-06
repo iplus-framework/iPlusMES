@@ -1969,7 +1969,7 @@ namespace gip.mes.processapplication
                 return new List<T>();
             return searchStartsFromNode.FindPredecessors<T>(onlyInSameGroup,
                                                     c => c is T,
-                                                    c => (  (c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
+                                                    c => (  (c is PWNodeOr && !(c is PWDosingDisBypass) && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
                                                          || (!String.IsNullOrEmpty(ignorePredecessorGroups) && c.ACUrl.Contains(ignorePredecessorGroups))),
                                                     maxRecursionDepth);
         }
