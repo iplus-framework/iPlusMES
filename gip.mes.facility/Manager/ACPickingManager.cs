@@ -1173,6 +1173,7 @@ namespace gip.mes.facility
                         reservation.ReservedQuantityUOM = reservationQ;
                         reservation.FacilityLot = flGroup.Key;
                         reservation.PickingPos = pickingPos;
+                        reservation.Material = flGroup.FirstOrDefault()?.Material;
                         dbApp.FacilityReservation.AddObject(reservation);
                     }
                 }
