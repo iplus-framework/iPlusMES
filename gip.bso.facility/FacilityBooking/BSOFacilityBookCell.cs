@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
+using static gip.mes.datamodel.MDFacilityManagementType;
 
 namespace gip.bso.facility
 {
@@ -1299,7 +1300,7 @@ namespace gip.bso.facility
                                 return;
                         }
 
-                        if(lotsForReservation != null && lotsForReservation.Any())
+                        if (lotsForReservation != null && lotsForReservation.Any())
                         {
                             MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
                             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
@@ -1386,8 +1387,21 @@ namespace gip.bso.facility
 
             if (nonAutomaticRelocationWithQuantSelection)
             {
-                BookRelocationManualWithQuantSelection();
-                ClearBookingData();
+                // doing direct relocation in case when Material facility management type is not FacilityChargeReservation
+                bool doDirectRelocation =
+                    CurrentFacility.Material == null
+                    || CurrentFacility.Material.MDFacilityManagementType == null
+                    || CurrentFacility.Material.MDFacilityManagementType.MDFacilityManagementTypeIndex != (short)FacilityManagementTypes.FacilityChargeReservation;
+                if (doDirectRelocation)
+                {
+                    BookRelocation();
+                    ClearBookingData();
+                }
+                else
+                {
+                    BookRelocationManualWithQuantSelection();
+                    ClearBookingData();
+                }
             }
 
             PostExecute();
