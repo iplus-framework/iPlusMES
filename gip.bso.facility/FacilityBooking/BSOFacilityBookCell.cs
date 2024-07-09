@@ -1246,13 +1246,25 @@ namespace gip.bso.facility
                 userQuestionAutomatic = Messages.YesNoCancel(this, "Question50035");
                 if (userQuestionAutomatic == Global.MsgResult.Yes)
                 {
+                    (gip.core.datamodel.ACClassMethod acClMth, bool wfRunBt) = ACFacilityManager.GetFacilityWF(CurrentFacility);
                     gip.core.datamodel.ACClassMethod acClassMethod = null;
                     bool wfRunsBatches = false;
-                    if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches))
+                    if (acClMth != null)
                     {
-                        ClearBookingData();
-                        return;
+                        acClassMethod = acClMth;
+                        wfRunsBatches = wfRunBt;
                     }
+                    else
+                    {
+                        if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches))
+                        {
+                            ClearBookingData();
+                            return;
+                        }
+
+                        // TODO: save selected WF to Facility?
+                    }
+
 
                     ACMethodBooking booking = CurrentBookParamRelocation;
                     // If Workflow doesn't contain a PWNodeProcessWorkflow => Start relocation directly

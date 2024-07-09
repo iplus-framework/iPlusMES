@@ -6,7 +6,7 @@ using gip.mes.datamodel;
 
 namespace gip.mes.facility
 {
-    public partial class FacilityManager 
+    public partial class FacilityManager
     {
         protected virtual void CreateConfigParams()
         {
@@ -403,6 +403,46 @@ namespace gip.mes.facility
             if (String.IsNullOrEmpty(rootStore))
                 return null;
             return dbApp.Facility.Where(c => c.FacilityNo == rootStore).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get WF for current facility (Picking)
+        /// search into tree hierarchy
+        /// </summary>
+        /// <param name="facility"></param>
+        /// <returns></returns>
+        public (gip.core.datamodel.ACClassMethod aCClassMethod, bool wfRunsBatches) GetFacilityWF(Facility facility)
+        {
+            bool wfRunsBatches = false;
+            gip.core.datamodel.ACClassMethod acClassMethod = null;
+            Facility currentFacility = facility;
+            while (currentFacility != null)
+            {
+                if (currentFacility.VBiACClassMethodID != null)
+                {
+                    acClassMethod = currentFacility.ACClassMethod;
+                    break;
+                }
+                currentFacility = currentFacility.Facility1_ParentFacility;
+            }
+
+            if (acClassMethod != null)
+            {
+                Type typePWWF = typeof(PWNodeProcessWorkflow);
+                wfRunsBatches = 
+                    acClassMethod
+                    .ACClassWF_ACClassMethod
+                    .ToArray()
+                    .Where(c => 
+                                c.RefPAACClassMethodID.HasValue && c.PWACClass != null 
+                                && c.PWACClass.ObjectType != null 
+                                && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)
+                        )
+                    .Any();
+
+            }
+
+            return (acClassMethod, wfRunsBatches);
         }
     }
 }

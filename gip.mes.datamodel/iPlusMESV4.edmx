@@ -1045,6 +1045,7 @@
           <Property Name="SkipPrintQuestion" Type="bit" Nullable="false" />
           <Property Name="ClassCode" Type="smallint" Nullable="false" />
           <Property Name="LeaveMaterialOccupation" Type="bit" Nullable="true" />
+	      <Property Name="VBiACClassMethodID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="FacilityBooking">
           <Key>
@@ -6760,6 +6761,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="Facility">
               <PropertyRef Name="VBiFacilityACClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+		<Association Name="FK_Facility_ACClassMethodID">
+          <End Role="ACClassMethod" Type="Self.ACClassMethod" Multiplicity="0..1" />
+          <End Role="Facility" Type="Self.Facility" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassMethod">
+              <PropertyRef Name="ACClassMethodID" />
+            </Principal>
+            <Dependent Role="Facility">
+              <PropertyRef Name="VBiACClassMethodID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -20086,6 +20099,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MaterialWFACClassMethod_ACClassMethod" Relationship="iPlusMESV4_Model.FK_MaterialWFACClassMethod_ACClassMethod" FromRole="ACClassMethod" ToRole="MaterialWFACClassMethod" />
           <NavigationProperty Name="Picking_ACClassMethod" Relationship="iPlusMESV4_Model.FK_Picking_ACClassMethod" FromRole="ACClassMethod" ToRole="Picking" />
           <NavigationProperty Name="VBGroupRight_ACClassMethod" Relationship="iPlusMESV4_Model.FK_VBGroupRight_ACClassMethodID" FromRole="ACClassMethod" ToRole="VBGroupRight" />
+          <NavigationProperty Name="Facility_ACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="ACClassMethod" ToRole="Facility" />
         </EntityType>
         <EntityType Name="ACClassMethodConfig">
           <Key>
@@ -32178,6 +32192,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <Property Name="SkipPrintQuestion" Type="Boolean" Nullable="false" />
 		  <Property Name="ClassCode" Type="Int16" Nullable="false" />
 		  <Property Name="LeaveMaterialOccupation" Type="Boolean" Nullable="true" />
+		  <Property Name="VBiACClassMethodID" Type="Guid" />
           <NavigationProperty Name="VBiFacilityACClass" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID" FromRole="Facility" ToRole="ACClass" />
           <NavigationProperty Name="VBiStackCalculatorACClass" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" FromRole="Facility" ToRole="ACClass" />
           <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Facility" ToRole="Company" />
@@ -32222,6 +32237,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PickingPos_ToFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID" FromRole="Facility" ToRole="PickingPos" />
           <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
           <NavigationProperty Name="FacilityReservation_Facility" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="Facility" ToRole="FacilityReservation" />
+	      <NavigationProperty Name="VBiACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="Facility" ToRole="ACClassMethod" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -32235,6 +32251,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+		<Association Name="FK_Facility_ACClassMethodID">
+			  <End Type="iPlusMESV4_Model.ACClassMethod" Role="ACClassMethod" Multiplicity="0..1" />
+			  <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
+			  <ReferentialConstraint>
+				  <Principal Role="ACClassMethod">
+					  <PropertyRef Name="ACClassMethodID" />
+				  </Principal>
+				  <Dependent Role="Facility">
+					  <PropertyRef Name="VBiACClassMethodID" />
+				  </Dependent>
+			  </ReferentialConstraint>
+		  </Association>
         <Association Name="FK_Facility_StackCalculatorACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
@@ -39542,6 +39570,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="VBiFacilityACClassID" ColumnName="VBiFacilityACClassID" />
                 <ScalarProperty Name="ParentFacilityID" ColumnName="ParentFacilityID" />
                 <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
+				<ScalarProperty Name="VBiACClassMethodID" ColumnName="VBiACClassMethodID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

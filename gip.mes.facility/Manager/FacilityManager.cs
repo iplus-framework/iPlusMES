@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
+using static gip.mes.datamodel.GlobalApp;
 
 namespace gip.mes.facility
 {
@@ -1375,6 +1376,7 @@ namespace gip.mes.facility
             FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
             facilityReservationModel.Material = material;
             facilityReservationModel.FacilityLot = facilityLot;
+            facilityReservationModel.SelectedReservationState = facilityReservationModel.ReservationStateList.Where(c=>(ReservationState)c.Value == ReservationState.New).FirstOrDefault();
             return facilityReservationModel;
         }
 
