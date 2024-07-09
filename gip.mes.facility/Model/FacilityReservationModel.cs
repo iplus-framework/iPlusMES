@@ -118,41 +118,53 @@ namespace gip.mes.facility
         public DateTime? OldestFacilityChargeDate { get; set; }
 
 
-        private bool _IsObserveQuantity;
-        [ACPropertyInfo(7, "", "en{'Observe quantity'}de{'Menge beachten'}")]
-        public bool IsObserveQuantity
+        #region Additional members -> ReservationState
+
+        public ReservationState ReservationState
         {
             get
             {
-                if (FacilityReservation != null)
+                ReservationState reservationState = ReservationState.New;
+                if(SelectedReservationState != null)
                 {
-                    if (FacilityReservation.ReservationState != ReservationState.New)
-                    {
-                        _IsObserveQuantity = true;
-                    }
-                    else
-                    {
-                        _IsObserveQuantity = false;
-                    }
+                    reservationState = (ReservationState)SelectedReservationState.Value;
                 }
-                return _IsObserveQuantity;
+                return reservationState;
+            }
+        }
+
+        ACValueItem _SelectedReservationState;
+        [ACPropertySelected(9999, nameof(ReservationState), ConstApp.FacilityReservation)]
+        public ACValueItem SelectedReservationState
+        {
+            get
+            {
+                return _SelectedReservationState;
             }
             set
             {
-                _IsObserveQuantity = value;
-                if (FacilityReservation != null && FacilityReservation.ReservationState <= ReservationState.New)
+                if (_SelectedReservationState != value)
                 {
-                    if (value)
-                    {
-                        FacilityReservation.ReservationState = ReservationState.ObserveQuantity;
-                    }
-                    else
-                    {
-                        FacilityReservation.ReservationState = ReservationState.New;
-                    }
+                    _SelectedReservationState = value;
+                    OnPropertyChanged(nameof(SelectedReservationState));
                 }
             }
         }
+
+        /// <summary>
+        /// Gibt eine Liste aller Enums zurück, damit die Gui
+        /// damit arbeiten kann.
+        /// </summary>
+        [ACPropertyList(9999, nameof(ReservationState))]
+        public IEnumerable<ACValueItem> ReservationStateList
+        {
+            get
+            {
+                return GlobalApp.ReservationStateList;
+            }
+        }
+
+        #endregion
 
         #endregion
 

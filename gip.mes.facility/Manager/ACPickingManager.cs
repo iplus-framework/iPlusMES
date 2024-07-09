@@ -1165,15 +1165,17 @@ namespace gip.mes.facility
                 }
                 if (lotsForReservation.Any())
                 {
+                    pickingPos.TargetQuantityUOM = lotsForReservation.Sum(c => c.RelocationQuantity);
                     foreach (var flGroup in lotsForReservation.GroupBy(c => c.FacilityLot))
                     {
-                        double reservationQ = flGroup.Sum(c => c.StockQuantityUOM);
+                        double reservationQ = flGroup.Sum(c => c.RelocationQuantity);
                         secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
                         FacilityReservation reservation = FacilityReservation.NewACObject(dbApp, pickingPos, secondaryKey);
                         reservation.ReservedQuantityUOM = reservationQ;
                         reservation.FacilityLot = flGroup.Key;
                         reservation.PickingPos = pickingPos;
                         reservation.Material = flGroup.FirstOrDefault()?.Material;
+                        reservation.ReservationState = flGroup.Select(c => new { valState = (short)c.ReservationState, state = c.ReservationState }).OrderBy(c => c.valState).Select(c => c.state).FirstOrDefault();
                         dbApp.FacilityReservation.AddObject(reservation);
                     }
                 }
@@ -1808,10 +1810,10 @@ namespace gip.mes.facility
         #region FinishOrder
 
         public MsgWithDetails FinishOrder(
-            DatabaseApp dbApp, 
+            DatabaseApp dbApp,
             Picking picking,
-            ACInDeliveryNoteManager inDeliveryNoteManager, 
-            ACOutDeliveryNoteManager outDeliveryNoteManager, 
+            ACInDeliveryNoteManager inDeliveryNoteManager,
+            ACOutDeliveryNoteManager outDeliveryNoteManager,
             FacilityManager facilityManager,
             bool skipCheck = false)
         {
@@ -1955,9 +1957,9 @@ namespace gip.mes.facility
             {
                 if (inOrders != null)
                 {
-                    foreach(InOrder tmpInOrder in inOrders)
+                    foreach (InOrder tmpInOrder in inOrders)
                     {
-                        foreach(DeliveryNote tempDeliveryNote in deliveryNotes)
+                        foreach (DeliveryNote tempDeliveryNote in deliveryNotes)
                         {
                             inDeliveryNoteManager.CompleteInDeliveryNote(dbApp, tempDeliveryNote, tmpInOrder);
                         }

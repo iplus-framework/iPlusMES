@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using static gip.mes.datamodel.GlobalApp;
 
 namespace gip.mes.datamodel
 {
@@ -431,6 +432,7 @@ namespace gip.mes.datamodel
                 }
             }
         }
+
         #endregion
 
         #region IEntityProperty Members
@@ -476,6 +478,29 @@ namespace gip.mes.datamodel
             get
             {
                 return StockQuantity - ReservedQuantity;
+            }
+        }
+
+        private double? _RelocationQuantity;
+        /// <summary>
+        /// Quantity at default is AvailableQuantity
+        /// used by relocation quant dialog
+        /// </summary>
+        [ACPropertyInfo(15, "", "en{'Relocation Quantity'}de{'Umlagerung Menge'}")]
+        public double RelocationQuantity
+        {
+            get
+            {
+                if (_RelocationQuantity == null)
+                {
+                    _RelocationQuantity = AvailableQuantity;
+                }
+                return _RelocationQuantity ?? 0;
+            }
+            set
+            {
+                _RelocationQuantity = value;
+                OnPropertyChanged(nameof(RelocationQuantity));
             }
         }
 
@@ -743,6 +768,57 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Additional Properties -> ReservationState
+
+        public ReservationState ReservationState
+        {
+            get
+            {
+                ReservationState reservationState = ReservationState.New;
+                if (SelectedReservationState != null)
+                {
+                    reservationState = (ReservationState)SelectedReservationState.Value;
+                }
+                return reservationState;
+            }
+            set
+            {
+                SelectedReservationState = ReservationStateList.Where(c => ((ReservationState)c.Value) == value).FirstOrDefault();
+            }
+        }
+
+        ACValueItem _SelectedReservationState;
+        [ACPropertySelected(9999, nameof(ReservationState), ConstApp.FacilityReservation)]
+        public ACValueItem SelectedReservationState
+        {
+            get
+            {
+                return _SelectedReservationState;
+            }
+            set
+            {
+                if (_SelectedReservationState != value)
+                {
+                    _SelectedReservationState = value;
+                    OnPropertyChanged(nameof(SelectedReservationState));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gibt eine Liste aller Enums zurück, damit die Gui
+        /// damit arbeiten kann.
+        /// </summary>
+        [ACPropertyList(9999, nameof(ReservationState))]
+        public IEnumerable<ACValueItem> ReservationStateList
+        {
+            get
+            {
+                return GlobalApp.ReservationStateList;
+            }
+        }
+
+        #endregion
 
         #endregion
 
