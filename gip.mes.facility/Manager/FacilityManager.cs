@@ -1456,6 +1456,7 @@ namespace gip.mes.facility
                             && c.Material.MaterialNo == model.Material.MaterialNo
                             && c.FacilityLot != null
                             && c.FacilityLot.LotNo == model.FacilityLot.LotNo
+                            && !c.NotAvailable
                         )
                     .AsEnumerable()
                     .Select(c => c.AvailableQuantity)

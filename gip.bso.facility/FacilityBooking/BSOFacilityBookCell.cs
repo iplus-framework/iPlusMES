@@ -1383,6 +1383,7 @@ namespace gip.bso.facility
                             if (startWorkflow)
                             {
                                 StartWorkflow(acClassMethod, picking);
+                                ClearBookingData();
                             }
                         }
                     }
