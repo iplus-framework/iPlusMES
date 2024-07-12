@@ -1956,11 +1956,11 @@ namespace gip.bso.logistics
 
         private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool filterMaterial)
         {
-            accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
-            var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
-
             if (filterMaterial)
             {
+                accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
+                var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
+
                 if (CurrentPickingPos != null && CurrentPickingPos.Material != null)
                 {
                     if (acFilter != null)
@@ -1972,11 +1972,7 @@ namespace gip.bso.logistics
             }
             else
             {
-                if (acFilter != null)
-                    acFilter.SearchWord = "";
-                var acFilter2 = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo" && c != acFilter).FirstOrDefault();
-                if (acFilter2 != null)
-                    acFilter2.SearchWord = "";
+                accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_StorageBin, AccessBookingFacilityDefaultSort);
             }
             accessNavFacility.NavSearch(this.DatabaseApp);
         }
@@ -3085,13 +3081,13 @@ namespace gip.bso.logistics
         [ACMethodInteraction(nameof(RecalcActualQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking))]
         public void RecalcActualQuantity()
         {
-            if (!IsEnabledRecalcActualQuantity())
+            if(!IsEnabledRecalcActualQuantity())
             {
                 return;
             }
 
             PickingPos[] pickingPositions = SelectedPicking.PickingPos_Picking.ToArray();
-            foreach (PickingPos pos in pickingPositions)
+            foreach(PickingPos pos in pickingPositions)
             {
                 pos.RecalcActualQuantity();
             }
@@ -3099,8 +3095,8 @@ namespace gip.bso.logistics
 
         public bool IsEnabledRecalcActualQuantity()
         {
-            return
-                SelectedPicking != null
+            return 
+                SelectedPicking != null 
                 && SelectedPicking.PickingPos_Picking.Any();
         }
 
@@ -3575,7 +3571,7 @@ namespace gip.bso.logistics
                 OnPropertyChanged(nameof(FacilityBookingList));
                 ACFacilityManager.RecalcAfterPosting(DatabaseApp, currentPickingPos, changedQuantity, isCancellation, true);
                 Save();
-
+                
                 Msg msg = null;
                 if (autoSetQuantToZero == SetQuantToZeroMode.CheckIfZeroAskUser)
                     msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
