@@ -37,6 +37,7 @@ namespace gip.bso.manufacturing
         public BSOProdOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _DefaultReservationState = new ACPropertyConfigValue<ReservationState>(this, nameof(DefaultReservationState), ReservationState.New);
         }
 
         /// <summary>
@@ -67,6 +68,8 @@ namespace gip.bso.manufacturing
             if (_MatReqManager == null)
                 throw new Exception("MatReqManager not configured");
 
+            _ = DefaultReservationState;
+
             bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
             if (!skipSearchOnStart)
             {
@@ -78,6 +81,7 @@ namespace gip.bso.manufacturing
 
             if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
+                BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
             }
 
@@ -298,6 +302,20 @@ namespace gip.bso.manufacturing
             set
             {
                 _AllowPostingOnIntermediate.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<ReservationState> _DefaultReservationState;
+        [ACPropertyConfig("en{'Def. Batch plannning state'}de{'Def. Reservierungssstatus'}")]
+        public ReservationState DefaultReservationState
+        {
+            get
+            {
+                return _DefaultReservationState.ValueT;
+            }
+            set
+            {
+                _DefaultReservationState.ValueT = value;
             }
         }
 
@@ -5434,6 +5452,15 @@ namespace gip.bso.manufacturing
                 ProcessWorkflowPresenter != null
                 && ProcessWorkflowPresenter.SelectedWFNode != null
                 && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
+        }
+
+        #endregion
+
+        #region Reservation State
+
+        public virtual ReservationState GetDefaultReservationState()
+        {
+            return DefaultReservationState;
         }
 
         #endregion

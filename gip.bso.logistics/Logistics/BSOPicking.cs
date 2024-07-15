@@ -69,6 +69,7 @@ namespace gip.bso.logistics
             //DatabaseMode = DatabaseModes.OwnDB;
             _ForwardToRemoteStores = new ACPropertyConfigValue<bool>(this, nameof(ForwardToRemoteStores), false);
             _NavigateOnGenRelated = new ACPropertyConfigValue<bool>(this, nameof(NavigateOnGenRelated), false);
+            _DefaultReservationState = new ACPropertyConfigValue<ReservationState>(this, nameof(DefaultReservationState), ReservationState.New);
         }
 
         /// <summary>
@@ -97,6 +98,11 @@ namespace gip.bso.logistics
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+
+            _ = ForwardToRemoteStores;
+            _ = NavigateOnGenRelated;
+            _ = DefaultReservationState;
+
             bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
             if (!skipSearchOnStart)
             {
@@ -111,6 +117,7 @@ namespace gip.bso.logistics
 
             if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
+                BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityReservation_Changed;
             }
 
@@ -2306,6 +2313,20 @@ namespace gip.bso.logistics
             set
             {
                 _NavigateOnGenRelated.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<ReservationState> _DefaultReservationState;
+        [ACPropertyConfig("en{'Def. Batch plannning state'}de{'Def. Reservierungssstatus'}")]
+        public ReservationState DefaultReservationState
+        {
+            get
+            {
+                return _DefaultReservationState.ValueT;
+            }
+            set
+            {
+                _DefaultReservationState.ValueT = value;
             }
         }
 
@@ -4619,6 +4640,15 @@ namespace gip.bso.logistics
                 ProcessWorkflowPresenter != null
                 && ProcessWorkflowPresenter.SelectedWFNode != null
                 && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
+        }
+
+        #endregion
+
+        #region Facility Reservation
+
+        public virtual ReservationState GetDefaultReservationState()
+        {
+            return DefaultReservationState;
         }
 
         #endregion

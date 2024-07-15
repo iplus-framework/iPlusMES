@@ -144,6 +144,9 @@ namespace gip.mes.facility
             }
         }
 
+        public GlobalApp.ReservationState DefaultReservationState { get; set; }
+
+
         public Material Material { get; set; }
 
         public IEnumerable<FacilityReservation> FacilityReservationCollection { get; set; }
@@ -526,7 +529,7 @@ namespace gip.mes.facility
                         foreach (FacilityReservationModel forRemove in notSelectedModels)
                         {
                             _FacilityReservationList.Remove(forRemove);
-                            forRemove.FacilityReservation.DeleteACObject(DatabaseApp,false);
+                            forRemove.FacilityReservation.DeleteACObject(DatabaseApp, false);
                         }
                     }
 
@@ -634,7 +637,7 @@ namespace gip.mes.facility
 
                 if (facilityReservation == null)
                 {
-                    facilityReservation = ACFacilityManager.GetFacilityReservationModel(material, facilityCharge.FacilityLot);
+                    facilityReservation = ACFacilityManager.GetFacilityReservationModel(material, facilityCharge.FacilityLot, DefaultReservationState);
                     facilityReservations.Add(facilityReservation);
                 }
 
@@ -737,7 +740,7 @@ namespace gip.mes.facility
                     {
                         facilityReservation._AssignedQuantity = facilityReservation.FreeQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.AssignedQuantity;
-                        if(!facilityReservation.IsOnlyStockMovement)
+                        if (!facilityReservation.IsOnlyStockMovement)
                         {
                             facilityReservation.FreeQuantity = 0;
                         }
@@ -747,7 +750,7 @@ namespace gip.mes.facility
                     {
                         facilityReservation._AssignedQuantity = restQuantity;
                         facilityReservation.TotalReservedQuantity += facilityReservation.AssignedQuantity;
-                        if(!facilityReservation.IsOnlyStockMovement)
+                        if (!facilityReservation.IsOnlyStockMovement)
                         {
                             facilityReservation.FreeQuantity -= restQuantity;
                         }
