@@ -1455,25 +1455,31 @@ namespace gip.bso.logistics
 
         private void LoadFirstLastWeighting(BSOVisitorVoucher bSOVisitorVoucher)
         {
-            if (bSOVisitorVoucher.WeighingList == null || !bSOVisitorVoucher.WeighingList.Any())
-            {
-                bSOVisitorVoucher.FirstWeighing = null;
-                bSOVisitorVoucher.LastWeighing = null;
-                bSOVisitorVoucher.FLWeigDiff = 0;
-            }
-            else
+            bSOVisitorVoucher.FirstWeighing = null;
+            bSOVisitorVoucher.LastWeighing = null;
+            bSOVisitorVoucher.FLWeigDiff = 0;
+
+            if (bSOVisitorVoucher.WeighingList != null && bSOVisitorVoucher.WeighingList.Any())
             {
                 Dictionary<long, Weighing> weighings = new Dictionary<long, Weighing>();
                 foreach (Weighing weighing in bSOVisitorVoucher.WeighingList)
                 {
-                    long key = long.Parse(string.Join("", weighing.WeighingNo.Where(c => char.IsDigit(c))));
-                    weighings.Add(key, weighing);
+                    if(weighing.WeighingState != WeighingStateEnum.Cancelled)
+                    {
+                        long key = long.Parse(string.Join("", weighing.WeighingNo.Where(c => char.IsDigit(c))));
+                        weighings.Add(key, weighing);
+                    }
                 }
-                bSOVisitorVoucher.FirstWeighing = weighings.OrderBy(c => c.Key).FirstOrDefault().Value;
-                bSOVisitorVoucher.LastWeighing = weighings.OrderByDescending(c => c.Key).FirstOrDefault().Value;
-                bSOVisitorVoucher.FLWeigDiff = Math.Abs(bSOVisitorVoucher.FirstWeighing.Weight - bSOVisitorVoucher.LastWeighing.Weight);
+
+                if(weighings.Any())
+                {
+                    bSOVisitorVoucher.FirstWeighing = weighings.OrderBy(c => c.Key).FirstOrDefault().Value;
+                    bSOVisitorVoucher.LastWeighing = weighings.OrderByDescending(c => c.Key).FirstOrDefault().Value;
+                    bSOVisitorVoucher.FLWeigDiff = Math.Abs(bSOVisitorVoucher.FirstWeighing.Weight - bSOVisitorVoucher.LastWeighing.Weight);
+                }
             }
         }
+
         #endregion
 
         #endregion
