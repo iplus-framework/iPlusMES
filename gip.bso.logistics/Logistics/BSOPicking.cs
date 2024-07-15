@@ -1449,7 +1449,10 @@ namespace gip.bso.logistics
                         SelectedFacilityPreBooking = null;
                     RefreshBookingFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
                     RefreshBookingFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+
                     RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                    OnPropertyChanged(nameof(PositionFacilityFromList));
+
                     if (AccessBookingFacilityLot != null)
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                     OnPropertyChanged(nameof(BookingFacilityList));
@@ -1477,6 +1480,7 @@ namespace gip.bso.logistics
                     if (FilterPositionFacilityFrom)
                     {
                         RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                        OnPropertyChanged(nameof(PositionFacilityFromList));
                     }
                     break;
             }
