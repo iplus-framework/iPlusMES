@@ -1,9 +1,4 @@
 ﻿using gip.core.datamodel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
@@ -28,10 +23,10 @@ namespace gip.mes.datamodel
     {
         public ACValueListWeighingStateEnum() : base("WeighingState")
         {
-            AddEntry(WeighingStateEnum.New, "en{'New'}de{'Neu'}");
+            AddEntry(WeighingStateEnum.New, Const.New);
             AddEntry(WeighingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
             AddEntry(WeighingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
-            AddEntry(WeighingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
+            AddEntry(WeighingStateEnum.Cancelled, Const.Canceled);
         }
     }
 }

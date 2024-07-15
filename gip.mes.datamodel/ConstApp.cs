@@ -311,6 +311,10 @@
         public const string EntityTranslateKeyOfExtSys = "en{'Key of ext. system'}de{'Schlüssel von ext. System'}";
 
         public const string DeliveryNotePos = "en{'Indeliverynotepos'}de{'Eingangslieferscheinposition'}";
+
+
+        public const string Weighing = "en{'Weighing'}de{'Wägung'}";
+        public const string WeighingState = "en{'Weighing state''}de{'Wiegestatus'}";
         #endregion
 
 
