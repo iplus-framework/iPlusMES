@@ -18,7 +18,7 @@ namespace gip.mes.datamodel
     }
 
 
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Weighing state''}de{'Wiegestatus'}", Global.ACKinds.TACEnumACValueList)]
+    [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.WeighingState, Global.ACKinds.TACEnumACValueList)]
     public class ACValueListWeighingStateEnum : ACValueItemList
     {
         public ACValueListWeighingStateEnum() : base("WeighingState")
