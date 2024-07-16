@@ -1371,12 +1371,12 @@ namespace gip.mes.facility
             return facilityReservationModel;
         }
 
-        public FacilityReservationModel GetFacilityReservationModel(Material material, FacilityLot facilityLot)
+        public FacilityReservationModel GetFacilityReservationModel(Material material, FacilityLot facilityLot, ReservationState defaultReservationState)
         {
             FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
             facilityReservationModel.Material = material;
             facilityReservationModel.FacilityLot = facilityLot;
-            facilityReservationModel.SelectedReservationState = facilityReservationModel.ReservationStateList.Where(c=>(ReservationState)c.Value == ReservationState.New).FirstOrDefault();
+            facilityReservationModel.SelectedReservationState = facilityReservationModel.ReservationStateList.Where(c=>(ReservationState)c.Value == defaultReservationState).FirstOrDefault();
             return facilityReservationModel;
         }
 
@@ -1522,6 +1522,7 @@ namespace gip.mes.facility
         }
 
         #endregion
+        
     }
 }
 
