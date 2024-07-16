@@ -1253,6 +1253,10 @@ namespace gip.bso.facility
                     {
                         acClassMethod = acClMth;
                         wfRunsBatches = wfRunBt;
+                        if (!SelectAppManager(acClassMethod.ACClass.ACProject))
+                        {
+                            return;
+                        }
                     }
                     else
                     {
@@ -1262,9 +1266,23 @@ namespace gip.bso.facility
                             return;
                         }
 
-                        // TODO: save selected WF to Facility?
-                    }
 
+                        // Question50035
+                        // Save selected process workflow ({0}) as default for this facility ({1})?
+                        // Ausgewählten Prozess-Workflow ({0}) als Standard für dieser Lagerplatz ({1}) speichern?
+                        Global.MsgResult saveQuestion = Messages.Question(this, "Question50110", Global.MsgResult.No,false, acClassMethod.ACCaption, CurrentFacility.FacilityNo);
+                        if (saveQuestion == Global.MsgResult.Yes)
+                        {
+
+                            CurrentFacility.VBiACClassMethodID = acClassMethod.ACClassMethodID;
+                            MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+                            if (msgWithDetails != null && !msgWithDetails.IsSucceded())
+                            {
+                                Messages.Msg(msgWithDetails);
+                                Messages.LogMessageMsg(msgWithDetails);
+                            }
+                        }
+                    }
 
                     ACMethodBooking booking = CurrentBookParamRelocation;
                     // If Workflow doesn't contain a PWNodeProcessWorkflow => Start relocation directly

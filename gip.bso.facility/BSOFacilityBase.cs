@@ -339,7 +339,7 @@ namespace gip.bso.facility
 
             IEnumerable<gip.core.datamodel.ACClassWF> workflowRootWFs = null;
             // Falls Umlagerung eines Quants, dann muss Benutzer gefragt werden an welcher Aufgabestelle er das Quant aufgeben will für einen Transport
-            if (   forBooking.OutwardFacilityCharge != null 
+            if (forBooking.OutwardFacilityCharge != null
                 && (forBooking.OutwardFacilityCharge.Facility.MDFacilityType == null || forBooking.OutwardFacilityCharge.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
             {
                 if (!forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
@@ -404,12 +404,12 @@ namespace gip.bso.facility
                                                      .Select(c => c.ACClassWF1_ParentACClassWF);
             }
             // Sonst Umlagerungsprozess von Silo zu Silo
-            else if ((    forBooking.OutwardFacility != null 
+            else if ((forBooking.OutwardFacility != null
                        || (forBooking.OutwardFacilityCharge != null && forBooking.OutwardFacilityCharge.Facility.MDFacilityType != null && forBooking.OutwardFacilityCharge.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                      && forBooking.InwardFacility != null)
             {
                 Facility outwardFacility = forBooking.OutwardFacility != null ? forBooking.OutwardFacility : forBooking.OutwardFacilityCharge.Facility;
-                if (   !outwardFacility.VBiFacilityACClassID.HasValue
+                if (!outwardFacility.VBiFacilityACClassID.HasValue
                     || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                     return false;
                 msg = OnValidateRoutesForWF(forBooking, outwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
@@ -596,6 +596,24 @@ namespace gip.bso.facility
             wfRunsBatches = acClassMethod.ACClassWF_ACClassMethod.ToArray().Where(c => c.RefPAACClassMethodID.HasValue && c.PWACClass != null && c.PWACClass.ObjectType != null && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)).Any();
             gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
 
+            if (!SelectAppManager(project))
+            {
+                return false;
+            }
+
+            ACComponent pAppManager = SelectedAppManager as ACComponent;
+            if (pAppManager == null)
+                return false;
+            if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
+            {
+                // TODO: Message
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool SelectAppManager(gip.core.datamodel.ACProject project)
+        {
             SelectedAppManager = null;
             AppManagersList = this.Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).ToList();
             if (AppManagersList.Count > 1)
@@ -605,15 +623,8 @@ namespace gip.bso.facility
                     return false;
             }
             else
-                SelectedAppManager = AppManagersList.FirstOrDefault();
-
-            ACComponent pAppManager = SelectedAppManager as ACComponent;
-            if (pAppManager == null)
-                return false;
-            if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
             {
-                // TODO: Message
-                return false;
+                SelectedAppManager = AppManagersList.FirstOrDefault();
             }
             return true;
         }
