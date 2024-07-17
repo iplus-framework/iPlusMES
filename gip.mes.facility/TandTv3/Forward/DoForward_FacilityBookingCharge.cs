@@ -18,9 +18,30 @@ namespace gip.mes.facility.TandTv3
 
         #region IItemTracking
 
+        public override List<IACObjectEntity> GetSameStepItems()
+        {
+            List<IACObjectEntity> items = base.GetSameStepItems();
+            if(Item.PickingPosID != null)
+            {
+                items.AddRange(Item.PickingPos.FacilityBookingCharge_PickingPos);
+            }
+            return items;
+        }
+
         public override List<IACObjectEntity> GetNextStepItems()
         {
             List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
+            bool forDebug =
+                (Item.InwardFacility != null && Item.InwardFacility.FacilityNo.Contains("104"))
+                ||
+                (Item.OutwardFacility != null && Item.OutwardFacility.FacilityNo.Contains("104"))
+
+                ;
+
+            if (forDebug)
+            {
+                //System.Diagnostics.Debugger.Break();
+            }
 
             FacilityCharge fc = null;
             if (Item.InwardFacilityChargeID != null)
@@ -59,7 +80,7 @@ namespace gip.mes.facility.TandTv3
                 .FacilityLot
                 .FacilityBookingCharge_OutwardFacilityLot
                 .Where(c =>
-                            // c.OutwardMaterialID == Item.InwardMaterialID
+                             // c.OutwardMaterialID == Item.InwardMaterialID
                              // c.OutwardFacilityID == Item.InwardFacilityID
                              (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
                 .OrderBy(c => c.FacilityBookingChargeNo)
@@ -89,41 +110,51 @@ namespace gip.mes.facility.TandTv3
                 nextStepItems.AddRange(inwardItems);
             }
 
-            if (Item.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.PickingRelocation)
-            {
-                List<FacilityBookingCharge> nextFbcs = new List<FacilityBookingCharge>();
-                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+            //short[] pickingTypes = new short[]
+            //{
+            //    (short)GlobalApp.FacilityBookingType.PickingInward,
+            //    (short)GlobalApp.FacilityBookingType.PickingInwardCancel,
+            //    (short)GlobalApp.FacilityBookingType.PickingOutward,
+            //    (short)GlobalApp.FacilityBookingType.PickingOutwardCancel,
+            //    (short)GlobalApp.FacilityBookingType.PickingRelocation,
+            //};
 
-                FacilityBookingCharge relocatedCharge
-                    = Item
-                      .PickingPos
-                      .FacilityBookingCharge_PickingPos
-                      .Where(c => c.InwardFacilityCharge != null)
-                      .FirstOrDefault();
+            //if (pickingTypes.Contains(Item.FacilityBookingTypeIndex))
+            //{
+            //    List<FacilityBookingCharge> nextFbcs = new List<FacilityBookingCharge>();
+            //    nextFbcs.AddRange(Item.PickingPos.FacilityBookingCharge_PickingPos);
+            //    //bool isOrderTrackingActive = Result.IsOrderTrackingActive();
 
-                if (relocatedCharge != null)
-                {
-                    nextFbcs =
-                        relocatedCharge
-                        .InwardFacilityCharge
-                        .FacilityBookingCharge_OutwardFacilityCharge
-                           .Where(c =>
-                                c.OutwardMaterialID == relocatedCharge.InwardMaterialID
-                                && c.OutwardFacilityID == relocatedCharge.InwardFacilityID
-                                && (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
-                        .OrderBy(c => c.FacilityBookingChargeNo)
-                        .ToList();
+            //    //FacilityBookingCharge relocatedCharge
+            //    //    = Item
+            //    //      .PickingPos
+            //    //      .FacilityBookingCharge_PickingPos
+            //    //      .Where(c => c.InwardFacilityCharge != null)
+            //    //      .FirstOrDefault();
 
-                    if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosID != null)
-                    {
-                        foreach (FacilityBookingCharge fbc in nextFbcs)
-                        {
-                            Result.AddOrderConnection(Item, fbc);
-                        }
-                    }
-                    nextStepItems.AddRange(nextFbcs);
-                }
-            }
+            //    //if (relocatedCharge != null)
+            //    //{
+            //    //    nextFbcs =
+            //    //        relocatedCharge
+            //    //        .InwardFacilityCharge
+            //    //        .FacilityBookingCharge_OutwardFacilityCharge
+            //    //           .Where(c =>
+            //    //                c.OutwardMaterialID == relocatedCharge.InwardMaterialID
+            //    //                && c.OutwardFacilityID == relocatedCharge.InwardFacilityID
+            //    //                && (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
+            //    //        .OrderBy(c => c.FacilityBookingChargeNo)
+            //    //        .ToList();
+
+            //    //    if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosID != null)
+            //    //    {
+            //    //        foreach (FacilityBookingCharge fbc in nextFbcs)
+            //    //        {
+            //    //            Result.AddOrderConnection(Item, fbc);
+            //    //        }
+            //    //    }
+            //    //    nextStepItems.AddRange(nextFbcs);
+            //    //}
+            //}
 
             // TODO: @aagincic: define bookings important for tracking -> (one lot transformed to another etc)
             //if (Item.FacilityInventoryPos != null)
@@ -145,8 +176,8 @@ namespace gip.mes.facility.TandTv3
                 fbc
                 .ProdOrderPartslistPosRelation
                 .FacilityBookingCharge_ProdOrderPartslistPosRelation
-                .Where(c => 
-                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                .Where(c =>
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID
                             && c.InsertDate < fbc.InsertDate
                             && c.OutwardFacilityChargeID == fbc.OutwardFacilityChargeID
                       )
@@ -157,8 +188,8 @@ namespace gip.mes.facility.TandTv3
                 fbc
                 .ProdOrderPartslistPosRelation
                 .FacilityBookingCharge_ProdOrderPartslistPosRelation
-                .Where(c => 
-                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                .Where(c =>
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID
                             && c.InsertDate > fbc.InsertDate
                             && c.OutwardFacilityChargeID == fbc.OutwardFacilityChargeID
                       )

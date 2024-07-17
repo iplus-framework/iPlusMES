@@ -31,7 +31,7 @@ namespace gip.mes.facility.TandTv3
                 {
                     pos = Item.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos;
                 }
-                else if(Item.ProdOrderPartslistPosID != null)
+                else if (Item.ProdOrderPartslistPosID != null)
                 {
                     pos = Item.ProdOrderPartslistPos;
                 }
@@ -42,7 +42,7 @@ namespace gip.mes.facility.TandTv3
                 }
 
                 return result;
-                    
+
             }
         }
         #endregion
@@ -72,6 +72,11 @@ namespace gip.mes.facility.TandTv3
 
             if (Item.OutOrderPosID != null)
                 sameStepItems.Add(Item.OutOrderPos.TopParentOutOrderPos);
+
+            if (Item.PickingPosID != null)
+            {
+                sameStepItems.Add(Item.PickingPos);
+            }
 
             return sameStepItems;
         }
@@ -123,9 +128,9 @@ namespace gip.mes.facility.TandTv3
                 fbc
                 .ProdOrderPartslistPos
                 .FacilityBookingCharge_ProdOrderPartslistPos
-                .Where(c => 
-                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
-                            && c.InsertDate < fbc.InsertDate 
+                .Where(c =>
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID
+                            && c.InsertDate < fbc.InsertDate
                             && c.InwardFacilityChargeID == fbc.InwardFacilityChargeID
                        )
                 .OrderBy(c => c.InsertDate)
@@ -135,8 +140,8 @@ namespace gip.mes.facility.TandTv3
                 fbc
                 .ProdOrderPartslistPos
                 .FacilityBookingCharge_ProdOrderPartslistPos
-                .Where(c => 
-                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID 
+                .Where(c =>
+                            c.FacilityBookingChargeID != fbc.FacilityBookingChargeID
                             && c.InsertDate > fbc.InsertDate
                             && c.InwardFacilityChargeID == fbc.InwardFacilityChargeID
                         )
