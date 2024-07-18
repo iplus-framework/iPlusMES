@@ -1378,7 +1378,40 @@ namespace gip.bso.logistics
         {
             get
             {
+                // Manage case if CurrentPickingPos.FromFacility is not in filtered set:
+                // if not add to list to display value and prevent delete initial value
+                if (CurrentPickingPos != null && CurrentPickingPos.FromFacility != null)
+                {
+                    if (!AccessPositionFacilityFrom?.NavList.Contains(CurrentPickingPos.FromFacility) ?? false)
+                    {
+                        AccessPositionFacilityFrom?.NavList.Add(CurrentPickingPos.FromFacility);
+                    }
+                }
+
+                // add child facilities
+                foreach(Facility facility in AccessPositionFacilityFrom?.NavList)
+                {
+                    AddChidFacilityToPosFacilityFormList(facility);
+                }
+
+                // Order list
+
                 return AccessPositionFacilityFrom?.NavList;
+            }
+        }
+
+        private void AddChidFacilityToPosFacilityFormList(Facility facility)
+        {
+            if (!AccessPositionFacilityFrom?.NavList.Contains(facility) ?? false)
+            {
+                AccessPositionFacilityFrom?.NavList.Add(facility);
+            }
+            if (facility.Facility_ParentFacility.Any())
+            {
+                foreach (Facility childFacility in facility.Facility_ParentFacility)
+                {
+                    AddChidFacilityToPosFacilityFormList(childFacility);
+                }
             }
         }
 
@@ -1484,7 +1517,8 @@ namespace gip.bso.logistics
             {
                 case nameof(CurrentPickingPos.PickingMaterialID):
                     OnPropertyChanged(nameof(MDUnitList));
-						OnPropertyChanged(nameof(PositionFacilityFromList));
+                    RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                    OnPropertyChanged(nameof(PositionFacilityFromList));
                     break;
             }
         }
@@ -3132,8 +3166,8 @@ namespace gip.bso.logistics
 
         public bool IsEnabledRecalcActualQuantity()
         {
-            return 
-                SelectedPicking != null 
+            return
+                SelectedPicking != null
                 && SelectedPicking.PickingPos_Picking.Any();
         }
 
@@ -3608,7 +3642,7 @@ namespace gip.bso.logistics
                 OnPropertyChanged(nameof(FacilityBookingList));
                 ACFacilityManager.RecalcAfterPosting(DatabaseApp, currentPickingPos, changedQuantity, isCancellation, true);
                 Save();
-                
+
                 Msg msg = null;
                 if (autoSetQuantToZero == SetQuantToZeroMode.CheckIfZeroAskUser)
                     msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
