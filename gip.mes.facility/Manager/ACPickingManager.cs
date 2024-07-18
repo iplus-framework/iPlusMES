@@ -2421,6 +2421,7 @@ namespace gip.mes.facility
                         routes.AddRange(rResult.Routes);
                 }
 
+                short? destinationFilterClassCode = null;
                 #region Filter routes if is selected    ShowCellsInRoute
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
@@ -2449,6 +2450,17 @@ namespace gip.mes.facility
                         {
                             routes = routes.Where(c => c.Items.Select(x => x.Source.GetACUrl()).Intersect(classes).Any()).ToList();
                         }
+                    }
+
+                    IACConfig configClassCode = configManager.GetConfiguration(
+                        mandatoryConfigStores,
+                        configACUrl + "\\",
+                        acClassWFDischarging.ConfigACUrl + ACUrlHelper.Delimiter_DirSeperator + ACStateConst.SMStarting + ACUrlHelper.Delimiter_DirSeperator + nameof(Facility.ClassCode),
+                        null,
+                        out priorityLevel);
+                    if (configClassCode != null)
+                    {
+                        destinationFilterClassCode = (short)configClassCode.Value;
                     }
                 }
                 #endregion
@@ -2508,6 +2520,8 @@ namespace gip.mes.facility
                                 if (showSelectedCells)
                                     continue;
                                 unselFacility = queryUnselFacilities.Where(c => c.VBiFacilityACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                                if (unselFacility == null)
+                                    continue;
                                 if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
                                     continue;
                                 bool ifMaterialMatch =
@@ -2521,6 +2535,12 @@ namespace gip.mes.facility
                                 //);
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
+                                if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
+                                {
+                                    uint bitCmpResult = ((uint)unselFacility.ClassCode) & ((uint)destinationFilterClassCode.Value);
+                                    if (bitCmpResult == 0)
+                                        continue;
+                                }
                             }
                             reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, pickingPos, null, selectedReservationForModule, unselFacility, acClassWFDischarging, aCClassWF));
                         }

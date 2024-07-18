@@ -1328,9 +1328,9 @@ namespace gip.bso.logistics
 
         #region PickingPos -> PositionFacilityFrom
 
-        private bool _FilterPositionFacilityFrom = true;
+        private bool? _FilterPositionFacilityFrom = null;
         [ACPropertyInfo(814, "", "en{'Only show source bins with material'}de{'Zeige Quelle-Lagerplätze mit Material'}")]
-        public bool FilterPositionFacilityFrom
+        public bool? FilterPositionFacilityFrom
         {
             get
             {
@@ -1474,10 +1474,7 @@ namespace gip.bso.logistics
             {
                 case nameof(CurrentPickingPos.PickingMaterialID):
                     OnPropertyChanged(nameof(MDUnitList));
-                    if (FilterPositionFacilityFrom)
-                    {
-                        RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
-                    }
+                    RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
                     break;
             }
         }
@@ -1789,7 +1786,7 @@ namespace gip.bso.logistics
             }
         }
 
-        private bool _BookingFilterMaterial = true;
+        private bool _BookingFilterMaterial = false;
         [ACPropertyInfo(9999, "", "en{'Only show source bins with material'}de{'Zeige Quell-Lagerplätze mit Material'}")]
         public bool BookingFilterMaterial
         {
@@ -1914,6 +1911,18 @@ namespace gip.bso.logistics
             }
         }
 
+        private List<ACFilterItem> AccessBookingFacilityDefaultFilter_StorageAll
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.equal, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.and, "", true),
+                };
+            }
+        }
+
         private List<ACSortItem> AccessBookingFacilityDefaultSort
         {
             get
@@ -1954,9 +1963,13 @@ namespace gip.bso.logistics
             RefreshFilterFacilityAccess(accessNavFacility, bookingFilterMaterial);
         }
 
-        private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool filterMaterial)
+        private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool? filterMaterial)
         {
-            if (filterMaterial)
+            if (!filterMaterial.HasValue)
+            {
+                accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_StorageAll, AccessBookingFacilityDefaultSort);
+            }
+            else if (filterMaterial.Value)
             {
                 accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
                 var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
@@ -3081,13 +3094,13 @@ namespace gip.bso.logistics
         [ACMethodInteraction(nameof(RecalcActualQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking))]
         public void RecalcActualQuantity()
         {
-            if(!IsEnabledRecalcActualQuantity())
+            if (!IsEnabledRecalcActualQuantity())
             {
                 return;
             }
 
             PickingPos[] pickingPositions = SelectedPicking.PickingPos_Picking.ToArray();
-            foreach(PickingPos pos in pickingPositions)
+            foreach (PickingPos pos in pickingPositions)
             {
                 pos.RecalcActualQuantity();
             }

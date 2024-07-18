@@ -1509,6 +1509,8 @@ namespace gip.mes.facility
                                 if (showSelectedCells)
                                     continue;
                                 unselFacility = queryUnselFacilities.Where(c => c.VBiFacilityACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                                if (unselFacility == null)
+                                    continue;
                                 if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
                                     continue;
                                 bool ifMaterialMatch =
