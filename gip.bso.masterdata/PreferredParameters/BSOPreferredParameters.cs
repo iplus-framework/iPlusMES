@@ -387,22 +387,20 @@ namespace gip.bso.masterdata
 
             VD.DatabaseApp databaseApp = Database as VD.DatabaseApp;
 
-            if (partslistID != null)
-            {
-                CurrentConfigStore = databaseApp.Partslist.Where(c => c.PartslistID == partslistID).FirstOrDefault();
-            }
-            if (prodOrderPartslistID != null)
-            {
-                CurrentConfigStore = databaseApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID).FirstOrDefault();
-            }
             if (pickingID != null)
             {
                 CurrentConfigStore = databaseApp.Picking.Where(c => c.PickingID == pickingID).FirstOrDefault();
             }
-
+            else if (prodOrderPartslistID != null)
+            {
+                CurrentConfigStore = databaseApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID).FirstOrDefault();
+            }
+            else if (partslistID != null)
+            {
+                CurrentConfigStore = databaseApp.Partslist.Where(c => c.PartslistID == partslistID).FirstOrDefault();
+            }
 
             (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(databaseApp, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
-
 
             _PWNodeParamValueList = pwNodeParams;
             _PAFunctionParamValueList = paFunctionParams;

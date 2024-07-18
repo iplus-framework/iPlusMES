@@ -69,7 +69,6 @@ namespace gip.bso.masterdata
 
         #endregion
 
-
         #region Properties
 
         #region Managers
@@ -139,6 +138,49 @@ namespace gip.bso.masterdata
                 .FacilityMaterial_Facility
                 .OrderBy(c => c.Material.MaterialNo)
                 .ToList();
+        }
+        #endregion
+
+        #region  Assigned Workflow
+
+        private List<gip.core.datamodel.ACClassMethod> _ProcessWorkflowList;
+        [ACPropertyList(9999, "ProcessWorkflow")]
+        public List<gip.core.datamodel.ACClassMethod> ProcessWorkflowList
+        {
+            get
+            {
+                if (_ProcessWorkflowList == null)
+                {
+                    _ProcessWorkflowList =
+                        DatabaseApp
+                        .ContextIPlus
+                        .ACClassMethod
+                        .Where(c =>
+                                    c.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                                    &&
+                                    !c.IsSubMethod
+                               )
+                        .OrderBy(c => c.ACIdentifier)
+                        .ToList();
+                }
+                return _ProcessWorkflowList;
+            }
+        }
+
+        private gip.core.datamodel.ACClassMethod _SelectedProcessWorkflow;
+
+        [ACPropertySelected(9999, "ProcessWorkflow", "en{'ProcessWorkflow'}de{'ProcessWorkflow'}")]
+        public gip.core.datamodel.ACClassMethod SelectedProcessWorkflow
+        {
+            get
+            {
+                return _SelectedProcessWorkflow;
+            }
+            set
+            {
+                _SelectedProcessWorkflow = value;
+                OnPropertyChanged();
+            }
         }
         #endregion
 
@@ -514,6 +556,67 @@ namespace gip.bso.masterdata
         }
 
         #endregion
+
+        #region Assigned Workflow
+
+        [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true)]
+        public void SetProcessWorkflow()
+        {
+            if (!IsEnabledSetProcessWorkflow())
+            {
+                return;
+            }
+            ShowDialog(this, "DlgSetProcessWorkfow");
+        }
+
+        public bool IsEnabledSetProcessWorkflow()
+        {
+            return SelectedFacility != null;
+        }
+
+        [ACMethodInfo(nameof(RemoveProcessWorkflow), "en{'Remove process workflow'}de{'Prozess-Workflow entfernen'}", 51, true)]
+        public void RemoveProcessWorkflow()
+        {
+            if (!IsEnabledRemoveProcessWorkflow())
+            {
+                return;
+            }
+            // Question50111
+            // Remove assigned process workflow from facility?
+            // Zugewiesenen Prozessablauf aus der Einrichtung entfernen?
+            Global.MsgResult saveQuestion = Messages.Question(this, "Question50111", Global.MsgResult.No);
+            if (saveQuestion == Global.MsgResult.Yes)
+            {
+                SelectedFacility.VBiACClassMethod = null;
+                OnPropertyChanged(nameof(SelectedFacility));
+            }
+        }
+
+        public bool IsEnabledRemoveProcessWorkflow()
+        {
+            return SelectedFacility != null && SelectedFacility.VBiACClassMethodID != null;
+        }
+
+        [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true)]
+        public void SetWFOk()
+        {
+            if (!IsEnabledSetWFOk())
+            {
+                return;
+            }
+            SelectedFacility.VBiACClassMethod = SelectedProcessWorkflow.FromAppContext<gip.mes.datamodel.ACClassMethod>(DatabaseApp);
+            CloseTopDialog();
+            OnPropertyChanged(nameof(SelectedFacility));
+        }
+
+        public bool IsEnabledSetWFOk()
+        {
+            return SelectedFacility != null && SelectedProcessWorkflow != null;
+        }
+
+
+        #endregion
+
 
         #endregion
     }

@@ -141,6 +141,19 @@ namespace gip.bso.masterdata
             }
         }
 
+        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        [ACPropertyInfo(603)]
+        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
+        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
+        {
+            get
+            {
+                if (_BSOPreferredParameters == null)
+                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
+                return _BSOPreferredParameters;
+            }
+        }
+
         #endregion
 
         #region Properties (Manager)
@@ -2385,6 +2398,31 @@ namespace gip.bso.masterdata
             {
                 MaterialWFPresenter.SelectMaterial(SelectedIntermediate.Material);
             }
+        }
+
+        #endregion
+
+        #region ShowParamDialog
+
+        [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
+        public void ShowParamDialog()
+        {
+            if (!IsEnabledShowParamDialog())
+                return;
+
+            BSOPreferredParameters_Child.Value.ShowParamDialog(
+                ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
+                SelectedPartslist.PartslistID,
+                null,
+                null);
+        }
+
+        public bool IsEnabledShowParamDialog()
+        {
+            return
+                ProcessWorkflowPresenter != null
+                && ProcessWorkflowPresenter.SelectedWFNode != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
         }
 
         #endregion

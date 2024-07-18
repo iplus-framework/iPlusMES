@@ -1,9 +1,4 @@
 ﻿using gip.core.datamodel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
@@ -23,15 +18,15 @@ namespace gip.mes.datamodel
     }
 
 
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Weighing state''}de{'Wiegestatus'}", Global.ACKinds.TACEnumACValueList)]
+    [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.WeighingState, Global.ACKinds.TACEnumACValueList)]
     public class ACValueListWeighingStateEnum : ACValueItemList
     {
         public ACValueListWeighingStateEnum() : base("WeighingState")
         {
-            AddEntry(WeighingStateEnum.New, "en{'New'}de{'Neu'}");
+            AddEntry(WeighingStateEnum.New, Const.New);
             AddEntry(WeighingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
             AddEntry(WeighingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
-            AddEntry(WeighingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
+            AddEntry(WeighingStateEnum.Cancelled, Const.Canceled);
         }
     }
 }

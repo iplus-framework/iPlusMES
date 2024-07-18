@@ -14607,6 +14607,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <End Role="ACClass" EntitySet="ACClass" />
             <End Role="Facility" EntitySet="Facility" />
           </AssociationSet>
+		  <AssociationSet Name="FK_Facility_ACClassMethodID" Association="Self.FK_Facility_ACClassMethodID">
+            <End Role="ACClassMethod" EntitySet="ACClassMethod" />
+            <End Role="Facility" EntitySet="Facility" />
+          </AssociationSet>
           <AssociationSet Name="FK_FacilityBooking_CompanyID" Association="Self.FK_FacilityBooking_CompanyID">
             <End Role="Company" EntitySet="Company" />
             <End Role="FacilityBooking" EntitySet="FacilityBooking" />
@@ -19173,6 +19177,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           </AssociationSet>
           <AssociationSet Name="FK_Facility_StackCalculatorACClassID" Association="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID">
             <End Role="ACClass" EntitySet="ACClass" />
+            <End Role="Facility" EntitySet="Facility" />
+          </AssociationSet>
+		  <AssociationSet Name="FK_Facility_ACClassMethodID" Association="iPlusMESV4_Model.FK_Facility_ACClassMethodID">
+            <End Role="ACClassMethod" EntitySet="ACClassMethod" />
             <End Role="Facility" EntitySet="Facility" />
           </AssociationSet>
           <AssociationSet Name="FK_Facility_CompanyID" Association="iPlusMESV4_Model.FK_Facility_CompanyID">
@@ -40803,6 +40811,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
         <EntityTypeShape EntityType="iPlusMESV4_Model.Facility" Width="1.5" PointX="77" PointY="293.75" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_FacilityACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_ACClassMethodID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_CompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_IncomingFacilityID" />
