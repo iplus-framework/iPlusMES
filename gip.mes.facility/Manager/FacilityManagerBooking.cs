@@ -657,19 +657,29 @@ namespace gip.mes.facility
                 }
             }
 
-            if (BP.ParamsAdjusted.InwardFacility != null)
+            Facility facilityBin = BP.ParamsAdjusted.InwardFacility;
+            if (facilityBin == null)
             {
-                ReleaseStateFacility(FBC.InwardFacilityStock, BP.ParamsAdjusted.MDReleaseState);
-                SetMaterialAssignmentOnFacility(BP, FBC.InwardFacility, FBC.InwardMaterial, FBC.InwardFacilityCharge.Partslist);
+                if (FBC.InwardFacility != null)
+                    facilityBin = FBC.InwardFacility;
+                else if (FBC.InwardFacilityCharge != null)
+                    facilityBin = FBC.InwardFacilityCharge.Facility;
+                else if (facilityCharges != null && facilityCharges.Any())
+                    facilityBin = facilityCharges.FirstOrDefault().Facility;
+            }
+            if (facilityBin != null)
+            {
+                if (BP.ParamsAdjusted.InwardFacility != null)
+                {
+                    ReleaseStateFacility(FBC.InwardFacilityStock, BP.ParamsAdjusted.MDReleaseState);
+                    SetMaterialAssignmentOnFacility(BP, facilityBin, FBC.InwardMaterial, FBC.InwardFacilityCharge.Partslist);
+                }
 
                 // Merke dass auf Silo gebucht worden ist, weil evtl. eine Reorganistation danach stattfinden muss
-                if ((BP.ParamsAdjusted.InwardFacility.MDFacilityType != null) && (BP.ParamsAdjusted.IsLotManaged))
+                if (facilityBin.MDFacilityType != null && facilityBin.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
-                    if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                    {
-                        if (!BP.InwardCellsWithLotManagedBookings.Contains(FBC.InwardFacility))
-                            BP.InwardCellsWithLotManagedBookings.Add(FBC.InwardFacility);
-                    }
+                    if (!BP.InwardCellsWithLotManagedBookings.Contains(facilityBin))
+                        BP.InwardCellsWithLotManagedBookings.Add(facilityBin);
                 }
             }
 
@@ -745,18 +755,28 @@ namespace gip.mes.facility
                 }
             }
 
-            if (BP.ParamsAdjusted.OutwardFacility != null)
+
+            Facility facilityBin = BP.ParamsAdjusted.OutwardFacility;
+            if (facilityBin == null)
             {
-                ReleaseStateFacility(FBC.OutwardFacilityStock, BP.ParamsAdjusted.MDReleaseState);
+                if (FBC.OutwardFacility != null)
+                    facilityBin = FBC.OutwardFacility;
+                else if (FBC.OutwardFacilityCharge != null)
+                    facilityBin = FBC.OutwardFacilityCharge.Facility;
+                else if (facilityCharges != null && facilityCharges.Any())
+                    facilityBin = facilityCharges.FirstOrDefault().Facility;
+            }
+
+            if (facilityBin != null)
+            {
+                if (BP.ParamsAdjusted.OutwardFacility != null)
+                    ReleaseStateFacility(FBC.OutwardFacilityStock, BP.ParamsAdjusted.MDReleaseState);
 
                 // Merke dass auf Silo gebucht worden ist, weil evtl. eine Reorganistation danach stattfinden muss
-                if ((BP.ParamsAdjusted.OutwardFacility.MDFacilityType != null) && (BP.ParamsAdjusted.IsLotManaged))
+                if (facilityBin.MDFacilityType != null && facilityBin.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
-                    if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                    {
-                        if (!BP.OutwardCellsWithLotManagedBookings.Contains(FBC.OutwardFacility))
-                            BP.OutwardCellsWithLotManagedBookings.Add(FBC.OutwardFacility);
-                    }
+                    if (!BP.OutwardCellsWithLotManagedBookings.Contains(facilityBin))
+                        BP.OutwardCellsWithLotManagedBookings.Add(facilityBin);
                 }
             }
 
@@ -2009,17 +2029,46 @@ namespace gip.mes.facility
 
             // Ermittle Schichten im Silo
             List<FacilityCharge> cellChargeList = s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).ToList();
-            if (cellChargeList.Count > 1)
+            if (cellChargeList.Count == 0)
             {
-                // Reorganisiere
-                StackItemList stackItems;
-                MsgBooking msgBookingResult;
-                stackCalculator.ReOrganize(cellChargeList, out stackItems, out msgBookingResult);
-                bookingResult = DoReOrganizeStackBooking(BP, stackItems);
-                if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                if (BP.InwardFacilityCharge != null && !BP.InwardFacilityCharge.NotAvailable)
+                    cellChargeList.Add(BP.InwardFacilityCharge);
+                else if (BP.OutwardFacilityCharge != null && !BP.OutwardFacilityCharge.NotAvailable)
+                    cellChargeList.Add(BP.OutwardFacilityCharge);
+            }
+            else if (cellChargeList.Count >= 1)
+            {
+                // If some changed InMemory, then remove them
+                cellChargeList.RemoveAll(c => c.NotAvailable);
+            }
+            if (cellChargeList.Count >= 1)
+            {
+                if (cellChargeList.Count > 1)
                 {
-                    BP.Merge(msgBookingResult);
-                    return bookingResult;
+                    // Reorganisiere
+                    StackItemList stackItems;
+                    MsgBooking msgBookingResult;
+                    stackCalculator.ReOrganize(cellChargeList, out stackItems, out msgBookingResult);
+                    bookingResult = DoReOrganizeStackBooking(BP, stackItems);
+                    if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                    {
+                        BP.Merge(msgBookingResult);
+                        return bookingResult;
+                    }
+                }
+                if (facility.Material == null)
+                {
+                    FacilityCharge fc = cellChargeList.FirstOrDefault();
+                    SetMaterialAssignmentOnFacility(BP, facility, fc.Material.Material1_ProductionMaterial != null ? fc.Material.Material1_ProductionMaterial : fc.Material, null);
+                }
+            }
+            else if (facility.Material != null && !facility.ShouldLeaveMaterialOccupation)
+            {
+                bool isFacilityInUse = CheckIsFacilityInUse(facility);
+                if (!isFacilityInUse)
+                {
+                    facility.Material = null;
+                    facility.Partslist = null;
                 }
             }
             return bookingResult;

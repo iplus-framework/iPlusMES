@@ -4597,13 +4597,7 @@ namespace gip.bso.logistics
 
         public bool IsEnabledCreateNewLabOrder()
         {
-            if (SelectedPickingPos != null)
-            {
-                if (SelectedPickingPos.LabOrder_PickingPos.Any())
-                    return false;
-            }
-
-            return true;
+            return SelectedPickingPos != null;
         }
 
         [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606)]
