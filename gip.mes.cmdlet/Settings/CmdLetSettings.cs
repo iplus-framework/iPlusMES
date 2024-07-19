@@ -6,6 +6,7 @@
         /// Query or set translations: ACClassText or ACClassMessage
         /// </summary>
         public const string TranslationCmdlet_Name = @"iPlusTranslation";
+        public const string TranslationFromSourceFileCmdlet_Name = @"iPlusTranslationFromSourceFile";
 
         /// <summary>
         /// Used to 
