@@ -3,27 +3,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 
 namespace gip.mes.cmdlet.Translation
 {
-    public class TranslationServiceFromFile
+    public class TranslationFromFileService
     {
         #region const
         public string[] begins = new string[] { "Error", "Info", "Warning" };
         #endregion
 
-        public TranslationServiceFromFile() { }
+        public TranslationFromFileService() { }
 
 
         public MsgWithDetails UpdateTranslations(Database database, ACProject project, string fileName, string updateName)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
-            List<List<string>> translationPairs = GetTranslationPairs(fileName);
+            List<SoruceFileTranslationPair> translationPairs = GetTranslationPairs(fileName);
 
-            List< FileTranslationDefinition > definitions = new List<FileTranslationDefinition>();
+            List<FileTranslationDefinition> definitions = new List<FileTranslationDefinition>();
             foreach (var translationPair in translationPairs)
             {
                 (Msg msg, FileTranslationDefinition definition) = GetTranslationDefinition(translationPair);
@@ -37,10 +35,10 @@ namespace gip.mes.cmdlet.Translation
                 }
             }
 
-            foreach(FileTranslationDefinition definition in definitions)
+            foreach (FileTranslationDefinition definition in definitions)
             {
                 Msg updateMsg = UpdateDefinition(database, definition, project, updateName);
-                if(updateMsg != null)
+                if (updateMsg != null)
                 {
                     msgWithDetails.AddDetailMessage(updateMsg);
                 }
@@ -49,14 +47,15 @@ namespace gip.mes.cmdlet.Translation
             return msgWithDetails;
         }
 
-        private List<List<string>> GetTranslationPairs(string fileName)
+        private List<SoruceFileTranslationPair> GetTranslationPairs(string fileName)
         {
-            List<List<string>> translationPairs = new List<List<string>>();
+            List<SoruceFileTranslationPair> translationPairs = new List<SoruceFileTranslationPair>();
             List<string> tempList = null;
             int? inLines = null;
-            string[] allLines = File.ReadAllLines(fileName);
+            List<string> allLines = File.ReadAllLines(fileName).ToList();
             foreach (string line in allLines)
             {
+                int lineNr = allLines.IndexOf(line) + 1;
                 if (
                         line.Contains($"// {begins[0]}")
                         || line.Contains($"// {begins[1]}")
@@ -72,15 +71,18 @@ namespace gip.mes.cmdlet.Translation
                     inLines++;
                     tempList.Add(line);
 
-                    if(inLines == 4)
+                    if (inLines == 4)
                     {
-                        translationPairs.Add(tempList);
+                        SoruceFileTranslationPair pair = new SoruceFileTranslationPair();
+                        pair.LineNr = lineNr - 4;
+                        pair.Data = tempList;
+                        translationPairs.Add(pair);
                         inLines = null;
                         tempList = null;
                     }
                 }
-                
-                
+
+
             }
             return translationPairs;
         }
@@ -111,25 +113,37 @@ namespace gip.mes.cmdlet.Translation
                 }
                 else
                 {
-                    message.ACCaptionTranslation = $"en{{'{definition.EnTranslation}'}}de{{'{definition.DeTranslation}'}}";
-                    message.UpdateName = updateName;
-                    message.UpdateDate = DateTime.Now;
-                    MsgWithDetails saveMsg = database.ACSaveChanges();
-                    if (saveMsg != null && saveMsg.IsSucceded())
+                    string translation = $"en{{'{definition.EnTranslation}'}}de{{'{definition.DeTranslation}'}}";
+                    if (message.ACCaptionTranslation != translation)
                     {
-                        msg = new Msg()
+                        message.ACCaptionTranslation = translation;
+                        message.UpdateName = updateName;
+                        message.UpdateDate = DateTime.Now;
+                        MsgWithDetails saveMsg = database.ACSaveChanges();
+                        if (saveMsg != null && saveMsg.IsSucceded())
                         {
-                            MessageLevel = eMsgLevel.Error,
-                            Message = $"Error saving translation :{definition.Owner} | {definition.ID}! Error: {saveMsg.DetailsAsText}"
-                        };
-                        database.ACUndoChanges();
+                            msg = new Msg()
+                            {
+                                MessageLevel = eMsgLevel.Error,
+                                Message = $"Error saving translation :{definition.Owner} | {definition.ID}! Error: {saveMsg.DetailsAsText}"
+                            };
+                            database.ACUndoChanges();
+                        }
+                        else
+                        {
+                            msg = new Msg()
+                            {
+                                MessageLevel = eMsgLevel.Info,
+                                Message = $"Saved translation :{definition.Owner} | {definition.ID}! \n Translation: {message.ACCaptionTranslation}"
+                            };
+                        }
                     }
                     else
                     {
                         msg = new Msg()
                         {
                             MessageLevel = eMsgLevel.Info,
-                            Message = $"Saved translation :{definition.Owner} | {definition.ID}! \n Translation: {message.ACCaptionTranslation}"
+                            Message = $"Translation {definition.Owner} | {definition.ID} not changed!"
                         };
                     }
                 }
@@ -137,59 +151,59 @@ namespace gip.mes.cmdlet.Translation
             return msg;
         }
 
-        private (Msg msg, FileTranslationDefinition definition) GetTranslationDefinition(List<string> lines)
+        private (Msg msg, FileTranslationDefinition definition) GetTranslationDefinition(SoruceFileTranslationPair source)
         {
             Msg msg = null;
             FileTranslationDefinition definition = null;
-            if (lines.Count != 4)
+            if (source.Data.Count != 4)
             {
                 msg = new Msg()
                 {
                     MessageLevel = eMsgLevel.Error,
-                    Message = $"Bad linies count!"
+                    Message = $"Bad linies count! Line Nr:{source.LineNr}"
                 };
             }
             else
             {
-                string ID = ParseID(lines[0]);
+                string ID = ParseID(source.Data[0]);
                 if (ID == null)
                 {
                     msg = new Msg()
                     {
                         MessageLevel = eMsgLevel.Error,
-                        Message = $"Unable to parse ID! Value: {lines[0]}"
+                        Message = $"Unable to parse ID! Line Nr:{source.LineNr}, Value: {source.Data[0]}"
                     };
                 }
                 else
                 {
-                    string className = GetLineContent(lines[1]);
+                    string className = GetLineContent(source.Data[1]);
                     if (className == null)
                     {
                         msg = new Msg()
                         {
                             MessageLevel = eMsgLevel.Error,
-                            Message = $"Unable to parse class name! Value: {lines[1]}"
+                            Message = $"Unable to parse class name! Line Nr:{source.LineNr} Value: {source.Data[1]}"
                         };
                     }
                     else
                     {
-                        string enTranslation = GetLineContent(lines[2]);
+                        string enTranslation = GetLineContent(source.Data[2]);
                         if (enTranslation == null)
                         {
                             msg = new Msg()
                             {
                                 MessageLevel = eMsgLevel.Error,
-                                Message = $"Unable to parse en translation! Value: {lines[2]}"
+                                Message = $"Unable to parse en translation! Line Nr:{source.LineNr} Value: {source.Data[2]}"
                             };
                         }
 
-                        string deTranslation = GetLineContent(lines[3]);
+                        string deTranslation = GetLineContent(source.Data[3]);
                         if (enTranslation == null)
                         {
                             msg = new Msg()
                             {
                                 MessageLevel = eMsgLevel.Error,
-                                Message = $"Unable to parse de translation! Value: {lines[3]}"
+                                Message = $"Unable to parse de translation! Line Nr:{source.LineNr} Value: {source.Data[3]}"
                             };
                         }
 

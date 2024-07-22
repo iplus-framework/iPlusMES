@@ -38,7 +38,7 @@ namespace gip.mes.cmdlet.Translation
                     ACProject project = database.ACProject.Where(c=>c.ACProjectName == ProjectName).FirstOrDefault();
                     if(project != null)
                     {
-                        TranslationServiceFromFile translationServiceFromFile = new TranslationServiceFromFile();
+                        TranslationFromFileService translationServiceFromFile = new TranslationFromFileService();
                         MsgWithDetails msg = translationServiceFromFile.UpdateTranslations(database, project, FileName, UpdateName);
                         if(msg.MsgDetails.Any())
                         {

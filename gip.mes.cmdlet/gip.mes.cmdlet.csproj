@@ -75,6 +75,7 @@
     <Compile Include="Settings\CmdLetSettings.cs" />
     <Compile Include="Translation\FileTranslationDefinition.cs" />
     <Compile Include="Translation\MessageTypeEnum.cs" />
+    <Compile Include="Translation\SoruceFileTranslationPair.cs" />
     <Compile Include="Translation\TranslationGetCmdlet.cs" />
     <Compile Include="DesignSync\ACClassExporter.cs" />
     <Compile Include="DesignSync\ACClassImporter.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Translation\ItemTypeEnum.cs" />
     <Compile Include="Translation\TranslationImportFromSourceFileCmdlet.cs" />
     <Compile Include="Translation\TranslationNewCmdlet.cs" />
-    <Compile Include="Translation\TranslationServiceFromFile.cs" />
+    <Compile Include="Translation\TranslationFromFileService.cs" />
     <Compile Include="Translation\TranslationSetCmdlet.cs" />
     <Compile Include="Translation\TranslationPresentation.cs" />
     <Compile Include="ACRootFactory.cs" />
