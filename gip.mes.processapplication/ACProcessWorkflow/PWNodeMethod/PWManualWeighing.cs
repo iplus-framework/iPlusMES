@@ -632,6 +632,10 @@ namespace gip.mes.processapplication
             }
         }
 
+        /// <summary>
+        /// If this Parameter ist set, then only line can be selected in Weighing-Dialog and when weighing ist finished
+        /// this node completes and a outer loop (PWLoadingLoop) will start this node again.
+        /// </summary>
         public bool EachPosSeparated
         {
             get

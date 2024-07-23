@@ -2241,7 +2241,11 @@ namespace gip.mes.facility
                     facilityQuery = SilosWithMaterial(dbApp, pickingPos, searchMode != ACPartslistManager.SearchMode.AllSilos, projSpecificParams, onlyContainer);
                 }
             }
-            ApplyLotReservationFilter(facilityQuery, pickingPos, reservationMode);
+
+            IList<Guid> destinationFromSupplys = null;
+            if (pickingPos != null && pickingPos.Picking != null && pickingPos.Picking.PickingType == GlobalApp.PickingType.IssueVehicle)
+                destinationFromSupplys = GetDestinationsFromSupplyPickings(dbApp, pickingPos);
+            ApplyLotReservationFilter(facilityQuery, pickingPos, reservationMode, destinationFromSupplys);
 
             if (onlyContainer)
             {
@@ -2378,12 +2382,34 @@ namespace gip.mes.facility
         );
 
 
-        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, PickingPos pickingPos, short reservationMode)
+        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, PickingPos pickingPos, short reservationMode, IList<Guid> allowedFacilities = null)
         {
             if (qrySilosResult == null)
                 return;
-            qrySilosResult.ApplyLotReservationFilter(pickingPos, reservationMode);
+            qrySilosResult.ApplyLotReservationFilter(pickingPos, reservationMode, allowedFacilities);
         }
+
+
+        protected static readonly Func<DatabaseApp, string, Guid, IQueryable<Guid>> s_cQry_SilosFromSupplyPickings =
+        CompiledQuery.Compile<DatabaseApp, string, Guid, IQueryable<Guid>>(
+            (ctx, pickingNo, materialID) => ctx.FacilityBookingCharge.Where(c => c.PickingPosID.HasValue
+                                    && c.PickingPos.Picking.PickingNo.StartsWith(pickingNo)
+                                    && c.InwardMaterialID == materialID
+                                    && c.InwardFacilityID.HasValue)
+                                    .Select(c => c.InwardFacilityID.Value)
+        );
+
+        public virtual IList<Guid> GetDestinationsFromSupplyPickings(DatabaseApp dbApp, PickingPos pickingPos)
+        {
+            if (pickingPos == null)
+                return null;
+            string pickingNo = pickingPos.Picking.PickingNo + "-";
+            Guid materialID = pickingPos.Material.MaterialID;
+            return s_cQry_SilosFromSupplyPickings(dbApp, pickingNo, materialID).Distinct().ToList();
+        }
+
+        //Picking.FormatNoForSupply
+
         #endregion
 
         #region Target-Selection

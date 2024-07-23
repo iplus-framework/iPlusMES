@@ -1429,7 +1429,7 @@ namespace gip.mes.processapplication
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
-                            PickingPos currentDisEntity = dbApp.PickingPos.FirstOrDefault(c=>c.PickingPosID == currentDisEntityID);
+                            PickingPos currentDisEntity = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == currentDisEntityID);
                             if (propertyToSet == 1)
                             {
                                 currentDisEntity.ACClassTaskID = this.ContentTask.ACClassTaskID;

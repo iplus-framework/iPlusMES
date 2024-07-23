@@ -9,6 +9,7 @@ using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 using gip.core.processapplication;
 using static gip.core.communication.ISOonTCP.PLC;
+using System.Security.Policy;
 
 namespace gip.mes.processapplication
 {
@@ -44,6 +45,10 @@ namespace gip.mes.processapplication
             }
         }
 
+        /// <summary>
+        /// This switch forces the dosing node to dose all picking positions in sequence as long as possible without terminating the dosing node. When all positions that can be dosed at this point have been processed, the step ends.
+        /// It ignores which PickingPos has been passed in the contructor for this root node (PWMethodTransportBase.CurrentPickingPos)
+        /// </summary>
         public bool DoseAllPosFromPicking
         {
             get
@@ -255,10 +260,10 @@ namespace gip.mes.processapplication
                 return StartNextCompResult.Done;
             var pwGroup = ParentPWGroup;
             // Nur einmal starten erlaubt:
-            if (   !RepeatDosingForPicking
-                && !DoseAllPosFromPicking
-                && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
-                return StartNextCompResult.Done;
+            //if (   !RepeatDosingForPicking
+            //    && !DoseAllPosFromPicking
+            //    && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
+            //    return StartNextCompResult.Done;
 
             Msg msg = null;
             using (var dbIPlus = new Database())
@@ -293,7 +298,6 @@ namespace gip.mes.processapplication
                                                .ToArray();
                 }
 
-
                 if (!DoseAllPosFromPicking)
                 {
                     if (pickingPosFromPWMethod == null)
@@ -301,10 +305,15 @@ namespace gip.mes.processapplication
                     else
                         openPickings = new PickingPos[] { pickingPosFromPWMethod };
                 }
-
+                if (openPickings == null || !openPickings.Any())
+                    return StartNextCompResult.Done;
 
                 foreach (PickingPos pickingPos in openPickings)
                 {
+                    // If this line is currently in use by another Workflow, the ignore this line and go to next
+                    if (pickingPos.ACClassTaskID.HasValue && pickingPos.ACClassTaskID.Value != this.ContentTask.ACClassTaskID && pickingPos.ACClassTaskID.Value != Root.ContentTask.ACClassTaskID)
+                        continue;
+
                     double targetWeight = 0;
                     if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
                     {
@@ -312,6 +321,18 @@ namespace gip.mes.processapplication
                         dbApp.ACSaveChanges();
                         continue;
                     }
+
+                    // dosingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
+                    // Start each line separated
+                    if (CurrentDosingPos != null 
+                        && CurrentDosingPos.ValueT != Guid.Empty 
+                        && CurrentDosingPos.ValueT != pickingPos.PickingPosID
+                        && (!DoseAllPosFromPicking || EachPosSeparated)
+                        && !pickingPos.ACClassTaskID.HasValue)
+                    {
+                        return StartNextCompResult.Done;
+                    }
+
                     targetWeight = pickingPos.RemainingDosingWeight * -1;
                     if (targetWeight < 0.000001)
                         targetWeight = 1;
@@ -419,6 +440,8 @@ namespace gip.mes.processapplication
                     {
                         if (NoSourceFoundForDosing.ValueT == 0)
                         {
+                            if (ComponentsSkippable)
+                                continue;
                             NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
                             NoSourceFoundForDosing.ValueT = 1;
 
@@ -1048,8 +1071,8 @@ namespace gip.mes.processapplication
                                                             "-",
                                                             pickingPos.PickingMaterial.MaterialNo,
                                                             restQuantity,
-                                                            dosingQuantityFromSilo.Value,
-                                                            restQuantity - dosingQuantityFromSilo.Value);
+                                                            dosingQuantityFromSilo.HasValue ? dosingQuantityFromSilo.Value : 0,
+                                                            restQuantity - (dosingQuantityFromSilo.HasValue ? dosingQuantityFromSilo.Value : 0));
                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);

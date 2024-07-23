@@ -309,7 +309,7 @@ namespace gip.mes.facility
                 }
             }
 
-            public void ApplyLotReservationFilter(PickingPos pickingPos, short reservationMode)
+            public void ApplyLotReservationFilter(PickingPos pickingPos, short reservationMode, IList<Guid> allowedFacilities = null)
             {
                 if (_FilteredResult == null || !_FilteredResult.Any())
                     return;
@@ -320,10 +320,10 @@ namespace gip.mes.facility
                         .Select(c => new ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM, ReservationStateIndex = c.ReservationStateIndex })
                         .ToArray();
                 }
-                BuildFilteredResultFromReservationInfo(reservationMode);
+                BuildFilteredResultFromReservationInfo(reservationMode, allowedFacilities);
             }
 
-            private void BuildFilteredResultFromReservationInfo(short reservationMode)
+            private void BuildFilteredResultFromReservationInfo(short reservationMode, IList<Guid> allowedFacilities = null)
             {
                 if (_ReservationInfos == null || !_ReservationInfos.Any())
                     return;
@@ -352,6 +352,8 @@ namespace gip.mes.facility
                         .Where(c => c.FacilityCharges.Where(d => d.IsReservedLot).Any())
                         .ToList();
                 }
+                if (allowedFacilities != null && allowedFacilities.Any())
+                    _FilteredResult = _FilteredResult.Where(c => allowedFacilities.Contains(c.StorageBin.FacilityID)).ToList();
             }
 
             #endregion

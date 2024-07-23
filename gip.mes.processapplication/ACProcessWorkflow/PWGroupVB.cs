@@ -738,27 +738,46 @@ namespace gip.mes.processapplication
                     {
                         string moduleACUrl = module.GetACUrl();
 
-
                         RoutingResult rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
                         if (rResult.Routes != null && rResult.Routes.Any())
                         {
                             if (hasGroupDosings)
                             {
-                                if (pickingPos.FromFacility != null && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
+                                PWDosing pwDosing = pwDosings.FirstOrDefault();
+                                List<PickingPos> openPickings = new List<PickingPos>();
+                                // If more line can be dosed, then ignore passed pickingPos and 
+                                if (pwDosing.DoseAllPosFromPicking)
                                 {
-                                    routingParameters.SelectionRuleID = SelRuleID_ReachableSource;
-                                    routingParameters.Direction = RouteDirections.Backwards;
-                                    routingParameters.DBSelector = (c, p, r) => c.ACClassID == pickingPos.FromFacility.VBiFacilityACClassID.Value;
-                                    routingParameters.DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType)));
-                                    routingParameters.SelectionRuleParams = new object[] { pickingPos.FromFacility.VBiFacilityACClassID.Value };
-
-                                    rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
+                                    openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
+                                                                    .Where(c => c.PickingID == picking.PickingID
+                                                                            && c.MDDelivPosLoadStateID.HasValue
+                                                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                                                                || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                                                    .OrderBy(c => c.Sequence)
+                                                                    .ToList();
                                 }
-                                else if (pickingPos.FromFacility == null)
+                                if (!openPickings.Contains(pickingPos))
+                                    openPickings.Add(pickingPos);
+
+                                foreach (PickingPos pickingPos2 in openPickings)
                                 {
-                                    var pwDosing = pwDosings.FirstOrDefault();
-                                    if (pwDosing != null)
-                                        rResult = pwDosing.HasAndCanProcessAnyMaterialPicking(module, dbApp, db, pickingPos);
+                                    if (pickingPos2.FromFacility != null && pickingPos2.FromFacility.VBiFacilityACClassID.HasValue)
+                                    {
+                                        routingParameters.SelectionRuleID = SelRuleID_ReachableSource;
+                                        routingParameters.Direction = RouteDirections.Backwards;
+                                        routingParameters.DBSelector = (c, p, r) => c.ACClassID == pickingPos2.FromFacility.VBiFacilityACClassID.Value;
+                                        routingParameters.DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType)));
+                                        routingParameters.SelectionRuleParams = new object[] { pickingPos2.FromFacility.VBiFacilityACClassID.Value };
+
+                                        rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
+                                    }
+                                    else if (pickingPos2.FromFacility == null)
+                                    {
+                                        if (pwDosing != null)
+                                            rResult = pwDosing.HasAndCanProcessAnyMaterialPicking(module, dbApp, db, pickingPos2);
+                                    }
+                                    if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
+                                        break;
                                 }
                             }
                             if (rResult != null && rResult.Routes != null && rResult.Routes.Any())

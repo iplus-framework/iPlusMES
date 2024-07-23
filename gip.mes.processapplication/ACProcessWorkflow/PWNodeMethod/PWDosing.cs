@@ -98,7 +98,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("FacilityNoSort", typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add("FacilityNoSort", "en{'Priorization order container number'}de{'Priorisierungsreihenfolge Silonummer'}");
             method.ParameterValueList.Add(new ACValue("DoseAllPosFromPicking", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all picking lines at the same time'}de{'Alle Kommissionierpositionen gleichzeitig dosieren'}");
+            paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all picking lines'}de{'Alle Kommissionierpositionen dosieren'}");
+            method.ParameterValueList.Add(new ACValue("EachPosSeparated", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleife verwiegen'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDosing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDosing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWDosing), HandleExecuteACMethod_PWDosing);
@@ -844,6 +846,25 @@ namespace gip.mes.processapplication
             }
         }
 
+        /// <summary>
+        /// If this Parameter ist set, then only line will be dosed an then this node completes and a outer loop (PWDosingLoop/PWLoadingLoop) will start this node again.
+        /// This is helpful if you want to run some functions between each dosing
+        /// </summary>
+        public bool EachPosSeparated
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("EachPosSeparated");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
         public RuleValueList ExcludedSilosRule
         {
             get
@@ -1261,7 +1282,7 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c=>c.PickingPosID ==  dosingPosId);
+                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID ==  dosingPosId);
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             if (IsProduction)
                                 orderLog.ProdOrderPartslistPosRelationID = dosingPosId;
