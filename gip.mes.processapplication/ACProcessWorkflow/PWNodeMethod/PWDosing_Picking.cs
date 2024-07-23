@@ -88,12 +88,10 @@ namespace gip.mes.processapplication
                     Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
                     if (picking == null)
                         return false;
-                    PickingPos pickingPosFromPWMethod = null;
-                    if (pwMethodTransport.CurrentPickingPos != null && !DoseAllPosFromPicking)
-                        pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
 
-                    PickingPos[] openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
-                                    //.Include(c => c.FromFacility.FacilityCharge_Facility)
+                    PickingPos[] openPickings = dbApp.PickingPos
+                                    .Include(c => c.FromFacility.FacilityReservation_Facility)
+                                    .Include(c => c.MDDelivPosLoadState)
                                     .Where(c => c.PickingID == picking.PickingID
                                             && c.MDDelivPosLoadStateID.HasValue
                                             && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
@@ -111,10 +109,11 @@ namespace gip.mes.processapplication
 
                     if (!DoseAllPosFromPicking)
                     {
+                        var pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos;
                         if (pickingPosFromPWMethod == null)
                             openPickings = openPickings.Take(1).ToArray();
                         else
-                            openPickings = new PickingPos[] { pickingPosFromPWMethod };
+                            openPickings = openPickings.Where(c => c.PickingPosID == pickingPosFromPWMethod.PickingPosID).ToArray();
                     }
 
 
@@ -260,10 +259,10 @@ namespace gip.mes.processapplication
                 return StartNextCompResult.Done;
             var pwGroup = ParentPWGroup;
             // Nur einmal starten erlaubt:
-            //if (   !RepeatDosingForPicking
-            //    && !DoseAllPosFromPicking
-            //    && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
-            //    return StartNextCompResult.Done;
+            if (!RepeatDosingForPicking
+                && (!DoseAllPosFromPicking || EachPosSeparated || ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging)
+                && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
+            return StartNextCompResult.Done;
 
             Msg msg = null;
             using (var dbIPlus = new Database())
@@ -272,12 +271,10 @@ namespace gip.mes.processapplication
                 Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
                 if (picking == null)
                     return StartNextCompResult.Done;
-                PickingPos pickingPosFromPWMethod = null;
-                if (pwMethodTransport.CurrentPickingPos != null && !DoseAllPosFromPicking)
-                    pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
 
-                PickingPos[] openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
-                                //.Include(c => c.FromFacility.FacilityCharge_Facility)
+                PickingPos[] openPickings = dbApp.PickingPos
+                                .Include(c => c.FromFacility.FacilityReservation_Facility)
+                                .Include(c => c.MDDelivPosLoadState)
                                 .Where(c => c.PickingID == picking.PickingID
                                         && c.MDDelivPosLoadStateID.HasValue
                                         && (   c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
@@ -300,10 +297,11 @@ namespace gip.mes.processapplication
 
                 if (!DoseAllPosFromPicking)
                 {
+                    var pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos;
                     if (pickingPosFromPWMethod == null)
                         openPickings = openPickings.Take(1).ToArray();
                     else
-                        openPickings = new PickingPos[] { pickingPosFromPWMethod };
+                        openPickings = openPickings.Where(c => c.PickingPosID == pickingPosFromPWMethod.PickingPosID).ToArray();
                 }
                 if (openPickings == null || !openPickings.Any())
                     return StartNextCompResult.Done;
@@ -311,27 +309,27 @@ namespace gip.mes.processapplication
                 foreach (PickingPos pickingPos in openPickings)
                 {
                     // If this line is currently in use by another Workflow, the ignore this line and go to next
-                    if (pickingPos.ACClassTaskID.HasValue && pickingPos.ACClassTaskID.Value != this.ContentTask.ACClassTaskID && pickingPos.ACClassTaskID.Value != Root.ContentTask.ACClassTaskID)
+                    if (pickingPos.ACClassTaskID2.HasValue && this.ContentTask != null && pickingPos.ACClassTaskID2.Value != this.ContentTask.ACClassTaskID)// && pickingPos.ACClassTaskID2.Value != Root.ContentTask.ACClassTaskID)
                         continue;
 
                     double targetWeight = 0;
                     if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
                     {
                         pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                        pickingPos.ACClassTaskID2 = null;
                         dbApp.ACSaveChanges();
                         continue;
                     }
 
-                    // dosingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
                     // Start each line separated
-                    if (CurrentDosingPos != null 
-                        && CurrentDosingPos.ValueT != Guid.Empty 
-                        && CurrentDosingPos.ValueT != pickingPos.PickingPosID
-                        && (!DoseAllPosFromPicking || EachPosSeparated)
-                        && !pickingPos.ACClassTaskID.HasValue)
-                    {
-                        return StartNextCompResult.Done;
-                    }
+                    //if (CurrentDosingPos != null 
+                    //    && CurrentDosingPos.ValueT != Guid.Empty 
+                    //    && CurrentDosingPos.ValueT != pickingPos.PickingPosID
+                    //    && (!DoseAllPosFromPicking || EachPosSeparated)
+                    //    && !pickingPos.ACClassTaskID2.HasValue)
+                    //{
+                    //    return StartNextCompResult.Done;
+                    //}
 
                     targetWeight = pickingPos.RemainingDosingWeight * -1;
                     if (targetWeight < 0.000001)
@@ -367,6 +365,9 @@ namespace gip.mes.processapplication
                         else if (Math.Abs(targetWeight) > remainingWeight.Value)
                         {
                             targetWeight = remainingWeight.Value;
+                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                            if (targetWeight <= double.Epsilon)
+                                return StartNextCompResult.Done;
                             //pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                             //dbApp.ACSaveChanges();
                             //return StartNextCompResult.Done;
@@ -474,6 +475,7 @@ namespace gip.mes.processapplication
                                 return StartNextCompResult.CycleWait;
                             }
                             pickingPos.MDDelivPosLoadState = posLoadState;
+                            pickingPos.ACClassTaskID2 = null;
                             dbApp.ACSaveChanges();
                             continue;
                         }
@@ -716,6 +718,8 @@ namespace gip.mes.processapplication
                             posState = posState2;
                     }
                     pickingPos.MDDelivPosLoadState = posState;
+                    if (posState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+                        pickingPos.ACClassTaskID2 = null;
                     MsgWithDetails msg2 = dbApp.ACSaveChanges();
                     if (msg2 != null)
                     {
@@ -780,6 +784,8 @@ namespace gip.mes.processapplication
                             if (mode == ManageDosingStatesMode.ResetDosings)
                             {
                                 childPos.MDDelivPosLoadState = resettingPosState;
+                                if (resettingPosState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+                                    childPos.ACClassTaskID2 = null;
                             }
                         }
                     }
@@ -920,6 +926,48 @@ namespace gip.mes.processapplication
             return CachedEmptySiloHandlingOption.Value;
         }
 
+        protected virtual void OnCompletedPicking()
+        {
+            ResetTaskIdFromPickingPos();
+        }
+
+        protected virtual void ResetTaskIdFromPickingPos()
+        {
+            PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+            if (pwMethodTransport == null || pwMethodTransport.CurrentPicking == null || this.ContentTask == null)
+                return;
+
+            try
+            {
+                Guid taskID = this.ContentTask.ACClassTaskID;
+
+                using (var dbIPlus = new Database())
+                using (var dbApp = new DatabaseApp(dbIPlus))
+                {
+                    Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
+                    if (picking == null)
+                        return;
+
+                    PickingPos[] openPickings = dbApp.PickingPos
+                                    .Include(c => c.MDDelivPosLoadState)
+                                    .Where(c => c.PickingID == picking.PickingID
+                                            && c.ACClassTaskID2 == taskID)
+                                    .ToArray();
+                    if (openPickings != null && openPickings.Any())
+                    {
+                        foreach (var openPicking in openPickings)
+                        {
+                            openPicking.ACClassTaskID2 = null;
+                        }
+                        dbApp.ACSaveChanges();
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
         public virtual bool HasAndCanProcessAnyMaterialPicking(PAProcessModule module)
         {
             PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
@@ -936,8 +984,9 @@ namespace gip.mes.processapplication
                 if (pwMethodTransport.CurrentPickingPos != null && !DoseAllPosFromPicking)
                     pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
 
-                PickingPos[] openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
-                                //.Include(c => c.FromFacility.FacilityCharge_Facility)
+                PickingPos[] openPickings = dbApp.PickingPos
+                                .Include(c => c.FromFacility.FacilityReservation_Facility)
+                                .Include(c => c.MDDelivPosLoadState)
                                 .Where(c => c.PickingID == picking.PickingID
                                         && c.MDDelivPosLoadStateID.HasValue
                                         && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
@@ -1118,6 +1167,7 @@ namespace gip.mes.processapplication
 
                     }
                     pickingPos.MDDelivPosLoadState = posLoadState;
+                    pickingPos.ACClassTaskID2 = null;
                     dbApp.ACSaveChanges();
                     return ValidateDosingRouteEnum.ContinueNextComp;
                 }
@@ -1566,6 +1616,8 @@ namespace gip.mes.processapplication
                         if (changePosState && posState != null)
                         {
                             pickingPos.MDDelivPosLoadState = posState;
+                            if (posState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+                                pickingPos.ACClassTaskID2 = null;
                             msg = dbApp.ACSaveChanges();
                             if (msg != null)
                             {
@@ -1637,6 +1689,7 @@ namespace gip.mes.processapplication
                     || (dosingQuantityReached && !isEndlessDosing))
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                    pickingPos.ACClassTaskID2 = null;
                 }
 
                 if (!inEmptyingMode)
@@ -1667,6 +1720,7 @@ namespace gip.mes.processapplication
                         {
                             pwGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
                             pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                            pickingPos.ACClassTaskID2 = null;
                         }
                     }
                 }

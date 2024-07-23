@@ -277,9 +277,6 @@
           <Property Name="DirectionIndex" Type="smallint" Nullable="false" />
           <Property Name="XMLValue" Type="text" />
           <Property Name="LogicalOperationIndex" Type="smallint" Nullable="false" />
-          <Property Name="RelationWeight" Type="smallint" Nullable="false" />
-          <Property Name="UseFactor" Type="smallint" Nullable="false" />
-          <Property Name="LastManipulationDT" Type="datetime" Nullable="false" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
@@ -288,6 +285,9 @@
           <Property Name="Divisor" Type="float" />
           <Property Name="ConvExpressionT" Type="varchar" MaxLength="200" />
           <Property Name="ConvExpressionS" Type="varchar" MaxLength="200" />
+          <Property Name="RelationWeight" Type="smallint" Nullable="false" />
+          <Property Name="UseFactor" Type="smallint" Nullable="false" />
+          <Property Name="LastManipulationDT" Type="datetime" Nullable="false" />
           <Property Name="IsDeactivated" Type="bit" Nullable="false" />
           <Property Name="DisplayGroup" Type="smallint" />
           <Property Name="GroupName" Type="varchar(max)" />
@@ -3934,12 +3934,12 @@
           <Property Name="DeliveryCompanyAddressID" Type="uniqueidentifier" />
           <Property Name="MirroredFromPickingID" Type="uniqueidentifier" />
           <Property Name="Comment2" Type="varchar(max)" />
+          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
           <Property Name="ScheduledOrder" Type="int" />
           <Property Name="ScheduledStartDate" Type="datetime" />
           <Property Name="ScheduledEndDate" Type="datetime" />
           <Property Name="CalculatedStartDate" Type="datetime" />
           <Property Name="CalculatedEndDate" Type="datetime" />
-          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="PickingConfig">
           <Key>
@@ -3988,6 +3988,7 @@
           <Property Name="PickingActualUOM" Type="float" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
           <Property Name="ACClassTaskID" Type="uniqueidentifier" />
+          <Property Name="ACClassTaskID2" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="PickingPosProdOrderPartslistPos">
           <Key>
@@ -4816,7 +4817,7 @@
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4837,7 +4838,7 @@ warning 6002: The table/view 'NKGV4.dbo.ACProgramLogView' does not have a primar
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4849,7 +4850,7 @@ warning 6002: The table/view 'NKGV4.dbo.ACProgramLogView' does not have a primar
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4873,7 +4874,7 @@ warning 6002: The table/view 'NKGV4.dbo.MachineMaterialPosView' does not have a 
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4897,7 +4898,7 @@ warning 6002: The table/view 'NKGV4.dbo.MachineMaterialRelView' does not have a 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4922,7 +4923,7 @@ warning 6002: The table/view 'NKGV4.dbo.MachineMaterialView' does not have a pri
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4951,7 +4952,7 @@ warning 6002: The table/view 'NKGV4.dbo.OrderLogPosMachines' does not have a pri
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4981,7 +4982,7 @@ warning 6002: The table/view 'NKGV4.dbo.OrderLogPosView' does not have a primary
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5031,7 +5032,7 @@ warning 6002: The table/view 'NKGV4.dbo.OrderLogRelView' does not have a primary
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5051,7 +5052,7 @@ warning 6002: The table/view 'NKGV4.dbo.ProdOrderConnectionsDetailView' does not
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5065,7 +5066,7 @@ warning 6002: The table/view 'NKGV4.dbo.ProdOrderConnectionsView' does not have 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5087,7 +5088,7 @@ warning 6002: The table/view 'NKGV4.dbo.ProdOrderInwardsView' does not have a pr
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5111,7 +5112,7 @@ warning 6002: The table/view 'NKGV4.dbo.ProdOrderOutwardsView' does not have a p
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5124,7 +5125,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBSystemColumns' does not have a primary
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -12741,7 +12742,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_TandTv3MixPointPickingPos_TandTv3MixPointID">
+        <Association Name="FK_TandTv3MixPointPickingPos_TandTv3TandTv3MixPointID">
           <End Role="TandTv3MixPoint" Type="Self.TandTv3MixPoint" Multiplicity="1" />
           <End Role="TandTv3MixPointPickingPos" Type="Self.TandTv3MixPointPickingPos" Multiplicity="*" />
           <ReferentialConstraint>
@@ -16524,7 +16525,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
             <End Role="PickingPos" EntitySet="PickingPos" />
             <End Role="TandTv3MixPointPickingPos" EntitySet="TandTv3MixPointPickingPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_TandTv3MixPointPickingPos_TandTv3MixPointID" Association="Self.FK_TandTv3MixPointPickingPos_TandTv3MixPointID">
+          <AssociationSet Name="FK_TandTv3MixPointPickingPos_TandTv3TandTv3MixPointID" Association="Self.FK_TandTv3MixPointPickingPos_TandTv3TandTv3MixPointID">
             <End Role="TandTv3MixPoint" EntitySet="TandTv3MixPoint" />
             <End Role="TandTv3MixPointPickingPos" EntitySet="TandTv3MixPointPickingPos" />
           </AssociationSet>
@@ -19179,6 +19180,10 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
             <End Role="ACClass" EntitySet="ACClass" />
             <End Role="Facility" EntitySet="Facility" />
           </AssociationSet>
+		  <AssociationSet Name="FK_Facility_ACClassMethodID" Association="iPlusMESV4_Model.FK_Facility_ACClassMethodID">
+            <End Role="ACClassMethod" EntitySet="ACClassMethod" />
+            <End Role="Facility" EntitySet="Facility" />
+          </AssociationSet>
           <AssociationSet Name="FK_Facility_CompanyID" Association="iPlusMESV4_Model.FK_Facility_CompanyID">
             <End Role="Company" EntitySet="Company" />
             <End Role="Facility" EntitySet="Facility" />
@@ -19820,171 +19825,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
             <End Role="PickingPos" EntitySet="PickingPos" />
             <End Role="LabOrder" EntitySet="LabOrder" />
           </AssociationSet>
-          <EntitySet Name="Facility1Set" EntityType="iPlusMESV4_Model.Facility1" />
-          <AssociationSet Name="FK_Facility_FacilityACClassID1" Association="iPlusMESV4_Model.FK_Facility_FacilityACClassID1">
-            <End Role="ACClass" EntitySet="ACClass" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_StackCalculatorACClassID1" Association="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID1">
-            <End Role="ACClass" EntitySet="ACClass" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_ACClassMethodID" Association="iPlusMESV4_Model.FK_Facility_ACClassMethodID">
-            <End Role="ACClassMethod" EntitySet="ACClassMethod" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_CompanyID1" Association="iPlusMESV4_Model.FK_Facility_CompanyID1">
-            <End Role="Company" EntitySet="Company" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_CompanyPersonID1" Association="iPlusMESV4_Model.FK_Facility_CompanyPersonID1">
-            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_IncomingFacilityID1" Association="iPlusMESV4_Model.FK_Facility_IncomingFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Facility11" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_LockedFacilityID1" Association="iPlusMESV4_Model.FK_Facility_LockedFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Facility11" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_MaterialID1" Association="iPlusMESV4_Model.FK_Facility_MaterialID1">
-            <End Role="Material" EntitySet="Material" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_MDFacilityTypeID1" Association="iPlusMESV4_Model.FK_Facility_MDFacilityTypeID1">
-            <End Role="MDFacilityType" EntitySet="MDFacilityType" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_MDFacilityVehicleTypeID1" Association="iPlusMESV4_Model.FK_Facility_MDFacilityVehicleTypeID1">
-            <End Role="MDFacilityVehicleType" EntitySet="MDFacilityVehicleType" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_MDUnitID1" Association="iPlusMESV4_Model.FK_Facility_MDUnitID1">
-            <End Role="MDUnit" EntitySet="MDUnit" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_OutgoingFacilityID1" Association="iPlusMESV4_Model.FK_Facility_OutgoingFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Facility11" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_ParentFacilityID1" Association="iPlusMESV4_Model.FK_Facility_ParentFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Facility11" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_PartsListID1" Association="iPlusMESV4_Model.FK_Facility_PartsListID1">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="Facility1" EntitySet="Facility1Set" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_InwardFacilityID1" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_InwardFacilityLocationID1" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLocationID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_OutwardFacilityID1" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_OutwardFacilityLocationID1" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_InwardFacilityID1" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_InwardFacilityLocationID1" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityLocationID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_OutwardFacilityID1" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_OutwardFacilityLocationID1" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityCharge_FacilityID1" Association="iPlusMESV4_Model.FK_FacilityCharge_FacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityHistory_FacilityID1" Association="iPlusMESV4_Model.FK_FacilityHistory_FacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityHistory" EntitySet="FacilityHistory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityInventory_Facility1" Association="iPlusMESV4_Model.FK_FacilityInventory_Facility1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityMaterial_Facility1" Association="iPlusMESV4_Model.FK_FacilityMaterial_Facility1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityMaterial" EntitySet="FacilityMaterial" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityMDSchedulingGroup_Facility1" Association="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityMDSchedulingGroup" EntitySet="FacilityMDSchedulingGroup" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityReservation_FacilityID1" Association="iPlusMESV4_Model.FK_FacilityReservation_FacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityReservation" EntitySet="FacilityReservation" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityStock_FacilityID1" Association="iPlusMESV4_Model.FK_FacilityStock_FacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="FacilityStock" EntitySet="FacilityStock" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MaintOrder_FacilityID1" Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="MaintOrder" EntitySet="MaintOrder" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Material_InFacilityID1" Association="iPlusMESV4_Model.FK_Material_InFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Material" EntitySet="Material" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Material_OutFacilityID1" Association="iPlusMESV4_Model.FK_Material_OutFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Material" EntitySet="Material" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PickingPos_FromFacilityID1" Association="iPlusMESV4_Model.FK_PickingPos_FromFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="PickingPos" EntitySet="PickingPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PickingPos_ToFacilityID1" Association="iPlusMESV4_Model.FK_PickingPos_ToFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="PickingPos" EntitySet="PickingPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TandTv3MixPointFacility_FacilityID1" Association="iPlusMESV4_Model.FK_TandTv3MixPointFacility_FacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="TandTv3MixPointFacility" EntitySet="TandTv3MixPointFacility" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Tourplan_TrailerFacilityID1" Association="iPlusMESV4_Model.FK_Tourplan_TrailerFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Tourplan" EntitySet="Tourplan" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Tourplan_VehicleFacilityID1" Association="iPlusMESV4_Model.FK_Tourplan_VehicleFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Tourplan" EntitySet="Tourplan" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Visitor_TrailerFacilityID1" Association="iPlusMESV4_Model.FK_Visitor_TrailerFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Visitor" EntitySet="Visitor" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Visitor_VehicleFacilityID1" Association="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="Visitor" EntitySet="Visitor" />
-          </AssociationSet>
-          <AssociationSet Name="FK_VisitorVoucher_TrailerFacilityID1" Association="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
-          </AssociationSet>
-          <AssociationSet Name="FK_VisitorVoucher_VehicleFacilityID1" Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID1">
-            <End Role="Facility1" EntitySet="Facility1Set" />
-            <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
-          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -20127,8 +19967,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="ACClassTask_TaskTypeACClass" Relationship="iPlusMESV4_Model.FK_ACClassTask_TaskTypeACClassID" FromRole="ACClass" ToRole="ACClassTask" />
           <NavigationProperty Name="MaintOrder_VBiPAACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_PAACClassID" FromRole="ACClass" ToRole="MaintOrder" />
           <NavigationProperty Name="FacilityReservation_VBiACClass" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ACClassID" FromRole="ACClass" ToRole="FacilityReservation" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID1" FromRole="ACClass" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID1" FromRole="ACClass" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="ACClassConfig">
           <Key>
@@ -20270,7 +20108,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="MaterialWFACClassMethod_ACClassMethod" Relationship="iPlusMESV4_Model.FK_MaterialWFACClassMethod_ACClassMethod" FromRole="ACClassMethod" ToRole="MaterialWFACClassMethod" />
           <NavigationProperty Name="Picking_ACClassMethod" Relationship="iPlusMESV4_Model.FK_Picking_ACClassMethod" FromRole="ACClassMethod" ToRole="Picking" />
           <NavigationProperty Name="VBGroupRight_ACClassMethod" Relationship="iPlusMESV4_Model.FK_VBGroupRight_ACClassMethodID" FromRole="ACClassMethod" ToRole="VBGroupRight" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="ACClassMethod" ToRole="Facility1" />
+          <NavigationProperty Name="Facility_ACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="ACClassMethod" ToRole="Facility" />
         </EntityType>
         <EntityType Name="ACClassMethodConfig">
           <Key>
@@ -20848,7 +20686,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="VisitorVoucher_VisitorCompany" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyID" FromRole="Company" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Company" ToRole="Facility" />
           <NavigationProperty Name="MaintOrderAssignment_Company" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" FromRole="Company" ToRole="MaintOrderAssignment" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID1" FromRole="Company" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -21143,7 +20980,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="Visitor_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="CompanyPerson" ToRole="Facility" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID1" FromRole="CompanyPerson" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -21408,10 +21244,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID" FromRole="FacilityBooking" ToRole="Facility" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosID" FromRole="FacilityBooking" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_PickingPosID" FromRole="FacilityBooking" ToRole="PickingPos" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID1" FromRole="FacilityBooking" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLocationID1" FromRole="FacilityBooking" ToRole="Facility1" />
-          <NavigationProperty Name="Facility2" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityID1" FromRole="FacilityBooking" ToRole="Facility1" />
-          <NavigationProperty Name="Facility3" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID1" FromRole="FacilityBooking" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="FacilityBookingCharge">
           <Key>
@@ -21515,10 +21347,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID" FromRole="FacilityBookingCharge" ToRole="Facility" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosID" FromRole="FacilityBookingCharge" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_PickingPosID" FromRole="FacilityBookingCharge" ToRole="PickingPos" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityID1" FromRole="FacilityBookingCharge" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityLocationID1" FromRole="FacilityBookingCharge" ToRole="Facility1" />
-          <NavigationProperty Name="Facility2" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityID1" FromRole="FacilityBookingCharge" ToRole="Facility1" />
-          <NavigationProperty Name="Facility3" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID1" FromRole="FacilityBookingCharge" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="FacilityCharge">
           <Key>
@@ -21579,7 +21407,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityID" FromRole="FacilityCharge" ToRole="Facility" />
           <NavigationProperty Name="OperationLog_FacilityCharge" Relationship="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" FromRole="FacilityCharge" ToRole="OperationLog" />
           <NavigationProperty Name="FacilityReservation_FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityReservation" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityID1" FromRole="FacilityCharge" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="FacilityHistory">
           <Key>
@@ -21611,7 +21438,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="ReservedInwardQuantity" Type="Double" Nullable="false" />
           <NavigationProperty Name="History" Relationship="iPlusMESV4_Model.FK_FacilityHistory_HistoryID" FromRole="FacilityHistory" ToRole="History" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityHistory_FacilityID" FromRole="FacilityHistory" ToRole="Facility" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityHistory_FacilityID1" FromRole="FacilityHistory" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="FacilityInventoryPos">
           <Key>
@@ -21852,7 +21678,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="YearTargetOutwardAmb" Type="Double" Nullable="false" />
           <NavigationProperty Name="MDReleaseState" Relationship="iPlusMESV4_Model.FK_FacilityStock_MDReleaseStateID" FromRole="FacilityStock" ToRole="MDReleaseState" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityStock_FacilityID" FromRole="FacilityStock" ToRole="Facility" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityStock_FacilityID1" FromRole="FacilityStock" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="History">
           <Key>
@@ -22444,9 +22269,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="PickingPos_PickingMaterial" Relationship="iPlusMESV4_Model.FK_PickingPos_MaterialID" FromRole="Material" ToRole="PickingPos" />
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="FacilityReservation_Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_MaterialID1" FromRole="Material" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_Material_InFacilityID1" FromRole="Material" ToRole="Facility1" />
-          <NavigationProperty Name="Facility2" Relationship="iPlusMESV4_Model.FK_Material_OutFacilityID1" FromRole="Material" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -23111,7 +22933,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="IsDefault" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Facility_MDFacilityType" Relationship="iPlusMESV4_Model.FK_Facility_MDFacilityTypeID" FromRole="MDFacilityType" ToRole="Facility" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_MDFacilityTypeID1" FromRole="MDFacilityType" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="MDFacilityVehicleType">
           <Key>
@@ -23129,7 +22950,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="IsDefault" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Facility_MDFacilityVehicleType" Relationship="iPlusMESV4_Model.FK_Facility_MDFacilityVehicleTypeID" FromRole="MDFacilityVehicleType" ToRole="Facility" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_MDFacilityVehicleTypeID1" FromRole="MDFacilityVehicleType" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="MDGMPAdditive">
           <Key>
@@ -23912,7 +23732,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="Facility_MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID" FromRole="MDUnit" ToRole="Facility" />
           <NavigationProperty Name="PartslistPos_MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="MDUnit" ToRole="PartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_MDUnit" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDUnitID" FromRole="MDUnit" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID1" FromRole="MDUnit" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -24424,7 +24243,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID1" FromRole="Partslist" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -24968,7 +24786,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="TandTv3MDBookingDirection" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointFacility_TandTv3TandTv3MDBookingDirectionID" FromRole="TandTv3MixPointFacility" ToRole="TandTv3MDBookingDirection" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointFacility_FacilityID" FromRole="TandTv3MixPointFacility" ToRole="Facility" />
           <NavigationProperty Name="TandTv3MixPoint" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointFacility_TandTv3TandTv3MixPointID" FromRole="TandTv3MixPointFacility" ToRole="TandTv3MixPoint" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointFacility_FacilityID1" FromRole="TandTv3MixPointFacility" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="TandTv3MixPointFacilityBookingCharge">
           <Key>
@@ -25106,8 +24923,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="TourplanPos_Tourplan" Relationship="iPlusMESV4_Model.FK_TourplanPos_TourplanID" FromRole="Tourplan" ToRole="TourplanPos" />
           <NavigationProperty Name="TrailerFacility" Relationship="iPlusMESV4_Model.FK_Tourplan_TrailerFacilityID" FromRole="Tourplan" ToRole="Facility" />
           <NavigationProperty Name="VehicleFacility" Relationship="iPlusMESV4_Model.FK_Tourplan_VehicleFacilityID" FromRole="Tourplan" ToRole="Facility" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Tourplan_TrailerFacilityID1" FromRole="Tourplan" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_Tourplan_VehicleFacilityID1" FromRole="Tourplan" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="TourplanConfig">
           <Key>
@@ -25447,8 +25262,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="VisitorVoucher_Visitor" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorID" FromRole="Visitor" ToRole="VisitorVoucher" />
           <NavigationProperty Name="TrailerFacility" Relationship="iPlusMESV4_Model.FK_Visitor_TrailerFacilityID" FromRole="Visitor" ToRole="Facility" />
           <NavigationProperty Name="VehicleFacility" Relationship="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID" FromRole="Visitor" ToRole="Facility" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Visitor_TrailerFacilityID1" FromRole="Visitor" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID1" FromRole="Visitor" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="VisitorVoucher">
           <Key>
@@ -25486,8 +25299,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="TrailerFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" FromRole="VisitorVoucher" ToRole="Facility" />
           <NavigationProperty Name="VehicleFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" FromRole="VisitorVoucher" ToRole="Facility" />
           <NavigationProperty Name="Weighing_VisitorVoucher" Relationship="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" FromRole="VisitorVoucher" ToRole="Weighing" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID1" FromRole="VisitorVoucher" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID1" FromRole="VisitorVoucher" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="Weighing">
           <Key>
@@ -32052,7 +31863,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -32391,6 +32202,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="SkipPrintQuestion" Type="Boolean" Nullable="false" />
 		  <Property Name="ClassCode" Type="Int16" Nullable="false" />
 		  <Property Name="LeaveMaterialOccupation" Type="Boolean" Nullable="true" />
+		  <Property Name="VBiACClassMethodID" Type="Guid" />
           <NavigationProperty Name="VBiFacilityACClass" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID" FromRole="Facility" ToRole="ACClass" />
           <NavigationProperty Name="VBiStackCalculatorACClass" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" FromRole="Facility" ToRole="ACClass" />
           <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Facility" ToRole="Company" />
@@ -32435,6 +32247,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="PickingPos_ToFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID" FromRole="Facility" ToRole="PickingPos" />
           <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
           <NavigationProperty Name="FacilityReservation_Facility" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="Facility" ToRole="FacilityReservation" />
+	      <NavigationProperty Name="VBiACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="Facility" ToRole="ACClassMethod" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -32448,6 +32261,18 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
+		<Association Name="FK_Facility_ACClassMethodID">
+			  <End Type="iPlusMESV4_Model.ACClassMethod" Role="ACClassMethod" Multiplicity="0..1" />
+			  <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
+			  <ReferentialConstraint>
+				  <Principal Role="ACClassMethod">
+					  <PropertyRef Name="ACClassMethodID" />
+				  </Principal>
+				  <Dependent Role="Facility">
+					  <PropertyRef Name="VBiACClassMethodID" />
+				  </Dependent>
+			  </ReferentialConstraint>
+		  </Association>
         <Association Name="FK_Facility_StackCalculatorACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
@@ -32853,7 +32678,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="FacilityInventory" ToRole="Facility" />
           <NavigationProperty Name="MDFacilityInventoryState" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="FacilityInventory" ToRole="MDFacilityInventoryState" />
           <NavigationProperty Name="FacilityInventoryPos_FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventory" ToRole="FacilityInventoryPos" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility1" FromRole="FacilityInventory" ToRole="Facility1" />
         </EntityType>
         <Association Name="FK_FacilityInventory_Facility">
           <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
@@ -32914,7 +32738,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="ThroughputMin" Type="Double" />
           <Property Name="ThroughputAuto" Type="Int16" Nullable="false" />
           <NavigationProperty Name="FacilityMaterialOEE_FacilityMaterial" Relationship="iPlusMESV4_Model.FK_FacilityMaterialOEE_FacilityMaterial" FromRole="FacilityMaterial" ToRole="FacilityMaterialOEE" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility1" FromRole="FacilityMaterial" ToRole="Facility1" />
         </EntityType>
         <EntityType Name="FacilityMDSchedulingGroup">
           <Key>
@@ -32931,7 +32754,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility" FromRole="FacilityMDSchedulingGroup" ToRole="Facility" />
           <NavigationProperty Name="MDPickingType" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDPickingType" FromRole="FacilityMDSchedulingGroup" ToRole="MDPickingType" />
           <NavigationProperty Name="MDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDSchedulingGroup" FromRole="FacilityMDSchedulingGroup" ToRole="MDSchedulingGroup" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility1" FromRole="FacilityMDSchedulingGroup" ToRole="Facility1" />
         </EntityType>
         <Association Name="FK_FacilityMaterial_Facility">
           <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="1" />
@@ -33983,8 +33805,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="TandTv3MixPointPickingPos_PickingPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointPickingPos_PickingPosID" FromRole="PickingPos" ToRole="TandTv3MixPointPickingPos" />
           <NavigationProperty Name="FacilityReservation_PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" FromRole="PickingPos" ToRole="FacilityReservation" />
           <NavigationProperty Name="LabOrder_PickingPos" Relationship="iPlusMESV4_Model.FK_LabOrder_PickingPosID" FromRole="PickingPos" ToRole="LabOrder" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_PickingPos_FromFacilityID1" FromRole="PickingPos" ToRole="Facility1" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID1" FromRole="PickingPos" ToRole="Facility1" />
+          <Property Name="ACClassTaskID2" Type="Guid" />
         </EntityType>
         <Association Name="FK_ACClassTask_TaskTypeACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="1">
@@ -34498,7 +34319,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="MaintOrderPos_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderPos" />
           <NavigationProperty Name="MaintOrderProperty_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderProperty_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderProperty" />
           <NavigationProperty Name="MaintOrderTask_MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrderTask_MaintOrderID" FromRole="MaintOrder" ToRole="MaintOrderTask" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID1" FromRole="MaintOrder" ToRole="Facility1" />
         </EntityType>
         <Association Name="FK_MaintOrder_PAACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -34693,7 +34513,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="FacilityReservation" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="FacilityReservation" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID" FromRole="FacilityReservation" ToRole="ProdOrderPartslistPosRelation" />
-          <NavigationProperty Name="Facility1" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID1" FromRole="FacilityReservation" ToRole="Facility1" />
         </EntityType>
         <Association Name="FK_FacilityReservation_ACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -34929,602 +34748,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
             </Principal>
             <Dependent Role="LabOrder">
               <PropertyRef Name="PickingPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="Facility1">
-          <Key>
-            <PropertyRef Name="FacilityID" />
-          </Key>
-          <Property Name="FacilityID" Type="Guid" Nullable="false" />
-          <Property Name="ParentFacilityID" Type="Guid" />
-          <Property Name="VBiFacilityACClassID" Type="Guid" />
-          <Property Name="FacilityNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="FacilityName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="MDFacilityTypeID" Type="Guid" Nullable="false" />
-          <Property Name="MaterialID" Type="Guid" />
-          <Property Name="MDUnitID" Type="Guid" />
-          <Property Name="VBiStackCalculatorACClassID" Type="Guid" />
-          <Property Name="InwardEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="OutwardEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="LastFCSortNo" Type="Int32" Nullable="false" />
-          <Property Name="LastFCSortNoReverse" Type="Int32" Nullable="false" />
-          <Property Name="PartslistID" Type="Guid" />
-          <Property Name="LockedFacilityID" Type="Guid" />
-          <Property Name="OutgoingFacilityID" Type="Guid" />
-          <Property Name="IncomingFacilityID" Type="Guid" />
-          <Property Name="ReservedQuantity" Type="Double" Nullable="false" />
-          <Property Name="OrderedQuantity" Type="Double" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyID" Type="Guid" />
-          <Property Name="CompanyPersonID" Type="Guid" />
-          <Property Name="Tara" Type="Double" Nullable="false" />
-          <Property Name="MaxWeightCapacity" Type="Double" Nullable="false" />
-          <Property Name="MaxVolumeCapacity" Type="Double" Nullable="false" />
-          <Property Name="Drivername" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="false" />
-          <Property Name="Tolerance" Type="Single" Nullable="false" />
-          <Property Name="HighLidNo" Type="Int32" Nullable="false" />
-          <Property Name="FittingsDistanceFront" Type="Int32" Nullable="false" />
-          <Property Name="FittingsDistanceBehind" Type="Int32" Nullable="false" />
-          <Property Name="DistanceFront" Type="Double" Nullable="false" />
-          <Property Name="DistanceBehind" Type="Double" Nullable="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="MDFacilityVehicleTypeID" Type="Guid" />
-          <Property Name="Density" Type="Double" Nullable="false" />
-          <Property Name="DensityAmb" Type="Double" Nullable="false" />
-          <Property Name="MinStockQuantity" Type="Double" />
-          <Property Name="OptStockQuantity" Type="Double" />
-          <Property Name="OrderPostingOnEmptying" Type="Boolean" Nullable="false" />
-          <Property Name="DisabledForMobile" Type="Boolean" Nullable="false" />
-          <Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="PostingBehaviourIndex" Type="Int16" Nullable="false" />
-          <Property Name="SkipPrintQuestion" Type="Boolean" Nullable="false" />
-          <Property Name="ClassCode" Type="Int16" Nullable="false" />
-          <Property Name="LeaveMaterialOccupation" Type="Boolean" />
-          <Property Name="VBiACClassMethodID" Type="Guid" />
-          <NavigationProperty Name="ACClass" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID1" FromRole="Facility1" ToRole="ACClass" />
-          <NavigationProperty Name="ACClass1" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID1" FromRole="Facility1" ToRole="ACClass" />
-          <NavigationProperty Name="ACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="Facility1" ToRole="ACClassMethod" />
-          <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID1" FromRole="Facility1" ToRole="Company" />
-          <NavigationProperty Name="CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID1" FromRole="Facility1" ToRole="CompanyPerson" />
-          <NavigationProperty Name="Facility11" Relationship="iPlusMESV4_Model.FK_Facility_IncomingFacilityID1" FromRole="Facility1" ToRole="Facility11" />
-          <NavigationProperty Name="Facility2" Relationship="iPlusMESV4_Model.FK_Facility_IncomingFacilityID1" FromRole="Facility11" ToRole="Facility1" />
-          <NavigationProperty Name="Facility111" Relationship="iPlusMESV4_Model.FK_Facility_LockedFacilityID1" FromRole="Facility1" ToRole="Facility11" />
-          <NavigationProperty Name="Facility3" Relationship="iPlusMESV4_Model.FK_Facility_LockedFacilityID1" FromRole="Facility11" ToRole="Facility1" />
-          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_Facility_MaterialID1" FromRole="Facility1" ToRole="Material" />
-          <NavigationProperty Name="MDFacilityType" Relationship="iPlusMESV4_Model.FK_Facility_MDFacilityTypeID1" FromRole="Facility1" ToRole="MDFacilityType" />
-          <NavigationProperty Name="MDFacilityVehicleType" Relationship="iPlusMESV4_Model.FK_Facility_MDFacilityVehicleTypeID1" FromRole="Facility1" ToRole="MDFacilityVehicleType" />
-          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID1" FromRole="Facility1" ToRole="MDUnit" />
-          <NavigationProperty Name="Facility12" Relationship="iPlusMESV4_Model.FK_Facility_OutgoingFacilityID1" FromRole="Facility1" ToRole="Facility11" />
-          <NavigationProperty Name="Facility4" Relationship="iPlusMESV4_Model.FK_Facility_OutgoingFacilityID1" FromRole="Facility11" ToRole="Facility1" />
-          <NavigationProperty Name="Facility13" Relationship="iPlusMESV4_Model.FK_Facility_ParentFacilityID1" FromRole="Facility1" ToRole="Facility11" />
-          <NavigationProperty Name="Facility5" Relationship="iPlusMESV4_Model.FK_Facility_ParentFacilityID1" FromRole="Facility11" ToRole="Facility1" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID1" FromRole="Facility1" ToRole="Partslist" />
-          <NavigationProperty Name="FacilityBooking" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID1" FromRole="Facility1" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBooking1" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLocationID1" FromRole="Facility1" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBooking2" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityID1" FromRole="Facility1" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBooking3" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID1" FromRole="Facility1" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBookingCharge" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityID1" FromRole="Facility1" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityBookingCharge1" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityLocationID1" FromRole="Facility1" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityBookingCharge2" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityID1" FromRole="Facility1" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityBookingCharge3" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID1" FromRole="Facility1" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityID1" FromRole="Facility1" ToRole="FacilityCharge" />
-          <NavigationProperty Name="FacilityHistory" Relationship="iPlusMESV4_Model.FK_FacilityHistory_FacilityID1" FromRole="Facility1" ToRole="FacilityHistory" />
-          <NavigationProperty Name="FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility1" FromRole="Facility1" ToRole="FacilityInventory" />
-          <NavigationProperty Name="FacilityMaterial" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility1" FromRole="Facility1" ToRole="FacilityMaterial" />
-          <NavigationProperty Name="FacilityMDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility1" FromRole="Facility1" ToRole="FacilityMDSchedulingGroup" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID1" FromRole="Facility1" ToRole="FacilityReservation" />
-          <NavigationProperty Name="FacilityStock" Relationship="iPlusMESV4_Model.FK_FacilityStock_FacilityID1" FromRole="Facility1" ToRole="FacilityStock" />
-          <NavigationProperty Name="MaintOrder" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID1" FromRole="Facility1" ToRole="MaintOrder" />
-          <NavigationProperty Name="Material1" Relationship="iPlusMESV4_Model.FK_Material_InFacilityID1" FromRole="Facility1" ToRole="Material" />
-          <NavigationProperty Name="Material2" Relationship="iPlusMESV4_Model.FK_Material_OutFacilityID1" FromRole="Facility1" ToRole="Material" />
-          <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_PickingPos_FromFacilityID1" FromRole="Facility1" ToRole="PickingPos" />
-          <NavigationProperty Name="PickingPos1" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID1" FromRole="Facility1" ToRole="PickingPos" />
-          <NavigationProperty Name="TandTv3MixPointFacility" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointFacility_FacilityID1" FromRole="Facility1" ToRole="TandTv3MixPointFacility" />
-          <NavigationProperty Name="Tourplan" Relationship="iPlusMESV4_Model.FK_Tourplan_TrailerFacilityID1" FromRole="Facility1" ToRole="Tourplan" />
-          <NavigationProperty Name="Tourplan1" Relationship="iPlusMESV4_Model.FK_Tourplan_VehicleFacilityID1" FromRole="Facility1" ToRole="Tourplan" />
-          <NavigationProperty Name="Visitor" Relationship="iPlusMESV4_Model.FK_Visitor_TrailerFacilityID1" FromRole="Facility1" ToRole="Visitor" />
-          <NavigationProperty Name="Visitor1" Relationship="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID1" FromRole="Facility1" ToRole="Visitor" />
-          <NavigationProperty Name="VisitorVoucher" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID1" FromRole="Facility1" ToRole="VisitorVoucher" />
-          <NavigationProperty Name="VisitorVoucher1" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID1" FromRole="Facility1" ToRole="VisitorVoucher" />
-        </EntityType>
-        <Association Name="FK_Facility_FacilityACClassID1">
-          <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ACClass">
-              <PropertyRef Name="ACClassID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="VBiFacilityACClassID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_StackCalculatorACClassID1">
-          <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ACClass">
-              <PropertyRef Name="ACClassID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="VBiStackCalculatorACClassID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_ACClassMethodID">
-          <End Type="iPlusMESV4_Model.ACClassMethod" Role="ACClassMethod" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ACClassMethod">
-              <PropertyRef Name="ACClassMethodID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="VBiACClassMethodID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_CompanyID1">
-          <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Company">
-              <PropertyRef Name="CompanyID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="CompanyID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_CompanyPersonID1">
-          <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyPerson">
-              <PropertyRef Name="CompanyPersonID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="CompanyPersonID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_IncomingFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility11" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Facility11">
-              <PropertyRef Name="IncomingFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_LockedFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility11" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Facility11">
-              <PropertyRef Name="LockedFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_MaterialID1">
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Material">
-              <PropertyRef Name="MaterialID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_MDFacilityTypeID1">
-          <End Type="iPlusMESV4_Model.MDFacilityType" Role="MDFacilityType" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDFacilityType">
-              <PropertyRef Name="MDFacilityTypeID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="MDFacilityTypeID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_MDFacilityVehicleTypeID1">
-          <End Type="iPlusMESV4_Model.MDFacilityVehicleType" Role="MDFacilityVehicleType" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDFacilityVehicleType">
-              <PropertyRef Name="MDFacilityVehicleTypeID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="MDFacilityVehicleTypeID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_MDUnitID1">
-          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDUnit">
-              <PropertyRef Name="MDUnitID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_OutgoingFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility11" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Facility11">
-              <PropertyRef Name="OutgoingFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_ParentFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility11" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Facility11">
-              <PropertyRef Name="ParentFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_PartsListID1">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="Facility1">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_InwardFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="InwardFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_InwardFacilityLocationID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="InwardFacilityLocationID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_OutwardFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="OutwardFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_OutwardFacilityLocationID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="OutwardFacilityLocationID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_InwardFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="InwardFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_InwardFacilityLocationID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="InwardFacilityLocationID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_OutwardFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="OutwardFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_OutwardFacilityLocationID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="OutwardFacilityLocationID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityCharge_FacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityCharge">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityHistory_FacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.FacilityHistory" Role="FacilityHistory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityHistory">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityInventory_Facility1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityInventory">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityMaterial_Facility1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.FacilityMaterial" Role="FacilityMaterial" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityMaterial">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityMDSchedulingGroup_Facility1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.FacilityMDSchedulingGroup" Role="FacilityMDSchedulingGroup" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityMDSchedulingGroup">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityReservation_FacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityReservation" Role="FacilityReservation" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityReservation">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityStock_FacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.FacilityStock" Role="FacilityStock" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityStock">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MaintOrder_FacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.MaintOrder" Role="MaintOrder" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="MaintOrder">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Material_InFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Material">
-              <PropertyRef Name="InFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Material_OutFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Material">
-              <PropertyRef Name="OutFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PickingPos_FromFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PickingPos" Role="PickingPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="PickingPos">
-              <PropertyRef Name="FromFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PickingPos_ToFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PickingPos" Role="PickingPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="PickingPos">
-              <PropertyRef Name="ToFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TandTv3MixPointFacility_FacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.TandTv3MixPointFacility" Role="TandTv3MixPointFacility" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="TandTv3MixPointFacility">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Tourplan_TrailerFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Tourplan" Role="Tourplan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Tourplan">
-              <PropertyRef Name="TrailerFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Tourplan_VehicleFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Tourplan" Role="Tourplan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Tourplan">
-              <PropertyRef Name="VehicleFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Visitor_TrailerFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Visitor" Role="Visitor" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Visitor">
-              <PropertyRef Name="TrailerFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Visitor_VehicleFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Visitor" Role="Visitor" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="Visitor">
-              <PropertyRef Name="VehicleFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_VisitorVoucher_TrailerFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.VisitorVoucher" Role="VisitorVoucher" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="VisitorVoucher">
-              <PropertyRef Name="TrailerFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_VisitorVoucher_VehicleFacilityID1">
-          <End Type="iPlusMESV4_Model.Facility1" Role="Facility1" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.VisitorVoucher" Role="VisitorVoucher" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility1">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="VisitorVoucher">
-              <PropertyRef Name="VehicleFacilityID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -40307,6 +39530,62 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Facility">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.Facility">
+              <MappingFragment StoreEntitySet="Facility">
+                <ScalarProperty Name="ClassCode" ColumnName="ClassCode" />
+                <ScalarProperty Name="LeaveMaterialOccupation" ColumnName="LeaveMaterialOccupation" />
+                <ScalarProperty Name="SkipPrintQuestion" ColumnName="SkipPrintQuestion" />
+                <ScalarProperty Name="PostingBehaviourIndex" ColumnName="PostingBehaviourIndex" />
+                <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
+                <ScalarProperty Name="DisabledForMobile" ColumnName="DisabledForMobile" />
+                <ScalarProperty Name="OrderPostingOnEmptying" ColumnName="OrderPostingOnEmptying" />
+                <ScalarProperty Name="OptStockQuantity" ColumnName="OptStockQuantity" />
+                <ScalarProperty Name="MinStockQuantity" ColumnName="MinStockQuantity" />
+                <ScalarProperty Name="DensityAmb" ColumnName="DensityAmb" />
+                <ScalarProperty Name="Density" ColumnName="Density" />
+                <ScalarProperty Name="MDFacilityVehicleTypeID" ColumnName="MDFacilityVehicleTypeID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="DistanceBehind" ColumnName="DistanceBehind" />
+                <ScalarProperty Name="DistanceFront" ColumnName="DistanceFront" />
+                <ScalarProperty Name="FittingsDistanceBehind" ColumnName="FittingsDistanceBehind" />
+                <ScalarProperty Name="FittingsDistanceFront" ColumnName="FittingsDistanceFront" />
+                <ScalarProperty Name="HighLidNo" ColumnName="HighLidNo" />
+                <ScalarProperty Name="Tolerance" ColumnName="Tolerance" />
+                <ScalarProperty Name="Drivername" ColumnName="Drivername" />
+                <ScalarProperty Name="MaxVolumeCapacity" ColumnName="MaxVolumeCapacity" />
+                <ScalarProperty Name="MaxWeightCapacity" ColumnName="MaxWeightCapacity" />
+                <ScalarProperty Name="Tara" ColumnName="Tara" />
+                <ScalarProperty Name="CompanyPersonID" ColumnName="CompanyPersonID" />
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="OrderedQuantity" ColumnName="OrderedQuantity" />
+                <ScalarProperty Name="ReservedQuantity" ColumnName="ReservedQuantity" />
+                <ScalarProperty Name="IncomingFacilityID" ColumnName="IncomingFacilityID" />
+                <ScalarProperty Name="OutgoingFacilityID" ColumnName="OutgoingFacilityID" />
+                <ScalarProperty Name="LockedFacilityID" ColumnName="LockedFacilityID" />
+                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
+                <ScalarProperty Name="LastFCSortNoReverse" ColumnName="LastFCSortNoReverse" />
+                <ScalarProperty Name="LastFCSortNo" ColumnName="LastFCSortNo" />
+                <ScalarProperty Name="OutwardEnabled" ColumnName="OutwardEnabled" />
+                <ScalarProperty Name="InwardEnabled" ColumnName="InwardEnabled" />
+                <ScalarProperty Name="VBiStackCalculatorACClassID" ColumnName="VBiStackCalculatorACClassID" />
+                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="MDFacilityTypeID" ColumnName="MDFacilityTypeID" />
+                <ScalarProperty Name="FacilityName" ColumnName="FacilityName" />
+                <ScalarProperty Name="FacilityNo" ColumnName="FacilityNo" />
+                <ScalarProperty Name="VBiFacilityACClassID" ColumnName="VBiFacilityACClassID" />
+                <ScalarProperty Name="ParentFacilityID" ColumnName="ParentFacilityID" />
+                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
+				<ScalarProperty Name="VBiACClassMethodID" ColumnName="VBiACClassMethodID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="FacilityInventory">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityInventory">
               <MappingFragment StoreEntitySet="FacilityInventory">
@@ -40615,6 +39894,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <EntitySetMapping Name="PickingPos">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PickingPos">
               <MappingFragment StoreEntitySet="PickingPos">
+                <ScalarProperty Name="ACClassTaskID2" ColumnName="ACClassTaskID2" />
                 <ScalarProperty Name="ACClassTaskID" ColumnName="ACClassTaskID" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
                 <ScalarProperty Name="PickingActualUOM" ColumnName="PickingActualUOM" />
@@ -40753,62 +40033,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
                 <ScalarProperty Name="TargetPartslistPosID" ColumnName="TargetPartslistPosID" />
                 <ScalarProperty Name="Sequence" ColumnName="Sequence" />
                 <ScalarProperty Name="PartslistPosRelationID" ColumnName="PartslistPosRelationID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Facility1Set">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.Facility1">
-              <MappingFragment StoreEntitySet="Facility">
-                <ScalarProperty Name="VBiACClassMethodID" ColumnName="VBiACClassMethodID" />
-                <ScalarProperty Name="LeaveMaterialOccupation" ColumnName="LeaveMaterialOccupation" />
-                <ScalarProperty Name="ClassCode" ColumnName="ClassCode" />
-                <ScalarProperty Name="SkipPrintQuestion" ColumnName="SkipPrintQuestion" />
-                <ScalarProperty Name="PostingBehaviourIndex" ColumnName="PostingBehaviourIndex" />
-                <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
-                <ScalarProperty Name="DisabledForMobile" ColumnName="DisabledForMobile" />
-                <ScalarProperty Name="OrderPostingOnEmptying" ColumnName="OrderPostingOnEmptying" />
-                <ScalarProperty Name="OptStockQuantity" ColumnName="OptStockQuantity" />
-                <ScalarProperty Name="MinStockQuantity" ColumnName="MinStockQuantity" />
-                <ScalarProperty Name="DensityAmb" ColumnName="DensityAmb" />
-                <ScalarProperty Name="Density" ColumnName="Density" />
-                <ScalarProperty Name="MDFacilityVehicleTypeID" ColumnName="MDFacilityVehicleTypeID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="DistanceBehind" ColumnName="DistanceBehind" />
-                <ScalarProperty Name="DistanceFront" ColumnName="DistanceFront" />
-                <ScalarProperty Name="FittingsDistanceBehind" ColumnName="FittingsDistanceBehind" />
-                <ScalarProperty Name="FittingsDistanceFront" ColumnName="FittingsDistanceFront" />
-                <ScalarProperty Name="HighLidNo" ColumnName="HighLidNo" />
-                <ScalarProperty Name="Tolerance" ColumnName="Tolerance" />
-                <ScalarProperty Name="Drivername" ColumnName="Drivername" />
-                <ScalarProperty Name="MaxVolumeCapacity" ColumnName="MaxVolumeCapacity" />
-                <ScalarProperty Name="MaxWeightCapacity" ColumnName="MaxWeightCapacity" />
-                <ScalarProperty Name="Tara" ColumnName="Tara" />
-                <ScalarProperty Name="CompanyPersonID" ColumnName="CompanyPersonID" />
-                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="OrderedQuantity" ColumnName="OrderedQuantity" />
-                <ScalarProperty Name="ReservedQuantity" ColumnName="ReservedQuantity" />
-                <ScalarProperty Name="IncomingFacilityID" ColumnName="IncomingFacilityID" />
-                <ScalarProperty Name="OutgoingFacilityID" ColumnName="OutgoingFacilityID" />
-                <ScalarProperty Name="LockedFacilityID" ColumnName="LockedFacilityID" />
-                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
-                <ScalarProperty Name="LastFCSortNoReverse" ColumnName="LastFCSortNoReverse" />
-                <ScalarProperty Name="LastFCSortNo" ColumnName="LastFCSortNo" />
-                <ScalarProperty Name="OutwardEnabled" ColumnName="OutwardEnabled" />
-                <ScalarProperty Name="InwardEnabled" ColumnName="InwardEnabled" />
-                <ScalarProperty Name="VBiStackCalculatorACClassID" ColumnName="VBiStackCalculatorACClassID" />
-                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="MDFacilityTypeID" ColumnName="MDFacilityTypeID" />
-                <ScalarProperty Name="FacilityName" ColumnName="FacilityName" />
-                <ScalarProperty Name="FacilityNo" ColumnName="FacilityNo" />
-                <ScalarProperty Name="VBiFacilityACClassID" ColumnName="VBiFacilityACClassID" />
-                <ScalarProperty Name="ParentFacilityID" ColumnName="ParentFacilityID" />
-                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -41592,6 +40816,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
         <EntityTypeShape EntityType="iPlusMESV4_Model.Facility" Width="1.5" PointX="77" PointY="293.75" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_FacilityACClassID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_ACClassMethodID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_CompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_IncomingFacilityID" />
@@ -41768,48 +40993,6 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_ACClassWFID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_LabOrder_PickingPosID" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.Facility1" Width="1.5" PointX="74" PointY="289.25" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_FacilityACClassID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_ACClassMethodID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_CompanyID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_CompanyPersonID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_IncomingFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_LockedFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_MaterialID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_MDFacilityTypeID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_MDFacilityVehicleTypeID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_MDUnitID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_OutgoingFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_ParentFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_PartsListID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLocationID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityLocationID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_FacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityHistory_FacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_Facility1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMaterial_Facility1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_FacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityStock_FacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_MaintOrder_FacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Material_InFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Material_OutFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PickingPos_FromFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PickingPos_ToFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointFacility_FacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Tourplan_TrailerFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Tourplan_VehicleFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_TrailerFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID1" />
       </Diagram>
     </Diagrams>
   </Designer>

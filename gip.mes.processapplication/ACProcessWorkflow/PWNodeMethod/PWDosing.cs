@@ -1258,6 +1258,13 @@ namespace gip.mes.processapplication
             }
         }
 
+
+        public override void SMCompleted()
+        {
+            OnCompletedPicking();
+            base.SMCompleted();
+        }
+
         protected gip.core.datamodel.ACProgramLog _NewAddedProgramLog = null;
         protected override void OnNewProgramLogAddedToQueue(ACMethod acMethod, gip.core.datamodel.ACProgramLog currentProgramLog)
         {
@@ -1289,6 +1296,7 @@ namespace gip.mes.processapplication
                             if (IsTransport)
                             {
                                 dosingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
+                                dosingPos.ACClassTaskID2 = this.ContentTask.ACClassTaskID;
                                 orderLog.PickingPosID = dosingPosId;
                             }
                             dbApp.OrderLog.AddObject(orderLog);
@@ -2081,6 +2089,7 @@ namespace gip.mes.processapplication
         #region Reset
         public override void Reset()
         {
+            ResetTaskIdFromPickingPos();
             if (CurrentDosingRoute != null)
             {
                 CurrentDosingRoute.Detach();

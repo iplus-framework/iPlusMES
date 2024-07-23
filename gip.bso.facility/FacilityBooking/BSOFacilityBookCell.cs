@@ -1310,6 +1310,7 @@ namespace gip.bso.facility
 
                         // Option select charge for Material->IsLotReservationNeeded
                         List<FacilityCharge> lotsForReservation = null;
+                        bool needReservations = false;
                         if (
                                 booking.OutwardFacility != null
                                 && booking.OutwardFacility.Material != null
@@ -1318,6 +1319,7 @@ namespace gip.bso.facility
                                 && FacilityChargeList.Any()
                             )
                         {
+                            needReservations = true;
                             Dialog_Result = new VBDialogResult();
                             ResetFacilityChargeSelection();
                             DistributeQuantityFacilityChargeDialog(CurrentBookParamRelocation.InwardQuantity ?? 0);
@@ -1330,7 +1332,8 @@ namespace gip.bso.facility
                                 return;
                         }
 
-                        if (lotsForReservation != null && lotsForReservation.Any())
+                        if (   !needReservations 
+                            || (lotsForReservation != null && lotsForReservation.Any()))
                         {
                             MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
                             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)

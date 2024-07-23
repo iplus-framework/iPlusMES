@@ -1388,10 +1388,13 @@ namespace gip.bso.logistics
                     }
                 }
 
-                // add child facilities
-                foreach(Facility facility in AccessPositionFacilityFrom?.NavList)
+                if (AccessPositionFacilityFrom != null && AccessPositionFacilityFrom.NavList != null)
                 {
-                    AddChidFacilityToPosFacilityFormList(facility);
+                    // add child facilities
+                    foreach (Facility facility in AccessPositionFacilityFrom?.NavList)
+                    {
+                        AddChidFacilityToPosFacilityFormList(facility);
+                    }
                 }
 
                 // Order list

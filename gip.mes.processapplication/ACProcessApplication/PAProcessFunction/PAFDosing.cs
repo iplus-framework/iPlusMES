@@ -1263,7 +1263,8 @@ namespace gip.mes.processapplication
                         remainingWeight = (scale as PAProcessModuleVB).MaxWeightCapacity.ValueT;
 
                     if (remainingWeight.HasValue 
-                        && (targetQuantity > (remainingWeight.Value * 1.01))) // Toleranz 1%
+                        && (targetQuantity > (remainingWeight.Value * 1.01))
+                        && Math.Abs(remainingWeight.Value) > 0.000001) // Toleranz 1%
                     {
                         MsgWithDetails msg = new MsgWithDetails()
                                         {

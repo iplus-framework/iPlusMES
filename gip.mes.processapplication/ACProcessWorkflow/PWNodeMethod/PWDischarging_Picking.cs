@@ -1171,6 +1171,7 @@ namespace gip.mes.processapplication
                 if (pickingPos.Material == null)
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                    pickingPos.ACClassTaskID2 = null;
                     msg = dbApp.ACSaveChangesWithRetry();
                     if (msg != null)
                     {
@@ -1245,7 +1246,10 @@ namespace gip.mes.processapplication
                             }
 
                             if (pickingPos.RemainingDosingQuantityUOM >= -1)
+                            {
                                 pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                                pickingPos.ACClassTaskID2 = null;
+                            }
 
                             msg = dbApp.ACSaveChangesWithRetry();
                             if (msg != null)

@@ -1385,6 +1385,9 @@ namespace gip.mes.facility
             foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                         .OrderBy(c => c.Sequence))
             {
+                // Reset rembered Dosing-Node when starting again.
+                if (pos.ACClassTaskID2.HasValue)
+                    pos.ACClassTaskID2 = null;
                 if (pos.Material != null && pos.Material.IsLotReservationNeeded)
                 {
                     if (!pos.FacilityReservation_PickingPos.Where(c => !c.VBiACClassID.HasValue).Any())
