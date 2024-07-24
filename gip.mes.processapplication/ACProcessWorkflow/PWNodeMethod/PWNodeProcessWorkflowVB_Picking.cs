@@ -168,7 +168,13 @@ namespace gip.mes.processapplication
 
                 if (nextPos == null)
                 {
-                    if (this.RunByModuleTrigger)
+                    if (!allCompleted)
+                    {
+                        if (RunByModuleTrigger && CurrentACState == ACStateEnum.SMRunning)
+                            CurrentACState = ACStateEnum.SMStarting;
+                        return StartNextBatchResult.WaitForNextEvent;
+                    }
+                    else
                     {
                         ParallelNodeStats parallelNodesStat = GetParallelNodeStats();
                         if (parallelNodesStat.ActiveParallelNodesCount <= 0)
@@ -181,10 +187,13 @@ namespace gip.mes.processapplication
                                     .ToList()
                                     .ForEach(c => c.IterationCount.ValueT = 1);
                             }
+                            if (CurrentACState == ACStateEnum.SMStarting)
+                            {
+                                int countParallelNodes;
+                                CompleteParallelNodes(out countParallelNodes);
+                            }
                         }
-                        //if (parallelNodes.StartingParallelNodes == parallelNodes.AreOtherParallelNodesCompletable)
                     }
-
                     StartNextPickingWF(detachedPicking);
                     return StartNextBatchResult.Done;
                 }

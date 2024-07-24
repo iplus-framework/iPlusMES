@@ -1663,6 +1663,12 @@ namespace gip.mes.processapplication
                                         DatabaseApp dbApp, PickingPos pickingPos, Facility outwardFacility,
                                         PADosingAbortReason dosingFuncResultState, ref double postingQuantity)
         {
+            if (BookTargetQIfZero == PostingMode.QuantityFromStore)
+            {
+                double stock = outwardFacility.CurrentFacilityStock.StockQuantity;
+                if (Math.Abs(stock) > Double.Epsilon)
+                    postingQuantity = stock;
+            }
         }
 
         /// <summary>

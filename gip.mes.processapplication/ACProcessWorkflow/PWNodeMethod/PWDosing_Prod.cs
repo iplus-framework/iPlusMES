@@ -1749,6 +1749,8 @@ namespace gip.mes.processapplication
                         changePosState = true;
                         // Falls dosiert
 
+                        OnDoDosingBookingRelationGetPostingQuantity(collectedMessages, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState, ref actualQuantity);
+
                         ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
                                        dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
                                        isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState);
@@ -1934,6 +1936,19 @@ namespace gip.mes.processapplication
             }
 
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
+        }
+
+
+        public virtual void OnDoDosingBookingRelationGetPostingQuantity(MsgWithDetails collectedMessages, IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
+                                        DatabaseApp dbApp, ProdOrderPartslistPosRelation dosingPosRelation, Facility outwardFacility,
+                                        PADosingAbortReason dosingFuncResultState, ref double? postingQuantity)
+        {
+            if (BookTargetQIfZero == PostingMode.QuantityFromStore)
+            {
+                double stock = outwardFacility.CurrentFacilityStock.StockQuantity;
+                if (Math.Abs(stock) > Double.Epsilon)
+                    postingQuantity = stock;
+            }
         }
 
         /// <summary>
