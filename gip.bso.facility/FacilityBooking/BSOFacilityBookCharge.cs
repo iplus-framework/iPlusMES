@@ -642,9 +642,9 @@ namespace gip.bso.facility
             if (CurrentFacilityCharge != null && CurrentFacilityCharge.Facility != null && !AccessQuantFacilityFilter.NavList.Contains(CurrentFacilityCharge.Facility))
             {
                 AccessQuantFacilityFilter.NavList.Add(CurrentFacilityCharge.Facility);
-                
+
             }
-            if(CurrentFacilityCharge != null)
+            if (CurrentFacilityCharge != null)
             {
                 SelectedQuantFacilityFilter = CurrentFacilityCharge.Facility;
             }
@@ -886,7 +886,7 @@ namespace gip.bso.facility
 
                         if (navACQueryDefinition.TakeCount == 0)
                         {
-                            navACQueryDefinition.TakeCount = GetDefaultQuantFacilityFilterTakeCount();
+                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         }
 
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(QuantFacilityFilterDefaultFilter);
@@ -909,6 +909,13 @@ namespace gip.bso.facility
             {
                 return new List<ACFilterItem>()
                 {
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.equal, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.StorageBin).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.StorageBinContainer).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.PreparationBin).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
                 };
             }
         }
