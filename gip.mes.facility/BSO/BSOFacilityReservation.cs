@@ -507,7 +507,10 @@ namespace gip.mes.facility
                         .Where(c =>
                             c.IsSelected
                             && c.FacilityReservation == null
-                            && !IsNegligibleQuantity(TargetQuantityUOM, c.AssignedQuantity, Const_ZeroQuantityCheckFactor)
+                            // 1. why check small quantities - should be enalbed to reserve small quantities
+                            // 2. comparation with summary quantity (TargetQuantityUOM) don't have sense
+                            // TODO: maybe one another check to avoid some lot reservations for any reason
+                            // && !IsNegligibleQuantity(TargetQuantityUOM, c.AssignedQuantity, Const_ZeroQuantityCheckFactor)
                             )
                         .ToList();
 
