@@ -19,9 +19,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.mes.facility;
-using System.Data.Objects;
 using System.Data;
-using gip.bso.masterdata;
 
 namespace gip.bso.logistics
 {
@@ -310,9 +308,9 @@ namespace gip.bso.logistics
                     {
                         ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "VisitorVoucherNo").FirstOrDefault();
                         if (sortItem != null && sortItem.IsConfiguration)
+                        {
                             sortItem.SortDirection = Global.SortDirections.descending;
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        }
                     }
 
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<VisitorVoucher>(VisitorVoucher.ClassName, this);

@@ -860,9 +860,6 @@ namespace gip.bso.facility
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        //navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         _AccessPrimary = navACQueryDefinition.NewAccessNav<FacilityInventory>(FacilityInventory.ClassName, this);

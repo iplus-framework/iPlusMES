@@ -327,8 +327,6 @@ namespace gip.bso.facility
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter, true, true);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<FacilityCharge>(FacilityCharge.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;

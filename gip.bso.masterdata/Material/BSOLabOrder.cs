@@ -355,14 +355,6 @@ namespace gip.bso.masterdata
             }
         }
 
-        public override int NavigationQueryTakeCount
-        {
-            get
-            {
-                return 50;
-            }
-        }
-
         #endregion
 
         LabOrder _LastLabOrder = null;

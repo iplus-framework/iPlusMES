@@ -118,12 +118,7 @@ namespace gip.bso.masterdata
                 if (_AccessPrimary == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Vehicle", ACType.ACIdentifier);
-                    if (navACQueryDefinition != null)
-                    {
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
-                    }
-                    bool rebuildACQueryDef = false;
+                     bool rebuildACQueryDef = false;
                     short fcTypeLocation = (short)FacilityTypesEnum.Vehicle;
                     if (navACQueryDefinition.ACFilterColumns.Count <= 0)
                     {

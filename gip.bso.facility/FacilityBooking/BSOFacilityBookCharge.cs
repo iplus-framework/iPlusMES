@@ -507,8 +507,6 @@ namespace gip.bso.facility
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter, true, true);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<FacilityCharge>(FacilityCharge.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
@@ -883,12 +881,6 @@ namespace gip.bso.facility
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(QuantFacilityFilterDefaultSort);
-
-                        if (navACQueryDefinition.TakeCount == 0)
-                        {
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
-                        }
-
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(QuantFacilityFilterDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -937,11 +929,6 @@ namespace gip.bso.facility
         {
             ACFilterItem aCFilterItem = sender as ACFilterItem;
 
-        }
-
-        public virtual int GetDefaultQuantFacilityFilterTakeCount()
-        {
-            return ACQueryDefinition.C_DefaultTakeCount;
         }
 
         [ACPropertyInfo(9999, nameof(QuantFacilityFilter))]

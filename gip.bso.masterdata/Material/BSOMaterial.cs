@@ -1748,8 +1748,6 @@ namespace gip.bso.masterdata
                 if (_AccessAssociatedPartslistPos == null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(this, Const.QueryPrefix + "AssociatedPartslistPos", nameof(PartslistPos));
-                    if (navACQueryDefinition.TakeCount == 0)
-                        navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(AccessAssociatedPartslistPosDefaultSort);
                     navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(AccessAssociatedPartslistPosDefaultFilter);
                     _AccessAssociatedPartslistPos = navACQueryDefinition.NewAccessNav<PartslistPos>("AssociatedPartslistPos", this);

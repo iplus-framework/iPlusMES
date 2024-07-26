@@ -122,11 +122,6 @@ namespace gip.bso.masterdata
                 if (_AccessPrimary == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
-                    if (navACQueryDefinition != null)
-                    {
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
-                    }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Company>(Company.ClassName, this);
                 }
                 return _AccessPrimary;

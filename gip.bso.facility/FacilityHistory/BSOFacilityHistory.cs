@@ -156,9 +156,9 @@ namespace gip.bso.facility
                     {
                         ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "BalanceDate").FirstOrDefault();
                         if (sortItem != null && sortItem.IsConfiguration)
+                        {
                             sortItem.SortDirection = Global.SortDirections.descending;
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        }
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<History>(History.ClassName, this);
                 }

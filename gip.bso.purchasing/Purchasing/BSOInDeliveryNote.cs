@@ -270,8 +270,6 @@ namespace gip.bso.purchasing
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<DeliveryNote>(DeliveryNote.ClassName, this);
@@ -762,8 +760,6 @@ namespace gip.bso.purchasing
                     if (acQueryDef != null)
                     {
                         acQueryDef.CheckAndReplaceColumnsIfDifferent(AccessInOrderPosDefaultFilter, AccessInOrderPosDefaultSort, true, true);
-                        if (acQueryDef.TakeCount == 0)
-                            acQueryDef.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
 
                     _AccessInOrderPos = acQueryDef.NewAccessNav<InOrderPos>(InOrderPos.ClassName, this);
@@ -1539,7 +1535,7 @@ namespace gip.bso.purchasing
                 .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
                 .OrderBy(c => c.ExpirationDate)
                 .ThenBy(c => c.FillingDate)
-                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .Take(Root.Environment.AccessDefaultTakeCount)
                 .ToList();
         }
 

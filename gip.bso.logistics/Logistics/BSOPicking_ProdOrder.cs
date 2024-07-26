@@ -50,8 +50,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(ProdOrderPartslistPosDefaultFilter, ProdOrderPartslistPosDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
 
                     _AccessProdOrderPartslistPos = navACQueryDefinition.NewAccessNav<ProdOrderPartslistPos>(ProdOrderPartslistPos.ClassName, this);
