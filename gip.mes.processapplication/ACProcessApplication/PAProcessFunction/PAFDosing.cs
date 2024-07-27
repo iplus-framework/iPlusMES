@@ -1229,7 +1229,7 @@ namespace gip.mes.processapplication
 
                     if (IsSimulationOn)
                     {
-                        if (prevR != null)
+                        if (prevR != null && acMethod != previousParams)
                             PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
                         PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
                     }

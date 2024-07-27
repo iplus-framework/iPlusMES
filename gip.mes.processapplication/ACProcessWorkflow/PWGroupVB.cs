@@ -10,6 +10,7 @@ using gip.mes.facility;
 using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.processapplication.PWDosing;
 using gip.core.processapplication;
+using DocumentFormat.OpenXml.ExtendedProperties;
 
 namespace gip.mes.processapplication
 
@@ -93,6 +94,7 @@ namespace gip.mes.processapplication
                 _LastModulesInAutomaticMode = null;
                 _ExtraDisTargetDest = null;
                 _ExtraDisTargetComp = null;
+                _RoutingCheckWait = null;
             }
             return base.ACDeInit(deleteACClassTask);
         }
@@ -107,6 +109,7 @@ namespace gip.mes.processapplication
                 _LastModulesInAutomaticMode = null;
                 _ExtraDisTargetDest = null;
                 _ExtraDisTargetComp = null;
+                _RoutingCheckWait = null;
             }
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
@@ -223,10 +226,11 @@ namespace gip.mes.processapplication
 
 
         #region Occupation of Processmodules and Routing
-        /// <summary>
-        /// Rule Cache
-        /// </summary>
         private Guid[] _LastTargets = null;
+        /// <summary>
+        /// Cache, which destinations were chek last time, to be able to compare if user has changed the destinations in the picking/btrachplan targets
+        /// If changed, then a routing check must be activated
+        /// </summary>
         protected Guid[] LastTargets
         {
             get
@@ -249,15 +253,14 @@ namespace gip.mes.processapplication
             }
         }
 
+        private SafeList<PAProcessModule> _LastCalculatedRouteablePMList = null;
         /// <summary>
         /// Cache with Process-Modules which can be potentially mapped/accessed from this PWGroup beacuse they are routable to the planned destination
         /// </summary>
-        private SafeList<PAProcessModule> _LastCalculatedRouteablePMList = null;
         protected SafeList<PAProcessModule> LastCalculatedRouteablePMList
         {
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _LastCalculatedRouteablePMList;
@@ -265,14 +268,18 @@ namespace gip.mes.processapplication
             }
             set
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     _LastCalculatedRouteablePMList = value;
                 }
             }
         }
+
         private List<PAProcessModule> _LastModulesInAutomaticMode = null;
+        /// <summary>
+        /// Cache of Processmodules, that have been checked last time an were in automatic mode. 
+        /// It's needed to be able to compare if somebody has switched to manual or automatic mode an therefore an new routing check to the destinations are needed 
+        /// </summary>
         protected List<PAProcessModule> LastModulesInAutomaticMode
         {
             get
@@ -293,6 +300,58 @@ namespace gip.mes.processapplication
                     _LastModulesInAutomaticMode = value;
                 }
             }
+        }
+
+        private DateTime? _RoutingCheckWait = null;
+        public bool IsInRoutingCheckWaitNotElapsed
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _RoutingCheckWait.HasValue && _RoutingCheckWait.Value > DateTime.Now;
+                }
+            }
+        }
+
+        public bool IsInRoutingCheckWait
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _RoutingCheckWait.HasValue;
+                }
+            }
+        }
+
+        public void ResetRoutingCheckWait()
+        {
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _RoutingCheckWait = null;
+            }
+        }
+
+        public void SetRoutingCheckWait()
+        {
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _RoutingCheckWait = DateTime.Now.AddSeconds(30);
+            }
+        }
+
+        public override void ClearMyConfiguration()
+        {
+            ResetRoutingCheckWait();
+            base.ClearMyConfiguration();
+        }
+
+        public override void SubscribeToProjectWorkCycle()
+        {
+            if (!IsSubscribedToWorkCycle)
+                ResetRoutingCheckWait();
+            base.SubscribeToProjectWorkCycle();
         }
 
         /// <summary>
@@ -350,127 +409,28 @@ namespace gip.mes.processapplication
                         && ParentPWMethod<PWMethodProduction>().CurrentProdOrderPartslistPos != null
                         && ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch != null)
                     {
-                        short destError = 0;
-                        string errorMsg = "";
-                        Guid[] targets = null;
-                        if (IsInEmptyingMode)
-                        {
-                            var extraDest = ExtraDisTargetComp;
-                            if (extraDest != null)
-                                targets = new Guid[] { extraDest.ComponentClass.ACClassID };
-                        }
-                        if (targets == null)
-                            targets = ParentPWMethod<PWMethodProduction>().GetCachedDestinations(false/*addedModules.Any()*/, out destError, out errorMsg);
-                        if (targets == null || !targets.Any())
-                        {
-                            if (ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
-                            {
-                                if (destError == -1)
-                                {
-                                    Msg msg = new Msg(errorMsg, this, eMsgLevel.Error, PWClassName, "ProcessModuleList", 1010);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                }
-                                else if (destError == 1)
-                                {
-                                    // Error50150: Batchplan is empty.
-                                    Msg msg = msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1020, "Error50150");
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                }
-                                else if (destError == 2)
-                                {
-                                    // Error00126: No route found to planned destination
-                                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(3)", 1030, "Error00126");
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                }
-                                return new List<PAProcessModule>();
-                            }
-                            else
-                                return modulesInAutomaticMode;
-                        }
-
-                        if (targets != null && targets.Any())
-                        {
-                            var pwDosings = this.FindChildComponents<IPWNodeReceiveMaterialRouteable>(c => c is IPWNodeReceiveMaterialRouteable);
-
-                            // Performance-Optimization:
-                            // If targets changed, then recalculate routebale PM List
-                            if (PWMethodTransportBase.AreCachedDestinationsDifferent(LastTargets, targets))
-                            {
-                                LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-                            }
-                            if (LastCalculatedRouteablePMList == null)
-                                LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-                            LastTargets = null;
-
-                            Type typeOfSilo = typeof(PAMSilo);
-                            Guid thisMethodID = ContentACClassWF.ACClassMethodID;
-                            using (var db = new Database())
-                            {
-                                foreach (var module in modulesInAutomaticMode)
-                                {
-                                    if (!LastCalculatedRouteablePMList.Contains(module))
-                                    {
-                                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-
-                                        ACRoutingParameters routingParameters = new ACRoutingParameters()
-                                        {
-                                            RoutingService = this.RoutingService,
-                                            Database = db,
-                                            SelectionRuleID = SelRuleID_ReachableDest,
-                                            Direction = RouteDirections.Forwards,
-                                            SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
-                                            DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
-                                            DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                                        && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                                            || !c.BasedOnACClassID.HasValue
-                                                                            || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
-                                            IncludeReserved = true,
-                                            IncludeAllocated = true
-                                        };
-
-                                        RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
-                                        if (rResult.Routes != null && rResult.Routes.Any())
-                                        {
-                                            bool canAdd = true;
-                                            if (DosableOnGroupCheck)
-                                            {
-                                                if (pwDosings != null && pwDosings.Any())
-                                                {
-                                                    canAdd = false;
-                                                    foreach (IPWNodeReceiveMaterialRouteable pwDosing in pwDosings)
-                                                    {
-                                                        canAdd = pwDosing.HasAndCanProcessAnyMaterial(module);
-                                                        if (canAdd)
-                                                            break;
-                                                    }
-                                                }
-                                            }
-
-                                            if (canAdd)
-                                                LastCalculatedRouteablePMList.Add(module);
-                                        }
-                                    }
-                                }
-                            }
-                            if (!LastCalculatedRouteablePMList.Any())
-                            {
-                                // Error00126: No route found to planned destination
-                                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(1)", 1040, "Error00126");
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                            }
-                        }
-                        else
-                            LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-
-                        _LastTargets = targets;
-                        return LastCalculatedRouteablePMList.ToList();
+                        var pmListForPicking = HandleModuleListForProdOrder(modulesInAutomaticMode, removedModules, addedModules);
+                        return pmListForPicking;
                     }
-                    else if (IsIntake)
+                    else if (IsTransport)
                     {
-                        var pwMethod = ParentPWMethod<PWMethodIntake>();
-                        if (pwMethod != null && (pwMethod.CurrentPicking != null || pwMethod.CurrentDeliveryNotePos != null || pwMethod.CurrentFacilityBooking != null))
+                        var pwMethod = ParentPWMethod<PWMethodTransportBase>();
+                        if (pwMethod != null)
                         {
+                            List<PAProcessModule> cachedList = null;
+                            if (pwMethod.CurrentPicking != null)
+                                cachedList = GetCachedModulesForPickingIfWaiting(modulesInAutomaticMode, removedModules, addedModules);
+                            else if (pwMethod.CurrentDeliveryNotePos != null && IsIntake)
+                            {
+                                Guid[] targets;
+                                bool targetsChanged = false;
+                                cachedList = GetCachedModulesForDNoteIfWaiting(pwMethod as PWMethodIntake, modulesInAutomaticMode, removedModules, addedModules, out targetsChanged, out targets);
+                                if (targets == null && cachedList == null)
+                                    cachedList = new List<PAProcessModule>();
+                            }
+                            if (cachedList != null)
+                                return cachedList;
+
                             using (var db = new Database())
                             using (var dbApp = new DatabaseApp(db))
                             {
@@ -487,174 +447,15 @@ namespace gip.mes.processapplication
                                 if (pwMethod.CurrentFacilityBooking != null)
                                     fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
 
+                                List<PAProcessModule> pmList = null;
                                 if (picking != null)
-                                {
-                                    var pmListForPicking = HandleModuleListForPicking(dbApp, db, picking, pickingPos, modulesInAutomaticMode);
-                                    if (pmListForPicking != null)
-                                        return pmListForPicking;
-                                }
-                                else if (notePos != null)
-                                {
-                                    short destError = 0;
-                                    string errorMsg = "";
-                                    Guid[] targets = null;
-                                    if (IsInEmptyingMode)
-                                    {
-                                        var extraDest = ExtraDisTargetComp;
-                                        if (extraDest != null)
-                                            targets = new Guid[] { extraDest.ComponentClass.ACClassID };
-                                    }
-                                    if (targets == null)
-                                        targets = pwMethod.GetCachedDestinationsForDN(false/*addedModules.Any()*/, out destError, out errorMsg);
-                                    if (targets == null || !targets.Any())
-                                    {
-                                        if (destError == -1)
-                                        {
-                                            Msg msg = new Msg(errorMsg, this, eMsgLevel.Error, PWClassName, "ProcessModuleList", 1050);
-                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                        }
-                                        else if (destError == 1)
-                                        {
-                                            // Error50150: Batchplan is empty.
-                                            Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1060, "Error50150");
-                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                        }
-                                        else if (destError == 2)
-                                        {
-                                            // Error00126: No route found to planned destination
-                                            Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(3)", 1070, "Error00126");
-                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                        }
-                                        return new List<PAProcessModule>();
-                                    }
-
-                                    if (targets != null && targets.Any())
-                                    {
-                                        // Performance-Optimization:
-                                        // If targets changed, then recalculate routebale PM List
-                                        if (PWMethodTransportBase.AreCachedDestinationsDifferent(LastTargets, targets))
-                                        {
-                                            LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-                                        }
-                                        if (LastCalculatedRouteablePMList == null)
-                                            LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-                                        LastTargets = null;
-
-                                        Type typeOfSilo = typeof(PAMSilo);
-                                        Guid thisMethodID = ContentACClassWF.ACClassMethodID;
-                                        IList<gip.core.datamodel.ACClass> selectedModules = pwMethod.ACFacilityManager.GetSelectedModulesAsACClass(notePos, db);
-
-                                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-
-                                        ACRoutingParameters routingParameters = new ACRoutingParameters()
-                                        {
-                                            RoutingService = this.RoutingService,
-                                            Database = db,
-                                            AttachRouteItemsToContext = false,
-                                            SelectionRuleID = SelRuleID_ReachableDest,
-                                            Direction = RouteDirections.Forwards,
-                                            SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
-                                            DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
-                                            DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                                                && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                                                    || !c.BasedOnACClassID.HasValue
-                                                                                    || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                            MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
-                                            IncludeReserved = true,
-                                            IncludeAllocated = true
-                                        };
-
-                                        foreach (var module in modulesInAutomaticMode)
-                                        {
-                                            if (!LastCalculatedRouteablePMList.Contains(module)
-                                                && selectedModules.Where(c => c.ACClassID == module.ComponentClass.ACClassID).Any())
-                                            {
-                                                RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
-                                                if (rResult.Routes != null && rResult.Routes.Any())
-                                                    LastCalculatedRouteablePMList.Add(module);
-                                            }
-                                        }
-                                        if (!LastCalculatedRouteablePMList.Any())
-                                        {
-                                            // Error00126: No route found to planned destination
-                                            Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(1)", 1080, "Error00126");
-                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                        }
-                                    }
-                                    else
-                                        LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-                                    LastTargets = targets;
-                                    return LastCalculatedRouteablePMList.ToList();
-                                }
+                                    pmList = HandleModuleListForPicking(dbApp, db, picking, pickingPos, modulesInAutomaticMode, removedModules, addedModules);
+                                else if (notePos != null && IsIntake)
+                                    pmList = HandleModuleListForDNote(pwMethod as PWMethodIntake, dbApp, db, notePos, modulesInAutomaticMode, removedModules, addedModules);
                                 else if (fBooking != null)
-                                {
-                                    if (!String.IsNullOrEmpty(fBooking.PropertyACUrl))
-                                    {
-                                        var querySource = modulesInAutomaticMode.Where(c => c.GetACUrl() == fBooking.PropertyACUrl);
-                                        if (querySource.Any())
-                                            return querySource.ToList();
-                                    }
-                                    if (fBooking.OutwardFacility != null && fBooking.OutwardFacility.VBiFacilityACClassID.HasValue)
-                                    {
-                                        var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacility.VBiFacilityACClassID.Value);
-                                        if (querySource.Any())
-                                            return querySource.ToList();
-                                    }
-                                    if (fBooking.OutwardFacilityCharge != null && fBooking.OutwardFacilityCharge.Facility != null && fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.HasValue)
-                                    {
-                                        var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.Value);
-                                        if (querySource.Any())
-                                            return querySource.ToList();
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    else if (IsTransport)
-                    {
-                        var pwMethod = ParentPWMethod<PWMethodTransportBase>();
-                        if (pwMethod != null)
-                        {
-                            using (var db = new Database())
-                            using (var dbApp = new DatabaseApp(db))
-                            {
-                                Picking picking = null;
-                                PickingPos pickingPos = null;
-                                FacilityBooking fBooking = null;
-                                if (pwMethod.CurrentPicking != null)
-                                    picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
-                                if (pwMethod.CurrentPickingPos != null)
-                                    pickingPos = pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
-                                if (pwMethod.CurrentFacilityBooking != null)
-                                    fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
-                                if (picking != null)
-                                {
-                                    var pmListForPicking = HandleModuleListForPicking(dbApp, db, picking, pickingPos, modulesInAutomaticMode);
-                                    if (pmListForPicking != null)
-                                        return pmListForPicking;
-                                }
-                                else if (fBooking != null)
-                                {
-                                    if (!String.IsNullOrEmpty(fBooking.PropertyACUrl))
-                                    {
-                                        var querySource = modulesInAutomaticMode.Where(c => c.GetACUrl() == fBooking.PropertyACUrl);
-                                        if (querySource.Any())
-                                            return querySource.ToList();
-                                    }
-                                    if (fBooking.OutwardFacility != null && fBooking.OutwardFacility.VBiFacilityACClassID.HasValue)
-                                    {
-                                        var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacility.VBiFacilityACClassID.Value);
-                                        if (querySource.Any())
-                                            return querySource.ToList();
-                                    }
-                                    if (fBooking.OutwardFacilityCharge != null && fBooking.OutwardFacilityCharge.Facility != null && fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.HasValue)
-                                    {
-                                        var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.Value);
-                                        if (querySource.Any())
-                                            return querySource.ToList();
-                                    }
-                                }
+                                    pmList = HandleModuleListForBooking(dbApp, db, fBooking, modulesInAutomaticMode, removedModules, addedModules);
+                                if (pmList != null)
+                                    return pmList;
                             }
                         }
                     }
@@ -668,132 +469,457 @@ namespace gip.mes.processapplication
             }
         }
 
-        protected virtual List<PAProcessModule> HandleModuleListForPicking(DatabaseApp dbApp, Database db, Picking picking, PickingPos pickingPos, List<PAProcessModule> modulesInAutomaticMode)
+        protected virtual List<PAProcessModule> HandleModuleListForProdOrder(List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules)
         {
-            if (pickingPos == null)
+            short destError = 0;
+            string errorMsg = "";
+            Guid[] targets = null;
+            if (IsInEmptyingMode)
             {
-                if (!picking.PickingPos_Picking.Where(c => c.InOrderPosID.HasValue || c.OutOrderPosID.HasValue || c.PickingPosProdOrderPartslistPos_PickingPos.Any()).Any())
-                {
-                    pickingPos = picking.PickingPos_Picking
-                        .Where(c => c.MDDelivPosLoadStateID.HasValue && c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)
-                        .OrderBy(c => c.Sequence)
-                        .FirstOrDefault();
-                    if (pickingPos == null)
-                    {
-                        pickingPos = picking.PickingPos_Picking
-                            .Where(c => !c.MDDelivPosLoadStateID.HasValue)
-                            .OrderBy(c => c.Sequence)
-                            .FirstOrDefault();
-                    }
-                    else if (pickingPos == null)
-                    {
-                        pickingPos = picking.PickingPos_Picking.FirstOrDefault();
-                    }
-                }
+                var extraDest = ExtraDisTargetComp;
+                if (extraDest != null)
+                    targets = new Guid[] { extraDest.ComponentClass.ACClassID };
             }
-            if (pickingPos != null && pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID.HasValue)
+            if (targets == null)
+                targets = ParentPWMethod<PWMethodProduction>().GetCachedDestinations(false/*addedModules.Any()*/, out destError, out errorMsg);
+            if (targets == null || !targets.Any())
             {
-                List<PWDosing> pwDosings = this.FindChildComponents<PWDosing>(c => c is PWDosing);
-                bool hasGroupDosings = pwDosings.Any();
-                Guid[] targets = new Guid[] { pickingPos.ToFacility.VBiFacilityACClassID.Value };
-                var lastTargest = LastTargets;
-                if (lastTargest == null
-                    || !lastTargest.Any()
-                    || lastTargest.Count() != targets.Count()
-                    || !lastTargest.All(targets.Contains)
-                    || !targets.All(lastTargest.Contains))
+                if (ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
                 {
-                    LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+                    if (destError == -1)
+                    {
+                        Msg msg = new Msg(errorMsg, this, eMsgLevel.Error, PWClassName, "ProcessModuleList", 1010);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    }
+                    else if (destError == 1)
+                    {
+                        // Error50150: Batchplan is empty.
+                        Msg msg = msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1020, "Error50150");
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    }
+                    else if (destError == 2)
+                    {
+                        // Error00126: No route found to planned destination
+                        Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(3)", 1030, "Error00126");
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    }
+                    return new List<PAProcessModule>();
                 }
+                else
+                    return modulesInAutomaticMode;
+            }
+
+            if (targets != null && targets.Any())
+            {
+                bool targetsChanged = PWMethodTransportBase.AreCachedDestinationsDifferent(LastTargets, targets);
+                if (!targetsChanged
+                    && LastCalculatedRouteablePMList != null
+                    && (removedModules == null || !removedModules.Any())
+                    && (addedModules == null || !addedModules.Any())
+                    && IsInRoutingCheckWaitNotElapsed)
+                    return LastCalculatedRouteablePMList.ToList();
+
+                var pwDosings = this.FindChildComponents<IPWNodeReceiveMaterialRouteable>(c => c is IPWNodeReceiveMaterialRouteable);
+                if (targetsChanged)
+                    LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
                 if (LastCalculatedRouteablePMList == null)
                     LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
-                LastTargets = null;
-
+                LastTargets = targets;
+                SetRoutingCheckWait();
 
                 Type typeOfSilo = typeof(PAMSilo);
                 Guid thisMethodID = ContentACClassWF.ACClassMethodID;
-                Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
-
-                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                using (var db = new Database())
                 {
-                    RoutingService = this.RoutingService,
-                    Database = db,
-                    AttachRouteItemsToContext = false,
-                    SelectionRuleID = SelRuleID_ReachableDest,
-                    Direction = RouteDirections.Forwards,
-                    SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
-                    DBSelector = (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
-                    DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                        && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                            || !c.BasedOnACClassID.HasValue
-                                                            || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                    MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
-                    IncludeReserved = true,
-                    IncludeAllocated = true
-                };
-
-                foreach (var module in modulesInAutomaticMode)
-                {
-                    if (!LastCalculatedRouteablePMList.Contains(module))
+                    foreach (var module in modulesInAutomaticMode)
                     {
-                        string moduleACUrl = module.GetACUrl();
-
-                        RoutingResult rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
-                        if (rResult.Routes != null && rResult.Routes.Any())
+                        if (!LastCalculatedRouteablePMList.Contains(module))
                         {
-                            if (hasGroupDosings)
+                            Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+                            ACRoutingParameters routingParameters = new ACRoutingParameters()
                             {
-                                PWDosing pwDosing = pwDosings.FirstOrDefault();
-                                List<PickingPos> openPickings = new List<PickingPos>();
-                                // If more line can be dosed, then ignore passed pickingPos and 
-                                if (pwDosing.DoseAllPosFromPicking)
-                                {
-                                    openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
-                                                                    .Where(c => c.PickingID == picking.PickingID
-                                                                            && c.MDDelivPosLoadStateID.HasValue
-                                                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
-                                                                                || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
-                                                                    .OrderBy(c => c.Sequence)
-                                                                    .ToList();
-                                }
-                                if (!openPickings.Contains(pickingPos))
-                                    openPickings.Add(pickingPos);
+                                RoutingService = this.RoutingService,
+                                Database = db,
+                                SelectionRuleID = SelRuleID_ReachableDest,
+                                Direction = RouteDirections.Forwards,
+                                SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                                DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                                DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                            && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                                || !c.BasedOnACClassID.HasValue
+                                                                || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                                IncludeReserved = true,
+                                IncludeAllocated = true
+                            };
 
-                                foreach (PickingPos pickingPos2 in openPickings)
+                            RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
+                            if (rResult.Routes != null && rResult.Routes.Any())
+                            {
+                                bool canAdd = true;
+                                if (DosableOnGroupCheck)
                                 {
-                                    if (pickingPos2.FromFacility != null && pickingPos2.FromFacility.VBiFacilityACClassID.HasValue)
+                                    if (pwDosings != null && pwDosings.Any())
                                     {
-                                        routingParameters.SelectionRuleID = SelRuleID_ReachableSource;
-                                        routingParameters.Direction = RouteDirections.Backwards;
-                                        routingParameters.DBSelector = (c, p, r) => c.ACClassID == pickingPos2.FromFacility.VBiFacilityACClassID.Value;
-                                        routingParameters.DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType)));
-                                        routingParameters.SelectionRuleParams = new object[] { pickingPos2.FromFacility.VBiFacilityACClassID.Value };
-
-                                        rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParameters);
+                                        canAdd = false;
+                                        foreach (IPWNodeReceiveMaterialRouteable pwDosing in pwDosings)
+                                        {
+                                            canAdd = pwDosing.HasAndCanProcessAnyMaterial(module);
+                                            if (canAdd)
+                                                break;
+                                        }
                                     }
-                                    else if (pickingPos2.FromFacility == null)
-                                    {
-                                        if (pwDosing != null)
-                                            rResult = pwDosing.HasAndCanProcessAnyMaterialPicking(module, dbApp, db, pickingPos2);
-                                    }
-                                    if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
-                                        break;
                                 }
+
+                                if (canAdd)
+                                    LastCalculatedRouteablePMList.Add(module);
                             }
-                            if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
-                                LastCalculatedRouteablePMList.Add(module);
                         }
                     }
                 }
                 if (!LastCalculatedRouteablePMList.Any())
                 {
                     // Error00126: No route found to planned destination
-                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1090, "Error00126");
+                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(1)", 1040, "Error00126");
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 }
+            }
+            else
+            {
+                LastTargets = null;
+                LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+            }
 
-                LastTargets = targets;
+            return LastCalculatedRouteablePMList.ToList();
+        }
+
+        protected List<PAProcessModule> GetCachedModulesForPickingIfWaiting(List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules)
+        {
+            Guid[] lastTargets = LastTargets;
+            if (lastTargets != null
+                && lastTargets.Any()
+                && LastCalculatedRouteablePMList != null
+                && (removedModules == null || !removedModules.Any())
+                && (addedModules == null || !addedModules.Any())
+                && IsInRoutingCheckWaitNotElapsed)
                 return LastCalculatedRouteablePMList.ToList();
+            return null;
+        }
+
+        protected virtual List<PAProcessModule> HandleModuleListForPicking(DatabaseApp dbApp, Database db, Picking picking, PickingPos pickingPos, List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules)
+        {
+            List<PickingPos> openPickings = new List<PickingPos>();
+            List<Guid> targets = null;
+            // Determine all Targets which should be reached from this module
+            // If picking line is not passed when workflow was started, then find the next line which should be processed
+            if (pickingPos != null && pickingPos.ToFacility != null && pickingPos.ToFacility.VBiFacilityACClassID.HasValue)
+            {
+                targets = new List<Guid> { pickingPos.ToFacility.VBiFacilityACClassID.Value };
+            }
+            else //if (pickingPos == null || pwDosing.DoseAllPosFromPicking)
+            {
+                targets = new List<Guid>();
+                openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
+                                                .Include(c => c.FacilityReservation_PickingPos)
+                                                .Include(c => c.PickingPosProdOrderPartslistPos_PickingPos)
+                                                .Include(c => c.MDDelivPosLoadState)
+                                                .Where(c => c.PickingID == picking.PickingID
+                                                        && c.MDDelivPosLoadStateID.HasValue
+                                                        && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                                            || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                                .OrderBy(c => c.Sequence)
+                                                .ToList();
+                foreach (PickingPos item in openPickings)
+                {
+                    if (item.ToFacility != null && item.ToFacility.VBiFacilityACClassID.HasValue)
+                    {
+                        if (!targets.Contains(item.ToFacility.VBiFacilityACClassID.Value))
+                            targets.Add(item.ToFacility.VBiFacilityACClassID.Value);
+                        if (pickingPos == null)
+                            pickingPos = item;
+                    }
+                    else
+                    {
+                        var subTargets = item.FacilityReservation_PickingPos.Where(c => c.VBiACClassID.HasValue && c.ReservationState != GlobalApp.ReservationState.Finished).Select(c => c.VBiACClassID.Value).ToArray();
+                        if (subTargets != null && subTargets.Any())
+                        {
+                            foreach (var subTarget in subTargets)
+                            {
+                                if (!targets.Contains(subTarget))
+                                    targets.Add((subTarget));
+                                if (pickingPos == null)
+                                    pickingPos = item;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (targets == null || !targets.Any())
+            {
+                if (LastCalculatedRouteablePMList != null)
+                    LastCalculatedRouteablePMList = null;
+                LastTargets = null;
+                return null;
+            }
+
+            List<PWDosing> pwDosings = this.FindChildComponents<PWDosing>(c => c is PWDosing);
+            PWDosing pwDosing = pwDosings.FirstOrDefault();
+            bool hasGroupDosings = pwDosings.Any();
+
+            Guid[] lastTargets = LastTargets;
+            // Has been a calculation in the past? If yes, compare if something has changed since last test. If not, then nothing has also changed accorind the routable Modules
+            if (   lastTargets != null 
+                && lastTargets.Any() 
+                && LastCalculatedRouteablePMList != null
+                && lastTargets.Count() == targets.Count()
+                && lastTargets.All(targets.Contains)
+                && targets.All(lastTargets.Contains)
+                && (removedModules == null || !removedModules.Any())
+                && (addedModules == null || !addedModules.Any())
+                && !hasGroupDosings)
+            {
+                return LastCalculatedRouteablePMList.ToList();
+            }
+
+            LastTargets = targets.ToArray();
+            if (LastCalculatedRouteablePMList == null)
+                LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+            SetRoutingCheckWait();
+
+            // If destination was defined in line, then try to find all processmodules from which the destination could be reached.
+            Type typeOfSilo = typeof(PAMSilo);
+            Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+            Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+            ACRoutingParameters routingParamFindDest = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = db,
+                AttachRouteItemsToContext = false,
+                SelectionRuleID = SelRuleID_ReachableDest,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleParams = new object[] { targets.ToArray(), allPossibleModulesinThisWF },
+                DBSelector = (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
+                DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                    && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                        || !c.BasedOnACClassID.HasValue
+                                                        || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
+
+            ACRoutingParameters routingParamFindSource = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = db,
+                AttachRouteItemsToContext = false,
+                SelectionRuleID = SelRuleID_ReachableSource,
+                Direction = RouteDirections.Backwards,
+                SelectionRuleParams = new object[] { targets.ToArray(), allPossibleModulesinThisWF },
+                DBSelector = (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
+                DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule && (typeOfSilo.IsAssignableFrom(c.ObjectType))),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
+
+            if (hasGroupDosings)
+            {
+                // If more line can be dosed, then ignore passed pickingPos and 
+                if (pwDosing.DoseAllPosFromPicking && (openPickings == null || !openPickings.Any()))
+                {
+                    openPickings = dbApp.PickingPos.Include(c => c.FromFacility.FacilityReservation_Facility)
+                                                    .Include(c => c.FacilityReservation_PickingPos)
+                                                    .Include(c => c.PickingPosProdOrderPartslistPos_PickingPos)
+                                                    .Include(c => c.MDDelivPosLoadState)
+                                                    .Where(c => c.PickingID == picking.PickingID
+                                                            && c.MDDelivPosLoadStateID.HasValue
+                                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                                                || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                                    .OrderBy(c => c.Sequence)
+                                                    .ToList();
+                }
+                if (!openPickings.Contains(pickingPos))
+                    openPickings.Add(pickingPos);
+            }
+
+            // Test modules if destination or source could be reached
+            foreach (var module in modulesInAutomaticMode)
+            {
+                if (!LastCalculatedRouteablePMList.Contains(module))
+                {
+                    string moduleACUrl = module.GetACUrl();
+
+                    // Test if destination reachable
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParamFindDest);
+                    if (rResult.Routes != null && rResult.Routes.Any())
+                    {
+                        // If group has dosing nodes, test if Dosing is possible
+                        if (hasGroupDosings)
+                        {
+                            rResult = null;
+                            foreach (PickingPos pickingPos2 in openPickings)
+                            {
+                                if (pickingPos2.FromFacility != null && pickingPos2.FromFacility.VBiFacilityACClassID.HasValue)
+                                {
+                                    routingParamFindSource.DBSelector = (c, p, r) => c.ACClassID == pickingPos2.FromFacility.VBiFacilityACClassID.Value;
+                                    routingParamFindSource.SelectionRuleParams = new object[] { pickingPos2.FromFacility.VBiFacilityACClassID.Value };
+                                    rResult = ACRoutingService.FindSuccessors(moduleACUrl, routingParamFindSource);
+                                }
+                                else if (pickingPos2.FromFacility == null)
+                                {
+                                    if (pwDosing != null)
+                                        rResult = pwDosing.HasAndCanProcessAnyMaterialPicking(module, dbApp, db, pickingPos2);
+                                }
+                                if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
+                                    break;
+                            }
+                        }
+                        if (rResult != null && rResult.Routes != null && rResult.Routes.Any())
+                            LastCalculatedRouteablePMList.Add(module);
+                    }
+                }
+            }
+            if (!LastCalculatedRouteablePMList.Any())
+            {
+                // Error00126: No route found to planned destination
+                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1090, "Error00126");
+                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+            }
+
+            SetRoutingCheckWait();
+            return LastCalculatedRouteablePMList.ToList();
+
+        }
+
+        protected List<PAProcessModule> GetCachedModulesForDNoteIfWaiting(PWMethodIntake pwMethod, List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules, out bool targetsChanged, out Guid[] targets)
+        {
+            short destError = 0;
+            string errorMsg = "";
+            targets = null;
+            targetsChanged = false;
+            if (IsInEmptyingMode)
+            {
+                var extraDest = ExtraDisTargetComp;
+                if (extraDest != null)
+                    targets = new Guid[] { extraDest.ComponentClass.ACClassID };
+            }
+            if (targets == null)
+                targets = pwMethod?.GetCachedDestinationsForDN(false/*addedModules.Any()*/, out destError, out errorMsg);
+            if (targets == null || !targets.Any())
+            {
+                if (destError == -1)
+                {
+                    Msg msg = new Msg(errorMsg, this, eMsgLevel.Error, PWClassName, "ProcessModuleList", 1050);
+                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                }
+                else if (destError == 1)
+                {
+                    // Error50150: Batchplan is empty.
+                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1060, "Error50150");
+                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                }
+                else if (destError == 2)
+                {
+                    // Error00126: No route found to planned destination
+                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(3)", 1070, "Error00126");
+                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                }
+                return null;
+            }
+
+            // Performance-Optimization:
+            // If targets changed, then recalculate routebale PM List
+            targetsChanged = PWMethodTransportBase.AreCachedDestinationsDifferent(LastTargets, targets);
+            if (!  targetsChanged
+                && LastCalculatedRouteablePMList != null
+                && (removedModules == null || !removedModules.Any())
+                && (addedModules == null || !addedModules.Any()))
+                return LastCalculatedRouteablePMList.ToList();
+            return null;
+        }
+
+        protected virtual List<PAProcessModule> HandleModuleListForDNote(PWMethodIntake pwMethod, DatabaseApp dbApp, Database db, DeliveryNotePos notePos, List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules)
+        {
+            Guid[] targets;
+            bool targetsChanged = false;
+            List<PAProcessModule> lastRoutes = GetCachedModulesForDNoteIfWaiting(pwMethod, modulesInAutomaticMode, removedModules, addedModules, out targetsChanged, out targets);
+            if (targets == null || !targets.Any())
+            {
+                LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+                return LastCalculatedRouteablePMList.ToList();
+            }
+            if (lastRoutes != null && !targetsChanged)
+                return lastRoutes;
+
+            LastCalculatedRouteablePMList = new SafeList<PAProcessModule>();
+            LastTargets = targets;
+
+            Type typeOfSilo = typeof(PAMSilo);
+            Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+            IList<gip.core.datamodel.ACClass> selectedModules = pwMethod.ACFacilityManager.GetSelectedModulesAsACClass(notePos, db);
+
+            Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = db,
+                AttachRouteItemsToContext = false,
+                SelectionRuleID = SelRuleID_ReachableDest,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                                    && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                        || !c.BasedOnACClassID.HasValue
+                                                        || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
+
+            foreach (var module in modulesInAutomaticMode)
+            {
+                if (!LastCalculatedRouteablePMList.Contains(module)
+                    && selectedModules.Where(c => c.ACClassID == module.ComponentClass.ACClassID).Any())
+                {
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
+                    if (rResult.Routes != null && rResult.Routes.Any())
+                        LastCalculatedRouteablePMList.Add(module);
+                }
+            }
+            if (!LastCalculatedRouteablePMList.Any())
+            {
+                // Error00126: No route found to planned destination
+                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(1)", 1080, "Error00126");
+                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+            }
+            return LastCalculatedRouteablePMList.ToList();
+        }
+
+        protected virtual List<PAProcessModule> HandleModuleListForBooking(DatabaseApp dbApp, Database db, FacilityBooking fBooking, List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules)
+        {
+            if (!String.IsNullOrEmpty(fBooking.PropertyACUrl))
+            {
+                var querySource = modulesInAutomaticMode.Where(c => c.GetACUrl() == fBooking.PropertyACUrl);
+                if (querySource.Any())
+                    return querySource.ToList();
+            }
+            if (fBooking.OutwardFacility != null && fBooking.OutwardFacility.VBiFacilityACClassID.HasValue)
+            {
+                var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacility.VBiFacilityACClassID.Value);
+                if (querySource.Any())
+                    return querySource.ToList();
+            }
+            if (fBooking.OutwardFacilityCharge != null && fBooking.OutwardFacilityCharge.Facility != null && fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.HasValue)
+            {
+                var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.Value);
+                if (querySource.Any())
+                    return querySource.ToList();
             }
             return null;
         }
@@ -970,8 +1096,9 @@ namespace gip.mes.processapplication
             base.Reset();
             LastModulesInAutomaticMode = null;
             LastTargets = null;
-            _LastCalculatedRouteablePMList = null;
+            LastCalculatedRouteablePMList = null;
             _SkipGroup = null;
+            ResetRoutingCheckWait();
         }
 
         protected override bool OnHandleAvailableProcessModule(PAProcessModule processModule)

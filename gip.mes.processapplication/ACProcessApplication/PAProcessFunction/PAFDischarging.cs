@@ -318,7 +318,7 @@ namespace gip.mes.processapplication
 
                     if (IsSimulationOn)
                     {
-                        if (prevR != null)
+                        if (prevR != null && acMethod != previousParams)
                             PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
                         PAEControlModuleBase.ActivateRouteOnSimulation(newR, false);
                     }
@@ -384,29 +384,30 @@ namespace gip.mes.processapplication
                         acMethod.ResultValueList["ActualQuantity"] = actualQuantity;
                     }
                 }
-                ACValue value = acMethod.ParameterValueList.GetACValue("Route");
-                if (value != null)
+                if (CurrentACState >= ACStateEnum.SMCompleted)
                 {
-                    using (var db = new Database())
+                    ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+                    if (value != null)
                     {
-                        core.datamodel.Route route = value.ValueT<core.datamodel.Route>().Clone() as core.datamodel.Route;
-                        try
+                        using (var db = new Database())
                         {
-                            route.AttachTo(db); // Global context
-                            PAEControlModuleBase.ActivateRouteOnSimulation(route, true);
+                            core.datamodel.Route route = value.ValueT<core.datamodel.Route>().Clone() as core.datamodel.Route;
+                            try
+                            {
+                                route.AttachTo(db); // Global context
+                                PAEControlModuleBase.ActivateRouteOnSimulation(route, true);
 
-                        }
-                        catch (Exception e)
-                        {
-                            Messages.LogException(this.GetACUrl(), "AnalyzeACMethodResult(20)", e);
-                        }
-                        finally
-                        {
-                            route.Detach(true);
+                            }
+                            catch (Exception e)
+                            {
+                                Messages.LogException(this.GetACUrl(), "AnalyzeACMethodResult(20)", e);
+                            }
+                            finally
+                            {
+                                route.Detach(true);
+                            }
                         }
                     }
-
-
                 }
             }
 
