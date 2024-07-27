@@ -14,6 +14,13 @@ namespace gip.mes.facility
         public static string[] OriginalValueNames = new string[] { nameof(TotalReservedQuantity), nameof(FreeQuantity) };
         #endregion
 
+        #region ctor's
+        public FacilityReservationModel()
+        {
+
+        }
+        #endregion
+
         #region Material & Lot
 
         [ACPropertyInfo(1, "", ConstApp.Material)]

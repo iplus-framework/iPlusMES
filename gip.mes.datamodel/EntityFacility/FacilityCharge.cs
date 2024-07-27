@@ -721,10 +721,15 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (!_relatedCompanyLoaded)
+                if (!_relatedCompanyLoaded && Material != null)
                 {
                     _relatedCompanyLoaded = true;
-                    _RelatedCompany = Material.CompanyMaterial_Material.OrderByDescending(c => c.InsertDate).Select(c => c.Company).FirstOrDefault();
+                    _RelatedCompany = 
+                        Material
+                        .CompanyMaterial_Material
+                        .OrderByDescending(c => c.InsertDate)
+                        .Select(c => c.Company)
+                        .FirstOrDefault();
                 }
                 return _RelatedCompany;
             }

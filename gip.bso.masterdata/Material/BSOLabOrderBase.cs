@@ -119,9 +119,11 @@ namespace gip.bso.masterdata
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
+                        if(navACQueryDefinition.TakeCount == 0)
+                        {
+                            // dp something
+                        }
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = NavigationQueryTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                         _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>(LabOrder.ClassName, this);
                         _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
@@ -191,14 +193,6 @@ namespace gip.bso.masterdata
             get
             {
                 return GlobalApp.LabOrderType.Order;
-            }
-        }
-
-        public virtual int NavigationQueryTakeCount
-        {
-            get
-            {
-                return ACQueryDefinition.C_DefaultTakeCount;
             }
         }
 

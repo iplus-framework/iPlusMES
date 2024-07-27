@@ -114,8 +114,6 @@ namespace gip.bso.masterdata
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         _AccessAssociatedPartslistPos = navACQueryDefinition.NewAccessNav<Material>(Material.ClassName, this);
                         _AccessAssociatedPartslistPos.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);

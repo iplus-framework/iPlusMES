@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.facility
 {
@@ -506,8 +507,6 @@ namespace gip.bso.facility
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter, true, true);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<FacilityCharge>(FacilityCharge.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
@@ -627,10 +626,31 @@ namespace gip.bso.facility
                     OnPropertyChanged(nameof(ContractualPartnerList));
                     OnPropertyChanged(nameof(StorageUnitTestList));
                     OnPropertyChanged(nameof(CurrentFacilityLot));
+                    CorrectCurrentFacilityChargeFacilityList();
                     ClearBookingData();
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private void CorrectCurrentFacilityChargeFacilityList()
+        {
+            AccessQuantFacilityFilter.NavSearch();
+
+            if (CurrentFacilityCharge != null && CurrentFacilityCharge.Facility != null && !AccessQuantFacilityFilter.NavList.Contains(CurrentFacilityCharge.Facility))
+            {
+                AccessQuantFacilityFilter.NavList.Add(CurrentFacilityCharge.Facility);
+
+            }
+            if (CurrentFacilityCharge != null)
+            {
+                SelectedQuantFacilityFilter = CurrentFacilityCharge.Facility;
+            }
+            else
+            {
+                SelectedQuantFacilityFilter = null;
+            }
+            OnPropertyChanged(nameof(QuantFacilityFilterList));
         }
 
         public virtual void CurrentFacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -839,6 +859,113 @@ namespace gip.bso.facility
             set
             {
                 _ReassignemntMaterials = value;
+            }
+        }
+
+        #endregion
+
+        #region AccessNav -> QuantFacilityFilter 
+
+        public const string QuantFacilityFilter = "QuantFacilityFilter";
+
+        ACAccess<Facility> _AccessQuantFacilityFilter;
+        [ACPropertyAccess(9999, nameof(QuantFacilityFilter))]
+        public ACAccess<Facility> AccessQuantFacilityFilter
+        {
+            get
+            {
+                if (_AccessQuantFacilityFilter == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Facility.ClassName, ACType.ACIdentifier);
+
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(QuantFacilityFilterDefaultSort);
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(QuantFacilityFilterDefaultFilter);
+
+                        foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
+                        {
+                            aCFilterItem.PropertyChanged += QuantFacilityFilterDefaultSort_PropertyChanged;
+                        }
+                    }
+
+                    _AccessQuantFacilityFilter = navACQueryDefinition.NewAccessNav<Facility>(nameof(QuantFacilityFilter), this);
+                }
+                return _AccessQuantFacilityFilter;
+            }
+        }
+
+        public virtual List<ACFilterItem> QuantFacilityFilterDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.equal, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.StorageBin).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.StorageBinContainer).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.PreparationBin).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                };
+            }
+        }
+
+        public virtual List<ACSortItem> QuantFacilityFilterDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortPickingNo = new ACSortItem("FacilityNo", SortDirections.ascending, true);
+                acSortItems.Add(acSortPickingNo);
+
+                return acSortItems;
+            }
+        }
+
+        public virtual void QuantFacilityFilterDefaultSort_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ACFilterItem aCFilterItem = sender as ACFilterItem;
+
+        }
+
+        [ACPropertyInfo(9999, nameof(QuantFacilityFilter))]
+        public IEnumerable<Facility> QuantFacilityFilterList
+        {
+            get
+            {
+                return AccessQuantFacilityFilter.NavList;
+            }
+        }
+
+        private Facility _SelectedQuantFacilityFilter;
+        [ACPropertySelected(9999, nameof(QuantFacilityFilter), ConstApp.FacilityNo)]
+        public Facility SelectedQuantFacilityFilter
+        {
+            get
+            {
+                return _SelectedQuantFacilityFilter;
+            }
+            set
+            {
+                if (_SelectedQuantFacilityFilter != value)
+                {
+                    _SelectedQuantFacilityFilter = value;
+                    if (
+                        CurrentFacilityCharge != null
+                        &&
+                            (
+                               (CurrentFacilityCharge.Facility == null && value != null)
+                               || (CurrentFacilityCharge.Facility != null && CurrentFacilityCharge.Facility != value)
+                            )
+                        )
+                    {
+                        CurrentFacilityCharge.Facility = value;
+                    }
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -1142,6 +1269,7 @@ namespace gip.bso.facility
                 case "CurrentFacilityCharge\\Material":
                 case "CurrentFacilityCharge\\Facility":
                 case "CurrentFacilityCharge\\SplitNo":
+                case nameof(SelectedQuantFacilityFilter):
                     if (CurrentFacilityCharge == null || CurrentFacilityCharge.EntityState != System.Data.EntityState.Added)
                         return Global.ControlModes.Disabled;
                     break;

@@ -1009,8 +1009,6 @@ namespace gip.bso.manufacturing
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<ProdOrder>(ProdOrder.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
@@ -4872,7 +4870,7 @@ namespace gip.bso.manufacturing
                 .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
                 .OrderBy(c => c.ExpirationDate)
                 .ThenBy(c => c.FillingDate)
-                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .Take(Root.Environment.AccessDefaultTakeCount)
                 .ToList();
         }
 

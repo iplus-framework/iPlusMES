@@ -774,8 +774,6 @@ namespace gip.bso.logistics
                     ACQueryDefinition acQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + CompanyAddress.ClassName, ACType.ACIdentifier);
 
                     acQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterDeliveryAddressDefaultSort);
-                    if (acQueryDefinition.TakeCount == 0)
-                        acQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     acQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterDeliveryAddressDefaultFilter);
 
                     _AccessFilterDeliveryAddress = acQueryDefinition.NewAccessNav<CompanyAddress>("FilterDeliveryAddress", this);
@@ -855,8 +853,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -910,8 +906,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -1003,8 +997,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -2204,7 +2196,7 @@ namespace gip.bso.logistics
                 .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
                 .OrderBy(c => c.ExpirationDate)
                 .ThenBy(c => c.FillingDate)
-                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .Take(Root.Environment.AccessDefaultTakeCount)
                 .ToList();
         }
 
