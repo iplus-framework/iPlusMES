@@ -2029,6 +2029,18 @@ namespace gip.mes.facility
 
             // Ermittle Schichten im Silo
             List<FacilityCharge> cellChargeList = s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).ToList();
+            if (BP.CreatedPostings != null && BP.CreatedPostings.Any())
+            {
+                foreach (FacilityCharge modifiedFC in BP.CreatedPostings.Where(c => c.InwardFacilityCharge != null || c.OutwardFacilityCharge != null)
+                                                                        .Select(c => c.InwardFacilityCharge != null ? c.InwardFacilityCharge : c.OutwardFacilityCharge))
+                {
+                    if (!modifiedFC.NotAvailable && !cellChargeList.Contains(modifiedFC))
+                        cellChargeList.Add(modifiedFC);
+                    else if (modifiedFC.NotAvailable && cellChargeList.Contains(modifiedFC))
+                        cellChargeList.Remove(modifiedFC);
+                }
+            }
+
             if (cellChargeList.Count == 0)
             {
                 if (BP.InwardFacilityCharge != null && !BP.InwardFacilityCharge.NotAvailable)
