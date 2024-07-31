@@ -340,18 +340,22 @@ namespace gip.mes.processapplication
             }
         }
 
-        public bool IsFillingRequested
+        public virtual bool IsFillingRequested
         {
             get
             {
-                if (MatSensorFilling == null
-                    || MatSensorFilling.SensorState == null)
-                    return false;
-                if (InvertMatSensorValue)
-                    return MatSensorFilling.SensorState.ValueT == PANotifyState.Off;
-                else
-                    return MatSensorFilling.SensorState.ValueT != PANotifyState.Off;
+                return GetFillingRequested(MatSensorFilling);
             }
+        }
+
+        protected bool GetFillingRequested(PAESensorDigital pAESensorDigital)
+        {
+            if (pAESensorDigital == null || pAESensorDigital.SensorState == null)
+                return false;
+            if (InvertMatSensorValue)
+                return pAESensorDigital.SensorState.ValueT == PANotifyState.Off;
+            else
+                return pAESensorDigital.SensorState.ValueT != PANotifyState.Off;
         }
 
         private bool _MatSensorEmtpyChecked = false;
