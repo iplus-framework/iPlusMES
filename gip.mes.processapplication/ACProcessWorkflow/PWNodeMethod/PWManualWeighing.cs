@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Vml.Office;
 using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.processapplication;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
@@ -1551,12 +1552,21 @@ namespace gip.mes.processapplication
 
             if (facilityCharge.HasValue)
             {
+                bool changeOnPAF = false;
                 if (FreeSelectionMode)
                 {
                     CurrentOpenMaterial = prodOrderPartslistPosRelation;
+                    changeOnPAF = true;
+
+                    PAFManualWeighing manWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+                    if (manWeighing != null)
+                    {
+                        ACMethod acMethod = manWeighing.CurrentACMethod.ValueT;
+                        InitializePAFACMethod(acMethod, facilityCharge);
+                    }
                 }
 
-                Msg msg = SetFacilityCharge(facilityCharge, prodOrderPartslistPosRelation, forceSetFC_F);
+                Msg msg = SetFacilityCharge(facilityCharge, prodOrderPartslistPosRelation, forceSetFC_F, changeOnPAF);
 
                 if (msg != null)
                 {
@@ -3069,6 +3079,8 @@ namespace gip.mes.processapplication
                 else if (weighingComponent.PickingPosition != null)
                     acMethod["PLPosRelation"] = weighingComponent.PickingPosition.PickingPosID;
 
+
+
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
 
                 if (currentFacilityCharge.HasValue)
@@ -3084,7 +3096,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        private Msg InitializePAFACMethod(ACMethod acMethod, Guid? currentFacilityCharge)
+        protected virtual Msg InitializePAFACMethod(ACMethod acMethod, Guid? currentFacilityCharge)
         {
             using (DatabaseApp dbApp = new DatabaseApp())
             {
@@ -3092,7 +3104,7 @@ namespace gip.mes.processapplication
 
                 if (currentFacilityCharge.HasValue)
                 {
-                    FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge);
+                    FacilityCharge fc = dbApp.FacilityCharge.Include(c => c.Facility).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge);
                     if (fc == null)
                     {
                         //Error50376: The quant {0} doesn't exist in the database!
