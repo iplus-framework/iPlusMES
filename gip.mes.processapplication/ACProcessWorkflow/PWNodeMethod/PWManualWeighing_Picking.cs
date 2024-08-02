@@ -844,15 +844,7 @@ namespace gip.mes.processapplication
                             bool canExecutePosting = CanExecutePosting(null, pickingPos);
                             if (canExecutePosting)
                             {
-                                facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, null, actualQuantity);
-                                bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                                bookingParam.OutwardQuantity = (double)actualQuantity;
-                                bookingParam.OutwardFacility = facility;
-                                bookingParam.OutwardFacilityCharge = facilityCharge;
-                                bookingParam.SetCompleted = isConsumedLot;
-                                if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-                                    bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-                                msg = dbApp.ACSaveChangesWithRetry();
+                                msg = DoManualWeighingPickingPreBooking(facilityPreBooking, dbApp, pickingPos, actualQuantity, bookingParam, facility, facilityCharge, isConsumedLot,collectedMessages);
                             }
 
                             if (msg != null)
@@ -978,6 +970,21 @@ namespace gip.mes.processapplication
         public virtual bool CanExecutePosting(ACMethodBooking bookingParam, PickingPos pickingPos)
         {
             return true;
+        }
+
+        public virtual Msg DoManualWeighingPickingPreBooking(FacilityPreBooking facilityPreBooking, DatabaseApp dbApp, PickingPos pickingPos, double actualQuantity,
+                                                              ACMethodBooking bookingParam, Facility facility, FacilityCharge facilityCharge, bool isConsumedLot,
+                                                              MsgWithDetails collectedMessages)
+        {
+            facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, null, actualQuantity);
+            bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+            bookingParam.OutwardQuantity = (double)actualQuantity;
+            bookingParam.OutwardFacility = facility;
+            bookingParam.OutwardFacilityCharge = facilityCharge;
+            bookingParam.SetCompleted = isConsumedLot;
+            if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+            return dbApp.ACSaveChangesWithRetry();
         }
     }
 }
