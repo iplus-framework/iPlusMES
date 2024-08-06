@@ -4774,6 +4774,12 @@ namespace gip.mes.processapplication
                 case nameof(GetReworkStatus):
                     result = GetReworkStatus();
                     return true;
+                case nameof(InterdischargingStart):
+                    result = InterdischargingStart();
+                    return true;
+                case nameof(CompleteInterdischarging):
+                    CompleteInterdischarging();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
