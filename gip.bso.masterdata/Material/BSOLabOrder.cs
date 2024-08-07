@@ -765,7 +765,8 @@ namespace gip.bso.masterdata
         /// <param name="outOrderPos">The out order position.The out order position.</param>
         /// <param name="prodOrderPartslistPos">The production order partslist positionThe production order partslist position</param>
         /// <param name="facilityLot">The facility lot.The facility lot.</param>
-        /// <returns>The result in <see cref="VBDialogResult" /> object</returns>
+        /// <param name="pickingPos">Picking line</param>
+        /// /// <returns>The result in <see cref="VBDialogResult" /> object</returns>
         [ACMethodInfo("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 701)]
         public VBDialogResult NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos)
         {

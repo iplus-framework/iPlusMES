@@ -540,6 +540,24 @@ namespace gip.bso.logistics
             }
         }
 
+        [ACPropertyInfo(59, "", "en{'ExtString10'}de{'ExtString10'}")]
+        public virtual string ExtString10
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        [ACPropertyInfo(60, "", "en{'ExtString11'}de{'ExtString11'}")]
+        public virtual string ExtString11
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         [ACPropertyInfo(60, "", "en{'ExtDouble1'}de{'ExtDouble1'}")]
         public virtual double? ExtDouble1
         {

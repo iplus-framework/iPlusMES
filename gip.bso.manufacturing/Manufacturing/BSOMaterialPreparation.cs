@@ -546,7 +546,7 @@ namespace gip.bso.manufacturing
             return SelectedPickingPos != null && SelectedPreparedMaterial != null; ;
         }
 
-        [ACMethodInteraction("", "en{'Show picking'}de{'Kommission öffnen'}", 901, true, nameof(SelectedPicking))]
+        [ACMethodInteraction("", "en{'Show picking'}de{'Kommission öffnen'}", 781, true, nameof(SelectedPicking))]
         public void ShowPicking()
         {
             if (!IsEnabledShowPicking())

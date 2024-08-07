@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:gip.mes.client.mobile"
     xmlns:vb="clr-namespace:gip.core.layoutengine;assembly=gip.core.layoutengine"
     xmlns:dm="clr-namespace:gip.core.datamodel;assembly=gip.core.datamodel"
-    Title="VarioBatch" Height="800" Width="480" MaxHeight="2560" MaxWidth="1440" MinHeight="800" MinWidth="480" Loaded="Window_Loaded" Closing="Window_Closing" Icon="/gip.mes.client.mobile;component/Images/iPlusIconDesktop.ico" WindowState="Normal">
+    Title="iPlus" Height="800" Width="480" MaxHeight="2560" MaxWidth="1440" MinHeight="800" MinWidth="480" Loaded="Window_Loaded" Closing="Window_Closing" Icon="/gip.mes.client.mobile;component/Images/iPlusIconDesktop.ico" WindowState="Normal">
     <Window.Resources>
         <ResourceDictionary>
         </ResourceDictionary>
@@ -34,7 +34,7 @@
                 </vb:VBStatusBarItem>
 
                 <vb:VBStatusBarItem Grid.Column="1" HorizontalAlignment="Center">
-                    <vb:VBTextBlock x:Name="Title" FontSize="25" HorizontalAlignment="Center" TextAlignment="Center"></vb:VBTextBlock>
+                    <vb:VBTextBlock x:Name="TitleHeader" FontSize="25" HorizontalAlignment="Center" TextAlignment="Center"></vb:VBTextBlock>
                 </vb:VBStatusBarItem>
 
                 <Grid Grid.Column="2" HorizontalAlignment="Right">

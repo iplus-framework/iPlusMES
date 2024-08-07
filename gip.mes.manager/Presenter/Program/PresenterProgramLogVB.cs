@@ -91,7 +91,7 @@ namespace gip.mes.manager
             }
         }
 
-        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 901, true, "CurrentProgramLogWrapper")]
+        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 781, true, "CurrentProgramLogWrapper")]
         public void ShowOrder()
         {
             if (CurrentProgramLogWrapper != null)

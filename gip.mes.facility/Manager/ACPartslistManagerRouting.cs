@@ -1045,8 +1045,8 @@ namespace gip.mes.facility
                         && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
                         && c.ProdOrderPartslistPos.ProdOrderPartslistID == posSourceProdOrderPartslistID
                   )
-            .Select(c => c.InwardFacilityLot)
-            .SelectMany(c => c.FacilityBookingCharge_InwardFacilityLot)
+            //.Select(c => c.InwardFacilityLot)
+            //.SelectMany(c => c.FacilityBookingCharge_InwardFacilityLot)
             .Where(c =>
                         c.InwardFacilityID.HasValue
                         && (
@@ -1446,8 +1446,8 @@ namespace gip.mes.facility
                         && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
                         && c.ProdOrderPartslistPos.ProdOrderPartslistID == posSourceProdOrderPartslistID
                   )
-            .Select(c => c.InwardFacilityLot)
-            .SelectMany(c => c.FacilityBookingCharge_InwardFacilityLot)
+             //.Select(c => c.InwardFacilityLot)
+             //.SelectMany(c => c.FacilityBookingCharge_InwardFacilityLot)
             .Where(c =>
                         c.InwardFacilityID.HasValue
                         && (
@@ -1491,10 +1491,15 @@ namespace gip.mes.facility
             try
             {
                 ProdOrderPartslistPos pos = relation.SourceProdOrderPartslistPos;
-
-
                 if (!searchForAlternativeMaterials)
                 {
+//#if DEBUG
+//                    if (System.Diagnostics.Debugger.IsAttached)
+//                    {
+//                        string strQuery = ((System.Data.Objects.ObjectQuery)s_cQry_SilosFromLotsOfPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer)).ToTraceString();
+//                        this.Messages.LogDebug(this.GetACUrl(), "Query", strQuery);
+//                    }
+//#endif
                     return new QrySilosResult(s_cQry_SilosFromLotsOfPrevStage(ctx, pos.MaterialID, pos.Material.ProductionMaterialID != null ? pos.Material.ProductionMaterialID : pos.Material.MaterialID, pos.SourceProdOrderPartslistID, checkOutwardEnabled, onlyContainer).ToArray());
                 }
                 else if (pos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())

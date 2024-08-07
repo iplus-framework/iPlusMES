@@ -3022,15 +3022,15 @@ namespace gip.mes.facility
                     && ParamsAdjusted.OutwardFacility.MDFacilityType != null
                     && ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.OutwardFacility.Material == null
-                    && ParamsAdjusted.OutwardFacility.FacilityCharge_Facility.Any())
+                    && ParamsAdjusted.OutwardFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).Any())
                 {
-                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacility.FacilityCharge_Facility.First().Material;
+                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutwardFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).FirstOrDefault()?.Material;
                 }
                 if (ParamsAdjusted.InwardFacility != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.InwardFacility.Material == null
-                    && ParamsAdjusted.InwardFacility.FacilityCharge_Facility.Any())
+                    && ParamsAdjusted.InwardFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).Any())
                 {
                     ParamsAdjusted.InwardMaterial = ParamsAdjusted.OutwardMaterial;
                 }

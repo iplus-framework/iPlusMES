@@ -153,6 +153,21 @@ namespace gip.bso.facility
             }
         }
 
+        [ACPropertyInfo(999, nameof(FilterExternLotNo2), ConstApp.ExternLotNo2)]
+        public string FilterExternLotNo2
+        {
+            get
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(nameof(FacilityLot.ExternLotNo2));
+                return string.IsNullOrEmpty(tmp) ? null : tmp;
+            }
+            set
+            {
+                AccessPrimary.NavACQueryDefinition.SetSearchValue(nameof(FacilityLot.ExternLotNo2), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #endregion
@@ -197,6 +212,7 @@ namespace gip.bso.facility
                 {
                     new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.LotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true, true),
                     new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.ExternLotNo), Global.LogicalOperators.contains, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityLot.ExternLotNo2), Global.LogicalOperators.contains, Global.Operators.and, null, true),
                     new ACFilterItem(Global.FilterTypes.filter, $"{nameof(Material)}\\{nameof(Material.MaterialNo)}", Global.LogicalOperators.contains, Global.Operators.and, null, true)
                 };
             }
@@ -258,7 +274,6 @@ namespace gip.bso.facility
         }
 
         private List<FacilityLot> _FacilityLotList;
-
         /// <summary>
         /// Gets the facility lot list.
         /// </summary>
@@ -558,6 +573,29 @@ namespace gip.bso.facility
         }
         #endregion
 
+        #region Navigation
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 781, true, nameof(SelectedFacilityLot))]
+        public void NavigateToFacilityLotOverview()
+        {
+            if (!IsEnabledNavigateToFacilityLotOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityLot.FacilityLotID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityLotOverview()
+        {
+            if (SelectedFacilityLot != null)
+                return true;
+            return false;
+        }
+        #endregion
 
         #endregion
 
@@ -640,56 +678,62 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "ShowDialogNewLot":
+                case nameof(ShowDialogNewLot):
                     result = ShowDialogNewLot(acParameter.Count() == 1 ? (string)acParameter[0] : "", acParameter.Count() == 2 ? (Material)acParameter[1] : null);
                     return true;
-                case "ShowDialogOrder":
+                case nameof(ShowDialogOrder):
                     ShowDialogOrder((String)acParameter[0]);
                     return true;
-                case "ShowDialogOrderInfo":
+                case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "OnActivate":
+                case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
+                    return true;
+                case nameof(NavigateToFacilityLotOverview):
+                    NavigateToFacilityLotOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    result = IsEnabledNavigateToFacilityLotOverview();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -700,7 +744,8 @@ namespace gip.bso.facility
             base.OnPropertyChanged(name);
             if (name == nameof(FilterMaterialNo)
                 || name == nameof(FilterLotNo)
-                || name == nameof(FilterExternLotNo))
+                || name == nameof(FilterExternLotNo)
+                || name == nameof(FilterExternLotNo2))
             {
                 Search();
             }

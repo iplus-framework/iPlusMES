@@ -360,7 +360,8 @@ namespace gip.bso.facility
             {
                 query.Include(c => c.FacilityStock_Facility)
                         .Include(c => c.Material)
-                        .Include(c => c.FacilityCharge_Facility);
+                        .Include(c => c.Partslist)
+                        .Include(c => c.MDFacilityType);
             }
             return result;
         }
@@ -558,9 +559,7 @@ namespace gip.bso.facility
                 if (value != null)
                     value.PropertyChanged += CurrentFacility_PropertyChanged;
 
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(FacilityLotList));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
 
                 if (FacilityChargeList != null)
                 {
@@ -648,6 +647,7 @@ namespace gip.bso.facility
             }
         }
 
+        IEnumerable<FacilityCharge> _FacilityChargeList;
         /// <summary>
         /// Gets the facility charge list.
         /// </summary>
@@ -657,11 +657,21 @@ namespace gip.bso.facility
         {
             get
             {
+                if (_FacilityChargeList != null)
+                    return _FacilityChargeList;
                 if (CurrentFacility == null)
                     return null;
-                CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
-                return CurrentFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).OrderBy(c => c.FacilityChargeSortNo).ToList();
+                //CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
+                _FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).ToArray();
+                return _FacilityChargeList;
             }
+        }
+
+        private void RefreshFacilityChargeList()
+        {
+            OnPropertyChanged(nameof(CurrentFacility));
+            _FacilityChargeList = null;
+            OnPropertyChanged(nameof(FacilityChargeList));
         }
 
         /// <summary>
@@ -825,7 +835,7 @@ namespace gip.bso.facility
                         DatabaseApp.Facility
                                     .Include(c => c.FacilityStock_Facility)
                                     .Include(c => c.Material)
-                                    .Include(c => c.FacilityCharge_Facility)
+                                    .Include(c => c.MDFacilityType)
                         .Where(c => c.FacilityID == SelectedFacility.FacilityID));
             if (CurrentFacility != null && CurrentFacility.CurrentFacilityStock != null)
                 CurrentFacility.CurrentFacilityStock.AutoRefresh(DatabaseApp);
@@ -1141,8 +1151,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
 
             return true;
@@ -1211,8 +1220,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1511,8 +1519,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             return true;
         }
@@ -1678,8 +1685,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("LockFacility");
         }
@@ -1726,8 +1732,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("LockFacilityAbsolute");
         }
@@ -1775,8 +1780,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("ReleaseFacility");
         }
@@ -1824,8 +1828,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("ReleaseFacilityAbsolute");
         }
@@ -1874,8 +1877,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1929,8 +1931,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -2040,8 +2041,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -2079,8 +2079,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -2159,37 +2158,50 @@ namespace gip.bso.facility
             DialogResult = false;
             CloseTopDialog();
         }
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            PAOrderInfoEntry entityInfo = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Facility)).FirstOrDefault();
+            if (entityInfo == null)
+                return;
+
+            Facility facility = this.DatabaseApp.Facility.Where(c => c.FacilityID == entityInfo.EntityID).FirstOrDefault();
+            if (facility == null)
+                return;
+
+            ShowDialogFacility(facility.FacilityNo);
+        }
         #endregion
 
-        #region ShowFacilityLotForQuant
+        #region Dialog Navigate
 
-        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 903, true, nameof(SelectedFacilityCharge))]
-        public void ShowFacilityLotForQuant()
+        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 780, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToOrder()
         {
-            if (!IsEnabledShowFacilityLotForQuant())
+            if (!IsEnabledNavigateToOrder())
                 return;
 
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
             if (service != null)
             {
                 PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslistPos), SelectedFacilityCharge.FinalPositionFromFbc.ProdOrderPartslistPosID));
                 service.ShowDialogOrder(this, info);
             }
         }
 
-        public bool IsEnabledShowFacilityLotForQuant()
+        public bool IsEnabledNavigateToOrder()
         {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FinalPositionFromFbc != null)
                 return true;
             return false;
         }
 
-        #endregion
-
-        #region Navigation BSOFaciltiyBookCharge
-
-        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Navigate to quant'}de{'Zum Quant navigieren'}", 603, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
         public void NavigateToFacilityCharge()
         {
             if (!IsEnabledNavigateToFacilityCharge())
@@ -2220,6 +2232,93 @@ namespace gip.bso.facility
         }
 
 
+        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacility))]
+        public void NavigateToFacilityOverview()
+        {
+            if (!IsEnabledNavigateToFacilityOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacility.FacilityID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityOverview()
+        {
+            if (SelectedFacility != null && SelectedFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                return true;
+            return false;
+        }
+
+        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 783, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityLot()
+        {
+            if (!IsEnabledNavigateToFacilityLot())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityLot()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityLotOverview()
+        {
+            if (!IsEnabledNavigateToFacilityLotOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityLotOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 785, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToMaterialOverview()
+        {
+            if (!IsEnabledNavigateToMaterialOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToMaterialOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Material != null)
+                return true;
+            return false;
+        }
         #endregion
 
         #endregion
@@ -2462,6 +2561,45 @@ namespace gip.bso.facility
                     return true;
                 case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
+                    return true;
+                case nameof(NavigateToFacilityLot):
+                    NavigateToFacilityLot();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLot):
+                    result = IsEnabledNavigateToFacilityLot();
+                    return true;
+                case nameof(NavigateToFacilityLotOverview):
+                    NavigateToFacilityLotOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    result = IsEnabledNavigateToFacilityLotOverview();
+                    return true;
+                case nameof(NavigateToFacilityCharge):
+                    NavigateToFacilityCharge();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityCharge):
+                    result = IsEnabledNavigateToFacilityCharge();
+                    return true;
+                case nameof(NavigateToFacilityOverview):
+                    NavigateToFacilityOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    result = IsEnabledNavigateToFacilityOverview();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(NavigateToMaterialOverview):
+                    NavigateToMaterialOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    result = IsEnabledNavigateToMaterialOverview();
+                    return true;
+                case nameof(NavigateToOrder):
+                    NavigateToOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToOrder):
+                    result = IsEnabledNavigateToOrder();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

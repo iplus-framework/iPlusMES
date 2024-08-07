@@ -353,6 +353,7 @@ namespace gip.mes.facility
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => c.FacilityID == facID && (!showNotAvailable.HasValue || c.NotAvailable == showNotAvailable.Value))
+                .OrderBy(c => c.FacilityChargeSortNo)
         );
 
         public IEnumerable<FacilityChargeSumFacilityHelper> GetFacilityChargeSumFacilityHelperList(IEnumerable<FacilityCharge> facilityChargeList, FacilityQueryFilter bookingFilter)

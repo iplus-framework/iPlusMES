@@ -1629,6 +1629,69 @@ namespace gip.bso.masterdata
         }
         #endregion
 
+        #region Show Dialog
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            PAOrderInfoEntry entityInfo = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Material)).FirstOrDefault();
+            if (entityInfo == null)
+                return;
+
+            Material material = this.DatabaseApp.Material.Where(c => c.MaterialID == entityInfo.EntityID).FirstOrDefault();
+            if (material == null)
+                return;
+
+            ShowDialogMaterial(material.MaterialNo);
+        }
+
+        [ACMethodInfo("Dialog", "en{'Dialog Material'}de{'Dialog Material'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogMaterial(string materialNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "MaterialNo").FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, nameof(Facility.FacilityNo), Global.LogicalOperators.contains, Global.Operators.and, materialNo, false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = materialNo;
+
+            this.Search();
+            ShowDialog(this, "OrderInfoDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+        #endregion
+
+        #region Navigation
+        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 783, true, nameof(SelectedMaterial))]
+        public void NavigateToMaterialOverview()
+        {
+            if (!IsEnabledNavigateToMaterialOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedMaterial.MaterialID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToMaterialOverview()
+        {
+            if (SelectedMaterial != null)
+                return true;
+            return false;
+        }
+        #endregion
+
         #endregion
 
         #region Translation
@@ -2487,6 +2550,18 @@ namespace gip.bso.masterdata
                     return true;
                 case nameof(IsEnabledReplaceMaterial):
                     result = IsEnabledReplaceMaterial();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(ShowDialogMaterial):
+                    ShowDialogMaterial((String)acParameter[0]);
+                    return true;
+                case nameof(NavigateToMaterialOverview):
+                    NavigateToMaterialOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    result = IsEnabledNavigateToMaterialOverview();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
