@@ -3772,13 +3772,34 @@ namespace gip.mes.processapplication
 
                         if (!isForInterdischarge && (!tQuantityFromPAF.HasValue || _IsLotChanged))
                         {
-                            double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
-                            if (tQuantityFromPAF.HasValue && calcActualQuantity > 0.00001)
+                            double postedQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
+                            double calcActualQuantity = actualQuantity - postedQuantity;
+
+                            if (calcActualQuantity < double.Epsilon)
                             {
-                                calcActualQuantity = tQuantityFromPAF.Value + weighingPosRelation.RemainingDosingQuantityUOM;
+                                if (tQuantityFromPAF.HasValue)
+                                {
+                                    postedQuantity = tQuantityFromPAF.Value + weighingPosRelation.RemainingDosingQuantityUOM;
+                                    calcActualQuantity = actualQuantity - postedQuantity;
+                                }
+                                else
+                                {
+                                    ACMethod currentACMethod = CurrentACMethod.ValueT;
+                                    var targetQ = currentACMethod?.ParameterValueList.GetACValue("TargetQuantity");
+                                    double targetWeight = 0;
+                                    if (targetQ != null)
+                                        targetWeight = targetQ.ParamAsDouble;
+
+                                    if (targetWeight > double.Epsilon)
+                                    {
+                                        postedQuantity = targetWeight + weighingPosRelation.RemainingDosingQuantityUOM;
+                                        calcActualQuantity = actualQuantity - postedQuantity;
+                                    }
+                                }
                             }
-                            if (actualQuantity > calcActualQuantity)
-                                actualQuantity = actualQuantity - calcActualQuantity;
+
+                            if (calcActualQuantity > double.Epsilon)
+                                actualQuantity = calcActualQuantity;
                         }
 
                         if (actualQuantity > 0.000001)
