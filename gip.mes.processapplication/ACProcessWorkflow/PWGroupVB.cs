@@ -64,20 +64,20 @@ namespace gip.mes.processapplication
             RegisterExecuteHandler(typeof(PWGroupVB), HandleExecuteACMethod_PWGroupVB);
 
             ACRoutingService.RegisterSelectionQuery(SelRuleID_ReachableDest, 
-                (c, p) =>      c.Component.ValueT is PAProcessModule
-                            && (p[0] as Guid[]).Contains(c.Component.ValueT.ComponentClass.ACClassID),
-                (c, p) =>   !(p[1] as Guid[]).Contains(c.Component.ValueT.ComponentClass.ACClassID)
-                            && (c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace));
+                (c, p) =>      c.ComponentInstance is PAProcessModule
+                            && (p[0] as Guid[]).Contains(c.ComponentInstance.ComponentClass.ACClassID),
+                (c, p) =>   !(p[1] as Guid[]).Contains(c.ComponentInstance.ComponentClass.ACClassID)
+                            && (c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace));
 
             ACRoutingService.RegisterSelectionQuery(SelRuleID_ReachableSource,
-                (c, p) => (c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace)
-                            && (Guid)p[0] == c.Component.ValueT.ComponentClass.ACClassID,
-                (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace);
+                (c, p) => (c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace)
+                            && (Guid)p[0] == c.ComponentInstance.ComponentClass.ACClassID,
+                (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace);
 
             ACRoutingService.RegisterSelectionQuery(SelRuleID_IsDestDirectSucessor,
-                (c, p) => (c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace)
-                            && (Guid)p[0] == c.Component.ValueT.ComponentClass.ACClassID,
-                (c, p) => c.Component.ValueT is PAProcessModule);
+                (c, p) => (c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace)
+                            && (Guid)p[0] == c.ComponentInstance.ComponentClass.ACClassID,
+                (c, p) => c.ComponentInstance is PAProcessModule);
         }
 
         public PWGroupVB(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

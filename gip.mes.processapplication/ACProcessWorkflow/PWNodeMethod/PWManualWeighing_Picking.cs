@@ -844,7 +844,7 @@ namespace gip.mes.processapplication
                             bool canExecutePosting = CanExecutePosting(null, pickingPos);
                             if (canExecutePosting)
                             {
-                                msg = DoManualWeighingPickingPreBooking(facilityPreBooking, dbApp, pickingPos, actualQuantity, bookingParam, facility, facilityCharge, isConsumedLot,collectedMessages);
+                                msg = DoManualWeighingPickingPreBooking(ref facilityPreBooking, dbApp, pickingPos, actualQuantity, bookingParam, facility, facilityCharge, isConsumedLot,collectedMessages);
                             }
 
                             if (msg != null)
@@ -972,7 +972,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public virtual Msg DoManualWeighingPickingPreBooking(FacilityPreBooking facilityPreBooking, DatabaseApp dbApp, PickingPos pickingPos, double actualQuantity,
+        public virtual Msg DoManualWeighingPickingPreBooking(ref FacilityPreBooking facilityPreBooking, DatabaseApp dbApp, PickingPos pickingPos, double actualQuantity,
                                                               ACMethodBooking bookingParam, Facility facility, FacilityCharge facilityCharge, bool isConsumedLot,
                                                               MsgWithDetails collectedMessages)
         {

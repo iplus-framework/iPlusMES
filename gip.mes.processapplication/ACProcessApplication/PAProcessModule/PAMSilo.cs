@@ -40,22 +40,22 @@ namespace gip.mes.processapplication
         static PAMSilo()
         {
             RegisterExecuteHandler(typeof(PAMSilo), HandleExecuteACMethod_PAMSilo);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo, (c, p) => c.Component.ValueT is PAMSilo, null);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_SiloDirect, (c, p) => c.Component.ValueT is PAMSilo, (c, p) => c.Component.ValueT is PAProcessModule);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Storage, (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin, null);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo_Deselector, null, (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo, (c, p) => c.ComponentInstance is PAMSilo, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_SiloDirect, (c, p) => c.ComponentInstance is PAMSilo, (c, p) => c.ComponentInstance is PAProcessModule);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Storage, (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo_Deselector, null, (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_DosingFunc,
-                                                    (c, p) => c.Component.ValueT is PAProcessModuleVB
-                                                                && !(c.Component.ValueT is PAMSilo)
-                                                                && !(c.Component.ValueT is PAMParkingspace)
-                                                                && c.Component.ValueT.FindChildComponents<PAFDosing>(d => d is PAFDosing, null, 1).Any(),
-                                                    (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin);
+                                                    (c, p) => c.ComponentInstance is PAProcessModuleVB
+                                                                && !(c.ComponentInstance is PAMSilo)
+                                                                && !(c.ComponentInstance is PAMParkingspace)
+                                                                && c.ComponentInstance.FindChildComponents<PAFDosing>(d => d is PAFDosing, null, 1).Any(),
+                                                    (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_DischargingFunc,
-                                                    (c, p) => c.Component.ValueT is PAProcessModuleVB
-                                                                && !(c.Component.ValueT is PAMSilo)
-                                                                && !(c.Component.ValueT is PAMParkingspace)
-                                                                && c.Component.ValueT.FindChildComponents<PAFDischarging>(d => d is PAFDischarging, null, 1).Any(),
-                                                    (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin);
+                                                    (c, p) => c.ComponentInstance is PAProcessModuleVB
+                                                                && !(c.ComponentInstance is PAMSilo)
+                                                                && !(c.ComponentInstance is PAMParkingspace)
+                                                                && c.ComponentInstance.FindChildComponents<PAFDischarging>(d => d is PAFDischarging, null, 1).Any(),
+                                                    (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin);
         }
 
 

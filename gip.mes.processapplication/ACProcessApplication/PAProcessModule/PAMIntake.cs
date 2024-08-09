@@ -13,7 +13,7 @@ namespace gip.mes.processapplication
         static PAMIntake()
         {
             RegisterExecuteHandler(typeof(PAMIntake), HandleExecuteACMethod_PAMIntake);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_PAMIntake, (c, p) => c.Component.ValueT is PAMIntake, (c, p) => c.Component.ValueT is PAProcessModule);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_PAMIntake, (c, p) => c.ComponentInstance is PAMIntake, (c, p) => c.ComponentInstance is PAProcessModule);
         }
 
         public PAMIntake(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
