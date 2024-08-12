@@ -2044,6 +2044,15 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Methods => Routing
+
+        public void RunPossibleRoutesCheck()
+        {
+            
+        }
+
+        #endregion
+
         #endregion
 
         #region BackgroundWorker

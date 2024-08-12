@@ -17,7 +17,7 @@ namespace gip.mes.processapplication
         static PAMIntermediatebin()
         {
             RegisterExecuteHandler(typeof(PAMIntermediatebin), HandleExecuteACMethod_PAMIntermediatebin);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Intermediatebin, (c, p) => c.Component.ValueT is PAMIntermediatebin, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Intermediatebin, (c, p) => c.ComponentInstance is PAMIntermediatebin, null);
         }
 
         public PAMIntermediatebin(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
