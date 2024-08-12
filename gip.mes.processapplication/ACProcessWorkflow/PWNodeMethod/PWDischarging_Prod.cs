@@ -84,6 +84,7 @@ namespace gip.mes.processapplication
                     MaterialWFConnection connectionToDischarging = null;
                     bool isLastDisNode = IsLastDisNode(dbApp, batchPlan, out connectionToDischarging);
                     ACComponent targetSiloACComp = null;
+                    ACMethod exParallelMethod = null;
                     // Falls dies der letzte Entleerschritt ist, dann erfolgt Entleerung ins ein Silo
                     if (connectionToDischarging != null)
                     {
@@ -102,17 +103,20 @@ namespace gip.mes.processapplication
                                 {
                                     Type typeOfSilo = typeof(PAMSilo);
                                     Guid thisMethodID = ContentACClassWF.ACClassMethodID;
+                                    if (KeepSameRoute)
+                                        exParallelMethod = FindParallelDischargingIfRoute();
                                     DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
                                                             (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                                                     && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                         || !c.BasedOnACClassID.HasValue
                                                                         || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                                            PAProcessModule.SelRuleID_ProcessModule_Deselector, null);
+                                                            PAProcessModule.SelRuleID_ProcessModule_Deselector, null, null, exParallelMethod);
                                     // Falls Route nicht existiert, dann fahre in Standardziel
                                     if (CurrentDischargingDest(dbIPlus, false) == null)
                                         targetSiloACComp = null;
                                 }
                             }
+
                             // Kein Leerfahrmodus oder keine Route gefunden
                             if (targetSiloACComp == null || CurrentDischargingDest(dbIPlus, false) == null)
                             {
@@ -203,6 +207,8 @@ namespace gip.mes.processapplication
                                 Route predefinedRoute = nextDestination?.PredefinedRoute;
                                 if (predefinedRoute != null)
                                     predefinedRoute = predefinedRoute.Clone() as Route;
+                                if (KeepSameRoute)
+                                    exParallelMethod = FindParallelDischargingIfRoute();
 
                                 Type typeOfSilo = typeof(PAMSilo);
                                 Guid thisMethodID = ContentACClassWF.ACClassMethodID;
@@ -211,7 +217,7 @@ namespace gip.mes.processapplication
                                                                 && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                                     || !c.BasedOnACClassID.HasValue
                                                                     || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                                        PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute);
+                                                        PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute, exParallelMethod);
 
                                 nextDestination.ReservationState = GlobalApp.ReservationState.Active;
                                 // Falls Zielsilo nicht belegt
@@ -278,7 +284,17 @@ namespace gip.mes.processapplication
                         if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
 
-                        if (!ValidateAndSetRouteForParam(acMethod))
+                        if (exParallelMethod == null && KeepSameRoute)
+                            exParallelMethod = FindParallelDischargingIfRoute();
+                        Route shareRoute = null;
+                        if (exParallelMethod != null)
+                        {
+                            ACValue exValue = exParallelMethod.ParameterValueList.GetACValue(nameof(Route));
+                            if (exValue != null && exValue.Value != null)
+                                shareRoute = (Route) exValue.Value;
+                        }
+
+                        if (!ValidateAndSetRouteForParam(acMethod, shareRoute))
                             return StartDisResult.CycleWait;
 
                         ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
@@ -505,7 +521,17 @@ namespace gip.mes.processapplication
                                 if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
-                                if (!ValidateAndSetRouteForParam(acMethod))
+                                if (exParallelMethod == null && KeepSameRoute)
+                                    exParallelMethod = FindParallelDischargingIfRoute();
+                                Route shareRoute = null;
+                                if (exParallelMethod != null)
+                                {
+                                    ACValue exValue = exParallelMethod.ParameterValueList.GetACValue(nameof(Route));
+                                    if (exValue != null && exValue.Value != null)
+                                        shareRoute = (Route)exValue.Value;
+                                }
+
+                                if (!ValidateAndSetRouteForParam(acMethod, shareRoute))
                                     return StartDisResult.CycleWait;
 
                                 ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
@@ -1213,7 +1239,7 @@ namespace gip.mes.processapplication
                             if (previousDischargingRoute != null)
                             {
                                 CurrentDischargingRoute = previousDischargingRoute;
-                                acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                                acMethod[nameof(Route)] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
                             }
                             return StartDisResult.CycleWait;
                         }
@@ -1229,7 +1255,7 @@ namespace gip.mes.processapplication
                     if (msg != null)
                     {
                         CurrentDischargingRoute = previousDischargingRoute;
-                        acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                        acMethod[nameof(Route)] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
                     }
                     else
                     {

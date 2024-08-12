@@ -2017,7 +2017,7 @@ namespace gip.mes.processapplication
             Route route = dosingRoute != null ? dosingRoute.Clone() as Route : null;
             if (!ValidateRouteForFuncParam(route))
                 return false;
-            acMethod["Route"] = route;
+            acMethod[nameof(Route)] = route;
             return route != null;
         }
         #endregion

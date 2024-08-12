@@ -1324,7 +1324,11 @@ namespace gip.mes.facility
         {
 
             // TODO: Benutzerauswahl, mit welchem Steuerrezept gefahren werden soll (nicht .FirstOrDefault()):
-            var selectedProcessWF = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            PartslistACClassMethod selectedProcessWF = null;
+            if (vbACClassWF != null)
+                selectedProcessWF = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.Where(c => c.MaterialWFACClassMethod.ACClassMethodID == vbACClassWF.ACClassMethodID).FirstOrDefault();
+            if (selectedProcessWF == null)
+                prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
             if (selectedProcessWF == null)
                 return null;
 

@@ -3125,7 +3125,7 @@ namespace gip.mes.processapplication
                     //Error50363: Can't find a Route in the AvailableRoutes with RouteSourceID: {0}
                     return new Msg(this, eMsgLevel.Error, PWClassName, "InitializePAFACMethod(40)", 1360, "Error50363", facility.VBiFacilityACClassID);
                 }
-                acMethod.ParameterValueList["Route"] = route;
+                acMethod.ParameterValueList[nameof(Route)] = route;
             }
             if (currentFacilityCharge.HasValue)
                 acMethod.ParameterValueList["FacilityCharge"] = currentFacilityCharge.Value;
@@ -3299,7 +3299,7 @@ namespace gip.mes.processapplication
                     acMethod["PLPosRelation"] = weighingComponent.PLPosRelation.ProdOrderPartslistPosRelationID;
                 else
                     acMethod["PLPosRelation"] = weighingComponent.PickingPosition.PickingPosID;
-                acMethod["Route"] = new Route();
+                acMethod[nameof(Route)] = new Route();
 
                 if (!IsManualWeighing)
                 {
@@ -3339,7 +3339,7 @@ namespace gip.mes.processapplication
             else
             {
                 acMethod["TargetQuantity"] = PWBinSelection.BinSelectionReservationQuantity;
-                acMethod["Route"] = new Route();
+                acMethod[nameof(Route)] = new Route();
             }
 
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))

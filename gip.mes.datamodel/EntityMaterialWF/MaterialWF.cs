@@ -181,6 +181,15 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(9999)]
+        public override string ACCaption
+        {
+            get
+            {
+                return this.MaterialWFNo + " " + this.Name;
+            }
+        }
+
         /// <summary>
         /// Creates and adds a new IACConfig-Entry to ConfigItemsSource.
         /// The implementing class creates a new entity object an add it to its "own Configuration-Table".

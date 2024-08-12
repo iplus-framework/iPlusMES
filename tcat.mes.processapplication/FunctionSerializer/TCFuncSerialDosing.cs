@@ -157,7 +157,7 @@ namespace tcat.mes.processapplication
             Array.Copy(stringTemp, 0, paramPackage, iOffset, stringTemp.Length);
             iOffset += TCDataTypeLength.String(81);
 
-            Route route = request.ParameterValueList.FirstOrDefault(c => c.ACIdentifier == "Route").Value as Route;
+            Route route = request.ParameterValueList.FirstOrDefault(c => c.ACIdentifier == nameof(Route)).Value as Route;
             if(route != null && route.Any())
             {
                 int iOffsetRoute = iOffset;

@@ -311,13 +311,16 @@ namespace gip.mes.processapplication
                 Route predefinedRoute = facReservation?.PredefinedRoute;
                 if (predefinedRoute != null)
                     predefinedRoute = predefinedRoute.Clone() as Route;
+                ACMethod exParallelMethod = null;
+                if (predefinedRoute == null && KeepSameRoute)
+                    exParallelMethod = FindParallelDischargingIfRoute();
 
                 DetermineDischargingRoute(Root.Database as Database, module, targetSiloACComp, 0,
                                         (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
                                                 && (typeOfSilo.IsAssignableFrom(c.ObjectType)
                                                     || !c.BasedOnACClassID.HasValue
                                                     || (c.BasedOnACClassID.HasValue && c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID != thisMethodID).Any()))),
-                                        PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute);
+                                        PAMSilo.SelRuleID_Silo_Deselector, null, predefinedRoute, exParallelMethod);
 
                 MDReleaseState.ReleaseStates resultReleaseState = MDReleaseState.ReleaseStates.Free;
                 foreach (DeliveryNotePos notePos in dnPos.DeliveryNote.DeliveryNotePos_DeliveryNote)
@@ -820,7 +823,7 @@ namespace gip.mes.processapplication
                     if (previousDischargingRoute != null)
                     {
                         CurrentDischargingRoute = previousDischargingRoute;
-                        acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                        acMethod[nameof(Route)] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
                     }
                     return StartDisResult.CycleWait;
                 }
@@ -832,7 +835,7 @@ namespace gip.mes.processapplication
             if (msg != null)
             {
                 CurrentDischargingRoute = previousDischargingRoute;
-                acMethod["Route"] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
+                acMethod[nameof(Route)] = previousDischargingRoute; // Revert route, because Parameter was already set in ValidateAndSetRouteForParam
             }
             else
             {

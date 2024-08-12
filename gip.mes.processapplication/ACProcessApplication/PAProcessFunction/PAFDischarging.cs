@@ -270,7 +270,7 @@ namespace gip.mes.processapplication
 
         protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
-            ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
@@ -288,7 +288,7 @@ namespace gip.mes.processapplication
             Route prevR = null;
             if (previousParams != null && IsSimulationOn)
             {
-                valuePrev = previousParams.ParameterValueList.GetACValue("Route");
+                valuePrev = previousParams.ParameterValueList.GetACValue(nameof(Route));
                 if (valuePrev != null)
                     prevR = valuePrev.ValueT<Route>();
             }
@@ -386,7 +386,7 @@ namespace gip.mes.processapplication
                 }
                 if (CurrentACState >= ACStateEnum.SMCompleted)
                 {
-                    ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+                    ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
                     if (value != null)
                     {
                         using (var db = new Database())
@@ -644,7 +644,7 @@ namespace gip.mes.processapplication
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
 
-            ACValue value = currentACMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = currentACMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value != null)
             {
                 Route originalR = value.ValueT<Route>();
@@ -854,7 +854,7 @@ namespace gip.mes.processapplication
         {
             if (acMethod == null)
                 return null;
-            ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value == null)
                 return null;
             Route route = value.ValueT<Route>();
@@ -891,8 +891,8 @@ namespace gip.mes.processapplication
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
             method.ParameterValueList.Add(new ACValue("Source", typeof(Int16), (Int16)0, Global.ParamOption.Optional));
             paramTranslation.Add("Source", "en{'Source'}de{'Quelle'}");
-            method.ParameterValueList.Add(new ACValue("Route", typeof(Route), null, Global.ParamOption.Required));
-            paramTranslation.Add("Route", "en{'Route'}de{'Route'}");
+            method.ParameterValueList.Add(new ACValue(nameof(Route), typeof(Route), null, Global.ParamOption.Required));
+            paramTranslation.Add(nameof(Route), "en{'Route'}de{'Route'}");
             method.ParameterValueList.Add(new ACValue("Destination", typeof(Int16), (Int16)0, Global.ParamOption.Required));
             paramTranslation.Add("Destination", "en{'Destination'}de{'Ziel'}");
             method.ParameterValueList.Add(new ACValue("EmptyWeight", typeof(Double?), null, Global.ParamOption.Optional));
@@ -996,7 +996,7 @@ namespace gip.mes.processapplication
                 {
                     if (acValue != null)
                         newACMethod.ParameterValueList["Destination"] = valueDestination;
-                    newACMethod.ParameterValueList["Route"] = null;
+                    newACMethod.ParameterValueList[nameof(Route)] = null;
                 }
                 catch (Exception ec)
                 {
