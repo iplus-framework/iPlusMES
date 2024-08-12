@@ -1934,12 +1934,6 @@ namespace gip.mes.facility
             return result;
         }
 
-        public virtual void FilterPossibleRoutes()
-        {
-
-        }
-
-        
         #endregion
 
         #endregion
