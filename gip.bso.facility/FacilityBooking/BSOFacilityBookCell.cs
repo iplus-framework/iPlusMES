@@ -647,6 +647,7 @@ namespace gip.bso.facility
             }
         }
 
+        bool _RefreshFCCache = false;
         IEnumerable<FacilityCharge> _FacilityChargeList;
         /// <summary>
         /// Gets the facility charge list.
@@ -663,13 +664,23 @@ namespace gip.bso.facility
                     return null;
                 //CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
                 _FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).ToArray();
+                if (_RefreshFCCache && _FacilityChargeList != null && _FacilityChargeList.Any())
+                {
+                    _RefreshFCCache = false;
+                    foreach (var item in _FacilityChargeList)
+                    {
+                        item.ResetCachedValues();
+                    }
+                }
                 return _FacilityChargeList;
             }
         }
 
-        private void RefreshFacilityChargeList()
+        private void RefreshFacilityChargeList(bool refresh = false)
         {
             OnPropertyChanged(nameof(CurrentFacility));
+            if (refresh)
+                _RefreshFCCache = true;
             _FacilityChargeList = null;
             OnPropertyChanged(nameof(FacilityChargeList));
         }
@@ -831,6 +842,8 @@ namespace gip.bso.facility
         {
             if (!PreExecute())
                 return;
+            if (requery || CurrentFacility == null)
+                _RefreshFCCache = true;
             LoadEntity<Facility>(requery, () => SelectedFacility, () => CurrentFacility, c => CurrentFacility = c,
                         DatabaseApp.Facility
                                     .Include(c => c.FacilityStock_Facility)

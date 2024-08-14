@@ -445,50 +445,44 @@ namespace gip.mes.datamodel
             }
         }
 
-        /// <summary>
-        /// There are no comments for Property ReservedInwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedInwardQuantity()
-        {
-            if (this.Material == null)
-                return;
+        //public void RecalcReservedInwardQuantity()
+        //{
+        //    if (this.Material == null)
+        //        return;
 
-            this.ReservedInwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = Material.FacilityReservation_Material.Where(c => c.InOrderPosID.HasValue);
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch geliefert wird
-                // TODO: Zugänge von Produktionsaufträge mit einrechnen
-                this.ReservedInwardQuantity += facilityReservation.InOrderPos.TargetQuantity - facilityReservation.InOrderPos.ActualQuantity;
-            }
-        }
+        //    this.ReservedInwardQuantity = 0;
+        //    // TODO: OR-Klausel einfügen für Produktionsaufträge
+        //    IEnumerable<FacilityReservation> facilityReservationList = Material.FacilityReservation_Material.Where(c => c.InOrderPosID.HasValue);
+        //    foreach (FacilityReservation facilityReservation in facilityReservationList)
+        //    {
+        //        // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+        //        // Die TargetQuantity gibt an, wieviel Reserviert ist
+        //        // Die Differenz gibt an, wieviel noch geliefert wird
+        //        // TODO: Zugänge von Produktionsaufträge mit einrechnen
+        //        this.ReservedInwardQuantity += facilityReservation.InOrderPos.TargetQuantity - facilityReservation.InOrderPos.ActualQuantity;
+        //    }
+        //}
 
 
 
-        /// <summary>
-        /// There are no comments for Property ReservedOutwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedOutwardQuantity()
-        {
-            if (this.Material == null)
-                return;
+        //public void RecalcReservedOutwardQuantity()
+        //{
+        //    if (this.Material == null)
+        //        return;
 
-            this.ReservedOutwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = Material.FacilityReservation_Material.Where(c => c.OutOrderPosID.HasValue);
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch abgebucht wird
-                // TODO: Abgänge von Produktionsaufträgen mit einrechnen
-                this.ReservedOutwardQuantity += facilityReservation.OutOrderPos.TargetQuantity - facilityReservation.OutOrderPos.ActualQuantity;
+        //    this.ReservedOutwardQuantity = 0;
+        //    // TODO: OR-Klausel einfügen für Produktionsaufträge
+        //    IEnumerable<FacilityReservation> facilityReservationList = Material.FacilityReservation_Material.Where(c => c.OutOrderPosID.HasValue);
+        //    foreach (FacilityReservation facilityReservation in facilityReservationList)
+        //    {
+        //        // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+        //        // Die TargetQuantity gibt an, wieviel Reserviert ist
+        //        // Die Differenz gibt an, wieviel noch abgebucht wird
+        //        // TODO: Abgänge von Produktionsaufträgen mit einrechnen
+        //        this.ReservedOutwardQuantity += facilityReservation.OutOrderPos.TargetQuantity - facilityReservation.OutOrderPos.ActualQuantity;
 
-            }
-        }
+        //    }
+        //}
 
 
 

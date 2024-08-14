@@ -1091,9 +1091,14 @@ namespace gip.bso.facility
         {
             if (!PreExecute("Load"))
                 return;
+            bool isNewDialog = CurrentFacilityCharge == null;
+            if (requery)
+                CurrentFacilityCharge?.ResetCachedValues();
             LoadEntity<FacilityCharge>(requery, () => SelectedFacilityCharge, () => CurrentFacilityCharge, c => CurrentFacilityCharge = c,
                         DatabaseApp.FacilityCharge
                         .Where(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID));
+            if (isNewDialog)
+                CurrentFacilityCharge?.ResetCachedValues();
             PostExecute("Load");
         }
 
@@ -1298,16 +1303,12 @@ namespace gip.bso.facility
                         return Global.ControlModes.Disabled;
                     break;
                 case "CurrentFacilityCharge\\FacilityLot":
-                    if (IsFacilityChargeWithFacilityBooking)
-                    {
+                    if (HasFCHadAnyStock)
                         return Global.ControlModes.Disabled;
-                    }
                     break;
                 case nameof(CurrentFacilityLot):
-                    if (IsFacilityChargeWithFacilityBooking)
-                    {
+                    if (HasFCHadAnyStock)
                         return Global.ControlModes.Disabled;
-                    }
                     break;
 
             }
@@ -2228,20 +2229,15 @@ namespace gip.bso.facility
 
         public bool IsEnabledFacilityChargeLotGenerateDlg()
         {
-            return CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && !IsFacilityChargeWithFacilityBooking;
+            return CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && !HasFCHadAnyStock;
         }
 
 
-        public bool IsFacilityChargeWithFacilityBooking
+        public bool HasFCHadAnyStock
         {
             get
             {
-                if (CurrentFacilityCharge == null) return false;
-                return
-                    CurrentFacilityCharge.FacilityBooking_InwardFacilityCharge.Any() ||
-                    CurrentFacilityCharge.FacilityBooking_OutwardFacilityCharge.Any() ||
-                    CurrentFacilityCharge.FacilityBookingCharge_InwardFacilityCharge.Any() ||
-                    CurrentFacilityCharge.FacilityBookingCharge_OutwardFacilityCharge.Any();
+                return CurrentFacilityCharge == null || Math.Abs(CurrentFacilityCharge.StockQuantityUOM) >= double.Epsilon || !CurrentFacilityCharge.NotAvailable;
             }
         }
         #endregion

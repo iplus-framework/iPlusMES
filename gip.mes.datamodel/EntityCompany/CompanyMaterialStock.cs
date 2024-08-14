@@ -411,25 +411,20 @@ namespace gip.mes.datamodel
         }
 
 
-        /// <summary>
-        /// There are no comments for Property ReservedInwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedInwardQuantity()
-        {
-            if (this.CompanyMaterial == null)
-                return;
-        }
+        //public void RecalcReservedInwardQuantity()
+        //{
+        //    if (this.CompanyMaterial == null)
+        //        return;
+        //}
 
 
 
-        /// <summary>
-        /// There are no comments for Property ReservedOutwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedOutwardQuantity()
-        {
-            if (this.CompanyMaterial == null)
-                return;
-        }
+
+        //public void RecalcReservedOutwardQuantity()
+        //{
+        //    if (this.CompanyMaterial == null)
+        //        return;
+        //}
 
 
 

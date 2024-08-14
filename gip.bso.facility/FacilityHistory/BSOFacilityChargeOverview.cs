@@ -697,9 +697,14 @@ namespace gip.bso.facility
         {
             if (!PreExecute("Load"))
                 return;
+            bool isNewDialog = CurrentFacilityCharge == null;
+            if (requery)
+                CurrentFacilityCharge?.ResetCachedValues();
             LoadEntity<FacilityCharge>(requery, () => SelectedFacilityCharge, () => CurrentFacilityCharge, c => CurrentFacilityCharge = c,
                         DatabaseApp.FacilityCharge
                         .Where(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID));
+            if (isNewDialog)
+                CurrentFacilityCharge?.ResetCachedValues();
             PostExecute("Load");
         }
 
