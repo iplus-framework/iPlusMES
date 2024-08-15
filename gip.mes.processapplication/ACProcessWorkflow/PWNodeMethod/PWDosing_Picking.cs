@@ -880,7 +880,7 @@ namespace gip.mes.processapplication
                     IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     if (routes == null || !routes.Any())
                     {
-                        if (AutoChangeScale && possibleSilos != null && possibleSilos.FilteredResult  != null && possibleSilos.FilteredResult.Any())
+                        if (/*DontWaitForChangeScale && */possibleSilos != null && possibleSilos.FilteredResult  != null && possibleSilos.FilteredResult.Any())
                         {
                             var parallelActiveDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
                                     && c != this

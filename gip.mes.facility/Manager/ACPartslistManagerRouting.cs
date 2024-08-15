@@ -121,14 +121,37 @@ namespace gip.mes.facility
 
                 public List<FacilityChargeInfo> FacilityCharges { get; set; }
 
+                private DateTime? _OldestQuantDate;
+                public DateTime OldestQuantDate
+                {
+                    get
+                    {
+                        if (_OldestQuantDate == null)
+                            Sum();
+                        return _OldestQuantDate.Value;
+                    }
+                }
+
                 private void Sum()
                 {
+                    _OldestQuantDate = DateTime.MaxValue;
                     if (FacilityCharges == null)
                         return;
                     _StockOfReservations = null;
                     _StockFree = null;
                     foreach (FacilityChargeInfo fcInfo in FacilityCharges)
                     {
+                        if (fcInfo.Quant.FillingDate.HasValue)
+                        {
+                            if (fcInfo.Quant.FillingDate.Value < _OldestQuantDate)
+                                _OldestQuantDate = fcInfo.Quant.FillingDate.Value;
+                        }
+                        else
+                        {
+                            if (fcInfo.Quant.InsertDate < _OldestQuantDate)
+                                _OldestQuantDate = fcInfo.Quant.InsertDate;
+                        }
+                        
                         if (fcInfo.IsReservedLot)
                         {
                             if (!_StockOfReservations.HasValue)
@@ -168,7 +191,18 @@ namespace gip.mes.facility
             {
                 get
                 {
-                    return FilteredResult.Select(c => c.StorageBin);
+                    return SortedFilteredResult.Select(c => c.StorageBin);
+                }
+            }
+
+            /// <summary>
+            /// Result sorted by Oldest Quant Date
+            /// </summary>
+            public IOrderedEnumerable<FacilitySumByLots> SortedFilteredResult
+            {
+                get
+                {
+                    return FilteredResult.OrderBy(c => c.OldestQuantDate);
                 }
             }
 

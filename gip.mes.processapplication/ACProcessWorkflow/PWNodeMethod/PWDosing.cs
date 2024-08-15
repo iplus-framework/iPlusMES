@@ -121,8 +121,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("AdaptToTargetQ", "en{'Adapt to total remaining target quantity'}de{'Anpassung an Gesamtrestsollwert'}");
             method.ParameterValueList.Add(new ACValue("OldestSilo", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OldestSilo", "en{'Dosing from oldest Silo only'}de{'Nur aus ältestem Silo dosieren'}");
-            method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("AutoChangeScale", "en{'Automatically change scale'}de{'Automatischer Waagenwechsel'}");
+            method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(double), 0.0, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoChangeScale", "en{'No waiting for potential scale change if stocks are sufficient (Factor target q.)'}de{'Kein Warten auf potentiellen Waagenwechsel bei ausreichendem Bestand (Faktor Sollm.)'}");
             method.ParameterValueList.Add(new ACValue("CheckScaleEmpty", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("CheckScaleEmpty", "en{'Check if scale empty'}de{'Prüfung Waage leer'}");
             method.ParameterValueList.Add(new ACValue(nameof(BookTargetQIfZero), typeof(PostingMode), PostingMode.False, Global.ParamOption.Optional));
@@ -783,7 +783,24 @@ namespace gip.mes.processapplication
             }
         }
         
-        public bool AutoChangeScale
+        /// <summary>
+        /// If set, then dosing node doesn't wait for a completition of the dosing on another process module because there is enough material to complete the weighing
+        /// </summary>
+        public bool DontWaitForChangeScale
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    double factor = StockFactorForChangeScale;
+                    return factor <= double.Epsilon ? false : true;
+                }
+                return false;
+            }
+        }
+
+        public double StockFactorForChangeScale
         {
             get
             {
@@ -793,10 +810,27 @@ namespace gip.mes.processapplication
                     var acValue = method.ParameterValueList.GetACValue("AutoChangeScale");
                     if (acValue != null)
                     {
-                        return acValue.ParamAsBoolean;
+                        try
+                        {
+                            string value = acValue.ParamAsString;
+                            if (String.IsNullOrEmpty(value) || value.ToLower() == "false")
+                                return 0.0;
+                            else if (value.ToLower() == "true")
+                                return 2.0;
+                            else
+                            {
+                                double doubleValue = acValue.ParamAsDouble;
+                                if (doubleValue <= 0.000001)
+                                    return 0.0;
+                                return Math.Abs(doubleValue);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
-                return false;
+                return 0.0;
             }
         }
 
@@ -2317,7 +2351,7 @@ namespace gip.mes.processapplication
             {
                 xmlChild = doc.CreateElement("AutoChangeScale");
                 if (xmlChild != null)
-                    xmlChild.InnerText = AutoChangeScale.ToString();
+                    xmlChild.InnerText = DontWaitForChangeScale.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 

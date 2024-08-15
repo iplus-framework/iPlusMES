@@ -453,11 +453,12 @@ namespace gip.bso.masterdata
             {
                 bool change = false;
 
+                List<ACClassMethod> visitedMethods = new List<ACClassMethod>();
                 if (allMachineItems != null)
                 {
                     foreach (MachineItem machineItem in allMachineItems)
                     {
-                        bool tmpChange = WriteConfigToPWMNode(database, machineItem);
+                        bool tmpChange = WriteConfigToPWMNode(database, machineItem, visitedMethods);
                         change = change || tmpChange;
                     }
                 }
@@ -468,7 +469,7 @@ namespace gip.bso.masterdata
                     {
                         foreach (RuleSelection ruleSelection in ruleGroup.RuleSelectionList)
                         {
-                            bool tmpChange = WriteConfigToPWMNode(database, ruleSelection.MachineItem);
+                            bool tmpChange = WriteConfigToPWMNode(database, ruleSelection.MachineItem, visitedMethods);
                             change = change || tmpChange;
                         }
                     }
@@ -485,13 +486,15 @@ namespace gip.bso.masterdata
                     }
                     else
                     {
+                        if (visitedMethods != null && visitedMethods.Any())
+                            ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, visitedMethods, database, true);
                         OnSave();
                     }
                 }
             }
         }
 
-        private bool WriteConfigToPWMNode(Database database, MachineItem machineItem)
+        private bool WriteConfigToPWMNode(Database database, MachineItem machineItem, List<ACClassMethod> visitedMethods)
         {
             bool change = false;
             foreach (ACClassWF aCClassWF in machineItem.PWNodes)
@@ -552,6 +555,8 @@ namespace gip.bso.masterdata
 
                 if (change && excludedModules.Any())
                 {
+                    if (!visitedMethods.Contains(aCClassWF.ACClassMethod))
+                        visitedMethods.Add(aCClassWF.ACClassMethod);
                     RuleValue ruleValue = RulesCommand.RuleValueFromObjectList(ACClassWFRuleTypes.Excluded_process_modules, excludedModules);
                     RulesCommand.WriteIACConfig(database, currentStoreConfigItem, new List<RuleValue>() { ruleValue });
                 }

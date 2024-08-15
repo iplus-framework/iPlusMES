@@ -6,6 +6,9 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
+using static gip.mes.facility.ACPartslistManager.QrySilosResult;
+using DocumentFormat.OpenXml.Vml.Office;
+using DocumentFormat.OpenXml.Drawing;
 
 
 namespace gip.mes.processapplication
@@ -353,6 +356,10 @@ namespace gip.mes.processapplication
                     bool componentsSkippable = ComponentsSkippable;
                     DosingSkipMode skipComponentsMode = SkipComponentsMode;
                     StartNextCompResult openDosingsResult = StartNextCompResult.Done;
+
+                    IEnumerable<IPWNodeReceiveMaterial> allParallelDosingWFs = GetParallelDosingWFs(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
+                    IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos = GetAllExcludedSilos(allParallelDosingWFs);
+
                     // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
                     if (queryOpenDosings != null && queryOpenDosings.Any())
                     {
@@ -485,9 +492,8 @@ namespace gip.mes.processapplication
 
                             MDProdOrderPartslistPosState posState;
                             ACPartslistManager.QrySilosResult possibleSilos;
-                            IEnumerable<IPWNodeReceiveMaterial> parallelDosingWFs = GetParallelDosingWFs(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
-                            IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos = GetAllExcludedSilos(parallelDosingWFs);
 
+                            // Finde heraus ob dieses Prozessmodul aus dem ältesten Silo dosieren kann.
                             RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                 OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                 null, null, allExcludedSilos, ReservationMode);
@@ -497,6 +503,7 @@ namespace gip.mes.processapplication
                             Route preferredDosingRoute = null, alternativeDosingRoute = null;
                             ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility = null, alternativeDosingFacility = null, preferredDosingFacilityNotRoutableHere = null;
 
+                            // Eine Route ist gefunden mit dem ältesten Silo auf diese Waage ist gefunden routes nicht leer ist!
                             if (routes != null && routes.Any())
                             {
                                 List<Route> routesList = routes.ToList();
@@ -509,6 +516,7 @@ namespace gip.mes.processapplication
                                     return StartNextCompResult.CycleWait;
                                 }
 
+                                // Wenn Prozessmodul mehrere Eingangpunkte hat, dann entferne zuerst alle Routen, die nicht mit diesem Dosierknoten dosiert werden können
                                 PAFDosing dosingFunc = responsibleFunc as PAFDosing;
                                 if (dosingFunc != null)
                                 {
@@ -530,10 +538,12 @@ namespace gip.mes.processapplication
                                 }
 
                                 routes = routesList;
+                                // Suche aus der Routenliste die Route heraus, die bevorzugt werden soll
                                 PriorizeSilosAndGetRoute(possibleSilos, routes, dosingWeight, out correctedDosingWeight, out preferredDosingRoute, out preferredDosingFacility, out alternativeDosingRoute, out alternativeDosingFacility, out preferredDosingFacilityNotRoutableHere);
                             }
 
-                            // Wenn keine Route gefunden zu dieser Waage gefunden wurde
+                            // SONST: Wenn routes aber leer ist, kann es sein, dass es noch weitere Silos gibt die auf anderen Prozessmodulen dosiert werden können.
+                            //        In diesem Fall ist possibleSilos nicht leer && parallelDosingWFs hat Einträge)
                             // oder wenn aufgrund von Reservierungen nicht das richtige Silo gefunden wurde
                             // prüfe ob auf anderen Dosierschritte eine Dosierung möglich wäre
                             if (   (routes == null || !routes.Any())
@@ -588,11 +598,11 @@ namespace gip.mes.processapplication
                                 Route preferredDosingRoute2 = null, alternativeDosingRoute2 = null;
                                 ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility2 = null, alternativeDosingFacility2 = null, preferredDosingFacilityNotRoutableHere2 = null;
 
-                                if (   parallelDosingWFs != null 
-                                    && parallelDosingWFs.Any()
+                                if (   allParallelDosingWFs != null 
+                                    && allParallelDosingWFs.Any()
                                     && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())))
                                 {
-                                    List<IPWNodeReceiveMaterial> otherDosingWFs = parallelDosingWFs.Where(c => (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0
+                                    List<IPWNodeReceiveMaterial> otherDosingWFs = allParallelDosingWFs.Where(c => (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0
                                                                                                             || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null
                                                                                                                 && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
                                                                                                    .ToList();
@@ -647,13 +657,19 @@ namespace gip.mes.processapplication
                                     }
                                 }
 
+                                // Wenn es andere parallele Knoten gibt, dann finde heraus ob auf den anderen dosiert werden könnte
+                                // indem indirekt geprüft wird ob es weitere Silos gibt die nicht auf dieser Waage dosiert werden können.
                                 if (hasOtherStartableDosingNodes)
                                 {
                                     bool continueToNextComp = false;
+                                    // Suchbedingung ist, finde alle Silos (unabhängig von der Priorisierung) und prüfe ob eines dieser Silos auch auf diesem Prozessmodul dosiert werden könnte
                                     queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
                                     ACPartslistManager.QrySilosResult possibleSilos2;
                                     IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos2);
-                                    // If there are other blocked Silos on this scale:
+                                    List<FacilitySumByLots> silosNotDosableHere = null;
+                                    if (this.DontWaitForChangeScale)
+                                        silosNotDosableHere = GetFirstSilosNotDosableHere(routes2, possibleSilos2, allExcludedSilos);
+                                    // Fall A) routes2 ist nicht leer, wenn es Silos mit niedrigerer Priorität gibt, die auf diesem Prozessmodul dosiert werden können:
                                     if (routes2 != null && routes2.Any())
                                     {
                                         continueToNextComp = true;
@@ -686,17 +702,33 @@ namespace gip.mes.processapplication
                                         else
                                             isAnyCompDosableFromAnyRoutableSilo = true;
                                     }
+                                    // Fall B) Es gibt weitere Silos, die NICHT auf diesem Prozessmodul dosiert werden können, dann gehe zur nächsten Komponente und versuche diese zu dosieren
                                     else if (possibleSilos2 != null && possibleSilos2.FoundSilos.Any())
+                                    {
                                         continueToNextComp = true;
-                                    // Versuche nächste Komponente vorerst zu dosieren, weil es andere Dosierschritte gibt welche die Dosierung übernehmen könnten
+                                    }
+                                    // Fall C) Es gibt keine andere Waage oder Silo => Gehe NICHT zur nächsten Komponente und warte
+                                    else
+                                        continueToNextComp = false;
+
+                                    // Versuche NÄCHSTE Komponente vorerst zu dosieren, weil es andere Dosierschritte gibt welche die Dosierung übernehmen könnten
                                     if (continueToNextComp)
                                     {
-                                        hasOpenDosings = true;
+                                        if (silosNotDosableHere != null && DontWaitForChangeScale)
+                                        {
+                                            double stockFactor = StockFactorForChangeScale;
+                                            double minStock = Math.Abs(relation.RemainingDosingWeight * stockFactor);
+                                            double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                            if (sumStock < minStock)
+                                                hasOpenDosings = true;
+                                        }
+                                        else
+                                            hasOpenDosings = true;
                                         continue;
                                     }
                                 }
 
-
+                                // Wenn keine anderen Knoten gefunden worden (continue im oberen Block ist nicht durchgleaufen) sind aber noch offene Komponenten da, die dosiert werden müssten, dann gebe Fehlermeldung heraus.
                                 if (routes == null || !routes.Any())
                                 {
                                     // TODO: Was passiert wenn noch eine Komponente kommt, muss skaliert werden?
@@ -1061,6 +1093,14 @@ namespace gip.mes.processapplication
                             // Finde die anderen Knoten die zur Zeit dosieren
                             if (queryActiveDosings != null && queryActiveDosings.Any())
                             {
+                                var openRelations = queryActiveDosings.Select(c => c.ProdOrderPartslistPosRelationID);
+                                CurrentParallelPWDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
+                                                                        && c != this
+                                                                        && (c as PWDosing).CurrentDosingPos.ValueT != Guid.Empty
+                                                                        && openRelations.Contains((c as PWDosing).CurrentDosingPos.ValueT))
+                                                                        .ToList();
+                                currentParallelPWDosings = CurrentParallelPWDosings.ToList();
+
                                 // Prüfe ob die parallelen aktiven Dosierungen noch auf dieser Waage dosiert werden könnten für einen potentiellen Waagenwechsel
                                 if (!isAnyCompDosableFromAnyRoutableSilo)
                                 {
@@ -1068,21 +1108,59 @@ namespace gip.mes.processapplication
                                     {
                                         ACPartslistManager.QrySilosResult possibleSilos;
                                         RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
-                                        var routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+                                        IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                                         if (routes != null && routes.Any())
-                                            isAnyCompDosableFromAnyRoutableSilo = true;
+                                        {
+                                            //List<FacilitySumByLots> silosNotDosableHere = null;
+                                            if (this.DontWaitForChangeScale)
+                                            {
+                                                PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
+                                                if (activePWDos != null)
+                                                {
+                                                    PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
+                                                    if (currentSilo != null)
+                                                    {
+                                                        double stockFactor = StockFactorForChangeScale;
+                                                        double minStock = Math.Abs(activeDosing.RemainingDosingWeight * stockFactor);
+                                                        if (currentSilo.FillLevel.ValueT >= minStock)
+                                                            currentParallelPWDosings.Remove(activePWDos);
+                                                        else
+                                                        {
+                                                            List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
+                                                            silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
+                                                            double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                                            if (sumStock < minStock)
+                                                                isAnyCompDosableFromAnyRoutableSilo = true;
+                                                            else
+                                                                currentParallelPWDosings.Remove(activePWDos);
+                                                        }
+                                                    }
+                                                    else
+                                                        isAnyCompDosableFromAnyRoutableSilo = true;
+                                                }
+                                                else
+                                                    isAnyCompDosableFromAnyRoutableSilo = true;
+
+                                                //silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos);
+                                                //if (silosNotDosableHere != null)
+                                                //{
+                                                //    double stockFactor = StockFactorForChangeScale;
+                                                //    double minStock = Math.Abs(activeDosing.RemainingDosingWeight * stockFactor);
+                                                //    double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                                //    if (sumStock < minStock)
+                                                //        isAnyCompDosableFromAnyRoutableSilo = true;
+                                                //}
+                                                //else
+                                                //    isAnyCompDosableFromAnyRoutableSilo = true;
+                                            }
+                                            else
+                                                isAnyCompDosableFromAnyRoutableSilo = true;
+                                        }
                                     }
                                 }
-
-                                var openRelations = queryActiveDosings.Select(c => c.ProdOrderPartslistPosRelationID);
-                                CurrentParallelPWDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
-                                                                        && c != this
-                                                                        && (c as PWDosing).CurrentDosingPos.ValueT != Guid.Empty
-                                                                        && openRelations.Contains((c as PWDosing).CurrentDosingPos.ValueT))
-                                                                        .ToList();
                             }
 
-                            currentParallelPWDosings = CurrentParallelPWDosings;
+
                             if (   !isAnyCompDosableFromAnyRoutableSilo 
                                 || ((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) && openDosingsResult == StartNextCompResult.Done))
                             {
@@ -1213,6 +1291,41 @@ namespace gip.mes.processapplication
             //}
         }
 
+        /// <summary>
+        /// This method returns all Silos which must be dosed on another scale before the first silo on this scale is needed 
+        /// </summary>
+        /// <param name="possibleSilos"></param>
+        /// <param name="routes"></param>
+        /// <returns></returns>
+        protected List<FacilitySumByLots> GetFirstSilosNotDosableHere(IEnumerable<Route> routes, ACPartslistManager.QrySilosResult possibleSilos, IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos, bool removeDisabledFirst = true)
+        {
+            List<FacilitySumByLots> notDosableHere = new List<FacilitySumByLots>();
+            if (possibleSilos == null)
+                return notDosableHere;
+            List<FacilitySumByLots> validSilos = new List<FacilitySumByLots>();
+            foreach (FacilitySumByLots prioSilo in possibleSilos.SortedFilteredResult)
+            {
+                if (!prioSilo.StorageBin.VBiFacilityACClassID.HasValue || (allExcludedSilos != null && allExcludedSilos.Where(c => c.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).Any()))
+                    continue;
+                if (removeDisabledFirst && !prioSilo.StorageBin.OutwardEnabled)
+                    continue;
+                validSilos.Add(prioSilo);
+            }
+            foreach (FacilitySumByLots prioSilo in validSilos)
+            {
+                if (routes != null)
+                {
+                    Route dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.StorageBin.VBiFacilityACClassID).FirstOrDefault();
+                    if (dosingRoute == null)
+                        notDosableHere.Add(prioSilo);
+                    else
+                        break;
+                }
+                else
+                    notDosableHere.Add(prioSilo);
+            }
+            return notDosableHere;
+        }
 
         protected virtual ProdOrderPartslistPosRelation[] OnSortOpenDosings(ProdOrderPartslistPosRelation[] queryOpenDosings, Database dbIPlus, DatabaseApp dbApp)
         {
@@ -1547,7 +1660,7 @@ namespace gip.mes.processapplication
                     IEnumerable<Route> routes = GetRoutes(dosingPosRelation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     if (routes == null || !routes.Any())
                     {
-                        if (AutoChangeScale && possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
+                        if (/*DontWaitForChangeScale && */possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                         {
                             var parallelActiveDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
                                     && c != this
