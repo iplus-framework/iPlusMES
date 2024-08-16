@@ -200,16 +200,14 @@ namespace gip.mes.processapplication
             {
                 if (_MDSchedulingID.HasValue)
                     return _MDSchedulingID.Value;
+                string schedulingKey = MDSchedulingKey;
                 if (String.IsNullOrEmpty(MDSchedulingKey))
-                {
-                    _MDSchedulingID = Guid.Empty;
-                    return _MDSchedulingID.Value;
-                }
+                    schedulingKey = this.ACIdentifier;
                 try
                 {
                     using (DatabaseApp dbApp = new DatabaseApp())
                     {
-                        var query = dbApp.MDSchedulingGroup.Where(c => c.MDKey == MDSchedulingKey).Select(c => c.MDSchedulingGroupID);
+                        var query = dbApp.MDSchedulingGroup.Where(c => c.MDKey == schedulingKey).Select(c => c.MDSchedulingGroupID);
                         _MDSchedulingID = query.Any() ? query.FirstOrDefault() : Guid.Empty;
                         return _MDSchedulingID.Value;
                     }
