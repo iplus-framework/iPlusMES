@@ -813,10 +813,10 @@ namespace gip.mes.processapplication
                         try
                         {
                             string value = acValue.ParamAsString;
-                            if (String.IsNullOrEmpty(value) || value.ToLower() == "false")
+                            if (String.IsNullOrEmpty(value) || value.ToLower() == "false" || value.ToLower() == "true")
                                 return 0.0;
-                            else if (value.ToLower() == "true")
-                                return 2.0;
+                            //else if (value.ToLower() == "true")
+                            //    return 2.0;
                             else
                             {
                                 double doubleValue = acValue.ParamAsDouble;
