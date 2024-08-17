@@ -1,0 +1,1 @@
+alter table FacilityReservation add CalculatedRoute varchar(max) null
