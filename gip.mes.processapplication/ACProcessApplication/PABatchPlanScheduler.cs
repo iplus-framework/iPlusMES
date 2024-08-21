@@ -17,6 +17,13 @@ namespace gip.mes.processapplication
         public PABatchPlanScheduler(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _RMIPoint = new ACPointAsyncRMI(this, nameof(RMIPoint), 1);
+            _RMIPoint.SetMethod = OnSetInvocationPoint;
+        }
+
+        static PABatchPlanScheduler()
+        {
+            ACMethod.RegisterVirtualMethod(typeof(PABatchPlanScheduler), "RunRoutesCalculation", CreateVirtualRunRouteCalculationMethod("RunRouteCalculation", "en{'Route calculation'}de{'Route calculation'}", null));
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -60,6 +67,20 @@ namespace gip.mes.processapplication
         }
 
         #endregion        
+
+        #region Propreties => RMI
+
+        ACPointAsyncRMI _RMIPoint;
+        [ACPropertyAsyncMethodPoint(9999)]
+        public ACPointAsyncRMI RMIPoint
+        {
+            get
+            {
+                return _RMIPoint;
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -234,10 +255,109 @@ namespace gip.mes.processapplication
         }
         #endregion
 
+        #region Methods => Route calculation
+
+        [ACMethodAsync("Send", "en{'RunRoutesCalculation'}de{'RunRoutesCalculation'}", 201, false)]
+        public ACMethodEventArgs RunRoutesCalculation(ACMethod acMethod)
+        {
+            ACPointAsyncRMIWrap<ACComponent> currentAsyncRMI = RMIPoint.CurrentAsyncRMI;
+
+            ApplicationManager.ApplicationQueue.Add(() => RoutesCalculation(currentAsyncRMI, acMethod));
+
+            return new ACMethodEventArgs(acMethod, Global.ACMethodResultState.InProcess);
+        }
+
+        public void RoutesCalculation(ACPointAsyncRMIWrap<ACComponent> currentAsyncRMI, ACMethod acMethod)
+        {
+            RoutesCalculation();
+
+            if (currentAsyncRMI != null && !currentAsyncRMI.CallbackIsPending)
+            {
+                // 2. Fill out the result parameters
+                ACMethodEventArgs result = new ACMethodEventArgs(acMethod, Global.ACMethodResultState.Succeeded);
+                result.GetACValue("CalculationFinished").Value = true;
+
+                // 3. Invoke callback method of the invoker. 
+                // If client has requested the asynchronous invocation was via network the callback will be done on the remote side at the client
+                RMIPoint.InvokeCallbackDelegate(result);
+            }
+        }
+
+        public void RoutesCalculation()
+        {
+            using (Database db = new core.datamodel.Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
+            {
+                var batchPlans = ProdOrderManager.GetProductionLinieBatchPlansWithPWNode(dbApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null, null, null, null, null);
+
+                MsgWithDetails msg = new MsgWithDetails();
+                List<FacilityReservationRoutes> routesResult = new List<FacilityReservationRoutes>();
+
+                ConfigManagerIPlus configManager = ConfigManagerIPlus.GetServiceInstance(this);
+
+                foreach (ProdOrderBatchPlan batchPlan in batchPlans)
+                {
+                    List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { batchPlan.ProdOrderPartslist, batchPlan.ProdOrderPartslist.Partslist, batchPlan.ProdOrderPartslist.Partslist.MaterialWF, 
+                                                                                             batchPlan.IplusVBiACClassWF.ACClassMethod};
+                    var result = ProdOrderManager.CalculatePossibleRoutes(dbApp, db, batchPlan, listOfSelectedStores, configManager, msg);
+                    if (result != null && result.Any())
+                    {
+                        routesResult.AddRange(result);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region RegisterVirtualMethods
+
+        protected static ACMethodWrapper CreateVirtualRunRouteCalculationMethod(string acIdentifier, string captionTranslation, Type pwClass)
+        {
+            ACMethod method = new ACMethod(acIdentifier);
+
+            Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            method.ParameterValueList.Add(new ACValue("RouteCalculation", typeof(bool), false, Global.ParamOption.Required));
+            paramTranslation.Add("RouteCalculation", "en{'RouteCalculation'}de{'RouteCalculation'}");
+
+
+            Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
+            method.ResultValueList.Add(new ACValue("CalculationFinished", typeof(bool), true, Global.ParamOption.Required));
+            resultTranslation.Add("CalculationFinished", "en{'CalculationFinished'}de{'CalculationFinished'}");
+
+            return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
+        }
+
+        #endregion
+
+        #region Methods => RMI
+
+        public bool OnSetInvocationPoint(IACPointNetBase point)
+        {
+            var query = ReferencePoint.ConnectionList.Where(c => c is IACContainerRef);
+            // This delegate in invioked when the RMI-Point has got a new entry
+
+            // VARIANT A:
+            // DeQueueInvocationList() handles all new entries by calling ExampleMethodAsync() for each new entry
+            RMIPoint.DeQueueInvocationList();
+
+            //// VARIANT B:
+            //// If you want to handle it on another way, then implement you own logic. 
+            //foreach (var newEntry in RMIPoint.ConnectionList.Where(c => c.State == PointProcessingState.NewEntry))
+            //{
+            //    // Call ActivateAsyncRMI if you want to handle this entry. (ActivateAsyncRMI knows that your ExampleMethodAsync has to be invoked)
+            //    RMIPoint.ActivateAsyncRMI(newEntry, true);
+            //    // Attention: If you don't invoke all new entries, than you have to handle the other remaining entries in another cyclic thread
+            //    // otherwise the requester will never get back a result!
+            //}
+
+            return true;
+        }
+
+        #endregion
+
         #endregion
 
 
     }
-
-
 }

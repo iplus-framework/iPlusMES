@@ -109,6 +109,8 @@ namespace gip.bso.logistics
             _ValidateBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBeforeStart), false);
             _FilterPickingStateLess = new ACPropertyConfigValue<PickingStateEnum>(this, nameof(FilterPickingStateLess), PickingStateEnum.InProcess);
             _FilterPickingStateGreater = new ACPropertyConfigValue<PickingStateEnum>(this, nameof(FilterPickingStateGreater), PickingStateEnum.WaitOnManualClosing);
+
+            _RMISubscr = new ACPointAsyncRMISubscr(this, "RMISubscr", 1);
         }
 
         #region c´tors -> ACInit
@@ -1041,6 +1043,20 @@ namespace gip.bso.logistics
             {
                 _SelectedPickingTimelineItem = value;
                 OnPropertyChanged(nameof(SelectedPickingTimelineItem));
+            }
+        }
+
+        #endregion
+
+        #region Properties => RMI and Routing
+
+        ACPointAsyncRMISubscr _RMISubscr;
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        public ACPointAsyncRMISubscr RMISubscr
+        {
+            get
+            {
+                return _RMISubscr;
             }
         }
 
@@ -2046,12 +2062,122 @@ namespace gip.bso.logistics
 
         #region Methods => Routing
 
+        [ACMethodInfo("","", 9999, true)]
         public void RunPossibleRoutesCheck()
         {
-            
+            InvokeCalculateRoutesAsync();
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return PickingList != null && PickingList.Any();
+        }
+
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
+        {
+            // The callback-method can be called
+            if (e != null)
+            {
+                IACTask taskEntry = wrapObject as IACTask;
+                ACPointAsyncRMIWrap<ACComponent> taskEntryMoreConcrete = wrapObject as ACPointAsyncRMIWrap<ACComponent>;
+                ACMethodEventArgs eM = e as ACMethodEventArgs;
+                if (taskEntry.State == PointProcessingState.Deleted)
+                {
+                    // Compare RequestID to identify your asynchronus invocation
+                    if (taskEntry.RequestID == myTestRequestID)
+                    {
+                        OnCalculateRoutesCallback();
+                    }
+                }
+                if (taskEntryMoreConcrete.Result.ResultState == Global.ACMethodResultState.Succeeded)
+                {
+                    bool wasMyAsynchronousRequest = false;
+                    if (myRequestEntryA != null && myRequestEntryA.CompareTo(taskEntryMoreConcrete) == 0)
+                        wasMyAsynchronousRequest = true;
+                    System.Diagnostics.Trace.WriteLine(wasMyAsynchronousRequest.ToString());
+                }
+            }
+        }
+
+        Guid myTestRequestID;
+        ACPointAsyncRMISubscrWrap<ACComponent> myRequestEntryA;
+        public bool InvokeCalculateRoutesAsync()
+        {
+            // 1. Invoke ACUrlACTypeSignature for getting a default-ACMethod-Instance
+            ACMethod acMethod = PAWorkflowScheduler.ACUrlACTypeSignature("!RunRouteCalculation", gip.core.datamodel.Database.GlobalDatabase);
+
+            // 2. Fill out all important parameters
+            acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
+
+
+            myRequestEntryA = RMISubscr.InvokeAsyncMethod(PAWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
+            if (myRequestEntryA != null)
+                myTestRequestID = myRequestEntryA.RequestID;
+            return myRequestEntryA != null;
+        }
+
+
+        public void OnCalculateRoutesCallback()
+        {
+            var pickings = PickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+            List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+            foreach (Picking picking in pickings)
+            {
+                if (PickingList.Where(c => c.PickingID == picking.PickingID).Any())
+                    continue;
+
+                foreach (PickingPos pPos in picking.PickingPos_Picking)
+                {
+                    reservations.AddRange(pPos.FacilityReservation_PickingPos);
+                }
+            }
+
+            var myReservations = SelectedPicking.Picking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+
+            ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+            var prodOrderBatchPlans  = prodOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused,
+                                                                                                     null, null, null, null, null, null, null);
+
+            reservations.AddRange(prodOrderBatchPlans.SelectMany(c => c.FacilityReservation_ProdOrderBatchPlan.Where(x => x.FacilityID.HasValue)));
+
+            List<FacilityReservation> result = new List<FacilityReservation>();
+
+            foreach (FacilityReservation reservation in myReservations)
+            {
+                if (reservation.CalculatedRoute != null)
+                {
+                    string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                    foreach (string routeHash in splitedRoute)
+                    {
+                        IEnumerable<FacilityReservation> items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(routeHash));
+                        if (items.Any())
+                            result.AddRange(items);
+                    }
+                }
+            }
+
+            if (result.Any())
+            {
+                List<string> reservationsWithSameRoute = result.Where(c => c.PickingPos != null).Select(c => c.PickingPos.Picking.PickingNo).Distinct().ToList();
+                IEnumerable<string> prodOrderWithSameRoute = result.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo).Distinct();
+                if (prodOrderWithSameRoute != null && prodOrderWithSameRoute.Any())
+                    reservationsWithSameRoute.AddRange(prodOrderWithSameRoute);
+
+                if (reservationsWithSameRoute != null && reservationsWithSameRoute.Any())
+                {
+                    Messages.Msg(new Msg(eMsgLevel.Info, "The following orders order may use same module: " +  string.Join(", ", reservationsWithSameRoute)));
+                }
+            }
+
         }
 
         #endregion
+
+
 
         #endregion
 

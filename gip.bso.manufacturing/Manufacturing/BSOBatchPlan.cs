@@ -27,7 +27,7 @@ namespace gip.bso.manufacturing
         public BSOBatchPlan(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _RMISubscr = new ACPointAsyncRMISubscr(this, "RMISubscr", 1);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -599,6 +599,20 @@ namespace gip.bso.manufacturing
                 return SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.BatchSize < 0.000001 ? 0.0 : SelectedIntermediate.DifferenceQuantityUOM / SelectedBatchPlanForIntermediate.BatchSize;
             }
         }
+
+        #region Properties => RMI
+
+        ACPointAsyncRMISubscr _RMISubscr;
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        public ACPointAsyncRMISubscr RMISubscr
+        {
+            get
+            {
+                return _RMISubscr;
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -1328,6 +1342,130 @@ namespace gip.bso.manufacturing
         public bool IsEnabledOpenRoute()
         {
             return SelectedTarget != null && SelectedTarget.CurrentRoute != null;
+        }
+
+        [ACMethodInfo("", "", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            InvokeCalculateRoutesAsync();
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return SelectedBatchPlanForIntermediate != null;
+        }
+
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
+        {
+            // The callback-method can be called
+            if (e != null)
+            {
+                IACTask taskEntry = wrapObject as IACTask;
+                ACPointAsyncRMIWrap<ACComponent> taskEntryMoreConcrete = wrapObject as ACPointAsyncRMIWrap<ACComponent>;
+                ACMethodEventArgs eM = e as ACMethodEventArgs;
+                if (taskEntry.State == PointProcessingState.Deleted)
+                {
+                    // Compare RequestID to identify your asynchronus invocation
+                    if (taskEntry.RequestID == myTestRequestID)
+                    {
+                        OnCalculateRoutesCallback();
+                    }
+                }
+                if (taskEntryMoreConcrete.Result.ResultState == Global.ACMethodResultState.Succeeded)
+                {
+                    bool wasMyAsynchronousRequest = false;
+                    if (myRequestEntryA != null && myRequestEntryA.CompareTo(taskEntryMoreConcrete) == 0)
+                        wasMyAsynchronousRequest = true;
+                    System.Diagnostics.Trace.WriteLine(wasMyAsynchronousRequest.ToString());
+                }
+            }
+        }
+
+        Guid myTestRequestID;
+        ACPointAsyncRMISubscrWrap<ACComponent> myRequestEntryA;
+        public bool InvokeCalculateRoutesAsync()
+        {
+            ACComponent paWorkflowScheduler = BSOBatchPlanSchedulerBSO?.PAWorkflowScheduler;
+            if (paWorkflowScheduler == null)
+            {
+                string acUrl = @"\Planning\BatchPlanScheduler";
+                using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                {
+                    core.datamodel.ACClass paClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == nameof(PABatchPlanScheduler) && !c.ACProject.IsProduction);
+                    while (paClass != null)
+                    {
+                        acUrl = paClass.ACURLComponentCached;
+                        paClass = paClass.ACClass_BasedOnACClass.Where(c => c.ACProject.IsProduction).FirstOrDefault();
+                    }
+                }
+
+                paWorkflowScheduler = Root.ACUrlCommand(acUrl) as ACComponent;
+            }
+
+            if (paWorkflowScheduler == null)
+            {
+                Messages.Msg(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
+                return false;
+            }
+
+            // 1. Invoke ACUrlACTypeSignature for getting a default-ACMethod-Instance
+            ACMethod acMethod = paWorkflowScheduler.ACUrlACTypeSignature("!RunRouteCalculation", gip.core.datamodel.Database.GlobalDatabase);
+
+            // 2. Fill out all important parameters
+            acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
+
+
+            myRequestEntryA = RMISubscr.InvokeAsyncMethod(paWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
+            if (myRequestEntryA != null)
+                myTestRequestID = myRequestEntryA.RequestID;
+            return myRequestEntryA != null;
+        }
+
+
+        public void OnCalculateRoutesCallback()
+        {
+            var batchPlans = ProdOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null, null, null, null, null);
+
+            List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+            foreach (ProdOrderBatchPlan batchPlan in batchPlans)
+            {
+                if ((BSOBatchPlanSchedulerBSO != null && BSOBatchPlanSchedulerBSO.ProdOrderBatchPlanList.Any(c => c.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID))
+                    || SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID)
+                    continue;
+
+                reservations.AddRange(batchPlan.FacilityReservation_ProdOrderBatchPlan);
+            }
+
+            var myReservations = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+
+            List<FacilityReservation> result = new List<FacilityReservation>();
+
+            foreach (FacilityReservation reservation in myReservations)
+            {
+                if (reservation.CalculatedRoute != null)
+                {
+                    string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                    foreach (string routeHash in splitedRoute)
+                    {
+                        var items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(routeHash));
+                        if (items.Any())
+                            result.AddRange(items);
+                    }
+                }
+            }
+
+            if (result.Any())
+            {
+                var ordersWithSameRoute = result.Select(c => c.ProdOrderBatchPlan).Select(c => c.ProdOrderPartslist.ProdOrder).Distinct();
+                if (ordersWithSameRoute != null && ordersWithSameRoute.Any())
+                {
+                    Messages.Msg(new Msg(eMsgLevel.Info, "The following orders order may use same module: " + string.Join(", ", ordersWithSameRoute)));
+                }
+            }
+
         }
 
         #endregion

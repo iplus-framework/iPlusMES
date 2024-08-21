@@ -1950,6 +1950,53 @@ namespace gip.mes.facility
                                     .ThenBy(c => c.InsertDate)
         );
 
+        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansWithPWNode =
+        CompiledQuery.Compile<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
+                                    ctx.ProdOrderBatchPlan
+                                    .Include("ProdOrderPartslist")
+                                    .Include("ProdOrderPartslist.MDProdOrderState")
+                                    .Include("ProdOrderPartslist.ProdOrder")
+                                    .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
+                                    .Include("ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder")
+                                    .Include("ProdOrderPartslist.Partslist")
+                                    .Include("ProdOrderPartslist.Partslist.Material")
+                                    .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                                    .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
+                                    .Where(c =>
+                                            c.ProdOrderPartslist.Partslist.IsEnabled
+                                            && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any()
+                                            && c.PlanStateIndex >= fromPlanState
+                                            && c.PlanStateIndex <= toPlanState
+                                            && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
+                                            && (
+                                                    string.IsNullOrEmpty(materialNo)
+                                                    || (c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo) || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo))
+                                                )
+                                            && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                                            && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                                            && (filterStartTime == null
+                                                 || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
+                                                 || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
+                                                )
+                                            && (filterEndTime == null
+                                                 || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
+                                                 || (c.ScheduledEndDate == null && c.ScheduledStartDate != null && c.ScheduledStartDate <= filterEndTime)
+                                                 || (c.ScheduledEndDate == null && c.ScheduledStartDate == null && c.UpdateDate <= filterEndTime)
+                                                )
+                                             && (
+                                                    (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                                                    || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                )
+                                            && (
+                                                   mdBatchPlanGroup == null
+                                                   ||
+                                                   c.MDBatchPlanGroupID == mdBatchPlanGroup
+                                                )
+                                          )
+                                    .OrderBy(c => c.ScheduledOrder ?? 0)
+                                    .ThenBy(c => c.InsertDate)
+        );
 
         public ObservableCollection<ProdOrderBatchPlan> GetProductionLinieBatchPlans(
             DatabaseApp databaseApp,
@@ -1971,6 +2018,24 @@ namespace gip.mes.facility
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
 
+        public ObservableCollection<ProdOrderBatchPlan> GetProductionLinieBatchPlansWithPWNode(
+            DatabaseApp databaseApp,
+            GlobalApp.BatchPlanState fromPlanState,
+            GlobalApp.BatchPlanState toPlanState,
+            DateTime? filterStartTime,
+            DateTime? filterEndTime,
+            MDProdOrderState.ProdOrderStates? minProdOrderState,
+            Guid? planningMRID,
+            Guid? mdBatchPlanGroup,
+            string programNo,
+            string materialNo)
+        {
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansWithPWNode(databaseApp, (short)fromPlanState,
+                (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
+                planningMRID, mdBatchPlanGroup, programNo, materialNo) as ObjectQuery<ProdOrderBatchPlan>;
+            batchQuery.MergeOption = MergeOption.OverwriteChanges;
+            return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
+        }
 
         #endregion
         #endregion

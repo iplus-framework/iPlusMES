@@ -152,6 +152,57 @@ namespace gip.mes.facility
         }
 
 
+        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>> s_cQry_PickingWithPWNode =
+       CompiledQuery.Compile<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>>(
+           (ctx, greaterEqualState, lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) =>
+                                   ctx.Picking
+                                   .Include("PickingPos_Picking.PickingMaterial")
+                                   .Include("PickingPos_Picking.OutOrderPos.Material")
+                                   .Include("PickingPos_Picking.InOrderPos.Material")
+                                   .Include("PickingPos_Picking.ToFacility")
+                                   .Include("PickingPos_Picking.FromFacility")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.FacilityLot")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.Material")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.FacilityStock_Facility")
+                                   .Where(c => (c.VBiACClassWF != null && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
+                                           && (c.PickingStateIndex >= greaterEqualState
+                                               || c.PickingStateIndex <= lessEqualState)
+                                           && (string.IsNullOrEmpty(pickingNo) || c.PickingNo.Contains(pickingNo))
+                                           && (
+                                                   string.IsNullOrEmpty(materialNo)
+                                                   || (c.PickingPos_Picking.Any(x => x.PickingMaterial != null && x.PickingMaterial.MaterialNo.Contains(materialNo)))
+                                               )
+                                           && (filterStartTime == null
+                                                || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
+                                                || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
+                                               )
+                                           && (filterEndTime == null
+                                                || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
+                                                || (c.ScheduledEndDate == null && c.ScheduledStartDate != null && c.ScheduledStartDate <= filterEndTime)
+                                                || (c.ScheduledEndDate == null && c.ScheduledStartDate == null && c.UpdateDate <= filterEndTime)
+                                               )
+                                         )
+                                   .OrderBy(c => c.ScheduledOrder ?? 0)
+                                   .ThenBy(c => c.InsertDate)
+       );
+
+        public ObjectQuery<Picking> GetScheduledPickings(
+            DatabaseApp databaseApp,
+            PickingStateEnum greaterEqualState,
+            PickingStateEnum lessEqualState,
+            DateTime? filterStartTime,
+            DateTime? filterEndTime,
+            string pickingNo,
+            string materialNo)
+        {
+            ObjectQuery<Picking> query = s_cQry_PickingWithPWNode(databaseApp, (short)greaterEqualState,
+                (short)lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) as ObjectQuery<Picking>;
+            query.MergeOption = MergeOption.OverwriteChanges;
+            return query;
+        }
+
+
         #endregion
 
         #endregion
@@ -1811,8 +1862,7 @@ namespace gip.mes.facility
         //    }
         //}
         
-        public IEnumerable<PickingPosRoutes> GetPossibleRoutes(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
-                                        PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages)
+        public IEnumerable<FacilityReservationRoutes> CalculatePossibleRoutes(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores, MsgWithDetails detailMessages)
         {
             Msg msg = null;
             core.datamodel.ACClassWF planningNode = null;
@@ -1896,42 +1946,232 @@ namespace gip.mes.facility
                 return null;
             }
 
-            List<PickingPosRoutes> result = new List<PickingPosRoutes>();
+            List<FacilityReservationRoutes> result = new List<FacilityReservationRoutes>();
 
             foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                        .OrderBy(c => c.Sequence))
             {
-                if (pos.Material != null && pos.Material.IsLotReservationNeeded)
+
+                foreach (FacilityReservation reservation in pos.FacilityReservation_PickingPos)
                 {
-                    if (!pos.FacilityReservation_PickingPos.Where(c => !c.VBiACClassID.HasValue).Any())
+                    if (reservation.CalculatedRoute != null)
+                        continue;
+
+                    IEnumerable<Route> routes = null;
+
+                    if (pos.FromFacility != null)
                     {
-                        // Error50634: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
-                        msg = new Msg
-                        {
-                            Source = GetACUrl(),
-                            MessageLevel = eMsgLevel.Error,
-                            ACIdentifier = "CheckResourcesAndRouting(20)",
-                            Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
-                        };
-                        detailMessages.AddDetailMessage(msg);
+                        routes = CheckRoutingKnownSourceReservation(dbApp, dbiPlus, picking, detailMessages, pos, reservation, siloType, selectionRuleID, selectionRuleParams);
+                    }
+                    else
+                    {
+                        routes = CheckRoutingRoutingUnknownSourceReservation(dbApp, dbiPlus, picking, detailMessages, pos, reservation, siloType, selectionRuleID, selectionRuleParams);
+                    }
+
+                    if (routes != null)
+                    {
+                        reservation.CalculatedRoute = routes.FirstOrDefault().GetRouteItemsHash();
+                        result.Add(new FacilityReservationRoutes() { Reservation = reservation, Routes = new RoutingResult(routes, false, null) });
                     }
                 }
-
-                IEnumerable<Route> routes = null;
-
-                if (pos.FromFacility != null)
-                {
-                    routes = CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams, true);
-                }
-                else
-                {
-                    routes = CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams, true);
-                }
-
-                result.Add(new PickingPosRoutes() { PickingPosition = pos, Routes = routes });
             }
 
+            Msg msgSave = dbApp.ACSaveChanges();
+            if (msgSave != null)
+                detailMessages.AddDetailMessage(msgSave);
+
             return result;
+        }
+
+        private IEnumerable<Route> CheckRoutingKnownSourceReservation(DatabaseApp dbApp, Database dbiPlus, Picking picking,
+                                                                      MsgWithDetails detailMessages, PickingPos pos, FacilityReservation reservation, Type siloType,
+                                                                      string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+        {
+            Msg msg;
+
+            if (pos.FromFacility == null || reservation.Facility == null || pos.FromFacility.MDFacilityType == null || reservation.Facility.MDFacilityType == null)
+            {
+                //Error50113: No source, no target or no facilitytype defined in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+            if (!pos.FromFacility.VBiFacilityACClassID.HasValue || !reservation.Facility.VBiFacilityACClassID.HasValue)
+            {
+                //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
+            var toClass = reservation.Facility.GetFacilityACClass(dbiPlus);
+            if (fromClass == toClass)
+                return null;
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                AttachRouteItemsToContext = false,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = selectionRuleID,
+                SelectionRuleParams = selectionRuleParams,
+                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 10,
+                IgnorePreferences = true
+            };
+
+            RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
+            if (result.Routes == null || !result.Routes.Any())
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(90)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            return result?.Routes;
+        }
+
+        private IEnumerable<Route> CheckRoutingRoutingUnknownSourceReservation(DatabaseApp dbApp, Database dbiPlus, Picking picking,
+                                                                               MsgWithDetails detailMessages, PickingPos pos, FacilityReservation reservation, Type siloType,
+                                                                               string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+        {
+            Msg msg;
+
+            if (reservation.Facility == null || reservation.Facility.MDFacilityType == null)
+            {
+                //Error50113: No source, no target or no facilitytype defined in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            if (!reservation.Facility.VBiFacilityACClassID.HasValue)
+            {
+                //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            if (reservation.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer && !pos.PickingMaterialID.HasValue)
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = "No material assigned to picking position."
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+
+            QrySilosResult possibleSilos = null;
+            core.datamodel.ACClass compClass = reservation.Facility.FacilityACClass;
+
+            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos,
+                                                  null, null, null, true, 0, selectionRuleID, selectionRuleParams);
+
+            if (routes == null || !routes.Any())
+            {
+                //Error50120: No route found for transport from {0} to {1}
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = nameof(CheckResourcesAndRoutingUnknownSource) + "(90)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50120", "", reservation.Facility.FacilityNo)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            return routes;
+        }
+
+        public Msg CompareCalculateRoutes(Picking currentPicking, IEnumerable<Picking> pickingsExcludeComparation, DatabaseApp dbApp)
+        {
+            var pickings = GetScheduledPickings(dbApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+            List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+            foreach (Picking picking in pickings)
+            {
+                if (pickingsExcludeComparation.Where(c => c.PickingID == picking.PickingID).Any())
+                    continue;
+
+                foreach (PickingPos pPos in picking.PickingPos_Picking)
+                {
+                    reservations.AddRange(pPos.FacilityReservation_PickingPos);
+                }
+            }
+
+            var myReservations = currentPicking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+
+            List<FacilityReservation> result = new List<FacilityReservation>();
+
+            foreach (FacilityReservation reservation in myReservations)
+            {
+                if (reservation.CalculatedRoute != null)
+                {
+                    string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                    foreach (string routeHash in splitedRoute)
+                    {
+                        var items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(routeHash));
+                        if (items.Any())
+                            result.AddRange(items);
+                    }
+                }
+            }
+
+            if (result.Any())
+            {
+                var pickingsWithSameRoute = result.Select(c => c.PickingPos).Select(c => c.Picking.PickingNo).Distinct();
+                if (pickingsWithSameRoute != null && pickingsWithSameRoute.Any())
+                {
+                    return new Msg(eMsgLevel.Info, "The following orders order may use same module: " + string.Join(", ", pickingsWithSameRoute));
+                }
+            }
+
+            return null;
         }
 
         #endregion
