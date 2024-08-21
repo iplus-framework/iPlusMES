@@ -136,7 +136,7 @@
     <Compile Include="Model\PartslistValidationInfo.cs" />
     <Compile Include="Model\OEE\FacilityOEEAvg.cs" />
     <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
-    <Compile Include="Model\PickingPosRoutes.cs" />
+    <Compile Include="Model\FacilityReservationRoutes.cs" />
     <Compile Include="Model\PlanningTargetStockPreview.cs" />
     <Compile Include="Model\ProdOrderPartslistOverview.cs" />
     <Compile Include="Model\RemotePickingInfo.cs" />

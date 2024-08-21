@@ -1060,6 +1060,18 @@ namespace gip.bso.logistics
             }
         }
 
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999,"","")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #endregion
@@ -2065,7 +2077,9 @@ namespace gip.bso.logistics
         [ACMethodInfo("","", 9999, true)]
         public void RunPossibleRoutesCheck()
         {
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
             InvokeCalculateRoutesAsync();
+            ShowDialog(this, "CalculatedRouteDialog");
         }
 
         public bool IsEnabledPossibleRoutesCheck()
@@ -2116,7 +2130,6 @@ namespace gip.bso.logistics
                 myTestRequestID = myRequestEntryA.RequestID;
             return myRequestEntryA != null;
         }
-
 
         public void OnCalculateRoutesCallback()
         {
@@ -2169,10 +2182,17 @@ namespace gip.bso.logistics
 
                 if (reservationsWithSameRoute != null && reservationsWithSameRoute.Any())
                 {
-                    Messages.Msg(new Msg(eMsgLevel.Info, "The following orders order may use same module: " +  string.Join(", ", reservationsWithSameRoute)));
+                    CalculateRouteResult = "The following orders order may use same module: " + string.Join(", ", reservationsWithSameRoute);
+                }
+                else
+                {
+                    CalculateRouteResult = "There no order which will use equipment from this order!";
                 }
             }
+            else
+                CalculateRouteResult = "There no order which will use equipment from this order!"; ;
 
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
         }
 
         #endregion
