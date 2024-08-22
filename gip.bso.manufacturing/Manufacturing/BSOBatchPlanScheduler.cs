@@ -4670,7 +4670,14 @@ namespace gip.bso.manufacturing
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
 
             if (BSOBatchPlanChild != null && BSOBatchPlanChild.Value != null)
-                BSOBatchPlanChild.Value.InvokeCalculateRoutesAsync();
+            {
+                bool invoked = BSOBatchPlanChild.Value.InvokeCalculateRoutesAsync(); 
+                if (!invoked)
+                {
+                    Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                    return;
+                }
+            }
 
             ShowDialog(this, "CalculatedRouteDialog");
         }

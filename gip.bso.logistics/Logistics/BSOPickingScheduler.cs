@@ -2079,7 +2079,12 @@ namespace gip.bso.logistics
         {
             CalculateRouteResult = null;
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
-            InvokeCalculateRoutesAsync();
+            bool invoked = InvokeCalculateRoutesAsync();
+            if (!invoked)
+            {
+                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                return;
+            }
             ShowDialog(this, "CalculatedRouteDialog");
         }
 

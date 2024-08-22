@@ -1361,7 +1361,12 @@ namespace gip.bso.manufacturing
             CalculateRouteResult = null;
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
 
-            InvokeCalculateRoutesAsync();
+            bool invoked = InvokeCalculateRoutesAsync();
+            if (!invoked)
+            {
+                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                return;
+            }
 
             ShowDialog(this, "CalculatedRouteDialog");
         }
@@ -1453,7 +1458,15 @@ namespace gip.bso.manufacturing
                 reservations.AddRange(batchPlan.FacilityReservation_ProdOrderBatchPlan);
             }
 
-            var myReservations = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+            var myReservations = BSOBatchPlanSchedulerBSO != null ? BSOBatchPlanSchedulerBSO.SelectedProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray() : SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+
+            ACPickingManager pickingManager = ACPickingManager.GetServiceInstance(this);
+            var pickings = pickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+            if (pickings != null && pickings.Any())
+            {
+                reservations.AddRange(pickings.SelectMany(x => x.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos)).Distinct());
+            }
 
             List<FacilityReservation> result = new List<FacilityReservation>();
 
