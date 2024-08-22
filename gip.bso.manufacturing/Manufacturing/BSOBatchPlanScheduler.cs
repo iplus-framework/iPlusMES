@@ -1989,6 +1989,22 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties => CalculatedRoutes
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999, "", "")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Methods
@@ -4642,6 +4658,26 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #endregion
+
+        #region Methods => RouteCalculation
+
+        [ACMethodInfo("", "", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+
+            if (BSOBatchPlanChild != null && BSOBatchPlanChild.Value != null)
+                BSOBatchPlanChild.Value.InvokeCalculateRoutesAsync();
+
+            ShowDialog(this, "CalculatedRouteDialog");
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return SelectedProdOrderBatchPlan != null && BSOBatchPlanChild != null;
+        }
 
         #endregion
 

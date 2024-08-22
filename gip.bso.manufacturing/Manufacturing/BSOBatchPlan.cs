@@ -21,7 +21,6 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch planning'}de{'Batchplanung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
     public class BSOBatchPlan : VBBSOModulesSelector
     {
-
         #region c´tors
 
         public BSOBatchPlan(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -600,7 +599,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        #region Properties => RMI
+        #region Properties => RMI and CalculatedRoutes
 
         ACPointAsyncRMISubscr _RMISubscr;
         [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
@@ -609,6 +608,18 @@ namespace gip.bso.manufacturing
             get
             {
                 return _RMISubscr;
+            }
+        }
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999, "", "")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1422,7 +1433,6 @@ namespace gip.bso.manufacturing
             return myRequestEntryA != null;
         }
 
-
         public void OnCalculateRoutesCallback()
         {
             var batchPlans = ProdOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null, null, null, null, null);
@@ -1457,15 +1467,37 @@ namespace gip.bso.manufacturing
                 }
             }
 
+            string calculateRouteResult;
+
             if (result.Any())
             {
-                var ordersWithSameRoute = result.Select(c => c.ProdOrderBatchPlan).Select(c => c.ProdOrderPartslist.ProdOrder).Distinct();
-                if (ordersWithSameRoute != null && ordersWithSameRoute.Any())
+                List<string> reservationsWithSameRoute = result.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo).Distinct().ToList();
+                IEnumerable<string> pickingsWithSameRoute = result.Where(c => c.PickingPos != null).Select(c => c.PickingPos.Picking.PickingNo).Distinct();
+                if (pickingsWithSameRoute != null && pickingsWithSameRoute.Any())
+                    reservationsWithSameRoute.AddRange(pickingsWithSameRoute);
+
+                if (reservationsWithSameRoute != null && reservationsWithSameRoute.Any())
                 {
-                    Messages.Msg(new Msg(eMsgLevel.Info, "The following orders order may use same module: " + string.Join(", ", ordersWithSameRoute)));
+                    calculateRouteResult = "The following orders order may use same module: " + string.Join(", ", reservationsWithSameRoute);
+                }
+                else
+                {
+                    calculateRouteResult = "There no order which will use equipment from this order!";
                 }
             }
+            else
+                calculateRouteResult = "There no order which will use equipment from this order!"; ;
 
+            if (BSOBatchPlanSchedulerBSO != null)
+            {
+                BSOBatchPlanSchedulerBSO.CalculateRouteResult = calculateRouteResult;
+                BSOBatchPlanSchedulerBSO.CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+            }
+            else
+            {
+                CalculateRouteResult = calculateRouteResult;
+                CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+            }
         }
 
         #endregion
@@ -1517,6 +1549,5 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
     }
 }
