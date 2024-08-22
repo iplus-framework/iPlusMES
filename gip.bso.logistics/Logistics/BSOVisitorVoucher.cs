@@ -20,6 +20,7 @@ using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.mes.facility;
 using System.Data;
+using System.Data.Objects;
 
 namespace gip.bso.logistics
 {
@@ -261,7 +262,7 @@ namespace gip.bso.logistics
                         }
                     }
                 }
-                OnPropertyChanged("FilterVisitorVouchers");
+                OnPropertyChanged(nameof(FilterVisitorVouchers));
             }
         }
 
@@ -345,9 +346,21 @@ namespace gip.bso.logistics
                         RebuildAccessPrimary();
                         navACQueryDefinition.SaveConfig(true);
                     }
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
+        }
+
+        private IQueryable<VisitorVoucher> _AccessPrimary_NavSearchExecuting(IQueryable<VisitorVoucher> result)
+        {
+            ObjectQuery<VisitorVoucher> query = result as ObjectQuery<VisitorVoucher>;
+            if (query != null)
+            {
+                query.Include(c => c.Picking_VisitorVoucher);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -369,9 +382,9 @@ namespace gip.bso.logistics
                     return;
                 TempNewVisitor = null;
                 AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentVisitorVoucher");
+                OnPropertyChanged();
                 EmptyVisitorSearch();
-                OnPropertyChanged("CurrentVisitor");
+                OnPropertyChanged(nameof(CurrentVisitor));
 
                 RefreshLists(true);
             }
@@ -410,9 +423,10 @@ namespace gip.bso.logistics
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedVisitorVoucher");
+                OnPropertyChanged(nameof(SelectedVisitorVoucher));
             }
         }
+
         #endregion
 
         #region Visitor Assignment
@@ -507,9 +521,9 @@ namespace gip.bso.logistics
                 if (CurrentVisitorVoucher != null)
                 {
                     CurrentVisitorVoucher.Visitor = value;
-                    OnPropertyChanged("CurrentVisitorVoucher");
+                    OnPropertyChanged(nameof(CurrentVisitorVoucher));
                 }
-                OnPropertyChanged("CurrentVisitor");
+                OnPropertyChanged(nameof(CurrentVisitor));
             }
         }
 
@@ -566,10 +580,10 @@ namespace gip.bso.logistics
                     AccessVisitor.NavACQueryDefinition.SearchWord = value;
                     AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                     AccessVisitor.NavSearch(this.DatabaseApp);
-                    OnPropertyChanged("VisitorList");
+                    OnPropertyChanged(nameof(VisitorList));
                     CurrentVisitor = VisitorList.FirstOrDefault();
                 }
-                OnPropertyChanged("FindVisitor");
+                OnPropertyChanged(nameof(FindVisitor));
             }
         }
 
@@ -600,11 +614,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorNo");
+                OnPropertyChanged(nameof(FindVisitorNo));
             }
         }
 
@@ -635,11 +649,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorVehicleNo");
+                OnPropertyChanged(nameof(FindVisitorVehicleNo));
             }
         }
 
@@ -670,11 +684,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorCompanyNo");
+                OnPropertyChanged(nameof(FindVisitorCompanyNo));
             }
         }
 
@@ -705,11 +719,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorCompanyName");
+                OnPropertyChanged(nameof(FindVisitorCompanyName));
             }
         }
 
@@ -740,11 +754,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorPersonName");
+                OnPropertyChanged(nameof(FindVisitorPersonName));
             }
         }
 
@@ -775,11 +789,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorCardNo");
+                OnPropertyChanged(nameof(FindVisitorCardNo));
             }
         }
 
@@ -1035,7 +1049,7 @@ namespace gip.bso.logistics
             DatabaseApp.VisitorVoucher.AddObject(voucher);
             TempNewVisitor = null;
             AccessPrimary.NavList.Add(voucher);
-            OnPropertyChanged("VisitorVoucherList");
+            OnPropertyChanged(nameof(VisitorVoucherList));
             SelectedVisitorVoucher = voucher;
             CurrentVisitorVoucher = voucher;
 
@@ -1100,7 +1114,7 @@ namespace gip.bso.logistics
             }
             if (isSearchable)
                 AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("VisitorVoucherList");
+            OnPropertyChanged(nameof(VisitorVoucherList));
             RefreshLists(true);
         }
 
@@ -1121,25 +1135,25 @@ namespace gip.bso.logistics
             if (acAccess == _AccessVisitor)
             {
                 _AccessVisitor.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("VisitorList");
+                OnPropertyChanged(nameof(VisitorList));
                 return true;
             }
             else if (acAccess == _AccessUnAssignedDeliveryNote)
             {
                 _AccessUnAssignedDeliveryNote.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("UnAssignedDeliveryNoteList");
+                OnPropertyChanged(nameof(UnAssignedDeliveryNoteList));
                 return true;
             }
             else if (acAccess == _AccessUnAssignedPicking)
             {
                 _AccessUnAssignedPicking.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("UnAssignedPickingList");
+                OnPropertyChanged(nameof(UnAssignedPickingList));
                 return true;
             }
             else if (acAccess == _AccessUnAssignedTourplan)
             {
                 _AccessUnAssignedTourplan.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("UnAssignedTourplanList");
+                OnPropertyChanged(nameof(UnAssignedTourplanList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -1185,7 +1199,7 @@ namespace gip.bso.logistics
                 if (result != null)
                 {
                     result.VisitorVoucher = CurrentVisitorVoucher;
-                    OnPropertyChanged("DeliveryNoteList");
+                    OnPropertyChanged(nameof(DeliveryNoteList));
                 }
             }
         }
@@ -1232,9 +1246,9 @@ namespace gip.bso.logistics
                 if (TempNewVisitor != null)
                 {
                     TempNewVisitor.VisitorVoucher_Visitor.Add(CurrentVisitorVoucher);
-                    OnPropertyChanged("AllVisitorList");
+                    OnPropertyChanged(nameof(AllVisitorList));
                     CurrentVisitorVoucher.Visitor = TempNewVisitor;
-                    OnPropertyChanged("CurrentVisitorVoucher");
+                    OnPropertyChanged(nameof(CurrentVisitorVoucher));
                 }
             }
             childBSO.Stop();

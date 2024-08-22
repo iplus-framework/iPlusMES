@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -149,6 +152,65 @@ namespace gip.mes.datamodel
         {
             if (bRefreshConfig)
                 ACProperties.Refresh();
+        }
+
+        #endregion
+
+        #region Additional Members
+
+        /// <summary>
+        /// Picking status info
+        /// </summary>
+        private string _PickingStatusInfo;
+        [ACPropertyInfo(999, nameof(PickingStatusInfo), "en{'Picking status'}de{'Verladestatus'}")]
+        public string PickingStatusInfo
+        {
+            get
+            {
+                if (_PickingStatusInfo == null)
+                {
+                    _PickingStatusInfo = LoadPickingStatusInfo();
+                }
+                return _PickingStatusInfo;
+            }
+            set
+            {
+                if (_PickingStatusInfo != value)
+                {
+                    _PickingStatusInfo = value;
+                    OnPropertyChanged("PickingStatusInfo");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Helper mehtods
+
+        private string LoadPickingStatusInfo()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (Picking_VisitorVoucher != null && Picking_VisitorVoucher.Any())
+            {
+                List<Picking> pickings = Picking_VisitorVoucher.OrderBy(c => c.PickingNo).ToList();
+                foreach (Picking picking in pickings)
+                {
+                    string pickingState = "";
+                    ACValueItem acvalueItem = (this.GetObjectContext() as DatabaseApp).PickingStateList[picking.PickingStateIndex];
+                    if(acvalueItem != null)
+                    {
+                        pickingState = acvalueItem.ACCaption;
+                    }
+                    sb.Append($"{picking.PickingNo} - {pickingState}");
+                    if(pickings.IndexOf(picking) < (pickings.Count - 1))
+                    {
+                        sb.Append(Environment.NewLine);
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
 
         #endregion
