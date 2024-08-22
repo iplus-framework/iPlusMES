@@ -221,24 +221,7 @@ namespace gip.mes.processapplication
             if (ts.TotalSeconds < 15)
                 return;
 
-            using (Database db = new core.datamodel.Database())
-            using (DatabaseApp dbApp = new DatabaseApp(db))
-            {
-                var pickings = PickingManager.GetScheduledPickings(dbApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
-
-                MsgWithDetails msg = new MsgWithDetails();
-                List<FacilityReservationRoutes> routesResult = new List<FacilityReservationRoutes>();
-
-                foreach (Picking picking in pickings)
-                {
-                    List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { picking };
-                    var result = PickingManager.CalculatePossibleRoutes(dbApp, db, picking, listOfSelectedStores, msg);
-                    if (result != null && result.Any())
-                    {
-                        routesResult.AddRange(result);
-                    }
-                }
-            }
+            RoutesCalculation();
 
             PABatchPlanScheduler batchScheduler = ParentACComponent.FindChildComponents<PABatchPlanScheduler>(c => c is PABatchPlanScheduler).FirstOrDefault() as PABatchPlanScheduler;
             if (batchScheduler != null)
@@ -255,6 +238,27 @@ namespace gip.mes.processapplication
                 RMIPoint.InvokeCallbackDelegate(result);
             }
 
+        }
+
+        public void RoutesCalculation()
+        {
+            using (Database db = new core.datamodel.Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
+            {
+                var pickings = PickingManager.GetScheduledPickings(dbApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+                MsgWithDetails msg = new MsgWithDetails();
+                foreach (Picking picking in pickings)
+                {
+                    List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { picking };
+                    PickingManager.CalculatePossibleRoutes(dbApp, db, picking, listOfSelectedStores, msg);
+                }
+
+                if (msg.MsgDetailsCount > 0)
+                {
+                    OnNewAlarmOccurred(IsSchedulingAlarm, msg);
+                }    
+            }
         }
 
         #endregion

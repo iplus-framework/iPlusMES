@@ -2074,7 +2074,7 @@ namespace gip.bso.logistics
 
         #region Methods => Routing
 
-        [ACMethodInfo("","", 9999, true)]
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
         public void RunPossibleRoutesCheck()
         {
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
@@ -2196,8 +2196,6 @@ namespace gip.bso.logistics
         }
 
         #endregion
-
-
 
         #endregion
 

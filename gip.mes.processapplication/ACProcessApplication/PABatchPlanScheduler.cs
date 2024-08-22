@@ -271,6 +271,10 @@ namespace gip.mes.processapplication
         {
             RoutesCalculation();
 
+            PAPickingScheduler pickingSchedueler = ParentACComponent.FindChildComponents<PAPickingScheduler>(c => c is PAPickingScheduler).FirstOrDefault() as PAPickingScheduler;
+            if (pickingSchedueler != null)
+                pickingSchedueler.RoutesCalculation();
+
             if (currentAsyncRMI != null && !currentAsyncRMI.CallbackIsPending)
             {
                 // 2. Fill out the result parameters
@@ -299,11 +303,12 @@ namespace gip.mes.processapplication
                 {
                     List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { batchPlan.ProdOrderPartslist, batchPlan.ProdOrderPartslist.Partslist, batchPlan.ProdOrderPartslist.Partslist.MaterialWF, 
                                                                                              batchPlan.IplusVBiACClassWF.ACClassMethod};
-                    var result = ProdOrderManager.CalculatePossibleRoutes(dbApp, db, batchPlan, listOfSelectedStores, configManager, msg);
-                    if (result != null && result.Any())
-                    {
-                        routesResult.AddRange(result);
-                    }
+                    ProdOrderManager.CalculatePossibleRoutes(dbApp, db, batchPlan, listOfSelectedStores, configManager, msg);
+                }
+
+                if (msg.MsgDetailsCount > 0)
+                {
+                    OnNewAlarmOccurred(IsSchedulingAlarm, msg);
                 }
             }
         }

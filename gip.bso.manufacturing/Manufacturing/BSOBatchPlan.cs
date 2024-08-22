@@ -1355,10 +1355,14 @@ namespace gip.bso.manufacturing
             return SelectedTarget != null && SelectedTarget.CurrentRoute != null;
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
         public void RunPossibleRoutesCheck()
         {
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+
             InvokeCalculateRoutesAsync();
+
+            ShowDialog(this, "CalculatedRouteDialog");
         }
 
         public bool IsEnabledPossibleRoutesCheck()

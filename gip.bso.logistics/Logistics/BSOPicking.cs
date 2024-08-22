@@ -2527,6 +2527,32 @@ namespace gip.bso.logistics
         private List<Picking> _VisitedPickings = null;
         #endregion
 
+        #region Properties => RMI and Routing
+
+        ACPointAsyncRMISubscr _RMISubscr;
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        public ACPointAsyncRMISubscr RMISubscr
+        {
+            get
+            {
+                return _RMISubscr;
+            }
+        }
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999, "", "")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -4681,6 +4707,158 @@ namespace gip.bso.logistics
         {
             return DefaultReservationState;
         }
+
+        #endregion
+
+        #region Methods => Routing
+
+        #region Methods => Routing
+
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+            InvokeCalculateRoutesAsync();
+            ShowDialog(this, "CalculatedRouteDialog");
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return PickingList != null && PickingList.Any();
+        }
+
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
+        {
+            // The callback-method can be called
+            if (e != null)
+            {
+                IACTask taskEntry = wrapObject as IACTask;
+                ACPointAsyncRMIWrap<ACComponent> taskEntryMoreConcrete = wrapObject as ACPointAsyncRMIWrap<ACComponent>;
+                ACMethodEventArgs eM = e as ACMethodEventArgs;
+                if (taskEntry.State == PointProcessingState.Deleted)
+                {
+                    // Compare RequestID to identify your asynchronus invocation
+                    if (taskEntry.RequestID == myTestRequestID)
+                    {
+                        OnCalculateRoutesCallback();
+                    }
+                }
+                if (taskEntryMoreConcrete.Result.ResultState == Global.ACMethodResultState.Succeeded)
+                {
+                    bool wasMyAsynchronousRequest = false;
+                    if (myRequestEntryA != null && myRequestEntryA.CompareTo(taskEntryMoreConcrete) == 0)
+                        wasMyAsynchronousRequest = true;
+                    System.Diagnostics.Trace.WriteLine(wasMyAsynchronousRequest.ToString());
+                }
+            }
+        }
+
+        Guid myTestRequestID;
+        ACPointAsyncRMISubscrWrap<ACComponent> myRequestEntryA;
+        public bool InvokeCalculateRoutesAsync()
+        {
+            ACComponent paWorkflowScheduler = null;
+            if (paWorkflowScheduler == null)
+            {
+                string acUrl = @"\Planning\PickingScheduler";
+                using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                {
+                    core.datamodel.ACClass paClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == nameof(PABatchPlanScheduler) && !c.ACProject.IsProduction);
+                    while (paClass != null)
+                    {
+                        acUrl = paClass.ACURLComponentCached;
+                        paClass = paClass.ACClass_BasedOnACClass.Where(c => c.ACProject.IsProduction).FirstOrDefault();
+                    }
+                }
+
+                paWorkflowScheduler = Root.ACUrlCommand(acUrl) as ACComponent;
+            }
+
+            if (paWorkflowScheduler == null)
+            {
+                Messages.Msg(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
+                return false;
+            }
+
+            // 1. Invoke ACUrlACTypeSignature for getting a default-ACMethod-Instance
+            ACMethod acMethod = paWorkflowScheduler.ACUrlACTypeSignature("!RunRouteCalculation", gip.core.datamodel.Database.GlobalDatabase);
+
+            // 2. Fill out all important parameters
+            acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
+
+
+            myRequestEntryA = RMISubscr.InvokeAsyncMethod(paWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
+            if (myRequestEntryA != null)
+                myTestRequestID = myRequestEntryA.RequestID;
+            return myRequestEntryA != null;
+        }
+
+        public void OnCalculateRoutesCallback()
+        {
+            var pickings = PickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+            List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+            foreach (Picking picking in pickings)
+            {
+                if (PickingList.Where(c => c.PickingID == picking.PickingID).Any())
+                    continue;
+
+                foreach (PickingPos pPos in picking.PickingPos_Picking)
+                {
+                    reservations.AddRange(pPos.FacilityReservation_PickingPos);
+                }
+            }
+
+            var myReservations = SelectedPicking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+
+            ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+            var prodOrderBatchPlans = prodOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused,
+                                                                                                     null, null, null, null, null, null, null);
+
+            reservations.AddRange(prodOrderBatchPlans.SelectMany(c => c.FacilityReservation_ProdOrderBatchPlan.Where(x => x.FacilityID.HasValue)));
+
+            List<FacilityReservation> result = new List<FacilityReservation>();
+
+            foreach (FacilityReservation reservation in myReservations)
+            {
+                if (reservation.CalculatedRoute != null)
+                {
+                    string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                    foreach (string routeHash in splitedRoute)
+                    {
+                        IEnumerable<FacilityReservation> items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(routeHash));
+                        if (items.Any())
+                            result.AddRange(items);
+                    }
+                }
+            }
+
+            if (result.Any())
+            {
+                List<string> reservationsWithSameRoute = result.Where(c => c.PickingPos != null).Select(c => c.PickingPos.Picking.PickingNo).Distinct().ToList();
+                IEnumerable<string> prodOrderWithSameRoute = result.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo).Distinct();
+                if (prodOrderWithSameRoute != null && prodOrderWithSameRoute.Any())
+                    reservationsWithSameRoute.AddRange(prodOrderWithSameRoute);
+
+                if (reservationsWithSameRoute != null && reservationsWithSameRoute.Any())
+                {
+                    CalculateRouteResult = "The following orders order may use same module: " + string.Join(", ", reservationsWithSameRoute);
+                }
+                else
+                {
+                    CalculateRouteResult = "There no order which will use equipment from this order!";
+                }
+            }
+            else
+                CalculateRouteResult = "There no order which will use equipment from this order!"; ;
+
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+        }
+
+        #endregion
 
         #endregion
 
