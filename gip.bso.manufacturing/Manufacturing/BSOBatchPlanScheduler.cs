@@ -4666,6 +4666,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
         public void RunPossibleRoutesCheck()
         {
+            CalculateRouteResult = null;
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
 
             if (BSOBatchPlanChild != null && BSOBatchPlanChild.Value != null)
