@@ -357,7 +357,14 @@ namespace gip.bso.logistics
             ObjectQuery<VisitorVoucher> query = result as ObjectQuery<VisitorVoucher>;
             if (query != null)
             {
-                query.Include(c => c.Picking_VisitorVoucher);
+                query
+                    .Include(c => c.MDVisitorVoucherState)
+                    .Include(c => c.Visitor)
+                    .Include(c => c.Picking_VisitorVoucher)
+                    .Include(c => c.DeliveryNote_VisitorVoucher)
+                    .Include(c => c.Tourplan_VisitorVoucher);
+
+                result = query;
             }
 
             return result;
