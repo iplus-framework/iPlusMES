@@ -1003,7 +1003,8 @@ namespace gip.bso.logistics
                 Direction = RouteDirections.Backwards,
                 MaxRouteAlternativesInLoop = 1,
                 IncludeReserved = true,
-                IncludeAllocated = true
+                IncludeAllocated = true,
+                ResultMode = RouteResultMode.ShortRoute
             };
 
             var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
