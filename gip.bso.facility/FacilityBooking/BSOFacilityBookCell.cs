@@ -580,17 +580,32 @@ namespace gip.bso.facility
             if (e.PropertyName == nameof(FacilityCharge.IsSelected))
             {
                 FacilityCharge facilityCharge = sender as FacilityCharge;
-                if (!facilityCharge.IsSelected)
+                if (!facilityCharge.InIsSelectedProcess)
                 {
-                    List<FacilityCharge> others = FacilityChargeList.Where(c => c.FacilityChargeID != facilityCharge.FacilityChargeID).ToList();
-                    bool anyOtherNotSelected = others.Where(c => !c.IsSelected).Any();
-                    if (!anyOtherNotSelected)
+                    foreach (FacilityCharge fc in FacilityChargeList)
                     {
-                        // means all other are selected - should ReservationState = ObserveQuantity
-                        foreach (FacilityCharge fc in others)
+                        facilityCharge.InIsSelectedProcess = true;
+                    }
+
+                    if (!facilityCharge.IsSelected)
+                    {
+                        List<FacilityCharge> others = FacilityChargeList.Where(c => c.FacilityChargeID != facilityCharge.FacilityChargeID).ToList();
+                        bool anyOtherNotSelected = others.Where(c => !c.IsSelected).Any();
+                        if (!anyOtherNotSelected)
                         {
-                            fc.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
+                            // means all other are selected - should ReservationState = ObserveQuantity
+                            foreach (FacilityCharge fc in others)
+                            {
+                                fc.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
+                            }
                         }
+                    }
+
+                    DistributeRelocationQuantOnSelection(facilityCharge.FacilityChargeID, facilityCharge.IsSelected, CurrentBookParamRelocation.InwardQuantity ?? 0);
+
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        facilityCharge.InIsSelectedProcess = false;
                     }
                 }
             }
@@ -675,6 +690,7 @@ namespace gip.bso.facility
                 return _FacilityChargeList;
             }
         }
+
 
         private void RefreshFacilityChargeList(bool refresh = false)
         {
@@ -1291,7 +1307,7 @@ namespace gip.bso.facility
                         // Question50035
                         // Save selected process workflow ({0}) as default for this facility ({1})?
                         // Ausgewählten Prozess-Workflow ({0}) als Standard für dieser Lagerplatz ({1}) speichern?
-                        Global.MsgResult saveQuestion = Messages.Question(this, "Question50110", Global.MsgResult.No,false, acClassMethod.ACCaption, CurrentFacility.FacilityNo);
+                        Global.MsgResult saveQuestion = Messages.Question(this, "Question50110", Global.MsgResult.No, false, acClassMethod.ACCaption, CurrentFacility.FacilityNo);
                         if (saveQuestion == Global.MsgResult.Yes)
                         {
 
@@ -1343,7 +1359,7 @@ namespace gip.bso.facility
                             needReservations = true;
                             Dialog_Result = new VBDialogResult();
                             ResetFacilityChargeSelection();
-                            DistributeQuantityFacilityChargeDialog(CurrentBookParamRelocation.InwardQuantity ?? 0);
+                            DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
                             ShowDialog(this, "SelectChargeForRelocationAutomaticDlg");
                             if (Dialog_Result.SelectedCommand == eMsgButton.OK)
                             {
@@ -1353,7 +1369,7 @@ namespace gip.bso.facility
                                 return;
                         }
 
-                        if (   !needReservations 
+                        if (!needReservations
                             || (lotsForReservation != null && lotsForReservation.Any()))
                         {
                             MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
@@ -1488,6 +1504,9 @@ namespace gip.bso.facility
             if (!IsEnabledDlgSelectChargeOk())
                 return;
             Dialog_Result.SelectedCommand = eMsgButton.OK;
+
+            CurrentBookParamRelocation.InwardQuantity = GetSelectedFacilityChargeQuantity();
+
             CloseTopDialog();
         }
 
@@ -1542,7 +1561,7 @@ namespace gip.bso.facility
             List<FacilityCharge> lotsForReservation = null;
             Dialog_Result = new VBDialogResult();
             ResetFacilityChargeSelection();
-            DistributeQuantityFacilityChargeDialog(CurrentBookParamRelocation.InwardQuantity ?? 0);
+            DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
             ShowDialog(this, "SelectChargeForRelocationDlg");
             if (Dialog_Result.SelectedCommand == eMsgButton.OK)
             {
@@ -1638,24 +1657,129 @@ namespace gip.bso.facility
             }
         }
 
-        public void DistributeQuantityFacilityChargeDialog(double quantity)
+
+        /// <summary>
+        /// Use booking mask relocation quantity and distribute it to 
+        /// available quants
+        /// </summary>
+        /// <param name="quantity"></param>
+        public void DistributeRelocationQuantityToAvailableQuants(double quantity)
         {
             double restQuantity = quantity;
+
             foreach (FacilityCharge facilityCharge in FacilityChargeList)
             {
-                if (facilityCharge.RelocationQuantity > restQuantity)
+                facilityCharge.InIsSelectedProcess = true;
+            }
+
+            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            {
+                if (Math.Abs(restQuantity) < 0.1)
                 {
-                    facilityCharge.RelocationQuantity = restQuantity;
-                    facilityCharge.IsSelected = true;
-                    break;
+                    facilityCharge.IsSelected = false;
+                    facilityCharge.RelocationQuantity = 0;
                 }
                 else
                 {
-                    facilityCharge.IsSelected = true;
-                    restQuantity -= facilityCharge.RelocationQuantity;
+                    if (restQuantity <= facilityCharge.AvailableQuantity)
+                    {
+                        facilityCharge.IsSelected = true;
+                        facilityCharge.RelocationQuantity = restQuantity;
+                        restQuantity = 0;
+                    }
+                    else
+                    {
+                        facilityCharge.IsSelected = true;
+                        facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
+                        restQuantity -= facilityCharge.RelocationQuantity;
+                    }
                 }
             }
+
+            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            {
+                facilityCharge.InIsSelectedProcess = false;
+            }
         }
+
+        /// <summary>
+        /// Changing quantity after showing quant dialog
+        /// and redistribute quantity by user quant selection
+        /// </summary>
+        /// <param name="facilityChargeID"></param>
+        /// <param name="isSelected"></param>
+        /// <param name="quantity"></param>
+        public void DistributeRelocationQuantOnSelection(Guid facilityChargeID, bool isSelected, double quantity)
+        {
+            double alreadySelectedQuantity = 
+                FacilityChargeList
+                .Where(c=> c.IsSelected && c.FacilityChargeID  != facilityChargeID)
+                .Select(c=>c.RelocationQuantity)
+                .DefaultIfEmpty()
+                .Sum();
+
+            double restQuantity = quantity - alreadySelectedQuantity;
+            if(restQuantity < 0)
+            {
+                restQuantity = 0;
+            }
+
+            // handling calling client
+            FacilityCharge selectedFacilityCharge = FacilityChargeList.Where(c => c.FacilityChargeID == facilityChargeID).FirstOrDefault();
+            if (isSelected)
+            {
+                if (restQuantity <= selectedFacilityCharge.AvailableQuantity)
+                {
+                    selectedFacilityCharge.RelocationQuantity = restQuantity;
+                    restQuantity = 0;
+                }
+                else
+                {
+                    selectedFacilityCharge.RelocationQuantity = selectedFacilityCharge.AvailableQuantity;
+                    restQuantity -= selectedFacilityCharge.RelocationQuantity;
+                }
+            }
+
+            List<FacilityCharge> notSelectedCharges = FacilityChargeList.Where(c => !c.IsSelected).ToList();
+            foreach (FacilityCharge facilityCharge in notSelectedCharges)
+            {
+                facilityCharge.RelocationQuantity = 0;
+            }
+
+            //List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID).ToList();
+            //foreach (FacilityCharge facilityCharge in selectedCharges)
+            //{
+            //    if (Math.Abs(restQuantity) < 0.1)
+            //    {
+            //        //facilityCharge.IsSelected = false;
+            //        facilityCharge.RelocationQuantity = 0;
+            //    }
+            //    else
+            //    {
+            //        if (restQuantity <= facilityCharge.AvailableQuantity)
+            //        {
+            //            facilityCharge.RelocationQuantity = restQuantity;
+            //            restQuantity = 0;
+            //        }
+            //        else
+            //        {
+            //            facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
+            //            restQuantity -= facilityCharge.RelocationQuantity;
+            //        }
+            //    }
+            //}
+        }
+
+        public double GetSelectedFacilityChargeQuantity()
+        {
+            double quantity = 0;
+            if (FacilityChargeList != null)
+            {
+                quantity = FacilityChargeList.Where(c => c.IsSelected).Select(c => c.RelocationQuantity).Sum();
+            }
+            return quantity;
+        }
+
 
         public override bool IsPhysicalTransportPossible
         {
@@ -2619,7 +2743,6 @@ namespace gip.bso.facility
         }
 
         #endregion
-
 
     }
 

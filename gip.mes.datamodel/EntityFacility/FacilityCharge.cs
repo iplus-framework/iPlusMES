@@ -433,6 +433,10 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        // avoid handling IsSelected for others when one is treated
+        public bool InIsSelectedProcess { get; set; }
+
         #endregion
 
         #region IEntityProperty Members
@@ -458,7 +462,7 @@ namespace gip.mes.datamodel
 
         public void ResetCachedValues()
         {
-            _RelocationQuantity = null;
+            _RelocationQuantity = 0;
             _IsInputOutside = null;
             _HasDeliveryPostings = null;
             _HasProductionPostings = null;
@@ -502,7 +506,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        private double? _RelocationQuantity;
+        private double _RelocationQuantity;
         /// <summary>
         /// Quantity at default is AvailableQuantity
         /// used by relocation quant dialog
@@ -512,11 +516,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (_RelocationQuantity == null)
-                {
-                    _RelocationQuantity = AvailableQuantity;
-                }
-                return _RelocationQuantity ?? 0;
+                return _RelocationQuantity;
             }
             set
             {
@@ -742,7 +742,7 @@ namespace gip.mes.datamodel
                 if (!_relatedCompanyLoaded && Material != null)
                 {
                     _relatedCompanyLoaded = true;
-                    _RelatedCompany = 
+                    _RelatedCompany =
                         Material
                         .CompanyMaterial_Material
                         .OrderByDescending(c => c.InsertDate)
@@ -900,9 +900,9 @@ namespace gip.mes.datamodel
         ProdOrderPartslistPos _FinalRootPositionFromFB = null;
         public ProdOrderPartslistPos GetFinalRootPositionFromFB()
         {
-            if (_FinalRootPositionFromFBRead) 
+            if (_FinalRootPositionFromFBRead)
                 return _FinalRootPositionFromFB;
-            _FinalRootPositionFromFB  = this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
+            _FinalRootPositionFromFB = this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
                                              .Select(a => a.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? a.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : a.ProdOrderPartslistPos)
                                              .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
                                              .FirstOrDefault();
@@ -914,7 +914,7 @@ namespace gip.mes.datamodel
         ProdOrderPartslistPos _FinalPositionFromFB = null;
         public ProdOrderPartslistPos GetFinalPositionFromFB()
         {
-            if (_FinalPositionFromFBRead) 
+            if (_FinalPositionFromFBRead)
                 return _FinalPositionFromFB;
             _FinalPositionFromFB = this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
                                              .Select(a => a.ProdOrderPartslistPos)
