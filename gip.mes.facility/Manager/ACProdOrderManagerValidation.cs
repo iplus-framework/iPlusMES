@@ -286,10 +286,9 @@ namespace gip.mes.facility
 
                 if (result != null)
                 {
-                    fr.CalculatedRoute = routes.Routes.FirstOrDefault().GetRouteItemsHash();
+                    fr.CalculatedRoute = routes.Routes.FirstOrDefault().GetRouteItemsGuid();
                     result.Add(new FacilityReservationRoutes() { Reservation = fr, Routes = new RoutingResult(routes.Routes, false, null) });
                 }
-
             }
 
             Msg msgSave = dbApp.ACSaveChanges();

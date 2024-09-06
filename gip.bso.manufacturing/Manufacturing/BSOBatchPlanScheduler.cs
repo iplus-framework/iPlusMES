@@ -13,6 +13,7 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
+using System.Threading;
 
 namespace gip.bso.manufacturing
 {
@@ -4663,9 +4664,10 @@ namespace gip.bso.manufacturing
 
         #region Methods => RouteCalculation
 
-        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        [ACMethodInteraction("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
         public void RunPossibleRoutesCheck()
         {
+            MsgList.Clear();
             CalculateRouteResult = null;
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
 
@@ -4685,6 +4687,14 @@ namespace gip.bso.manufacturing
         public bool IsEnabledPossibleRoutesCheck()
         {
             return SelectedProdOrderBatchPlan != null && BSOBatchPlanChild != null;
+        }
+
+        public void SetRoutesCheckResult(IEnumerable<Msg> msgList)
+        {
+            foreach (Msg msg in msgList)
+            {
+                MsgList.Add(msg);
+            }
         }
 
         #endregion

@@ -9,6 +9,7 @@ using gip.core.manager;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
+using System.Threading;
 
 namespace gip.bso.manufacturing
 {
@@ -47,6 +48,9 @@ namespace gip.bso.manufacturing
                 ProdOrderBSO.PropertyChanged += ProdOrderBSO_PropertyChanged;
             if (!base.ACInit(startChildMode))
                 return false;
+
+            _MainSyncContext = SynchronizationContext.Current;
+
             return true;
         }
 
@@ -66,6 +70,8 @@ namespace gip.bso.manufacturing
             if (_VarioConfigManager != null)
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
             _VarioConfigManager = null;
+
+            _MainSyncContext = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -622,6 +628,8 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged();
             }
         }
+
+        private SynchronizationContext _MainSyncContext;
 
         #endregion
 
@@ -1445,76 +1453,172 @@ namespace gip.bso.manufacturing
 
         public void OnCalculateRoutesCallback()
         {
-            var batchPlans = ProdOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null, null, null, null, null);
-
-            List<FacilityReservation> reservations = new List<FacilityReservation>();
-
-            foreach (ProdOrderBatchPlan batchPlan in batchPlans)
+            try
             {
-                if ((BSOBatchPlanSchedulerBSO != null && BSOBatchPlanSchedulerBSO.ProdOrderBatchPlanList.Any(c => c.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID))
-                    || SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID)
-                    continue;
 
-                reservations.AddRange(batchPlan.FacilityReservation_ProdOrderBatchPlan);
-            }
+                var batchPlans = ProdOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null, null, null, null, null);
 
-            var myReservations = BSOBatchPlanSchedulerBSO != null ? BSOBatchPlanSchedulerBSO.SelectedProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray() : SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+                List<FacilityReservation> reservations = new List<FacilityReservation>();
 
-            ACPickingManager pickingManager = ACPickingManager.GetServiceInstance(this);
-            var pickings = pickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
-
-            if (pickings != null && pickings.Any())
-            {
-                reservations.AddRange(pickings.SelectMany(x => x.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos)).Distinct());
-            }
-
-            List<FacilityReservation> result = new List<FacilityReservation>();
-
-            foreach (FacilityReservation reservation in myReservations)
-            {
-                if (reservation.CalculatedRoute != null)
+                foreach (ProdOrderBatchPlan batchPlan in batchPlans)
                 {
-                    string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+                    //if ((BSOBatchPlanSchedulerBSO != null && BSOBatchPlanSchedulerBSO.ProdOrderBatchPlanList.Any(c => c.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID))
+                    //    || SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID)
+                    //    continue;
 
-                    foreach (string routeHash in splitedRoute)
+                    reservations.AddRange(batchPlan.FacilityReservation_ProdOrderBatchPlan);
+                }
+
+                var myReservations = BSOBatchPlanSchedulerBSO != null ? BSOBatchPlanSchedulerBSO.SelectedProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray() : SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+
+                ACPickingManager pickingManager = ACPickingManager.GetServiceInstance(this);
+                var pickings = pickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+                if (pickings != null && pickings.Any())
+                {
+                    reservations.AddRange(pickings.SelectMany(x => x.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos)).Distinct());
+                }
+
+                List<Tuple<FacilityReservation, string>> result = new List<Tuple<FacilityReservation, string>>();
+
+                foreach (FacilityReservation reservation in myReservations)
+                {
+                    if (reservation.CalculatedRoute != null)
                     {
-                        var items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(routeHash));
-                        if (items.Any())
-                            result.AddRange(items);
+                        string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                        foreach (string guid in splitedRoute)
+                        {
+                            if (string.IsNullOrEmpty(guid))
+                                continue;
+
+                            IEnumerable<Tuple<FacilityReservation, string>> items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(guid)).Select(c => new Tuple<FacilityReservation, string>(c, guid));
+                            if (items.Any())
+                                result.AddRange(items);
+                        }
                     }
                 }
-            }
 
-            string calculateRouteResult;
+                string calculateRouteResult;
+                List<Msg> msgList = new List<Msg>();
 
-            if (result.Any())
-            {
-                List<string> reservationsWithSameRoute = result.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo).Distinct().ToList();
-                IEnumerable<string> pickingsWithSameRoute = result.Where(c => c.PickingPos != null).Select(c => c.PickingPos.Picking.PickingNo).Distinct();
-                if (pickingsWithSameRoute != null && pickingsWithSameRoute.Any())
-                    reservationsWithSameRoute.AddRange(pickingsWithSameRoute);
-
-                if (reservationsWithSameRoute != null && reservationsWithSameRoute.Any())
+                if (result.Any())
                 {
-                    calculateRouteResult = "The following orders order may use same module: " + string.Join(", ", reservationsWithSameRoute);
+                    var groupedByPickings = result.Where(c => c.Item1.PickingPos != null).GroupBy(x => x.Item1.PickingPos.Picking);
+                    var groupedByBatchPlan = result.Where(c => c.Item1.ProdOrderBatchPlan != null).GroupBy(x => x.Item1.ProdOrderBatchPlan);
+
+                    List<core.datamodel.ACClass> tempList = new List<core.datamodel.ACClass>();
+                    //List<Msg> msgs = new List<Msg>();
+
+                    foreach (var batchPlan in groupedByBatchPlan)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", batchPlan.Key.ProdOrderPartslist.ProdOrder.ProgramNo, batchPlan.Key.ProdOrderPartslist.InsertDate, batchPlan.Key.ProdOrderPartslist.Partslist.Material.MaterialName1);
+
+                        var groupByReservation = batchPlan.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        msgList.Add(new Msg(eMsgLevel.Info, message));
+                    }
+
+                    foreach (var pickingItem in groupedByPickings)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", pickingItem.Key.PickingNo, pickingItem.Key.MDPickingType.ACCaption, pickingItem.Key.InsertDate);
+
+                        var groupByReservation = pickingItem.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    ";
+                            message += reservationItem.Key.PickingPos.Material.MaterialName1;
+                            message += " (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        msgList.Add(new Msg(eMsgLevel.Info, message));
+                    }
+
+                    calculateRouteResult = "The routing check is over, please take a look results in the Messages window!";
+                }
+                else
+                    calculateRouteResult = "There no order which will use equipment from this order!"; ;
+
+                if (BSOBatchPlanSchedulerBSO != null)
+                {
+                    BSOBatchPlanSchedulerBSO.CalculateRouteResult = calculateRouteResult;
+                    BSOBatchPlanSchedulerBSO.CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+
+                    _MainSyncContext?.Send((object state) =>
+                    {
+                        BSOBatchPlanSchedulerBSO.SetRoutesCheckResult(msgList);
+                    }, new object());
                 }
                 else
                 {
-                    calculateRouteResult = "There no order which will use equipment from this order!";
+                    CalculateRouteResult = calculateRouteResult;
+                    CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+
+                    BSOProdOrder prodOrder = FindParentComponent<BSOProdOrder>(c => c is BSOProdOrder);
+                    if (prodOrder != null)
+                    {
+                        _MainSyncContext?.Send((object state) =>
+                        {
+                            prodOrder.SetRoutesCheckResult(msgList);
+                        }, new object());
+                    }
                 }
             }
-            else
-                calculateRouteResult = "There no order which will use equipment from this order!"; ;
-
-            if (BSOBatchPlanSchedulerBSO != null)
+            catch (Exception e)
             {
-                BSOBatchPlanSchedulerBSO.CalculateRouteResult = calculateRouteResult;
-                BSOBatchPlanSchedulerBSO.CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
-            }
-            else
-            {
-                CalculateRouteResult = calculateRouteResult;
-                CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+                Messages.LogException(this.GetACUrl(), nameof(OnCalculateRoutesCallback), e);
             }
         }
 

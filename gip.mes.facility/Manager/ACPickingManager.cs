@@ -1970,7 +1970,7 @@ namespace gip.mes.facility
 
                     if (routes != null)
                     {
-                        reservation.CalculatedRoute = routes.FirstOrDefault().GetRouteItemsHash();
+                        reservation.CalculatedRoute = routes.FirstOrDefault().GetRouteItemsGuid();
                         result.Add(new FacilityReservationRoutes() { Reservation = reservation, Routes = new RoutingResult(routes, false, null) });
                     }
                 }

@@ -4195,6 +4195,14 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        public void SetRoutesCheckResult(IEnumerable<Msg> msgList)
+        {
+            foreach (Msg msg in msgList)
+            {
+                MsgList.Add(msg);
+            }
+        }
+
         #endregion
 
         #region Workflows
