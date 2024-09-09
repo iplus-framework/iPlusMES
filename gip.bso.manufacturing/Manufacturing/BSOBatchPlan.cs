@@ -1461,13 +1461,7 @@ namespace gip.bso.manufacturing
                 List<FacilityReservation> reservations = new List<FacilityReservation>();
 
                 foreach (ProdOrderBatchPlan batchPlan in batchPlans)
-                {
-                    //if ((BSOBatchPlanSchedulerBSO != null && BSOBatchPlanSchedulerBSO.ProdOrderBatchPlanList.Any(c => c.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID))
-                    //    || SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID)
-                    //    continue;
-
                     reservations.AddRange(batchPlan.FacilityReservation_ProdOrderBatchPlan);
-                }
 
                 var myReservations = BSOBatchPlanSchedulerBSO != null ? BSOBatchPlanSchedulerBSO.SelectedProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray() : SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
 
@@ -1475,9 +1469,7 @@ namespace gip.bso.manufacturing
                 var pickings = pickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
 
                 if (pickings != null && pickings.Any())
-                {
                     reservations.AddRange(pickings.SelectMany(x => x.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos)).Distinct());
-                }
 
                 List<Tuple<FacilityReservation, string>> result = new List<Tuple<FacilityReservation, string>>();
 
@@ -1508,7 +1500,6 @@ namespace gip.bso.manufacturing
                     var groupedByBatchPlan = result.Where(c => c.Item1.ProdOrderBatchPlan != null).GroupBy(x => x.Item1.ProdOrderBatchPlan);
 
                     List<core.datamodel.ACClass> tempList = new List<core.datamodel.ACClass>();
-                    //List<Msg> msgs = new List<Msg>();
 
                     foreach (var batchPlan in groupedByBatchPlan)
                     {
@@ -1586,10 +1577,10 @@ namespace gip.bso.manufacturing
                         msgList.Add(new Msg(eMsgLevel.Info, message));
                     }
 
-                    calculateRouteResult = "The routing check is over, please take a look results in the Messages window!";
+                    calculateRouteResult = CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50096");
                 }
                 else
-                    calculateRouteResult = "There no order which will use equipment from this order!"; ;
+                    calculateRouteResult = CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50097");
 
                 if (BSOBatchPlanSchedulerBSO != null)
                 {

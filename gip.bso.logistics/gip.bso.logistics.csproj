@@ -266,6 +266,9 @@
     <None Include="VBControlScripts\2024-08-22 15-24_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="VBControlScripts\2024-09-09 11-16_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\BingServices\" />

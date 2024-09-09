@@ -2086,6 +2086,8 @@ namespace gip.bso.logistics
         {
             MsgList.Clear();
             CalculateRouteResult = null;
+            CurrentProgressInfo.TotalProgress.ProgressRangeFrom = 0;
+            CurrentProgressInfo.TotalProgress.ProgressRangeTo = 100;
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
@@ -2155,13 +2157,8 @@ namespace gip.bso.logistics
 
                 foreach (Picking picking in pickings)
                 {
-                    //if (PickingList.Where(c => c.PickingID == picking.PickingID).Any())
-                    //    continue;
-
                     foreach (PickingPos pPos in picking.PickingPos_Picking)
-                    {
                         reservations.AddRange(pPos.FacilityReservation_PickingPos);
-                    }
                 }
 
                 var myReservations = SelectedPicking.Picking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
@@ -2198,7 +2195,6 @@ namespace gip.bso.logistics
                     var groupedByBatchPlan = result.Where(c => c.Item1.ProdOrderBatchPlan != null).GroupBy(x => x.Item1.ProdOrderBatchPlan);
 
                     List<core.datamodel.ACClass> tempList = new List<core.datamodel.ACClass>();
-                    //List<Msg> msgs = new List<Msg>();
 
                     foreach (var pickingItem in groupedByPickings)
                     {
@@ -2282,12 +2278,13 @@ namespace gip.bso.logistics
                         }, new object());
                     }
 
-                    CalculateRouteResult = "The routing check is over, please take a look results in the Messages window!";
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50100"); 
                 }
                 else
-                    CalculateRouteResult = "There no order which will use equipment from this order!";
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50101");
 
                 CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+                CurrentProgressInfo.TotalProgress.ProgressCurrent = 100;
             }
             catch (Exception e)
             {

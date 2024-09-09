@@ -4802,6 +4802,7 @@ namespace gip.bso.logistics
             acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
 
 
+            
             myRequestEntryA = RMISubscr.InvokeAsyncMethod(paWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
             if (myRequestEntryA != null)
                 myTestRequestID = myRequestEntryA.RequestID;
@@ -4945,10 +4946,10 @@ namespace gip.bso.logistics
                         }, new object());
                     }
 
-                    CalculateRouteResult = "The routing check is over, please take a look results in the Messages window!";
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50099");
                 }
                 else
-                    CalculateRouteResult = "There no order which will use equipment from this order!"; ;
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50098"); 
 
                 CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
             }
