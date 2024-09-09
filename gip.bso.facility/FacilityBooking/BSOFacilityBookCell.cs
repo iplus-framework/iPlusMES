@@ -572,6 +572,7 @@ namespace gip.bso.facility
 
                 OnPropertyChanged(nameof(ContractualPartnerList));
                 ClearBookingData();
+                OnPropertyChanged();
             }
         }
 
@@ -699,6 +700,7 @@ namespace gip.bso.facility
                 _RefreshFCCache = true;
             _FacilityChargeList = null;
             OnPropertyChanged(nameof(FacilityChargeList));
+            OnPropertyChanged(nameof(IsEnabledPartslist));
         }
 
         /// <summary>
