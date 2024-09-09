@@ -4897,10 +4897,20 @@ namespace gip.bso.manufacturing
                 {
                     case FacilitySelectLoctation.PrebookingInward:
                         SelectedInwardACMethodBooking.InwardFacility = facility;
+                        if(!BookingInwardFacilityList.Contains(facility))
+                        {
+                            BookingInwardFacilityList.Add(facility);
+                            OnPropertyChanged(nameof(BookingInwardFacilityList));
+                        }
                         OnPropertyChanged(nameof(SelectedInwardACMethodBooking));
                         break;
                     case FacilitySelectLoctation.PrebookingOutward:
                         SelectedOutwardACMethodBooking.OutwardFacility = facility;
+                        if (!BookingOutwardFacilityList.Contains(facility))
+                        {
+                            BookingOutwardFacilityList.Add(facility);
+                            OnPropertyChanged(nameof(BookingOutwardFacilityList));
+                        }
                         OnPropertyChanged(nameof(SelectedOutwardACMethodBooking));
                         break;
                     default:
