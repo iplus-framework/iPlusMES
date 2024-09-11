@@ -104,6 +104,24 @@ namespace gip.bso.masterdata
         #endregion
 
         #region BSO->ACProperty
+
+        #region Child BSO
+
+        ACChildItem<BSOCompanyMaterialOverview> _BSOCompanyMaterialOverview_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOCompanyMaterialOverview_Child), typeof(BSOCompanyMaterialOverview))]
+        public ACChildItem<BSOCompanyMaterialOverview> BSOCompanyMaterialOverview_Child
+        {
+            get
+            {
+                if (_BSOCompanyMaterialOverview_Child == null)
+                    _BSOCompanyMaterialOverview_Child = new ACChildItem<BSOCompanyMaterialOverview>(this, nameof(BSOCompanyMaterialOverview_Child));
+                return _BSOCompanyMaterialOverview_Child;
+            }
+        }
+
+        #endregion
+
         #region 1. Company
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         /// <summary>
@@ -167,11 +185,21 @@ namespace gip.bso.masterdata
                         CurrentHouseAdress = CompanyAddress.NewACObject(DatabaseApp, CurrentCompany);
                         CurrentHouseAdress.IsHouseCompanyAddress = true;
                     }
+
+                    if (BSOCompanyMaterialOverview_Child != null && BSOCompanyMaterialOverview_Child.Value != null)
+                    {
+                        BSOCompanyMaterialOverview_Child.Value.CurrentCompany =  value;
+                        BSOCompanyMaterialOverview_Child.Value.Search();
+                    }
                 }
                 else
                 {
                     CurrentHouseAdress = null;
                     CurrentCompanyAddress = null;
+                    if (BSOCompanyMaterialOverview_Child != null && BSOCompanyMaterialOverview_Child.Value != null)
+                    {
+                        BSOCompanyMaterialOverview_Child.Value.Clear();
+                    }
                 }
             }
         }
@@ -1610,7 +1638,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledDeleteCompanyMaterialPickup();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
