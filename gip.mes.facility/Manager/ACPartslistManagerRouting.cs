@@ -1715,8 +1715,7 @@ namespace gip.mes.facility
             if (poRelation != null)
             {
                 // Prüfe ob Entnahme von anderem Auftrag erlaubt
-                if (poRelation.SourceProdOrderPartslistPos.TakeMatFromOtherOrder
-                    && poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
+                if (poRelation.SourceProdOrderPartslistPos.SourceProdOrderPartslistID.HasValue)
                 {
                     if (filterTimeOlderThan.HasValue)
                     {
@@ -1742,16 +1741,29 @@ namespace gip.mes.facility
                     }
                     ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
 
-                    if (onlyContainer)
-                    {
-                        facilityQuery.ApplyBlockedQuantsFilter();
 
-                    }
+
+                    if (onlyContainer)
+                        facilityQuery.ApplyBlockedQuantsFilter();
                     else
                         facilityQuery.ApplyFreeQuantsInBinFilter();
 
                     facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
-                    if (facilityQuery.FilteredResult == null || !facilityQuery.FilteredResult.Any())
+
+                    if (routableSilos != null && routableSilos.Any())
+                        facilityQuery.ApplyRoutableSilos(routableSilos);
+
+                    if (!poRelation.SourceProdOrderPartslistPos.TakeMatFromOtherOrder)
+                    {
+                        List<Guid> lots = poRelation.SourceProdOrderPartslistPos
+                                                           .SourceProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                                                           .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern && c.FacilityLotID.HasValue)
+                                                           .Select(c => c.FacilityLotID.Value).Distinct().ToList();
+
+                        facilityQuery.FilteredResult = facilityQuery.FilteredResult.Where(c => c.FacilityCharges.Any(x => x.Quant.FacilityLotID.HasValue && lots.Contains(x.Quant.FacilityLotID.Value))).ToList();
+                    }
+
+                    if ((facilityQuery.FilteredResult == null || !facilityQuery.FilteredResult.Any()) && !poRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos.Any())
                         return facilityQuery;
                 }
                 // Falls kein Alternativmaterial gepflegt, gebe leeres resultat zurück
@@ -1885,9 +1897,7 @@ namespace gip.mes.facility
             RoutingResult routableSilos = ACRoutingService.FindSuccessors(scaleACClass, routingParamRoutableSilos);
             IEnumerable<core.datamodel.ACClass> routableSilosACClass = null;
             if (routableSilos != null && routableSilos.Routes != null && routableSilos.Routes.Any())
-            {
                 routableSilosACClass = routableSilos.Routes.Select(c => c.GetRouteSource().Source);
-            }
 
             possibleSilos = FindSilos(relation, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode, routableSilosACClass);
             if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
