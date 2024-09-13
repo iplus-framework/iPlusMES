@@ -104,7 +104,6 @@
     <Compile Include="FacilityHistory\BSOFacilityMaterialOverview.cs" />
     <Compile Include="FacilityHistory\BSOFacilityChargeOverview.cs" />
     <Compile Include="FacilityHistory\BSOFacilityLocationOverview.cs" />
-    <Compile Include="FacilityHistory\BSOFacilityReservationOverview.cs" />
     <Compile Include="FacilityHistory\BSOTandTFastView.cs" />
     <Compile Include="Model\IntermediateMaterialOverview.cs" />
     <Compile Include="Model\TandTFastViewModel.cs" />
@@ -121,6 +120,9 @@
     <Compile Include="TandTv3\IFactoryTandTPointPresenterComponent.cs" />
     <Compile Include="TandTv3\SearchRouteCombination.cs" />
     <Compile Include="TandTv3\TandTGraphModel.cs" />
+    <None Include="VBControlScripts\2024-09-13 15-54_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">

@@ -21,6 +21,7 @@ using gip.core.autocomponent;
 using System.Data.Objects;
 using gip.mes.facility;
 using System.Runtime.CompilerServices;
+using gip.bso.masterdata;
 
 namespace gip.bso.facility
 {

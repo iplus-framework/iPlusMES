@@ -208,6 +208,12 @@
 
         public const string Material = "en{'Material'}de{'Material'}";
         public const string MaterialNo = "en{'Material No.'}de{'Material-Nr.'}";
+
+        public const string CompanyMaterial = "en{'Company Material'}de{'Unternehmensmaterial'}";
+        public const string CompanyMaterialNo = "en{'External Material-No.'}de{'Externe Material-Nr.'}";
+        public const string CompanyMaterialName = "en{'External Material Name'}de{'Externer Materialname'}";
+
+
         public const string MaterialStock = "en{'Material Stock'}de{'Materialbestand'}";
         public const string ExternLotNo = "en{'Extern Lot No.'}de{'Externe Losnr.'}";
         public const string ExternLotNo2 = "en{'Extern Lot No.2'}de{'Externe Losnr.2'}";

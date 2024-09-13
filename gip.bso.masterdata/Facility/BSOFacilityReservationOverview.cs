@@ -1,14 +1,13 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System.Collections.Generic;
-using System.Data.Objects;
-using System.Linq;
 using System;
-using gip.core.autocomponent;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace gip.bso.facility
+namespace gip.bso.masterdata
 {
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOFacilityReservationOverview : ACBSOvb

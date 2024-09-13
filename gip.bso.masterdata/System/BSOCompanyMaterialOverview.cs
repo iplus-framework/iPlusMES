@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
@@ -31,12 +32,30 @@ namespace gip.bso.masterdata
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            bool baseACInit = base.ACInit(startChildMode);
-            FilterCompanyMaterialOverview = CompanyMaterialOverviewTypeEnum.ViewSupplierStock;
+            bool baseACInit =  base.ACInit(startChildMode);
+            FilterCompanyMaterialOverview = CompanyMaterialOverviewTypeEnum.ViewPartnerStockOfUniqueMaterials;
             return baseACInit;
         }
 
         #endregion
+
+        #region ChildBSO
+
+        ACChildItem<BSOMaterialDetails> _BSOMaterialDetails_Child_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo(nameof(BSOMaterialDetails_Child), typeof(BSOMaterialDetails))]
+        public ACChildItem<BSOMaterialDetails> BSOMaterialDetails_Child
+        {
+            get
+            {
+                if (_BSOMaterialDetails_Child_Child == null)
+                    _BSOMaterialDetails_Child_Child = new ACChildItem<BSOMaterialDetails>(this, nameof(BSOMaterialDetails_Child));
+                return _BSOMaterialDetails_Child_Child;
+            }
+        }
+
+        #endregion
+
 
         #region Properties
 
@@ -61,9 +80,7 @@ namespace gip.bso.masterdata
             }
         }
 
-
         #region Properties -> Filter
-
 
         public CompanyMaterialOverviewTypeEnum? FilterCompanyMaterialOverview
         {
@@ -163,10 +180,24 @@ namespace gip.bso.masterdata
                 {
                     _SelectedMaterialOverview = value;
                     OnPropertyChanged(nameof(SelectedMaterialOverview));
+
+                    if(BSOMaterialDetails_Child != null && BSOMaterialDetails_Child.Value != null)
+                    {
+                        
+                        if (value!= null)
+                        {
+                            BSOMaterialDetails_Child.Value.CurrentMaterialID = value.MaterialID;
+                            BSOMaterialDetails_Child.Value.CurrentMaterialStock = value.CurrentMaterialStock;
+                        }
+                        else
+                        {
+                            BSOMaterialDetails_Child.Value.CurrentMaterialID = null;
+                            BSOMaterialDetails_Child.Value.CurrentMaterialStock = null;
+                        }
+                    }
                 }
             }
         }
-
 
         private List<CompanyMaterialOverviewModel> _MaterialOverviewList;
         /// <summary>
@@ -207,10 +238,12 @@ namespace gip.bso.masterdata
             if (FilterCompanyMaterialOverview != null)
             {
                 MaterialOverviewList = GetMaterialOverviewList(DatabaseApp, CurrentCompany, FilterCompanyMaterialOverview ?? CompanyMaterialOverviewTypeEnum.ViewSupplierStock);
+                SelectedMaterialOverview = MaterialOverviewList.FirstOrDefault();
             }
             else
             {
                 MaterialOverviewList = null;
+                SelectedMaterialOverview = null;
             }
         }
 
@@ -239,6 +272,13 @@ namespace gip.bso.masterdata
                 default:
                     break;
             }
+
+            int nr = 0;
+            foreach(CompanyMaterialOverviewModel item in result)
+            {
+                nr ++;
+                item.Sn = nr;
+            }     
             return result;
         }
 
@@ -281,55 +321,64 @@ namespace gip.bso.masterdata
         private List<CompanyMaterialOverviewModel> GetViewPartnerStockOfUniqueMaterials(DatabaseApp databaseApp, Company company)
         {
             return
-               s_cQry_ViewSupplierStock(databaseApp, company.CompanyID)
+               s_cQry_ViewPartnerStockOfUniqueMaterials(databaseApp, company.CompanyID)
                 .ToList();
         }
 
+
         #endregion
+
+        #endregion
+
+        #region Methods -> Overrides
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(Clear):
+                    Clear();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
 
         #endregion
 
         #region Queries
 
-        public static readonly Func<DatabaseApp, Guid, bool?, IQueryable<FacilityCharge>> s_cQry_FacilityOverviewFacilityCharge =
-            CompiledQuery.Compile<DatabaseApp, Guid, bool?, IQueryable<FacilityCharge>>(
-                (ctx, facID, showNotAvailable) => ctx.FacilityCharge
-                .Include(FacilityLot.ClassName)
-                .Include(Facility.ClassName)
-                .Include("Facility.Facility1_ParentFacility")
-                .Include(Material.ClassName)
-                .Include(MDReleaseState.ClassName)
-                .Include(MDUnit.ClassName)
-                .Where(c => c.FacilityID == facID && (!showNotAvailable.HasValue || c.NotAvailable == showNotAvailable.Value))
-                .OrderBy(c => c.FacilityChargeSortNo)
-        );
-
         public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewSupplierStock =
-           CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
-               (databaseApp, companyID) =>
-               databaseApp
-                .FacilityCharge
-               .Include(c => c.CompanyMaterial)
-               .Include(c => c.CompanyMaterial.Material)
-                .Where(c =>
-                    !c.NotAvailable
-                    && c.CompanyMaterial.CompanyID == companyID
-                )
-                .Select(c => c.CompanyMaterial)
-                .GroupBy(c => c.CompanyMaterialNo)
-                .Select(c => c.FirstOrDefault() ?? null)
-                .Select(c =>
-                        new CompanyMaterialOverviewModel
-                        {
-                            MaterialNo = c.Material.MaterialNo,
-                            MaterialName = c.Material.MaterialName1,
-                            CompanyMaterialNo = c.CompanyMaterialNo,
-                            CompanyMaterialName = c.CompanyMaterialName
-                        })
-                .OrderBy(c => c.MaterialNo)
-                .ThenBy(c => c.CompanyMaterialNo)
+     CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
+         (databaseApp, companyID) =>
+         databaseApp
+          .FacilityCharge
+         .Include(c => c.CompanyMaterial)
+         .Include(c => c.CompanyMaterial.Material)
+          .Where(c =>
+              !c.NotAvailable
+              && c.CompanyMaterial.CompanyID == companyID
+          )
+          .Select(c => c.CompanyMaterial)
+          .GroupBy(c => c.CompanyMaterialNo)
+          .Select(c => c.FirstOrDefault() ?? null)
+          .Select(c =>
+                  new CompanyMaterialOverviewModel
+                  {
+                      MaterialID = c.MaterialID,
+                      MaterialNo = c.Material.MaterialNo,
+                      MaterialName = c.Material.MaterialName1,
+                      CompanyMaterialNo = c.CompanyMaterialNo,
+                      CompanyMaterialName = c.CompanyMaterialName,
+                      CurrentMaterialStock = c.Material.MaterialStock_Material.OrderBy(x=>x.InsertDate).FirstOrDefault()
+                  })
+          .OrderBy(c => c.MaterialNo)
+          .ThenBy(c => c.CompanyMaterialNo)
 
-            );
+      );
 
         public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockLotManaged =
            CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
@@ -356,10 +405,12 @@ namespace gip.bso.masterdata
                 .Select(c =>
                         new CompanyMaterialOverviewModel
                         {
+                            MaterialID = c.MaterialID,
                             MaterialNo = c.Material.MaterialNo,
                             MaterialName = c.Material.MaterialName1,
                             CompanyMaterialNo = c.CompanyMaterialNo,
-                            CompanyMaterialName = c.CompanyMaterialName
+                            CompanyMaterialName = c.CompanyMaterialName,
+                            CurrentMaterialStock = c.Material.MaterialStock_Material.OrderBy(x => x.InsertDate).FirstOrDefault()
                         })
                 .OrderBy(c => c.MaterialNo)
                 .ThenBy(c => c.CompanyMaterialNo)
@@ -391,15 +442,39 @@ namespace gip.bso.masterdata
                 .Select(c =>
                         new CompanyMaterialOverviewModel
                         {
+                            MaterialID = c.MaterialID,
                             MaterialNo = c.Material.MaterialNo,
                             MaterialName = c.Material.MaterialName1,
                             CompanyMaterialNo = c.CompanyMaterialNo,
-                            CompanyMaterialName = c.CompanyMaterialName
+                            CompanyMaterialName = c.CompanyMaterialName,
+                            CurrentMaterialStock = c.Material.MaterialStock_Material.OrderBy(x => x.InsertDate).FirstOrDefault()
                         })
                 .OrderBy(c => c.MaterialNo)
                 .ThenBy(c => c.CompanyMaterialNo)
 
             );
+
+
+        public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockOfUniqueMaterials =
+     CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
+         (databaseApp, companyID) =>
+         databaseApp
+          .CompanyMaterial
+          .Where(c=>c.CompanyID == companyID)
+          .Select(c =>
+                  new CompanyMaterialOverviewModel
+                  {
+                      MaterialID = c.MaterialID,
+                      MaterialNo = c.Material.MaterialNo,
+                      MaterialName = c.Material.MaterialName1,
+                      CompanyMaterialNo = c.CompanyMaterialNo,
+                      CompanyMaterialName = c.CompanyMaterialName,
+                      CurrentMaterialStock = c.Material.MaterialStock_Material.OrderBy(x => x.InsertDate).FirstOrDefault()
+                  })
+          .OrderBy(c => c.MaterialNo)
+          .ThenBy(c => c.CompanyMaterialNo)
+
+      );
 
         #endregion
     }

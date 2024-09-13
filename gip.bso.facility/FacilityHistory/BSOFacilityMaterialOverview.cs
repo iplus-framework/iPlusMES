@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
@@ -106,14 +107,6 @@ namespace gip.bso.facility
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            this._CurrentFacilityCharge = null;
-            this._CurrentFacilityChargeSumFacilityHelper = null;
-            this._CurrentFacilityChargeSumLocationHelper = null;
-            this._CurrentFacilityChargeSumLotHelper = null;
-            this._SelectedFacilityCharge = null;
-            this._SelectedFacilityChargeSumFacilityHelper = null;
-            this._SelectedFacilityChargeSumLocationHelper = null;
-            this._SelectedFacilityChargeSumLotHelper = null;
             this._MaterialGroupFilter = null;
 
             if (_AccessPrimary != null)
@@ -141,16 +134,16 @@ namespace gip.bso.facility
 
         #region ChildBSO
 
-        ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
+        ACChildItem<BSOMaterialDetails> _BSOMaterialDetails_Child_Child;
         [ACPropertyInfo(600)]
-        [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
-        public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
+        [ACChildInfo(nameof(BSOMaterialDetails_Child), typeof(BSOMaterialDetails))]
+        public ACChildItem<BSOMaterialDetails> BSOMaterialDetails_Child
         {
             get
             {
-                if (_BSOFacilityReservationOverview_Child == null)
-                    _BSOFacilityReservationOverview_Child = new ACChildItem<BSOFacilityReservationOverview>(this, nameof(BSOFacilityReservationOverview_Child));
-                return _BSOFacilityReservationOverview_Child;
+                if (_BSOMaterialDetails_Child_Child == null)
+                    _BSOMaterialDetails_Child_Child = new ACChildItem<BSOMaterialDetails>(this, nameof(BSOMaterialDetails_Child));
+                return _BSOMaterialDetails_Child_Child;
             }
         }
 
@@ -220,7 +213,7 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged(nameof(SelectedMaterialStock));
+                OnPropertyChanged();
             }
         }
 
@@ -242,29 +235,22 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Current = value;
-                CleanMovements();
-                OnPropertyChanged(nameof(CurrentMaterialStock));
-                RefreshRelatedData();
-                ClearReservation();
+                OnPropertyChanged();
+
+                if (BSOMaterialDetails_Child != null && BSOMaterialDetails_Child.Value != null)
+                {
+                    if (value != null)
+                    {
+                        BSOMaterialDetails_Child.Value.CurrentMaterialID = value.MaterialID;
+                        BSOMaterialDetails_Child.Value.CurrentMaterialStock = value;
+                    }
+                    else
+                    {
+                        BSOMaterialDetails_Child.Value.CurrentMaterialID = null;
+                        BSOMaterialDetails_Child.Value.CurrentMaterialStock = null;
+                    }
+                }
             }
-        }
-
-        public override void OnPropertyChanged([CallerMemberName] string name = "")
-        {
-            base.OnPropertyChanged(name);
-            if (name == "ShowNotAvailable")
-            {
-                RefreshRelatedData();
-            }
-        }
-
-        public void RefreshRelatedData()
-        {
-            RefreshFacilityChargeList();
-
-            RefreshFacilityChargeSumLotHelperList();
-            RefreshFacilityChargeSumFacilityHelperList();
-            RefreshFacilityChargeSumLocationHelperList();
         }
 
         /// <summary>
@@ -308,301 +294,6 @@ namespace gip.bso.facility
             {
                 return DatabaseApp.MDMaterialGroup;
             }
-        }
-
-        #endregion
-
-        #region BSO->ACProperty->FacilityLot
-
-        /// <summary>
-        /// The _ current facility charge sum lot helper
-        /// </summary>
-        FacilityChargeSumLotHelper _CurrentFacilityChargeSumLotHelper;
-        /// <summary>
-        /// Gets or sets the current facility charge sum lot helper.
-        /// </summary>
-        /// <value>The current facility charge sum lot helper.</value>
-        [ACPropertyCurrent(806, "FacilityChargeSumLotHelper")]
-        public FacilityChargeSumLotHelper CurrentFacilityChargeSumLotHelper
-        {
-            get
-            {
-                return _CurrentFacilityChargeSumLotHelper;
-            }
-            set
-            {
-                _CurrentFacilityChargeSumLotHelper = value;
-                OnPropertyChanged(nameof(CurrentFacilityChargeSumLotHelper));
-            }
-        }
-
-        /// <summary>
-        /// Gets the facility charge sum lot helper list.
-        /// </summary>
-        /// <value>The facility charge sum lot helper list.</value>
-        [ACPropertyList(807, "FacilityChargeSumLotHelper")]
-        public IEnumerable<FacilityChargeSumLotHelper> FacilityChargeSumLotHelperList
-        {
-            get
-            {
-                if (CurrentMaterialStock == null)
-                    return null;
-                if (CurrentMaterialStock.Material == null)
-                    return null;
-                List<FacilityChargeSumLotHelper> items = ACFacilityManager.GetFacilityChargeSumLotHelperList(FacilityChargeList, new FacilityQueryFilter() { MaterialID = CurrentMaterialStock.MaterialID }).ToList();
-                // when FilterLotNos exist - reduce already used FacilityLots
-                if (FilterLotNos != null && FilterLotNos.Any())
-                {
-                    items = items.Where(c => !FilterLotNos.Contains(c.FacilityLot.LotNo)).ToList();
-                }
-                return items;
-            }
-        }
-        /// <summary>
-        /// The _ selected facility charge sum lot helper
-        /// </summary>
-        FacilityChargeSumLotHelper _SelectedFacilityChargeSumLotHelper;
-        /// <summary>
-        /// Gets or sets the selected facility charge sum lot helper.
-        /// </summary>
-        /// <value>The selected facility charge sum lot helper.</value>
-        [ACPropertySelected(808, "FacilityChargeSumLotHelper")]
-        public FacilityChargeSumLotHelper SelectedFacilityChargeSumLotHelper
-        {
-            get
-            {
-                return _SelectedFacilityChargeSumLotHelper;
-            }
-            set
-            {
-                _SelectedFacilityChargeSumLotHelper = value;
-                OnPropertyChanged(nameof(SelectedFacilityChargeSumLotHelper));
-            }
-        }
-
-
-        private void RefreshFacilityChargeSumLotHelperList()
-        {
-            CurrentFacilityChargeSumLotHelper = null;
-            SelectedFacilityChargeSumLotHelper = null;
-            OnPropertyChanged(nameof(FacilityChargeSumLotHelperList));
-        }
-
-        #endregion
-
-        #region BSO->ACProperty->FacilityCharge
-
-        /// <summary>
-        /// The _ current facility charge
-        /// </summary>
-        FacilityCharge _CurrentFacilityCharge;
-        /// <summary>
-        /// Gets or sets the current facility charge.
-        /// </summary>
-        /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(809, FacilityCharge.ClassName)]
-        public FacilityCharge CurrentFacilityCharge
-        {
-            get
-            {
-                return _CurrentFacilityCharge;
-            }
-            set
-            {
-                _CurrentFacilityCharge = value;
-                OnPropertyChanged(nameof(CurrentFacilityCharge));
-            }
-        }
-
-        IEnumerable<FacilityCharge> _FacilityChargeList;
-        /// <summary>
-        /// Gets the facility charge list.
-        /// </summary>
-        /// <value>The facility charge list.</value>
-        [ACPropertyList(810, FacilityCharge.ClassName)]
-        public IEnumerable<FacilityCharge> FacilityChargeList
-        {
-            get
-            {
-                if (_FacilityChargeList != null)
-                    return _FacilityChargeList;
-                if (CurrentMaterialStock == null)
-                    return null;
-                if (CurrentMaterialStock.Material == null)
-                    return null;
-                _FacilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(this.DatabaseApp, CurrentMaterialStock.MaterialID, ShowNotAvailable).ToArray();
-                return _FacilityChargeList;
-            }
-        }
-
-        /// <summary>
-        /// The _ selected facility charge
-        /// </summary>
-        FacilityCharge _SelectedFacilityCharge;
-        /// <summary>
-        /// Gets or sets the selected facility charge.
-        /// </summary>
-        /// <value>The selected facility charge.</value>
-        [ACPropertySelected(811, FacilityCharge.ClassName)]
-        public FacilityCharge SelectedFacilityCharge
-        {
-            get
-            {
-                return _SelectedFacilityCharge;
-            }
-            set
-            {
-                _SelectedFacilityCharge = value;
-                OnPropertyChanged(nameof(SelectedFacilityCharge));
-            }
-        }
-
-        private void RefreshFacilityChargeList()
-        {
-            CurrentFacilityCharge = null;
-            SelectedFacilityCharge = null;
-            _FacilityChargeList = null;
-            OnPropertyChanged(nameof(FacilityChargeList));
-        }
-        #endregion
-
-        #region BSO->ACProperty->SumLocation
-        /// <summary>
-        /// SumLocation: A sum over all Charges/Batches of the actual Material grouped by Storage Location
-        /// </summary>
-        FacilityChargeSumLocationHelper _CurrentFacilityChargeSumLocationHelper;
-        /// <summary>
-        /// Gets or sets the current facility charge sum location helper.
-        /// </summary>
-        /// <value>The current facility charge sum location helper.</value>
-        [ACPropertyCurrent(812, "FacilityChargeSumLocationHelper")]
-        public FacilityChargeSumLocationHelper CurrentFacilityChargeSumLocationHelper
-        {
-            get
-            {
-                return _CurrentFacilityChargeSumLocationHelper;
-            }
-            set
-            {
-                _CurrentFacilityChargeSumLocationHelper = value;
-                OnPropertyChanged(nameof(CurrentFacilityChargeSumLocationHelper));
-            }
-        }
-
-        /// <summary>
-        /// Gets the facility charge sum location helper list.
-        /// </summary>
-        /// <value>The facility charge sum location helper list.</value>
-        [ACPropertyList(813, "FacilityChargeSumLocationHelper")]
-        public IEnumerable<FacilityChargeSumLocationHelper> FacilityChargeSumLocationHelperList
-        {
-            get
-            {
-                if (CurrentMaterialStock == null)
-                    return null;
-                if (CurrentMaterialStock.Material == null)
-                    return null;
-                return ACFacilityManager.GetFacilityChargeSumLocationHelperList(FacilityChargeList, new FacilityQueryFilter());
-            }
-        }
-        /// <summary>
-        /// The _ selected facility charge sum location helper
-        /// </summary>
-        FacilityChargeSumLocationHelper _SelectedFacilityChargeSumLocationHelper;
-        /// <summary>
-        /// Gets or sets the selected facility charge sum location helper.
-        /// </summary>
-        /// <value>The selected facility charge sum location helper.</value>
-        [ACPropertySelected(814, "FacilityChargeSumLocationHelper")]
-        public FacilityChargeSumLocationHelper SelectedFacilityChargeSumLocationHelper
-        {
-            get
-            {
-                return _SelectedFacilityChargeSumLocationHelper;
-            }
-            set
-            {
-                _SelectedFacilityChargeSumLocationHelper = value;
-                OnPropertyChanged(nameof(SelectedFacilityChargeSumLocationHelper));
-            }
-        }
-
-        private void RefreshFacilityChargeSumLocationHelperList()
-        {
-            CurrentFacilityChargeSumLocationHelper = null;
-            SelectedFacilityChargeSumLocationHelper = null;
-            OnPropertyChanged(nameof(FacilityChargeSumLocationHelperList));
-        }
-
-        #endregion
-
-        #region BSO->ACProperty->SumFacility
-        /// <summary>
-        /// SumLocation: A sum over all Charges/Batches of the actual Material grouped by Storage Area
-        /// </summary>
-        FacilityChargeSumFacilityHelper _CurrentFacilityChargeSumFacilityHelper;
-        /// <summary>
-        /// Gets or sets the current facility charge sum facility helper.
-        /// </summary>
-        /// <value>The current facility charge sum facility helper.</value>
-        [ACPropertyCurrent(815, "FacilityChargeSumFacilityHelper")]
-        public FacilityChargeSumFacilityHelper CurrentFacilityChargeSumFacilityHelper
-        {
-            get
-            {
-                return _CurrentFacilityChargeSumFacilityHelper;
-            }
-            set
-            {
-                _CurrentFacilityChargeSumFacilityHelper = value;
-                OnPropertyChanged(nameof(CurrentFacilityChargeSumFacilityHelper));
-            }
-        }
-
-        /// <summary>
-        /// Gets the facility charge sum facility helper list.
-        /// </summary>
-        /// <value>The facility charge sum facility helper list.</value>
-        [ACPropertyList(816, "FacilityChargeSumFacilityHelper")]
-        public IEnumerable<FacilityChargeSumFacilityHelper> FacilityChargeSumFacilityHelperList
-        {
-            get
-            {
-                if (CurrentMaterialStock == null)
-                    return null;
-                if (CurrentMaterialStock.Material == null)
-                    return null;
-                return ACFacilityManager.GetFacilityChargeSumFacilityHelperList(FacilityChargeList, new FacilityQueryFilter());
-            }
-        }
-
-        /// <summary>
-        /// The _ selected facility charge sum facility helper
-        /// </summary>
-        FacilityChargeSumFacilityHelper _SelectedFacilityChargeSumFacilityHelper;
-        /// <summary>
-        /// Gets or sets the selected facility charge sum facility helper.
-        /// </summary>
-        /// <value>The selected facility charge sum facility helper.</value>
-        [ACPropertySelected(817, "FacilityChargeSumFacilityHelper")]
-        public FacilityChargeSumFacilityHelper SelectedFacilityChargeSumFacilityHelper
-        {
-            get
-            {
-                return _SelectedFacilityChargeSumFacilityHelper;
-            }
-            set
-            {
-                _SelectedFacilityChargeSumFacilityHelper = value;
-                OnPropertyChanged(nameof(SelectedFacilityChargeSumFacilityHelper));
-            }
-        }
-
-        private void RefreshFacilityChargeSumFacilityHelperList()
-        {
-            CurrentFacilityChargeSumFacilityHelper = null;
-            SelectedFacilityChargeSumFacilityHelper = null;
-            OnPropertyChanged(nameof(FacilityChargeSumFacilityHelperList));
         }
 
         #endregion
@@ -755,10 +446,10 @@ namespace gip.bso.facility
         [ACMethodCommand(nameof(ShowLotDlg), Const.Ok, (short)MISort.Okay)]
         public void ShowLotDlgOk()
         {
-            if (DialogResult != null)
+            if (DialogResult != null && IsEnabledShowLotDlgOk())
             {
                 DialogResult.SelectedCommand = eMsgButton.OK;
-                DialogResult.ReturnValue = SelectedFacilityChargeSumLotHelper.FacilityLot;
+                DialogResult.ReturnValue = BSOMaterialDetails_Child.Value.SelectedFacilityChargeSumLotHelper.FacilityLot;
             }
             FilterLotNos = null;
             CloseTopDialog();
@@ -766,7 +457,7 @@ namespace gip.bso.facility
 
         public bool IsEnabledShowLotDlgOk()
         {
-            return SelectedFacilityChargeSumLotHelper != null;
+            return BSOMaterialDetails_Child != null && BSOMaterialDetails_Child.Value != null && BSOMaterialDetails_Child.Value.SelectedFacilityChargeSumLotHelper != null;
         }
 
         [ACMethodCommand(nameof(ShowLotDlg), Const.Cancel, (short)MISort.Cancel)]
@@ -798,243 +489,6 @@ namespace gip.bso.facility
             }
             //filterItem = new ACFilterItem(Global.FilterTypes.filter, filter_key_materialwf, WFOperator, Global.Operators.and, "", true);
             //AccessPrimary.NavACQueryDefinition.ACFilterColumns.Add(filterItem);
-        }
-
-        #endregion
-
-        #region BSO->ACMethod->Reservation
-
-        /// <summary>
-        /// Source Property: LoadFacilityReservation
-        /// </summary>
-        [ACMethodInfo(nameof(LoadFacilityReservation), "en{'Load Facility Reservation'}de{'Reservierung einladen'}", 999)]
-        public void LoadFacilityReservation()
-        {
-            if (!IsEnabledMethodName())
-                return;
-            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
-            {
-                BSOFacilityReservationOverview_Child.Value.LoadReservation(CurrentMaterialStock.Material, SearchFrom, SearchTo);
-            }
-        }
-
-        public bool IsEnabledMethodName()
-        {
-            return CurrentMaterialStock != null;
-        }
-
-
-
-        private void ClearReservation()
-        {
-            if (BSOFacilityReservationOverview_Child != null && BSOFacilityReservationOverview_Child.Value != null)
-            {
-                BSOFacilityReservationOverview_Child.Value.ClearReservation();
-            }
-        }
-
-        #endregion
-
-        #region BSO->ACMethod->Navigation
-        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 780, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToOrder()
-        {
-            if (!IsEnabledNavigateToOrder())
-                return;
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslistPos), SelectedFacilityCharge.FinalPositionFromFbc.ProdOrderPartslistPosID));
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToOrder()
-        {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FinalPositionFromFbc != null)
-                return true;
-            return false;
-        }
-
-        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacilityCharge()
-        {
-            if (!IsEnabledNavigateToFacilityCharge())
-            {
-                return;
-            }
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityCharge), SelectedFacilityCharge.FacilityChargeID));
-                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
-                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
-
-                if (SelectedFacilityCharge.FacilityLotID != null)
-                {
-                    info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
-                }
-
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToFacilityCharge()
-        {
-            return SelectedFacilityCharge != null;
-        }
-
-        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 781, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacilityLot()
-        {
-            if (!IsEnabledNavigateToFacilityLot())
-                return;
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToFacilityLot()
-        {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
-                return true;
-            return false;
-        }
-
-        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 782, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacilityLotOverview()
-        {
-            if (!IsEnabledNavigateToFacilityLotOverview())
-                return;
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
-                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToFacilityLotOverview()
-        {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
-                return true;
-            return false;
-        }
-
-        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 783, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacilityOverview()
-        {
-            if (!IsEnabledNavigateToFacilityOverview())
-                return;
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
-                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToFacilityOverview()
-        {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Facility != null && SelectedFacilityCharge.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                return true;
-            return false;
-        }
-
-        [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 784, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacility()
-        {
-            if (!IsEnabledNavigateToFacility())
-                return;
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToFacility()
-        {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Facility != null && SelectedFacilityCharge.Facility.MDFacilityType != null && SelectedFacilityCharge.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
-                return true;
-            return false;
-        }
-
-        [ACMethodInteraction("", "en{'Manage Material'}de{'Verwalte Material'}", 785, true, nameof(SelectedMaterialStock))]
-        public void NavigateToMaterial()
-        {
-            if (!IsEnabledNavigateToMaterial())
-                return;
-
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedMaterialStock.MaterialID));
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToMaterial()
-        {
-            if (SelectedMaterialStock != null && SelectedMaterialStock.Material != null)
-                return true;
-            return false;
-        }
-        #endregion
-
-        #region BSO->ACMethod->DialogOrderInfo
-
-        [ACMethodInfo("Dialog", "en{'Dialog'}de{'Dialog'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
-        {
-            if (AccessPrimary == null || paOrderInfo == null)
-                return;
-
-            PAOrderInfoEntry entityInfo = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Material)).FirstOrDefault();
-            if (entityInfo == null)
-                return;
-
-            Material material = this.DatabaseApp.Material.Where(c => c.MaterialID == entityInfo.EntityID).FirstOrDefault();
-            if (material == null)
-                return;
-
-            ShowDialogOrder(material.MaterialNo);
-        }
-
-        [ACMethodInfo("Dialog", "en{'Dialog'}de{'Dialog'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string no)
-        {
-            if (AccessPrimary == null)
-                return;
-
-            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == Material.ClassName + "\\" + nameof(Material.MaterialNo)).FirstOrDefault();
-            if (filterItem == null)
-            {
-                filterItem = new ACFilterItem(Global.FilterTypes.filter, Material.ClassName + "\\" + nameof(Material.MaterialNo), Global.LogicalOperators.contains, Global.Operators.and, no, false);
-                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
-            }
-            filterItem.SearchWord = no;
-
-            this.Search();
-            ShowDialog(this, "OrderInfoDialog");
-            this.ParentACComponent.StopComponent(this);
         }
 
         #endregion
@@ -1072,92 +526,11 @@ namespace gip.bso.facility
                 case nameof(Filter):
                     Filter();
                     return true;
-                case nameof(NavigateToFacilityLot):
-                    NavigateToFacilityLot();
-                    return true;
-                case nameof(IsEnabledNavigateToFacilityLot):
-                    result = IsEnabledNavigateToFacilityLot();
-                    return true;
-                case nameof(NavigateToFacilityLotOverview):
-                    NavigateToFacilityLotOverview();
-                    return true;
-                case nameof(IsEnabledNavigateToFacilityLotOverview):
-                    result = IsEnabledNavigateToFacilityLotOverview();
-                    return true;
-                case nameof(NavigateToFacilityCharge):
-                    NavigateToFacilityCharge();
-                    return true;
-                case nameof(IsEnabledNavigateToFacilityCharge):
-                    result = IsEnabledNavigateToFacilityCharge();
-                    return true;
-                case nameof(NavigateToFacilityOverview):
-                    NavigateToFacilityOverview();
-                    return true;
-                case nameof(IsEnabledNavigateToFacilityOverview):
-                    result = IsEnabledNavigateToFacilityOverview();
-                    return true;
-                case nameof(NavigateToMaterial):
-                    NavigateToMaterial();
-                    return true;
-                case nameof(IsEnabledNavigateToMaterial):
-                    result = IsEnabledNavigateToMaterial();
-                    return true;
-                case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
-                    return true;
-                case nameof(ShowDialogOrder):
-                    ShowDialogOrder((String)acParameter[0]);
-                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
 
-        #region FacilityBooking(Charge)Overview methods -> Executive methods overrides
-
-        public override bool IsEnabledRefreshMovements()
-        {
-            return base.IsEnabledRefreshMovements() && CurrentMaterialStock != null && CurrentMaterialStock.MaterialID != null;
-        }
-
-        public override FacilityQueryFilter GetFacilityBookingFilter()
-        {
-            FacilityQueryFilter filter = base.GetFacilityBookingFilter();
-            if (CurrentMaterialStock != null && CurrentMaterialStock.MaterialID != null)
-                filter.MaterialID = CurrentMaterialStock.MaterialID;
-            return filter;
-        }
-
-        public override void OnFacilityBookingSearchSum()
-        {
-            if (FacilityBookingOverviewList != null && CurrentMaterialStock != null)
-            {
-                double sum = 0.0;
-                foreach (var fb in FacilityBookingOverviewList)
-                {
-                    if (String.IsNullOrEmpty(fb.InwardMaterialNo) || fb.InwardMaterialNo == CurrentMaterialStock.Material.MaterialNo)
-                        sum += fb.InwardQuantityUOM;
-                    if (String.IsNullOrEmpty(fb.OutwardMaterialNo) || fb.OutwardMaterialNo == CurrentMaterialStock.Material.MaterialNo)
-                        sum -= fb.OutwardQuantityUOM;
-                    fb.InOutSumUOM = sum;
-                }
-            }
-
-            if (FacilityBookingChargeOverviewList != null && CurrentMaterialStock != null)
-            {
-                double sum = 0.0;
-                foreach (var fb in FacilityBookingChargeOverviewList)
-                {
-                    if (fb.InwardMaterialNo == CurrentMaterialStock.Material.MaterialNo)
-                        sum += fb.InwardQuantityUOM;
-                    if (fb.OutwardMaterialNo == CurrentMaterialStock.Material.MaterialNo)
-                        sum -= fb.OutwardQuantityUOM;
-                    fb.InOutSumUOM = sum;
-                }
-            }
-        }
-
-        #endregion
     }
 }
