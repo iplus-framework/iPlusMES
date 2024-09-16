@@ -284,6 +284,14 @@ namespace gip.mes.processapplication
                         if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
 
+                        if (exParallelMethod == null
+                            && responsibleFunc.IsHandOverFunc
+                            && responsibleFunc.CurrentACState >= ACStateEnum.SMRunning 
+                            && responsibleFunc.CurrentACState < ACStateEnum.SMResetting
+                            && responsibleFunc.CurrentACMethod != null)
+                        {
+                            exParallelMethod = responsibleFunc.CurrentACMethod.ValueT;
+                        }
                         if (exParallelMethod == null && KeepSameRoute)
                             exParallelMethod = FindParallelDischargingIfRoute();
                         Route shareRoute = null;
@@ -521,8 +529,17 @@ namespace gip.mes.processapplication
                                 if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
+                                if (exParallelMethod == null
+                                    && responsibleFunc.IsHandOverFunc
+                                    && responsibleFunc.CurrentACState >= ACStateEnum.SMRunning
+                                    && responsibleFunc.CurrentACState < ACStateEnum.SMResetting
+                                    && responsibleFunc.CurrentACMethod != null)
+                                {
+                                    exParallelMethod = responsibleFunc.CurrentACMethod.ValueT;
+                                }
                                 if (exParallelMethod == null && KeepSameRoute)
                                     exParallelMethod = FindParallelDischargingIfRoute();
+                                
                                 Route shareRoute = null;
                                 if (exParallelMethod != null)
                                 {

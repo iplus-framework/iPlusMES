@@ -5,6 +5,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
 using gip.mes.datamodel;
+using System.Reflection;
 
 namespace gip.mes.processapplication
 {
@@ -240,6 +241,7 @@ namespace gip.mes.processapplication
             }
             base.Reset();
         }
+
         #endregion
 
         #region Execute-Helper-Handlers

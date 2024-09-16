@@ -188,7 +188,7 @@ namespace gip.bso.manufacturing
                     }
                 }
 
-                string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo)) as string;
+                string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo)) as string;
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
                     //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
@@ -262,7 +262,7 @@ namespace gip.bso.manufacturing
                 return true;
             }
 
-            processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo), picking.PickingNo);
+            processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo), picking.PickingNo);
 
             return StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID);
         }

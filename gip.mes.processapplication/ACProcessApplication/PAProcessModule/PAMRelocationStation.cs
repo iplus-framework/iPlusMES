@@ -231,7 +231,7 @@ namespace gip.mes.processapplication
                     }
                 }
 
-                string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo)) as string;
+                string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo)) as string;
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
                     //Question50103: The process module is reserved for order {0}. Are you sure that you want continue?
@@ -276,7 +276,7 @@ namespace gip.mes.processapplication
                 return false;
             }
 
-            processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo), picking.PickingNo);
+            processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo), picking.PickingNo);
 
             return StartWorkflow(dbApp, acClassMethod, picking, appManager, workflow.ACClassWFID, processModule);
         }

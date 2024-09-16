@@ -11,6 +11,7 @@ using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.processapplication.PWDosing;
 using gip.core.processapplication;
 using DocumentFormat.OpenXml.ExtendedProperties;
+using System.Diagnostics;
 
 namespace gip.mes.processapplication
 
@@ -59,6 +60,8 @@ namespace gip.mes.processapplication
                     wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
                     wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where Materials can be processed'}de{'Nur Prozessmodule wo Material verarbeitet werden kann'}");
+                    wrapper.Method.ParameterValueList.Add(new ACValue("ReserveModule", typeof(bool), false, Global.ParamOption.Optional));
+                    wrapper.ParameterTranslation.Add("ReserveModule", "en{'Reserve occupied module for next batch'}de{'Reserviere belegtes Prozessmodul für nächsten Batch'}");
                 }
             }
             RegisterExecuteHandler(typeof(PWGroupVB), HandleExecuteACMethod_PWGroupVB);
@@ -164,6 +167,26 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("DosableOnGroupCheck");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Reserve occupied module for next batch
+        /// </summary>
+        public bool ReserveModule
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReserveModule");
                     if (acValue != null)
                     {
                         return acValue.ParamAsBoolean;
@@ -375,6 +398,10 @@ namespace gip.mes.processapplication
                 if (ApplicationManager == null || ContentACClassWF == null || !ContentACClassWF.RefPAACClassID.HasValue)
                     return null;
                 List<PAProcessModule> modulesInAutomaticMode = base.ProcessModuleList;
+                modulesInAutomaticMode = modulesInAutomaticMode.Where(c => c.ReservationInfo == null || String.IsNullOrEmpty(c.ReservationInfo.ValueT) || c.ReservationInfo.ValueT == this.CurrentProgramNo).ToList();
+                if (ReserveModule)
+                    modulesInAutomaticMode = modulesInAutomaticMode.OrderByDescending(c => c.ReservationInfoSortString).ToList();
+
                 try
                 {
                     if (modulesInAutomaticMode == null
@@ -923,6 +950,7 @@ namespace gip.mes.processapplication
             }
             return null;
         }
+
         #endregion
 
 
@@ -1111,14 +1139,39 @@ namespace gip.mes.processapplication
             return base.OnHandleAvailableProcessModule(processModule);
         }
 
+        protected override void OnProcessModuleOccupied(PAProcessModule processModule)
+        {
+            base.OnProcessModuleOccupied(processModule);
+            if (   processModule != null 
+                && processModule.ReservationInfo != null 
+                && ReserveModule)
+            {
+                PWMethodProduction methodBase = ParentPWMethod<PWMethodProduction>();
+                if (methodBase != null)
+                {
+                    if (methodBase.IsLastBatchRunning)
+                        processModule.ReservationInfo.ValueT = null;
+                    else
+                        processModule.ReservationInfo.ValueT = CurrentProgramNo;
+                }
+            }
+        }
+
         protected override void OnProcessModuleReleased(PAProcessModule module)
         {
             base.OnProcessModuleReleased(module);
-            PAProcessModuleVB pAProcessModuleVB = module as PAProcessModuleVB;
-            if (   pAProcessModuleVB != null 
-                && pAProcessModuleVB.OrderReservationInfo != null 
-                && !String.IsNullOrEmpty(pAProcessModuleVB.OrderReservationInfo.ValueT)) 
-                pAProcessModuleVB.OrderReservationInfo.ValueT = null;
+            if (module != null && module.ReservationInfo != null)
+            {
+                bool canResetReservation = true;
+                if (ReserveModule)
+                {
+                    PWMethodProduction methodBase = ParentPWMethod<PWMethodProduction>();
+                    if (methodBase != null && !methodBase.IsLastBatchRunning)
+                        canResetReservation = false;
+                }
+                if (canResetReservation && !String.IsNullOrEmpty(module.ReservationInfo.ValueT))
+                    module.ResetReservationInfo();
+            }
         }
         #endregion
 

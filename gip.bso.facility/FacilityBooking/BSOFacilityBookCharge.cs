@@ -2237,7 +2237,7 @@ namespace gip.bso.facility
         {
             get
             {
-                return CurrentFacilityCharge == null || Math.Abs(CurrentFacilityCharge.StockQuantityUOM) >= double.Epsilon || !CurrentFacilityCharge.NotAvailable;
+                return CurrentFacilityCharge == null || Math.Abs(CurrentFacilityCharge.StockQuantityUOM) >= double.Epsilon || CurrentFacilityCharge.NotAvailable;
             }
         }
         #endregion

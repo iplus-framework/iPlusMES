@@ -923,6 +923,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("TargetQuantity", "en{'Target quantity (Set value if negative)'}de{'Sollmenge (Setze Wert falls negativ)'}");
             method.ParameterValueList.Add(new ACValue("ScaleBatchWeight", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleBatchWeight", "en{'Scale batch weight (SWT tip weight)'}de{'Kippgewicht Waage (SWT)'}");
+            method.ParameterValueList.Add(new ACValue("HandOver", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("HandOver", "en{'Hand over active function to next Batch'}de{'Übergebe aktive Funktion an nächsten Batch'}");
 
             if (acIdentifier == "DischargingIntake")
             {
