@@ -8,6 +8,22 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Facility charge item'}de{'Facility charge item'}", Global.ACKinds.TACSimpleClass)]
     public class FacilityChargeItem : EntityBase, IACObject
     {
+        public FacilityChargeItem(FacilityChargeItem facilityChargeItem, double stockQuantity)
+        {
+            this.FacilityCharge = facilityChargeItem.FacilityCharge;
+            this.FacilityChargeID = facilityChargeItem.FacilityChargeID;
+            this.FacilityChargeNo = facilityChargeItem.FacilityChargeNo;
+            this.FacilityNo = facilityChargeItem.FacilityNo;
+            this.FacilityName = facilityChargeItem.FacilityName;
+            this.ExternLotNo = facilityChargeItem.ExternLotNo;
+            this.StockQuantityUOM = stockQuantity;
+            this.FacilityChargeNo = facilityChargeItem.FacilityChargeNo;
+            this.ExpirationDate = facilityChargeItem.ExpirationDate;
+            this.FillingDate = facilityChargeItem.FillingDate;
+            this.MDUnit = facilityChargeItem.MDUnit;
+            this.FacilityType = facilityChargeItem.FacilityType;
+        }
+
         public FacilityChargeItem(FacilityCharge facilityCharge, double? targetQuantity)
         {
             FacilityCharge = facilityCharge;
@@ -22,6 +38,7 @@ namespace gip.bso.manufacturing
             MDUnit = facilityCharge.MDUnit;
             FacilityNo = facilityCharge.Facility.FacilityNo;
             FacilityName = facilityCharge.Facility.FacilityName;
+            FacilityType = facilityCharge.Facility.MDFacilityType.FacilityType;
 
             if (targetQuantity.HasValue && targetQuantity.Value > StockQuantityUOM)
             {
@@ -113,6 +130,13 @@ namespace gip.bso.manufacturing
                 _Warning = value;
                 OnPropertyChanged("Warning");
             }
+        }
+
+        [ACPropertyInfo(9999)]
+        public FacilityTypesEnum FacilityType
+        {
+            get;
+            set;
         }
 
         public void OnTargetQunatityChanged(double? targetQuantity)
