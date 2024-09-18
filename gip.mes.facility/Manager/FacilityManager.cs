@@ -1521,8 +1521,23 @@ namespace gip.mes.facility
             return facilityReservationModel;
         }
 
+        public List<string> GetFacilityReservationFacilityNos(FacilityReservationModel facilityReservation, IEnumerable<FacilityCharge> facilityCharges)
+        {
+            List<string> facilityNos = new List<string>();
+            List<FacilityCharge> filteredList = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.LotNo == facilityReservation?.FacilityLot.LotNo).ToList();
+            foreach (FacilityCharge facilityCharge in filteredList)
+            {
+                if (!facilityNos.Contains(facilityCharge.Facility.FacilityNo))
+                {
+                    facilityNos.Add(facilityCharge.Facility.FacilityNo);
+                }
+            }
+            return facilityNos;
+        }
+
+
         #endregion
-        
+
     }
 }
 

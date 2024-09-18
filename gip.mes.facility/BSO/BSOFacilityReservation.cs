@@ -335,7 +335,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    List<FacilityReservationModel> facilityReservationModels = GetFacilityReservationList();
+                    List<FacilityReservationModel> facilityReservationModels = GetFacilityReservationList(DatabaseApp, Material != null ? Material.MaterialID : Guid.Empty);
                     LoadFacilityReservationList(facilityReservationModels);
                 }
             }
@@ -354,8 +354,14 @@ namespace gip.mes.facility
             SelectedFacilityReservation = _FacilityReservationList.FirstOrDefault();
         }
 
-        private List<FacilityReservationModel> GetFacilityReservationList()
+        private List<FacilityReservationModel> GetFacilityReservationList(DatabaseApp databaseApp, Guid materialID)
         {
+            List<FacilityCharge> facilityCharges =
+               databaseApp
+               .FacilityCharge
+               .Where(c => c.MaterialID == materialID && !c.NotAvailable && c.FacilityLot != null)
+               .ToList();
+
             List<FacilityReservationModel> reservations = new List<FacilityReservationModel>();
             if (FacilityReservationOwner != null && FacilityReservationCollection != null && FacilityReservationCollection.Any())
             {
@@ -367,6 +373,9 @@ namespace gip.mes.facility
                     FacilityReservationModelBase modelBase = ACFacilityManager.CalcFacilityReservationModelQuantity(DatabaseApp, FacilityReservationOwner, facilityReservationModel, false);
                     facilityReservationModel.CopyFrom(modelBase);
                     facilityReservationModel.PropertyChanged += FacilityReservationModel_PropertyChanged;
+
+                    facilityReservationModel.FacilityNoList = ACFacilityManager.GetFacilityReservationFacilityNos(facilityReservationModel, facilityCharges);
+
                     reservations.Add(facilityReservationModel);
                 }
             }
@@ -653,17 +662,8 @@ namespace gip.mes.facility
                         facilityReservation.OldestFacilityChargeDate = chargeDate;
                     }
                 }
-
-                // FacilityNo list
-                if (facilityReservation.FacilityNoList == null)
-                {
-                    facilityReservation.FacilityNoList = new List<string>();
-                }
-                if (!facilityReservation.FacilityNoList.Contains(facilityCharge.Facility.FacilityNo))
-                {
-                    facilityReservation.FacilityNoList.Add(facilityCharge.Facility.FacilityNo);
-                }
             }
+
 
 
             foreach (FacilityReservationModel facilityReservation in facilityReservations)
@@ -687,6 +687,8 @@ namespace gip.mes.facility
                 {
                     facilityReservation.SetSelected(true);
                 }
+
+                facilityReservation.FacilityNoList = ACFacilityManager.GetFacilityReservationFacilityNos(facilityReservation, facilityCharges);
             }
 
             double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
@@ -807,7 +809,7 @@ namespace gip.mes.facility
             switch (command)
             {
                 case nameof(LoadFacilityReservationList):
-                    e.Result = GetFacilityReservationList();
+                    e.Result = GetFacilityReservationList(DatabaseApp, Material != null ? Material.MaterialID : Guid.Empty);
                     break;
                 case nameof(AddFacilityReservation):
                     e.Result = LoadFacilityLotList(DatabaseApp, Material, FacilityReservationList);

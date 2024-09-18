@@ -131,7 +131,7 @@ namespace gip.mes.facility
             get
             {
                 ReservationState reservationState = ReservationState.New;
-                if(SelectedReservationState != null)
+                if (SelectedReservationState != null)
                 {
                     reservationState = (ReservationState)SelectedReservationState.Value;
                 }
