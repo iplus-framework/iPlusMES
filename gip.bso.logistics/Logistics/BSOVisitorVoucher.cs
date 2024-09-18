@@ -1434,6 +1434,8 @@ namespace gip.bso.logistics
             RefreshUnAssignedTourplanList(forceQueryFromDb);
             OnPropertyChanged(nameof(TourplanList));
 
+            LoadPickingRelatedData(PickingList);
+            LoadPickingRelatedData(UnAssignedPickingList);
             RefreshUnAssignedPickingList(forceQueryFromDb);
             OnPropertyChanged(nameof(PickingList));
 

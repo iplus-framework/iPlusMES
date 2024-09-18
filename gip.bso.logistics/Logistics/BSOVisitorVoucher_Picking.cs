@@ -491,6 +491,23 @@ namespace gip.bso.logistics
 
         }
 
+        public void LoadPickingRelatedData(IEnumerable<Picking> pickings)
+        {
+            if (pickings != null)
+            {
+                foreach (Picking picking in pickings)
+                {
+                    LoadPickingRelatedData(picking);
+                }
+            }
+        }
+
+        public void LoadPickingRelatedData(Picking picking)
+        {
+            picking.PreparationStatus = PickingManager.GetPickingPreparationStatus(DatabaseApp, picking);
+            picking.PreparationStatusName = PickingManager.GetPickingPreparationStatusName(DatabaseApp, picking.PreparationStatus);
+        }
+
         #endregion
 
         #region Navigation
