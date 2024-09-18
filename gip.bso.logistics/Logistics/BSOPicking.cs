@@ -3150,10 +3150,21 @@ namespace gip.bso.logistics
                 foreach (var picking in mirroredPickings)
                 {
                     if (mirroredPicking == null)
+                    {
                         mirroredPicking = picking;
-                    AccessPrimary.NavList.Add(picking);
+                    }
+                    
+                    if(!AccessPrimary.NavList.Contains(picking))
+                    {
+                        AccessPrimary.NavList.Add(picking);
+                    }
+                    if (!PickingList.Contains(picking))
+                    {
+                        PickingList.Add(picking);
+                    }
                 }
             }
+
             OnPropertyChanged(nameof(PickingList));
             if (NavigateOnGenRelated && mirroredPicking != null)
             {
