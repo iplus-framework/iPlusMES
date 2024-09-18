@@ -1078,6 +1078,24 @@ namespace gip.mes.datamodel
             }
         }
 
+        private ACValueItemList _PickingPreparationStatusList;
+        [ACPropertyInfo(9999)]
+        public ACValueItemList PickingPreparationStatusList
+        {
+            get
+            {
+                if (_PickingPreparationStatusList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PickingPreparationStatusEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _PickingPreparationStatusList = enumClass.ACValueListForEnum;
+                    else
+                        _PickingPreparationStatusList = new ACValueListPickingPreparationStatusEnum();
+                }
+                return _PickingPreparationStatusList;
+            }
+        }
+
         [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> TimePeriodsList
         {

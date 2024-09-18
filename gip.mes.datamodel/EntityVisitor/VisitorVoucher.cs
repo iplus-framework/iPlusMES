@@ -167,10 +167,6 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (_PickingStatusInfo == null)
-                {
-                    _PickingStatusInfo = LoadPickingStatusInfo();
-                }
                 return _PickingStatusInfo;
             }
             set
@@ -183,37 +179,23 @@ namespace gip.mes.datamodel
             }
         }
 
-        #endregion
-
-        #region Helper mehtods
-
-        private string LoadPickingStatusInfo()
+        private string _PreparationStatusInfo;
+        [ACPropertyInfo(999, nameof(PreparationStatusInfo), ConstApp.PickingPreparationStatus)]
+        public string PreparationStatusInfo
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (Picking_VisitorVoucher != null && Picking_VisitorVoucher.Any())
+            get
             {
-                List<Picking> pickings = Picking_VisitorVoucher.OrderBy(c => c.PickingNo).ToList();
-                foreach (Picking picking in pickings)
-                {
-                    string pickingState = "";
-                    ACValueItem acvalueItem = (this.GetObjectContext() as DatabaseApp).PickingStateList[picking.PickingStateIndex];
-                    if(acvalueItem != null)
-                    {
-                        pickingState = acvalueItem.ACCaption;
-                    }
-                    sb.Append($"{picking.PickingNo} - {pickingState}");
-                    if(pickings.IndexOf(picking) < (pickings.Count - 1))
-                    {
-                        sb.Append(Environment.NewLine);
-                    }
-                }
+                return _PreparationStatusInfo;
             }
-
-            return sb.ToString();
+            set
+            {
+                _PreparationStatusInfo = value;
+                OnPropertyChanged(nameof(PreparationStatusInfo));
+            }
         }
 
         #endregion
+        
     }
 }
 

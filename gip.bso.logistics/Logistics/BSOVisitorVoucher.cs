@@ -1028,6 +1028,8 @@ namespace gip.bso.logistics
             if (CurrentVisitorVoucher != null)
             {
                 CurrentVisitorVoucher.ACProperties.Refresh();
+                LoadRelatedVisitorVoucherData(CurrentVisitorVoucher);
+
             }
             PostExecute("Load");
         }
@@ -1121,6 +1123,7 @@ namespace gip.bso.logistics
             }
             if (isSearchable)
                 AccessPrimary.NavSearch(DatabaseApp);
+            LoadRelatedVisitorVoucherData();
             OnPropertyChanged(nameof(VisitorVoucherList));
             RefreshLists(true);
         }
@@ -1437,6 +1440,23 @@ namespace gip.bso.logistics
             RefreshWeighingList();
         }
 
+        public void LoadRelatedVisitorVoucherData()
+        {
+            if (VisitorVoucherList != null)
+            {
+                foreach (VisitorVoucher voucher in VisitorVoucherList)
+                {
+                    LoadRelatedVisitorVoucherData(voucher);
+                }
+            }
+        }
+
+        public void LoadRelatedVisitorVoucherData(VisitorVoucher voucher)
+        {
+            voucher.PickingStatusInfo = PickingManager.GetPickingStatusInfo(DatabaseApp, voucher.Picking_VisitorVoucher);
+            voucher.PreparationStatusInfo = PickingManager.GetMirroredPickingPreparationStatus(DatabaseApp, voucher.Picking_VisitorVoucher);
+        }
+
         #endregion
 
         #region Weighing
@@ -1483,14 +1503,14 @@ namespace gip.bso.logistics
                 Dictionary<long, Weighing> weighings = new Dictionary<long, Weighing>();
                 foreach (Weighing weighing in bSOVisitorVoucher.WeighingList)
                 {
-                    if(weighing.WeighingState != WeighingStateEnum.Cancelled)
+                    if (weighing.WeighingState != WeighingStateEnum.Cancelled)
                     {
                         long key = long.Parse(string.Join("", weighing.WeighingNo.Where(c => char.IsDigit(c))));
                         weighings.Add(key, weighing);
                     }
                 }
 
-                if(weighings.Any())
+                if (weighings.Any())
                 {
                     bSOVisitorVoucher.FirstWeighing = weighings.OrderBy(c => c.Key).FirstOrDefault().Value;
                     bSOVisitorVoucher.LastWeighing = weighings.OrderByDescending(c => c.Key).FirstOrDefault().Value;

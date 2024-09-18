@@ -308,6 +308,7 @@
         public const string Picking = "en{'Picking Order'}de{'Kommissionierauftrag'}";
         public const string PickingType = "en{'Picking type'}de{'Kommissionierung Typ'}";
         public const string PickingNo = "en{'Picking-No.'}de{'Kommissions-Nr.'}";
+        public const string PickingPreparationStatus = "en{'Preparation status'}de{'Bereitstellungsstatus'}";
 
         public const string Backward = "en{'Backward'}de{'Zurück '}";
         public const string Forward = "en{'Forward'}de{'Vorwärts'}";

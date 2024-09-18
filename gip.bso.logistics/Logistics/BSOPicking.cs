@@ -2989,6 +2989,7 @@ namespace gip.bso.logistics
             }
             AccessPrimary.NavList.Remove(CurrentPicking);
             _PickingList = AccessPrimary.NavList.ToList();
+            SetPreparationStatusInList();
             Picking firstPicking = AccessPrimary.NavList.FirstOrDefault();
             OnPropertyChanged(nameof(PickingList));
             CurrentPicking = firstPicking;
@@ -3019,6 +3020,7 @@ namespace gip.bso.logistics
             {
                 AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
                 _PickingList = AccessPrimary.NavList.ToList();
+                SetPreparationStatusInList();
             }
 
             OnPropertyChanged(nameof(PickingList));
@@ -3153,8 +3155,8 @@ namespace gip.bso.logistics
                     {
                         mirroredPicking = picking;
                     }
-                    
-                    if(!AccessPrimary.NavList.Contains(picking))
+
+                    if (!AccessPrimary.NavList.Contains(picking))
                     {
                         AccessPrimary.NavList.Add(picking);
                     }
@@ -4813,7 +4815,7 @@ namespace gip.bso.logistics
             acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
 
 
-            
+
             myRequestEntryA = RMISubscr.InvokeAsyncMethod(paWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
             if (myRequestEntryA != null)
                 myTestRequestID = myRequestEntryA.RequestID;
@@ -4960,13 +4962,29 @@ namespace gip.bso.logistics
                     CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50099");
                 }
                 else
-                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50098"); 
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50098");
 
                 CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
             }
             catch (Exception e)
             {
                 Messages.LogException(this.GetACUrl(), nameof(OnCalculateRoutesCallback), e);
+            }
+        }
+
+        #endregion
+
+        #region Methods -> Other
+
+        public void SetPreparationStatusInList()
+        {
+            if (_PickingList != null)
+            {
+                foreach (Picking picking in _PickingList)
+                {
+                    picking.PreparationStatus = PickingManager.GetPickingPreparationStatus(DatabaseApp, picking);
+                    picking.PreparationStatusName = PickingManager.GetPickingPreparationStatusName(DatabaseApp, picking.PreparationStatus);
+                }
             }
         }
 

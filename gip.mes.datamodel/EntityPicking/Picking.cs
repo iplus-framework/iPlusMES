@@ -177,6 +177,38 @@ namespace gip.mes.datamodel
                 }
             }
         }
+
+
+        private PickingPreparationStatusEnum? _PreparationStatus;
+        [ACPropertyInfo(999, nameof(PreparationStatus), ConstApp.PickingPreparationStatus)]
+        public PickingPreparationStatusEnum? PreparationStatus
+        {
+            get
+            {
+                return _PreparationStatus;
+            }
+            set
+            {
+                _PreparationStatus = value;
+                OnPropertyChanged(nameof(PreparationStatus));
+            }
+        }
+
+        private string _PreparationStatusName;
+        [ACPropertyInfo(999, nameof(PreparationStatusName), ConstApp.PickingPreparationStatus)]
+        public string PreparationStatusName
+        {
+            get
+            {
+                return _PreparationStatusName;
+            }
+            set
+            {
+                _PreparationStatusName = value;
+                OnPropertyChanged(nameof(PreparationStatusName));
+            }
+        }
+
         #endregion
 
         #region IACConfigStore

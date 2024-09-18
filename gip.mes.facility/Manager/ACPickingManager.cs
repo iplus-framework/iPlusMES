@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data.Objects;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.facility
@@ -1861,7 +1862,7 @@ namespace gip.mes.facility
         //        }
         //    }
         //}
-        
+
         public IEnumerable<FacilityReservationRoutes> CalculatePossibleRoutes(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores, MsgWithDetails detailMessages)
         {
             Msg msg = null;
@@ -2485,6 +2486,113 @@ namespace gip.mes.facility
                 mirroredPicking.PickingPos_Picking.Add(mirroredPos);
             }
             return mirroredPickings;
+        }
+
+
+        /// <summary>
+        /// Get preparation status for mirrored pickings
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="picking"></param>
+        /// <returns></returns>
+        public PickingPreparationStatusEnum? GetPickingPreparationStatus(DatabaseApp databaseApp, Picking picking)
+        {
+            PickingPreparationStatusEnum? status = null;
+
+            List<Picking> mirroredPickings = databaseApp.Picking.Where(c => c.MirroredFromPickingID == picking.PickingID).ToList();
+            if (mirroredPickings.Any())
+            {
+                status = PickingPreparationStatusEnum.None;
+
+                if (mirroredPickings.Any(c => c.PickingStateIndex > (short)PickingStateEnum.InProcess))
+                {
+                    status = PickingPreparationStatusEnum.Partial;
+                }
+
+                if (!mirroredPickings.Any(c => c.PickingStateIndex != (short)PickingStateEnum.Finished))
+                {
+                    status = PickingPreparationStatusEnum.Full;
+                }
+
+                // @aagincic question: should be checked by position?
+            }
+
+            return status;
+        }
+
+        public string GetPickingPreparationStatusName(DatabaseApp databaseApp, PickingPreparationStatusEnum? status)
+        {
+            string statusName = null;
+            if (status != null)
+            {
+                ACValueItem acvalueItem = databaseApp.PickingPreparationStatusList.Where(c => (PickingPreparationStatusEnum)c.Value == status).FirstOrDefault();
+                if (acvalueItem != null)
+                {
+                    statusName = acvalueItem.ACCaption;
+                }
+            }
+            return statusName;
+        }
+
+        public string GetPickingStatusInfo(DatabaseApp databaseApp, IEnumerable<Picking> pickings)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (pickings != null && pickings.Any())
+            {
+                List<Picking> tmpPickings = pickings.OrderBy(c => c.PickingNo).ToList();
+                foreach (Picking picking in tmpPickings)
+                {
+                    string pickingState = "";
+                    ACValueItem acvalueItem = databaseApp.PickingStateList.Where(c => (PickingStateEnum)c.Value == picking.PickingState).FirstOrDefault();
+                    if (acvalueItem != null)
+                    {
+                        pickingState = acvalueItem.ACCaption;
+                    }
+                    sb.Append($"{picking.PickingNo} - {pickingState}");
+                    if (tmpPickings.IndexOf(picking) < (tmpPickings.Count - 1))
+                    {
+                        sb.Append(System.Environment.NewLine);
+                    }
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public string GetMirroredPickingPreparationStatus(DatabaseApp databaseApp, IEnumerable<Picking> pickings)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (pickings != null && pickings.Any())
+            {
+                List<Picking> tmpPickings = pickings.OrderBy(c => c.PickingNo).ToList();
+                foreach (Picking picking in tmpPickings)
+                {
+                    string pickingState = "";
+                    PickingPreparationStatusEnum? preparationStatus = GetPickingPreparationStatus(databaseApp, picking);
+                    ACValueItem acvalueItem = null;
+
+                    if (preparationStatus != null)
+                    {
+                        acvalueItem = databaseApp.PickingPreparationStatusList.Where(c => (PickingPreparationStatusEnum)c.Value == preparationStatus).FirstOrDefault();
+                    }
+
+                    if (acvalueItem != null)
+                    {
+                        pickingState = acvalueItem.ACCaption;
+                    }
+
+                    sb.Append($"{picking.PickingNo} - {pickingState}");
+
+                    if (tmpPickings.IndexOf(picking) < (tmpPickings.Count - 1))
+                    {
+                        sb.Append(System.Environment.NewLine);
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
 
         #endregion
