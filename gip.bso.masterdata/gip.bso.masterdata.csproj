@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="Facility\BSOFacility.cs" />
     <Compile Include="Facility\BSOFacilityExplorer.cs" />
+    <Compile Include="Facility\BSOFacilityReservation.cs" />
     <Compile Include="Facility\BSOFacilityReservationOverview.cs" />
     <Compile Include="Facility\BSOPrinterSettingsMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
@@ -478,6 +479,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2024-09-13 15-50_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2024-09-19 16-30_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
