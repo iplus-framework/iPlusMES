@@ -204,6 +204,8 @@
         public const string FacilityNo = "en{'Storage Bin No.'}de{'Lagerplatznummer'}";
         public const string FacilityStock = "en{'Stock'}de{'Lagerbestand'}";
         public const string FacilityReservation = "en{'Reservation'}de{'Reservierung'}";
+        public const string FRIncludedFacilities = "en{'Included facilities'}de{'Eingeschlossene Lagerplätze'}";
+        public const string FRExcludedFacilities = "en{'Excluded facilities'}de{'Ausgeschlossene Lagerplätze'}";
         public const string DisplayMaterialOfQuant = "en{'Display material of quant'}de{'Anzeigematerial von Quant'}";
 
         public const string Material = "en{'Material'}de{'Material'}";
@@ -375,6 +377,8 @@
         public const string OperationitemTimeStatus = "en{'Operation item status'}de{'Vorgangspositionsstatus'}";
 
         #endregion
+
+        
 
     }
 }

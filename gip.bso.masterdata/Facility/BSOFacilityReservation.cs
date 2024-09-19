@@ -2,14 +2,16 @@
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Windows.Ink;
 
-namespace gip.mes.facility
+namespace gip.bso.masterdata
 {
     public delegate void ReservationChange();
 
@@ -28,6 +30,8 @@ namespace gip.mes.facility
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _UseBackGroundWorker = new ACPropertyConfigValue<bool>(this, nameof(UseBackGroundWorker), false);
+            _IncludedFacilities = new ACPropertyConfigValue<string>(this, nameof(IncludedFacilities), "");
+            _ExcludedFacilities = new ACPropertyConfigValue<string>(this, nameof(ExcludedFacilities), "");
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -39,17 +43,38 @@ namespace gip.mes.facility
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _ = IncludedFacilities;
+            _ = ExcludedFacilities;
+
+            LoadFilterFacilityLists();
+
             return baseInit;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            SaveFilterFacilityLists();
             bool baseDeInit = base.ACDeInit(deleteACClassTask);
-
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
-
             return baseDeInit;
+        }
+
+        #endregion
+
+        #region Child BSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
+            }
         }
 
         #endregion
@@ -85,9 +110,38 @@ namespace gip.mes.facility
             }
         }
 
+
+        protected ACPropertyConfigValue<string> _IncludedFacilities;
+        [ACPropertyConfig(ConstApp.FRIncludedFacilities)]
+        public string IncludedFacilities
+        {
+            get
+            {
+                return _IncludedFacilities.ValueT;
+            }
+            set
+            {
+                _IncludedFacilities.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<string> _ExcludedFacilities;
+        [ACPropertyConfig(ConstApp.FRExcludedFacilities)]
+        public string ExcludedFacilities
+        {
+            get
+            {
+                return _ExcludedFacilities.ValueT;
+            }
+            set
+            {
+                _ExcludedFacilities.ValueT = value;
+            }
+        }
         #endregion
 
         #region Properties
+        private bool showLotDialog;
 
         private IACObjectEntity _FacilityReservationOwner;
         public IACObjectEntity FacilityReservationOwner
@@ -206,7 +260,6 @@ namespace gip.mes.facility
             }
         }
 
-
         #endregion
 
         #region FacilityReservation
@@ -279,6 +332,7 @@ namespace gip.mes.facility
             else
             {
                 ForReservationQuantityUOM = NeededQuantityUOM;
+                showLotDialog = true;
                 BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
                 ShowDialog(this, DesignNameProgressBar);
             }
@@ -356,11 +410,7 @@ namespace gip.mes.facility
 
         private List<FacilityReservationModel> GetFacilityReservationList(DatabaseApp databaseApp, Guid materialID)
         {
-            List<FacilityCharge> facilityCharges =
-               databaseApp
-               .FacilityCharge
-               .Where(c => c.MaterialID == materialID && !c.NotAvailable && c.FacilityLot != null)
-               .ToList();
+            List<FacilityCharge> facilityCharges = GetFacilityCharges(databaseApp, materialID, FilterFacilityIncludedList, FilterFacilityExcludedList);
 
             List<FacilityReservationModel> reservations = new List<FacilityReservationModel>();
             if (FacilityReservationOwner != null && FacilityReservationCollection != null && FacilityReservationCollection.Any())
@@ -456,7 +506,6 @@ namespace gip.mes.facility
                 }
             }
         }
-
 
         private List<FacilityReservationModel> _FacilityLotList;
         /// <summary>
@@ -627,11 +676,7 @@ namespace gip.mes.facility
         {
             List<FacilityReservationModel> facilityReservations = new List<FacilityReservationModel>();
 
-            List<FacilityCharge> facilityCharges =
-                databaseApp
-                .FacilityCharge
-                .Where(c => c.MaterialID == material.MaterialID && !c.NotAvailable && c.FacilityLot != null)
-                .ToList();
+            List<FacilityCharge> facilityCharges = GetFacilityCharges(databaseApp, material.MaterialID, FilterFacilityIncludedList, FilterFacilityExcludedList);
 
             foreach (FacilityCharge facilityCharge in facilityCharges)
             {
@@ -767,7 +812,7 @@ namespace gip.mes.facility
             return facilityReservations;
         }
 
-        private void DoFinishLoadFacilityLotList(List<FacilityReservationModel> facilityReservationModels)
+        private void DoFinishLoadFacilityLotList(List<FacilityReservationModel> facilityReservationModels, bool showDialog)
         {
             foreach (FacilityReservationModel facilityReservationModel in facilityReservationModels)
             {
@@ -778,10 +823,271 @@ namespace gip.mes.facility
             _FacilityLotList = facilityReservationModels;
             OnPropertyChanged(nameof(FacilityLotList));
             SelectedFacilityLot = _FacilityLotList.FirstOrDefault();
-            ShowDialog(this, "LotDlg");
+
+            if (showDialog)
+            {
+                ShowDialog(this, "LotDlg");
+            }
         }
 
         #endregion
+
+        #endregion
+
+        #endregion
+
+        #region FilterFacility
+
+        #region FilterFacility -> Included
+
+
+
+        public const string FilterFacilityIncluded = "FilterFacilityIncluded";
+
+        private Facility _SelectedFilterFacilityIncluded;
+        /// <summary>
+        /// Selected property for Facility
+        /// </summary>
+        /// <value>The selected FilterFacilityIncluded</value>
+        [ACPropertySelected(9999, nameof(FilterFacilityIncluded), ConstApp.FRIncludedFacilities)]
+        public Facility SelectedFilterFacilityIncluded
+        {
+            get
+            {
+                return _SelectedFilterFacilityIncluded;
+            }
+            set
+            {
+                if (_SelectedFilterFacilityIncluded != value)
+                {
+                    _SelectedFilterFacilityIncluded = value;
+                    OnPropertyChanged(nameof(SelectedFilterFacilityIncluded));
+                }
+            }
+        }
+
+        private List<Facility> _FilterFacilityIncludedList;
+        /// <summary>
+        /// List property for Facility
+        /// </summary>
+        /// <value>The FilterFacilityIncluded list</value>
+        [ACPropertyList(9999, nameof(FilterFacilityIncluded))]
+        public List<Facility> FilterFacilityIncludedList
+        {
+            get
+            {
+                return _FilterFacilityIncludedList;
+            }
+        }
+
+        #endregion
+
+        #region FilterFacility -> Excluded
+
+        public const string FilterFacilityExcluded = "FilterFacilityExcluded";
+        private Facility _SelectedFilterFacilityExcluded;
+        /// <summary>
+        /// Selected property for Facility
+        /// </summary>
+        /// <value>The selected FilterFacilityExcluded</value>
+        [ACPropertySelected(9999, nameof(FilterFacilityExcluded), ConstApp.FRExcludedFacilities)]
+        public Facility SelectedFilterFacilityExcluded
+        {
+            get
+            {
+                return _SelectedFilterFacilityExcluded;
+            }
+            set
+            {
+                if (_SelectedFilterFacilityExcluded != value)
+                {
+                    _SelectedFilterFacilityExcluded = value;
+                    OnPropertyChanged(nameof(SelectedFilterFacilityExcluded));
+                }
+            }
+        }
+
+
+        private List<Facility> _FilterFacilityExcludedList;
+        /// <summary>
+        /// List property for Facility
+        /// </summary>
+        /// <value>The FilterFacilityExcluded list</value>
+        [ACPropertyList(9999, nameof(FilterFacilityExcluded))]
+        public List<Facility> FilterFacilityExcludedList
+        {
+            get
+            {
+                return _FilterFacilityExcludedList;
+            }
+        }
+
+        #endregion
+
+        #region FilterFacility -> ACMethod
+
+
+        /// <summary>
+        /// Source Property: AddFilterFacilityIncluded
+        /// </summary>
+        [ACMethodInfo(nameof(AddFilterFacilityIncluded), Const.Add, 999)]
+        public void AddFilterFacilityIncluded()
+        {
+            if (!IsEnabledAddFilterFacilityIncluded())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog();
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+
+                if (_FilterFacilityIncludedList == null)
+                {
+                    _FilterFacilityIncludedList = new List<Facility>();
+                }
+
+                if (!_FilterFacilityIncludedList.Contains(facility))
+                {
+                    _FilterFacilityIncludedList.Add(facility);
+                    OnPropertyChanged(nameof(FilterFacilityIncludedList));
+                }
+            }
+        }
+
+        public bool IsEnabledAddFilterFacilityIncluded()
+        {
+            return true;
+        }
+
+
+        /// <summary>
+        /// Source Property: RemoveFilterFacilityIncluded
+        /// </summary>
+        [ACMethodInfo(nameof(RemoveFilterFacilityIncluded), Const.Remove, 999)]
+        public void RemoveFilterFacilityIncluded()
+        {
+            if (!IsEnabledRemoveFilterFacilityIncluded())
+                return;
+
+            FilterFacilityIncludedList.Remove(SelectedFilterFacilityIncluded);
+            SelectedFilterFacilityIncluded = FilterFacilityIncludedList.FirstOrDefault();
+            OnPropertyChanged(nameof(FilterFacilityIncludedList));
+        }
+
+        public bool IsEnabledRemoveFilterFacilityIncluded()
+        {
+            return SelectedFilterFacilityIncluded != null;
+        }
+
+
+        /// <summary>
+        /// Source Property: AddFilterFacilityIncluded
+        /// </summary>
+        [ACMethodInfo(nameof(AddFilterFacilityExcluded), Const.Add, 999)]
+        public void AddFilterFacilityExcluded()
+        {
+            if (!IsEnabledAddFilterFacilityExcluded())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog();
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+
+                if (_FilterFacilityExcludedList == null)
+                {
+                    _FilterFacilityExcludedList = new List<Facility>();
+                }
+
+                if (!_FilterFacilityExcludedList.Contains(facility))
+                {
+                    _FilterFacilityExcludedList.Add(facility);
+                    OnPropertyChanged(nameof(FilterFacilityExcludedList));
+                    OnPropertyChanged(nameof(SelectedFilterFacilityExcluded));
+                }
+            }
+        }
+
+        public bool IsEnabledAddFilterFacilityExcluded()
+        {
+            return true;
+        }
+
+
+        /// <summary>
+        /// Source Property: RemoveFilterFacilityIncluded
+        /// </summary>
+        [ACMethodInfo(nameof(RemoveFilterFacilityExcluded), Const.Remove, 999)]
+        public void RemoveFilterFacilityExcluded()
+        {
+            if (!IsEnabledRemoveFilterFacilityExcluded())
+                return;
+
+            FilterFacilityExcludedList.Remove(SelectedFilterFacilityExcluded);
+            SelectedFilterFacilityExcluded = FilterFacilityExcludedList.FirstOrDefault();
+            OnPropertyChanged(nameof(FilterFacilityExcludedList));
+        }
+
+        public bool IsEnabledRemoveFilterFacilityExcluded()
+        {
+            return SelectedFilterFacilityExcluded != null;
+        }
+
+        /// <summary>
+        /// Source Property: RemoveFilterFacilityIncluded
+        /// </summary>
+        [ACMethodInfo(nameof(SearchLot), ConstApp.Search, 999)]
+        public void SearchLot()
+        {
+            if (!IsEnabledSearchLot())
+                return;
+
+            showLotDialog = false;
+            BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledSearchLot()
+        {
+            return true;
+        }
+
+
+        #endregion
+
+        #region FilterFacility -> Load&Save methods
+        private void LoadFilterFacilityLists()
+        {
+            if (!string.IsNullOrEmpty(IncludedFacilities))
+            {
+                _FilterFacilityIncludedList = DatabaseApp.Facility.Where(c => IncludedFacilities.Contains(c.FacilityNo)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(ExcludedFacilities))
+            {
+                _FilterFacilityExcludedList = DatabaseApp.Facility.Where(c => ExcludedFacilities.Contains(c.FacilityNo)).ToList();
+            }
+
+            OnPropertyChanged(nameof(FilterFacilityIncludedList));
+            OnPropertyChanged(nameof(FilterFacilityExcludedList));
+        }
+
+        private void SaveFilterFacilityLists()
+        {
+            IncludedFacilities = "";
+            if (_FilterFacilityIncludedList != null && _FilterFacilityIncludedList.Any())
+            {
+                IncludedFacilities = string.Join(";", _FilterFacilityIncludedList);
+            }
+
+            ExcludedFacilities = "";
+            if (_FilterFacilityExcludedList != null && _FilterFacilityExcludedList.Any())
+            {
+                ExcludedFacilities = string.Join(";", _FilterFacilityExcludedList);
+            }
+
+            Root.Database.SaveChanges();
+        }
 
         #endregion
 
@@ -842,7 +1148,7 @@ namespace gip.mes.facility
                         break;
                     case nameof(AddFacilityReservation):
                         List<FacilityReservationModel> reservations = e.Result as List<FacilityReservationModel>;
-                        DoFinishLoadFacilityLotList(reservations);
+                        DoFinishLoadFacilityLotList(reservations, showLotDialog);
                         if (OnReservationChanged != null)
                         {
                             OnReservationChanged();
@@ -1009,6 +1315,74 @@ namespace gip.mes.facility
         {
             return (testedQuantity / referentQuantity) < factor;
         }
+
+        private List<FacilityCharge> GetFacilityCharges(DatabaseApp databaseApp, Guid materialID, List<Facility> inlcudedFacilities, List<Facility> excludedFacilities)
+        {
+            string incl = null;
+            if (inlcudedFacilities != null && inlcudedFacilities.Any())
+            {
+                incl = string.Join(",", inlcudedFacilities.Select(c => c.FacilityNo).Distinct().ToArray());
+            }
+
+            string excl = null;
+            if (excludedFacilities != null && excludedFacilities.Any())
+            {
+                excl = string.Join(",", excludedFacilities.Select(c => c.FacilityNo).Distinct().ToArray());
+            }
+
+            return
+                 databaseApp
+               .FacilityCharge
+               .Where(c =>
+                            (
+                                incl == null
+                                ||
+                                incl.Contains(c.Facility.FacilityNo)
+                                || (
+                                        c.Facility.Facility1_ParentFacility != null
+                                        && incl.Contains(c.Facility.Facility1_ParentFacility.FacilityNo)
+                                   ) // L1
+                                || (
+                                        c.Facility.Facility1_ParentFacility != null
+                                        && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                        && incl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                                ) // L2
+                                || (
+                                        c.Facility.Facility1_ParentFacility != null
+                                        && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                        && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                        && incl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                                ) // L3
+                            )
+                            && 
+                            (
+                                excl == null 
+                                ||
+                                !(
+                                    excl.Contains(c.Facility.FacilityNo)
+                                    || (
+                                            c.Facility.Facility1_ParentFacility != null
+                                            && excl.Contains(c.Facility.Facility1_ParentFacility.FacilityNo)
+                                       ) // L1
+                                        || (
+                                                c.Facility.Facility1_ParentFacility != null
+                                                && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                                && excl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                                        ) // L2
+                                        || (
+                                                c.Facility.Facility1_ParentFacility != null
+                                                && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                                && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                                && excl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                                        ) // L3
+                                  )
+                            )
+                            && c.MaterialID == materialID
+                            && !c.NotAvailable
+                            && c.FacilityLot != null)
+               .ToList();
+        }
+
 
         #endregion
     }

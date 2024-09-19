@@ -51,7 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BSO\BSOFacilityReservation.cs" />
     <Compile Include="BSO\TargetEqualityComparer.cs" />
     <Compile Include="BSO\VBBSOModulesSelector.cs" />
     <Compile Include="Helperclasses\FacilityChargeList.cs" />
