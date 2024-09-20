@@ -9,6 +9,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Windows.Ink;
 
 namespace gip.bso.masterdata
@@ -1318,69 +1320,77 @@ namespace gip.bso.masterdata
 
         private List<FacilityCharge> GetFacilityCharges(DatabaseApp databaseApp, Guid materialID, List<Facility> inlcudedFacilities, List<Facility> excludedFacilities)
         {
-            string incl = null;
+            string[] incl = null;
             if (inlcudedFacilities != null && inlcudedFacilities.Any())
             {
-                incl = string.Join(",", inlcudedFacilities.Select(c => c.FacilityNo).Distinct().ToArray());
+                incl = inlcudedFacilities.Select(c => c.FacilityNo).Distinct().ToArray();
             }
 
-            string excl = null;
+            string[] excl = null;
             if (excludedFacilities != null && excludedFacilities.Any())
             {
-                excl = string.Join(",", excludedFacilities.Select(c => c.FacilityNo).Distinct().ToArray());
+                excl = excludedFacilities.Select(c => c.FacilityNo).Distinct().ToArray();
             }
 
+
             return
-                 databaseApp
-               .FacilityCharge
-               .Where(c =>
-                            (
-                                incl == null
-                                ||
-                                incl.Contains(c.Facility.FacilityNo)
+            databaseApp
+            .Facility
+            .Where(FilterFacilityByIncludeExclude(incl, excl))
+            .SelectMany(c=>c.FacilityCharge_Facility)
+            .Where(c =>
+                    c.MaterialID == materialID
+                    && !c.NotAvailable
+                    && c.FacilityLot != null)
+            .ToList();
+        }
+
+        public static Func<Facility, bool> FilterFacilityByIncludeExclude(string[] incl, string[] excl)
+        {
+            return
+            facility =>
+                    (incl == null
+                        ||
+                        incl.Contains(facility.FacilityNo)
+                        || (
+                                facility.Facility1_ParentFacility != null
+                                && incl.Contains(facility.Facility1_ParentFacility.FacilityNo)
+                            ) // L1
+                        || (
+                                facility.Facility1_ParentFacility != null
+                                && facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                && incl.Contains(facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                        ) // L2
+                        || (
+                                facility.Facility1_ParentFacility != null
+                                && facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                && facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                && incl.Contains(facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                        ) // L3
+                    )
+                    &&
+                    (
+                        excl == null
+                        ||
+                        !(
+                            excl.Contains(facility.FacilityNo)
+                            || (
+                                    facility.Facility1_ParentFacility != null
+                                    && excl.Contains(facility.Facility1_ParentFacility.FacilityNo)
+                                ) // L1
                                 || (
-                                        c.Facility.Facility1_ParentFacility != null
-                                        && incl.Contains(c.Facility.Facility1_ParentFacility.FacilityNo)
-                                   ) // L1
-                                || (
-                                        c.Facility.Facility1_ParentFacility != null
-                                        && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
-                                        && incl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                                        facility.Facility1_ParentFacility != null
+                                        && facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                        && excl.Contains(facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
                                 ) // L2
                                 || (
-                                        c.Facility.Facility1_ParentFacility != null
-                                        && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
-                                        && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
-                                        && incl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
+                                        facility.Facility1_ParentFacility != null
+                                        && facility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                        && facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                                        && excl.Contains(facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
                                 ) // L3
                             )
-                            && 
-                            (
-                                excl == null 
-                                ||
-                                !(
-                                    excl.Contains(c.Facility.FacilityNo)
-                                    || (
-                                            c.Facility.Facility1_ParentFacility != null
-                                            && excl.Contains(c.Facility.Facility1_ParentFacility.FacilityNo)
-                                       ) // L1
-                                        || (
-                                                c.Facility.Facility1_ParentFacility != null
-                                                && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
-                                                && excl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
-                                        ) // L2
-                                        || (
-                                                c.Facility.Facility1_ParentFacility != null
-                                                && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null
-                                                && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
-                                                && excl.Contains(c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
-                                        ) // L3
-                                  )
-                            )
-                            && c.MaterialID == materialID
-                            && !c.NotAvailable
-                            && c.FacilityLot != null)
-               .ToList();
+                    );
         }
 
 
