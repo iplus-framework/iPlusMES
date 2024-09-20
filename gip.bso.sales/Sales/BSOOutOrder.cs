@@ -1,3 +1,4 @@
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.reporthandler.Flowdoc;
