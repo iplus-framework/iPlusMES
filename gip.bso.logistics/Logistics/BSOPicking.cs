@@ -121,6 +121,15 @@ namespace gip.bso.logistics
             {
                 BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityReservation_Changed;
+                
+                if (SelectedFilterMDPickingType != null)
+                {
+                    BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(SelectedFilterMDPickingType.MDKey);
+                }
+                else
+                {
+                    BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(null);
+                }
             }
 
             _MainSyncContext = SynchronizationContext.Current;

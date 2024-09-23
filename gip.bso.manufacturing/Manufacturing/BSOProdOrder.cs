@@ -88,6 +88,8 @@ namespace gip.bso.manufacturing
             {
                 BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
+
+                BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(null);
             }
 
             return true;

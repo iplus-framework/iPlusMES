@@ -3,15 +3,13 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using System.Windows.Ink;
 
 namespace gip.bso.masterdata
 {
@@ -32,8 +30,7 @@ namespace gip.bso.masterdata
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _UseBackGroundWorker = new ACPropertyConfigValue<bool>(this, nameof(UseBackGroundWorker), false);
-            _IncludedFacilities = new ACPropertyConfigValue<string>(this, nameof(IncludedFacilities), "");
-            _ExcludedFacilities = new ACPropertyConfigValue<string>(this, nameof(ExcludedFacilities), "");
+            _FilterFacilityConfig = new ACPropertyConfigValue<string>(this, nameof(FilterFacilityConfig), "");
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -45,10 +42,7 @@ namespace gip.bso.masterdata
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
-            _ = IncludedFacilities;
-            _ = ExcludedFacilities;
-
-            LoadFilterFacilityLists();
+            _ = FilterFacilityConfig;
 
             return baseInit;
         }
@@ -113,36 +107,28 @@ namespace gip.bso.masterdata
         }
 
 
-        protected ACPropertyConfigValue<string> _IncludedFacilities;
-        [ACPropertyConfig(ConstApp.FRIncludedFacilities)]
-        public string IncludedFacilities
+        protected ACPropertyConfigValue<string> _FilterFacilityConfig;
+        [ACPropertyConfig(ConstApp.FacilityFilterConfig)]
+        public string FilterFacilityConfig
         {
             get
             {
-                return _IncludedFacilities.ValueT;
+                return _FilterFacilityConfig.ValueT;
             }
             set
             {
-                _IncludedFacilities.ValueT = value;
+                _FilterFacilityConfig.ValueT = value;
             }
         }
 
-        protected ACPropertyConfigValue<string> _ExcludedFacilities;
-        [ACPropertyConfig(ConstApp.FRExcludedFacilities)]
-        public string ExcludedFacilities
-        {
-            get
-            {
-                return _ExcludedFacilities.ValueT;
-            }
-            set
-            {
-                _ExcludedFacilities.ValueT = value;
-            }
-        }
         #endregion
 
         #region Properties
+
+        public string FilterFacilityGroup { get; set; }
+
+        public FilterFacilityModel FilterFacilityModel { get; set; }
+
         private bool showLotDialog;
 
         private IACObjectEntity _FacilityReservationOwner;
@@ -842,8 +828,6 @@ namespace gip.bso.masterdata
 
         #region FilterFacility -> Included
 
-
-
         public const string FilterFacilityIncluded = "FilterFacilityIncluded";
 
         private Facility _SelectedFilterFacilityIncluded;
@@ -1058,16 +1042,41 @@ namespace gip.bso.masterdata
         #endregion
 
         #region FilterFacility -> Load&Save methods
-        private void LoadFilterFacilityLists()
+        public void LoadFilterFacilityLists(string filterFacilityGroup)
         {
-            if (!string.IsNullOrEmpty(IncludedFacilities))
+            FilterFacilityGroup = filterFacilityGroup;
+
+            List<FilterFacilityModel> configs = new List<FilterFacilityModel>();
+
+            if (!string.IsNullOrEmpty(FilterFacilityConfig))
             {
-                _FilterFacilityIncludedList = DatabaseApp.Facility.Where(c => IncludedFacilities.Contains(c.FacilityNo)).ToList();
+                try
+                {
+                    configs = JsonConvert.DeserializeObject<List<FilterFacilityModel>>(FilterFacilityConfig);
+                }
+                catch (Exception ex)
+                {
+                    //
+                }
             }
 
-            if (!string.IsNullOrEmpty(ExcludedFacilities))
+            FilterFacilityModel = configs.Where(c => (c.Group ?? "") == (FilterFacilityGroup ?? "")).FirstOrDefault();
+            if (FilterFacilityModel == null)
             {
-                _FilterFacilityExcludedList = DatabaseApp.Facility.Where(c => ExcludedFacilities.Contains(c.FacilityNo)).ToList();
+                FilterFacilityModel = new FilterFacilityModel()
+                {
+                    Group = FilterFacilityGroup
+                };
+            }
+
+            if (FilterFacilityModel.IncludedFacilities != null && FilterFacilityModel.IncludedFacilities.Any())
+            {
+                _FilterFacilityIncludedList = DatabaseApp.Facility.Where(c => FilterFacilityModel.IncludedFacilities.Contains(c.FacilityNo)).OrderBy(c => c.FacilityNo).ToList();
+            }
+
+            if (FilterFacilityModel.ExcludedFacilities != null && FilterFacilityModel.ExcludedFacilities.Any())
+            {
+                _FilterFacilityExcludedList = DatabaseApp.Facility.Where(c => FilterFacilityModel.ExcludedFacilities.Contains(c.FacilityNo)).OrderBy(c => c.FacilityNo).ToList();
             }
 
             OnPropertyChanged(nameof(FilterFacilityIncludedList));
@@ -1076,17 +1085,45 @@ namespace gip.bso.masterdata
 
         private void SaveFilterFacilityLists()
         {
-            IncludedFacilities = "";
-            if (_FilterFacilityIncludedList != null && _FilterFacilityIncludedList.Any())
+            List<FilterFacilityModel> configs = new List<FilterFacilityModel>();
+
+            if (!string.IsNullOrEmpty(FilterFacilityConfig))
             {
-                IncludedFacilities = string.Join(";", _FilterFacilityIncludedList);
+                try
+                {
+                    configs = JsonConvert.DeserializeObject<List<FilterFacilityModel>>(FilterFacilityConfig);
+                }
+                catch (Exception ex)
+                {
+                    //
+                }
+            }
+            FilterFacilityModel existing = configs.Where(c => (c.Group ?? "") == (FilterFacilityGroup ?? "")).FirstOrDefault();
+            if (existing != null)
+            {
+                configs.Remove(existing);
             }
 
-            ExcludedFacilities = "";
-            if (_FilterFacilityExcludedList != null && _FilterFacilityExcludedList.Any())
+            if(FilterFacilityIncludedList != null)
             {
-                ExcludedFacilities = string.Join(";", _FilterFacilityExcludedList);
+                FilterFacilityModel.IncludedFacilities = FilterFacilityIncludedList.Select(c => c.FacilityNo).ToArray();
             }
+            else
+            {
+                FilterFacilityModel.IncludedFacilities = null;
+            }
+
+            if(FilterFacilityExcludedList != null)
+            {
+                FilterFacilityModel.ExcludedFacilities = FilterFacilityExcludedList.Select(c => c.FacilityNo).ToArray();
+            }
+            else
+            {
+                FilterFacilityModel.ExcludedFacilities =null;
+            }
+            configs.Add(FilterFacilityModel);
+
+            FilterFacilityConfig = JsonConvert.SerializeObject(configs);
 
             Root.Database.SaveChanges();
         }
@@ -1337,7 +1374,7 @@ namespace gip.bso.masterdata
             databaseApp
             .Facility
             .Where(FilterFacilityByIncludeExclude(incl, excl))
-            .SelectMany(c=>c.FacilityCharge_Facility)
+            .SelectMany(c => c.FacilityCharge_Facility)
             .Where(c =>
                     c.MaterialID == materialID
                     && !c.NotAvailable
