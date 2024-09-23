@@ -11,11 +11,14 @@ namespace gip.bso.masterdata
         #region Properties
 
         public List<RuleGroup> RuleGroups { get; set; } = new List<RuleGroup>();
+        public List<RuleGroup> ReservationRuleGroups { get; set; } = new List<RuleGroup>();
         public List<MachineItem> MachineItems { get; set; } = new List<MachineItem>();
         public List<VD.Material> DosableMaterials { get; set; } = new List<VD.Material>();
         public List<VD.Material> NotDosableMaterials { get; set; } = new List<VD.Material>();
 
         public IACConfigStore CurrentConfigStore { get; set; }
+
+        public List<VD.FacilityReservation> AllFacilityReservations { get; set; } = new List<VD.FacilityReservation>();
 
         #endregion
 

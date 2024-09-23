@@ -96,12 +96,14 @@ namespace gip.bso.masterdata
 
         #region Property -> RuleGroup
 
+        public const string RuleGroup = "RuleGroup";
+
         private RuleGroup _SelectedRuleGroup;
         /// <summary>
         /// Selected property for EntityType
         /// </summary>
         /// <value>The selected RuleGroup</value>
-        [ACPropertySelected(9999, "RuleGroup", "en{'TODO: RuleGroup'}de{'TODO: RuleGroup'}")]
+        [ACPropertySelected(9999, nameof(RuleGroup), "en{'TODO: RuleGroup'}de{'TODO: RuleGroup'}")]
         public RuleGroup SelectedRuleGroup
         {
             get
@@ -113,7 +115,7 @@ namespace gip.bso.masterdata
                 if (_SelectedRuleGroup != value)
                 {
                     _SelectedRuleGroup = value;
-                    OnPropertyChanged(nameof(SelectedRuleGroup));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -124,7 +126,7 @@ namespace gip.bso.masterdata
         /// List property for EntityType
         /// </summary>
         /// <value>The RuleGroup list</value>
-        [ACPropertyList(9999, "RuleGroup")]
+        [ACPropertyList(9999, nameof(RuleGroup))]
         public List<RuleGroup> RuleGroupList
         {
             get
@@ -148,7 +150,7 @@ namespace gip.bso.masterdata
                 if (_CurrentRuleSelection != value)
                 {
                     _CurrentRuleSelection = value;
-                    OnPropertyChanged(nameof(CurrentRuleSelection));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -174,7 +176,7 @@ namespace gip.bso.masterdata
                 if (_SelectedAllItems != value)
                 {
                     _SelectedAllItems = value;
-                    OnPropertyChanged(nameof(SelectedAllItems));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -216,7 +218,7 @@ namespace gip.bso.masterdata
                 if (_SelectedNotDosableMaterials != value)
                 {
                     _SelectedNotDosableMaterials = value;
-                    OnPropertyChanged(nameof(SelectedNotDosableMaterials));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -239,6 +241,49 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region Properties -> ReservationRuleGroup
+
+        public const string ReservationRuleGroup = "ReservationRuleGroup";
+
+        private RuleGroup _SelectedReservationRuleGroup;
+        /// <summary>
+        /// Selected property for EntityType
+        /// </summary>
+        /// <value>The selected RuleGroup</value>
+        [ACPropertySelected(9999, nameof(ReservationRuleGroup), "en{'TODO: RuleGroup'}de{'TODO: RuleGroup'}")]
+        public RuleGroup SelectedReservationRuleGroup
+        {
+            get
+            {
+                return _SelectedReservationRuleGroup;
+            }
+            set
+            {
+                if (_SelectedReservationRuleGroup != value)
+                {
+                    _SelectedReservationRuleGroup = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private List<RuleGroup> _ReservationRuleGroupList;
+        /// <summary>
+        /// List property for EntityType
+        /// </summary>
+        /// <value>The RuleGroup list</value>
+        [ACPropertyList(9999, nameof(ReservationRuleGroup))]
+        public List<RuleGroup> ReservationRuleGroupList
+        {
+            get
+            {
+                return _ReservationRuleGroupList;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region ACMethod
@@ -254,10 +299,12 @@ namespace gip.bso.masterdata
             _NotDosableMaterialsList = result.NotDosableMaterials;
             AnyNotDosableMaterial = _NotDosableMaterialsList != null && _NotDosableMaterialsList.Any();
             _AllItemsList = result.MachineItems.Where(c => c.RuleGroup == null).OrderBy(c => c.Machine.ACIdentifier).ToList();
+            _ReservationRuleGroupList = result.ReservationRuleGroups.Where(c => c.RuleSelectionList.Any()).ToList();
 
             OnPropertyChanged(nameof(RuleGroupList));
             OnPropertyChanged(nameof(NotDosableMaterialsList));
             OnPropertyChanged(nameof(AllItemsList));
+            OnPropertyChanged(nameof(ReservationRuleGroupList));
 
             ShowDialog(this, "DlgSelectSources");
         }
@@ -283,12 +330,12 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        
+
 
         private SourceSelectionRulesResult DoShowDialogSelectSources(VD.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
             WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, iPlusMESConfigManager, acClassWFID, partslistID, prodOrderPartslistID, null);
-            
+
             SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
             LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, wFGroupStartData.ConfigStores, wFGroupStartData.Partslist, wFGroupStartData.InvokerPWNode);
             sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist, null);
@@ -316,6 +363,43 @@ namespace gip.bso.masterdata
                     LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, subConfigStores, wFGroupStartData.Partslist, subWf, preConfigACUrl);
                 }
             }
+
+            sourceSelectionRulesResult.AllFacilityReservations =
+                databaseApp
+                .ProdOrderPartslist
+                .Where(c => c.ProdOrderPartslistID == prodOrderPartslistID)
+                .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+                .Where(c => c.MaterialPosTypeIndex == (short)VD.GlobalApp.MaterialPosTypes.OutwardRoot)
+                .SelectMany(c => c.FacilityReservation_ProdOrderPartslistPos)
+                .ToList();
+
+            if (sourceSelectionRulesResult.AllFacilityReservations != null && sourceSelectionRulesResult.AllFacilityReservations.Any())
+            {
+                SourceSelectionRulesResult filteredResult = new SourceSelectionRulesResult();
+                filteredResult.CurrentConfigStore = sourceSelectionRulesResult.CurrentConfigStore;
+
+                foreach (RuleGroup ruleGroup in sourceSelectionRulesResult.RuleGroups)
+                {
+                    foreach (RuleSelection ruleSelection in ruleGroup.RuleSelectionList)
+                    {
+                        if (
+                                sourceSelectionRulesResult
+                                .AllFacilityReservations
+                                .Where(c => c.MaterialID == ruleSelection.MachineItem.Material.MaterialID)
+                                .Any())
+                        {
+                            RuleGroup filteredRuleGroup = sourceSelectionRulesResult.ReservationRuleGroups.Where(c=>c.RefPAACClass.ACClassID == ruleGroup.RefPAACClass.ACClassID).FirstOrDefault();
+                            if(filteredRuleGroup == null)
+                            {
+                                filteredRuleGroup = new RuleGroup(filteredResult, ruleGroup.RefPAACClass);
+                                sourceSelectionRulesResult.ReservationRuleGroups.Add(filteredRuleGroup);
+                            }
+                            filteredRuleGroup.RuleSelectionList.Add(ruleSelection);
+                        }
+                    }
+                }
+            }
+
 
             return sourceSelectionRulesResult;
         }

@@ -14,6 +14,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region ctor's
+
         public RuleGroup(SourceSelectionRulesResult sourceSelectionRulesResult, ACClass refPAACClass)
         {
             SourceSelectionRulesResult = sourceSelectionRulesResult;
