@@ -1284,10 +1284,10 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, Route shareRoute, out Route route)
+        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, Route shareRoute, out Route route, out Route diffRouteOnDestChange)
         {
             route = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
-            Route diffRouteOnDestChange = null;
+            diffRouteOnDestChange = null;
             if (acMethod != null && route != null)
             {
                 Route prevRoute = shareRoute;
@@ -1303,13 +1303,13 @@ namespace gip.mes.processapplication
             return ValidateRouteForFuncParam(diffRouteOnDestChange != null ? diffRouteOnDestChange : route);
         }
 
-        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod, Route shareRoute = null)
+        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod, Route shareRoute = null, bool setIntersectionOfSharedRoute = false)
         {
             Route route;
-
-            if (!ValidateAndGetCurrentDischargingRouteForParam(acMethod, shareRoute, out route))
+            Route diffRouteOnDestChange;
+            if (!ValidateAndGetCurrentDischargingRouteForParam(acMethod, shareRoute, out route, out diffRouteOnDestChange))
                 return false;
-            acMethod[nameof(Route)] = route;
+            acMethod[nameof(Route)] = setIntersectionOfSharedRoute && diffRouteOnDestChange != null ? diffRouteOnDestChange : route;
             return route != null;
         }
 

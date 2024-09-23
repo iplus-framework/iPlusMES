@@ -39,6 +39,7 @@ namespace gip.mes.datamodel
         public const string NoColumnName = "PickingNo";
         public const string FormatNewNo = "PK{0}";
         public const string FormatNoForSupply = "{0}-{1:D4}";
+        public const string FormatNoForOrderSupply = "{0}-{1}-{2:D4}";
 
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
