@@ -97,6 +97,7 @@
     <Compile Include="Facility\BSOFacilityReservationOverview.cs" />
     <Compile Include="Facility\BSOPrinterSettingsMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
+    <Compile Include="Facility\FilterFacilityModel.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
     <Compile Include="Material\BSOMaterialDetails.cs" />
     <Compile Include="PreferredParameters\BSOPreferredParameters.cs" />

@@ -206,6 +206,7 @@
         public const string FacilityReservation = "en{'Reservation'}de{'Reservierung'}";
         public const string FRIncludedFacilities = "en{'Included facilities'}de{'Eingeschlossene Lagerplätze'}";
         public const string FRExcludedFacilities = "en{'Excluded facilities'}de{'Ausgeschlossene Lagerplätze'}";
+        public const string FacilityFilterConfig = "en{'Facility filter config'}de{'Lagerfilter Konfiguration'}";
         public const string DisplayMaterialOfQuant = "en{'Display material of quant'}de{'Anzeigematerial von Quant'}";
 
         public const string Material = "en{'Material'}de{'Material'}";
