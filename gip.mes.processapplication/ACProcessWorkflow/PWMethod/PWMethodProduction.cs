@@ -302,7 +302,7 @@ namespace gip.mes.processapplication
             if (IsLastBatchRunning && CurrentACProgram != null)
             {
                 string programNo = CurrentACProgram.ProgramNo;
-                PWGroupVB[] groupsWithReservedModules = FindChildComponents<PWGroupVB>(c => c is PWGroupVB && (c as PWGroupVB).ReserveModule).ToArray();
+                PWGroupVB[] groupsWithReservedModules = FindChildComponents<PWGroupVB>(c => c is PWGroupVB && (c as PWGroupVB).ReserveModule == 1).ToArray();
                 if (groupsWithReservedModules != null && groupsWithReservedModules.Any())
                 {
                     foreach (PWGroupVB group in groupsWithReservedModules)

@@ -6,6 +6,7 @@ using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -175,6 +176,7 @@ namespace gip.bso.manufacturing
             if (processModule == null)
                 return false;
 
+            string orderReservationInfo = null;
             if (!skipProcessModuleValidation)
             {
                 string orderInfo = processModule.ACUrlCommand(nameof(PAProcessModule.OrderInfo)) as string;
@@ -188,7 +190,7 @@ namespace gip.bso.manufacturing
                     }
                 }
 
-                string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo)) as string;
+                orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo)) as string;
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
                     //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
@@ -262,9 +264,7 @@ namespace gip.bso.manufacturing
                 return true;
             }
 
-            processModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo), picking.PickingNo);
-
-            return StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID);
+            return StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID, string.IsNullOrEmpty(orderReservationInfo) ? processModule : null);
         }
 
         public void ClearBookingData()
@@ -347,7 +347,7 @@ namespace gip.bso.manufacturing
             return nameof(PWMethodSingleDosing);
         }
 
-        protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, Picking picking, ACComponent selectedAppManager, Guid allowedWFNode)
+        protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, Picking picking, ACComponent selectedAppManager, Guid allowedWFNode, ACComponent setReservationInfoOnModule = null)
         {
             using (Database db = new gip.core.datamodel.Database())
             {
@@ -363,6 +363,9 @@ namespace gip.bso.manufacturing
                 db.ACProgram.AddObject(program);
                 if (db.ACSaveChanges() == null)
                 {
+                    if (setReservationInfoOnModule != null)
+                        setReservationInfoOnModule.ACUrlCommand(nameof(PAProcessModule.ReservationInfo), secondaryKey);
+
                     ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
                     if (paramProgram == null)
                         acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));

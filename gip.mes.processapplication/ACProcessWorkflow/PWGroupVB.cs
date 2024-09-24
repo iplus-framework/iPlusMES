@@ -60,8 +60,8 @@ namespace gip.mes.processapplication
                     wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
                     wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where Materials can be processed'}de{'Nur Prozessmodule wo Material verarbeitet werden kann'}");
-                    wrapper.Method.ParameterValueList.Add(new ACValue("ReserveModule", typeof(bool), false, Global.ParamOption.Optional));
-                    wrapper.ParameterTranslation.Add("ReserveModule", "en{'Reserve occupied module for next batch'}de{'Reserviere belegtes Prozessmodul für nächsten Batch'}");
+                    wrapper.Method.ParameterValueList.Add(new ACValue("ReserveModule", typeof(ushort), 0, Global.ParamOption.Optional));
+                    wrapper.ParameterTranslation.Add("ReserveModule", "en{'Reserve occupied module for next batch (1=An;2=Ignore)'}de{'Reserviere belegtes Prozessmodul für nächsten Batch (1=An;2=Ignoriere)'}");
                 }
             }
             RegisterExecuteHandler(typeof(PWGroupVB), HandleExecuteACMethod_PWGroupVB);
@@ -179,7 +179,7 @@ namespace gip.mes.processapplication
         /// <summary>
         /// Reserve occupied module for next batch
         /// </summary>
-        public bool ReserveModule
+        public ushort ReserveModule
         {
             get
             {
@@ -189,10 +189,15 @@ namespace gip.mes.processapplication
                     var acValue = method.ParameterValueList.GetACValue("ReserveModule");
                     if (acValue != null)
                     {
-                        return acValue.ParamAsBoolean;
+                        string value = acValue.ParamAsString;
+                        if (String.IsNullOrEmpty(value) || value.ToLower() == "false")
+                            return 0;
+                        else if (value.ToLower() == "true")
+                            return 1;
+                        return acValue.ParamAsUInt16;
                     }
                 }
-                return false;
+                return 0;
             }
         }
         #endregion
@@ -398,8 +403,9 @@ namespace gip.mes.processapplication
                 if (ApplicationManager == null || ContentACClassWF == null || !ContentACClassWF.RefPAACClassID.HasValue)
                     return null;
                 List<PAProcessModule> modulesInAutomaticMode = base.ProcessModuleList;
-                modulesInAutomaticMode = modulesInAutomaticMode.Where(c => c.ReservationInfo == null || String.IsNullOrEmpty(c.ReservationInfo.ValueT) || c.ReservationInfo.ValueT == this.CurrentProgramNo).ToList();
-                if (ReserveModule)
+                if (ReserveModule != 2)
+                    modulesInAutomaticMode = modulesInAutomaticMode.Where(c => c.ReservationInfo == null || String.IsNullOrEmpty(c.ReservationInfo.ValueT) || c.ReservationInfo.ValueT == this.CurrentProgramNo).ToList();
+                if (ReserveModule == 1)
                     modulesInAutomaticMode = modulesInAutomaticMode.OrderByDescending(c => c.ReservationInfoSortString).ToList();
 
                 try
@@ -1144,7 +1150,7 @@ namespace gip.mes.processapplication
             base.OnProcessModuleOccupied(processModule);
             if (   processModule != null 
                 && processModule.ReservationInfo != null 
-                && ReserveModule)
+                && ReserveModule == 1)
             {
                 PWMethodProduction methodBase = ParentPWMethod<PWMethodProduction>();
                 if (methodBase != null)
@@ -1163,7 +1169,7 @@ namespace gip.mes.processapplication
             if (module != null && module.ReservationInfo != null)
             {
                 bool canResetReservation = true;
-                if (ReserveModule)
+                if (ReserveModule == 1)
                 {
                     PWMethodProduction methodBase = ParentPWMethod<PWMethodProduction>();
                     if (methodBase != null && !methodBase.IsLastBatchRunning)
