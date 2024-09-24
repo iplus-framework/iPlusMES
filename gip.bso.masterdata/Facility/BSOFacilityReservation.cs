@@ -1054,7 +1054,7 @@ namespace gip.bso.masterdata
                 {
                     configs = JsonConvert.DeserializeObject<List<FilterFacilityModel>>(FilterFacilityConfig);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //
                 }
@@ -1093,7 +1093,7 @@ namespace gip.bso.masterdata
                 {
                     configs = JsonConvert.DeserializeObject<List<FilterFacilityModel>>(FilterFacilityConfig);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //
                 }
