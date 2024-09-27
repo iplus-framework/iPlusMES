@@ -234,9 +234,9 @@ namespace gip.mes.facility
 
         public LotCreationModeEnum LotCreationMode
         {
-            get 
+            get
             {
-                if (OneLotPerOrder == (ushort) LotCreationModeEnum.EachBatchOneLot)
+                if (OneLotPerOrder == (ushort)LotCreationModeEnum.EachBatchOneLot)
                     return LotCreationModeEnum.EachBatchOneLot;
                 else if (OneLotPerOrder == (ushort)LotCreationModeEnum.OneOrderOneLotWithOrderNo)
                     return LotCreationModeEnum.OneOrderOneLotWithOrderNo;
@@ -929,14 +929,14 @@ namespace gip.mes.facility
             return prodOrderBatchPlan;
         }
 
-        public bool FactoryBatchPlans(DatabaseApp databaseApp, PlanningMR filterPlanningMR, GlobalApp.BatchPlanState createdBatchState,
-            WizardSchedulerPartslist wizardSchedulerPartslist, ProdOrderPartslist defaultProdOrderPartslist, ref string programNo, out List<ProdOrderBatchPlan> generatedBatchPlans)
+        public bool FactoryProdOrderPartslist(DatabaseApp databaseApp,
+            PlanningMR filterPlanningMR,
+            WizardSchedulerPartslist wizardSchedulerPartslist,
+            ProdOrderPartslist defaultProdOrderPartslist,
+            ref string programNo)
         {
             bool success = false;
-            ProdOrderBatchPlan firstBatchPlan = null;
-            ProdOrderPartslist prodOrderPartslist = null;
             ProdOrder prodOrder = null;
-            generatedBatchPlans = null;
             if (string.IsNullOrEmpty(programNo))
             {
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
@@ -950,72 +950,84 @@ namespace gip.mes.facility
                 prodOrder = databaseApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == tmpProgramNo);
             }
 
-            if (wizardSchedulerPartslist.ProdOrderPartslistPos != null)
+            wizardSchedulerPartslist.ProgramNo = programNo;
+
+            if (wizardSchedulerPartslist.ProdOrderPartslist != null)
             {
                 success = true;
-                prodOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist;
             }
             else
             {
                 Msg msg = null;
-                prodOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == wizardSchedulerPartslist.Partslist.PartslistID);
-                if (prodOrderPartslist == null)
-                    msg = PartslistAdd(databaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out prodOrderPartslist);
-
-                if (prodOrderPartslist != null && defaultProdOrderPartslist != null)
+                wizardSchedulerPartslist.ProdOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == wizardSchedulerPartslist.Partslist.PartslistID);
+                if (wizardSchedulerPartslist.ProdOrderPartslist == null)
                 {
-                    CopyStartDepartmentFromMain(prodOrderPartslist, defaultProdOrderPartslist);
+                    ProdOrderPartslist tempPl = null;
+                    msg = PartslistAdd(databaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out tempPl);
+                    wizardSchedulerPartslist.ProdOrderPartslist = tempPl;
+                }
+
+                if (wizardSchedulerPartslist.ProdOrderPartslist != null && defaultProdOrderPartslist != null)
+                {
+                    CopyStartDepartmentFromMain(wizardSchedulerPartslist.ProdOrderPartslist, defaultProdOrderPartslist);
                 }
 
                 success = msg == null || msg.IsSucceded();
+
 
                 if (filterPlanningMR != null && success)
                 {
                     PlanningMR planningMR = databaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == filterPlanningMR.PlanningMRID);
                     PlanningMRProposal proposal = PlanningMRProposal.NewACObject(databaseApp, planningMR);
-                    proposal.ProdOrder = prodOrderPartslist.ProdOrder;
-                    proposal.ProdOrderPartslist = prodOrderPartslist;
+                    proposal.ProdOrder = prodOrder;
+                    proposal.ProdOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslist;
                     planningMR.PlanningMRProposal_PlanningMR.Add(proposal);
                 }
             }
 
-            if (success)
+            return success;
+        }
+
+        public bool FactoryBatchPlans(DatabaseApp databaseApp, PlanningMR filterPlanningMR, GlobalApp.BatchPlanState createdBatchState,
+            WizardSchedulerPartslist wizardSchedulerPartslist, out List<ProdOrderBatchPlan> generatedBatchPlans)
+        {
+            bool success = false;
+            ProdOrderBatchPlan firstBatchPlan = null;
+
+            MDProdOrderPartslistPosState mDProdOrderPartslistPosState = databaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
+
+            generatedBatchPlans = new List<ProdOrderBatchPlan>();
+            int nr = 0;
+            gip.mes.datamodel.ACClassWF vbACClassWF = wizardSchedulerPartslist.WFNodeMES;
+            List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, filterPlanningMR?.PlanningMRNo);
+            int scheduledOrder = 0;
+            if (vbACClassWF != null)
+                scheduledOrder =
+                    maxSchedulerOrders
+                    .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID)
+                    .SelectMany(c => c.WFs)
+                    .Where(c => c.ACClassWF.ACClassWFID == vbACClassWF.ACClassWFID)
+                    .Select(c => c.MaxScheduledOrder)
+                    .DefaultIfEmpty()
+                    .Max();
+
+            foreach (var item in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
             {
-
-                MDProdOrderPartslistPosState mDProdOrderPartslistPosState = databaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
-
-                generatedBatchPlans = new List<ProdOrderBatchPlan>();
-                int nr = 0;
-                gip.mes.datamodel.ACClassWF vbACClassWF = wizardSchedulerPartslist.WFNodeMES;
-                List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, filterPlanningMR?.PlanningMRNo);
-                int scheduledOrder = 0;
-                if (vbACClassWF != null)
-                    scheduledOrder =
-                        maxSchedulerOrders
-                        .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID)
-                        .SelectMany(c => c.WFs)
-                        .Where(c => c.ACClassWF.ACClassWFID == vbACClassWF.ACClassWFID)
-                        .Select(c => c.MaxScheduledOrder)
-                        .DefaultIfEmpty()
-                        .Max();
-
-                foreach (var item in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
-                {
-                    nr++;
-                    scheduledOrder++;
-                    ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, prodOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
-                    batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
-                    wizardSchedulerPartslist.ProdOrderPartslistPos = batchPlan.ProdOrderPartslistPos;
-                    WriteBatchPlanQuantities(item, batchPlan);
-                    batchPlan.Sequence = nr;
-                    if (firstBatchPlan == null)
-                        firstBatchPlan = batchPlan;
-                    generatedBatchPlans.Add(batchPlan);
-                }
-                wizardSchedulerPartslist.IsSolved = true;
-                wizardSchedulerPartslist.ProgramNo = prodOrder.ProgramNo;
-
+                nr++;
+                scheduledOrder++;
+                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.ProdOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
+                wizardSchedulerPartslist.ProdOrderPartslistPos = batchPlan.ProdOrderPartslistPos;
+                WriteBatchPlanQuantities(item, batchPlan);
+                batchPlan.Sequence = nr;
+                if (firstBatchPlan == null)
+                    firstBatchPlan = batchPlan;
+                generatedBatchPlans.Add(batchPlan);
             }
+            wizardSchedulerPartslist.IsSolved = true;
+
+            success = true;
+
             return success;
         }
 
@@ -1259,7 +1271,8 @@ namespace gip.mes.facility
             {
                 if (!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
                 {
-                    FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, plForBatchGenerate, ref programNo, out prodOrderBatchPlans);
+                    FactoryProdOrderPartslist(databaseApp, null, wPl,plForBatchGenerate, ref programNo);
+                    FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, out prodOrderBatchPlans);
                 }
                 else
                 {
@@ -1520,12 +1533,12 @@ namespace gip.mes.facility
                                 bool ifMaterialMatch =
                                         unselFacility != null
                                         && Material.IsMaterialEqual(intermediatePos.BookingMaterial, unselFacility.Material);
-                                        //&& unselFacility.Material != null
-                                        //&& (
-                                        //       intermediatePos.BookingMaterial != null
-                                        //    && ((unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID)
-                                        //        || (intermediatePos.BookingMaterial.ProductionMaterialID.HasValue && intermediatePos.BookingMaterial.ProductionMaterialID.Value == unselFacility.MaterialID))
-                                        // );
+                                //&& unselFacility.Material != null
+                                //&& (
+                                //       intermediatePos.BookingMaterial != null
+                                //    && ((unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID)
+                                //        || (intermediatePos.BookingMaterial.ProductionMaterialID.HasValue && intermediatePos.BookingMaterial.ProductionMaterialID.Value == unselFacility.MaterialID))
+                                // );
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                                 if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)

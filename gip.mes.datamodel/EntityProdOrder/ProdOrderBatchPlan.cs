@@ -371,6 +371,35 @@ namespace gip.mes.datamodel
                 }
             }
         }
+
+        private PreferredParamStateEnum _ParamState;
+        [ACPropertyInfo(999, nameof(ParamState), ConstApp.PrefParam)]
+        public PreferredParamStateEnum ParamState
+        {
+            get
+            {
+                return _ParamState;
+            }
+            set
+            {
+                if (_ParamState != value)
+                {
+                    _ParamState = value;
+                    OnPropertyChanged(nameof(ParamState));
+                }
+            }
+        }
+
+        [ACPropertyInfo(999, nameof(ParamStateName), "en{'Param state name'}de{'Parameterstatusname'}")]
+        public string ParamStateName
+        {
+            get
+            {
+                ACValueItem item = this.GetObjectContext<DatabaseApp>().PreferredParamStateList.Where(c => (PreferredParamStateEnum)c.Value == ParamState).FirstOrDefault();
+                return item.ACCaption;
+            }
+        }
+
         #endregion
 
         #region Partial methods
