@@ -99,8 +99,8 @@ namespace gip.bso.masterdata
             RuleSelection ruleSelection =
                 RuleSelectionList
                 .Where(c =>
-                            c.MachineItem.Machine == source
-                            && c.Target == target
+                            c.MachineItem.Machine.ACClassID == source.ACClassID
+                            && c.Target.ACClassID == target.ACClassID
                             && (material == null || (c.MachineItem.Material != null && c.MachineItem.Material.MaterialNo == material.MaterialNo))
                 ).FirstOrDefault();
 
@@ -108,13 +108,10 @@ namespace gip.bso.masterdata
             {
                 ruleSelection = new RuleSelection();
                 ruleSelection.RuleGroup = this;
-
                 ruleSelection.MachineItem = new MachineItem(SourceSelectionRulesResult, this, source, material, preConfigACUrl);
                 SourceSelectionRulesResult.MachineItems.Add(ruleSelection.MachineItem);
                 ruleSelection.MachineItem._IsSelected = true;
-
                 ruleSelection.Target = target;
-                
                 RuleSelectionList.Add(ruleSelection);
             }
 
