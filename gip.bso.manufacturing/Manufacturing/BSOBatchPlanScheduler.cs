@@ -961,9 +961,9 @@ namespace gip.bso.manufacturing
                     }
 
                     batchPlan.ParamState = PreferredParamStateEnum.ParamsNotRequired;
-                    if(batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+                    if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
                     {
-                        if(batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                        if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
                         {
                             batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
                         }
@@ -2904,21 +2904,89 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
-                bool isBatchReadyToStart = 
-                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any() 
-                    && (batchPlan.ProdOrderPartslist != null 
+                bool isBatchHaveFaciltiyReservation =
+                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
+
+                bool isPartslistEnabled =
+                    (batchPlan.ProdOrderPartslist != null
                     && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
 
-                if (!isBatchReadyToStart)
+                if (!isBatchHaveFaciltiyReservation)
                 {
                     // Error50559
-                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
-                    //  9   New 8401    NADJEV SIR ZA BUREK 1   0            
-                    Msg msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "SetBatchStateReadyToStart()", 3184, "Error50559",
+                    // Unable to start batch plan: #{0} {1} {2} {3}x{4}! Destination not selected!
+                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Zeil nicht ausgewählt!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
                         batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
                         batchPlan.BatchTargetCount, batchPlan.BatchSize);
                     msgWithDetails.AddDetailMessage(msg);
                 }
+
+                if (!isPartslistEnabled)
+                {
+                    // Error50653
+                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Partslist is not enabled!
+                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Rezeptur nicht freigegeben!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2931, "Error50653",
+                        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                        batchPlan.BatchTargetCount, batchPlan.BatchSize);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
+
+                bool? hasRequieredParams = null;
+                // check HasRequiredParams
+                if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+                {
+                    batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.AutoLoad();
+                    if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                    {
+                        batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
+                    }
+                    else
+                    {
+                        batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredNotDefined;
+                    }
+
+                    batchPlan.OnEntityPropertyChanged(nameof(ProdOrderBatchPlan.ParamStateName));
+
+
+                    if (batchPlan.ParamState == PreferredParamStateEnum.ParamsRequiredNotDefined)
+                    {
+                        // Question50113
+                        // Workflow {0} parameters on production order level are required! Do you want to proceed with parameters setup setup?
+                        // Workflow {0}-Parameter auf Produktionsauftragsebene sind erforderlich! Möchten Sie mit der Einrichtung der Parameter fortfahren?
+                        if (Messages.Question(BSOBatchPlanChild.Value, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
+                        {
+                            hasRequieredParams = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                                batchPlan.IplusVBiACClassWF.ACClassWFID,
+                                batchPlan.ProdOrderPartslist.PartslistID,
+                                batchPlan.ProdOrderPartslist.ProdOrderPartslistID,
+                                null);
+                            if (hasRequieredParams ?? false)
+                            {
+                                ACSaveChanges();
+                            }
+                        }
+
+                        if (!(hasRequieredParams ?? true))
+                        {
+                            // Error50654
+                            // Unable to start batch plan #{0} {1} {2} {3}x{4}! Workflow {0} parameters on production order level are required! Preferred params are not defined!
+                            // Batchplan #{0} {1} {2} {3}x{4} kann nicht gestartet werden! Workflow-{0}-Parameter auf Produktionsauftragsebene sind erforderlich! Bevorzugte Parameter sind nicht definiert!
+                            Msg msg = new Msg(BSOBatchPlanChild.Value, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2971, "Error50654",
+                                batchPlan.ScheduledOrder,
+                                batchPlan.ProdOrderPartslistPos.Material.MaterialNo,
+                                batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                                batchPlan.BatchTargetCount,
+                                batchPlan.BatchSize,
+                                batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption
+                                );
+                            msgWithDetails.AddDetailMessage(msg);
+                        }
+                    }
+                }
+
+                bool isBatchReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
 
                 if (ValidateBatchPlanBeforeStart)
                 {
