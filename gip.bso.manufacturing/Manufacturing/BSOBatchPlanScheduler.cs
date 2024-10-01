@@ -555,19 +555,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
-        [ACPropertyInfo(560)]
-        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
-        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
-        {
-            get
-            {
-                if (_BSOPreferredParameters == null)
-                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
-                return _BSOPreferredParameters;
-            }
-        }
-
         #endregion
 
         #region Properties
@@ -2727,7 +2714,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledShowPreferredParameters())
                 return;
-            bool isParamDefined = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+            bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                          SelectedProdOrderBatchPlan.IplusVBiACClassWF.ACClassWFID,
                          SelectedProdOrderBatchPlan.ProdOrderPartslist.PartslistID,
                          SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrderPartslistID,
@@ -2741,7 +2728,12 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledShowPreferredParameters()
         {
-            return SelectedProdOrderBatchPlan != null;
+            return 
+                BSOBatchPlanChild != null
+                && BSOBatchPlanChild.Value != null
+                && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
+                && BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value != null
+                && SelectedProdOrderBatchPlan != null;
         }
 
         #endregion
@@ -2933,58 +2925,8 @@ namespace gip.bso.manufacturing
                     msgWithDetails.AddDetailMessage(msg);
                 }
 
-                bool? hasRequieredParams = null;
                 // check HasRequiredParams
-                if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
-                {
-                    batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.AutoLoad();
-                    if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
-                    {
-                        batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
-                    }
-                    else
-                    {
-                        batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredNotDefined;
-                    }
-
-                    batchPlan.OnEntityPropertyChanged(nameof(ProdOrderBatchPlan.ParamStateName));
-
-
-                    if (batchPlan.ParamState == PreferredParamStateEnum.ParamsRequiredNotDefined)
-                    {
-                        // Question50113
-                        // Workflow {0} parameters on production order level are required! Do you want to proceed with parameters setup setup?
-                        // Workflow {0}-Parameter auf Produktionsauftragsebene sind erforderlich! Möchten Sie mit der Einrichtung der Parameter fortfahren?
-                        if (Messages.Question(BSOBatchPlanChild.Value, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
-                        {
-                            hasRequieredParams = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
-                                batchPlan.IplusVBiACClassWF.ACClassWFID,
-                                batchPlan.ProdOrderPartslist.PartslistID,
-                                batchPlan.ProdOrderPartslist.ProdOrderPartslistID,
-                                null);
-                            if (hasRequieredParams ?? false)
-                            {
-                                ACSaveChanges();
-                            }
-                        }
-
-                        if (!(hasRequieredParams ?? true))
-                        {
-                            // Error50654
-                            // Unable to start batch plan #{0} {1} {2} {3}x{4}! Workflow {0} parameters on production order level are required! Preferred params are not defined!
-                            // Batchplan #{0} {1} {2} {3}x{4} kann nicht gestartet werden! Workflow-{0}-Parameter auf Produktionsauftragsebene sind erforderlich! Bevorzugte Parameter sind nicht definiert!
-                            Msg msg = new Msg(BSOBatchPlanChild.Value, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2971, "Error50654",
-                                batchPlan.ScheduledOrder,
-                                batchPlan.ProdOrderPartslistPos.Material.MaterialNo,
-                                batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
-                                batchPlan.BatchTargetCount,
-                                batchPlan.BatchSize,
-                                batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption
-                                );
-                            msgWithDetails.AddDetailMessage(msg);
-                        }
-                    }
-                }
+                bool? hasRequieredParams = BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
 
                 bool isBatchReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
 
@@ -3873,8 +3815,10 @@ namespace gip.bso.manufacturing
             {
                 WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
                 if (
-                        BSOPreferredParameters_Child != null
-                        && BSOPreferredParameters_Child.Value != null
+                         BSOBatchPlanChild != null
+                        && BSOBatchPlanChild.Value != null
+                        && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
+                        && BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value != null
                         && wizardSchedulerPartslist != null
                         && wizardSchedulerPartslist.WFNodeMES != null
                         && wizardSchedulerPartslist.HasRequiredParams
@@ -3889,7 +3833,7 @@ namespace gip.bso.manufacturing
 
                     if (wizardSchedulerPartslist.ProdOrderPartslist != null)
                     {
-                        bool isParamDefined = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                        bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                          wizardSchedulerPartslist.WFNodeMES.ACClassWFID,
                          wizardSchedulerPartslist.ProdOrderPartslist.PartslistID,
                          wizardSchedulerPartslist.ProdOrderPartslist.ProdOrderPartslistID,

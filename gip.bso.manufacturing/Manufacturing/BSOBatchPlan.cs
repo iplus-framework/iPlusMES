@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
 using System.Threading;
+using gip.bso.masterdata;
 
 namespace gip.bso.manufacturing
 {
@@ -99,6 +100,23 @@ namespace gip.bso.manufacturing
                 if (_VarioConfigManager == null)
                     return null;
                 return _VarioConfigManager.ValueT;
+            }
+        }
+
+        #endregion
+
+        #region Child BSO
+
+        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        [ACPropertyInfo(560)]
+        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
+        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
+        {
+            get
+            {
+                if (_BSOPreferredParameters == null)
+                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
+                return _BSOPreferredParameters;
             }
         }
 
@@ -954,6 +972,19 @@ namespace gip.bso.manufacturing
                     return;
                 }
 
+                MsgWithDetails msgWithDetails = new MsgWithDetails();
+                // check HasRequiredParams
+                bool? hasRequieredParams = ValidatePreferredParams(SelectedBatchPlanForIntermediate, msgWithDetails);
+                if (!(hasRequieredParams ?? true))
+                {
+                    if (msgWithDetails.MsgDetails != null && msgWithDetails.MsgDetails.Any())
+                    {
+                        Messages.Msg(msgWithDetails);
+                    }
+                    return;
+                }
+
+
                 ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
                 poManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, SelectedBatchPlanForIntermediate, CurrentProdOrderPartslist, SelectedIntermediate, true);
 
@@ -1214,6 +1245,62 @@ namespace gip.bso.manufacturing
         {
             return SelectedBatchPlanForIntermediate != null &&
                 (SelectedBatchPlanForIntermediate.ScheduledStartDate != null || SelectedBatchPlanForIntermediate.ScheduledEndDate != null);
+        }
+
+        public bool? ValidatePreferredParams(ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails)
+        {
+            bool? hasRequieredParams = null;
+            if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+            {
+                batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.AutoLoad();
+                if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                {
+                    batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
+                }
+                else
+                {
+                    batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredNotDefined;
+                }
+
+                batchPlan.OnEntityPropertyChanged(nameof(ProdOrderBatchPlan.ParamStateName));
+
+
+                if (batchPlan.ParamState == PreferredParamStateEnum.ParamsRequiredNotDefined)
+                {
+                    // Question50113
+                    // Workflow {0} parameters on production order level are required! Do you want to proceed with parameters setup setup?
+                    // Workflow {0}-Parameter auf Produktionsauftragsebene sind erforderlich! Möchten Sie mit der Einrichtung der Parameter fortfahren?
+                    if (Messages.Question(this, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
+                    {
+                        hasRequieredParams = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                            batchPlan.IplusVBiACClassWF.ACClassWFID,
+                            batchPlan.ProdOrderPartslist.PartslistID,
+                            batchPlan.ProdOrderPartslist.ProdOrderPartslistID,
+                            null);
+                        if (hasRequieredParams ?? false)
+                        {
+                            ACSaveChanges();
+                        }
+                    }
+
+                    if (!(hasRequieredParams ?? true))
+                    {
+                        // Error50654
+                        // Unable to start batch plan #{0} {1} {2} {3}x{4}! Workflow {0} parameters on production order level are required! Preferred params are not defined!
+                        // Batchplan #{0} {1} {2} {3}x{4} kann nicht gestartet werden! Workflow-{0}-Parameter auf Produktionsauftragsebene sind erforderlich! Bevorzugte Parameter sind nicht definiert!
+                        Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlan), $"{nameof(ValidatePreferredParams)}()", 1281, "Error50654",
+                            batchPlan.ScheduledOrder,
+                            batchPlan.ProdOrderPartslistPos.Material.MaterialNo,
+                            batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                            batchPlan.BatchTargetCount,
+                            batchPlan.BatchSize,
+                            batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption
+                            );
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
+                }
+            }
+            return hasRequieredParams;
         }
 
         #endregion
