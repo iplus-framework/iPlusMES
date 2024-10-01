@@ -492,7 +492,6 @@ namespace gip.bso.masterdata
                                     {
                                         RouteItem source = route.GetRouteSource();
                                         RouteItem target = route.GetRouteTarget();
-
                                         RuleSelection ruleSelection = ruleGroup.AddRuleSelection(mapPosToWFConnSub.PWNode, mat4DosingAndRoutes.Key, source.Source, target.Target, preConfigACUrl);
                                         // IsSelected == true - if auf any PWNode is not in excludedProcessModules
                                         ruleSelection.MachineItem._IsSelected = !excludedProcessModules.Select(c => c.ACClassID).Contains(source.Source.ACClassID) && ruleSelection.MachineItem.IsSelected;
@@ -520,7 +519,15 @@ namespace gip.bso.masterdata
             List<VD.Facility> facilities = databaseApp.Facility.Where(c => c.MaterialID != null && c.VBiFacilityACClassID != null).ToList();
             foreach (VD.Facility facility in facilities)
             {
-                List<MachineItem> matchedMachineItems = result.MachineItems.Where(c => c.Machine.ACClassID == facility.VBiFacilityACClassID).ToList();
+                List<MachineItem> matchedMachineItems = 
+                    result
+                    .MachineItems
+                    .Where(c => 
+                            c.Machine.ACClassID == facility.VBiFacilityACClassID 
+                            && c.Material == null
+                    )
+                    .ToList();
+
                 foreach (MachineItem machineItem in matchedMachineItems)
                 {
                     machineItem.Material = facility.Material;

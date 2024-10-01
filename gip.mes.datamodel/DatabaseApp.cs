@@ -1270,6 +1270,25 @@ namespace gip.mes.datamodel
                 return _WeighingStateList;
             }
         }
+
+        ACValueItemList _PreferredParamStateList = null;
+        [ACPropertyInfo(9999)]
+        public ACValueItemList PreferredParamStateList
+        {
+            get
+            {
+                if (_PreferredParamStateList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PreferredParamStateEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _PreferredParamStateList = enumClass.ACValueListForEnum;
+                    else
+                        _PreferredParamStateList = new ACValueListPreferredParamStateEnum();
+                }
+                return _PreferredParamStateList;
+            }
+        }
+
         #endregion
 
         #region INotifyPropertyChanged

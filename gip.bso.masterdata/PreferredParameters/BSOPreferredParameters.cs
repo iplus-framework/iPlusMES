@@ -89,6 +89,8 @@ namespace gip.bso.masterdata
 
         public Dictionary<ACClass, List<Guid>> AllMachines { get; set; } = new Dictionary<ACClass, List<Guid>>();
 
+        public VBDialogResult DialogResult;
+
         #endregion 
 
         #region Properties -> PWNode
@@ -516,10 +518,29 @@ namespace gip.bso.masterdata
             ShowDialog(this, dialogName);
         }
 
+        [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
+        public bool ShowParamDialogResult(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
+        {
+            DialogResult = new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
+
+            ShowParamDialog(acClassWFID, partslistID, prodOrderPartslistID, pickingID);
+            
+            bool success = DialogResult.SelectedCommand == eMsgButton.OK;
+            DialogResult = null;
+
+            return success;
+        }
+
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
-            ACSaveOrUndoChanges();
+            bool successSave = ACSaveOrUndoChanges();
+
+            if(DialogResult != null)
+            {
+                DialogResult.SelectedCommand = eMsgButton.OK;
+            }
+
             CloseTopDialog();
         }
 

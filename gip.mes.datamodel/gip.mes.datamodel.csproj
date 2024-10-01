@@ -129,6 +129,7 @@
     <Compile Include="EntityProdOrder\ProdOrderPartslistExpand.cs" />
     <Compile Include="EntityProdOrder\ProdOrderPartslistPos_Statistic.cs" />
     <Compile Include="EntityProdOrder\ProdOrderPartslist_Statistic.cs" />
+    <Compile Include="EntityProdOrder\PreferredParamStateEnum.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
     <Compile Include="Enums\FacilitySelectLoctation.cs" />
     <Compile Include="Enums\MovementReasonsEnum.cs" />

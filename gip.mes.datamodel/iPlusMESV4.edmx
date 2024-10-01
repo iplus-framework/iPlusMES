@@ -182,6 +182,7 @@
           <Property Name="AttachedFromACClassID" Type="uniqueidentifier" />
           <Property Name="IsStatic" Type="bit" Nullable="false" />
           <Property Name="ExecuteByDoubleClick" Type="bit" Nullable="false" />
+          <Property Name="HasRequiredParams" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="ACClassMethodConfig">
           <Key>
@@ -20092,6 +20093,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="AttachedFromACClassID" Type="Guid" />
           <Property Name="IsStatic" Type="Boolean" Nullable="false" />
           <Property Name="ExecuteByDoubleClick" Type="Boolean" Nullable="false" />
+          <Property Name="HasRequiredParams" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="ACClass" Relationship="iPlusMESV4_Model.FK_ACClassMethod_ACClassID" FromRole="ACClassMethod" ToRole="ACClass" />
           <NavigationProperty Name="AttachedFromACClass" Relationship="iPlusMESV4_Model.FK_ACClassMethod_AttachedFromACClass" FromRole="ACClassMethod" ToRole="ACClass" />
           <NavigationProperty Name="PWACClass" Relationship="iPlusMESV4_Model.FK_ACClassMethod_PWACClassID" FromRole="ACClassMethod" ToRole="ACClass" />
@@ -34908,6 +34910,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="ACClassMethod">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ACClassMethod">
               <MappingFragment StoreEntitySet="ACClassMethod">
+                <ScalarProperty Name="HasRequiredParams" ColumnName="HasRequiredParams" />
                 <ScalarProperty Name="ExecuteByDoubleClick" ColumnName="ExecuteByDoubleClick" />
                 <ScalarProperty Name="IsStatic" ColumnName="IsStatic" />
                 <ScalarProperty Name="AttachedFromACClassID" ColumnName="AttachedFromACClassID" />
