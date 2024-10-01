@@ -337,7 +337,7 @@ namespace gip.mes.processapplication
                                 acValue.Value = (Int16)ParentPWMethod<PWMethodProduction>().IsLastBatch;
                         }
                         if (acValue != null)
-                            OnSetLastBatchParam(acValue, acMethod, targetModule, dbApp, batchPlan, currentBatchPos);
+                            OnSetLastBatchParam(acValue, acMethod, targetModule, dbApp, batchPlan, currentBatchPos, nextDestination);
 
                         acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
                         if (   acValue != null
@@ -583,7 +583,7 @@ namespace gip.mes.processapplication
                                         acValue.Value = (Int16)ParentPWMethod<PWMethodProduction>().IsLastBatch;
                                 }
                                 if (acValue != null)
-                                    OnSetLastBatchParam(acValue, acMethod, dischargeToModule, dbApp, batchPlan, currentBatchPos);
+                                    OnSetLastBatchParam(acValue, acMethod, dischargeToModule, dbApp, batchPlan, currentBatchPos, null);
 
                                 ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
                                 if (acValueTargetQ != null && acValueTargetQ.ParamAsDouble < 0.000001)
@@ -1229,7 +1229,7 @@ namespace gip.mes.processapplication
                             acValue.Value = (Int16)ParentPWMethod<PWMethodProduction>().IsLastBatch;
                     }
                     if (acValue != null)
-                        OnSetLastBatchParam(acValue, acMethod, targetContainer, dbApp, batchPlan, currentBatchPos);
+                        OnSetLastBatchParam(acValue, acMethod, targetContainer, dbApp, batchPlan, currentBatchPos, nextPlannedSiloReservation);
 
 
                     acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
@@ -1704,7 +1704,7 @@ namespace gip.mes.processapplication
         }
 
 
-        protected virtual void OnSetLastBatchParam(ACValue lastBatchParam, ACMethod acMethod, PAProcessModule targetModule, DatabaseApp dbApp, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos currentBatchPos)
+        protected virtual void OnSetLastBatchParam(ACValue lastBatchParam, ACMethod acMethod, PAProcessModule targetModule, DatabaseApp dbApp, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos currentBatchPos, FacilityReservation nextPlannedSiloReservation)
         {
         }
 

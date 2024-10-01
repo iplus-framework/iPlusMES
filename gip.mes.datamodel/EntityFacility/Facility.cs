@@ -533,8 +533,6 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (!this.FacilityCharge_Facility.Any())
-                    return true;
                 try
                 {
                     return !FacilityCharge_Facility.Where(c => !c.NotAvailable).Any();

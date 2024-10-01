@@ -716,8 +716,7 @@ namespace gip.mes.processapplication
                                     {
                                         if (silosNotDosableHere != null && DontWaitForChangeScale)
                                         {
-                                            double stockFactor = StockFactorForChangeScale;
-                                            double minStock = Math.Abs(relation.RemainingDosingWeight * stockFactor);
+                                            double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, relation.RemainingDosingWeight);
                                             double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
                                             if (sumStock < minStock)
                                                 hasOpenDosings = true;
@@ -1120,8 +1119,7 @@ namespace gip.mes.processapplication
                                                     PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
                                                     if (currentSilo != null)
                                                     {
-                                                        double stockFactor = StockFactorForChangeScale;
-                                                        double minStock = Math.Abs(activeDosing.RemainingDosingWeight * stockFactor);
+                                                        double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
                                                         if (currentSilo.FillLevel.ValueT >= minStock)
                                                             currentParallelPWDosings.Remove(activePWDos);
                                                         else

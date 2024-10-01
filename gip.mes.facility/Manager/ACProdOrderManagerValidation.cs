@@ -18,10 +18,15 @@ namespace gip.mes.facility
         public MsgWithDetails ValidateProdOrderPartslist(DatabaseApp dbApp, ACPartslistManager partsListManager, ProdOrderPartslist poList)
         {
             MsgWithDetails detailMessages = new MsgWithDetails();
-            foreach (ProdOrderPartslistPos pos in poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
+            IEnumerable<ProdOrderPartslistPos> rootPosList = dbApp.ProdOrderPartslistPos
+                .Include(c => c.Material.MDFacilityManagementType)
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Where(c => c.ProdOrderPartslistID == poList.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .AsEnumerable();
+            foreach (ProdOrderPartslistPos pos in rootPosList)
             {
-                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(dbApp);
-                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(dbApp);
+                //pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(dbApp);
+                //pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(dbApp);
                 if (!pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.
@@ -29,7 +34,7 @@ namespace gip.mes.facility
                     {
                         Source = GetACUrl(),
                         MessageLevel = eMsgLevel.Warning,
-                        ACIdentifier = "ValidateStart(1)",
+                        ACIdentifier = "ValidateProdOrderPartslist(1)",
                         Message = Root.Environment.TranslateMessage(partsListManager, "Warning50013", pos.Sequence, pos.Material.MaterialNo, pos.MaterialName)
                     });
                 }
@@ -42,7 +47,7 @@ namespace gip.mes.facility
                     {
                         Source = GetACUrl(),
                         MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "CheckResourcesAndRouting(20)",
+                        ACIdentifier = "ValidateProdOrderPartslist(20)",
                         Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
                     });
                 }
@@ -126,10 +131,15 @@ namespace gip.mes.facility
                 });
             }
 
-            foreach (ProdOrderPartslistPos pos in poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
+            IEnumerable<ProdOrderPartslistPos> rootPosList = dbApp.ProdOrderPartslistPos
+                .Include(c => c.Material.MDFacilityManagementType)
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Where(c => c.ProdOrderPartslistID == poList.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .AsEnumerable();
+            foreach (ProdOrderPartslistPos pos in rootPosList) //poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
             {
-                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(dbApp);
-                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(dbApp);
+                //pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(dbApp);
+                //pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(dbApp);
                 if (!pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.
@@ -139,6 +149,19 @@ namespace gip.mes.facility
                         MessageLevel = eMsgLevel.Warning,
                         ACIdentifier = "ValidateStart(40)",
                         Message = Root.Environment.TranslateMessage(partsListManager, "Warning50013", pos.Sequence, pos.Material != null ? pos.Material.MaterialNo : "", pos.MaterialName)
+                    });
+                }
+                if (pos.Material != null
+                    && pos.Material.IsLotReservationNeeded
+                    && !pos.FacilityReservation_ProdOrderPartslistPos.Where(c => !c.VBiACClassID.HasValue).Any())
+                {
+                    // Error50635: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
+                    detailMessages.AddDetailMessage(new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "ValidateStart(41)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
                     });
                 }
             }

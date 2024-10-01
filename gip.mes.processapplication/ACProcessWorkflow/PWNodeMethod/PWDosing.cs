@@ -122,7 +122,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("OldestSilo", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OldestSilo", "en{'Dosing from oldest Silo only'}de{'Nur aus ältestem Silo dosieren'}");
             method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(double), 0.0, Global.ParamOption.Optional));
-            paramTranslation.Add("AutoChangeScale", "en{'No waiting for potential scale change if stocks are sufficient (Factor target q.)'}de{'Kein Warten auf potentiellen Waagenwechsel bei ausreichendem Bestand (Faktor Sollm.)'}");
+            paramTranslation.Add("AutoChangeScale", "en{'No waiting for potential scale change if stocks are sufficient [+=kg/-=%]'}de{'Kein Warten auf potentiellen Waagenwechsel bei ausreichendem Bestand [+=kg/-=%]'}");
             method.ParameterValueList.Add(new ACValue("CheckScaleEmpty", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("CheckScaleEmpty", "en{'Check if scale empty'}de{'Prüfung Waage leer'}");
             method.ParameterValueList.Add(new ACValue(nameof(BookTargetQIfZero), typeof(PostingMode), PostingMode.False, Global.ParamOption.Optional));
@@ -794,7 +794,7 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     double factor = StockFactorForChangeScale;
-                    return factor <= double.Epsilon ? false : true;
+                    return Math.Abs(factor) <= double.Epsilon ? false : true;
                 }
                 return false;
             }
@@ -820,9 +820,9 @@ namespace gip.mes.processapplication
                             else
                             {
                                 double doubleValue = acValue.ParamAsDouble;
-                                if (doubleValue <= 0.000001)
+                                if (Math.Abs(doubleValue) <= 0.000001)
                                     return 0.0;
-                                return Math.Abs(doubleValue);
+                                return doubleValue;
                             }
                         }
                         catch (Exception)
@@ -832,6 +832,37 @@ namespace gip.mes.processapplication
                 }
                 return 0.0;
             }
+        }
+
+        public static double CalcMinStockForScaleChange(double reservValue, double targetQ, double? forceDefaultPerc = 2.0)
+        {
+            double minWeight = targetQ;
+            // Falls Wert negativ, dann ist es ein Prozentwert.
+            if (reservValue < -0.0000001)
+            {
+                if (Math.Abs(targetQ) > Double.Epsilon)
+                {
+                    reservValue = Math.Abs(targetQ) * reservValue * -0.01;
+                    minWeight = Math.Abs(targetQ) + reservValue;
+                }
+                else
+                    minWeight = 0.001;
+            }
+            // Falls Wert == 0, dann verwende 100 % Sicherheitsreserve
+            else if (Math.Abs(reservValue) <= Double.Epsilon && forceDefaultPerc.HasValue)
+            {
+                if (Math.Abs(targetQ) > Double.Epsilon)
+                {
+                    reservValue = Math.Abs(targetQ) * forceDefaultPerc.Value;
+                    minWeight = Math.Abs(targetQ) + reservValue;
+                }
+                else
+                    minWeight = 0.001;
+            }
+            // Sonst absoluter wert, der auf den Sollwert aufaddiert wird
+            else
+                minWeight = Math.Abs(targetQ) + reservValue;
+            return minWeight;
         }
 
         /// <summary>

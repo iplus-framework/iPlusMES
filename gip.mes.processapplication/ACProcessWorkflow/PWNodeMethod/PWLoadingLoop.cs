@@ -111,6 +111,11 @@ namespace gip.mes.processapplication
                     loop = receiveMat.HasAnyMaterialToProcess;
             }
 
+            if (loop.HasValue && loop.Value && receiveMat != null && receiveMat is PWDosing)
+            {
+                (receiveMat as PWDosing).OnDosingLoopDecision(this, loop.Value);
+            }
+
 
             if (loop.HasValue && loop.Value && _PreviousLoopTime.HasValue)
             {
