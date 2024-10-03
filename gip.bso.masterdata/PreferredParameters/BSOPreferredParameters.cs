@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using gip.mes.autocomponent;
 
 namespace gip.bso.masterdata
 {
     [ACClassInfo(Const.PackName_VarioSystem, VD.ConstApp.PrefParam, Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
-    public class BSOPreferredParameters : ACBSO
+    public class BSOPreferredParameters : ACBSOvb
     {
         #region c´tors
 
@@ -487,11 +488,10 @@ namespace gip.bso.masterdata
             Clear();
 
             string dialogName = "ParamDlg";
-            VD.DatabaseApp databaseApp = Database as VD.DatabaseApp;
 
-            SetupCurrentConfigStore(databaseApp, partslistID, prodOrderPartslistID, pickingID);
+            SetupCurrentConfigStore(DatabaseApp, partslistID, prodOrderPartslistID, pickingID);
 
-            (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(databaseApp, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
+            (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(DatabaseApp, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
 
             if (UseShortDialog)
             {

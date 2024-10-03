@@ -121,7 +121,7 @@ namespace gip.bso.logistics
             {
                 BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityReservation_Changed;
-                
+
                 if (SelectedFilterMDPickingType != null)
                 {
                     BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(SelectedFilterMDPickingType.MDKey);
@@ -4437,7 +4437,7 @@ namespace gip.bso.logistics
         #region Show order dialog
 
         [ACMethodInfo("Dialog", "en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string pickingNo, Guid pickingPosID)
+        public void ShowDialogOrder(string pickingNo, Guid pickingPosID, bool showPreferredParam = false)
         {
             if (AccessPrimary == null)
                 return;
@@ -4463,7 +4463,27 @@ namespace gip.bso.logistics
                         SelectedPickingPos = pickingPos;
                 }
             }
+
+            if (showPreferredParam && ProcessWorkflowPresenter != null)
+            {
+                //ProcessWorkflowPresenter.SelectedWFNode
+                IACComponent firstNode = 
+                    ProcessWorkflowPresenter
+                    .SelectedRootWFNode
+                    .ACComponentChilds
+                    .Where(c => c.ACIdentifier != "Start" && c.ACIdentifier != "End")
+                    .FirstOrDefault();
+                
+                IACComponentPWNode firstPWNode = firstNode as IACComponentPWNode;
+                bool setupParam = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                firstPWNode.ContentACClassWF.ACClassWFID,
+                null,
+                null,
+                CurrentPicking.PickingID);
+            }
+
             ShowDialog(this, "DisplayOrderDialog");
+
             this.ParentACComponent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
@@ -4477,6 +4497,7 @@ namespace gip.bso.logistics
             // Falls Produktionsauftrag
             PickingPos pickingPos = null;
             Picking picking = null;
+            bool showPreferredParams = false;
             foreach (var entry in paOrderInfo.Entities)
             {
                 if (entry.EntityName == Picking.ClassName)
@@ -4503,12 +4524,17 @@ namespace gip.bso.logistics
                     pickingPos = currentOrderLog.PickingPos;
                     picking = pickingPos.Picking;
                 }
+                else if (entry.EntityName == nameof(BSOPreferredParameters))
+                {
+                    showPreferredParams = true;
+                }
             }
+
 
             if (picking == null)
                 return;
 
-            ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty);
+            ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty, showPreferredParams);
             paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
@@ -5063,7 +5089,12 @@ namespace gip.bso.logistics
                     DialogCancel();
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1]);
+                    bool showPreferredParams = false;
+                    if (acParameter.Length == 3)
+                    {
+                        showPreferredParams = (bool)acParameter[2];
+                    }
+                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], showPreferredParams);
                     return true;
                 case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);

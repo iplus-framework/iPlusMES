@@ -46,7 +46,8 @@ namespace gip.bso.facility
         public BSOFacilityBookCharge(gip.core.datamodel.ACClass typeACClass, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(typeACClass, content, parentACObject, parameter)
         {
-            _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, "ExpirationDateDayPeriod", 30);
+            _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, nameof(ExpirationDateDayPeriod), 30);
+            _IsCheckPreferredParamsActive = new ACPropertyConfigValue<bool>(this, nameof(IsCheckPreferredParamsActive), false);
         }
 
         /// <summary>
@@ -63,6 +64,7 @@ namespace gip.bso.facility
                 Search();
 
             _ = ExpirationDateDayPeriod;
+            _ = IsCheckPreferredParamsActive;
 
             return true;
         }
@@ -119,6 +121,25 @@ namespace gip.bso.facility
                 if (_ExpirationDateDayPeriod.ValueT != value)
                 {
                     _ExpirationDateDayPeriod.ValueT = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private ACPropertyConfigValue<bool> _IsCheckPreferredParamsActive;
+        [ACPropertyConfig("en{'Active check preferred params'}de{'Überprüfung von bevorzugten Parameter aktiv'}")]
+        public bool IsCheckPreferredParamsActive
+        {
+            get
+            {
+                return _IsCheckPreferredParamsActive.ValueT;
+            }
+            set
+            {
+                if (_IsCheckPreferredParamsActive.ValueT != value)
+                {
+                    _IsCheckPreferredParamsActive.ValueT = value;
                     OnPropertyChanged();
                 }
             }
@@ -1482,6 +1503,7 @@ namespace gip.bso.facility
                         }
                         Save();
 
+
                         msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
                         if (!msgDetails.IsSucceded())
                         {
@@ -1507,10 +1529,17 @@ namespace gip.bso.facility
                         }
 
                         Global.MsgResult openPicking = Global.MsgResult.No;
-                        if (OpenPickingBeforeStart)
+                        if (IsCheckPreferredParamsActive)
                         {
-                            // Question50035: Do you want to open the picking order before starting the workflow?
-                            openPicking = Messages.Question(this, "Question50106");
+                            openPicking = Global.MsgResult.Yes;
+                        }
+                        else
+                        {
+                            if (OpenPickingBeforeStart)
+                            {
+                                // Question50106: Do you want to open the picking order before starting the workflow?
+                                openPicking = Messages.Question(this, "Question50106");
+                            }
                         }
 
                         bool startWorkflow = true;
@@ -1526,9 +1555,22 @@ namespace gip.bso.facility
                                     EntityID = picking.PickingID,
                                     EntityName = Picking.ClassName
                                 });
+
+                                if(IsCheckPreferredParamsActive)
+                                {
+                                    info.Entities.Add(
+                                        new PAOrderInfoEntry()
+                                        {
+                                            EntityID = Guid.Empty,
+                                            EntityName = nameof(BSOPreferredParameters)
+                                        });
+                                }
+
                                 service.ShowDialogOrder(this, info);
-                                if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
-                                    startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
+                                startWorkflow = 
+                                    info.DialogResult != null 
+                                    && info.DialogResult.SelectedCommand == eMsgButton.OK 
+                                    && picking.PickingState != PickingStateEnum.WFActive;
                             }
                         }
                         if (startWorkflow)
@@ -1545,6 +1587,7 @@ namespace gip.bso.facility
 
             PostExecute("FacilityChargeRelocation");
         }
+
         /// <summary>
         /// Determines whether [is enabled facility charge relocation].
         /// </summary>
