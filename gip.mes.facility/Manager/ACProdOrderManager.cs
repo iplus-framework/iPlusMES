@@ -1652,7 +1652,7 @@ namespace gip.mes.facility
         /// <param name="batchPercentageDefinition"></param>
         /// <param name="intermediateList"></param>
         /// <returns></returns>
-        public Msg BatchCreateCascade(DatabaseApp dbApp, List<BatchPercentageModel> batchPercentageDefinition, List<PosIntermediateDepthWrap> intermediateList, RestHandleModeEnum calculationModel, int roundingDecimalPlaces = 2)
+        public Msg BatchCreateCascade(DatabaseApp dbApp, List<BatchPercentageModel> batchPercentageDefinition, List<PosIntermediateDepthWrap> intermediateList, RestHandleModeEnum calculationModel, List<object> createdEntities, int roundingDecimalPlaces = 2)
         {
             ProdOrderPartslist mandatoryPartslist = intermediateList.FirstOrDefault().Intermediate.ProdOrderPartslist;
             // Two list in game
@@ -1674,20 +1674,26 @@ namespace gip.mes.facility
                 ProdOrderBatch batch = ProdOrderBatch.NewACObject(dbApp, mandatoryPartslist, secondaryKey);
                 batch.BatchSeqNo = batchDef.Sequence;
                 mandatoryPartslist.ProdOrderBatch_ProdOrderPartslist.Add(batch);
+                createdEntities.Add(batch);
                 foreach (IntermediateBatchQuantityConnection connItem in defQuantityDistribution)
                 {
                     ProdOrderPartslistPos childPosition = BatchCreatePos(dbApp, connItem.IntermediateWarp.Intermediate, batch, connItem.BatchQuantityDefinition[batchDef.Sequence - 1]);
+                    createdEntities.Add(childPosition);
 
                     List<ProdOrderPartslistPosRelation> relations = dbApp.ProdOrderPartslistPosRelation
                             .Where(x => x.TargetProdOrderPartslistPosID == connItem.IntermediateWarp.Intermediate.ProdOrderPartslistPosID).ToList();
                     if (relations != null && relations.Any())
+                    {
                         foreach (ProdOrderPartslistPosRelation relation in relations)
                         {
                             double quantityFactor = connItem.IntermediateWarp.Intermediate.TargetQuantityUOM > 0 ?
                                 childPosition.TargetQuantityUOM / connItem.IntermediateWarp.Intermediate.TargetQuantityUOM
                                 : 0;
-                            BatchCreateRelation(dbApp, batch, childPosition, relation, quantityFactor);
+                            ProdOrderPartslistPosRelation batchRelation = BatchCreateRelation(dbApp, batch, childPosition, relation, quantityFactor);
+                            createdEntities.Add(batchRelation);
+
                         }
+                    }
                 }
             }
             return null;
@@ -1739,7 +1745,7 @@ namespace gip.mes.facility
             return childPosition;
         }
 
-        private void BatchCreateRelation(DatabaseApp dbApp, ProdOrderBatch batch, ProdOrderPartslistPos childPosition, ProdOrderPartslistPosRelation parentRelation, double quantityFactor)
+        private ProdOrderPartslistPosRelation BatchCreateRelation(DatabaseApp dbApp, ProdOrderBatch batch, ProdOrderPartslistPos childPosition, ProdOrderPartslistPosRelation parentRelation, double quantityFactor)
         {
             ProdOrderPartslistPosRelation childRelation = ProdOrderPartslistPosRelation.NewACObject(dbApp, parentRelation);
             childRelation.Sequence = parentRelation.Sequence;
@@ -1748,6 +1754,7 @@ namespace gip.mes.facility
             childRelation.TargetQuantityUOM = parentRelation.TargetQuantityUOM * quantityFactor;
             childRelation.RetrogradeFIFO = parentRelation.RetrogradeFIFO;
             childRelation.ProdOrderBatch = batch;
+            return childRelation;
         }
 
 

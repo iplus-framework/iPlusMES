@@ -4075,7 +4075,8 @@ namespace gip.bso.manufacturing
             if (intermediateList == null || !intermediateList.Any() || batchQuantityDefinition == null || !batchQuantityDefinition.Any()) return;
 
             List<BatchPercentageModel> batchPercentageModel = BatchSizeCalculation.GetPercentageModel(intermediateList.First().TargetQuantityUOM, batchQuantityDefinition);
-            Msg msg = ProdOrderManager.BatchCreateCascade(DatabaseApp, batchPercentageModel, intermediateList, batchHandleModel, BatchCreateBatchSizeDecimalPrecision);
+            List<object> createdEntities = new List<object>();
+            Msg msg = ProdOrderManager.BatchCreateCascade(DatabaseApp, batchPercentageModel, intermediateList, batchHandleModel, createdEntities, BatchCreateBatchSizeDecimalPrecision);
             if (msg != null)
             {
                 Messages.Msg(msg);

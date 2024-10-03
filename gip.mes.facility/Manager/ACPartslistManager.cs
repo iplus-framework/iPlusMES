@@ -729,7 +729,7 @@ namespace gip.mes.facility
             bool isAddedElements = false;
             bool isDeletedElements = false;
 
-            if (!isChangedPartslist)
+            if (!isChangedPartslist && partslist.EntityState != EntityState.Detached && partslist.EntityState != EntityState.Deleted)
             {
                 isAddedElements =
                        partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added)
@@ -760,7 +760,7 @@ namespace gip.mes.facility
 
             if (!isChangedPartslist)
             {
-                IEnumerable<ObjectStateEntry> deletedItems = partslist.GetObjectContext().ObjectStateManager.GetObjectStateEntries(EntityState.Deleted);
+                IEnumerable<ObjectStateEntry> deletedItems = databaseApp.ObjectStateManager.GetObjectStateEntries(EntityState.Deleted);
                 if (deletedItems.Any())
                 {
                     IEnumerable<ObjectStateEntry> deletedPositions = deletedItems.Where(c => c.EntityKey.EntitySetName == nameof(PartslistPos));
