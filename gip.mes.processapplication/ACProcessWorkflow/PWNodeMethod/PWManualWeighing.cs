@@ -2569,7 +2569,7 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
+        protected IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
         {
             Guid[] facilities = GetAvailableFacilitiesForMaterial(dbApp, posRel).Select(c => c.FacilityID).ToArray();
 

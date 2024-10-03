@@ -555,19 +555,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
-        [ACPropertyInfo(560)]
-        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
-        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
-        {
-            get
-            {
-                if (_BSOPreferredParameters == null)
-                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
-                return _BSOPreferredParameters;
-            }
-        }
-
         #endregion
 
         #region Properties
@@ -961,9 +948,9 @@ namespace gip.bso.manufacturing
                     }
 
                     batchPlan.ParamState = PreferredParamStateEnum.ParamsNotRequired;
-                    if(batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+                    if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
                     {
-                        if(batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                        if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
                         {
                             batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
                         }
@@ -2727,7 +2714,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledShowPreferredParameters())
                 return;
-            bool isParamDefined = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+            bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                          SelectedProdOrderBatchPlan.IplusVBiACClassWF.ACClassWFID,
                          SelectedProdOrderBatchPlan.ProdOrderPartslist.PartslistID,
                          SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrderPartslistID,
@@ -2741,7 +2728,12 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledShowPreferredParameters()
         {
-            return SelectedProdOrderBatchPlan != null;
+            return 
+                BSOBatchPlanChild != null
+                && BSOBatchPlanChild.Value != null
+                && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
+                && BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value != null
+                && SelectedProdOrderBatchPlan != null;
         }
 
         #endregion
@@ -2904,21 +2896,39 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
-                bool isBatchReadyToStart = 
-                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any() 
-                    && (batchPlan.ProdOrderPartslist != null 
+                bool isBatchHaveFaciltiyReservation =
+                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
+
+                bool isPartslistEnabled =
+                    (batchPlan.ProdOrderPartslist != null
                     && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
 
-                if (!isBatchReadyToStart)
+                if (!isBatchHaveFaciltiyReservation)
                 {
                     // Error50559
-                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
-                    //  9   New 8401    NADJEV SIR ZA BUREK 1   0            
-                    Msg msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "SetBatchStateReadyToStart()", 3184, "Error50559",
+                    // Unable to start batch plan: #{0} {1} {2} {3}x{4}! Destination not selected!
+                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Zeil nicht ausgewählt!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
                         batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
                         batchPlan.BatchTargetCount, batchPlan.BatchSize);
                     msgWithDetails.AddDetailMessage(msg);
                 }
+
+                if (!isPartslistEnabled)
+                {
+                    // Error50653
+                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Partslist is not enabled!
+                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Rezeptur nicht freigegeben!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2931, "Error50653",
+                        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                        batchPlan.BatchTargetCount, batchPlan.BatchSize);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
+
+                // check HasRequiredParams
+                bool? hasRequieredParams = BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
+
+                bool isBatchReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
 
                 if (ValidateBatchPlanBeforeStart)
                 {
@@ -3805,8 +3815,10 @@ namespace gip.bso.manufacturing
             {
                 WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
                 if (
-                        BSOPreferredParameters_Child != null
-                        && BSOPreferredParameters_Child.Value != null
+                         BSOBatchPlanChild != null
+                        && BSOBatchPlanChild.Value != null
+                        && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
+                        && BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value != null
                         && wizardSchedulerPartslist != null
                         && wizardSchedulerPartslist.WFNodeMES != null
                         && wizardSchedulerPartslist.HasRequiredParams
@@ -3821,7 +3833,7 @@ namespace gip.bso.manufacturing
 
                     if (wizardSchedulerPartslist.ProdOrderPartslist != null)
                     {
-                        bool isParamDefined = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                        bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                          wizardSchedulerPartslist.WFNodeMES.ACClassWFID,
                          wizardSchedulerPartslist.ProdOrderPartslist.PartslistID,
                          wizardSchedulerPartslist.ProdOrderPartslist.ProdOrderPartslistID,
