@@ -30,25 +30,22 @@ namespace gip.bso.manufacturing
                 if (_SelectedInwardFacilityPreBooking != value)
                 {
                     _SelectedInwardFacilityPreBooking = value;
-                    if (value != null)
+
+                    RefreshFilterInFacilityAccess();
+                    
+                    if (
+                            _SelectedInwardFacilityPreBooking != null 
+                            && _SelectedInwardFacilityPreBooking.InwardFacility != null
+                            && !BookingInwardFacilityList.Contains(_SelectedInwardFacilityPreBooking.InwardFacility)
+                       )
                     {
-                        if (
-                                (_SelectedInwardFacilityPreBooking.InwardFacility != null &&
-                                !_SelectedInwardFacilityPreBooking.InwardFacility.MDFacilityType.AutomaticControlFacilityCharge &&
-                                BookingInwardFilterMaterial)
-                            )
-                        {
-                            BookingInwardFilterMaterial = false;
-                        }
-                        else
-                        {
-                            RefreshFilterInFacilityAccess();
-                        }
+                        AccessInBookingFacility.NavList.Add(_SelectedInwardFacilityPreBooking.InwardFacility);
                     }
-                    OnPropertyChanged("SelectedInwardFacilityPreBooking");
-                    OnPropertyChanged("SelectedInwardFacilityBooking");
-                    OnPropertyChanged("BookingInwardFacilityList");
-                    OnPropertyChanged("SelectedInwardACMethodBooking");
+                    
+                    OnPropertyChanged(nameof(SelectedInwardFacilityPreBooking));
+                    OnPropertyChanged(nameof(SelectedInwardFacilityBooking));
+                    OnPropertyChanged(nameof(BookingInwardFacilityList));
+                    OnPropertyChanged(nameof(SelectedInwardACMethodBooking));
                 }
             }
         }
