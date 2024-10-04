@@ -9,7 +9,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using static gip.mes.datamodel.GlobalApp;
-using System.Xml;
 using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.facility

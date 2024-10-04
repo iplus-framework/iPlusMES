@@ -508,7 +508,7 @@ namespace gip.mes.processapplication
                                     e.Message, e.InnerException != null ? e.InnerException.Message : "", e.StackTrace);
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 Messages.LogException(this.GetACUrl(), "Start(0)", msg.Message);
-                throw e;
+                throw new Exception(msg.Message, e);
             }
             finally
             {

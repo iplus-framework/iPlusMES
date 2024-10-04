@@ -9,7 +9,6 @@ using static gip.mes.datamodel.MDReservationMode;
 using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 using gip.core.processapplication;
 using static gip.core.communication.ISOonTCP.PLC;
-using System.Security.Policy;
 
 namespace gip.mes.processapplication
 {
