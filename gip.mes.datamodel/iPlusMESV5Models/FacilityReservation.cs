@@ -174,6 +174,13 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
         set { SetProperty<double?>(ref _ReservedQuantityUOM, value); }
     }
 
+    string _CalculatedRoute;
+    public string CalculatedRoute 
+    {
+        get { return _CalculatedRoute; }
+        set { SetProperty<string>(ref _CalculatedRoute, value); }
+    }
+
     private Facility _Facility;
     public virtual Facility Facility
     { 

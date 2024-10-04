@@ -707,7 +707,7 @@ namespace gip.bso.logistics
                          )
                         .ToArray();
 
-                if(relatedReservations.Any())
+                if (relatedReservations.Any())
                 {
                     foreach (POPartslistPosReservation item in result)
                     {
@@ -856,8 +856,8 @@ namespace gip.bso.logistics
             {
                 msg = this.PickingManager.ValidateStart(databaseApp, dbIPlus, CurrentPicking,
                                                             configStores,
-                                                            PARole.ValidationBehaviour.Strict);
-
+                                                            PARole.ValidationBehaviour.Strict,
+                                                            CurrentACClassWF, true);
                 if (msg != null)
                 {
                     if (!msg.IsSucceded())
@@ -865,7 +865,7 @@ namespace gip.bso.logistics
                         if (String.IsNullOrEmpty(msg.Message))
                         {
                             // Der Auftrag kann nicht gestartet werden weil:
-                            msg.Message = Root.Environment.TranslateMessage(this, "Question50027");
+                            msg.Message = Root.Environment.TranslateMessage(this, "Error50644");
                         }
                         Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
                     }
@@ -874,7 +874,7 @@ namespace gip.bso.logistics
                         if (String.IsNullOrEmpty(msg.Message))
                         {
                             //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
-                            msg.Message = Root.Environment.TranslateMessage(this, "Question50028");
+                            msg.Message = Root.Environment.TranslateMessage(this, "Question50109");
                         }
                         var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
                         if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
@@ -1003,7 +1003,8 @@ namespace gip.bso.logistics
                 Direction = RouteDirections.Backwards,
                 MaxRouteAlternativesInLoop = 1,
                 IncludeReserved = true,
-                IncludeAllocated = true
+                IncludeAllocated = true,
+                ResultMode = RouteResultMode.ShortRoute
             };
 
             var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
@@ -1067,6 +1068,23 @@ namespace gip.bso.logistics
         public bool IsEnabledOpenRoute()
         {
             return SelectedTarget != null && SelectedTarget.CurrentRoute != null;
+        }
+
+        protected override void _Targets_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            //if (SelectedTarget != null && PickingManager != null)
+            //{
+            //    PickingManager.ValidateChangedPosReservation(this.DatabaseApp, SelectedTarget);
+            //}
+        }
+
+        protected override void _SelectedTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base._SelectedTarget_PropertyChanged(sender, e);
+            if (SelectedTarget != null && PickingManager != null && e != null && e.PropertyName == nameof(POPartslistPosReservation.SelectedReservation))
+            {
+                PickingManager.ValidateChangedPosReservation(this, this.DatabaseApp, SelectedTarget, sender, e);
+            }
         }
 
         #endregion

@@ -3,7 +3,7 @@ using gip.core.autocomponent;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using vbModel = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using gip.mes.processapplication;
 using gip.mes.facility;
 
@@ -166,7 +166,7 @@ namespace gip.bso.facility
                 {
                     if (Enum.GetNames(typeof(PresenterMenuItems)).Contains(acCommand.ACUrl))
                     {
-                        using (vbModel.DatabaseApp databaseApp = new vbModel.DatabaseApp())
+                        using (VD.DatabaseApp databaseApp = new VD.DatabaseApp())
                         {
                             PresenterMenuItems menuItemType = (PresenterMenuItems)Enum.Parse(typeof(PresenterMenuItems), acCommand.ACUrl);
                             BSOTandTv3 parentBSO = ParentACObject as BSOTandTv3;
@@ -179,7 +179,7 @@ namespace gip.bso.facility
                                     (ParentACObject as BSOTandTv3).ShowDetails(this);
                                     break;
                                 case PresenterMenuItems.FacilityBookCell:
-                                    manager.ShowFacilityBookCellDialog((Content as vbModel.Facility).FacilityNo);
+                                    manager.ShowFacilityBookCellDialog((Content as VD.Facility).FacilityNo);
                                     break;
                                 case PresenterMenuItems.FacilityOverview:
                                     string facilityNo = (Content as FacilityPreview).FacilityNo;
@@ -203,9 +203,9 @@ namespace gip.bso.facility
                                     break;
                                 case PresenterMenuItems.ProdOrderPartslist:
                                     pAOrderInfoEntry = null;
-                                    if (Content is vbModel.ProdOrder)
+                                    if (Content is VD.ProdOrder)
                                     {
-                                        vbModel.ProdOrder prodOrder = Content as vbModel.ProdOrder;
+                                        VD.ProdOrder prodOrder = Content as VD.ProdOrder;
                                         Guid prodOrderPartslistID =
                                            databaseApp
                                             .ProdOrderPartslist
@@ -216,7 +216,7 @@ namespace gip.bso.facility
                                         pAOrderInfoEntry = new PAOrderInfoEntry()
                                         {
                                             EntityID = prodOrderPartslistID,
-                                            EntityName = vbModel.ProdOrderPartslist.ClassName
+                                            EntityName = VD.ProdOrderPartslist.ClassName
                                         };
                                     }
                                     // TandTv3Point v TandTv3PointPosGrouped
@@ -227,13 +227,13 @@ namespace gip.bso.facility
                                             pAOrderInfoEntry = new PAOrderInfoEntry()
                                             {
                                                 EntityID = tandTv3Point.ProductionPositions.FirstOrDefault().ProdOrderBatchID ?? Guid.Empty,
-                                                EntityName = vbModel.ProdOrderBatch.ClassName
+                                                EntityName = VD.ProdOrderBatch.ClassName
                                             };
                                         else if (tandTv3Point.ProdOrder != null)
                                             pAOrderInfoEntry = new PAOrderInfoEntry()
                                             {
                                                 EntityID = tandTv3Point.ProdOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault().ProdOrderPartslistID,
-                                                EntityName = vbModel.ProdOrderPartslist.ClassName
+                                                EntityName = VD.ProdOrderPartslist.ClassName
                                             };
                                     }
 
@@ -246,27 +246,27 @@ namespace gip.bso.facility
                                         if (tandTv3Point.IsInputPoint && tandTv3Point.InOrderPositions != null)
                                         {
                                             Guid[] inOrderPosiDs = tandTv3Point.InOrderPositions.Select(c => c.InOrderPosID).ToArray();
-                                            vbModel.DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => inOrderPosiDs.Contains(c.InOrderPosID ?? Guid.Empty)).FirstOrDefault();
+                                            VD.DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => inOrderPosiDs.Contains(c.InOrderPosID ?? Guid.Empty)).FirstOrDefault();
                                             if (dns != null)
                                                 pAOrderInfoEntry = new PAOrderInfoEntry()
                                                 {
                                                     EntityID = dns.DeliveryNotePosID,
-                                                    EntityName = vbModel.DeliveryNotePos.ClassName
+                                                    EntityName = VD.DeliveryNotePos.ClassName
                                                 };
                                         }
                                     }
                                     break;
                                 case PresenterMenuItems.InOrderPos:
-                                    if (Content is vbModel.InOrderPosPreview)
+                                    if (Content is VD.InOrderPosPreview)
                                     {
-                                        vbModel.InOrderPosPreview inOrderPos = Content as vbModel.InOrderPosPreview;
+                                        VD.InOrderPosPreview inOrderPos = Content as VD.InOrderPosPreview;
                                         manager.ShowInOrderDialog(inOrderPos.InOrderNo, inOrderPos.ID);
                                     }
                                     break;
                                 case PresenterMenuItems.OutOrderPos:
-                                    if (Content is vbModel.OutOrderPosPreview)
+                                    if (Content is VD.OutOrderPosPreview)
                                     {
-                                        vbModel.OutOrderPosPreview outOrderpos = Content as vbModel.OutOrderPosPreview;
+                                        VD.OutOrderPosPreview outOrderpos = Content as VD.OutOrderPosPreview;
                                         manager.ShowInOrderDialog(outOrderpos.OutOrderNo, outOrderpos.ID);
                                     }
                                     break;
@@ -282,7 +282,7 @@ namespace gip.bso.facility
                                             pAOrderInfoEntry = new PAOrderInfoEntry()
                                             {
                                                 EntityID = pickingPosIDs.FirstOrDefault(),
-                                                EntityName = vbModel.PickingPos.ClassName
+                                                EntityName = VD.PickingPos.ClassName
                                             };
                                         }
                                     }
@@ -386,14 +386,14 @@ namespace gip.bso.facility
                 result.Add(item);
             }
 
-            vbModel.MDTrackingStartItemTypeEnum contentItemType = (vbModel.MDTrackingStartItemTypeEnum)Enum.Parse(typeof(vbModel.MDTrackingStartItemTypeEnum), ItemType);
+            VD.MDTrackingStartItemTypeEnum contentItemType = (VD.MDTrackingStartItemTypeEnum)Enum.Parse(typeof(VD.MDTrackingStartItemTypeEnum), ItemType);
             bool validEnviroment = ParentACObject != null && Content != null;
 
             if (validEnviroment)
             {
-                vbModel.MDTrackingStartItemTypeEnum[] mixPointTypes = new vbModel.MDTrackingStartItemTypeEnum[]
+                VD.MDTrackingStartItemTypeEnum[] mixPointTypes = new VD.MDTrackingStartItemTypeEnum[]
                 {
-                    vbModel.MDTrackingStartItemTypeEnum.TandTv3Point, vbModel.MDTrackingStartItemTypeEnum.TandTv3PointPosGrouped
+                    VD.MDTrackingStartItemTypeEnum.TandTv3Point, VD.MDTrackingStartItemTypeEnum.TandTv3PointPosGrouped
                 };
                 if (mixPointTypes.Contains(contentItemType))
                 {
@@ -402,37 +402,37 @@ namespace gip.bso.facility
                     result.Add(new ACMenuItem("en{'View order'}de{'Auftrag anschauen'}", PresenterMenuItems.ProdOrderPartslist.ToString(), 250, null));
                 }
 
-                if (contentItemType == vbModel.MDTrackingStartItemTypeEnum.TandTv3PointDN)
+                if (contentItemType == VD.MDTrackingStartItemTypeEnum.TandTv3PointDN)
                 {
                     TandTv3Point tandTv3Point = Content as TandTv3Point;
                     result.Add(new ACMenuItem("en{'Dialog delivery note'}de{'Dialog Lieferschein'}", PresenterMenuItems.DeliveryNotePos.ToString(), 250, null));
                 }
 
-                if (ItemType == vbModel.MDTrackingStartItemTypeEnum.InOrderPosPreview.ToString())
+                if (ItemType == VD.MDTrackingStartItemTypeEnum.InOrderPosPreview.ToString())
                 {
                     TandTv3Point tandTv3Point = Content as TandTv3Point;
                     result.Add(new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", PresenterMenuItems.InOrderPos.ToString(), 250, null));
                 }
 
-                if (ItemType == vbModel.MDTrackingStartItemTypeEnum.OutOrderPosPreview.ToString())
+                if (ItemType == VD.MDTrackingStartItemTypeEnum.OutOrderPosPreview.ToString())
                 {
                     TandTv3Point tandTv3Point = Content as TandTv3Point;
                     result.Add(new ACMenuItem("en{'Dialog Sales Order'}de{'Dialog Kundenauftrag'}", PresenterMenuItems.OutOrderPos.ToString(), 250, null));
                 }
 
-                if (contentItemType == vbModel.MDTrackingStartItemTypeEnum.PickingPosPreview)
+                if (contentItemType == VD.MDTrackingStartItemTypeEnum.PickingPosPreview)
                 {
                     TandTv3Point tandTv3Point = Content as TandTv3Point;
                     result.Add(new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", PresenterMenuItems.PickingPos.ToString(), 250, null));
                 }
 
-                if (contentItemType == vbModel.MDTrackingStartItemTypeEnum.Facility || contentItemType == vbModel.MDTrackingStartItemTypeEnum.FacilityPreview)
+                if (contentItemType == VD.MDTrackingStartItemTypeEnum.Facility || contentItemType == VD.MDTrackingStartItemTypeEnum.FacilityPreview)
                 {
                     //result.Add(new ACMenuItem("en{'Manage stock'}de{'Bestand verwalten'}", PresenterMenuItems.FacilityBookCell.ToString(), 250, null));
                     result.Add(new ACMenuItem("en{'Stockhistory'}de{'Bestandshistorie'}", PresenterMenuItems.FacilityOverview.ToString(), 250, null));
                 }
 
-                if (contentItemType == vbModel.MDTrackingStartItemTypeEnum.ProdOrder)
+                if (contentItemType == VD.MDTrackingStartItemTypeEnum.ProdOrder)
                 {
                     result.Add(new ACMenuItem("en{'View order'}de{'Auftrag anschauen'}", PresenterMenuItems.ProdOrderPartslist.ToString(), 250, null));
                 }

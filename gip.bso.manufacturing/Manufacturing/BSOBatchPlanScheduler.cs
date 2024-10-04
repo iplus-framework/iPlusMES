@@ -12,6 +12,7 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -939,12 +940,25 @@ namespace gip.bso.manufacturing
             }
             if (prodOrderBatchPlans != null)
             {
-                if (ShowImages)
+                foreach (var batchPlan in prodOrderBatchPlans)
                 {
-                    foreach (var batchPlan in prodOrderBatchPlans)
+                    if (ShowImages)
                     {
                         Material material = batchPlan.ProdOrderPartslist.Partslist.Material;
                         MediaController.LoadIImageInfo(material);
+                    }
+
+                    batchPlan.ParamState = PreferredParamStateEnum.ParamsNotRequired;
+                    if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+                    {
+                        if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                        {
+                            batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
+                        }
+                        else
+                        {
+                            batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredNotDefined;
+                        }
                     }
                 }
             }
@@ -1990,6 +2004,22 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties => CalculatedRoutes
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999, "", "")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Methods
@@ -2525,7 +2555,7 @@ namespace gip.bso.manufacturing
 
         public override void ItemDrag(Dictionary<int, string> newOrder)
         {
-            if (!IsEnabledItemDrag()) 
+            if (!IsEnabledItemDrag())
                 return;
             Dictionary<int, Guid> revisitedNewOrder = newOrder.ToDictionary(key => key.Key, val => new Guid(val.Value));
             var batchPlanList = ProdOrderBatchPlanList.ToList();
@@ -2676,6 +2706,36 @@ namespace gip.bso.manufacturing
             var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(Partslist));
             if (acClass != null && acClass.ManagingBSO != null)
                 this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo(nameof(ShowPreferredParameters), ConstApp.PrefParam, 999)]
+        public void ShowPreferredParameters()
+        {
+            if (!IsEnabledShowPreferredParameters())
+                return;
+            bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                         SelectedProdOrderBatchPlan.IplusVBiACClassWF.ACClassWFID,
+                         SelectedProdOrderBatchPlan.ProdOrderPartslist.PartslistID,
+                         SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrderPartslistID,
+                         null);
+
+            if (isParamDefined)
+            {
+                SelectedProdOrderBatchPlan.OnEntityPropertyChanged(nameof(ProdOrderBatchPlan.PlanState));
+            }
+        }
+
+        public bool IsEnabledShowPreferredParameters()
+        {
+            return 
+                BSOBatchPlanChild != null
+                && BSOBatchPlanChild.Value != null
+                && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
+                && BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value != null
+                && SelectedProdOrderBatchPlan != null;
         }
 
         #endregion
@@ -2838,17 +2898,39 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
-                bool isBatchReadyToStart = batchPlan.FacilityReservation_ProdOrderBatchPlan.Any() && (batchPlan.ProdOrderPartslist != null && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
-                if (!isBatchReadyToStart)
+                bool isBatchHaveFaciltiyReservation =
+                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
+
+                bool isPartslistEnabled =
+                    (batchPlan.ProdOrderPartslist != null
+                    && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
+
+                if (!isBatchHaveFaciltiyReservation)
                 {
                     // Error50559
-                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
-                    //  9   New 8401    NADJEV SIR ZA BUREK 1   0            
-                    Msg msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "SetBatchStateReadyToStart()", 3184, "Error50559",
+                    // Unable to start batch plan: #{0} {1} {2} {3}x{4}! Destination not selected!
+                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Zeil nicht ausgewählt!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
                         batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
                         batchPlan.BatchTargetCount, batchPlan.BatchSize);
                     msgWithDetails.AddDetailMessage(msg);
                 }
+
+                if (!isPartslistEnabled)
+                {
+                    // Error50653
+                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Partslist is not enabled!
+                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Rezeptur nicht freigegeben!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2931, "Error50653",
+                        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                        batchPlan.BatchTargetCount, batchPlan.BatchSize);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
+
+                // check HasRequiredParams
+                bool? hasRequieredParams = BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
+
+                bool isBatchReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
 
                 if (ValidateBatchPlanBeforeStart)
                 {
@@ -3728,6 +3810,48 @@ namespace gip.bso.manufacturing
             }
         }
 
+        [ACMethodInfo(nameof(WizardSetPreferredParams), ConstApp.PrefParam, 9999)]
+        public void WizardSetPreferredParams(object CommandParameter)
+        {
+            if (CommandParameter != null)
+            {
+                WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
+                if (
+                         BSOBatchPlanChild != null
+                        && BSOBatchPlanChild.Value != null
+                        && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
+                        && BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value != null
+                        && wizardSchedulerPartslist != null
+                        && wizardSchedulerPartslist.WFNodeMES != null
+                        && wizardSchedulerPartslist.HasRequiredParams
+                  )
+                {
+                    if (wizardSchedulerPartslist.ProdOrderPartslist == null)
+                    {
+                        string programNo = "";
+                        ProdOrderManager.FactoryProdOrderPartslist(DatabaseApp, null, wizardSchedulerPartslist, DefaultWizardSchedulerPartslist?.ProdOrderPartslist, ref programNo);
+                        ACSaveChanges();
+                    }
+
+                    if (wizardSchedulerPartslist.ProdOrderPartslist != null)
+                    {
+                        bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                         wizardSchedulerPartslist.WFNodeMES.ACClassWFID,
+                         wizardSchedulerPartslist.ProdOrderPartslist.PartslistID,
+                         wizardSchedulerPartslist.ProdOrderPartslist.ProdOrderPartslistID,
+                         null);
+
+                        if (isParamDefined)
+                        {
+                            wizardSchedulerPartslist.IsRequiredParamsSolved = wizardSchedulerPartslist.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any();
+                            wizardSchedulerPartslist.OnPropertyChanged(nameof(wizardSchedulerPartslist.ParamState));
+                            wizardSchedulerPartslist.OnPropertyChanged(nameof(wizardSchedulerPartslist.ParamStateName));
+                        }
+                    }
+                }
+            }
+        }
+
         private bool IsEnabledFactoryBatch()
         {
             return
@@ -3821,7 +3945,11 @@ namespace gip.bso.manufacturing
                     isEnabled = IsEnabledFactoryBatch();
                     break;
                 case NewScheduledBatchWizardPhaseEnum.PartslistForDefinition:
-                    isEnabled = (!SelectedWizardSchedulerPartslist.IsSolved || SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null) && SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup != null;
+                    isEnabled =
+                        (!SelectedWizardSchedulerPartslist.IsSolved
+                        || SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null)
+                        && SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup != null;
+                    // && SelectedWizardSchedulerPartslist.ParamState != WizardSetupParamStateEnum.ParamsRequiredNotDefined; - no requiered param validation in wizard
                     break;
                 case NewScheduledBatchWizardPhaseEnum.DefineBatch:
                     isEnabled =
@@ -4140,7 +4268,9 @@ namespace gip.bso.manufacturing
 
                 wizardSchedulerPartslist.Sn = sn;
                 if (prodOrder != null && string.IsNullOrEmpty(wizardSchedulerPartslist.ProgramNo))
+                {
                     wizardSchedulerPartslist.ProgramNo = prodOrder.ProgramNo;
+                }
             }
             if (AllWizardSchedulerPartslistList.Any())
             {
@@ -4457,7 +4587,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Private (Helper) Mehtods -> Load
 
-        protected override Guid? EntityIDOfSelectedSchedule 
+        protected override Guid? EntityIDOfSelectedSchedule
         {
             get
             {
@@ -4510,14 +4640,35 @@ namespace gip.bso.manufacturing
 
         private bool FactoryBatchPlans(WizardSchedulerPartslist wizardSchedulerPartslist, ref string programNo, out List<VD.ProdOrderBatchPlan> generatedBatchPlans)
         {
-            bool success = ProdOrderManager.FactoryBatchPlans(DatabaseApp, FilterPlanningMR, CreatedBatchState, wizardSchedulerPartslist,
-                DefaultWizardSchedulerPartslist?.ProdOrderPartslistPos?.ProdOrderPartslist, ref programNo, out generatedBatchPlans);
+            bool success = false;
+            generatedBatchPlans = new List<ProdOrderBatchPlan>();
+            success =
+                ProdOrderManager
+                .FactoryProdOrderPartslist(
+                        DatabaseApp,
+                        FilterPlanningMR,
+                        wizardSchedulerPartslist,
+                        DefaultWizardSchedulerPartslist?.ProdOrderPartslistPos?.ProdOrderPartslist,
+                        ref programNo
+                        );
+            if (success)
+            {
+                success =
+                ProdOrderManager.FactoryBatchPlans(
+                        DatabaseApp,
+                        FilterPlanningMR,
+                        CreatedBatchState,
+                        wizardSchedulerPartslist,
+                        out generatedBatchPlans);
+            }
+
             if (success)
             {
                 SetBSOBatchPlan_BatchParents(wizardSchedulerPartslist.WFNodeMES, wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
                 ProdOrderBatchPlan firstBatchPlan = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
                 LoadGeneratedBatchInCurrentLine(firstBatchPlan, wizardSchedulerPartslist.NewTargetQuantityUOM);
             }
+
             return success;
         }
 
@@ -4644,6 +4795,43 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #endregion
+
+        #region Methods => RouteCalculation
+
+        [ACMethodInteraction("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            MsgList.Clear();
+            CalculateRouteResult = null;
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+
+            if (BSOBatchPlanChild != null && BSOBatchPlanChild.Value != null)
+            {
+                bool invoked = BSOBatchPlanChild.Value.InvokeCalculateRoutesAsync();
+                if (!invoked)
+                {
+                    Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                    return;
+                }
+            }
+
+            ShowDialog(this, "CalculatedRouteDialog");
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return SelectedProdOrderBatchPlan != null && BSOBatchPlanChild != null;
+        }
+
+        public void SetRoutesCheckResult(IEnumerable<Msg> msgList)
+        {
+            foreach (Msg msg in msgList)
+            {
+                MsgList.Add(msg);
+            }
+        }
 
         #endregion
 

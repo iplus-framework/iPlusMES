@@ -3624,6 +3624,26 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
+        private ACValueItemList _PickingPreparationStatusList;
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public ACValueItemList PickingPreparationStatusList
+        {
+            get
+            {
+                if (_PickingPreparationStatusList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PickingPreparationStatusEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _PickingPreparationStatusList = enumClass.ACValueListForEnum;
+                    else
+                        _PickingPreparationStatusList = new ACValueListPickingPreparationStatusEnum();
+                }
+                return _PickingPreparationStatusList;
+            }
+        }
+
         [ACPropertyInfo(9999)]
         [NotMapped]
         public IEnumerable<ACValueItem> TimePeriodsList
@@ -3814,6 +3834,25 @@ namespace gip.mes.datamodel
                 return _WeighingStateList;
             }
         }
+
+        ACValueItemList _PreferredParamStateList = null;
+        [ACPropertyInfo(9999)]
+        public ACValueItemList PreferredParamStateList
+        {
+            get
+            {
+                if (_PreferredParamStateList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PreferredParamStateEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _PreferredParamStateList = enumClass.ACValueListForEnum;
+                    else
+                        _PreferredParamStateList = new ACValueListPreferredParamStateEnum();
+                }
+                return _PreferredParamStateList;
+            }
+        }
+
         #endregion
 
         #region INotifyPropertyChanged

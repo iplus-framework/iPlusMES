@@ -732,7 +732,7 @@ namespace gip.mes.facility
             bool isAddedElements = false;
             bool isDeletedElements = false;
 
-            if (!isChangedPartslist)
+            if (!isChangedPartslist && partslist.EntityState != EntityState.Detached && partslist.EntityState != EntityState.Deleted)
             {
                 isAddedElements =
                        partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added);

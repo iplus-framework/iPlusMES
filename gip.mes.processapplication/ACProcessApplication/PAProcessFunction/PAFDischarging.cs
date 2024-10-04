@@ -271,7 +271,7 @@ namespace gip.mes.processapplication
 
         protected override MsgWithDetails CompleteACMethodOnSMStarting(ACMethod acMethod, ACMethod previousParams)
         {
-            ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
@@ -289,7 +289,7 @@ namespace gip.mes.processapplication
             Route prevR = null;
             if (previousParams != null && IsSimulationOn)
             {
-                valuePrev = previousParams.ParameterValueList.GetACValue("Route");
+                valuePrev = previousParams.ParameterValueList.GetACValue(nameof(Route));
                 if (valuePrev != null)
                     prevR = valuePrev.ValueT<Route>();
             }
@@ -319,7 +319,7 @@ namespace gip.mes.processapplication
 
                     if (IsSimulationOn)
                     {
-                        if (prevR != null)
+                        if (prevR != null && acMethod != previousParams)
                             PAEControlModuleBase.ActivateRouteOnSimulation(prevR, true);
                         PAEControlModuleBase.ActivateRouteOnSimulation(newR, false);
                     }
@@ -385,29 +385,30 @@ namespace gip.mes.processapplication
                         acMethod.ResultValueList["ActualQuantity"] = actualQuantity;
                     }
                 }
-                ACValue value = acMethod.ParameterValueList.GetACValue("Route");
-                if (value != null)
+                if (CurrentACState >= ACStateEnum.SMCompleted)
                 {
-                    using (var db = new Database())
+                    ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
+                    if (value != null)
                     {
-                        core.datamodel.Route route = value.ValueT<core.datamodel.Route>().Clone() as core.datamodel.Route;
-                        try
+                        using (var db = new Database())
                         {
-                            route.AttachTo(db); // Global context
-                            PAEControlModuleBase.ActivateRouteOnSimulation(route, true);
+                            core.datamodel.Route route = value.ValueT<core.datamodel.Route>().Clone() as core.datamodel.Route;
+                            try
+                            {
+                                route.AttachTo(db); // Global context
+                                PAEControlModuleBase.ActivateRouteOnSimulation(route, true);
 
-                        }
-                        catch (Exception e)
-                        {
-                            Messages.LogException(this.GetACUrl(), "AnalyzeACMethodResult(20)", e);
-                        }
-                        finally
-                        {
-                            route.Detach(true);
+                            }
+                            catch (Exception e)
+                            {
+                                Messages.LogException(this.GetACUrl(), "AnalyzeACMethodResult(20)", e);
+                            }
+                            finally
+                            {
+                                route.Detach(true);
+                            }
                         }
                     }
-
-
                 }
             }
 
@@ -644,7 +645,7 @@ namespace gip.mes.processapplication
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
 
-            ACValue value = currentACMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = currentACMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value != null)
             {
                 Route originalR = value.ValueT<Route>();
@@ -854,7 +855,7 @@ namespace gip.mes.processapplication
         {
             if (acMethod == null)
                 return null;
-            ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value == null)
                 return null;
             Route route = value.ValueT<Route>();
@@ -891,8 +892,8 @@ namespace gip.mes.processapplication
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
             method.ParameterValueList.Add(new ACValue("Source", typeof(Int16), (Int16)0, Global.ParamOption.Optional));
             paramTranslation.Add("Source", "en{'Source'}de{'Quelle'}");
-            method.ParameterValueList.Add(new ACValue("Route", typeof(Route), null, Global.ParamOption.Required));
-            paramTranslation.Add("Route", "en{'Route'}de{'Route'}");
+            method.ParameterValueList.Add(new ACValue(nameof(Route), typeof(Route), null, Global.ParamOption.Required));
+            paramTranslation.Add(nameof(Route), "en{'Route'}de{'Route'}");
             method.ParameterValueList.Add(new ACValue("Destination", typeof(Int16), (Int16)0, Global.ParamOption.Required));
             paramTranslation.Add("Destination", "en{'Destination'}de{'Ziel'}");
             method.ParameterValueList.Add(new ACValue("EmptyWeight", typeof(Double?), null, Global.ParamOption.Optional));
@@ -923,6 +924,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("TargetQuantity", "en{'Target quantity (Set value if negative)'}de{'Sollmenge (Setze Wert falls negativ)'}");
             method.ParameterValueList.Add(new ACValue("ScaleBatchWeight", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleBatchWeight", "en{'Scale batch weight (SWT tip weight)'}de{'Kippgewicht Waage (SWT)'}");
+            method.ParameterValueList.Add(new ACValue("HandOver", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("HandOver", "en{'Hand over active function to next Batch'}de{'Übergebe aktive Funktion an nächsten Batch'}");
 
             if (acIdentifier == "DischargingIntake")
             {
@@ -996,7 +999,7 @@ namespace gip.mes.processapplication
                 {
                     if (acValue != null)
                         newACMethod.ParameterValueList["Destination"] = valueDestination;
-                    newACMethod.ParameterValueList["Route"] = null;
+                    newACMethod.ParameterValueList[nameof(Route)] = null;
                 }
                 catch (Exception ec)
                 {

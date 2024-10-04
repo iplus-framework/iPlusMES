@@ -1,10 +1,5 @@
 ﻿using gip.core.datamodel;
-using System.Collections.Generic;
-using gip.mes.facility;
 using System.ComponentModel;
-using System;
-using dbMes = gip.mes.datamodel;
-using System.ComponentModel.Design;
 
 namespace gip.bso.masterdata
 {

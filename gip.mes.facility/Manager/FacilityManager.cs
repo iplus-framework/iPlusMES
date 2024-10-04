@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
+using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
@@ -131,7 +132,7 @@ namespace gip.mes.facility
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualSplitFacilityChargeMethod(GlobalApp.FBT_Split_FacilityCharge, GlobalApp.FacilityBookingType.Split_FacilityCharge));
 
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualReassignFacilityChargeMethod(GlobalApp.FBT_Reassign_FacilityCharge, GlobalApp.FacilityBookingType.Reassign_FacilityCharge));
-
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualReassignFacilityChargeLotMethod(GlobalApp.FBT_Reassign_FacilityChargeLot, GlobalApp.FacilityBookingType.Reassign_FacilityChargeLot));
             #endregion
 
             #region BulkMaterial
@@ -864,6 +865,26 @@ namespace gip.mes.facility
             return new ACMethodWrapper(TMP, GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)BookingType).ACCaptionTranslation, null);
         }
 
+
+        private static ACMethodWrapper CreateVirtualReassignFacilityChargeLotMethod(string AcIdentitifer, GlobalApp.FacilityBookingType BookingType)
+        {
+            ACMethodBooking TMP = new ACMethodBooking();
+
+            TMP.ACIdentifier = AcIdentitifer;
+
+            TMP.ParameterValueList.Add(new ACValue("BookingType", typeof(GlobalApp.FacilityBookingType), BookingType, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue(MDMovementReason.ClassName, typeof(MDMovementReason), null, Global.ParamOption.Optional));
+
+            TMP.ParameterValueList.Add(new ACValue("OutwardFacilityCharge", typeof(FacilityCharge), null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue("InwardFacilityLot", typeof(Material), null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue("OutwardQuantity", typeof(Nullable<double>), null, Global.ParamOption.Optional));
+            //TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), false, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue("Comment", typeof(string), null, Global.ParamOption.Optional));
+            TMP.ResultValueList.Add(new ACValue("BookingResult", typeof(ACMethodEventArgs), null, Global.ParamOption.Required));
+
+            return new ACMethodWrapper(TMP, GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)BookingType).ACCaptionTranslation, null);
+        }
+
         #endregion
 
         #region BulkMaterial
@@ -1351,11 +1372,12 @@ namespace gip.mes.facility
             return facilityReservationModel;
         }
 
-        public FacilityReservationModel GetFacilityReservationModel(Material material, FacilityLot facilityLot)
+        public FacilityReservationModel GetFacilityReservationModel(Material material, FacilityLot facilityLot, ReservationState defaultReservationState)
         {
             FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
             facilityReservationModel.Material = material;
             facilityReservationModel.FacilityLot = facilityLot;
+            facilityReservationModel.SelectedReservationState = facilityReservationModel.ReservationStateList.Where(c=>(ReservationState)c.Value == defaultReservationState).FirstOrDefault();
             return facilityReservationModel;
         }
 
@@ -1435,6 +1457,7 @@ namespace gip.mes.facility
                             && c.Material.MaterialNo == model.Material.MaterialNo
                             && c.FacilityLot != null
                             && c.FacilityLot.LotNo == model.FacilityLot.LotNo
+                            && !c.NotAvailable
                         )
                     .AsEnumerable()
                     .Select(c => c.AvailableQuantity)
@@ -1493,12 +1516,29 @@ namespace gip.mes.facility
             facilityReservation.Material = facilityReservationModel.Material;
             facilityReservation.FacilityLot = facilityReservationModel.FacilityLot;
             facilityReservation.ReservedQuantityUOM = facilityReservationModel.AssignedQuantity;
+            facilityReservation.ReservationState = facilityReservationModel.ReservationState;
             facilityReservationModel.FacilityReservation = facilityReservation;
 
             return facilityReservationModel;
         }
 
+        public List<string> GetFacilityReservationFacilityNos(FacilityReservationModel facilityReservation, IEnumerable<FacilityCharge> facilityCharges)
+        {
+            List<string> facilityNos = new List<string>();
+            List<FacilityCharge> filteredList = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.LotNo == facilityReservation?.FacilityLot.LotNo).ToList();
+            foreach (FacilityCharge facilityCharge in filteredList)
+            {
+                if (!facilityNos.Contains(facilityCharge.Facility.FacilityNo))
+                {
+                    facilityNos.Add(facilityCharge.Facility.FacilityNo);
+                }
+            }
+            return facilityNos;
+        }
+
+
         #endregion
+
     }
 }
 

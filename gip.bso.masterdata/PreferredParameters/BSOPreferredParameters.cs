@@ -5,23 +5,25 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using gip.mes.autocomponent;
 
 namespace gip.bso.masterdata
 {
     [ACClassInfo(Const.PackName_VarioSystem, VD.ConstApp.PrefParam, Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
-    public class BSOPreferredParameters : ACBSO
+    public class BSOPreferredParameters : ACBSOvb
     {
         #region c´tors
 
         public BSOPreferredParameters(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _UseShortDialog = new ACPropertyConfigValue<bool>(this, nameof(UseShortDialog), false);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
+            _ = UseShortDialog;
             return base.ACInit(startChildMode);
         }
 
@@ -52,6 +54,22 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region Config
+        private ACPropertyConfigValue<bool> _UseShortDialog;
+        [ACPropertyConfig("en{'Use short dialog'}de{'Kurzdialog verwenden'}")]
+        public bool UseShortDialog
+        {
+            get
+            {
+                return _UseShortDialog.ValueT;
+            }
+            set
+            {
+                _UseShortDialog.ValueT = value;
+            }
+        }
+        #endregion
+
         #region Properties
 
         #region Properties -> General
@@ -71,6 +89,8 @@ namespace gip.bso.masterdata
         public IACConfigStore CurrentConfigStore { get; set; }
 
         public Dictionary<ACClass, List<Guid>> AllMachines { get; set; } = new Dictionary<ACClass, List<Guid>>();
+
+        public VBDialogResult DialogResult;
 
         #endregion 
 
@@ -374,49 +394,153 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region Properties -> QuickParam
+        public const string QuickParam = "QuickParam";
+
+        #region QuickParam
+        private IACConfig _SelectedQuickParam;
+        /// <summary>
+        /// Selected property for IACConfig
+        /// </summary>
+        /// <value>The selected QuickParam</value>
+        [ACPropertySelected(9999, nameof(QuickParam), "en{'TODO: QuickParam'}de{'TODO: QuickParam'}")]
+        public IACConfig SelectedQuickParam
+        {
+            get
+            {
+                return _SelectedQuickParam;
+            }
+            set
+            {
+                if (_SelectedQuickParam != value)
+                {
+                    _SelectedQuickParam = value;
+                    OnPropertyChanged(nameof(SelectedQuickParam));
+                }
+            }
+        }
+
+
+        private List<IACConfig> _QuickParamList;
+        /// <summary>
+        /// List property for IACConfig
+        /// </summary>
+        /// <value>The QuickParam list</value>
+        [ACPropertyList(9999, nameof(QuickParam))]
+        public List<IACConfig> QuickParamList
+        {
+            get
+            {
+                if (_QuickParamList == null)
+                    _QuickParamList = new List<IACConfig>();
+                return _QuickParamList;
+            }
+        }
+
+        private List<IACConfig> CloneParamInCurrentConfigStore(IACConfigStore currentConfigStore, List<ACConfigParam> configParams)
+        {
+            List<IACConfig> aCConfigs = new List<IACConfig>();
+            foreach (ACConfigParam configParam in configParams)
+            {
+                IACConfig newConfigParam = null;
+                if (configParam.DefaultConfiguration.ConfigStore == currentConfigStore)
+                {
+                    newConfigParam = configParam.DefaultConfiguration;
+                }
+                else
+                {
+                    newConfigParam = GetNewConfigParam(CurrentConfigStore, configParam, null);
+                    newConfigParam.Value = configParam.DefaultConfiguration.Value;
+                }
+
+                string lastDefinedExpression =
+                    configParam
+                    .ConfigurationList
+                    .Where(c => !string.IsNullOrEmpty(c.Expression))
+                    .OrderByDescending(c => c.ConfigStore.OverridingOrder)
+                    .Select(c => c.Expression)
+                    .DefaultIfEmpty()
+                    .FirstOrDefault();
+
+                newConfigParam.Expression = lastDefinedExpression;
+
+                aCConfigs.Add(newConfigParam);
+            }
+            return aCConfigs;
+        }
+
+        #endregion
+
+
+        #endregion
+
         #endregion
 
         #region Methods
 
         #region Methods -> ACMehtods
 
+        #region Methods -> ACMehtods -> ParamDialog
+
         [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
         public void ShowParamDialog(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
             Clear();
 
-            VD.DatabaseApp databaseApp = Database as VD.DatabaseApp;
+            string dialogName = "ParamDlg";
 
-            if (partslistID != null)
+            SetupCurrentConfigStore(DatabaseApp, partslistID, prodOrderPartslistID, pickingID);
+
+            (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(DatabaseApp, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
+
+            if (UseShortDialog)
             {
-                CurrentConfigStore = databaseApp.Partslist.Where(c => c.PartslistID == partslistID).FirstOrDefault();
+                List<IACConfig> pwNodeParamsQuick = CloneParamInCurrentConfigStore(CurrentConfigStore, pwNodeParams);
+                List<IACConfig> paFunctionParamsQuick = CloneParamInCurrentConfigStore(CurrentConfigStore, paFunctionParams);
+
+                _QuickParamList = new List<IACConfig>();
+                _QuickParamList.AddRange(pwNodeParamsQuick);
+                _QuickParamList.AddRange(paFunctionParamsQuick);
+
+                SelectedQuickParam = _QuickParamList.FirstOrDefault();
+
+                dialogName = "QuickParamDlg";
             }
-            if (prodOrderPartslistID != null)
+            else
             {
-                CurrentConfigStore = databaseApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID).FirstOrDefault();
+                _PWNodeParamValueList = pwNodeParams;
+                _PAFunctionParamValueList = paFunctionParams;
+
+                OnPropertyChanged(nameof(PWNodeParamValueList));
+                OnPropertyChanged(nameof(PAFunctionParamValueList));
             }
-            if (pickingID != null)
-            {
-                CurrentConfigStore = databaseApp.Picking.Where(c => c.PickingID == pickingID).FirstOrDefault();
-            }
 
+            ShowDialog(this, dialogName);
+        }
 
-            (List<ACConfigParam> pwNodeParams, List<ACConfigParam> paFunctionParams) = DoACConfigParams(databaseApp, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
+        [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
+        public bool ShowParamDialogResult(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
+        {
+            DialogResult = new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
 
+            ShowParamDialog(acClassWFID, partslistID, prodOrderPartslistID, pickingID);
+            
+            bool success = DialogResult.SelectedCommand == eMsgButton.OK;
+            DialogResult = null;
 
-            _PWNodeParamValueList = pwNodeParams;
-            _PAFunctionParamValueList = paFunctionParams;
-
-            OnPropertyChanged(nameof(PWNodeParamValueList));
-            OnPropertyChanged(nameof(PAFunctionParamValueList));
-
-            ShowDialog(this, "ParamDlg");
+            return success;
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
         {
-            ACSaveOrUndoChanges();
+            bool successSave = ACSaveOrUndoChanges();
+
+            if(DialogResult != null)
+            {
+                DialogResult.SelectedCommand = eMsgButton.OK;
+            }
+
             CloseTopDialog();
         }
 
@@ -425,6 +549,8 @@ namespace gip.bso.masterdata
         {
             CloseTopDialog();
         }
+
+        #endregion
 
         #endregion
 
@@ -448,20 +574,9 @@ namespace gip.bso.masterdata
                 OnPropertyChanged(nameof(PWNodeParamValueList));
                 SelectedPWNodeParamValue = additionalParam;
             }
-            Guid? vbiACClassID = SelectedPWNodeMachine != null ? SelectedPWNodeMachine.ACClassID : (Guid?)null;
-            if (vbiACClassID == null && SelectedPWNodeParamValue.VBiACClassID != null)
-                vbiACClassID = SelectedPWNodeParamValue.VBiACClassID;
 
-            string localParamConfigACUrl = SelectedPWNodeParamValue.LocalConfigACUrl + @"\" + SelectedPWNodeParamValue.ACMehtodACIdentifier + @"\" + SelectedPWNodeParamValue.ACIdentifier;
+            SelectedPWNodeParamValue.DefaultConfiguration = GetNewConfigParam(CurrentConfigStore, SelectedPWNodeParamValue, SelectedPAFunctionMachine);
 
-            SelectedPWNodeParamValue.DefaultConfiguration =
-                ConfigManagerIPlus
-                .ACConfigFactory(
-                    CurrentConfigStore,
-                    SelectedPWNodeParamValue,
-                    SelectedPWNodeParamValue.PreConfigACUrl,
-                    localParamConfigACUrl,
-                    vbiACClassID);
             SelectedPWNodeParamValue.ConfigurationList.Insert(0, SelectedPWNodeParamValue.DefaultConfiguration);
             OnPropertyChanged(nameof(HistoryPWNodeParamValueList));
             OnPropertyChanged(nameof(SelectedPWNodeParamValue));
@@ -729,8 +844,6 @@ namespace gip.bso.masterdata
             }
         }
 
-
-
         private List<ACConfigParam> GetACConfigParams(ACClassWF acClassWF, ACMethod acMethod, string preConfigACUrl, string localConfigACUrl, List<IACConfig> matchedConfigs, List<IACConfig> allConfigs)
         {
             List<ACConfigParam> aCConfigParams = new List<ACConfigParam>();
@@ -782,8 +895,6 @@ namespace gip.bso.masterdata
 
             return aCConfigParams;
         }
-
-
 
         private (ACClassMethod pwNodeMehtod, ACClassMethod paFunctionMethod) GetWFMethods(ACClassWF aCClassWF)
         {
@@ -854,6 +965,40 @@ namespace gip.bso.masterdata
             AllMachines = new Dictionary<ACClass, List<Guid>>();
         }
 
+        private void SetupCurrentConfigStore(VD.DatabaseApp databaseApp, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
+
+        {
+            if (pickingID != null)
+            {
+                CurrentConfigStore = databaseApp.Picking.Where(c => c.PickingID == pickingID).FirstOrDefault();
+            }
+            else if (prodOrderPartslistID != null)
+            {
+                CurrentConfigStore = databaseApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID).FirstOrDefault();
+            }
+            else if (partslistID != null)
+            {
+                CurrentConfigStore = databaseApp.Partslist.Where(c => c.PartslistID == partslistID).FirstOrDefault();
+            }
+        }
+
+        private static IACConfig GetNewConfigParam(IACConfigStore currentConfigStore, ACConfigParam aCConfigParam, ACClass machine)
+        {
+            Guid? vbiACClassID = machine != null ? machine.ACClassID : (Guid?)null;
+            if (vbiACClassID == null && aCConfigParam.VBiACClassID != null)
+                vbiACClassID = aCConfigParam.VBiACClassID;
+
+            string localParamConfigACUrl = aCConfigParam.LocalConfigACUrl + @"\" + aCConfigParam.ACMehtodACIdentifier + @"\" + aCConfigParam.ACIdentifier;
+
+            return
+                ConfigManagerIPlus
+                .ACConfigFactory(
+                    currentConfigStore,
+                    aCConfigParam,
+                    aCConfigParam.PreConfigACUrl,
+                    localParamConfigACUrl,
+                    vbiACClassID);
+        }
         #endregion
 
     }

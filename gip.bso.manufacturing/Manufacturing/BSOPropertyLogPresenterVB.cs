@@ -92,7 +92,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Methods
-        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 901, true, "SelectedPropertyLog")]
+        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 781, true, "SelectedPropertyLog")]
         public void ShowOrder()
         {
             if (SelectedItemInTimeline == null || SelectedItemInTimeline.ProgramLog == null)

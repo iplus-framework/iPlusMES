@@ -288,7 +288,7 @@ namespace gip.mes.processapplication
                 //    newACMethod.ParameterValueList["PLPosRelation"] = Guid.Empty;
                 //    newACMethod.ParameterValueList["FacilityCharge"] = Guid.Empty;
                 //    newACMethod.ParameterValueList["Facility"] = Guid.Empty;
-                //    newACMethod.ParameterValueList["Route"] = null;
+                //    newACMethod.ParameterValueList[nameof(Route)] = null;
                 //    newACMethod.ParameterValueList["TargetQuantity"] = (double)0.0;
                 //}
                 //catch (Exception ec)

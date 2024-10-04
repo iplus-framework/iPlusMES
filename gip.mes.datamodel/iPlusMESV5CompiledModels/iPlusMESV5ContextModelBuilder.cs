@@ -398,8 +398,9 @@ namespace gip.mes.datamodel
             FacilityEntityType.CreateForeignKey9(facility, facility);
             FacilityEntityType.CreateForeignKey10(facility, facility);
             FacilityEntityType.CreateForeignKey11(facility, partslist);
-            FacilityEntityType.CreateForeignKey12(facility, aCClass);
+            FacilityEntityType.CreateForeignKey12(facility, aCClassMethod);
             FacilityEntityType.CreateForeignKey13(facility, aCClass);
+            FacilityEntityType.CreateForeignKey14(facility, aCClass);
             FacilityBookingEntityType.CreateForeignKey1(facilityBooking, company);
             FacilityBookingEntityType.CreateForeignKey2(facilityBooking, facilityInventoryPos);
             FacilityBookingEntityType.CreateForeignKey3(facilityBooking, history);

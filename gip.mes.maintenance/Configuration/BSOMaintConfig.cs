@@ -1,10 +1,5 @@
-using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using VD = gip.mes.datamodel;
 
 namespace gip.mes.maintenance
 {

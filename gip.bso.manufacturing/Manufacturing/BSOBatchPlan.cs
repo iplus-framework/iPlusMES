@@ -9,6 +9,8 @@ using gip.core.manager;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
+using System.Threading;
+using gip.bso.masterdata;
 
 namespace gip.bso.manufacturing
 {
@@ -21,13 +23,12 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch planning'}de{'Batchplanung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
     public class BSOBatchPlan : VBBSOModulesSelector
     {
-
         #region c´tors
 
         public BSOBatchPlan(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _RMISubscr = new ACPointAsyncRMISubscr(this, "RMISubscr", 1);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -48,6 +49,9 @@ namespace gip.bso.manufacturing
                 ProdOrderBSO.PropertyChanged += ProdOrderBSO_PropertyChanged;
             if (!base.ACInit(startChildMode))
                 return false;
+
+            _MainSyncContext = SynchronizationContext.Current;
+
             return true;
         }
 
@@ -67,6 +71,8 @@ namespace gip.bso.manufacturing
             if (_VarioConfigManager != null)
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
             _VarioConfigManager = null;
+
+            _MainSyncContext = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -94,6 +100,23 @@ namespace gip.bso.manufacturing
                 if (_VarioConfigManager == null)
                     return null;
                 return _VarioConfigManager.ValueT;
+            }
+        }
+
+        #endregion
+
+        #region Child BSO
+
+        ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        [ACPropertyInfo(560)]
+        [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
+        public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
+        {
+            get
+            {
+                if (_BSOPreferredParameters == null)
+                    _BSOPreferredParameters = new ACChildItem<BSOPreferredParameters>(this, nameof(BSOPreferredParameters_Child));
+                return _BSOPreferredParameters;
             }
         }
 
@@ -600,6 +623,34 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties => RMI and CalculatedRoutes
+
+        ACPointAsyncRMISubscr _RMISubscr;
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        public ACPointAsyncRMISubscr RMISubscr
+        {
+            get
+            {
+                return _RMISubscr;
+            }
+        }
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999, "", "")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private SynchronizationContext _MainSyncContext;
+
+        #endregion
+
         #endregion
 
         #region Methods
@@ -753,6 +804,23 @@ namespace gip.bso.manufacturing
             return false;
         }
 
+        protected override void _Targets_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            //if (SelectedTarget != null && ProdOrderManager != null)
+            //{
+            //    ProdOrderManager.ValidateChangedPosReservation(this.DatabaseApp, SelectedTarget);
+            //}
+        }
+
+        protected override void _SelectedTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base._SelectedTarget_PropertyChanged(sender, e);
+            if (SelectedTarget != null && ProdOrderManager != null && e != null && e.PropertyName == nameof(POPartslistPosReservation.SelectedReservation))
+            {
+                ProdOrderManager.ValidateChangedPosReservation(this, this.DatabaseApp, SelectedTarget, sender, e);
+            }
+        }
+
         /// <summary>Called inside the GetControlModes-Method to get the Global.ControlModes from derivations.
         /// This method should be overriden in the derivations to dynmically control the presentation mode depending on the current value which is bound via VBContent</summary>
         /// <param name="vbControl">A WPF-Control that implements IVBContent</param>
@@ -903,6 +971,19 @@ namespace gip.bso.manufacturing
                     // TODO: Message
                     return;
                 }
+
+                MsgWithDetails msgWithDetails = new MsgWithDetails();
+                // check HasRequiredParams
+                bool? hasRequieredParams = ValidatePreferredParams(SelectedBatchPlanForIntermediate, msgWithDetails);
+                if (!(hasRequieredParams ?? true))
+                {
+                    if (msgWithDetails.MsgDetails != null && msgWithDetails.MsgDetails.Any())
+                    {
+                        Messages.Msg(msgWithDetails);
+                    }
+                    return;
+                }
+
 
                 ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
                 poManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, SelectedBatchPlanForIntermediate, CurrentProdOrderPartslist, SelectedIntermediate, true);
@@ -1166,6 +1247,62 @@ namespace gip.bso.manufacturing
                 (SelectedBatchPlanForIntermediate.ScheduledStartDate != null || SelectedBatchPlanForIntermediate.ScheduledEndDate != null);
         }
 
+        public bool? ValidatePreferredParams(ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails)
+        {
+            bool? hasRequieredParams = null;
+            if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+            {
+                batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.AutoLoad(batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslistReference, batchPlan);
+                if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                {
+                    batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredDefined;
+                }
+                else
+                {
+                    batchPlan.ParamState = PreferredParamStateEnum.ParamsRequiredNotDefined;
+                }
+
+                batchPlan.OnEntityPropertyChanged(nameof(ProdOrderBatchPlan.ParamStateName));
+
+
+                if (batchPlan.ParamState == PreferredParamStateEnum.ParamsRequiredNotDefined)
+                {
+                    // Question50113
+                    // Workflow {0} parameters on production order level are required! Do you want to proceed with parameters setup setup?
+                    // Workflow {0}-Parameter auf Produktionsauftragsebene sind erforderlich! Möchten Sie mit der Einrichtung der Parameter fortfahren?
+                    if (Messages.Question(this, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
+                    {
+                        hasRequieredParams = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                            batchPlan.IplusVBiACClassWF.ACClassWFID,
+                            batchPlan.ProdOrderPartslist.PartslistID,
+                            batchPlan.ProdOrderPartslist.ProdOrderPartslistID,
+                            null);
+                        if (hasRequieredParams ?? false)
+                        {
+                            ACSaveChanges();
+                        }
+                    }
+
+                    if (!(hasRequieredParams ?? true))
+                    {
+                        // Error50654
+                        // Unable to start batch plan #{0} {1} {2} {3}x{4}! Workflow {0} parameters on production order level are required! Preferred params are not defined!
+                        // Batchplan #{0} {1} {2} {3}x{4} kann nicht gestartet werden! Workflow-{0}-Parameter auf Produktionsauftragsebene sind erforderlich! Bevorzugte Parameter sind nicht definiert!
+                        Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlan), $"{nameof(ValidatePreferredParams)}()", 1281, "Error50654",
+                            batchPlan.ScheduledOrder,
+                            batchPlan.ProdOrderPartslistPos.Material.MaterialNo,
+                            batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                            batchPlan.BatchTargetCount,
+                            batchPlan.BatchSize,
+                            batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption
+                            );
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
+                }
+            }
+            return hasRequieredParams;
+        }
+
         #endregion
 
         #region Event-Callbacks
@@ -1313,6 +1450,256 @@ namespace gip.bso.manufacturing
             return SelectedTarget != null && SelectedTarget.CurrentRoute != null;
         }
 
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            CalculateRouteResult = null;
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+
+            bool invoked = InvokeCalculateRoutesAsync();
+            if (!invoked)
+            {
+                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                return;
+            }
+
+            ShowDialog(this, "CalculatedRouteDialog");
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return SelectedBatchPlanForIntermediate != null;
+        }
+
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
+        {
+            // The callback-method can be called
+            if (e != null)
+            {
+                IACTask taskEntry = wrapObject as IACTask;
+                ACPointAsyncRMIWrap<ACComponent> taskEntryMoreConcrete = wrapObject as ACPointAsyncRMIWrap<ACComponent>;
+                ACMethodEventArgs eM = e as ACMethodEventArgs;
+                if (taskEntry.State == PointProcessingState.Deleted)
+                {
+                    // Compare RequestID to identify your asynchronus invocation
+                    if (taskEntry.RequestID == myTestRequestID)
+                    {
+                        OnCalculateRoutesCallback();
+                    }
+                }
+                if (taskEntryMoreConcrete.Result.ResultState == Global.ACMethodResultState.Succeeded)
+                {
+                    bool wasMyAsynchronousRequest = false;
+                    if (myRequestEntryA != null && myRequestEntryA.CompareTo(taskEntryMoreConcrete) == 0)
+                        wasMyAsynchronousRequest = true;
+                    System.Diagnostics.Trace.WriteLine(wasMyAsynchronousRequest.ToString());
+                }
+            }
+        }
+
+        Guid myTestRequestID;
+        ACPointAsyncRMISubscrWrap<ACComponent> myRequestEntryA;
+        public bool InvokeCalculateRoutesAsync()
+        {
+            ACComponent paWorkflowScheduler = BSOBatchPlanSchedulerBSO?.PAWorkflowScheduler;
+            if (paWorkflowScheduler == null)
+            {
+                string acUrl = @"\Planning\BatchPlanScheduler";
+                using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                {
+                    core.datamodel.ACClass paClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == nameof(PABatchPlanScheduler) && !c.ACProject.IsProduction);
+                    while (paClass != null)
+                    {
+                        acUrl = paClass.ACURLComponentCached;
+                        paClass = paClass.ACClass_BasedOnACClass.Where(c => c.ACProject.IsProduction).FirstOrDefault();
+                    }
+                }
+
+                paWorkflowScheduler = Root.ACUrlCommand(acUrl) as ACComponent;
+            }
+
+            if (paWorkflowScheduler == null)
+            {
+                Messages.Msg(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
+                return false;
+            }
+
+            // 1. Invoke ACUrlACTypeSignature for getting a default-ACMethod-Instance
+            ACMethod acMethod = paWorkflowScheduler.ACUrlACTypeSignature("!RunRouteCalculation", gip.core.datamodel.Database.GlobalDatabase);
+
+            // 2. Fill out all important parameters
+            acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
+
+
+            myRequestEntryA = RMISubscr.InvokeAsyncMethod(paWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
+            if (myRequestEntryA != null)
+                myTestRequestID = myRequestEntryA.RequestID;
+            return myRequestEntryA != null;
+        }
+
+        public void OnCalculateRoutesCallback()
+        {
+            try
+            {
+
+                var batchPlans = ProdOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null, null, null, null, null);
+
+                List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+                foreach (ProdOrderBatchPlan batchPlan in batchPlans)
+                    reservations.AddRange(batchPlan.FacilityReservation_ProdOrderBatchPlan);
+
+                var myReservations = BSOBatchPlanSchedulerBSO != null ? BSOBatchPlanSchedulerBSO.SelectedProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray() : SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+
+                ACPickingManager pickingManager = ACPickingManager.GetServiceInstance(this);
+                var pickings = pickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+                if (pickings != null && pickings.Any())
+                    reservations.AddRange(pickings.SelectMany(x => x.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos)).Distinct());
+
+                List<Tuple<FacilityReservation, string>> result = new List<Tuple<FacilityReservation, string>>();
+
+                foreach (FacilityReservation reservation in myReservations)
+                {
+                    if (reservation.CalculatedRoute != null)
+                    {
+                        string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                        foreach (string guid in splitedRoute)
+                        {
+                            if (string.IsNullOrEmpty(guid))
+                                continue;
+
+                            IEnumerable<Tuple<FacilityReservation, string>> items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(guid)).Select(c => new Tuple<FacilityReservation, string>(c, guid));
+                            if (items.Any())
+                                result.AddRange(items);
+                        }
+                    }
+                }
+
+                string calculateRouteResult;
+                List<Msg> msgList = new List<Msg>();
+
+                if (result.Any())
+                {
+                    var groupedByPickings = result.Where(c => c.Item1.PickingPos != null).GroupBy(x => x.Item1.PickingPos.Picking);
+                    var groupedByBatchPlan = result.Where(c => c.Item1.ProdOrderBatchPlan != null).GroupBy(x => x.Item1.ProdOrderBatchPlan);
+
+                    List<core.datamodel.ACClass> tempList = new List<core.datamodel.ACClass>();
+
+                    foreach (var batchPlan in groupedByBatchPlan)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", batchPlan.Key.ProdOrderPartslist.ProdOrder.ProgramNo, batchPlan.Key.ProdOrderPartslist.InsertDate, batchPlan.Key.ProdOrderPartslist.Partslist.Material.MaterialName1);
+
+                        var groupByReservation = batchPlan.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        msgList.Add(new Msg(eMsgLevel.Info, message));
+                    }
+
+                    foreach (var pickingItem in groupedByPickings)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", pickingItem.Key.PickingNo, pickingItem.Key.MDPickingType.ACCaption, pickingItem.Key.InsertDate);
+
+                        var groupByReservation = pickingItem.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    ";
+                            message += reservationItem.Key.PickingPos.Material.MaterialName1;
+                            message += " (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        msgList.Add(new Msg(eMsgLevel.Info, message));
+                    }
+
+                    calculateRouteResult = CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50096");
+                }
+                else
+                    calculateRouteResult = CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50097");
+
+                if (BSOBatchPlanSchedulerBSO != null)
+                {
+                    BSOBatchPlanSchedulerBSO.CalculateRouteResult = calculateRouteResult;
+                    BSOBatchPlanSchedulerBSO.CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+
+                    _MainSyncContext?.Send((object state) =>
+                    {
+                        BSOBatchPlanSchedulerBSO.SetRoutesCheckResult(msgList);
+                    }, new object());
+                }
+                else
+                {
+                    CalculateRouteResult = calculateRouteResult;
+                    CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+
+                    BSOProdOrder prodOrder = FindParentComponent<BSOProdOrder>(c => c is BSOProdOrder);
+                    if (prodOrder != null)
+                    {
+                        _MainSyncContext?.Send((object state) =>
+                        {
+                            prodOrder.SetRoutesCheckResult(msgList);
+                        }, new object());
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(OnCalculateRoutesCallback), e);
+            }
+        }
+
         #endregion
 
         #endregion
@@ -1362,6 +1749,5 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
     }
 }

@@ -374,6 +374,14 @@ namespace gip.mes.datamodel
                 unicode: false);
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var vBiACClassMethodID = runtimeEntityType.AddProperty(
+                "VBiACClassMethodID",
+                typeof(Guid?),
+                propertyInfo: typeof(Facility).GetProperty("VBiACClassMethodID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Facility).GetField("_VBiACClassMethodID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            vBiACClassMethodID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var vBiFacilityACClassID = runtimeEntityType.AddProperty(
                 "VBiFacilityACClassID",
                 typeof(Guid?),
@@ -406,6 +414,9 @@ namespace gip.mes.datamodel
             var key = runtimeEntityType.AddKey(
                 new[] { facilityID });
             runtimeEntityType.SetPrimaryKey(key);
+
+            var index = runtimeEntityType.AddIndex(
+                new[] { vBiACClassMethodID });
 
             var nCI_FK_Facility_CompanyID = runtimeEntityType.AddIndex(
                 new[] { companyID },
@@ -752,6 +763,31 @@ namespace gip.mes.datamodel
 
         public static RuntimeForeignKey CreateForeignKey12(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiACClassMethodID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassMethodID") }),
+                principalEntityType);
+
+            var vBiACClassMethod = declaringEntityType.AddNavigation("VBiACClassMethod",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(ACClassMethod),
+                propertyInfo: typeof(Facility).GetProperty("VBiACClassMethod", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Facility).GetField("_VBiACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var facility_VBiACClassMethod = principalEntityType.AddNavigation("Facility_VBiACClassMethod",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<Facility>),
+                propertyInfo: typeof(ACClassMethod).GetProperty("Facility_VBiACClassMethod", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClassMethod).GetField("_Facility_VBiACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey13(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiFacilityACClassID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassID") }),
                 principalEntityType);
@@ -776,7 +812,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey13(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey14(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiStackCalculatorACClassID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassID") }),

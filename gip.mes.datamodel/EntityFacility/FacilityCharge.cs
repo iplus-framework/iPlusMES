@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -440,6 +441,11 @@ namespace gip.mes.datamodel
                 }
             }
         }
+
+
+        // avoid handling IsSelected for others when one is treated
+        public bool InIsSelectedProcess { get; set; }
+
         #endregion
 
         #region IEntityProperty Members
@@ -468,65 +474,30 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        #region additional properties
+        #region Additional Properties
 
-        /// <summary>
-        /// There are no comments for Property ReservedInwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedInwardQuantity()
+
+        public void ResetCachedValues()
         {
-            if (this.Material == null)
-                return;
-
-            this.ReservedInwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.InOrderPosID.HasValue);
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch geliefert wird
-                // TODO: Zugänge von Produktionsaufträge mit einrechnen
-                // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
-                //this.ReservedInwardQuantity +=
-                //        this.Material.QuantityToQuantity(facilityReservation.InOrderPos.TargetQuantity,
-                //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit)
-                //        - this.Material.QuantityToQuantity(facilityReservation.InOrderPos.ActualQuantity,
-                //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit);
-
-            }
+            _RelocationQuantity = 0;
+            _IsInputOutside = null;
+            _HasDeliveryPostings = null;
+            _HasProductionPostings = null;
+            _FinalPositionFromFbcRead = false;
+            _FinalRootPositionFromFbc = null;
+            _FinalPositionFromFbc = null;
+            _InOrderNo = null;
+            _relatedCompanyLoaded = false;
+            _RelatedCompany = null;
+            _CompanyNo = null;
+            _CompanyName = null;
+            _FinalRootPositionFromFBRead = false;
+            _FinalRootPositionFromFB = null;
+            _FinalPositionFromFBRead = false;
+            _FinalPositionFromFB = null;
         }
 
-        /// <summary>
-        /// There are no comments for Property ReservedOutwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedOutwardQuantity()
-        {
-            if (this.Material == null)
-                return;
-
-            this.ReservedOutwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.OutOrderPosID.HasValue);
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch abgebucht wird
-                // TODO: Abgänge von Produktionsaufträgen mit einrechnen
-                // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
-                //this.ReservedOutwardQuantity +=
-                //        this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.TargetQuantity,
-                //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit)
-                //        - this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.ActualQuantity,
-                //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
-                //                                    this.MaterialUnit.MDQuantityUnit);
-
-            }
-        }
+        #region Additional Properties -> Quantities
 
         /// <summary>
         /// There are no comments for Property ReservedQuantity in the schema.
@@ -554,8 +525,30 @@ namespace gip.mes.datamodel
             }
         }
 
-        #region FacilityCharge Origin
+        private double _RelocationQuantity;
+        /// <summary>
+        /// Quantity at default is AvailableQuantity
+        /// used by relocation quant dialog
+        /// </summary>
+        [ACPropertyInfo(15, "", "en{'Relocation Quantity'}de{'Umlagerung Menge'}")]
+        public double RelocationQuantity
+        {
+            get
+            {
+                return _RelocationQuantity;
+            }
+            set
+            {
+                _RelocationQuantity = value;
+                OnPropertyChanged(nameof(RelocationQuantity));
+            }
+        }
 
+        #endregion
+
+        #region Additional Properties -> FacilityCharge Origin
+
+        private bool? _IsInputOutside;
         /// <summary>
         /// Charge is direct input into stock from outside
         /// recived from distributor company
@@ -565,10 +558,10 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return
-                    FacilityBooking_InwardFacilityCharge.Any() && FacilityBooking_InwardFacilityCharge.Any(x => x.InOrderPosID != null)
-                    ||
-                    FacilityBookingCharge_InwardFacilityCharge.Any() && FacilityBookingCharge_InwardFacilityCharge.Select(x => x.FacilityBooking).Any(x => x.InOrderPosID != null);
+                if (_IsInputOutside.HasValue)
+                    return _IsInputOutside.Value;
+                _IsInputOutside = FacilityBookingCharge_InwardFacilityCharge.Where(x => x.InOrderPosID != null).Any();
+                return _IsInputOutside.Value;
             }
         }
 
@@ -580,37 +573,41 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return  FinalRootPositionFromFbc != null;
+                return FinalRootPositionFromFbc != null;
             }
         }
 
+        [NotMapped]
+        private bool? _HasDeliveryPostings;
         /// <summary>
-        /// Charge belong to delivered final product
+        /// Has Postings that are related to an Delivery (OutOrder)
         /// </summary>
         [NotMapped]
         public bool IsFinalOutputDelivered
         {
             get
             {
-                return
-                     FacilityBooking_OutwardFacilityCharge.Any() && FacilityBooking_OutwardFacilityCharge.Any(x => x.OutOrderPosID != null)
-                     ||
-                     FacilityBookingCharge_OutwardFacilityCharge.Any() && FacilityBookingCharge_OutwardFacilityCharge.Any(x => x.OutOrderPosID != null);
+                if (_HasDeliveryPostings.HasValue)
+                    return _HasDeliveryPostings.Value;
+                _HasDeliveryPostings = FacilityBookingCharge_OutwardFacilityCharge.Where(x => x.OutOrderPosID != null).Any();
+                return _HasDeliveryPostings.Value;
             }
         }
 
+        [NotMapped]
+        private bool? _HasProductionPostings = null;
         /// <summary>
-        /// @aagincic: this is implemented temporaly before InOrder preparing (for export purpurose)
+        /// Has Postings that are related to In- or Outword postings of Production Orders
         /// </summary>
         [NotMapped]
         public bool IsNoConnectionWithProduction
         {
             get
             {
-                return
-                FacilityBooking_InwardFacilityCharge.Any() && FacilityBooking_InwardFacilityCharge.Any(x => x.ProdOrderPartslistPosID == null && x.ProdOrderPartslistPosRelationID == null)
-                ||
-                FacilityBookingCharge_InwardFacilityCharge.Any() && FacilityBookingCharge_InwardFacilityCharge.Select(x => x.FacilityBooking).Any(x => x.ProdOrderPartslistPosID == null && x.ProdOrderPartslistPosRelationID == null);
+                if (_HasProductionPostings.HasValue)
+                    return _HasProductionPostings.Value;
+                _HasProductionPostings = FacilityBookingCharge_InwardFacilityCharge.Where(x => x.ProdOrderPartslistPosID == null && x.ProdOrderPartslistPosRelationID == null).Any();
+                return _HasProductionPostings.Value;
             }
         }
 
@@ -653,15 +650,13 @@ namespace gip.mes.datamodel
         {
             get
             {
-
                 if (_FinalRootPositionFromFbc != null)
                     return _FinalRootPositionFromFbc;
 
                 if (FinalPositionFromFbc != null)
                 {
-                    if (FinalPositionFromFbc.ProdOrderPartslistPos1_ParentProdOrderPartslistPos != null)
-                        _FinalRootPositionFromFbc = FinalPositionFromFbc.ProdOrderPartslistPos1_ParentProdOrderPartslistPos;
-                    else
+                    _FinalRootPositionFromFbc = FinalPositionFromFbc.ProdOrderPartslistPos1_ParentProdOrderPartslistPos;
+                    if (_FinalRootPositionFromFbc == null)
                         _FinalRootPositionFromFbc = FinalPositionFromFbc;
                 }
                 return _FinalRootPositionFromFbc;
@@ -669,19 +664,22 @@ namespace gip.mes.datamodel
         }
 
         [NotMapped]
+        private bool _FinalPositionFromFbcRead = false;
+        [NotMapped]
         private ProdOrderPartslistPos _FinalPositionFromFbc;
         [NotMapped]
         public ProdOrderPartslistPos FinalPositionFromFbc
         {
             get
             {
-                if (_FinalPositionFromFbc != null)
+                if (_FinalPositionFromFbcRead)
                     return _FinalPositionFromFbc;
 
                 _FinalPositionFromFbc = FacilityBookingCharge_InwardFacilityCharge
                     .Where(c => c.ProdOrderPartslistPosID != null)
                     .Select(c => c.ProdOrderPartslistPos)
                     .FirstOrDefault();
+                _FinalPositionFromFbcRead = true;
 
                 return _FinalPositionFromFbc;
             }
@@ -689,20 +687,21 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Additional Properties -> Order (ProdOrder, InOrder)
+
         [ACPropertyInfo(9999, "ProdOrderProgramNo", "en{'Order No.'}de{'Auftragsnummer'}")]
         [NotMapped]
         public string ProdOrderProgramNo
         {
             get
             {
-                string programNo = "";
                 if (IsFinalOutput)
                 {
                     ProdOrderPartslistPos pos = FinalPositionFromFbc;
                     if (pos != null)
-                        programNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                        return pos.ProdOrderPartslist?.ProdOrder?.ProgramNo;
                 }
-                return programNo;
+                return "";
             }
         }
 
@@ -729,62 +728,241 @@ namespace gip.mes.datamodel
         {
             get
             {
-                int seq = 1;
-
-                if (IsFinalOutput)
-                {
-                    FacilityBookingCharge fbc = FacilityBookingCharge_InwardFacilityCharge.FirstOrDefault();
-                    if (fbc != null && fbc.ProdOrderPartslistPos != null)
-                    {
-                        seq = fbc.ProdOrderPartslistPos.Sequence;
-                    }
-                }
-                return seq;
+                return FinalPositionFromFbc != null ? FinalPositionFromFbc.Sequence : 1;
             }
         }
 
-
+		[NotMapped]
+        string _InOrderNo = null;
         [ACPropertyInfo(999, "InOrderNo", "en{'Purchase Order Number'}de{'Bestellnummer'}")]
-        [NotMapped]
+		[NotMapped]
         public string InOrderNo
         {
             get
             {
-                string inOrderNo = "";
-                if (IsInputOutside)
+                if (!IsInputOutside)
+                    return null;
+                if (_InOrderNo == null)
                 {
-                    FacilityBooking fb = null;
-                    if (FacilityBooking_InwardFacilityCharge.Any(x => x.InOrderPosID != null))
-                    {
-                        fb = FacilityBooking_InwardFacilityCharge.FirstOrDefault(x => x.InOrderPosID != null);
-                    }
-                    else if (FacilityBookingCharge_InwardFacilityCharge.Any())
-                    {
-                        fb = FacilityBookingCharge_InwardFacilityCharge.Select(x => x.FacilityBooking).FirstOrDefault(x => x.InOrderPosID != null);
-                    }
-                    if (fb != null)
-                        inOrderNo = fb.InOrderPos.InOrder.InOrderNo;
+                    _InOrderNo = FacilityBooking_InwardFacilityCharge.Where(x => x.InOrderPosID != null).Select(x => x.InOrderPos.InOrder.InOrderNo).FirstOrDefault();
+                    if (_InOrderNo == null)
+                        _InOrderNo = "";
                 }
-                return inOrderNo;
+                //FacilityBooking fb = FacilityBooking_InwardFacilityCharge.Where(x => x.InOrderPosID != null).Select(x => x.InOrderPos.InOrder.InOrderNo).FirstOrDefault();
+                //if (FacilityBooking_InwardFacilityCharge.Any(x => x.InOrderPosID != null))
+                //{
+                //    fb = FacilityBooking_InwardFacilityCharge.FirstOrDefault(x => x.InOrderPosID != null);
+                //}
+                //else if (FacilityBookingCharge_InwardFacilityCharge.Any())
+                //{
+                //    fb = FacilityBookingCharge_InwardFacilityCharge.Select(x => x.FacilityBooking).FirstOrDefault(x => x.InOrderPosID != null);
+                //}
+                //if (fb != null)
+                //return fb.InOrderPos.InOrder.InOrderNo;
+                return _InOrderNo;
             }
         }
 
+        #endregion
+
+        #region Additional Properties -> Related Company 
+
+		[NotMapped]
+        private bool _relatedCompanyLoaded;
+		[NotMapped]
+        private Company _RelatedCompany;
+		[NotMapped]
+        protected Company RelatedCompany
+        {
+            get
+            {
+                if (!_relatedCompanyLoaded && Material != null)
+                {
+                    _relatedCompanyLoaded = true;
+                    _RelatedCompany =
+                        Material
+                        .CompanyMaterial_Material
+                        .OrderByDescending(c => c.InsertDate)
+                        .Select(c => c.Company)
+                        .FirstOrDefault();
+                }
+                return _RelatedCompany;
+            }
+        }
+
+		[NotMapped]
+        private string _CompanyNo;
+        [ACPropertyInfo(500, nameof(CompanyNo), ConstApp.CompanyNo)]
+		[NotMapped]
+        public string CompanyNo
+        {
+            get
+            {
+                if (_CompanyNo != null)
+                    return _CompanyNo;
+                if (RelatedCompany != null)
+                    _CompanyNo = RelatedCompany.CompanyNo;
+                if (_CompanyNo == null)
+                    _CompanyNo = "";
+                return _CompanyNo;
+            }
+        }
+
+		[NotMapped]
+        private string _CompanyName;
+        [ACPropertyInfo(501, nameof(CompanyName), ConstApp.CompanyName)]
+		[NotMapped]
+        public string CompanyName
+        {
+            get
+            {
+                if (_CompanyName != null)
+                    return _CompanyName;
+                if (RelatedCompany != null)
+                    _CompanyName = RelatedCompany.CompanyName;
+                if (_CompanyName == null)
+                    _CompanyName = "";
+                return _CompanyName;
+            }
+        }
+
+        #endregion
+
+        #region Additional Properties -> ReservationState
+
+        public ReservationState ReservationState
+        {
+            get
+            {
+                ReservationState reservationState = ReservationState.New;
+                if (SelectedReservationState != null)
+                {
+                    reservationState = (ReservationState)SelectedReservationState.Value;
+                }
+                return reservationState;
+            }
+            set
+            {
+                SelectedReservationState = ReservationStateList.Where(c => ((ReservationState)c.Value) == value).FirstOrDefault();
+            }
+        }
+
+        ACValueItem _SelectedReservationState;
+        [ACPropertySelected(9999, nameof(ReservationState), ConstApp.FacilityReservation)]
+        public ACValueItem SelectedReservationState
+        {
+            get
+            {
+                return _SelectedReservationState;
+            }
+            set
+            {
+                if (_SelectedReservationState != value)
+                {
+                    _SelectedReservationState = value;
+                    OnPropertyChanged(nameof(SelectedReservationState));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gibt eine Liste aller Enums zurück, damit die Gui
+        /// damit arbeiten kann.
+        /// </summary>
+        [ACPropertyList(9999, nameof(ReservationState))]
+        public IEnumerable<ACValueItem> ReservationStateList
+        {
+            get
+            {
+                return GlobalApp.ReservationStateList;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Methods
+
+        //public void RecalcReservedInwardQuantity()
+        //{
+        //    if (this.Material == null)
+        //        return;
+
+        //    this.ReservedInwardQuantity = 0;
+        //    // TODO: OR-Klausel einfügen für Produktionsaufträge
+        //    IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.InOrderPosID.HasValue);
+        //    foreach (FacilityReservation facilityReservation in facilityReservationList)
+        //    {
+        //        // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+        //        // Die TargetQuantity gibt an, wieviel Reserviert ist
+        //        // Die Differenz gibt an, wieviel noch geliefert wird
+        //        // TODO: Zugänge von Produktionsaufträge mit einrechnen
+        //        // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
+        //        //this.ReservedInwardQuantity +=
+        //        //        this.Material.QuantityToQuantity(facilityReservation.InOrderPos.TargetQuantity,
+        //        //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
+        //        //                                    this.MaterialUnit.MDQuantityUnit)
+        //        //        - this.Material.QuantityToQuantity(facilityReservation.InOrderPos.ActualQuantity,
+        //        //                                    facilityReservation.InOrderPos.Material.StorageMDQuantityUnit,
+        //        //                                    this.MaterialUnit.MDQuantityUnit);
+
+        //    }
+        //}
+
+
+        //public void RecalcReservedOutwardQuantity()
+        //{
+        //    if (this.Material == null)
+        //        return;
+
+        //    this.ReservedOutwardQuantity = 0;
+        //    // TODO: OR-Klausel einfügen für Produktionsaufträge
+        //    IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.OutOrderPosID.HasValue);
+        //    foreach (FacilityReservation facilityReservation in facilityReservationList)
+        //    {
+        //        // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+        //        // Die TargetQuantity gibt an, wieviel Reserviert ist
+        //        // Die Differenz gibt an, wieviel noch abgebucht wird
+        //        // TODO: Abgänge von Produktionsaufträgen mit einrechnen
+        //        // TODO: Mit MaterialUnit rechnen anstatt MDQuantityUnit
+        //        //this.ReservedOutwardQuantity +=
+        //        //        this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.TargetQuantity,
+        //        //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
+        //        //                                    this.MaterialUnit.MDQuantityUnit)
+        //        //        - this.FacilityLot.Material.QuantityToQuantity(facilityReservation.OutOrderPos.ActualQuantity,
+        //        //                                    facilityReservation.OutOrderPos.Material.StorageMDQuantityUnit,
+        //        //                                    this.MaterialUnit.MDQuantityUnit);
+
+        //    }
+        //}
+
+        bool _FinalRootPositionFromFBRead = false;
+        ProdOrderPartslistPos _FinalRootPositionFromFB = null;
         public ProdOrderPartslistPos GetFinalRootPositionFromFB()
         {
-            if (!this.FacilityBooking_InwardFacilityCharge.Any()) return null;
-            return this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
+            if (_FinalRootPositionFromFBRead)
+                return _FinalRootPositionFromFB;
+            _FinalRootPositionFromFB = this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
                                              .Select(a => a.ProdOrderPartslistPos.ParentProdOrderPartslistPosID != null ? a.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos : a.ProdOrderPartslistPos)
                                              .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
                                              .FirstOrDefault();
+            _FinalRootPositionFromFBRead = true;
+            return _FinalRootPositionFromFB;
         }
 
+        bool _FinalPositionFromFBRead = false;
+        ProdOrderPartslistPos _FinalPositionFromFB = null;
         public ProdOrderPartslistPos GetFinalPositionFromFB()
         {
-            if (!this.FacilityBooking_InwardFacilityCharge.Any()) return null;
-            return this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
+            if (_FinalPositionFromFBRead)
+                return _FinalPositionFromFB;
+            _FinalPositionFromFB = this.FacilityBooking_InwardFacilityCharge.Where(a => a.ProdOrderPartslistPosID != null)
                                              .Select(a => a.ProdOrderPartslistPos)
                                              .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
                                              .FirstOrDefault();
+            _FinalPositionFromFBRead = true;
+            return _FinalPositionFromFB;
         }
 
         public string GetProdOrderProgramNo()
@@ -806,24 +984,6 @@ namespace gip.mes.datamodel
             return programNo;
         }
 
-
-        /// <summary>
-        /// Charge belong to delivered final product
-        /// </summary>
-        public bool GetIsFinalOutputDelivered()
-        {
-            return (this.FacilityBooking_OutwardFacilityCharge.Any() && this.FacilityBooking_OutwardFacilityCharge.Any(x => x.OutOrderPosID != null))
-                 || (this.FacilityBookingCharge_OutwardFacilityCharge.Any() && this.FacilityBookingCharge_OutwardFacilityCharge.Any(x => x.OutOrderPosID != null));
-        }
-
-        /// <summary>
-        /// @aagincic: this is implemented temporaly before InOrder preparing (for export purpurose)
-        /// </summary>
-        public bool GetIsConnectedWithProdOrder()
-        {
-            return (this.FacilityBooking_InwardFacilityCharge.Any() && this.FacilityBooking_InwardFacilityCharge.Any(x => x.ProdOrderPartslistPosID != null || x.ProdOrderPartslistPosRelationID != null))
-                || (this.FacilityBookingCharge_InwardFacilityCharge.Any() && this.FacilityBookingCharge_InwardFacilityCharge.Select(x => x.FacilityBooking).Any(x => x.ProdOrderPartslistPosID != null || x.ProdOrderPartslistPosRelationID != null));
-        }
 
         public static IQueryable<FacilityChargeModel> GetFacilityChargeModelList(DatabaseApp dbApp, IQueryable<FacilityCharge> fcs)
         {
@@ -891,6 +1051,7 @@ namespace gip.mes.datamodel
 
             return queryStep2;
         }
+
 
         #endregion
 

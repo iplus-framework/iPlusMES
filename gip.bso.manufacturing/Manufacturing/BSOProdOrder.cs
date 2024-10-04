@@ -15,8 +15,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
@@ -37,6 +38,7 @@ namespace gip.bso.manufacturing
         public BSOProdOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _DefaultReservationState = new ACPropertyConfigValue<ReservationState>(this, nameof(DefaultReservationState), ReservationState.New);
         }
 
         /// <summary>
@@ -67,6 +69,12 @@ namespace gip.bso.manufacturing
             if (_MatReqManager == null)
                 throw new Exception("MatReqManager not configured");
 
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
+            _ = DefaultReservationState;
+
             bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
             if (!skipSearchOnStart)
             {
@@ -78,7 +86,10 @@ namespace gip.bso.manufacturing
 
             if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
+                BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityRservation_ReservationChanged;
+
+                BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(null);
             }
 
             return true;
@@ -95,6 +106,8 @@ namespace gip.bso.manufacturing
             _ACFacilityManager = null;
             ACMatReqManager.DetachACRefFromServiceInstance(this, _MatReqManager);
             _MatReqManager = null;
+            ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+            _PickingManager = null;
 
             _AccessInBookingFacility = null;
             _AccessOutBookingFacility = null;
@@ -226,6 +239,17 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected ACRef<ACPickingManager> _PickingManager = null;
+        public ACPickingManager PickingManager
+        {
+            get
+            {
+                if (_PickingManager == null)
+                    return null;
+                return _PickingManager.ValueT;
+            }
+        }
+
         #endregion
 
         #region ChildBSO
@@ -298,6 +322,20 @@ namespace gip.bso.manufacturing
             set
             {
                 _AllowPostingOnIntermediate.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<ReservationState> _DefaultReservationState;
+        [ACPropertyConfig("en{'Def. Batch plannning state'}de{'Def. Reservierungssstatus'}")]
+        public ReservationState DefaultReservationState
+        {
+            get
+            {
+                return _DefaultReservationState.ValueT;
+            }
+            set
+            {
+                _DefaultReservationState.ValueT = value;
             }
         }
 
@@ -991,8 +1029,6 @@ namespace gip.bso.manufacturing
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<ProdOrder>(ProdOrder.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
@@ -1611,7 +1647,7 @@ namespace gip.bso.manufacturing
         {
             if (paOrderInfo == null)
                 return base.FilterByOrderInfo(paOrderInfo);
-            
+
             if (AccessPrimary == null || paOrderInfo == null)
                 return new Msg(eMsgLevel.Error, "(AccessPrimary == null || paOrderInfo == null)");
 
@@ -2352,7 +2388,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void DeleteProdOrderPartslistPos()
         {
             if (!PreExecute("DeleteProdOrderPartslistPos")) return;
@@ -2368,7 +2404,7 @@ namespace gip.bso.manufacturing
             PostExecute("DeleteProdOrderPartslistPos");
         }
 
-        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "CreateNewLabOrderFromProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
         public void CreateNewLabOrderFromProdOrderPartslist()
         {
             if (!IsEnabledCreateNewLabOrderFromProdOrderPartslist())
@@ -2476,6 +2512,161 @@ namespace gip.bso.manufacturing
         //    }
         //    return false;
         //}
+
+        [ACMethodInteraction("", "en{'Create pickings for supply'}de{'Erstelle Bereitstellungsaufträge'}", 607, true, "SelectedProdOrderPartslistPos")]
+        public virtual void GeneratePickingForSupply()
+        {
+            if (!IsEnabledGeneratePickingForSupply())
+                return;
+
+            PickingPos[] createdSupplyPickings = DatabaseApp.PickingPos
+                                                .Where(c => c.Picking.MirroredFromPickingID == SelectedProdOrderPartslist.ProdOrderID
+                                                            && c.PickingMaterialID.HasValue
+                                                            && c.PickingMaterial.MaterialID == SelectedProdOrderPartslistPos.MaterialID)
+                                                .ToArray();
+            if (createdSupplyPickings != null && createdSupplyPickings.Any())
+            {
+                // Question50112: {0} supply orders have already been generated, would you like to create another?
+                var questionResult = Root.Messages.Question(this, "Question50112", MsgResult.No, false, createdSupplyPickings.Count());
+                if (questionResult == MsgResult.No)
+                    return;
+            }
+
+            Picking picking = PickingManager.CreateSupplyPicking(DatabaseApp, SelectedProdOrderPartslistPos);
+            if (picking != null)
+            {
+                Save();
+                if (picking.EntityState == EntityState.Unchanged)
+                {
+                    ShowPickingForSupply(picking);
+                }
+            }
+        }
+
+        public virtual bool IsEnabledGeneratePickingForSupply()
+        {
+            return SelectedProdOrderPartslistPos != null
+                && SelectedProdOrderPartslist != null
+                && SelectedProdOrderPartslist.MDProdOrderState != null
+                && SelectedProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished;
+        }
+
+        [ACMethodInteraction("", "en{'Show pickings for supply'}de{'Zeige Bereitstellungsaufträge'}", 608, true, "SelectedProdOrderPartslistPos")]
+        public virtual void ShowPickingsForSupply()
+        {
+            PickingPos[] createdSupplyPickings = DatabaseApp.PickingPos
+                                    .Include(c => c.Picking)
+                                    .Where(c => c.Picking.MirroredFromPickingID == SelectedProdOrderPartslist.ProdOrderID
+                                                && c.PickingMaterialID.HasValue
+                                                && c.PickingMaterial.MaterialID == SelectedProdOrderPartslistPos.MaterialID)
+                                    .ToArray();
+            if (createdSupplyPickings != null && createdSupplyPickings.Any())
+            {
+                Picking picking = null;
+                if (createdSupplyPickings.Count() == 1)
+                {
+                    picking = createdSupplyPickings.FirstOrDefault().Picking;
+                }
+                else
+                {
+                    DialogSupplyPickingResult = null;
+                    SupplyPickingList = createdSupplyPickings.Select(c => c.Picking).Distinct().OrderBy(c => c.PickingNo).ToArray();
+                    SelectedSupplyPicking = SupplyPickingList.FirstOrDefault();
+                    ShowDialog(this, "SelectSupplyPicking");
+                    if (DialogSupplyPickingResult == null || DialogSupplyPickingResult.SelectedCommand != eMsgButton.OK)
+                        return;
+                    picking = SelectedSupplyPicking;
+                }
+
+                if (picking == null)
+                    return;
+                ShowPickingForSupply(picking);
+            }
+        }
+
+        public virtual bool IsEnabledShowPickingsForSupply()
+        {
+            return SelectedProdOrderPartslistPos != null;
+        }
+
+
+        protected void ShowPickingForSupply(Picking picking)
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = picking.PickingID,
+                    EntityName = Picking.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+                //if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
+                //    startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
+            }
+        }
+
+        private Picking _SelectedSupplyPicking;
+        [ACPropertySelected(626, "SupplyPicking")]
+        public Picking SelectedSupplyPicking
+        {
+            get
+            {
+                return _SelectedSupplyPicking;
+            }
+            set
+            {
+                if (_SelectedSupplyPicking != value)
+                {
+                    _SelectedSupplyPicking = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private IEnumerable<Picking> _SupplyPickingList;
+        [ACPropertyList(627, "SupplyPicking")]
+        public IEnumerable<Picking> SupplyPickingList
+        {
+            get
+            {
+                return _SupplyPickingList;
+            }
+            set
+            {
+                if (_SupplyPickingList != value)
+                {
+                    _SupplyPickingList = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public VBDialogResult DialogSupplyPickingResult { get; set; }
+
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        public void DialogSupplyPickingOK()
+        {
+            DialogSupplyPickingResult = new VBDialogResult();
+            DialogSupplyPickingResult.SelectedCommand = eMsgButton.OK;
+            var selected = SelectedSupplyPicking;
+            CloseTopDialog();
+            SelectedSupplyPicking = selected;
+        }
+
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        public void DialogSupplyPickingCancel()
+        {
+            DialogSupplyPickingResult = new VBDialogResult();
+            DialogSupplyPickingResult.SelectedCommand = eMsgButton.Cancel;
+            var selected = SelectedSupplyPicking;
+            CloseTopDialog();
+            SelectedSupplyPicking = selected;
+        }
+
 
         #endregion
 
@@ -3884,7 +4075,8 @@ namespace gip.bso.manufacturing
             if (intermediateList == null || !intermediateList.Any() || batchQuantityDefinition == null || !batchQuantityDefinition.Any()) return;
 
             List<BatchPercentageModel> batchPercentageModel = BatchSizeCalculation.GetPercentageModel(intermediateList.First().TargetQuantityUOM, batchQuantityDefinition);
-            Msg msg = ProdOrderManager.BatchCreateCascade(DatabaseApp, batchPercentageModel, intermediateList, batchHandleModel, BatchCreateBatchSizeDecimalPrecision);
+            List<object> createdEntities = new List<object>();
+            Msg msg = ProdOrderManager.BatchCreateCascade(DatabaseApp, batchPercentageModel, intermediateList, batchHandleModel, createdEntities, BatchCreateBatchSizeDecimalPrecision);
             if (msg != null)
             {
                 Messages.Msg(msg);
@@ -4178,6 +4370,14 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        public void SetRoutesCheckResult(IEnumerable<Msg> msgList)
+        {
+            foreach (Msg msg in msgList)
+            {
+                MsgList.Add(msg);
+            }
+        }
 
         #endregion
 
@@ -4854,7 +5054,7 @@ namespace gip.bso.manufacturing
                 .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
                 .OrderBy(c => c.ExpirationDate)
                 .ThenBy(c => c.FillingDate)
-                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .Take(Root.Environment.AccessDefaultTakeCount)
                 .ToList();
         }
 
@@ -4873,10 +5073,20 @@ namespace gip.bso.manufacturing
                 {
                     case FacilitySelectLoctation.PrebookingInward:
                         SelectedInwardACMethodBooking.InwardFacility = facility;
+                        if(!BookingInwardFacilityList.Contains(facility))
+                        {
+                            BookingInwardFacilityList.Add(facility);
+                            OnPropertyChanged(nameof(BookingInwardFacilityList));
+                        }
                         OnPropertyChanged(nameof(SelectedInwardACMethodBooking));
                         break;
                     case FacilitySelectLoctation.PrebookingOutward:
                         SelectedOutwardACMethodBooking.OutwardFacility = facility;
+                        if (!BookingOutwardFacilityList.Contains(facility))
+                        {
+                            BookingOutwardFacilityList.Add(facility);
+                            OnPropertyChanged(nameof(BookingOutwardFacilityList));
+                        }
                         OnPropertyChanged(nameof(SelectedOutwardACMethodBooking));
                         break;
                     default:
@@ -4914,6 +5124,8 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #region Cloning
         public override object Clone()
         {
             BSOProdOrder clone = base.Clone() as BSOProdOrder;
@@ -4925,6 +5137,7 @@ namespace gip.bso.manufacturing
             clone.SelectedInwardFacilityBookingCharge = this.SelectedInwardFacilityBookingCharge;
             return clone;
         }
+        #endregion
 
         #region ACAction
 
@@ -5344,6 +5557,18 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledShowDialogSelectSources):
                     result = IsEnabledShowDialogSelectSources();
                     return true;
+                case nameof(GeneratePickingForSupply):
+                    GeneratePickingForSupply();
+                    return true;
+                case nameof(IsEnabledGeneratePickingForSupply):
+                    result = IsEnabledGeneratePickingForSupply();
+                    return true;
+                case nameof(ShowPickingsForSupply):
+                    ShowPickingsForSupply();
+                    return true;
+                case nameof(IsEnabledShowPickingsForSupply):
+                    result = IsEnabledShowPickingsForSupply();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -5412,7 +5637,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region ShowParamDialog
 
         [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
@@ -5434,6 +5658,15 @@ namespace gip.bso.manufacturing
                 ProcessWorkflowPresenter != null
                 && ProcessWorkflowPresenter.SelectedWFNode != null
                 && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
+        }
+
+        #endregion
+
+        #region Reservation State
+
+        public virtual ReservationState GetDefaultReservationState()
+        {
+            return DefaultReservationState;
         }
 
         #endregion
@@ -5549,17 +5782,17 @@ namespace gip.bso.manufacturing
 
     }
 
+    #region TabEnums
+
+    public enum BSOProdOrderTab
+    {
+        Intermediate,
+        OutwardBookingHistory,
+        InwardBookingHistory,
+        OutwardPreBookingHistory,
+        InwardPreBookingHistory
+    }
+
+
+    #endregion
 }
-#region TabEnums
-
-public enum BSOProdOrderTab
-{
-    Intermediate,
-    OutwardBookingHistory,
-    InwardBookingHistory,
-    OutwardPreBookingHistory,
-    InwardPreBookingHistory
-}
-
-
-#endregion

@@ -1,6 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
-using dbMes = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -344,9 +344,9 @@ namespace gip.bso.manufacturing
 
         #region BackgroundWorker -> DoMehtods -> GetOperationLogView
 
-        private void DoExportOperationLogBI(dbMes.DatabaseApp databaseApp, string fileName, DateTime startTime, DateTime endTime, bool isOneTable)
+        private void DoExportOperationLogBI(VD.DatabaseApp databaseApp, string fileName, DateTime startTime, DateTime endTime, bool isOneTable)
         {
-            List<dbMes.OperationLog> operationLogs =
+            List<VD.OperationLog> operationLogs =
                 databaseApp
                 .OperationLog
                 .Where(c => c.InsertDate >= startTime && c.InsertDate < endTime)
@@ -360,14 +360,14 @@ namespace gip.bso.manufacturing
             WriteExcel(fileName, dataTables);
         }
 
-        private List<OperationLogView> GetOperationLogView(List<dbMes.OperationLog> operationLogs)
+        private List<OperationLogView> GetOperationLogView(List<VD.OperationLog> operationLogs)
         {
             List<OperationLogView> operationLogViews = new List<OperationLogView>();
-            List<dbMes.OperationLog> filteredOperationLogs = 
+            List<VD.OperationLog> filteredOperationLogs = 
                 operationLogs
-                .Where(c=>c.XMLValue != null && c.Operation == (short)dbMes.OperationLogEnum.UnregisterEntityOnScan)
+                .Where(c=>c.XMLValue != null && c.Operation == (short)VD.OperationLogEnum.UnregisterEntityOnScan)
                 .ToList();
-            foreach (dbMes.OperationLog operationLog in filteredOperationLogs)
+            foreach (VD.OperationLog operationLog in filteredOperationLogs)
             {
                 OperationLogView wp = new OperationLogView();
 
@@ -385,7 +385,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        private void FillMaterialAndOrderData(dbMes.OperationLog operationLog, OperationLogView wp)
+        private void FillMaterialAndOrderData(VD.OperationLog operationLog, OperationLogView wp)
         {
             wp.MaterialNo = operationLog.FacilityCharge?.Partslist?.Material?.MaterialNo;
             wp.MaterialName = operationLog.FacilityCharge?.Partslist?.Material?.MaterialName1;
@@ -394,16 +394,16 @@ namespace gip.bso.manufacturing
             wp.SplitNo = operationLog.FacilityCharge?.SplitNo ?? 0;
         }
 
-        private void FillTimeData(List<dbMes.OperationLog> operationLogs, dbMes.OperationLog operationLog, OperationLogView wp)
+        private void FillTimeData(List<VD.OperationLog> operationLogs, VD.OperationLog operationLog, OperationLogView wp)
         {
-            dbMes.OperationLog initialOperationLog =
+            VD.OperationLog initialOperationLog =
                     operationLogs
                     .Where(c =>
                                 c.ACProgramLogID == operationLog.ACProgramLogID
                                 && c.FacilityChargeID == operationLog.FacilityChargeID
                                 && c.OperationLogID != operationLog.OperationLogID
                                 && c.InsertDate < operationLog.InsertDate
-                                && c.Operation == (short)dbMes.OperationLogEnum.RegisterEntityOnScan)
+                                && c.Operation == (short)VD.OperationLogEnum.RegisterEntityOnScan)
                     .OrderByDescending(c => c.InsertDate)
                     .FirstOrDefault();
 
@@ -415,12 +415,12 @@ namespace gip.bso.manufacturing
             wp.EndTime = operationLog.InsertDate;
         }
 
-        private void FillMachineData(dbMes.OperationLog operationLog, OperationLogView wp)
+        private void FillMachineData(VD.OperationLog operationLog, OperationLogView wp)
         {
             wp.ACCaptionInstance = Translator.GetTranslation(operationLog.RefACClass.ACCaptionTranslation);
             wp.ACUrlInstance = operationLog.RefACClass.ACURLComponentCached;
 
-            dbMes.ACClass basedOnClass = operationLog.RefACClass.ACClass1_BasedOnACClass;
+            VD.ACClass basedOnClass = operationLog.RefACClass.ACClass1_BasedOnACClass;
             if (basedOnClass != null)
             {
                 wp.ACCaptionTypeModel = Translator.GetTranslation(basedOnClass.ACCaptionTranslation);
@@ -428,7 +428,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void FillParamsData(dbMes.OperationLog operationLog, OperationLogView wp)
+        private void FillParamsData(VD.OperationLog operationLog, OperationLogView wp)
         {
             ACMethod method = gip.core.datamodel.ACClassMethod.DeserializeACMethod(operationLog.XMLValue);
             wp.MethodeName = method.ACCaption;

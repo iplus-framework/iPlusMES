@@ -37,6 +37,14 @@ namespace gip.mes.datamodel
                 nullable: true);
             aCClassTaskID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var aCClassTaskID2 = runtimeEntityType.AddProperty(
+                "ACClassTaskID2",
+                typeof(Guid?),
+                propertyInfo: typeof(PickingPos).GetProperty("ACClassTaskID2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PickingPos).GetField("_ACClassTaskID2", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            aCClassTaskID2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var comment = runtimeEntityType.AddProperty(
                 "Comment",
                 typeof(string),

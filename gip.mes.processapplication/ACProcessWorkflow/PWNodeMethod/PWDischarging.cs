@@ -10,6 +10,7 @@ using System.Xml;
 using gip.core.processapplication;
 
 using System.Reflection.Emit;
+using DocumentFormat.OpenXml.Vml.Office;
 
 namespace gip.mes.processapplication
 {
@@ -58,6 +59,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("ClassCode", "en{'Classification allowed destinations'}de{'Klassifizierung erlaubte Ziele'}");
             method.ParameterValueList.Add(new ACValue("SWTOn", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("SWTOn", "en{'SWT On'}de{'SWT An'}");
+            method.ParameterValueList.Add(new ACValue("KeepSameRoute", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("KeepSameRoute", "en{'Keep same Route'}de{'Gleiche Route beibehalten'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
@@ -576,6 +579,24 @@ namespace gip.mes.processapplication
                 return pamScale.Scale as PAEScaleTotalizing;
             }
         }
+
+        public bool KeepSameRoute
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("KeepSameRoute");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+        
         #endregion
 
         #region Methods
@@ -1201,7 +1222,7 @@ namespace gip.mes.processapplication
             Route prevRoute = null;
             if (currentActiveMethod != null)
             {
-                ACValue acValue = currentActiveMethod.ParameterValueList.GetACValue("Route");
+                ACValue acValue = currentActiveMethod.ParameterValueList.GetACValue(nameof(Route));
                 if (acValue != null)
                 {
                     prevRoute = (Route)acValue.Value;
@@ -1263,30 +1284,32 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, out Route route)
+        public virtual bool ValidateAndGetCurrentDischargingRouteForParam(ACMethod acMethod, Route shareRoute, out Route route, out Route diffRouteOnDestChange)
         {
             route = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
-            Route diffRouteOnDestChange = null;
+            diffRouteOnDestChange = null;
             if (acMethod != null && route != null)
             {
-                ACValue acValue = acMethod.ParameterValueList.GetACValue("Route");
-                if (acValue != null)
+                Route prevRoute = shareRoute;
+                if (prevRoute == null)
                 {
-                    Route prevRoute = (Route)acValue.Value;
-                    if (prevRoute != null)
-                        diffRouteOnDestChange = Route.IntersectRoutesGetDiff(route, prevRoute, true);
+                    ACValue acValue = acMethod.ParameterValueList.GetACValue(nameof(Route));
+                    if (acValue != null)
+                        prevRoute = (Route)acValue.Value;
                 }
+                if (prevRoute != null)
+                    diffRouteOnDestChange = Route.IntersectRoutesGetDiff(route, prevRoute, true);
             }
             return ValidateRouteForFuncParam(diffRouteOnDestChange != null ? diffRouteOnDestChange : route);
         }
 
-        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod)
+        public virtual bool ValidateAndSetRouteForParam(ACMethod acMethod, Route shareRoute = null, bool setIntersectionOfSharedRoute = false)
         {
             Route route;
-
-            if (!ValidateAndGetCurrentDischargingRouteForParam(acMethod, out route))
+            Route diffRouteOnDestChange;
+            if (!ValidateAndGetCurrentDischargingRouteForParam(acMethod, shareRoute, out route, out diffRouteOnDestChange))
                 return false;
-            acMethod["Route"] = route;
+            acMethod[nameof(Route)] = setIntersectionOfSharedRoute && diffRouteOnDestChange != null ? diffRouteOnDestChange : route;
             return route != null;
         }
 
@@ -1364,10 +1387,33 @@ namespace gip.mes.processapplication
             return item.TargetACComponent as PAProcessModule;
         }
 
-#endregion
+        public ACMethod FindParallelDischargingIfRoute()
+        {
+            PWGroup pwGroup = ParentPWGroup;
+            ACMethod exParallelMethod = null;
+            PWDischarging parallelDisCharging = RootPW.FindChildComponents<PWDischarging>(c => c is PWDischarging
+                                                       && (c as PWDischarging).CurrentACState >= ACStateEnum.SMRunning
+                                                       && (c as PWDischarging).CurrentACState < ACStateEnum.SMCompleted
+                                                       && (c as PWDischarging).ParentPWGroup.RefACClassOfContentWF == pwGroup.RefACClassOfContentWF
+                                                       && (c as PWDischarging).CurrentExecutingFunction != null)
+                                                 .FirstOrDefault();
+            if (parallelDisCharging != null)
+            {
+                exParallelMethod = parallelDisCharging.ExecutingACMethod;
+                if (exParallelMethod != null)
+                {
+                    ACValue exValue = exParallelMethod.ParameterValueList.GetACValue(nameof(Route));
+                    if (exValue != null && exValue.Value != null)
+                        return exParallelMethod;
+                }
+            }
+            return null;
+        }
+
+        #endregion
 
 
-#region Alarmhandling
+        #region Alarmhandling
         public override void AcknowledgeAlarms()
         {
             NoTargetWait = null;
@@ -1429,7 +1475,7 @@ namespace gip.mes.processapplication
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
-                            PickingPos currentDisEntity = dbApp.PickingPos.FirstOrDefault(c=>c.PickingPosID == currentDisEntityID);
+                            PickingPos currentDisEntity = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == currentDisEntityID);
                             if (propertyToSet == 1)
                             {
                                 currentDisEntity.ACClassTaskID = this.ContentTask.ACClassTaskID;
@@ -1745,9 +1791,9 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Planning and Testing
-        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList, ref DumpStats dumpStats)
         {
-            base.DumpPropertyList(doc, xmlACPropertyList);
+            base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
 
             XmlElement xmlChild = xmlACPropertyList["LastTargets"];
             if (xmlChild == null)

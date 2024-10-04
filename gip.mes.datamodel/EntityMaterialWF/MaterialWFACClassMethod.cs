@@ -82,6 +82,23 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(9999)]
+        public override string ACCaption
+        {
+            get
+            {
+                return this.MaterialWF.ACCaption + " <> " + ACCaptionACClassMethod;
+            }
+        }
+
+        public string ACCaptionACClassMethod
+        {
+            get
+            {
+                return Translator.GetTranslation(this.ACClassMethod.ACIdentifier, this.ACClassMethod.ACCaptionTranslation);
+            }
+        }
+
         public string GetKey()
         {
             return this.MaterialWF.GetACUrl() + ACUrlHelper.Delimiter_Relationship + ACClassMethod.GetACUrl();

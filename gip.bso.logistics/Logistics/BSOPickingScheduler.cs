@@ -11,6 +11,7 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
@@ -110,6 +111,8 @@ namespace gip.bso.logistics
             _ValidateBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBeforeStart), false);
             _FilterPickingStateLess = new ACPropertyConfigValue<PickingStateEnum>(this, nameof(FilterPickingStateLess), PickingStateEnum.InProcess);
             _FilterPickingStateGreater = new ACPropertyConfigValue<PickingStateEnum>(this, nameof(FilterPickingStateGreater), PickingStateEnum.WaitOnManualClosing);
+
+            _RMISubscr = new ACPointAsyncRMISubscr(this, "RMISubscr", 1);
         }
 
         #region c´tors -> ACInit
@@ -132,6 +135,8 @@ namespace gip.bso.logistics
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _MainSyncContext = SynchronizationContext.Current;
+
             _ = ShowImages;
             _ = ValidateBeforeStart;
 
@@ -150,6 +155,8 @@ namespace gip.bso.logistics
 
             MediaController = null;
             SelectedPicking = null;
+
+            _MainSyncContext = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -1047,6 +1054,34 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Properties => RMI and Routing
+
+        ACPointAsyncRMISubscr _RMISubscr;
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        public ACPointAsyncRMISubscr RMISubscr
+        {
+            get
+            {
+                return _RMISubscr;
+            }
+        }
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999,"","")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private SynchronizationContext _MainSyncContext;
+
+        #endregion
+
         #endregion
 
         #region Methods
@@ -1405,7 +1440,7 @@ namespace gip.bso.logistics
                     List<IACConfigStore> listOfSelectedStores = new List<IACConfigStore>() { picking.Picking };
                     msg = this.PickingManager.ValidateStart(this.DatabaseApp, dbIPlus, picking.Picking,
                                             listOfSelectedStores,
-                                            PARole.ValidationBehaviour.Strict);
+                                            PARole.ValidationBehaviour.Strict, picking.Picking.IplusVBiACClassWF, true);
                     if (msg != null)
                     {
                         if (!msg.IsSucceded())
@@ -2042,6 +2077,221 @@ namespace gip.bso.logistics
         }
 
         #endregion
+
+        #endregion
+
+        #region Methods => Routing
+
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            MsgList.Clear();
+            CalculateRouteResult = null;
+            CurrentProgressInfo.TotalProgress.ProgressRangeFrom = 0;
+            CurrentProgressInfo.TotalProgress.ProgressRangeTo = 100;
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+            bool invoked = InvokeCalculateRoutesAsync();
+            if (!invoked)
+            {
+                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                return;
+            }
+            ShowDialog(this, "CalculatedRouteDialog");
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return PickingList != null && PickingList.Any();
+        }
+
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
+        {
+            // The callback-method can be called
+            if (e != null)
+            {
+                IACTask taskEntry = wrapObject as IACTask;
+                ACPointAsyncRMIWrap<ACComponent> taskEntryMoreConcrete = wrapObject as ACPointAsyncRMIWrap<ACComponent>;
+                ACMethodEventArgs eM = e as ACMethodEventArgs;
+                if (taskEntry.State == PointProcessingState.Deleted)
+                {
+                    // Compare RequestID to identify your asynchronus invocation
+                    if (taskEntry.RequestID == myTestRequestID)
+                    {
+                        OnCalculateRoutesCallback();
+                    }
+                }
+                if (taskEntryMoreConcrete.Result.ResultState == Global.ACMethodResultState.Succeeded)
+                {
+                    bool wasMyAsynchronousRequest = false;
+                    if (myRequestEntryA != null && myRequestEntryA.CompareTo(taskEntryMoreConcrete) == 0)
+                        wasMyAsynchronousRequest = true;
+                    System.Diagnostics.Trace.WriteLine(wasMyAsynchronousRequest.ToString());
+                }
+            }
+        }
+
+        Guid myTestRequestID;
+        ACPointAsyncRMISubscrWrap<ACComponent> myRequestEntryA;
+        public bool InvokeCalculateRoutesAsync()
+        {
+            // 1. Invoke ACUrlACTypeSignature for getting a default-ACMethod-Instance
+            ACMethod acMethod = PAWorkflowScheduler.ACUrlACTypeSignature("!RunRouteCalculation", gip.core.datamodel.Database.GlobalDatabase);
+
+            // 2. Fill out all important parameters
+            acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
+
+
+            myRequestEntryA = RMISubscr.InvokeAsyncMethod(PAWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
+            if (myRequestEntryA != null)
+                myTestRequestID = myRequestEntryA.RequestID;
+            return myRequestEntryA != null;
+        }
+
+        public void OnCalculateRoutesCallback()
+        {
+            try
+            {
+                var pickings = PickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+                List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+                foreach (Picking picking in pickings)
+                {
+                    foreach (PickingPos pPos in picking.PickingPos_Picking)
+                        reservations.AddRange(pPos.FacilityReservation_PickingPos);
+                }
+
+                var myReservations = SelectedPicking.Picking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+
+                ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                var prodOrderBatchPlans = prodOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused,
+                                                                                                         null, null, null, null, null, null, null);
+
+                reservations.AddRange(prodOrderBatchPlans.SelectMany(c => c.FacilityReservation_ProdOrderBatchPlan.Where(x => x.FacilityID.HasValue)));
+
+                List<Tuple<FacilityReservation, string>> result = new List<Tuple<FacilityReservation, string>>();
+
+                foreach (FacilityReservation reservation in myReservations)
+                {
+                    if (reservation.CalculatedRoute != null)
+                    {
+                        string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                        foreach (string guid in splitedRoute)
+                        {
+                            if (string.IsNullOrEmpty(guid))
+                                continue;
+
+                            IEnumerable<Tuple<FacilityReservation, string>> items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(guid)).Select(c => new Tuple<FacilityReservation, string>(c, guid));
+                            if (items.Any())
+                                result.AddRange(items);
+                        }
+                    }
+                }
+
+                if (result.Any())
+                {
+                    var groupedByPickings = result.Where(c => c.Item1.PickingPos != null).GroupBy(x => x.Item1.PickingPos.Picking);
+                    var groupedByBatchPlan = result.Where(c => c.Item1.ProdOrderBatchPlan != null).GroupBy(x => x.Item1.ProdOrderBatchPlan);
+
+                    List<core.datamodel.ACClass> tempList = new List<core.datamodel.ACClass>();
+
+                    foreach (var pickingItem in groupedByPickings)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", pickingItem.Key.PickingNo, pickingItem.Key.MDPickingType.ACCaption, pickingItem.Key.InsertDate);
+
+                        var groupByReservation = pickingItem.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    ";
+                            message += reservationItem.Key.PickingPos.Material.MaterialName1;
+                            message += " (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        _MainSyncContext?.Send((object state) =>
+                        {
+                            MsgList.Add(new Msg(eMsgLevel.Info, message));
+                        }, new object());
+                    }
+
+                    foreach (var batchPlan in groupedByBatchPlan)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", batchPlan.Key.ProdOrderPartslist.ProdOrder.ProgramNo, batchPlan.Key.ProdOrderPartslist.InsertDate, batchPlan.Key.ProdOrderPartslist.Partslist.Material.MaterialName1);
+
+                        var groupByReservation = batchPlan.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        _MainSyncContext?.Send((object state) =>
+                        {
+                            MsgList.Add(new Msg(eMsgLevel.Info, message));
+                        }, new object());
+                    }
+
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50100"); 
+                }
+                else
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50101");
+
+                CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+                CurrentProgressInfo.TotalProgress.ProgressCurrent = 100;
+            }
+            catch (Exception e)
+            {
+                CalculateRouteResult = "Error: " + e.Message;
+            }
+        }
 
         #endregion
 

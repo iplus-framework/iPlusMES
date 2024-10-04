@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
 {
@@ -18,10 +19,15 @@ namespace gip.mes.facility
         public MsgWithDetails ValidateProdOrderPartslist(DatabaseApp dbApp, ACPartslistManager partsListManager, ProdOrderPartslist poList)
         {
             MsgWithDetails detailMessages = new MsgWithDetails();
-            foreach (ProdOrderPartslistPos pos in poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
+            IEnumerable<ProdOrderPartslistPos> rootPosList = dbApp.ProdOrderPartslistPos
+                .Include(c => c.Material.MDFacilityManagementType)
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Where(c => c.ProdOrderPartslistID == poList.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .AsEnumerable();
+            foreach (ProdOrderPartslistPos pos in rootPosList)
             {
-                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference, pos);
-                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference, pos);
+                //pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference, pos);
+                //pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference, pos);
                 if (!pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.
@@ -29,7 +35,7 @@ namespace gip.mes.facility
                     {
                         Source = GetACUrl(),
                         MessageLevel = eMsgLevel.Warning,
-                        ACIdentifier = "ValidateStart(1)",
+                        ACIdentifier = "ValidateProdOrderPartslist(1)",
                         Message = Root.Environment.TranslateMessage(partsListManager, "Warning50013", pos.Sequence, pos.Material.MaterialNo, pos.MaterialName)
                     });
                 }
@@ -42,7 +48,7 @@ namespace gip.mes.facility
                     {
                         Source = GetACUrl(),
                         MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "CheckResourcesAndRouting(20)",
+                        ACIdentifier = "ValidateProdOrderPartslist(20)",
                         Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
                     });
                 }
@@ -126,10 +132,15 @@ namespace gip.mes.facility
                 });
             }
 
-            foreach (ProdOrderPartslistPos pos in poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
+            IEnumerable<ProdOrderPartslistPos> rootPosList = dbApp.ProdOrderPartslistPos
+                .Include(c => c.Material.MDFacilityManagementType)
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Where(c => c.ProdOrderPartslistID == poList.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .AsEnumerable();
+            foreach (ProdOrderPartslistPos pos in rootPosList) //poList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot))
             {
-                pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference, pos);
-                pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference, pos);
+                //pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference, pos);
+                //pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.AutoRefresh(pos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference, pos);
                 if (!pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     // Stücklistenposition {0} {1} {2} ist keinem Zwischenmaterial zugeordnet.
@@ -139,6 +150,19 @@ namespace gip.mes.facility
                         MessageLevel = eMsgLevel.Warning,
                         ACIdentifier = "ValidateStart(40)",
                         Message = Root.Environment.TranslateMessage(partsListManager, "Warning50013", pos.Sequence, pos.Material != null ? pos.Material.MaterialNo : "", pos.MaterialName)
+                    });
+                }
+                if (pos.Material != null
+                    && pos.Material.IsLotReservationNeeded
+                    && !pos.FacilityReservation_ProdOrderPartslistPos.Where(c => !c.VBiACClassID.HasValue).Any())
+                {
+                    // Error50635: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
+                    detailMessages.AddDetailMessage(new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "ValidateStart(41)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
                     });
                 }
             }
@@ -228,6 +252,77 @@ namespace gip.mes.facility
             foreach (var item in result)
                 msg.AddDetailMessage(item);
         }
+
+        private DateTime _LastRunPossibleRoutesCheck = DateTime.Now;
+
+        public IEnumerable<FacilityReservationRoutes> CalculatePossibleRoutes(DatabaseApp dbApp, Database dbiPlus, ProdOrderBatchPlan batchPlan, List<IACConfigStore> configStores, ConfigManagerIPlus varioConfigManager, MsgWithDetails detailMessages)
+        {
+            TimeSpan ts = DateTime.Now - _LastRunPossibleRoutesCheck;
+            if (ts.TotalSeconds < 5)
+                return null;
+
+            if (batchPlan == null)
+                return null;
+
+            List<FacilityReservationRoutes> result = new List<FacilityReservationRoutes>();
+
+            foreach (FacilityReservation fr in batchPlan.FacilityReservation_ProdOrderBatchPlan)
+            {
+                if (!fr.FacilityID.HasValue)
+                    continue;
+
+                string targetCompACUrl = fr.FacilityACClass.ACUrlComponent;
+
+                ACRoutingParameters routingParameters = new ACRoutingParameters()
+                {
+                    RoutingService = this.RoutingService,
+                    Database = this.Database.ContextIPlus,
+                    SelectionRuleID = PAProcessModule.SelRuleID_ProcessModule,
+                    Direction = RouteDirections.Backwards,
+                    MaxRouteAlternativesInLoop = 1,
+                    IncludeReserved = true,
+                    IncludeAllocated = true
+                };
+
+
+                var dischargingClass = GetACClassWFDischarging(dbApp, batchPlan.ProdOrderPartslist, batchPlan.VBiACClassWF, batchPlan.ProdOrderPartslistPos);
+
+                var sources = dischargingClass.ParentACClass.DerivedClassesInProjects;
+                if (sources == null)
+                {
+                    Messages.Info(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
+                    return null;
+                }
+
+                List<core.datamodel.ACClass> possibleSources = sources.ToList();
+                core.datamodel.ACClass start = null;
+
+                if (batchPlan.IplusVBiACClassWF != null)
+                    start = ConfigManagerIPlus.FilterByAllowedInstances(dischargingClass.ACClassWF1_ParentACClassWF, configStores, varioConfigManager, possibleSources).FirstOrDefault();
+
+                if (start == null)
+                    start = sources.FirstOrDefault();
+
+                routingParameters.SelectionRuleID = "PAMSilo.Deselector";
+                routingParameters.Direction = RouteDirections.Forwards;
+
+                RoutingResult routes = ACRoutingService.SelectRoutes(start, fr.FacilityACClass, routingParameters);
+
+                if (result != null)
+                {
+                    fr.CalculatedRoute = routes.Routes.FirstOrDefault().GetRouteItemsGuid();
+                    result.Add(new FacilityReservationRoutes() { Reservation = fr, Routes = new RoutingResult(routes.Routes, false, null) });
+                }
+            }
+
+            Msg msgSave = dbApp.ACSaveChanges();
+            if (msgSave != null)
+                detailMessages.AddDetailMessage(msgSave);
+
+            return result;
+        }
+
+
 
         #endregion
 

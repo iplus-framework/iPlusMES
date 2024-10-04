@@ -94,6 +94,11 @@
         #endregion
 
         #region Labels
+        // Company
+        public const string Company = "en{'Company'}de{'Unternehmen'}";
+        public const string CompanyNo = "en{'Company No.'}de{'Unternehmensnr.'}";
+        public const string CompanyName = "en{'Company Name'}de{'Name des Unternehmens'}";
+
         // Quantity
         public const string InwardQuantity = "en{'Inward Quantity'}de{'Zugangsmenge'}";
         public const string InwardTargetQuantity = "en{'Target Inward Qty.'}de{'Zugangsmenge Soll'}";
@@ -199,9 +204,19 @@
         public const string FacilityNo = "en{'Storage Bin No.'}de{'Lagerplatznummer'}";
         public const string FacilityStock = "en{'Stock'}de{'Lagerbestand'}";
         public const string FacilityReservation = "en{'Reservation'}de{'Reservierung'}";
+        public const string FRIncludedFacilities = "en{'Included facilities'}de{'Eingeschlossene Lagerplätze'}";
+        public const string FRExcludedFacilities = "en{'Excluded facilities'}de{'Ausgeschlossene Lagerplätze'}";
+        public const string FacilityFilterConfig = "en{'Facility filter config'}de{'Lagerfilter Konfiguration'}";
+        public const string DisplayMaterialOfQuant = "en{'Display material of quant'}de{'Anzeigematerial von Quant'}";
 
         public const string Material = "en{'Material'}de{'Material'}";
         public const string MaterialNo = "en{'Material No.'}de{'Material-Nr.'}";
+
+        public const string CompanyMaterial = "en{'Company Material'}de{'Unternehmensmaterial'}";
+        public const string CompanyMaterialNo = "en{'External Material-No.'}de{'Externe Material-Nr.'}";
+        public const string CompanyMaterialName = "en{'External Material Name'}de{'Externer Materialname'}";
+
+
         public const string MaterialStock = "en{'Material Stock'}de{'Materialbestand'}";
         public const string ExternLotNo = "en{'Extern Lot No.'}de{'Externe Losnr.'}";
         public const string ExternLotNo2 = "en{'Extern Lot No.2'}de{'Externe Losnr.2'}";
@@ -209,8 +224,6 @@
         public const string Lot = "en{'Lot'}de{'Los'}";
         public const string LotNo = "en{'Lot No.'}de{'Los-Nr.'}";
         public const string SplitNo = "en{'Split No.'}de{'Splitnr'}";
-
-        public const string Company = "en{'Company'}de{'Unternehmen'}";
 
         public const string BOM = "en{'Bill of Materials'}de{'Stückliste'}";
 
@@ -298,6 +311,7 @@
         public const string Picking = "en{'Picking Order'}de{'Kommissionierauftrag'}";
         public const string PickingType = "en{'Picking type'}de{'Kommissionierung Typ'}";
         public const string PickingNo = "en{'Picking-No.'}de{'Kommissions-Nr.'}";
+        public const string PickingPreparationStatus = "en{'Preparation status'}de{'Bereitstellungsstatus'}";
 
         public const string Backward = "en{'Backward'}de{'Zurück '}";
         public const string Forward = "en{'Forward'}de{'Vorwärts'}";
@@ -307,6 +321,10 @@
         public const string EntityTranslateKeyOfExtSys = "en{'Key of ext. system'}de{'Schlüssel von ext. System'}";
 
         public const string DeliveryNotePos = "en{'Indeliverynotepos'}de{'Eingangslieferscheinposition'}";
+
+
+        public const string Weighing = "en{'Weighing'}de{'Wägung'}";
+        public const string WeighingState = "en{'Weighing state''}de{'Wiegestatus'}";
         #endregion
 
 
@@ -361,7 +379,7 @@
 
         #endregion
 
+        
 
     }
-
 }

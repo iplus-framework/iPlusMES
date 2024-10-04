@@ -290,9 +290,9 @@ namespace gip.mes.facility
 
             if (FBC.FacilityBooking != null)
             {
-                if (FBC.FacilityBooking.InwardMaterial != null)
+                if (FBC.FacilityBooking.InwardMaterial != null && FBC.FacilityBooking.InwardMaterial == FBC.InwardMaterial)
                 {
-                    if (FBC.FacilityBooking.InwardMaterialStock != null)
+                    if (FBC.FacilityBooking.InwardMaterialStock != null && FBC.FacilityBooking.InwardMaterialStock.MaterialID == FBC.FacilityBooking.InwardMaterial.MaterialID)
                         FBC.InwardMaterialStock = FBC.FacilityBooking.InwardMaterialStock;
                     else
                         FBC.InwardMaterialStock = FBC.FacilityBooking.InwardMaterial.GetMaterialStock_InsertIfNotExists(BP.DatabaseApp);
@@ -300,9 +300,9 @@ namespace gip.mes.facility
                 else if (FBC.InwardMaterial != null)
                     FBC.InwardMaterialStock = FBC.InwardMaterial.GetMaterialStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.InwardFacility != null)
+                if (FBC.FacilityBooking.InwardFacility != null && FBC.FacilityBooking.InwardFacility == FBC.InwardFacility)
                 {
-                    if (FBC.FacilityBooking.InwardFacilityStock != null)
+                    if (FBC.FacilityBooking.InwardFacilityStock != null && FBC.FacilityBooking.InwardFacilityStock.FacilityID == FBC.FacilityBooking.InwardFacility.FacilityID)
                         FBC.InwardFacilityStock = FBC.FacilityBooking.InwardFacilityStock;
                     else
                         FBC.InwardFacilityStock = FBC.FacilityBooking.InwardFacility.GetFacilityStock_InsertIfNotExists(BP.DatabaseApp);
@@ -310,9 +310,9 @@ namespace gip.mes.facility
                 else if (FBC.InwardFacility != null)
                     FBC.InwardFacilityStock = FBC.InwardFacility.GetFacilityStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.InwardFacilityLot != null)
+                if (FBC.FacilityBooking.InwardFacilityLot != null && FBC.FacilityBooking.InwardFacilityLot == FBC.InwardFacilityLot)
                 {
-                    if (FBC.FacilityBooking.InwardFacilityLotStock != null)
+                    if (FBC.FacilityBooking.InwardFacilityLotStock != null && FBC.FacilityBooking.InwardFacilityLotStock.FacilityLotID == FBC.FacilityBooking.InwardFacilityLot.FacilityLotID)
                         FBC.InwardFacilityLotStock = FBC.FacilityBooking.InwardFacilityLotStock;
                     else
                         FBC.InwardFacilityLotStock = FBC.FacilityBooking.InwardFacilityLot.GetFacilityLotStock_InsertIfNotExists(BP.DatabaseApp);
@@ -320,9 +320,9 @@ namespace gip.mes.facility
                 else if (FBC.InwardFacilityLot != null)
                     FBC.InwardFacilityLotStock = FBC.InwardFacilityLot.GetFacilityLotStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.InwardPartslist != null)
+                if (FBC.FacilityBooking.InwardPartslist != null && FBC.FacilityBooking.InwardPartslist == FBC.InwardPartslist)
                 {
-                    if (FBC.FacilityBooking.InwardPartslistStock != null)
+                    if (FBC.FacilityBooking.InwardPartslistStock != null && FBC.FacilityBooking.InwardPartslistStock.PartslistID == FBC.FacilityBooking.InwardPartslist.PartslistID)
                         FBC.InwardPartslistStock = FBC.FacilityBooking.InwardPartslistStock;
                     else
                         FBC.InwardPartslistStock = FBC.FacilityBooking.InwardPartslist.GetPartslistStock_InsertIfNotExists(BP.DatabaseApp);
@@ -330,9 +330,9 @@ namespace gip.mes.facility
                 else if (FBC.InwardPartslist != null)
                     FBC.InwardPartslistStock = FBC.InwardPartslist.GetPartslistStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.InwardCompanyMaterial != null)
+                if (FBC.FacilityBooking.InwardCompanyMaterial != null && FBC.FacilityBooking.InwardCompanyMaterial == FBC.InwardCompanyMaterial)
                 {
-                    if (FBC.FacilityBooking.InwardCompanyMaterialStock != null)
+                    if (FBC.FacilityBooking.InwardCompanyMaterialStock != null && FBC.FacilityBooking.InwardCompanyMaterialStock.CompanyMaterialID == FBC.FacilityBooking.InwardCompanyMaterial.CompanyMaterialID)
                         FBC.InwardCompanyMaterialStock = FBC.FacilityBooking.InwardCompanyMaterialStock;
                     else
                         FBC.InwardCompanyMaterialStock = FBC.FacilityBooking.InwardCompanyMaterial.GetCompanyMaterialStock_InsertIfNotExists(BP.DatabaseApp);
@@ -340,9 +340,9 @@ namespace gip.mes.facility
                 else if (FBC.InwardCompanyMaterial != null)
                     FBC.InwardCompanyMaterialStock = FBC.InwardCompanyMaterial.GetCompanyMaterialStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (BP.ParamsAdjusted.CPartnerCompanyMaterial != null)
+                if (BP.ParamsAdjusted.CPartnerCompanyMaterial != null && BP.ParamsAdjusted.CPartnerCompanyMaterial == FBC.InwardCPartnerCompMat)
                 {
-                    if (FBC.FacilityBooking.InwardCPartnerCompMatStock != null)
+                    if (FBC.FacilityBooking.InwardCPartnerCompMatStock != null && FBC.FacilityBooking.InwardCPartnerCompMatStock.CompanyMaterialID == BP.ParamsAdjusted.CPartnerCompanyMaterial.CompanyMaterialID)
                         FBC.InwardCPartnerCompMatStock = FBC.FacilityBooking.InwardCPartnerCompMatStock;
                     else
                         FBC.InwardCPartnerCompMatStock = BP.ParamsAdjusted.CPartnerCompanyMaterial.GetCompanyMaterialStock_InsertIfNotExists(BP.DatabaseApp);
@@ -603,9 +603,9 @@ namespace gip.mes.facility
 
             if (FBC.FacilityBooking != null)
             {
-                if (FBC.FacilityBooking.OutwardMaterial != null)
+                if (FBC.FacilityBooking.OutwardMaterial != null && FBC.FacilityBooking.OutwardMaterial == FBC.OutwardMaterial)
                 {
-                    if (FBC.FacilityBooking.OutwardMaterialStock != null)
+                    if (FBC.FacilityBooking.OutwardMaterialStock != null && FBC.FacilityBooking.OutwardMaterialStock.MaterialID == FBC.FacilityBooking.OutwardMaterial.MaterialID)
                         FBC.OutwardMaterialStock = FBC.FacilityBooking.OutwardMaterialStock;
                     else
                         FBC.OutwardMaterialStock = FBC.FacilityBooking.OutwardMaterial.GetMaterialStock_InsertIfNotExists(BP.DatabaseApp);
@@ -613,9 +613,9 @@ namespace gip.mes.facility
                 else if (FBC.OutwardMaterial != null)
                     FBC.OutwardMaterialStock = FBC.OutwardMaterial.GetMaterialStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.OutwardFacility != null)
+                if (FBC.FacilityBooking.OutwardFacility != null && FBC.FacilityBooking.OutwardFacility == FBC.OutwardFacility)
                 {
-                    if (FBC.FacilityBooking.OutwardFacilityStock != null)
+                    if (FBC.FacilityBooking.OutwardFacilityStock != null && FBC.FacilityBooking.OutwardFacilityStock.FacilityID == FBC.FacilityBooking.OutwardFacility.FacilityID)
                         FBC.OutwardFacilityStock = FBC.FacilityBooking.OutwardFacilityStock;
                     else
                         FBC.OutwardFacilityStock = FBC.FacilityBooking.OutwardFacility.GetFacilityStock_InsertIfNotExists(BP.DatabaseApp);
@@ -623,9 +623,9 @@ namespace gip.mes.facility
                 else if (FBC.OutwardFacility != null)
                     FBC.OutwardFacilityStock = FBC.OutwardFacility.GetFacilityStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.OutwardFacilityLot != null)
+                if (FBC.FacilityBooking.OutwardFacilityLot != null && FBC.FacilityBooking.OutwardFacilityLot == FBC.OutwardFacilityLot)
                 {
-                    if (FBC.FacilityBooking.OutwardFacilityLotStock != null)
+                    if (FBC.FacilityBooking.OutwardFacilityLotStock != null && FBC.FacilityBooking.OutwardFacilityLotStock.FacilityLotID == FBC.FacilityBooking.OutwardFacilityLot.FacilityLotID)
                         FBC.OutwardFacilityLotStock = FBC.FacilityBooking.OutwardFacilityLotStock;
                     else
                         FBC.OutwardFacilityLotStock = FBC.FacilityBooking.OutwardFacilityLot.GetFacilityLotStock_InsertIfNotExists(BP.DatabaseApp);
@@ -633,9 +633,9 @@ namespace gip.mes.facility
                 else if (FBC.OutwardFacilityLot != null)
                     FBC.OutwardFacilityLotStock = FBC.OutwardFacilityLot.GetFacilityLotStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.OutwardPartslist != null)
+                if (FBC.FacilityBooking.OutwardPartslist != null && FBC.FacilityBooking.OutwardPartslist == FBC.OutwardPartslist)
                 {
-                    if (FBC.FacilityBooking.OutwardPartslistStock != null)
+                    if (FBC.FacilityBooking.OutwardPartslistStock != null && FBC.FacilityBooking.OutwardPartslistStock.PartslistID == FBC.FacilityBooking.OutwardPartslist.PartslistID)
                         FBC.OutwardPartslistStock = FBC.FacilityBooking.OutwardPartslistStock;
                     else
                         FBC.OutwardPartslistStock = FBC.FacilityBooking.OutwardPartslist.GetPartslistStock_InsertIfNotExists(BP.DatabaseApp);
@@ -643,9 +643,9 @@ namespace gip.mes.facility
                 else if (FBC.OutwardPartslist != null)
                     FBC.OutwardPartslistStock = FBC.OutwardPartslist.GetPartslistStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (FBC.FacilityBooking.OutwardCompanyMaterial != null)
+                if (FBC.FacilityBooking.OutwardCompanyMaterial != null && FBC.FacilityBooking.OutwardCompanyMaterial == FBC.OutwardCompanyMaterial)
                 {
-                    if (FBC.FacilityBooking.OutwardCompanyMaterialStock != null)
+                    if (FBC.FacilityBooking.OutwardCompanyMaterialStock != null && FBC.FacilityBooking.OutwardCompanyMaterialStock.CompanyMaterialID == FBC.FacilityBooking.OutwardCompanyMaterial.CompanyMaterialID)
                         FBC.OutwardCompanyMaterialStock = FBC.FacilityBooking.OutwardCompanyMaterialStock;
                     else
                         FBC.OutwardCompanyMaterialStock = FBC.FacilityBooking.OutwardCompanyMaterial.GetCompanyMaterialStock_InsertIfNotExists(BP.DatabaseApp);
@@ -653,9 +653,9 @@ namespace gip.mes.facility
                 else if (FBC.OutwardCompanyMaterial != null)
                     FBC.OutwardCompanyMaterialStock = FBC.OutwardCompanyMaterial.GetCompanyMaterialStock_InsertIfNotExists(BP.DatabaseApp);
 
-                if (BP.ParamsAdjusted.CPartnerCompanyMaterial != null)
+                if (BP.ParamsAdjusted.CPartnerCompanyMaterial != null && BP.ParamsAdjusted.CPartnerCompanyMaterial == FBC.OutwardCPartnerCompMat)
                 {
-                    if (FBC.FacilityBooking.OutwardCPartnerCompMatStock != null)
+                    if (FBC.FacilityBooking.OutwardCPartnerCompMatStock != null && FBC.FacilityBooking.OutwardCPartnerCompMatStock.CompanyMaterialID == BP.ParamsAdjusted.CPartnerCompanyMaterial.CompanyMaterialID)
                         FBC.OutwardCPartnerCompMatStock = FBC.FacilityBooking.OutwardCPartnerCompMatStock;
                     else
                         FBC.OutwardCPartnerCompMatStock = BP.ParamsAdjusted.CPartnerCompanyMaterial.GetCompanyMaterialStock_InsertIfNotExists(BP.DatabaseApp);

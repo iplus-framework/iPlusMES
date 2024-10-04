@@ -15,6 +15,7 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -149,6 +150,47 @@ namespace gip.bso.logistics
         public bool IsEnabledRegisterWeight()
         {
             return SelectedScale != null && SelectedPickingPos != null;
+        }
+
+
+        double _WeighingValue = 0.0;
+        [ACPropertyInfo(659, "Weighings", "en{'Weight manually'}de{'Gewicht manuell'}")]
+        public double WeighingValue
+        {
+            get
+            {
+                return _WeighingValue;
+            }
+            set
+            {
+                if (_WeighingValue != value)
+                {
+                    _WeighingValue = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [ACMethodInfo("Dialog", "en{'Weight manuell'}de{'Gewicht manuell'}", (short)501)]
+        public void AddManualWeighing()
+        {
+            if (!IsEnabledAddManualWeighing())
+                return;
+            string secondaryKey = Root.NoManager.GetNewNo(this.Database, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, this);
+            Weighing weighing = Weighing.NewACObject(this.DatabaseApp, null, secondaryKey);
+            weighing.Weight = WeighingValue;
+            weighing.IdentNr = DateTime.Now.ToString();
+            weighing.PickingPos = SelectedPickingPos;
+            SelectedPickingPos.Weighing_PickingPos.Add(weighing);
+            //this.DatabaseApp.Weighing.AddObject(weighing);
+            RefreshWeighingList(true);
+            WeighingValue = 0.0;
+            Save();
+        }
+
+        public bool IsEnabledAddManualWeighing()
+        {
+            return SelectedPickingPos != null && Math.Abs(WeighingValue) > FacilityConst.C_ZeroCompare;
         }
         #endregion
 

@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using System.Threading;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 
 namespace gip.mes.facility
 {
-    public partial class FacilityManager 
+    public partial class FacilityManager
     {
         protected virtual void CreateConfigParams()
         {
@@ -40,6 +36,7 @@ namespace gip.mes.facility
             _BookingParameterQuantityIsAbsolute = new ACPropertyConfigValue<bool>(this, "BookingParameterQuantityIsAbsolute", false);
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
             _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
+            _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
             CreateModuleConstants();
         }
 
@@ -386,12 +383,66 @@ namespace gip.mes.facility
             set { _RootStoreForVehicles.ValueT = value; }
         }
 
+        private ACPropertyConfigValue<bool> _DisplayMaterialOfQuant;
+        [ACPropertyConfig(ConstApp.DisplayMaterialOfQuant)]
+        public bool DisplayMaterialOfQuant
+        {
+            get
+            {
+                return _DisplayMaterialOfQuant.ValueT;
+            }
+            set
+            {
+                _DisplayMaterialOfQuant.ValueT = value;
+            }
+        }
+
         public Facility GetRootStoreForVehicles(DatabaseApp dbApp)
         {
             string rootStore = RootStoreForVehicles;
             if (String.IsNullOrEmpty(rootStore))
                 return null;
             return dbApp.Facility.Where(c => c.FacilityNo == rootStore).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get WF for current facility (Picking)
+        /// search into tree hierarchy
+        /// </summary>
+        /// <param name="facility"></param>
+        /// <returns></returns>
+        public (gip.core.datamodel.ACClassMethod aCClassMethod, bool wfRunsBatches) GetFacilityWF(Facility facility)
+        {
+            bool wfRunsBatches = false;
+            gip.core.datamodel.ACClassMethod acClassMethod = null;
+            Facility currentFacility = facility;
+            while (currentFacility != null)
+            {
+                if (currentFacility.VBiACClassMethodID != null)
+                {
+                    acClassMethod = currentFacility.ACClassMethod;
+                    break;
+                }
+                currentFacility = currentFacility.Facility1_ParentFacility;
+            }
+
+            if (acClassMethod != null)
+            {
+                Type typePWWF = typeof(PWNodeProcessWorkflow);
+                wfRunsBatches = 
+                    acClassMethod
+                    .ACClassWF_ACClassMethod
+                    .ToArray()
+                    .Where(c => 
+                                c.RefPAACClassMethodID.HasValue && c.PWACClass != null 
+                                && c.PWACClass.ObjectType != null 
+                                && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)
+                        )
+                    .Any();
+
+            }
+
+            return (acClassMethod, wfRunsBatches);
         }
     }
 }

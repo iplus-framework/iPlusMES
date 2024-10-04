@@ -6,7 +6,6 @@ using gip.core.autocomponent;
 using VD = gip.mes.datamodel;
 using gip.core.processapplication;
 using gip.mes.datamodel;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
@@ -369,7 +368,7 @@ namespace gip.mes.processapplication
                     newACMethod.ParameterValueList["PLPosRelation"] = Guid.Empty;
                     newACMethod.ParameterValueList["FacilityCharge"] = Guid.Empty;
                     newACMethod.ParameterValueList["Facility"] = Guid.Empty;
-                    newACMethod.ParameterValueList["Route"] = null;
+                    newACMethod.ParameterValueList[nameof(Route)] = null;
                     newACMethod.ParameterValueList["TargetQuantity"] = (double)0.0;
                 }
                 catch (Exception ec)
@@ -407,7 +406,7 @@ namespace gip.mes.processapplication
             string matName = CurrentACMethod.ValueT[VD.Material.ClassName] as string;
             CurrentWeighingMaterial.ValueT = matName;
 
-            ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+            ACValue value = acMethod.ParameterValueList.GetACValue(nameof(Route));
             if (value == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
@@ -1436,8 +1435,8 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("Facility", typeof(Guid), null, Global.ParamOption.Optional));
             paramTranslation.Add("Facility", VD.ConstApp.Facility);
 
-            method.ParameterValueList.Add(new ACValue("Route", typeof(Route), null, Global.ParamOption.Required));
-            paramTranslation.Add("Route", "en{'Route'}de{'Route'}");
+            method.ParameterValueList.Add(new ACValue(nameof(Route), typeof(Route), null, Global.ParamOption.Required));
+            paramTranslation.Add(nameof(Route), "en{'Route'}de{'Route'}");
 
             method.ParameterValueList.Add(new ACValue("TargetQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Required));
             paramTranslation.Add("TargetQuantity", "en{'Target Quantity'}de{'Sollmenge'}");

@@ -46,6 +46,7 @@ namespace gip.mes.datamodel
         public const string FormatNewNo = "PK{0}";
         [NotMapped]
         public const string FormatNoForSupply = "{0}-{1:D4}";
+        public const string FormatNoForOrderSupply = "{0}-{1}-{2:D4}";
 
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
@@ -196,6 +197,38 @@ namespace gip.mes.datamodel
                 }
             }
         }
+
+
+        private PickingPreparationStatusEnum? _PreparationStatus;
+        [ACPropertyInfo(999, nameof(PreparationStatus), ConstApp.PickingPreparationStatus)]
+        public PickingPreparationStatusEnum? PreparationStatus
+        {
+            get
+            {
+                return _PreparationStatus;
+            }
+            set
+            {
+                _PreparationStatus = value;
+                OnPropertyChanged(nameof(PreparationStatus));
+            }
+        }
+
+        private string _PreparationStatusName;
+        [ACPropertyInfo(999, nameof(PreparationStatusName), ConstApp.PickingPreparationStatus)]
+        public string PreparationStatusName
+        {
+            get
+            {
+                return _PreparationStatusName;
+            }
+            set
+            {
+                _PreparationStatusName = value;
+                OnPropertyChanged(nameof(PreparationStatusName));
+            }
+        }
+
         #endregion
 
         #region IACConfigStore
@@ -358,6 +391,38 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Param State
+
+        private PreferredParamStateEnum _ParamState;
+        [ACPropertyInfo(999, nameof(ParamState), ConstApp.PrefParam)]
+        public PreferredParamStateEnum ParamState
+        {
+            get
+            {
+                return _ParamState;
+            }
+            set
+            {
+                if (_ParamState != value)
+                {
+                    _ParamState = value;
+                    OnPropertyChanged(nameof(ParamState));
+                }
+            }
+        }
+
+        [ACPropertyInfo(999, nameof(ParamStateName), "en{'Param state name'}de{'Parameterstatusname'}")]
+        public string ParamStateName
+        {
+            get
+            {
+                ACValueItem item = this.GetObjectContext<DatabaseApp>().PreferredParamStateList.Where(c => (PreferredParamStateEnum)c.Value == ParamState).FirstOrDefault();
+                return item.ACCaption;
+            }
+        }
+
+        #endregion
+
         #region Cloning
         public object Clone(bool withReferences)
         {
@@ -386,6 +451,7 @@ namespace gip.mes.datamodel
             Comment = from.Comment;
             XMLConfig = from.XMLConfig;
             KeyOfExtSys = from.KeyOfExtSys;
+            ParamState = from.ParamState;
         }
         #endregion
     }

@@ -29,6 +29,14 @@ namespace gip.mes.datamodel
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             facilityReservationID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var calculatedRoute = runtimeEntityType.AddProperty(
+                "CalculatedRoute",
+                typeof(string),
+                propertyInfo: typeof(FacilityReservation).GetProperty("CalculatedRoute", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(FacilityReservation).GetField("_CalculatedRoute", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            calculatedRoute.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var facilityChargeID = runtimeEntityType.AddProperty(
                 "FacilityChargeID",
                 typeof(Guid?),

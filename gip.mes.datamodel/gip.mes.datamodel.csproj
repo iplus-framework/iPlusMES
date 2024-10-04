@@ -181,6 +181,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-09-19_12-48_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-08-16_14-20_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-07-09_13-25_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2024-05-11_18-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -205,6 +214,15 @@
     <None Include="DbScripts\iPlusMES\dbsync_2024-01-18_09-45_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-09-13_11-07_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="DbScripts\iPlusMES\dbsync_2024-09-23_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DbScripts\iPlusMES\dbsync_2024-07-23_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DbScripts\iPlusMES\dbsync_2023-07-28_08-40_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

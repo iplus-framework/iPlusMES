@@ -236,7 +236,7 @@ namespace gip.mes.client.mobile
                     {
                         if (VBFrameController.CheckIfEntryEmpty(entry))
                         {
-                            Title.Text = null;
+                            TitleHeader.Text = null;
                             VBFrameController.ClearContent();
                             VBFrameController.CloseVBRibbon(RibbonBarGridMobile);
                             ToggleRibbonBarButton.Visibility = Visibility.Collapsed;
@@ -244,7 +244,7 @@ namespace gip.mes.client.mobile
                         }
                         else
                         {
-                            Title.Text = entry.Name;
+                            TitleHeader.Text = entry.Name;
                             VBFrameController.NavigationService.GoBack();
                             break;
                         }
@@ -254,7 +254,7 @@ namespace gip.mes.client.mobile
                 {
                     if (VBFrameController.Content != null)
                     {
-                        Title.Text = null;
+                        TitleHeader.Text = null;
                         ToggleRibbonBarButton.Visibility = Visibility.Collapsed;
                         VBFrameController.ClearContent();
                     }
@@ -274,14 +274,14 @@ namespace gip.mes.client.mobile
                 {
                     if (VBFrameController.CheckIfEntryEmpty(entry))
                     {
-                        Title.Text = null;
+                        TitleHeader.Text = null;
                         VBFrameController.ClearContent();
                         break;
                     }
                     else
                     {
                         VBFrameController.GoForward();
-                        Title.Text = entry.Name;
+                        TitleHeader.Text = entry.Name;
                         break;
                     }
                 }
@@ -482,7 +482,7 @@ namespace gip.mes.client.mobile
                 ribbonVisibilityOff = menuItem.RibbonOff;
                 caption = menuItem.UseACCaption ? menuItem.ACCaption : "";
                 title = menuItem.ACCaption;
-                Title.Text = menuItem.ACCaption;
+                TitleHeader.Text = menuItem.ACCaption;
             }
             VBFrameController.StartBusinessobject(acCommand.GetACUrl(), acCommand.ParameterList, caption, title, ribbonVisibilityOff);
             ToggleMenuVisibility();
@@ -607,7 +607,7 @@ namespace gip.mes.client.mobile
                 ACComponent channelManager = (ACComponent)ACRoot.SRoot.ACUrlCommand("?\\Communications\\WCFClientManager");
                 if (channelManager != null)
                 {
-                    Title.Text = "ConnectionInfo";
+                    TitleHeader.Text = "ConnectionInfo";
                     VBFrameController.ShowDialog(channelManager, "ConnectionInfoMobile", "", false);
                 }
             }
@@ -628,7 +628,7 @@ namespace gip.mes.client.mobile
                 ACComponent serviceHost = (ACComponent)ACRoot.SRoot.ACUrlCommand("?\\Communications\\WCFServiceManager");
                 if (serviceHost != null)
                 {
-                    Title.Text = "ConnectionInfo";
+                    TitleHeader.Text = "ConnectionInfo";
                     VBFrameController.ShowDialog(serviceHost, "ConnectionInfo", "", false);
                 }
             }

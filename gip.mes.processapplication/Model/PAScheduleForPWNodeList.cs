@@ -1,8 +1,6 @@
 ﻿using gip.core.datamodel;
 using VD = gip.mes.datamodel;
 using System;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -315,8 +315,6 @@ namespace gip.bso.sales
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Invoice>(Invoice.ClassName, this);
@@ -847,8 +845,6 @@ namespace gip.bso.sales
                     if (acQueryDef != null)
                     {
                         acQueryDef.CheckAndReplaceColumnsIfDifferent(OpenContractPosDefaultFilter, OpenContractPosDefaultSort, true, true);
-                        if (acQueryDef.TakeCount == 0)
-                            acQueryDef.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
 
                     _AccessOpenContractPos = acQueryDef.NewAccessNav<OutOrderPos>(OutOrderPos.ClassName, this);

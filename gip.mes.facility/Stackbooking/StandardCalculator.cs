@@ -241,7 +241,7 @@ namespace gip.mes.facility
                 return bookingResult;
             }
 
-
+            bool observeQuantity = false;
             List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
             Guid[] reservedLots = null;
             if (   BP.PartslistPosRelation != null 
@@ -249,8 +249,40 @@ namespace gip.mes.facility
                 && BP.PartslistPosRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos.Any())
             {
                 reservations = BP.PartslistPosRelation.SourceProdOrderPartslistPos.FacilityReservation_ProdOrderPartslistPos
-                                    .Select(c => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM })
+                                    .Select(c => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM, ReservationStateIndex = c.ReservationStateIndex })
                                     .ToList();
+                observeQuantity = reservations.Any(c => c.IsQuantityObservable);
+                if (observeQuantity)
+                {
+                    ACPartslistManager.QrySilosResult.ReservationInfo.UpdateActualQFromResCollection(reservations,
+                    BP.PartslistPosRelation.FacilityBookingCharge_ProdOrderPartslistPosRelation
+                        .Where(c => c.OutwardFacilityLotID.HasValue)
+                        .Select(c => new { LotID = c.OutwardFacilityLotID.Value, Q = c.OutwardQuantityUOM })
+                        .GroupBy(c => c.LotID)
+                        .Select(d => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = d.Key, ActualQuantity = d.Sum(e => e.Q) })
+                        .ToArray());
+                }
+                reservedLots = reservations.Select(c => c.FacilityLotID).ToArray();
+            }
+            else if (BP.PickingPos != null
+                && BP.PickingPos.FacilityReservation_PickingPos.Any())
+            {
+                reservations = BP.PickingPos.FacilityReservation_PickingPos
+                                    .Where(c => c.FacilityLotID.HasValue && !c.VBiACClassID.HasValue)
+                                    .Select(c => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = c.FacilityLotID.Value, Quantity = c.ReservedQuantityUOM, ReservationStateIndex = c.ReservationStateIndex })
+                                    .ToList();
+                observeQuantity = reservations.Any(c => c.IsQuantityObservable);
+                if (observeQuantity)
+                {
+                    ACPartslistManager.QrySilosResult.ReservationInfo.UpdateActualQFromResCollection(reservations,
+                    BP.PickingPos.FacilityBookingCharge_PickingPos
+                        .Where(c => c.OutwardFacilityLotID.HasValue)
+                        .Select(c => new { LotID = c.OutwardFacilityLotID.Value, Q = c.OutwardQuantityUOM })
+                        .GroupBy(c => c.LotID)
+                        .Select(d => new ACPartslistManager.QrySilosResult.ReservationInfo() { FacilityLotID = d.Key, ActualQuantity = d.Sum(e => e.Q) })
+                        .ToArray());
+                }
+                //BP.PickingPos.FacilityBookingCharge_PickingPos.Select(c => c.Out)
                 reservedLots = reservations.Select(c => c.FacilityLotID).ToArray();
             }
 
@@ -370,11 +402,29 @@ namespace gip.mes.facility
             // Summen der bisher gebuchten Chargen, gemessen in übergebener quantityUnit und weightUnit
             Double quantityAbsoluteRestUOM = quantityAbsoluteUOM;
             int forEachCounter = 0;
+            nCountElements = sortedFacilityCharges.Count();
 
             foreach (FacilityCharge facilityCharge in sortedFacilityCharges)
             {
                 forEachCounter++;
                 Double facilityChargeQuantityUOM = facilityCharge.StockQuantityUOM;
+                // If booking according to Reserved qauntities, the correct posting values, that not too much is used from lots
+                if (!bStockIncrease && observeQuantity && forEachCounter < nCountElements && facilityChargeQuantityUOM >= double.Epsilon)
+                {
+                    ReservationInfo reservationInfo = reservations.Where(c => c.FacilityLotID == facilityCharge.FacilityLotID).FirstOrDefault();
+                    if (reservationInfo != null && reservationInfo.RestQuantity.HasValue)
+                    {
+                        if (reservationInfo.RestQuantity.Value >= double.Epsilon)
+                            continue;
+                        if (Math.Abs(reservationInfo.RestQuantity.Value) < facilityChargeQuantityUOM)
+                        {
+                            facilityChargeQuantityUOM = Math.Abs(reservationInfo.RestQuantity.Value);
+                            reservationInfo.ActualQuantity = reservationInfo.Quantity;
+                        }
+                        else
+                            reservationInfo.ActualQuantity += facilityChargeQuantityUOM;
+                    }
+                }
                 // Konvertiere Menge von FaciliyCharge in übergebenen Einheiten
                 //try
                 //{

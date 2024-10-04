@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Security.Cryptography;
-using dbMes = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 
 namespace gip.bso.masterdata
 {
@@ -18,7 +16,7 @@ namespace gip.bso.masterdata
 
         #region ctor's
 
-        public MachineItem(SourceSelectionRulesResult sourceSelectionRulesResult, RuleGroup ruleGroup, ACClass machine, dbMes.Material material, string preConfigACUrl)
+        public MachineItem(SourceSelectionRulesResult sourceSelectionRulesResult, RuleGroup ruleGroup, ACClass machine, VD.Material material, string preConfigACUrl)
         {
             SourceSelectionRulesResult = sourceSelectionRulesResult;
             RuleGroup = ruleGroup;
@@ -41,8 +39,8 @@ namespace gip.bso.masterdata
         [ACPropertyInfo(100, "", Const.ProcessModule)]
         public ACClass Machine { get; set; }
 
-        [ACPropertyInfo(101, "", dbMes.ConstApp.Material)]
-        public dbMes.Material Material { get; set; }
+        [ACPropertyInfo(101, "", VD.ConstApp.Material)]
+        public VD.Material Material { get; set; }
 
 
         public bool _IsSelected;

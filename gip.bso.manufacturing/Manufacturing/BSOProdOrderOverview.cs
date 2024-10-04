@@ -360,10 +360,7 @@ namespace gip.bso.manufacturing
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
-
                     }
 
                     _AccessFilterFacility = navACQueryDefinition.NewAccessNav<Facility>("FilterFacility", this);

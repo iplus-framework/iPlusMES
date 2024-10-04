@@ -350,6 +350,7 @@ namespace gip.mes.facility
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => c.FacilityID == facID && (!showNotAvailable.HasValue || c.NotAvailable == showNotAvailable.Value))
+                .OrderBy(c => c.FacilityChargeSortNo)
         );
 
         public IEnumerable<FacilityChargeSumFacilityHelper> GetFacilityChargeSumFacilityHelperList(IEnumerable<FacilityCharge> facilityChargeList, FacilityQueryFilter bookingFilter)
@@ -855,6 +856,11 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
         }
 
         public virtual Msg IsAllowedReassignMaterial(DatabaseApp dbApp, Material currentMaterial, Material newMaterial)
+        {
+            return null;
+        }
+
+        public virtual Msg IsAllowedReassignLot(DatabaseApp dbApp, FacilityLot currentLot, FacilityLot newLot)
         {
             return null;
         }

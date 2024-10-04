@@ -1,19 +1,12 @@
 ﻿using System.Runtime.CompilerServices;
-using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.mes.autocomponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using VD = gip.mes.datamodel;
-using System.Text;
-using System.Threading.Tasks;
 using gip.mes.processapplication;
 using System.ComponentModel;
 using System.Data;
-using gip.core.processapplication;
-using System.Threading;
-using gip.mes.facility;
 using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
@@ -101,11 +94,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public VD.PickingPos _PickingPosition;
         [ACPropertyInfo(100)]
         public VD.PickingPos PickingPosition
         {
-            get;
-            set;
+            get => _PickingPosition;
+            set
+            {
+                _PickingPosition = value;
+
+                if (_PickingPosition != null)
+                {
+                    TargetQuantity = _PickingPosition.TargetQuantity;
+                }
+                else if (_PosRelation == null)
+                {
+                    MaterialName = null;
+                    MaterialNo = null;
+                    IsLotManaged = false;
+                    TargetQuantity = 0;
+                    ActualQuantity = 0;
+                }
+            }
         }
 
         [ACPropertyInfo(100)]

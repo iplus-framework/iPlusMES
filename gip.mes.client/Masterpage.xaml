@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:gip.mes.client"
     xmlns:vb="clr-namespace:gip.core.layoutengine;assembly=gip.core.layoutengine"
     xmlns:dm="clr-namespace:gip.core.datamodel;assembly=gip.core.datamodel"
-    Title="VarioBatch" Width="800" Height="600" Loaded="Window_Loaded" Closing="Window_Closing" Icon="/gip.mes.client;component/Images/iPlusIconDesktop.ico" WindowState="Normal">
+    Title="iPlus" Width="800" Height="600" Loaded="Window_Loaded" Closing="Window_Closing" Icon="/gip.mes.client;component/Images/iPlusIconDesktop.ico" WindowState="Normal">
     <Window.Resources>
         <ResourceDictionary>
         </ResourceDictionary>

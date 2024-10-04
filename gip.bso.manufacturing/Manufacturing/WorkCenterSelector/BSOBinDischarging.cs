@@ -3,7 +3,7 @@ using gip.core.datamodel;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
-using VB = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -288,7 +288,7 @@ namespace gip.bso.manufacturing
                             DischargingItem dischargingItem = DischargingItemList.FirstOrDefault(c => c.ItemID == _SourceCodeItemID);
                             if (dischargingItem != null)
                             {
-                                using (VB.DatabaseApp dbApp = new VB.DatabaseApp())
+                                using (VD.DatabaseApp dbApp = new VD.DatabaseApp())
                                 {
                                     var outwardBooking = dbApp.FacilityBooking.Where(c => c.ProdOrderPartslistPosRelationID == dischargingItem.ProdorderPartslistPosRelationID
                                                                                        && ((c.OutwardFacilityID.HasValue && c.OutwardFacility.FacilityNo == dischargingItem.InwardFacilityNo)

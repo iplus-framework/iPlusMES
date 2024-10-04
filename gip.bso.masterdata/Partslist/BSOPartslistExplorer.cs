@@ -225,8 +225,6 @@ namespace gip.bso.masterdata
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         if (navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter))
                         {
                             SetMaterialIDFilter();

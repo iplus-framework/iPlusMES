@@ -17,7 +17,7 @@ namespace gip.mes.processapplication
         static PAMHopperscale()
         {
             RegisterExecuteHandler(typeof(PAMHopperscale), HandleExecuteACMethod_PAMHopperscale);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Hopperscale, (c, p) => c.Component.ValueT is PAMHopperscale, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Hopperscale, (c, p) => c.ComponentInstance is PAMHopperscale, null);
         }
 
         public PAMHopperscale(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")

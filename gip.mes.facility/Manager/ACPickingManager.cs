@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
+using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
 using static gip.mes.facility.ACPartslistManager;
 
@@ -17,6 +19,7 @@ namespace gip.mes.facility
         public ACPickingManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _CheckIsRouteAllocated = new ACPropertyConfigValue<bool>(this, nameof(CheckIsRouteAllocated), false);
         }
 
         protected override void Construct(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -26,7 +29,11 @@ namespace gip.mes.facility
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            return base.ACInit(startChildMode);
+            bool result = base.ACInit(startChildMode);
+
+            _ = CheckIsRouteAllocated;
+
+            return result;
         }
 
         public override bool ACPostInit()
@@ -146,6 +153,57 @@ namespace gip.mes.facility
         }
 
 
+        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>> s_cQry_PickingWithPWNode =
+        EF.CompileQuery<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>>(
+           (ctx, greaterEqualState, lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) =>
+                                   ctx.Picking
+                                   .Include("PickingPos_Picking.PickingMaterial")
+                                   .Include("PickingPos_Picking.OutOrderPos.Material")
+                                   .Include("PickingPos_Picking.InOrderPos.Material")
+                                   .Include("PickingPos_Picking.ToFacility")
+                                   .Include("PickingPos_Picking.FromFacility")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.FacilityLot")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.Material")
+                                   .Include("PickingPos_Picking.FacilityReservation_PickingPos.Facility.FacilityStock_Facility")
+                                   .Where(c => (c.VBiACClassWF != null && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
+                                           && (c.PickingStateIndex >= greaterEqualState
+                                               || c.PickingStateIndex <= lessEqualState)
+                                           && (string.IsNullOrEmpty(pickingNo) || c.PickingNo.Contains(pickingNo))
+                                           && (
+                                                   string.IsNullOrEmpty(materialNo)
+                                                   || (c.PickingPos_Picking.Any(x => x.PickingMaterial != null && x.PickingMaterial.MaterialNo.Contains(materialNo)))
+                                               )
+                                           && (filterStartTime == null
+                                                || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
+                                                || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
+                                               )
+                                           && (filterEndTime == null
+                                                || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
+                                                || (c.ScheduledEndDate == null && c.ScheduledStartDate != null && c.ScheduledStartDate <= filterEndTime)
+                                                || (c.ScheduledEndDate == null && c.ScheduledStartDate == null && c.UpdateDate <= filterEndTime)
+                                               )
+                                         )
+                                   .OrderBy(c => c.ScheduledOrder ?? 0)
+                                   .ThenBy(c => c.InsertDate)
+       );
+
+        public IEnumerable<Picking> GetScheduledPickings(
+            DatabaseApp databaseApp,
+            PickingStateEnum greaterEqualState,
+            PickingStateEnum lessEqualState,
+            DateTime? filterStartTime,
+            DateTime? filterEndTime,
+            string pickingNo,
+            string materialNo)
+        {
+            IEnumerable<Picking> query = s_cQry_PickingWithPWNode(databaseApp, (short)greaterEqualState,
+                (short)lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) as IEnumerable<Picking>;
+            //query.MergeOption = MergeOption.OverwriteChanges;
+            return query;
+        }
+
+
         #endregion
 
         #endregion
@@ -182,6 +240,44 @@ namespace gip.mes.facility
             _BookParamZeroStockFacilityChargeClone.Database = dbApp;
 
             return _BookParamZeroStockFacilityChargeClone;
+        }
+
+        private ACPropertyConfigValue<bool> _CheckIsRouteAllocated;
+        [ACPropertyConfig("en{'Check is route allocated'}de{'Prüfen, ob Route zugewiesen ist'}")]
+        public bool CheckIsRouteAllocated
+        {
+            get
+            {
+                return _CheckIsRouteAllocated.ValueT;
+            }
+            set
+            {
+                _CheckIsRouteAllocated.ValueT = value;
+            }
+        }
+
+        private bool _CanStartIfRouteAllocated;
+        [ACPropertyInfo(9999, "", "en{'Can start if route allocated'}de{'Kann starten, wenn Route zugewiesen ist'}", "", true)]
+        public bool CanStartIfRouteAllocated
+        {
+            get => _CanStartIfRouteAllocated;
+            set => _CanStartIfRouteAllocated = value;
+        }
+
+        public bool CanUserStartIfRouteAllocated
+        {
+            get
+            {
+                ClassRightManager rightManager = CurrentRightsOfInvoker;
+                if (rightManager == null)
+                    return true;
+                IACPropertyBase acProperty = this.GetProperty(nameof(CanStartIfRouteAllocated));
+                if (acProperty == null)
+                    return true;
+                Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
+                return rightMode >= Global.ControlModes.Enabled;
+
+            }
         }
 
         #endregion
@@ -1121,14 +1217,17 @@ namespace gip.mes.facility
                 }
                 if (lotsForReservation.Any())
                 {
+                    pickingPos.TargetQuantityUOM = lotsForReservation.Sum(c => c.RelocationQuantity);
                     foreach (var flGroup in lotsForReservation.GroupBy(c => c.FacilityLot))
                     {
-                        double reservationQ = flGroup.Sum(c => c.StockQuantityUOM);
+                        double reservationQ = flGroup.Sum(c => c.RelocationQuantity);
                         secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
                         FacilityReservation reservation = FacilityReservation.NewACObject(dbApp, pickingPos, secondaryKey);
                         reservation.ReservedQuantityUOM = reservationQ;
                         reservation.FacilityLot = flGroup.Key;
                         reservation.PickingPos = pickingPos;
+                        reservation.Material = flGroup.FirstOrDefault()?.Material;
+                        reservation.ReservationState = flGroup.Select(c => new { valState = (short)c.ReservationState, state = c.ReservationState }).OrderBy(c => c.valState).Select(c => c.state).FirstOrDefault();
                         dbApp.FacilityReservation.Add(reservation);
                     }
                 }
@@ -1200,7 +1299,8 @@ namespace gip.mes.facility
         public virtual MsgWithDetails ValidateStart(DatabaseApp dbApp, Database dbiPlus,
             Picking picking, List<IACConfigStore> configStores,
             PARole.ValidationBehaviour validationBehaviour,
-            core.datamodel.ACClassWF planningNode = null)
+            core.datamodel.ACClassWF planningNode = null,
+            bool checkOnStart = false)
         {
             Msg msg = null;
             MsgWithDetails detailMessages = new MsgWithDetails();
@@ -1220,6 +1320,15 @@ namespace gip.mes.facility
                 detailMessages.AddDetailMessage(msg);
 
                 return detailMessages;
+            }
+
+            if (checkOnStart && planningNode == null)
+            {
+                var workflow = picking.ACClassMethod;
+                if (workflow != null)
+                {
+                    planningNode = workflow.ACClassWF_ACClassMethod.FirstOrDefault(c => c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeMethod)?.FromIPlusContext<core.datamodel.ACClassWF>(dbiPlus);
+                }
             }
 
             string selectionRuleID = "PAMSilo.Deselector";
@@ -1266,7 +1375,6 @@ namespace gip.mes.facility
                                         ruleParams.Add(acClass.ACClassID);
                                     }
                                 }
-
                             }
                         }
                     }
@@ -1279,7 +1387,7 @@ namespace gip.mes.facility
                 }
             }
 
-            CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams);
+            CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams, checkOnStart);
 
             return detailMessages;
         }
@@ -1299,10 +1407,11 @@ namespace gip.mes.facility
             return detailMessages;
         }
 
+
         #region Virtual and protected
         public virtual void CheckResourcesAndRouting(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, string selectionRuleID = "PAMSilo.Deselector",
-                                        object[] selectionRuleParams = null)
+                                        object[] selectionRuleParams = null, bool checkOnStart = false)
         {
             //if (configStores == null)
             //return;
@@ -1328,6 +1437,9 @@ namespace gip.mes.facility
             foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                         .OrderBy(c => c.Sequence))
             {
+                // Reset rembered Dosing-Node when starting again.
+                if (pos.ACClassTaskID2.HasValue)
+                    pos.ACClassTaskID2 = null;
                 if (pos.Material != null && pos.Material.IsLotReservationNeeded)
                 {
                     if (!pos.FacilityReservation_PickingPos.Where(c => !c.VBiACClassID.HasValue).Any())
@@ -1345,18 +1457,18 @@ namespace gip.mes.facility
                 }
                 if (pos.FromFacility != null)
                 {
-                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams);
+                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams, checkOnStart);
                 }
                 else
                 {
-                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams);
+                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType, selectionRuleID, selectionRuleParams, checkOnStart);
                 }
             }
         }
 
-        private void CheckResourcesAndRoutingKnownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
+        private IEnumerable<Route> CheckResourcesAndRoutingKnownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                                          PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType,
-                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null, bool checkOnStart = false)
         {
             Msg msg;
 
@@ -1371,7 +1483,7 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
             if (!pos.FromFacility.VBiFacilityACClassID.HasValue || !pos.ToFacility.VBiFacilityACClassID.HasValue)
             {
@@ -1384,7 +1496,7 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
 
             if (validationBehaviour == PARole.ValidationBehaviour.Strict
@@ -1402,7 +1514,7 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(this, "Error50115", pos.FromFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
                 if (pos.ToFacility.MaterialID.HasValue && pos.FromFacility.MaterialID.HasValue && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.FromFacility.Material))
                 {
@@ -1417,7 +1529,7 @@ namespace gip.mes.facility
                                 pos.ToFacility.Material.MaterialNo, pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
                 if (pos.ToFacility.PartslistID.HasValue && pos.FromFacility.PartslistID.HasValue && pos.ToFacility.PartslistID.Value != pos.FromFacility.PartslistID.Value)
                 {
@@ -1432,7 +1544,7 @@ namespace gip.mes.facility
                                 pos.ToFacility.Partslist.PartslistNo, pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
                 if (!pos.ToFacility.InwardEnabled)
                 {
@@ -1445,7 +1557,7 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
                 if (!pos.FromFacility.OutwardEnabled)
                 {
@@ -1458,7 +1570,7 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(this, "Error50119", pos.FromFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
             }
             else if (validationBehaviour == PARole.ValidationBehaviour.Strict
@@ -1478,7 +1590,7 @@ namespace gip.mes.facility
                                 pos.ToFacility.Material.MaterialNo, pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
                 if (!pos.ToFacility.InwardEnabled)
                 {
@@ -1491,13 +1603,13 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
             }
             var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
             var toClass = pos.ToFacility.GetFacilityACClass(dbiPlus);
             if (fromClass == toClass)
-                return;
+                return null;
 
             ACRoutingParameters routingParameters = new ACRoutingParameters()
             {
@@ -1512,13 +1624,13 @@ namespace gip.mes.facility
                 MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                 IncludeReserved = true,
                 IncludeAllocated = true,
-                DBRecursionLimit = 10
+                DBRecursionLimit = 10,
+                IgnorePreferences = true
             };
 
             RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
             if (result.Routes == null || !result.Routes.Any())
             {
-                //Error50120: No route found for transport from {0} to {1}
                 msg = new Msg
                 {
                     Source = GetACUrl(),
@@ -1527,13 +1639,38 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
+
+            if (checkOnStart && CheckIsRouteAllocated)
+            {
+                routingParameters.IncludeAllocated = false;
+                result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
+
+                if (result.Routes == null || !result.Routes.Any())
+                {
+                    eMsgLevel errorLevel = eMsgLevel.Error;
+                    if (CanUserStartIfRouteAllocated)
+                        errorLevel = eMsgLevel.Warning;
+
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = errorLevel,
+                        ACIdentifier = "CheckResourcesAndRouting(90)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return null;
+                }
+            }
+
+            return result?.Routes;
         }
 
-        private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
+        private IEnumerable<Route> CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
                                                          PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType,
-                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+                                                         string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null, bool checkOnStart = false)
         {
             Msg msg;
 
@@ -1548,7 +1685,7 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
 
             if (!pos.ToFacility.VBiFacilityACClassID.HasValue)
@@ -1562,7 +1699,7 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
 
             if (pos.ToFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer && !pos.PickingMaterialID.HasValue)
@@ -1575,7 +1712,7 @@ namespace gip.mes.facility
                     Message = "No material assigned to picking position."
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
 
             if (validationBehaviour == PARole.ValidationBehaviour.Strict
@@ -1596,7 +1733,7 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(this, "Error50115", pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
 
                 if (!pos.ToFacility.InwardEnabled)
@@ -1610,7 +1747,7 @@ namespace gip.mes.facility
                         Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
                     };
                     detailMessages.AddDetailMessage(msg);
-                    return;
+                    return null;
                 }
             }
 
@@ -1628,12 +1765,37 @@ namespace gip.mes.facility
                 {
                     Source = GetACUrl(),
                     MessageLevel = eMsgLevel.Error,
-                    ACIdentifier = "CheckResourcesAndRouting(90)",
+                    ACIdentifier = nameof(CheckResourcesAndRoutingUnknownSource) + "(90)",
                     Message = Root.Environment.TranslateMessage(this, "Error50120", "", pos.ToFacility.FacilityNo)
                 };
                 detailMessages.AddDetailMessage(msg);
-                return;
+                return null;
             }
+
+            if (checkOnStart && CheckIsRouteAllocated)
+            {
+                routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos,
+                                                  null, null, null, true, 0, selectionRuleID, selectionRuleParams, false);
+
+                if (routes == null || !routes.Any())
+                {
+                    eMsgLevel errorLevel = eMsgLevel.Error;
+                    if (CanUserStartIfRouteAllocated)
+                        errorLevel = eMsgLevel.Warning;
+
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = errorLevel,
+                        ACIdentifier = nameof(CheckResourcesAndRoutingUnknownSource) + "(95)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50120", "", pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return null;
+                }
+            }
+
+            return routes;
         }
 
 
@@ -1700,6 +1862,319 @@ namespace gip.mes.facility
         //        }
         //    }
         //}
+
+        public IEnumerable<FacilityReservationRoutes> CalculatePossibleRoutes(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores, MsgWithDetails detailMessages)
+        {
+            Msg msg = null;
+            core.datamodel.ACClassWF planningNode = null;
+
+            var workflow = picking.ACClassMethod;
+            if (workflow != null)
+            {
+                planningNode = workflow.ACClassWF_ACClassMethod.FirstOrDefault(c => c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeMethod)?.FromIPlusContext<core.datamodel.ACClassWF>(dbiPlus);
+            }
+
+            string selectionRuleID = "PAMSilo.Deselector";
+            object[] selectionRuleParams = null;
+
+            if (planningNode != null && configStores != null)
+            {
+                List<object> ruleParams = new List<object>();
+                core.datamodel.ACClassMethod subWorkflow = planningNode.RefPAACClassMethod;
+
+                if (subWorkflow != null)
+                {
+                    var pwGroups = subWorkflow.AllWFNodes.Where(c => c.PWACClass.ACKind == Global.ACKinds.TPWGroup).OfType<core.datamodel.ACClassWF>();
+
+                    if (pwGroups != null && pwGroups.Any())
+                    {
+                        ConfigManagerIPlus configManager = ConfigManagerIPlus.GetServiceInstance(this);
+                        if (configManager != null)
+                        {
+                            core.datamodel.ACClass[] possibleClassProjects = planningNode.RefPAACClass.ACClass_BasedOnACClass.ToArray();
+                            // 2. Determine on which Application-Projects can subworkflows be started (Line-Check)
+                            possibleClassProjects = ApplyRulesOnProjects(dbiPlus, planningNode, possibleClassProjects, configStores);
+
+                            Guid[] possibleProjectIDs = Array.Empty<Guid>();
+
+                            if (possibleClassProjects.Any())
+                                possibleProjectIDs = possibleClassProjects.Select(c => c.ACProjectID).ToArray();
+
+                            foreach (core.datamodel.ACClassWF group in pwGroups)
+                            {
+                                var ruleValueList = configManager.GetRuleValueList(configStores, planningNode.ConfigACUrl + "\\",
+                                                                                   group.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString());
+
+                                var selectedClasses = ruleValueList?.GetSelectedClasses(ACClassWFRuleTypes.Allowed_instances, dbiPlus);
+                                if (selectedClasses == null || !selectedClasses.Any())
+                                {
+                                    selectedClasses = group.RefPAACClass.ACClass_BasedOnACClass.Where(d => possibleProjectIDs.Contains(d.ACProjectID)).ToList();
+                                }
+
+                                if (selectedClasses != null && selectedClasses.Any())
+                                {
+                                    foreach (var acClass in selectedClasses)
+                                    {
+                                        ruleParams.Add(acClass.ACClassID);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (ruleParams.Any())
+                {
+                    selectionRuleID = "PAProcessModuleParam.Deselector";
+                    selectionRuleParams = ruleParams.ToArray();
+                }
+            }
+
+            Type siloType = null;
+            gip.core.datamodel.ACClass acClassSilo = ACClassManager.s_cQry_ACClassIdentifier(dbiPlus, FacilityManager.SiloClass);
+            if (acClassSilo != null)
+                siloType = acClassSilo.ObjectType;
+            if (acClassSilo == null || siloType == null)
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(10)",
+                    Message = String.Format("Type for {0} not found in Database or .NET-Type not loadable", FacilityManager.SiloClass)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            List<FacilityReservationRoutes> result = new List<FacilityReservationRoutes>();
+
+            foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
+                       .OrderBy(c => c.Sequence))
+            {
+
+                foreach (FacilityReservation reservation in pos.FacilityReservation_PickingPos)
+                {
+                    if (reservation.CalculatedRoute != null)
+                        continue;
+
+                    IEnumerable<Route> routes = null;
+
+                    if (pos.FromFacility != null)
+                    {
+                        routes = CheckRoutingKnownSourceReservation(dbApp, dbiPlus, picking, detailMessages, pos, reservation, siloType, selectionRuleID, selectionRuleParams);
+                    }
+                    else
+                    {
+                        routes = CheckRoutingRoutingUnknownSourceReservation(dbApp, dbiPlus, picking, detailMessages, pos, reservation, siloType, selectionRuleID, selectionRuleParams);
+                    }
+
+                    if (routes != null)
+                    {
+                        reservation.CalculatedRoute = routes.FirstOrDefault().GetRouteItemsGuid();
+                        result.Add(new FacilityReservationRoutes() { Reservation = reservation, Routes = new RoutingResult(routes, false, null) });
+                    }
+                }
+            }
+
+            Msg msgSave = dbApp.ACSaveChanges();
+            if (msgSave != null)
+                detailMessages.AddDetailMessage(msgSave);
+
+            return result;
+        }
+
+        private IEnumerable<Route> CheckRoutingKnownSourceReservation(DatabaseApp dbApp, Database dbiPlus, Picking picking,
+                                                                      MsgWithDetails detailMessages, PickingPos pos, FacilityReservation reservation, Type siloType,
+                                                                      string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+        {
+            Msg msg;
+
+            if (pos.FromFacility == null || reservation.Facility == null || pos.FromFacility.MDFacilityType == null || reservation.Facility.MDFacilityType == null)
+            {
+                //Error50113: No source, no target or no facilitytype defined in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+            if (!pos.FromFacility.VBiFacilityACClassID.HasValue || !reservation.Facility.VBiFacilityACClassID.HasValue)
+            {
+                //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
+            var toClass = reservation.Facility.GetFacilityACClass(dbiPlus);
+            if (fromClass == toClass)
+                return null;
+
+            ACRoutingParameters routingParameters = new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = this.Database.ContextIPlus,
+                AttachRouteItemsToContext = false,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleID = selectionRuleID,
+                SelectionRuleParams = selectionRuleParams,
+                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
+                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true,
+                DBRecursionLimit = 10,
+                IgnorePreferences = true
+            };
+
+            RoutingResult result = ACRoutingService.SelectRoutes(fromClass, toClass, routingParameters);
+            if (result.Routes == null || !result.Routes.Any())
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(90)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            return result?.Routes;
+        }
+
+        private IEnumerable<Route> CheckRoutingRoutingUnknownSourceReservation(DatabaseApp dbApp, Database dbiPlus, Picking picking,
+                                                                               MsgWithDetails detailMessages, PickingPos pos, FacilityReservation reservation, Type siloType,
+                                                                               string selectionRuleID = "PAMSilo.Deselector", object[] selectionRuleParams = null)
+        {
+            Msg msg;
+
+            if (reservation.Facility == null || reservation.Facility.MDFacilityType == null)
+            {
+                //Error50113: No source, no target or no facilitytype defined in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            if (!reservation.Facility.VBiFacilityACClassID.HasValue)
+            {
+                //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            if (reservation.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer && !pos.PickingMaterialID.HasValue)
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = "No material assigned to picking position."
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+
+            QrySilosResult possibleSilos = null;
+            core.datamodel.ACClass compClass = reservation.Facility.FacilityACClass;
+
+            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos,
+                                                  null, null, null, true, 0, selectionRuleID, selectionRuleParams);
+
+            if (routes == null || !routes.Any())
+            {
+                //Error50120: No route found for transport from {0} to {1}
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = nameof(CheckResourcesAndRoutingUnknownSource) + "(90)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50120", "", reservation.Facility.FacilityNo)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return null;
+            }
+
+            return routes;
+        }
+
+        public Msg CompareCalculateRoutes(Picking currentPicking, IEnumerable<Picking> pickingsExcludeComparation, DatabaseApp dbApp)
+        {
+            var pickings = GetScheduledPickings(dbApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+            List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+            foreach (Picking picking in pickings)
+            {
+                if (pickingsExcludeComparation.Where(c => c.PickingID == picking.PickingID).Any())
+                    continue;
+
+                foreach (PickingPos pPos in picking.PickingPos_Picking)
+                {
+                    reservations.AddRange(pPos.FacilityReservation_PickingPos);
+                }
+            }
+
+            var myReservations = currentPicking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+
+            List<FacilityReservation> result = new List<FacilityReservation>();
+
+            foreach (FacilityReservation reservation in myReservations)
+            {
+                if (reservation.CalculatedRoute != null)
+                {
+                    string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                    foreach (string routeHash in splitedRoute)
+                    {
+                        var items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(routeHash));
+                        if (items.Any())
+                            result.AddRange(items);
+                    }
+                }
+            }
+
+            if (result.Any())
+            {
+                var pickingsWithSameRoute = result.Select(c => c.PickingPos).Select(c => c.Picking.PickingNo).Distinct();
+                if (pickingsWithSameRoute != null && pickingsWithSameRoute.Any())
+                {
+                    return new Msg(eMsgLevel.Info, "The following orders order may use same module: " + string.Join(", ", pickingsWithSameRoute));
+                }
+            }
+
+            return null;
+        }
+
         #endregion
 
         #endregion
@@ -1707,10 +2182,10 @@ namespace gip.mes.facility
         #region FinishOrder
 
         public MsgWithDetails FinishOrder(
-            DatabaseApp dbApp, 
+            DatabaseApp dbApp,
             Picking picking,
-            ACInDeliveryNoteManager inDeliveryNoteManager, 
-            ACOutDeliveryNoteManager outDeliveryNoteManager, 
+            ACInDeliveryNoteManager inDeliveryNoteManager,
+            ACOutDeliveryNoteManager outDeliveryNoteManager,
             FacilityManager facilityManager,
             bool skipCheck = false)
         {
@@ -1846,7 +2321,7 @@ namespace gip.mes.facility
                 return result;
             }
 
-            picking.PickingStateIndex = (short)PickingStateEnum.Finished;
+            picking.PickingState = PickingStateEnum.Finished;
 
             // Close related documents
             (bool success, List<DeliveryNote> deliveryNotes, List<InOrder> inOrders, List<OutOrder> outOrders) = HasRelatedDocuments(picking);
@@ -1854,9 +2329,9 @@ namespace gip.mes.facility
             {
                 if (inOrders != null)
                 {
-                    foreach(InOrder tmpInOrder in inOrders)
+                    foreach (InOrder tmpInOrder in inOrders)
                     {
-                        foreach(DeliveryNote tempDeliveryNote in deliveryNotes)
+                        foreach (DeliveryNote tempDeliveryNote in deliveryNotes)
                         {
                             inDeliveryNoteManager.CompleteInDeliveryNote(dbApp, tempDeliveryNote, tmpInOrder);
                         }
@@ -1958,6 +2433,12 @@ namespace gip.mes.facility
             return String.Format(formatNewNo, from.PickingNo, newSequence);
         }
 
+        public virtual string OnGetNewNoForSupplyPicking(ProdOrderPartslist from, List<Picking> mirroredPickings, int storedMirroredPickingsCount, string formatNewNo = Picking.FormatNoForOrderSupply)
+        {
+            int newSequence = mirroredPickings.Count + storedMirroredPickingsCount + 1;
+            return String.Format(formatNewNo, from.ProdOrder.ProgramNo, from.Sequence, newSequence);
+        }
+
         public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, Picking from, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForSupply)
         {
             int storedMirroredPickingsCount = databaseApp.Picking.Where(c => c.MirroredFromPickingID == from.PickingID).Count();
@@ -2003,12 +2484,211 @@ namespace gip.mes.facility
                     FacilityReservation mirroredReservation = FacilityReservation.NewACObject(databaseApp, mirroredPos, secondaryKey);
                     mirroredReservation.CopyFrom(reservation, true);
                     mirroredReservation.PickingPos = mirroredPos;
+                    if (reservation.ReservationState == GlobalApp.ReservationState.ObserveQuantity)
+                        mirroredReservation.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
 
                     mirroredPos.FacilityReservation_PickingPos.Add(mirroredReservation);
                 }
                 mirroredPicking.PickingPos_Picking.Add(mirroredPos);
             }
             return mirroredPickings;
+        }
+
+        public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, ProdOrderPartslist from, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForOrderSupply)
+        {
+            int storedMirroredPickingsCount = 0;
+            datamodel.ACClassMethod workflowPL = null;
+            MDPickingType pickingType = null;
+            MDDelivPosLoadState loadState = null;
+            PrepareParamsForNewSupplyPicking(databaseApp, from, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
+            if (!separatePickingForEachPos.HasValue)
+            {
+                if (workflowPL != null)
+                    separatePickingForEachPos = workflowPL.ContinueByError;
+                else
+                    separatePickingForEachPos = true;
+            }
+
+            List<Picking> mirroredPickings = new List<Picking>();
+            Picking mirroredPicking = null;
+            ProdOrderPartslistPos[] positions = from.ProdOrderPartslistPos_ProdOrderPartslist.ToArray();
+            foreach (ProdOrderPartslistPos fromPos in positions)
+            {
+                if (mirroredPicking == null || separatePickingForEachPos.Value)
+                {
+                    mirroredPicking = CreateNewSupplyPicking(databaseApp, from, mirroredPickings, storedMirroredPickingsCount,workflowPL, pickingType, formatNewNo);
+                    mirroredPickings.Add(mirroredPicking);
+                }
+                AddSupplyPickingPos(databaseApp, from, fromPos, mirroredPicking, loadState, formatNewNo);
+            }
+            return mirroredPickings;
+        }
+
+        public virtual Picking CreateSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslistPos fromPos, string formatNewNo = Picking.FormatNoForOrderSupply)
+        {
+            int storedMirroredPickingsCount = 0;
+            datamodel.ACClassMethod workflowPL = null;
+            MDPickingType pickingType = null;
+            MDDelivPosLoadState loadState = null;
+            ProdOrderPartslist from = fromPos.ProdOrderPartslist;
+            PrepareParamsForNewSupplyPicking(databaseApp, from, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
+            Picking picking = CreateNewSupplyPicking(databaseApp, from, new List<Picking>(), storedMirroredPickingsCount, workflowPL, pickingType, formatNewNo);
+            AddSupplyPickingPos(databaseApp, from, fromPos, picking, loadState, formatNewNo);
+            return picking;
+        }
+
+        protected virtual void PrepareParamsForNewSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslist from, out int storedMirroredPickingsCount, out datamodel.ACClassMethod workflowPL, out MDPickingType pickingType, out MDDelivPosLoadState loadState)
+        {
+            storedMirroredPickingsCount = databaseApp.Picking.Where(c => c.MirroredFromPickingID == from.ProdOrderID).Count();
+            workflowPL = workflowPL = from.Partslist?.PartslistACClassMethod_Partslist.FirstOrDefault()?.MaterialWFACClassMethod?.ACClassMethod;
+            pickingType = databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
+            loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(databaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
+        }
+
+        protected virtual Picking CreateNewSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslist from, List<Picking> mirroredPickings, int storedMirroredPickingsCount,
+            datamodel.ACClassMethod workflowPL, MDPickingType pickingType, string formatNewNo)
+        {
+            string secondaryKey = OnGetNewNoForSupplyPicking(from, mirroredPickings, storedMirroredPickingsCount, formatNewNo);
+            Picking mirroredPicking = Picking.NewACObject(databaseApp, null, secondaryKey);
+            // Assign related Wokflow for supply
+            //mirroredPicking.CopyFrom(from, true);
+            if (pickingType != null)
+                mirroredPicking.MDPickingType = pickingType;
+            if (workflowPL != null && workflowPL.ACClassMethod1_ParentACClassMethod != null)
+                mirroredPicking.ACClassMethod = workflowPL.ACClassMethod1_ParentACClassMethod;
+            mirroredPicking.MirroredFromPickingID = from.ProdOrderID;
+            mirroredPickings.Add(mirroredPicking);
+            return mirroredPicking;
+        }
+
+        protected virtual void AddSupplyPickingPos(DatabaseApp databaseApp, ProdOrderPartslist from, ProdOrderPartslistPos fromPos, 
+            Picking mirroredPicking, MDDelivPosLoadState loadState, string formatNewNo)
+        {
+            PickingPos mirroredPos = PickingPos.NewACObject(databaseApp, mirroredPicking);
+            mirroredPos.PickingMaterial = fromPos.Material;
+            mirroredPos.ToFacility = null;
+            mirroredPos.FromFacility = null;
+            mirroredPos.MDDelivPosLoadState = loadState;
+            mirroredPos.TargetQuantity = fromPos.TargetQuantityUOM;
+            foreach (FacilityReservation reservation in fromPos.FacilityReservation_ProdOrderPartslistPos.ToArray())
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(databaseApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
+                FacilityReservation mirroredReservation = FacilityReservation.NewACObject(databaseApp, mirroredPos, secondaryKey);
+                mirroredReservation.CopyFrom(reservation, true);
+                mirroredReservation.ProdOrderPartslistPosID = null;
+                mirroredReservation.PickingPos = mirroredPos;
+                if (reservation.ReservationState == GlobalApp.ReservationState.ObserveQuantity)
+                    mirroredReservation.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
+
+                mirroredPos.FacilityReservation_PickingPos.Add(mirroredReservation);
+            }
+            mirroredPicking.PickingPos_Picking.Add(mirroredPos);
+        }
+
+        /// <summary>
+        /// Get preparation status for mirrored pickings
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="picking"></param>
+        /// <returns></returns>
+        public PickingPreparationStatusEnum? GetPickingPreparationStatus(DatabaseApp databaseApp, Picking picking)
+        {
+            PickingPreparationStatusEnum? status = null;
+
+            List<Picking> mirroredPickings = databaseApp.Picking.Where(c => c.MirroredFromPickingID == picking.PickingID).ToList();
+            if (mirroredPickings.Any())
+            {
+                status = PickingPreparationStatusEnum.None;
+
+                if (mirroredPickings.Any(c => c.PickingStateIndex > (short)PickingStateEnum.InProcess))
+                {
+                    status = PickingPreparationStatusEnum.Partial;
+                }
+
+                if (!mirroredPickings.Any(c => c.PickingStateIndex != (short)PickingStateEnum.Finished))
+                {
+                    status = PickingPreparationStatusEnum.Full;
+                }
+
+                // @aagincic question: should be checked by position?
+            }
+
+            return status;
+        }
+
+        public string GetPickingPreparationStatusName(DatabaseApp databaseApp, PickingPreparationStatusEnum? status)
+        {
+            string statusName = null;
+            if (status != null)
+            {
+                ACValueItem acvalueItem = databaseApp.PickingPreparationStatusList.Where(c => (PickingPreparationStatusEnum)c.Value == status).FirstOrDefault();
+                if (acvalueItem != null)
+                {
+                    statusName = acvalueItem.ACCaption;
+                }
+            }
+            return statusName;
+        }
+
+        public string GetPickingStatusInfo(DatabaseApp databaseApp, IEnumerable<Picking> pickings)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (pickings != null && pickings.Any())
+            {
+                List<Picking> tmpPickings = pickings.OrderBy(c => c.PickingNo).ToList();
+                foreach (Picking picking in tmpPickings)
+                {
+                    string pickingState = "";
+                    ACValueItem acvalueItem = databaseApp.PickingStateList.Where(c => (PickingStateEnum)c.Value == picking.PickingState).FirstOrDefault();
+                    if (acvalueItem != null)
+                    {
+                        pickingState = acvalueItem.ACCaption;
+                    }
+                    sb.Append($"{picking.PickingNo} - {pickingState}");
+                    if (tmpPickings.IndexOf(picking) < (tmpPickings.Count - 1))
+                    {
+                        sb.Append(System.Environment.NewLine);
+                    }
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public string GetMirroredPickingPreparationStatus(DatabaseApp databaseApp, IEnumerable<Picking> pickings)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (pickings != null && pickings.Any())
+            {
+                List<Picking> tmpPickings = pickings.OrderBy(c => c.PickingNo).ToList();
+                foreach (Picking picking in tmpPickings)
+                {
+                    string pickingState = "";
+                    PickingPreparationStatusEnum? preparationStatus = GetPickingPreparationStatus(databaseApp, picking);
+                    ACValueItem acvalueItem = null;
+
+                    if (preparationStatus != null)
+                    {
+                        acvalueItem = databaseApp.PickingPreparationStatusList.Where(c => (PickingPreparationStatusEnum)c.Value == preparationStatus).FirstOrDefault();
+                    }
+
+                    if (acvalueItem != null)
+                    {
+                        pickingState = acvalueItem.ACCaption;
+                    }
+
+                    sb.Append($"{picking.PickingNo} - {pickingState}");
+
+                    if (tmpPickings.IndexOf(picking) < (tmpPickings.Count - 1))
+                    {
+                        sb.Append(System.Environment.NewLine);
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
 
         #endregion
@@ -2029,7 +2709,8 @@ namespace gip.mes.facility
                                 bool onlyContainer = true,
                                 short reservationMode = 0,
                                 string selectionRuleID = "PAMSilo.Deselector",
-                                object[] selectionRuleParams = null)
+                                object[] selectionRuleParams = null,
+                                bool includeAllocated = true)
         {
             if (currentProcessModule == null)
             {
@@ -2065,7 +2746,7 @@ namespace gip.mes.facility
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
                     MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
-                    IncludeAllocated = true,
+                    IncludeAllocated = includeAllocated,
                     DBRecursionLimit = 10
                 };
 
@@ -2094,7 +2775,7 @@ namespace gip.mes.facility
                     DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID,
                     MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                     IncludeReserved = true,
-                    IncludeAllocated = true,
+                    IncludeAllocated = includeAllocated,
                     DBRecursionLimit = 10
                 };
 
@@ -2135,7 +2816,11 @@ namespace gip.mes.facility
                     facilityQuery = SilosWithMaterial(dbApp, pickingPos, searchMode != ACPartslistManager.SearchMode.AllSilos, projSpecificParams, onlyContainer);
                 }
             }
-            ApplyLotReservationFilter(facilityQuery, pickingPos, reservationMode);
+
+            IList<Guid> destinationFromSupplys = null;
+            if (pickingPos != null && pickingPos.Picking != null && pickingPos.Picking.PickingType == GlobalApp.PickingType.IssueVehicle)
+                destinationFromSupplys = GetDestinationsFromSupplyPickings(dbApp, pickingPos);
+            ApplyLotReservationFilter(facilityQuery, pickingPos, reservationMode, destinationFromSupplys);
 
             if (onlyContainer)
             {
@@ -2272,12 +2957,44 @@ namespace gip.mes.facility
         );
 
 
-        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, PickingPos pickingPos, short reservationMode)
+        protected virtual void ApplyLotReservationFilter(QrySilosResult qrySilosResult, PickingPos pickingPos, short reservationMode, IList<Guid> allowedFacilities = null)
         {
             if (qrySilosResult == null)
                 return;
-            qrySilosResult.ApplyLotReservationFilter(pickingPos, reservationMode);
+            qrySilosResult.ApplyLotReservationFilter(pickingPos, reservationMode, allowedFacilities);
         }
+
+
+        protected static readonly Func<DatabaseApp, string, Guid, IQueryable<Guid>> s_cQry_SilosFromSupplyPickingsNo =
+        EF.CompileQuery<DatabaseApp, string, Guid, IQueryable<Guid>>(
+            (ctx, pickingNo, materialID) => ctx.FacilityBookingCharge.Where(c => c.PickingPosID.HasValue
+                                    && c.PickingPos.Picking.PickingNo.StartsWith(pickingNo)
+                                    && c.InwardMaterialID == materialID
+                                    && c.InwardFacilityID.HasValue)
+                                    .Select(c => c.InwardFacilityID.Value)
+        );
+
+        protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<Guid>> s_cQry_SilosFromSupplyPickingsID =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<Guid>>(
+            (ctx, pickingID, materialID) => ctx.FacilityBookingCharge.Where(c => c.PickingPosID.HasValue
+                            && c.PickingPos.Picking.MirroredFromPickingID == pickingID
+                            && c.InwardMaterialID == materialID
+                            && c.InwardFacilityID.HasValue)
+                            .Select(c => c.InwardFacilityID.Value)
+);
+
+        public virtual IList<Guid> GetDestinationsFromSupplyPickings(DatabaseApp dbApp, PickingPos pickingPos)
+        {
+            if (pickingPos == null)
+                return null;
+            Guid materialID = pickingPos.Material.MaterialID;
+            //string pickingNo = pickingPos.Picking.PickingNo + "-";
+            //return s_cQry_SilosFromSupplyPickingsNo(dbApp, pickingNo, materialID).Distinct().ToList();
+            return s_cQry_SilosFromSupplyPickingsID(dbApp, pickingPos.PickingID, materialID).Distinct().ToList();
+        }
+
+        //Picking.FormatNoForSupply
+
         #endregion
 
         #region Target-Selection
@@ -2315,6 +3032,7 @@ namespace gip.mes.facility
                         routes.AddRange(rResult.Routes);
                 }
 
+                short? destinationFilterClassCode = null;
                 #region Filter routes if is selected    ShowCellsInRoute
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
@@ -2343,6 +3061,17 @@ namespace gip.mes.facility
                         {
                             routes = routes.Where(c => c.Items.Select(x => x.Source.GetACUrl()).Intersect(classes).Any()).ToList();
                         }
+                    }
+
+                    IACConfig configClassCode = configManager.GetConfiguration(
+                        mandatoryConfigStores,
+                        configACUrl + "\\",
+                        acClassWFDischarging.ConfigACUrl + ACUrlHelper.Delimiter_DirSeperator + ACStateConst.SMStarting + ACUrlHelper.Delimiter_DirSeperator + nameof(Facility.ClassCode),
+                        null,
+                        out priorityLevel);
+                    if (configClassCode != null)
+                    {
+                        destinationFilterClassCode = (short)configClassCode.Value;
                     }
                 }
                 #endregion
@@ -2402,6 +3131,8 @@ namespace gip.mes.facility
                                 if (showSelectedCells)
                                     continue;
                                 unselFacility = queryUnselFacilities.Where(c => c.VBiFacilityACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                                if (unselFacility == null)
+                                    continue;
                                 if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
                                     continue;
                                 bool ifMaterialMatch =
@@ -2415,6 +3146,12 @@ namespace gip.mes.facility
                                 //);
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
+                                if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
+                                {
+                                    uint bitCmpResult = ((uint)unselFacility.ClassCode) & ((uint)destinationFilterClassCode.Value);
+                                    if (bitCmpResult == 0)
+                                        continue;
+                                }
                             }
                             reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, pickingPos, null, selectedReservationForModule, unselFacility, acClassWFDischarging, aCClassWF));
                         }
@@ -2508,6 +3245,10 @@ namespace gip.mes.facility
             }
 
             return acClassWFDischarging;
+        }
+
+        public virtual void ValidateChangedPosReservation(VBBSOModulesSelector selector, DatabaseApp databaseApp, POPartslistPosReservation poReservation, object sender, PropertyChangedEventArgs e)
+        {
         }
 
         #endregion

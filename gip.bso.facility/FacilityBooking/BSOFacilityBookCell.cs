@@ -20,8 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
+using static gip.mes.datamodel.MDFacilityManagementType;
 
 namespace gip.bso.facility
 {
@@ -32,6 +31,8 @@ namespace gip.bso.facility
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "BookingFacility", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     public class BSOFacilityBookCell : BSOFacilityBase
     {
+
+
         /// <summary>
         /// The _ book param inward movement
         /// </summary>
@@ -359,7 +360,8 @@ namespace gip.bso.facility
             {
                 query.Include(c => c.FacilityStock_Facility)
                         .Include(c => c.Material)
-                        .Include(c => c.FacilityCharge_Facility);
+                        .Include(c => c.Partslist)
+                        .Include(c => c.MDFacilityType);
             }
             return result;
         }
@@ -434,6 +436,38 @@ namespace gip.bso.facility
                 AccessBookingFacility.NavACQueryDefinition.SaveConfig(false);
             }
             AccessBookingFacility.NavSearch(this.DatabaseApp);
+        }
+
+        [ACPropertyInfo(710, "", ConstApp.SelectAll)]
+        public bool SelectAllFacilityCharges
+        {
+            get
+            {
+                bool allChargesSelected = false;
+                if (FacilityChargeList != null)
+                {
+                    allChargesSelected = !FacilityChargeList.Any(c => !c.IsSelected);
+                }
+                return allChargesSelected;
+            }
+            set
+            {
+                if (FacilityChargeList != null)
+                {
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        fc.IsSelected = value;
+                        if (value)
+                        {
+                            fc.ReservationState = GlobalApp.ReservationState.New;
+                        }
+                        else
+                        {
+                            fc.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
+                        }
+                    }
+                }
+            }
         }
 
         #endregion
@@ -525,11 +559,56 @@ namespace gip.bso.facility
                 if (value != null)
                     value.PropertyChanged += CurrentFacility_PropertyChanged;
 
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(FacilityLotList));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
+
+                if (FacilityChargeList != null)
+                {
+                    foreach (FacilityCharge facilityCharge in FacilityChargeList)
+                    {
+                        facilityCharge.PropertyChanged -= FacilityCharge_PropertyChanged;
+                        facilityCharge.PropertyChanged += FacilityCharge_PropertyChanged;
+                    }
+                }
+
                 OnPropertyChanged(nameof(ContractualPartnerList));
                 ClearBookingData();
+                OnPropertyChanged();
+            }
+        }
+
+        private void FacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(FacilityCharge.IsSelected))
+            {
+                FacilityCharge facilityCharge = sender as FacilityCharge;
+                if (!facilityCharge.InIsSelectedProcess)
+                {
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        facilityCharge.InIsSelectedProcess = true;
+                    }
+
+                    if (!facilityCharge.IsSelected)
+                    {
+                        List<FacilityCharge> others = FacilityChargeList.Where(c => c.FacilityChargeID != facilityCharge.FacilityChargeID).ToList();
+                        bool anyOtherNotSelected = others.Where(c => !c.IsSelected).Any();
+                        if (!anyOtherNotSelected)
+                        {
+                            // means all other are selected - should ReservationState = ObserveQuantity
+                            foreach (FacilityCharge fc in others)
+                            {
+                                fc.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
+                            }
+                        }
+                    }
+
+                    DistributeRelocationQuantOnSelection(facilityCharge.FacilityChargeID, facilityCharge.IsSelected, CurrentBookParamRelocation.InwardQuantity ?? 0);
+
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        facilityCharge.InIsSelectedProcess = false;
+                    }
+                }
             }
         }
 
@@ -584,6 +663,8 @@ namespace gip.bso.facility
             }
         }
 
+        bool _RefreshFCCache = false;
+        IEnumerable<FacilityCharge> _FacilityChargeList;
         /// <summary>
         /// Gets the facility charge list.
         /// </summary>
@@ -593,11 +674,33 @@ namespace gip.bso.facility
         {
             get
             {
+                if (_FacilityChargeList != null)
+                    return _FacilityChargeList;
                 if (CurrentFacility == null)
                     return null;
-                CurrentFacility.FacilityCharge_Facility.AutoLoad(CurrentFacility.FacilityCharge_FacilityReference, CurrentFacility);
-                return CurrentFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).OrderBy(c => c.FacilityChargeSortNo).ToList();
+                //CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
+                _FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).ToArray();
+                if (_RefreshFCCache && _FacilityChargeList != null && _FacilityChargeList.Any())
+                {
+                    _RefreshFCCache = false;
+                    foreach (var item in _FacilityChargeList)
+                    {
+                        item.ResetCachedValues();
+                    }
+                }
+                return _FacilityChargeList;
             }
+        }
+
+
+        private void RefreshFacilityChargeList(bool refresh = false)
+        {
+            OnPropertyChanged(nameof(CurrentFacility));
+            if (refresh)
+                _RefreshFCCache = true;
+            _FacilityChargeList = null;
+            OnPropertyChanged(nameof(FacilityChargeList));
+            OnPropertyChanged(nameof(IsEnabledPartslist));
         }
 
         /// <summary>
@@ -757,11 +860,13 @@ namespace gip.bso.facility
         {
             if (!PreExecute())
                 return;
+            if (requery || CurrentFacility == null)
+                _RefreshFCCache = true;
             LoadEntity<Facility>(requery, () => SelectedFacility, () => CurrentFacility, c => CurrentFacility = c,
                         DatabaseApp.Facility
                                     .Include(c => c.FacilityStock_Facility)
                                     .Include(c => c.Material)
-                                    .Include(c => c.FacilityCharge_Facility)
+                                    .Include(c => c.MDFacilityType)
                         .Where(c => c.FacilityID == SelectedFacility.FacilityID));
             if (CurrentFacility != null && CurrentFacility.CurrentFacilityStock != null)
                 CurrentFacility.CurrentFacilityStock.AutoRefresh(DatabaseApp);
@@ -881,8 +986,6 @@ namespace gip.bso.facility
             return true;
         }
 
-
-
         #endregion
 
         #region ControlMode
@@ -999,13 +1102,32 @@ namespace gip.bso.facility
                             return;
                         }
                         Save();
-                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
-                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+
+                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
+                        if (!msgDetails.IsSucceded())
                         {
-                            Messages.Msg(msgDetails);
+                            if (String.IsNullOrEmpty(msgDetails.Message))
+                            {
+                                // Der Auftrag kann nicht gestartet werden weil:
+                                msgDetails.Message = Root.Environment.TranslateMessage(this, "Error50643");
+                            }
+                            Messages.Msg(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
                             ClearBookingData();
                             return;
                         }
+                        else if (msgDetails.HasWarnings())
+                        {
+                            if (String.IsNullOrEmpty(msgDetails.Message))
+                            {
+                                //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
+                                msgDetails.Message = Root.Environment.TranslateMessage(this, "Question50108");
+                            }
+                            var userResult = Messages.Msg(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
+                            if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
+                                return;
+                        }
+
+
                         Global.MsgResult openPicking = Global.MsgResult.No;
                         if (OpenPickingBeforeStart)
                         {
@@ -1015,7 +1137,7 @@ namespace gip.bso.facility
 
                         bool startWorkflow = true;
                         if (openPicking == Global.MsgResult.Yes)
-                        { 
+                        {
                             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
                             if (service != null)
                             {
@@ -1060,8 +1182,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
 
             return true;
@@ -1130,8 +1251,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1156,6 +1276,8 @@ namespace gip.bso.facility
         {
             if (!PreExecute()) return;
 
+            bool nonAutomaticRelocationWithQuantSelection = false;
+
             if (IsPhysicalTransportPossible)
             {
                 Global.MsgResult userQuestionAutomatic = Global.MsgResult.No;
@@ -1163,12 +1285,42 @@ namespace gip.bso.facility
                 userQuestionAutomatic = Messages.YesNoCancel(this, "Question50035");
                 if (userQuestionAutomatic == Global.MsgResult.Yes)
                 {
+                    (gip.core.datamodel.ACClassMethod acClMth, bool wfRunBt) = ACFacilityManager.GetFacilityWF(CurrentFacility);
                     gip.core.datamodel.ACClassMethod acClassMethod = null;
                     bool wfRunsBatches = false;
-                    if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches))
+                    if (acClMth != null)
                     {
-                        ClearBookingData();
-                        return;
+                        acClassMethod = acClMth;
+                        wfRunsBatches = wfRunBt;
+                        if (!SelectAppManager(acClassMethod.ACClass.ACProject))
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches))
+                        {
+                            ClearBookingData();
+                            return;
+                        }
+
+
+                        // Question50035
+                        // Save selected process workflow ({0}) as default for this facility ({1})?
+                        // Ausgewählten Prozess-Workflow ({0}) als Standard für dieser Lagerplatz ({1}) speichern?
+                        Global.MsgResult saveQuestion = Messages.Question(this, "Question50110", Global.MsgResult.No, false, acClassMethod.ACCaption, CurrentFacility.FacilityNo);
+                        if (saveQuestion == Global.MsgResult.Yes)
+                        {
+
+                            CurrentFacility.VBiACClassMethodID = acClassMethod.ACClassMethodID;
+                            MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+                            if (msgWithDetails != null && !msgWithDetails.IsSucceded())
+                            {
+                                Messages.Msg(msgWithDetails);
+                                Messages.LogMessageMsg(msgWithDetails);
+                            }
+                        }
                     }
 
                     ACMethodBooking booking = CurrentBookParamRelocation;
@@ -1197,6 +1349,7 @@ namespace gip.bso.facility
 
                         // Option select charge for Material->IsLotReservationNeeded
                         List<FacilityCharge> lotsForReservation = null;
+                        bool needReservations = false;
                         if (
                                 booking.OutwardFacility != null
                                 && booking.OutwardFacility.Material != null
@@ -1205,77 +1358,128 @@ namespace gip.bso.facility
                                 && FacilityChargeList.Any()
                             )
                         {
+                            needReservations = true;
                             Dialog_Result = new VBDialogResult();
-                            ShowDialog(this, "SelectChargeForRelocationDlg");
+                            ResetFacilityChargeSelection();
+                            DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
+                            ShowDialog(this, "SelectChargeForRelocationAutomaticDlg");
                             if (Dialog_Result.SelectedCommand == eMsgButton.OK)
                             {
                                 lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
                             }
+                            if (!OnFacilityRelocationLotsSelected(booking, lotsForReservation))
+                                return;
                         }
 
-                        MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
-                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+                        if (!needReservations
+                            || (lotsForReservation != null && lotsForReservation.Any()))
                         {
-                            Messages.Msg(msgDetails);
-                            ClearBookingData();
-                            ACUndoChanges();
-                            return;
-                        }
-                        if (picking == null)
-                        {
-                            UndoSave();
-                            ClearBookingData();
-                            return;
-                        }
-                        Save();
-                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
-                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
-                        {
-                            Messages.Msg(msgDetails);
-                            ClearBookingData();
-                            return;
-                        }
-
-                        Global.MsgResult openPicking = Global.MsgResult.No;
-                        if (OpenPickingBeforeStart)
-                        {
-                            // Question50035: Do you want to open the picking order before starting the workflow?
-                            openPicking = Messages.Question(this, "Question50106");
-                        }
-
-                        bool startWorkflow = true;
-                        if (openPicking == Global.MsgResult.Yes)
-                        {
-                            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-                            if (service != null)
+                            MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
+                            if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
                             {
-                                PAOrderInfo info = new PAOrderInfo();
-                                info.Entities.Add(
-                                new PAOrderInfoEntry()
+                                Messages.Msg(msgDetails);
+                                ClearBookingData();
+                                ACUndoChanges();
+                                return;
+                            }
+                            if (picking == null)
+                            {
+                                UndoSave();
+                                ClearBookingData();
+                                return;
+                            }
+
+                            Save();
+
+                            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
+                            if (!msgDetails.IsSucceded())
+                            {
+                                if (String.IsNullOrEmpty(msgDetails.Message))
                                 {
-                                    EntityID = picking.PickingID,
-                                    EntityName = Picking.ClassName
-                                });
-                                service.ShowDialogOrder(this, info);
-                                if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
-                                    startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
+                                    // Der Auftrag kann nicht gestartet werden weil:
+                                    msgDetails.Message = Root.Environment.TranslateMessage(this, "Error50643");
+                                }
+                                Messages.Msg(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
+                                ClearBookingData();
+                                return;
+                            }
+                            else if (msgDetails.HasWarnings())
+                            {
+                                if (String.IsNullOrEmpty(msgDetails.Message))
+                                {
+                                    //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
+                                    msgDetails.Message = Root.Environment.TranslateMessage(this, "Question50108");
+                                }
+                                var userResult = Messages.Msg(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
+                                if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
+                                    return;
+                            }
+
+                            Global.MsgResult openPicking = Global.MsgResult.No;
+                            if (OpenPickingBeforeStart)
+                            {
+                                // Question50035: Do you want to open the picking order before starting the workflow?
+                                openPicking = Messages.Question(this, "Question50106");
+                            }
+
+                            bool startWorkflow = true;
+                            if (openPicking == Global.MsgResult.Yes)
+                            {
+                                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+                                if (service != null)
+                                {
+                                    PAOrderInfo info = new PAOrderInfo();
+                                    info.Entities.Add(
+                                    new PAOrderInfoEntry()
+                                    {
+                                        EntityID = picking.PickingID,
+                                        EntityName = Picking.ClassName
+                                    });
+                                    service.ShowDialogOrder(this, info);
+                                    if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
+                                        startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
+                                }
+                            }
+                            if (startWorkflow)
+                            {
+                                StartWorkflow(acClassMethod, picking);
+                                ClearBookingData();
                             }
                         }
-                        if (startWorkflow)
-                        {
-                            StartWorkflow(acClassMethod, picking);
-                        }
                     }
-
                 }
                 else if (userQuestionAutomatic == Global.MsgResult.No)
-                    BookRelocation();
+                {
+                    nonAutomaticRelocationWithQuantSelection = true;
+                }
             }
             else
-                BookRelocation();
+            {
+                nonAutomaticRelocationWithQuantSelection = true;
+            }
+
+            if (nonAutomaticRelocationWithQuantSelection)
+            {
+                // doing direct relocation in case when Material facility management type is not FacilityChargeReservation
+                bool doDirectRelocation =
+                    CurrentFacility.Material == null
+                    || CurrentFacility.Material.MDFacilityManagementType == null
+                    || CurrentFacility.Material.MDFacilityManagementType.MDFacilityManagementTypeIndex != (short)FacilityManagementTypes.FacilityChargeReservation;
+                if (doDirectRelocation)
+                {
+                    BookRelocation();
+                    ClearBookingData();
+                }
+                else
+                {
+                    BookRelocationManualWithQuantSelection();
+                    ClearBookingData();
+                }
+            }
 
             PostExecute();
         }
+
         /// <summary>
         /// Determines whether [is enabled facility relocation].
         /// </summary>
@@ -1288,6 +1492,11 @@ namespace gip.bso.facility
             return bRetVal;
         }
 
+        protected virtual bool OnFacilityRelocationLotsSelected(ACMethodBooking relocationBooking, List<FacilityCharge> lotsForReservation)
+        {
+            return true;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1297,6 +1506,9 @@ namespace gip.bso.facility
             if (!IsEnabledDlgSelectChargeOk())
                 return;
             Dialog_Result.SelectedCommand = eMsgButton.OK;
+
+            CurrentBookParamRelocation.InwardQuantity = GetSelectedFacilityChargeQuantity();
+
             CloseTopDialog();
         }
 
@@ -1341,10 +1553,233 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             return true;
+        }
+
+        private void BookRelocationManualWithQuantSelection()
+        {
+            List<FacilityCharge> lotsForReservation = null;
+            Dialog_Result = new VBDialogResult();
+            ResetFacilityChargeSelection();
+            DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
+            ShowDialog(this, "SelectChargeForRelocationDlg");
+            if (Dialog_Result.SelectedCommand == eMsgButton.OK)
+            {
+                lotsForReservation = FacilityChargeList.Where(c => c.IsSelected && c.RelocationQuantity > 0).ToList();
+            }
+
+            if (lotsForReservation != null && lotsForReservation.Any())
+            {
+                BookRelocation(lotsForReservation);
+            }
+        }
+
+        private bool BookRelocation(List<FacilityCharge> facilityCharges)
+        {
+            bool success = false;
+            List<FacilityPreBooking> facilityPreBookings = new List<FacilityPreBooking>();
+            if (facilityCharges.Any(c => c.IsSelected && c.RelocationQuantity > 0))
+            {
+                foreach (FacilityCharge facilityCharge in facilityCharges)
+                {
+                    if (facilityCharge.IsSelected && facilityCharge.RelocationQuantity > 0)
+                    {
+                        ACMethodBooking acMethodBooking = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Relocation_FacilityCharge_Facility, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                        acMethodBooking.OutwardFacilityCharge = facilityCharge;
+                        acMethodBooking.InwardFacility = CurrentBookParamRelocation.InwardFacility;
+                        acMethodBooking.OutwardQuantity = facilityCharge.RelocationQuantity;
+                        acMethodBooking.InwardQuantity = facilityCharge.RelocationQuantity;
+                        acMethodBooking.MDUnit = facilityCharge.MDUnit ?? facilityCharge.Material.BaseMDUnit;
+
+                        string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                        FacilityPreBooking facilityPreBooking = FacilityPreBooking.NewACObject(DatabaseApp, null, secondaryKey);
+                        facilityPreBooking.ACMethodBooking = acMethodBooking;
+
+                        facilityPreBookings.Add(facilityPreBooking);
+                        DatabaseApp.FacilityPreBooking.Add(facilityPreBooking);
+                    }
+                }
+            }
+
+            MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+            if (msgWithDetails == null || msgWithDetails.IsSucceded())
+            {
+                foreach (FacilityPreBooking facilityPreBooking in facilityPreBookings)
+                {
+                    ACMethodBooking mth = facilityPreBooking.ACMethodBooking.Clone() as ACMethodBooking;
+
+                    // add BookFacilityWithRetry for case when FacilityCharge is blocked
+                    ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref mth, DatabaseApp);
+
+                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                    {
+                        string errorMessage = $"Error by processing relocation prebooking!";
+                        Msg msgPrebooking = new Msg(errorMessage, this, eMsgLevel.Error, nameof(BSOFacilityBookCell), nameof(BookRelocation), 10);
+                        Messages.LogMessageMsg(msgPrebooking);
+                    }
+                    else
+                    {
+                        // its ok
+                    }
+                }
+            }
+            else
+            {
+                Messages.Msg(msgWithDetails);
+                Messages.LogMessageMsg(msgWithDetails);
+            }
+
+            foreach (FacilityPreBooking facilityPreBooking in facilityPreBookings)
+            {
+                facilityPreBooking.DeleteACObject(DatabaseApp, false);
+            }
+
+            msgWithDetails = DatabaseApp.ACSaveChanges();
+
+            if (msgWithDetails != null && !msgWithDetails.IsSucceded())
+            {
+                Messages.Msg(msgWithDetails);
+                Messages.LogMessageMsg(msgWithDetails);
+            }
+
+            return success;
+        }
+
+        private void ResetFacilityChargeSelection()
+        {
+            if (FacilityChargeList != null)
+            {
+                SelectAllFacilityCharges = false;
+                foreach (FacilityCharge facilityCharge in FacilityChargeList)
+                {
+                    facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Use booking mask relocation quantity and distribute it to 
+        /// available quants
+        /// </summary>
+        /// <param name="quantity"></param>
+        public void DistributeRelocationQuantityToAvailableQuants(double quantity)
+        {
+            double restQuantity = quantity;
+
+            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            {
+                facilityCharge.InIsSelectedProcess = true;
+            }
+
+            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            {
+                if (Math.Abs(restQuantity) < 0.1)
+                {
+                    facilityCharge.IsSelected = false;
+                    facilityCharge.RelocationQuantity = 0;
+                }
+                else
+                {
+                    if (restQuantity <= facilityCharge.AvailableQuantity)
+                    {
+                        facilityCharge.IsSelected = true;
+                        facilityCharge.RelocationQuantity = restQuantity;
+                        restQuantity = 0;
+                    }
+                    else
+                    {
+                        facilityCharge.IsSelected = true;
+                        facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
+                        restQuantity -= facilityCharge.RelocationQuantity;
+                    }
+                }
+            }
+
+            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            {
+                facilityCharge.InIsSelectedProcess = false;
+            }
+        }
+
+        /// <summary>
+        /// Changing quantity after showing quant dialog
+        /// and redistribute quantity by user quant selection
+        /// </summary>
+        /// <param name="facilityChargeID"></param>
+        /// <param name="isSelected"></param>
+        /// <param name="quantity"></param>
+        public void DistributeRelocationQuantOnSelection(Guid facilityChargeID, bool isSelected, double quantity)
+        {
+            double alreadySelectedQuantity = 
+                FacilityChargeList
+                .Where(c=> c.IsSelected && c.FacilityChargeID  != facilityChargeID)
+                .Select(c=>c.RelocationQuantity)
+                .DefaultIfEmpty()
+                .Sum();
+
+            double restQuantity = quantity - alreadySelectedQuantity;
+            if(restQuantity < 0)
+            {
+                restQuantity = 0;
+            }
+
+            // handling calling client
+            FacilityCharge selectedFacilityCharge = FacilityChargeList.Where(c => c.FacilityChargeID == facilityChargeID).FirstOrDefault();
+            if (isSelected)
+            {
+                if (restQuantity <= selectedFacilityCharge.AvailableQuantity)
+                {
+                    selectedFacilityCharge.RelocationQuantity = restQuantity;
+                    restQuantity = 0;
+                }
+                else
+                {
+                    selectedFacilityCharge.RelocationQuantity = selectedFacilityCharge.AvailableQuantity;
+                    restQuantity -= selectedFacilityCharge.RelocationQuantity;
+                }
+            }
+
+            List<FacilityCharge> notSelectedCharges = FacilityChargeList.Where(c => !c.IsSelected).ToList();
+            foreach (FacilityCharge facilityCharge in notSelectedCharges)
+            {
+                facilityCharge.RelocationQuantity = 0;
+            }
+
+            //List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID).ToList();
+            //foreach (FacilityCharge facilityCharge in selectedCharges)
+            //{
+            //    if (Math.Abs(restQuantity) < 0.1)
+            //    {
+            //        //facilityCharge.IsSelected = false;
+            //        facilityCharge.RelocationQuantity = 0;
+            //    }
+            //    else
+            //    {
+            //        if (restQuantity <= facilityCharge.AvailableQuantity)
+            //        {
+            //            facilityCharge.RelocationQuantity = restQuantity;
+            //            restQuantity = 0;
+            //        }
+            //        else
+            //        {
+            //            facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
+            //            restQuantity -= facilityCharge.RelocationQuantity;
+            //        }
+            //    }
+            //}
+        }
+
+        public double GetSelectedFacilityChargeQuantity()
+        {
+            double quantity = 0;
+            if (FacilityChargeList != null)
+            {
+                quantity = FacilityChargeList.Where(c => c.IsSelected).Select(c => c.RelocationQuantity).Sum();
+            }
+            return quantity;
         }
 
 
@@ -1389,8 +1824,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("LockFacility");
         }
@@ -1437,8 +1871,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("LockFacilityAbsolute");
         }
@@ -1486,8 +1919,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("ReleaseFacility");
         }
@@ -1535,8 +1967,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacility");
-                OnPropertyChanged("FacilityChargeList");
+                RefreshFacilityChargeList();
             }
             PostExecute("ReleaseFacilityAbsolute");
         }
@@ -1585,8 +2016,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1640,8 +2070,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1751,8 +2180,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1790,8 +2218,7 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged(nameof(CurrentFacility));
-                OnPropertyChanged(nameof(FacilityChargeList));
+                RefreshFacilityChargeList();
             }
             PostExecute();
         }
@@ -1870,14 +2297,106 @@ namespace gip.bso.facility
             DialogResult = false;
             CloseTopDialog();
         }
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            PAOrderInfoEntry entityInfo = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Facility)).FirstOrDefault();
+            if (entityInfo == null)
+                return;
+
+            Facility facility = this.DatabaseApp.Facility.Where(c => c.FacilityID == entityInfo.EntityID).FirstOrDefault();
+            if (facility == null)
+                return;
+
+            ShowDialogFacility(facility.FacilityNo);
+        }
         #endregion
 
-        #region ShowFacilityLotForQuant
+        #region Dialog Navigate
 
-        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 903, true, nameof(SelectedFacilityCharge))]
-        public void ShowFacilityLotForQuant()
+        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 780, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToOrder()
         {
-            if (!IsEnabledShowFacilityLotForQuant())
+            if (!IsEnabledNavigateToOrder())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslistPos), SelectedFacilityCharge.FinalPositionFromFbc.ProdOrderPartslistPosID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToOrder()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FinalPositionFromFbc != null)
+                return true;
+            return false;
+        }
+
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityCharge()
+        {
+            if (!IsEnabledNavigateToFacilityCharge())
+            {
+                return;
+            }
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityCharge), SelectedFacilityCharge.FacilityChargeID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+
+                if (SelectedFacilityCharge.FacilityLotID != null)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                }
+
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityCharge()
+        {
+            return SelectedFacilityCharge != null;
+        }
+
+
+        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacility))]
+        public void NavigateToFacilityOverview()
+        {
+            if (!IsEnabledNavigateToFacilityOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacility.FacilityID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityOverview()
+        {
+            if (SelectedFacility != null && SelectedFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                return true;
+            return false;
+        }
+
+        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 783, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityLot()
+        {
+            if (!IsEnabledNavigateToFacilityLot())
                 return;
 
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
@@ -1889,13 +2408,56 @@ namespace gip.bso.facility
             }
         }
 
-        public bool IsEnabledShowFacilityLotForQuant()
+        public bool IsEnabledNavigateToFacilityLot()
         {
             if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
                 return true;
             return false;
         }
 
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityLotOverview()
+        {
+            if (!IsEnabledNavigateToFacilityLotOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityLotOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 785, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToMaterialOverview()
+        {
+            if (!IsEnabledNavigateToMaterialOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToMaterialOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Material != null)
+                return true;
+            return false;
+        }
         #endregion
 
         #endregion
@@ -2139,12 +2701,50 @@ namespace gip.bso.facility
                 case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
                     return true;
+                case nameof(NavigateToFacilityLot):
+                    NavigateToFacilityLot();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLot):
+                    result = IsEnabledNavigateToFacilityLot();
+                    return true;
+                case nameof(NavigateToFacilityLotOverview):
+                    NavigateToFacilityLotOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    result = IsEnabledNavigateToFacilityLotOverview();
+                    return true;
+                case nameof(NavigateToFacilityCharge):
+                    NavigateToFacilityCharge();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityCharge):
+                    result = IsEnabledNavigateToFacilityCharge();
+                    return true;
+                case nameof(NavigateToFacilityOverview):
+                    NavigateToFacilityOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    result = IsEnabledNavigateToFacilityOverview();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(NavigateToMaterialOverview):
+                    NavigateToMaterialOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    result = IsEnabledNavigateToMaterialOverview();
+                    return true;
+                case nameof(NavigateToOrder):
+                    NavigateToOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToOrder):
+                    result = IsEnabledNavigateToOrder();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
-
 
     }
 

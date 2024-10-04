@@ -707,62 +707,57 @@ namespace gip.mes.datamodel
         partial void OnYearOutwardDiffPercentChanged();
 
 
-        /// <summary>
-        /// There are no comments for Property ReservedInwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedInwardQuantity()
-        {
-            if ((this.Facility == null) || (this.Facility.Material == null))
-                return;
+        //public void RecalcReservedInwardQuantity()
+        //{
+        //    if ((this.Facility == null) || (this.Facility.Material == null))
+        //        return;
 
-            this.ReservedInwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = this.Facility.FacilityReservation_Facility.Where(c => c.InOrderPosID.HasValue).AsEnumerable();
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch geliefert wird
-                // TODO: Zugänge von Produktionsaufträge mit einrechnen
-                this.ReservedInwardQuantity +=
-                        this.Facility.Material.ConvertQuantity(facilityReservation.InOrderPos.TargetQuantity,
-                                                    facilityReservation.InOrderPos.Material.BaseMDUnit,
-                                                    this.Facility.Material.BaseMDUnit)
-                        - this.Facility.Material.ConvertQuantity(facilityReservation.InOrderPos.ActualQuantity,
-                                                    facilityReservation.InOrderPos.Material.BaseMDUnit,
-                                                    this.Facility.Material.BaseMDUnit);
+        //    this.ReservedInwardQuantity = 0;
+        //    // TODO: OR-Klausel einfügen für Produktionsaufträge
+        //    IEnumerable<FacilityReservation> facilityReservationList = this.Facility.FacilityReservation_Facility.Where(c => c.InOrderPosID.HasValue).AsEnumerable();
+        //    foreach (FacilityReservation facilityReservation in facilityReservationList)
+        //    {
+        //        // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+        //        // Die TargetQuantity gibt an, wieviel Reserviert ist
+        //        // Die Differenz gibt an, wieviel noch geliefert wird
+        //        // TODO: Zugänge von Produktionsaufträge mit einrechnen
+        //        this.ReservedInwardQuantity +=
+        //                this.Facility.Material.ConvertQuantity(facilityReservation.InOrderPos.TargetQuantity,
+        //                                            facilityReservation.InOrderPos.Material.BaseMDUnit,
+        //                                            this.Facility.Material.BaseMDUnit)
+        //                - this.Facility.Material.ConvertQuantity(facilityReservation.InOrderPos.ActualQuantity,
+        //                                            facilityReservation.InOrderPos.Material.BaseMDUnit,
+        //                                            this.Facility.Material.BaseMDUnit);
 
-            }
-        }
+        //    }
+        //}
 
 
-        /// <summary>
-        /// There are no comments for Property ReservedOutwardQuantity in the schema.
-        /// </summary>
-        public void RecalcReservedOutwardQuantity()
-        {
-            if ((this.Facility == null) || (this.Facility.Material == null))
-                return;
 
-            this.ReservedOutwardQuantity = 0;
-            // TODO: OR-Klausel einfügen für Produktionsaufträge
-            IEnumerable<FacilityReservation> facilityReservationList = this.Facility.FacilityReservation_Facility.Where(c => c.OutOrderPosID.HasValue).AsEnumerable();
-            foreach (FacilityReservation facilityReservation in facilityReservationList)
-            {
-                // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-                // Die TargetQuantity gibt an, wieviel Reserviert ist
-                // Die Differenz gibt an, wieviel noch abgebucht wird
-                // TODO: Abgänge von Produktionsaufträgen mit einrechnen
-                this.ReservedOutwardQuantity +=
-                        this.Facility.Material.ConvertQuantity(facilityReservation.OutOrderPos.TargetQuantity,
-                                                    facilityReservation.OutOrderPos.Material.BaseMDUnit,
-                                                    this.Facility.Material.BaseMDUnit)
-                        - this.Facility.Material.ConvertQuantity(facilityReservation.OutOrderPos.ActualQuantity,
-                                                    facilityReservation.OutOrderPos.Material.BaseMDUnit,
-                                                    this.Facility.Material.BaseMDUnit);
+        //public void RecalcReservedOutwardQuantity()
+        //{
+        //    if ((this.Facility == null) || (this.Facility.Material == null))
+        //        return;
 
-            }
-        }
+        //    this.ReservedOutwardQuantity = 0;
+        //    // TODO: OR-Klausel einfügen für Produktionsaufträge
+        //    IEnumerable<FacilityReservation> facilityReservationList = this.Facility.FacilityReservation_Facility.Where(c => c.OutOrderPosID.HasValue).AsEnumerable();
+        //    foreach (FacilityReservation facilityReservation in facilityReservationList)
+        //    {
+        //        // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
+        //        // Die TargetQuantity gibt an, wieviel Reserviert ist
+        //        // Die Differenz gibt an, wieviel noch abgebucht wird
+        //        // TODO: Abgänge von Produktionsaufträgen mit einrechnen
+        //        this.ReservedOutwardQuantity +=
+        //                this.Facility.Material.ConvertQuantity(facilityReservation.OutOrderPos.TargetQuantity,
+        //                                            facilityReservation.OutOrderPos.Material.BaseMDUnit,
+        //                                            this.Facility.Material.BaseMDUnit)
+        //                - this.Facility.Material.ConvertQuantity(facilityReservation.OutOrderPos.ActualQuantity,
+        //                                            facilityReservation.OutOrderPos.Material.BaseMDUnit,
+        //                                            this.Facility.Material.BaseMDUnit);
+
+        //    }
+        //}
 
 
 

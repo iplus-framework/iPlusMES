@@ -158,6 +158,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.bso.saleswpf", "gip.bso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gip.mes.console", "gip.mes.console\gip.mes.console.csproj", "{8D15CA98-4E31-4119-8884-B426C395E183}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7A0D755F-1A22-428E-9AA0-037D38F29A9C}"
+	ProjectSection(SolutionItems) = preProject
+		roTextFile1.txt = roTextFile1.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

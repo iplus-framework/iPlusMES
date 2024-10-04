@@ -1,15 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Transactions;
 using gip.core.datamodel;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Weighing'}de{'Wägung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, false, "", "BSOWeighing")]
+    [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.Weighing, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, false, "", "BSOWeighing")]
     [ACPropertyEntity(1, "WeighingNo", "en{'Weighing-No.'}de{'Wägungs-Nr.'}", "", "", true)]
     [ACPropertyEntity(2, "VBiACClassID", "en{'Scale'}de{'Waage'}", "", "", true)]
     [ACPropertyEntity(3, "Weight", "en{'Weight'}de{'Gewicht'}", "", "", true)]

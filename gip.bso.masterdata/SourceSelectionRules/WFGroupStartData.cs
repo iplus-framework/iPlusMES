@@ -30,7 +30,12 @@ namespace gip.bso.masterdata
             }
 
             // Load main WF
-            ConfigStores = GetConfigStores(iPlusMESConfigManager, new ACClassMethod[] { Method, InvokerPWNode.RefPAACClassMethod }, Partslist, ProdOrderPartslist, Picking);
+            ACClassMethod[] methods = new ACClassMethod[] { Method };
+            if(InvokerPWNode.RefPAACClassMethod != null)
+            {
+                methods = new ACClassMethod[] { Method, InvokerPWNode.RefPAACClassMethod };
+            }
+            ConfigStores = GetConfigStores(iPlusMESConfigManager, methods, Partslist, ProdOrderPartslist, Picking);
         }
         #endregion
 

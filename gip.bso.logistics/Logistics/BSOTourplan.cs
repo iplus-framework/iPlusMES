@@ -176,9 +176,9 @@ namespace gip.bso.logistics
                     {
                         ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "TourplanNo").FirstOrDefault();
                         if (sortItem != null && sortItem.IsConfiguration)
+                        {
                             sortItem.SortDirection = Global.SortDirections.descending;
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        }
                     }
 
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Tourplan>(Tourplan.ClassName, this);

@@ -2638,6 +2638,10 @@ public partial class IPCDrivesV5Context : DbContext
                 .HasForeignKey(d => d.PartslistID)
                 .HasConstraintName("FK_Facility_PartsListID");
 
+           entity.HasOne(d => d.VBiACClassMethod).WithMany(p => p.Facility_VBiACClassMethod)
+                .HasForeignKey(d => d.VBiACClassMethodID)
+                .HasConstraintName("FK_Facility_ACClassMethodID");
+
            entity.HasOne(d => d.VBiFacilityACClass).WithMany(p => p.Facility_VBiFacilityACClass)
                 .HasForeignKey(d => d.VBiFacilityACClassID)
                 .HasConstraintName("FK_Facility_FacilityACClassID");
@@ -3526,6 +3530,7 @@ public partial class IPCDrivesV5Context : DbContext
             entity.HasIndex(e => e.FacilityReservationNo, "UIX_FacilityReservation_FacilityReservationNo").IsUnique();
 
             entity.Property(e => e.FacilityReservationID).ValueGeneratedNever();
+            entity.Property(e => e.CalculatedRoute).IsUnicode(false);
             entity.Property(e => e.FacilityReservationNo)
                 .IsRequired()
                 .HasMaxLength(20)
@@ -8384,6 +8389,8 @@ public partial class IPCDrivesV5Context : DbContext
         modelBuilder.Entity<Picking>(entity =>
         {
             entity.ToTable("Picking");
+
+            entity.HasIndex(e => e.MirroredFromPickingID, "NCI_FK_Picking_MirroredFromPickingID");
 
             entity.HasIndex(e => e.TourplanID, "NCI_FK_Picking_TourplanID");
 

@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Vml.Office;
 using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.processapplication;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
@@ -632,6 +633,10 @@ namespace gip.mes.processapplication
             }
         }
 
+        /// <summary>
+        /// If this Parameter ist set, then only line can be selected in Weighing-Dialog and when weighing ist finished
+        /// this node completes and a outer loop (PWLoadingLoop) will start this node again.
+        /// </summary>
         public bool EachPosSeparated
         {
             get
@@ -1547,12 +1552,21 @@ namespace gip.mes.processapplication
 
             if (facilityCharge.HasValue)
             {
+                bool changeOnPAF = false;
                 if (FreeSelectionMode)
                 {
                     CurrentOpenMaterial = prodOrderPartslistPosRelation;
+                    changeOnPAF = true;
+
+                    PAFManualWeighing manWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+                    if (manWeighing != null)
+                    {
+                        ACMethod acMethod = manWeighing.CurrentACMethod.ValueT;
+                        InitializePAFACMethod(acMethod, facilityCharge);
+                    }
                 }
 
-                Msg msg = SetFacilityCharge(facilityCharge, prodOrderPartslistPosRelation, forceSetFC_F);
+                Msg msg = SetFacilityCharge(facilityCharge, prodOrderPartslistPosRelation, forceSetFC_F, changeOnPAF);
 
                 if (msg != null)
                 {
@@ -2555,7 +2569,7 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
+        protected IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
         {
             Guid[] facilities = GetAvailableFacilitiesForMaterial(dbApp, posRel).Select(c => c.FacilityID).ToArray();
 
@@ -3065,6 +3079,8 @@ namespace gip.mes.processapplication
                 else if (weighingComponent.PickingPosition != null)
                     acMethod["PLPosRelation"] = weighingComponent.PickingPosition.PickingPosID;
 
+
+
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
 
                 if (currentFacilityCharge.HasValue)
@@ -3080,7 +3096,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        private Msg InitializePAFACMethod(ACMethod acMethod, Guid? currentFacilityCharge)
+        protected virtual Msg InitializePAFACMethod(ACMethod acMethod, Guid? currentFacilityCharge)
         {
             using (DatabaseApp dbApp = new DatabaseApp())
             {
@@ -3088,7 +3104,7 @@ namespace gip.mes.processapplication
 
                 if (currentFacilityCharge.HasValue)
                 {
-                    FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge);
+                    FacilityCharge fc = dbApp.FacilityCharge.Include(c => c.Facility).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge);
                     if (fc == null)
                     {
                         //Error50376: The quant {0} doesn't exist in the database!
@@ -3109,7 +3125,7 @@ namespace gip.mes.processapplication
                     //Error50363: Can't find a Route in the AvailableRoutes with RouteSourceID: {0}
                     return new Msg(this, eMsgLevel.Error, PWClassName, "InitializePAFACMethod(40)", 1360, "Error50363", facility.VBiFacilityACClassID);
                 }
-                acMethod.ParameterValueList["Route"] = route;
+                acMethod.ParameterValueList[nameof(Route)] = route;
             }
             if (currentFacilityCharge.HasValue)
                 acMethod.ParameterValueList["FacilityCharge"] = currentFacilityCharge.Value;
@@ -3283,7 +3299,7 @@ namespace gip.mes.processapplication
                     acMethod["PLPosRelation"] = weighingComponent.PLPosRelation.ProdOrderPartslistPosRelationID;
                 else
                     acMethod["PLPosRelation"] = weighingComponent.PickingPosition.PickingPosID;
-                acMethod["Route"] = new Route();
+                acMethod[nameof(Route)] = new Route();
 
                 if (!IsManualWeighing)
                 {
@@ -3323,7 +3339,7 @@ namespace gip.mes.processapplication
             else
             {
                 acMethod["TargetQuantity"] = PWBinSelection.BinSelectionReservationQuantity;
-                acMethod["Route"] = new Route();
+                acMethod[nameof(Route)] = new Route();
             }
 
             if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))
@@ -3756,13 +3772,34 @@ namespace gip.mes.processapplication
 
                         if (!isForInterdischarge && (!tQuantityFromPAF.HasValue || _IsLotChanged))
                         {
-                            double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
-                            if (tQuantityFromPAF.HasValue && calcActualQuantity > 0.00001)
+                            double postedQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
+                            double calcActualQuantity = actualQuantity - postedQuantity;
+
+                            if (calcActualQuantity < double.Epsilon)
                             {
-                                calcActualQuantity = tQuantityFromPAF.Value + weighingPosRelation.RemainingDosingQuantityUOM;
+                                if (tQuantityFromPAF.HasValue)
+                                {
+                                    postedQuantity = tQuantityFromPAF.Value + weighingPosRelation.RemainingDosingQuantityUOM;
+                                    calcActualQuantity = actualQuantity - postedQuantity;
+                                }
+                                else
+                                {
+                                    ACMethod currentACMethod = CurrentACMethod.ValueT;
+                                    var targetQ = currentACMethod?.ParameterValueList.GetACValue("TargetQuantity");
+                                    double targetWeight = 0;
+                                    if (targetQ != null)
+                                        targetWeight = targetQ.ParamAsDouble;
+
+                                    if (targetWeight > double.Epsilon)
+                                    {
+                                        postedQuantity = targetWeight + weighingPosRelation.RemainingDosingQuantityUOM;
+                                        calcActualQuantity = actualQuantity - postedQuantity;
+                                    }
+                                }
                             }
-                            if (actualQuantity > calcActualQuantity)
-                                actualQuantity = actualQuantity - calcActualQuantity;
+
+                            if (calcActualQuantity > double.Epsilon)
+                                actualQuantity = calcActualQuantity;
                         }
 
                         if (actualQuantity > 0.000001)
@@ -4434,9 +4471,9 @@ namespace gip.mes.processapplication
             TareScale();
         }
 
-        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList, ref DumpStats dumpStats)
         {
-            base.DumpPropertyList(doc, xmlACPropertyList);
+            base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
 
             XmlElement xmlChild = xmlACPropertyList[nameof(InterdischargingScaleActualValue)];
             if (xmlChild == null)
@@ -4757,6 +4794,12 @@ namespace gip.mes.processapplication
                     return true;
                 case nameof(GetReworkStatus):
                     result = GetReworkStatus();
+                    return true;
+                case nameof(InterdischargingStart):
+                    result = InterdischargingStart();
+                    return true;
+                case nameof(CompleteInterdischarging):
+                    CompleteInterdischarging();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

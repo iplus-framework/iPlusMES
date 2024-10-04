@@ -8,9 +8,9 @@ using gip.mes.datamodel;
 using gip.core.processapplication;
 using System.Xml;
 using System.Collections.Specialized;
+using System.Web;
 using gip.mes.facility;
 using System.Globalization;
-using System.Web;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.processapplication
@@ -36,37 +36,37 @@ namespace gip.mes.processapplication
         public const string SelRuleID_DischargingFunc = "PAMSilo.DischargingFunc";
         #endregion
 
-
         #region c'tors
         static PAMSilo()
         {
             RegisterExecuteHandler(typeof(PAMSilo), HandleExecuteACMethod_PAMSilo);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo, (c, p) => c.Component.ValueT is PAMSilo, null);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_SiloDirect, (c, p) => c.Component.ValueT is PAMSilo, (c, p) => c.Component.ValueT is PAProcessModule);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Storage, (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin, null);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo_Deselector, null, (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo, (c, p) => c.ComponentInstance is PAMSilo, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_SiloDirect, (c, p) => c.ComponentInstance is PAMSilo, (c, p) => c.ComponentInstance is PAProcessModule);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Storage, (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo_Deselector, null, (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_DosingFunc,
-                                                    (c, p) => c.Component.ValueT is PAProcessModuleVB
-                                                                && !(c.Component.ValueT is PAMSilo)
-                                                                && !(c.Component.ValueT is PAMParkingspace)
-                                                                && c.Component.ValueT.FindChildComponents<PAFDosing>(d => d is PAFDosing, null, 1).Any(),
-                                                    (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin);
+                                                    (c, p) => c.ComponentInstance is PAProcessModuleVB
+                                                                && !(c.ComponentInstance is PAMSilo)
+                                                                && !(c.ComponentInstance is PAMParkingspace)
+                                                                && c.ComponentInstance.FindChildComponents<PAFDosing>(d => d is PAFDosing, null, 1).Any(),
+                                                    (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_DischargingFunc,
-                                                    (c, p) => c.Component.ValueT is PAProcessModuleVB
-                                                                && !(c.Component.ValueT is PAMSilo)
-                                                                && !(c.Component.ValueT is PAMParkingspace)
-                                                                && c.Component.ValueT.FindChildComponents<PAFDischarging>(d => d is PAFDischarging, null, 1).Any(),
-                                                    (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin);
+                                                    (c, p) => c.ComponentInstance is PAProcessModuleVB
+                                                                && !(c.ComponentInstance is PAMSilo)
+                                                                && !(c.ComponentInstance is PAMParkingspace)
+                                                                && c.ComponentInstance.FindChildComponents<PAFDischarging>(d => d is PAFDischarging, null, 1).Any(),
+                                                    (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin);
         }
 
 
-        public PAMSilo(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public PAMSilo(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
             _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
-            _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, "InvertMatSensorValue", true);
-            _LeaveMaterialOccupation = new ACPropertyConfigValue<bool>(this, "LeaveMaterialOccupation", false);
+            _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, nameof(InvertMatSensorValue), true);
+            _LeaveMaterialOccupation = new ACPropertyConfigValue<bool>(this, nameof(LeaveMaterialOccupation), false);
+            _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
             _Dimensions = new ACPropertyConfigValue<string>(this, nameof(Dimensions), "");
         }
 
@@ -88,6 +88,7 @@ namespace gip.mes.processapplication
                 }
             }
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             _ = InvertMatSensorValue;
             _ = Dimensions;
             _ = LeaveMaterialOccupation;
@@ -108,12 +109,16 @@ namespace gip.mes.processapplication
             if (FillLevelRaw != null)
                 (FillLevelRaw as IACPropertyNetTarget).ValueUpdatedOnReceival -= ChildProperties_ValueUpdatedOnReceival;
             UnSubscribeAllTransportFunctions();
+
             return base.ACPreDeInit(deleteACClassTask);
         }
 
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
             if (_MatSensorFilling != null)
             {
                 _MatSensorFilling.Detach();
@@ -159,7 +164,7 @@ namespace gip.mes.processapplication
             if (FillLevelRaw != null)
                 (FillLevelRaw as IACPropertyNetTarget).ValueUpdatedOnReceival += ChildProperties_ValueUpdatedOnReceival;
 
-            bool result =  base.ACPostInit();
+            bool result = base.ACPostInit();
 
             //CurrentTransportFunction = null;
 
@@ -167,7 +172,6 @@ namespace gip.mes.processapplication
             return result;
         }
         #endregion
-
 
         #region Points
         PAPoint _PAPointMatIn1;
@@ -191,8 +195,18 @@ namespace gip.mes.processapplication
         }
         #endregion
 
-
         #region References to Objects
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
         public IEnumerable<PAESensorDigital> MaterialSensors
         {
             get
@@ -247,6 +261,20 @@ namespace gip.mes.processapplication
             set
             {
                 _LeaveMaterialOccupation.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _DisplayMaterialOfQuant;
+        [ACPropertyConfig(ConstApp.DisplayMaterialOfQuant)]
+        public bool DisplayMaterialOfQuant
+        {
+            get
+            {
+                return _DisplayMaterialOfQuant.ValueT;
+            }
+            set
+            {
+                _DisplayMaterialOfQuant.ValueT = value;
             }
         }
 
@@ -312,18 +340,22 @@ namespace gip.mes.processapplication
             }
         }
 
-        public bool IsFillingRequested
+        public virtual bool IsFillingRequested
         {
             get
             {
-                if (   MatSensorFilling == null
-                    || MatSensorFilling.SensorState == null)
-                    return false;
-                if (InvertMatSensorValue)
-                    return MatSensorFilling.SensorState.ValueT == PANotifyState.Off;
-                else
-                    return MatSensorFilling.SensorState.ValueT != PANotifyState.Off;
+                return GetFillingRequested(MatSensorFilling);
             }
+        }
+
+        protected bool GetFillingRequested(PAESensorDigital pAESensorDigital)
+        {
+            if (pAESensorDigital == null || pAESensorDigital.SensorState == null)
+                return false;
+            if (InvertMatSensorValue)
+                return pAESensorDigital.SensorState.ValueT == PANotifyState.Off;
+            else
+                return pAESensorDigital.SensorState.ValueT != PANotifyState.Off;
         }
 
         private bool _MatSensorEmtpyChecked = false;
@@ -426,8 +458,8 @@ namespace gip.mes.processapplication
                 }
             }
         }
-        
-        
+
+
         public IEnumerable<IPAFuncScaleConfig> CurrentScaleFunctions
         {
             get
@@ -441,7 +473,6 @@ namespace gip.mes.processapplication
             }
         }
         #endregion
-
 
         #region Properties, Range 400
         [ACPropertyBindingTarget(400, "Read from PLC", "en{'Fill level'}de{'Füllstand'}", "", false, false, RemotePropID = 20)]
@@ -553,7 +584,7 @@ namespace gip.mes.processapplication
                 return FillLevel.ValueT - FillLevelScale.ValueT;
             }
         }
-        
+
         [ACPropertyBindingSource(450, "Error", "en{'Validation error'}de{'Validierungsfehler'}", "", false, false)]
         public IACContainerTNet<PANotifyState> ValidationError { get; set; }
         public const string PropNameValidationError = "ValidationError";
@@ -602,7 +633,6 @@ namespace gip.mes.processapplication
 
         #endregion
 
-
         #region Methods
 
         #region Execute-Helper-Handlers
@@ -636,7 +666,7 @@ namespace gip.mes.processapplication
                     result = IsDosingActiveFromThisSilo();
                     return true;
                 case nameof(CalculateFillingVolume):
-                    result = CalculateFillingVolume((double[]) acParameter[0], acParameter[1] as Dictionary<string, double>);
+                    result = CalculateFillingVolume((double[])acParameter[0], acParameter[1] as Dictionary<string, double>);
                     return true;
                 case nameof(CalculateFillingWeight):
                     result = CalculateFillingWeight((double[])acParameter[0], acParameter[1] as Dictionary<string, double>);
@@ -798,7 +828,7 @@ namespace gip.mes.processapplication
                 return;
             if (this.ApplicationManager.ApplicationQueue != null)
             {
-                this.ApplicationManager.ApplicationQueue.Add(() => 
+                this.ApplicationManager.ApplicationQueue.Add(() =>
                 {
                     UnSubscribeAllTransportFunctions();
                     List<PAFDosing> dosings = RebuildDosingsFromThisSilo();
@@ -957,11 +987,11 @@ namespace gip.mes.processapplication
         protected virtual void OnBuildMaterialInfo(Facility facilitySilo)
         {
             Material material = null;
-            RootDbOpQueue.AppContextQueue.ProcessAction(() =>                
+            RootDbOpQueue.AppContextQueue.ProcessAction(() =>
             {
                 try
                 {
-                    material = facilitySilo.Material;
+                    material = GetFacilitySiloMaterial(facilitySilo);
                 }
                 catch (Exception qEx)
                 {
@@ -981,6 +1011,39 @@ namespace gip.mes.processapplication
                 _CurrentDensity = 0.0;
             }
             OnRecalculateFillingWeight();
+        }
+
+        protected virtual Material GetFacilitySiloMaterial(Facility facilitySilo)
+        {
+            bool displayMaterialOfQuant = ACFacilityManager.DisplayMaterialOfQuant;
+            if (!displayMaterialOfQuant)
+            {
+                displayMaterialOfQuant = DisplayMaterialOfQuant;
+            }
+
+            Material material = facilitySilo.Material;
+
+            if(facilitySilo.Partslist != null)
+            {
+                material = facilitySilo.Partslist.Material;
+            }
+            else
+            {
+                if (material != null && material.Material_ProductionMaterial.Any() && displayMaterialOfQuant)
+                {
+                    using (DatabaseApp databaseApp = new DatabaseApp())
+                    {
+                        var quants = s_cQry_Quants(databaseApp, facilitySilo.FacilityID);
+                        FacilityCharge lastQuant = quants.FirstOrDefault();
+                        if (lastQuant != null)
+                        {
+                            material = lastQuant.Material;
+                        }
+                    }
+                }
+            }
+            
+            return material;
         }
 
         protected virtual void OnRefreshFacility(Facility facilitySilo, bool preventBroadcast, Guid? fbID)
@@ -1508,7 +1571,7 @@ namespace gip.mes.processapplication
                     // Prüfung nur, wenn nicht herausdosiert wird, weil manchmal der Leerlmelder kommen kann
                     // und wenn nicht erstmalige Zugangsbuchung auf dem Silo und das Material noch nicht angekommen ist, weil der Transport noch läuft.
                     var activeDosings = GetActiveDosingsFromThisSilo();
-                    if (   (activeDosings == null || !activeDosings.Any())
+                    if ((activeDosings == null || !activeDosings.Any())
                         && !(invoker == VSSInvoker.OnRefreshFacility && _LastStock <= 0.00001))
                     {
                         //Error50179: The empty message indicates that the silo {0} is empty, but the stock is higher than the empty tolerance is set.
@@ -1616,8 +1679,8 @@ namespace gip.mes.processapplication
 
         protected virtual void OnRecalculateFillingWeight()
         {
-            if (   HasBoundFillLevelScale 
-                || DictDimensions == null 
+            if (HasBoundFillLevelScale
+                || DictDimensions == null
                 || !DictDimensions.Any()
                 || _CurrentDensity <= double.Epsilon)
                 return;
@@ -1641,8 +1704,8 @@ namespace gip.mes.processapplication
         public virtual double CalculateFillingVolume(double[] measuredFillLevel, Dictionary<string, double> dimensions)
         {
             double volume = 0.0;
-            if (   measuredFillLevel == null 
-                || !measuredFillLevel.Any() 
+            if (measuredFillLevel == null
+                || !measuredFillLevel.Any()
                 || dimensions == null
                 || !dimensions.Any())
                 return volume;
@@ -1660,7 +1723,7 @@ namespace gip.mes.processapplication
                     return GetVolumeOfVerticalCylinder(dimensions[C_DimDiameter_1], h);
             }
             // couboid
-            else if (  dimensions.ContainsKey(C_DimLength_1)
+            else if (dimensions.ContainsKey(C_DimLength_1)
                     && dimensions.ContainsKey(C_DimWidth_1))
             {
                 double l = dimensions[C_DimLength_1];
@@ -1708,7 +1771,7 @@ namespace gip.mes.processapplication
         [ACMethodInfo("Function", "en{'Calculate filling volume [kg]'}de{'Füllvolumen berechnen [kg]'}", 9999)]
         public virtual double CalculateFillingWeight(double[] measuredFillLevel, Dictionary<string, double> dimensions)
         {
-            double volume = (double) ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingVolume), measuredFillLevel, dimensions);
+            double volume = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingVolume), measuredFillLevel, dimensions);
             if (volume > 0.000001)
             {
                 double density = CurrentDensity; // g/dm³
@@ -1724,7 +1787,7 @@ namespace gip.mes.processapplication
         {
             if (!IsEnabledSyncStockWithFillLevelScale())
                 return;
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
+            FacilityManager facManager = this.ACFacilityManager;
             if (facManager != null)
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -1736,7 +1799,7 @@ namespace gip.mes.processapplication
                     {
                         ACMethodBooking bookingParam = null;
                         double currentStock = facility.CurrentFacilityStock.StockQuantity;
-                        double currentLevel =  this.FillLevelScale.ValueT;
+                        double currentLevel = this.FillLevelScale.ValueT;
                         double diff = currentLevel - currentStock;
                         if (Math.Abs(diff) <= double.Epsilon)
                             return;
@@ -1769,7 +1832,7 @@ namespace gip.mes.processapplication
         public virtual bool IsEnabledSyncStockWithFillLevelScale()
         {
             double currentLevel = this.FillLevelScale.ValueT;
-            if (   currentLevel <= double.Epsilon
+            if (currentLevel <= double.Epsilon
                 || Facility.ValueT == null
                 || Facility.ValueT.ValueT == null
                )
@@ -1866,9 +1929,9 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Dumping and Testing
-        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList, ref DumpStats dumpStats)
         {
-            base.DumpPropertyList(doc, xmlACPropertyList);
+            base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
 
             XmlElement xmlChild = xmlACPropertyList["CurrentTransportFunctions"];
             if (xmlChild == null)

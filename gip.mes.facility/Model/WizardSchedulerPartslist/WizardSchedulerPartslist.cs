@@ -65,78 +65,11 @@ namespace gip.mes.facility
             DefineSelectedSchedulingGroup(selectedSchedulingGroup);
             ProductionUnitsUOM = partslist.ProductionUnits;
             SelectedBatchPlanGroup = selectedBatchPlanGroup;
-        }
-
-        private void DefineSelectedSchedulingGroup(MDSchedulingGroup selectedSchedulingGroup)
-        {
-            MDSchedulingGroup firstGroupInList = MDSchedulingGroupList.FirstOrDefault();
-            if (
-                firstGroupInList != null
-                && selectedSchedulingGroup != null
-                && MDSchedulingGroupList != null
-                && MDSchedulingGroupList.Select(c => c.MDSchedulingGroupID).Contains(selectedSchedulingGroup.MDSchedulingGroupID))
+            PartslistACClassMethod method = this.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            if (method != null)
             {
-                SelectedMDSchedulingGroup = SortSchedulingGroup(firstGroupInList, selectedSchedulingGroup);
+                HasRequiredParams = method.MaterialWFACClassMethod.ACClassMethod.HasRequiredParams;
             }
-            else
-            {
-                SelectedMDSchedulingGroup = firstGroupInList;
-            }
-        }
-
-        private MDSchedulingGroup SortSchedulingGroup(MDSchedulingGroup first, MDSchedulingGroup second)
-        {
-            MDSchedulingGroup selectedGroup = null;
-            int firstOrder = 0;
-            int secondOrder = 0;
-
-            IEnumerable<Tuple<int, Guid>> items =
-                Partslist
-                .PartslistConfig_Partslist
-                .Where(c => !string.IsNullOrEmpty(c.LocalConfigACUrl) && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
-                .ToArray()
-                .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
-                .OrderBy(c => c.Item1)
-                .ToArray();
-
-            if (items.Any())
-            {
-                firstOrder = items.Where(c => first.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == c.Item2)).Select(c => c.Item1).FirstOrDefault();
-                secondOrder = items.Where(c => second.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == c.Item2)).Select(c => c.Item1).FirstOrDefault();
-            }
-
-
-            // #1 case
-            // firstOrder = 0
-            // secondOrder = 2
-
-            // #2 case
-            // firstOrder = 2
-            // secondOrder = 0
-
-            // #3 case
-            // firstOrder = 0
-            // secondOrder = 0
-
-            // #4 case
-            // firstOrder = 1
-            // secondOrder = 2
-
-            // #4 case
-            // firstOrder = 2
-            // secondOrder = 1
-
-            selectedGroup = first;
-            if (firstOrder == 0 && secondOrder != 0)
-            {
-                selectedGroup = second;
-            }
-            else if (firstOrder == secondOrder || firstOrder > secondOrder)
-            {
-                selectedGroup = second;
-            }
-
-            return selectedGroup;
         }
 
         public WizardSchedulerPartslist(DatabaseApp databaseApp,
@@ -185,6 +118,9 @@ namespace gip.mes.facility
             {
                 SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
             }
+
+            // for now only check if exist any defined param
+            IsRequiredParamsSolved = prodOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any();
         }
         #endregion
 
@@ -192,10 +128,11 @@ namespace gip.mes.facility
 
         #region Properties -> Not marked (private)
 
+        public ProdOrderPartslist ProdOrderPartslist { get; set; }
         public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
         private Partslist _Partslist;
-        [ACPropertyInfo(519, "BatchPlanSuggestion", "en{'BOM'}de{'Stückliste.'}")]
+        [ACPropertyInfo(519, nameof(BatchPlanSuggestion), "en{'BOM'}de{'Stückliste.'}")]
         public Partslist Partslist
         {
             get
@@ -217,7 +154,7 @@ namespace gip.mes.facility
         public int? StartOffsetSecAVG { get; set; }
 
         private BatchPlanSuggestion _BatchPlanSuggestion;
-        [ACPropertyInfo(518, "BatchPlanSuggestion")]
+        [ACPropertyInfo(518, nameof(BatchPlanSuggestion))]
         public BatchPlanSuggestion BatchPlanSuggestion
         {
             get
@@ -234,20 +171,20 @@ namespace gip.mes.facility
 
         #region Properties -> Other (marked)
 
-        [ACPropertyInfo(99, "ProgramNo", "en{'Order Number'}de{'Auftragsnummer'}")]
+        [ACPropertyInfo(99, nameof(ProgramNo), "en{'Order Number'}de{'Auftragsnummer'}")]
         public string ProgramNo { get; set; }
 
-        [ACPropertyInfo(100, "Sn", "en{'No'}de{'Nr'}")]
+        [ACPropertyInfo(100, nameof(Sn), "en{'No'}de{'Nr'}")]
         public int Sn { get; set; }
 
-        [ACPropertyInfo(101, "PartslistNo", "en{'No'}de{'Nr'}")]
+        [ACPropertyInfo(101, nameof(PartslistNo), "en{'No'}de{'Nr'}")]
         public string PartslistNo { get; set; }
 
-        [ACPropertyInfo(102, "PartslistName", "en{'Bill of material name'}de{'Stückliste Name'}")]
+        [ACPropertyInfo(102, nameof(PartslistName), "en{'Bill of material name'}de{'Stückliste Name'}")]
         public string PartslistName { get; set; }
 
         private bool _IsSolved { get; set; }
-        [ACPropertyInfo(103, "IsSolved", "en{'IsSolved'}de{'IsSolved'}")]
+        [ACPropertyInfo(103, nameof(IsSolved), "en{'IsSolved'}de{'IsSolved'}")]
         public bool IsSolved
         {
             get
@@ -257,6 +194,60 @@ namespace gip.mes.facility
             set
             {
                 _IsSolved = value;
+            }
+        }
+
+        private bool _HasRequiredParams { get; set; }
+        [ACPropertyInfo(104, nameof(HasRequiredParams), "en{'Has requiered params'}de{'Hat erforderliche Parameter'}")]
+        public bool HasRequiredParams
+        {
+            get
+            {
+                return _HasRequiredParams;
+            }
+            set
+            {
+                _HasRequiredParams = value;
+            }
+        }
+
+        private bool _IsRequiredParamsSolved { get; set; }
+        [ACPropertyInfo(105, nameof(IsRequiredParamsSolved), "en{'Is required params solved'}de{'Sind die erforderlichen Parameter gelöst?'}")]
+        public bool IsRequiredParamsSolved
+        {
+            get
+            {
+                return _IsRequiredParamsSolved;
+            }
+            set
+            {
+                _IsRequiredParamsSolved = value;
+                OnPropertyChanged(nameof(IsRequiredParamsSolved));
+            }
+        }
+
+        [ACPropertyInfo(107, nameof(ParamState), "en{'Param state'}de{'Parameterstatus'}")]
+        public PreferredParamStateEnum ParamState
+
+        {
+            get
+            {
+                PreferredParamStateEnum paramState = PreferredParamStateEnum.ParamsNotRequired;
+                if (HasRequiredParams)
+                {
+                    paramState = IsRequiredParamsSolved ? PreferredParamStateEnum.ParamsRequiredDefined : PreferredParamStateEnum.ParamsRequiredNotDefined;
+                }
+                return paramState;
+            }
+        }
+
+        [ACPropertyInfo(108, nameof(ParamStateName), "en{'Param state name'}de{'Parameterstatusname'}")]
+        public string ParamStateName
+        {
+            get
+            {
+                ACValueItem item = DatabaseApp.PreferredParamStateList.Where(c=> (PreferredParamStateEnum)c.Value == ParamState).FirstOrDefault();
+                return item.ACCaption;
             }
         }
 
@@ -290,7 +281,7 @@ namespace gip.mes.facility
         public List<MDSchedulingGroup> MDSchedulingGroupList { get; set; }
 
         gip.mes.datamodel.ACClassWF _WFNodeMES;
-        [ACPropertyInfo(522, "WFNodeMES", "en{'WFNodeMES'}de{'WFNodeMES'}")]
+        [ACPropertyInfo(522, nameof(WFNodeMES), "en{'WFNodeMES'}de{'WFNodeMES'}")]
         public gip.mes.datamodel.ACClassWF WFNodeMES
         {
             get
@@ -434,7 +425,7 @@ namespace gip.mes.facility
         #endregion
 
         private double _TargetQuantity;
-        [ACPropertyInfo(105, "TargetQuantity", "en{'Quantity'}de{'Menge'}")]
+        [ACPropertyInfo(105, nameof(TargetQuantity), "en{'Quantity'}de{'Menge'}")]
         public double TargetQuantity
         {
             get
@@ -450,7 +441,7 @@ namespace gip.mes.facility
 
 
         private double _TargetQuantityUOM;
-        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Quantity (UOM)'}de{'Menge (BME)'}")]
+        [ACPropertyInfo(106, nameof(TargetQuantityUOM), "en{'Quantity (UOM)'}de{'Menge (BME)'}")]
         public double TargetQuantityUOM
         {
             get
@@ -480,7 +471,7 @@ namespace gip.mes.facility
         /// Doc  NewTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'New (UOM) quantity'}de{'Neu (BME) Menge'}")]
+        [ACPropertyInfo(999, nameof(NewTargetQuantityUOM), "en{'New (UOM) quantity'}de{'Neu (BME) Menge'}")]
         public double NewTargetQuantityUOM
         {
             get
@@ -514,7 +505,7 @@ namespace gip.mes.facility
         /// Doc  NewSyncTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'New (UOM) sync. quntity'}de{'Neu (BME) sync. Menge'}")]
+        [ACPropertyInfo(999, nameof(NewSyncTargetQuantityUOM), "en{'New (UOM) sync. quntity'}de{'Neu (BME) sync. Menge'}")]
         public double? NewSyncTargetQuantityUOM
         {
             get
@@ -548,7 +539,7 @@ namespace gip.mes.facility
 
 
         public double _NewTargetQuantity;
-        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'New quantity'}de{'Neu Menge'}")]
+        [ACPropertyInfo(999, nameof(NewTargetQuantityUOM), "en{'New quantity'}de{'Neu Menge'}")]
         public double NewTargetQuantity
         {
             get
@@ -567,7 +558,7 @@ namespace gip.mes.facility
         /// Doc  NewSyncTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'New sync. quantity'}de{'Neu sync. Menge'}")]
+        [ACPropertyInfo(999, nameof(NewSyncTargetQuantityUOM), "en{'New sync. quantity'}de{'Neu sync. Menge'}")]
         public double? NewSyncTargetQuantity
         {
             get
@@ -585,7 +576,7 @@ namespace gip.mes.facility
 
 
         public double? _ProductionUnitsUOM;
-        [ACPropertyInfo(999, "ProductionUnits", "en{'Units of production (UOM)'}de{'Produktionseinheiten (BME)'}")]
+        [ACPropertyInfo(999, nameof(ProductionUnits), "en{'Units of production (UOM)'}de{'Produktionseinheiten (BME)'}")]
         public double? ProductionUnitsUOM
 
         {
@@ -604,7 +595,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(999, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}")]
+        [ACPropertyInfo(999, nameof(ProductionUnits), "en{'Units of production'}de{'Produktionseinheiten'}")]
         public double? ProductionUnits
 
         {
@@ -645,7 +636,7 @@ namespace gip.mes.facility
         }
 
         private double _BatchSizeMinUOM;
-        [ACPropertyInfo(999, "BatchSizeMinUOM", "en{'Min. Batchsize (UOM)'}de{'Min. Batchgröße (BME)'}")]
+        [ACPropertyInfo(999, nameof(BatchSizeMinUOM), "en{'Min. Batchsize (UOM)'}de{'Min. Batchgröße (BME)'}")]
         public double BatchSizeMinUOM
         {
             get
@@ -676,7 +667,7 @@ namespace gip.mes.facility
 
         private double _BatchSizeMaxUOM;
 
-        [ACPropertyInfo(999, "BatchSizeMaxUOM", "en{'Max. Batchsize UOM'}de{'Max. Batchgröße (BME)'}")]
+        [ACPropertyInfo(999, nameof(BatchSizeMaxUOM), "en{'Max. Batchsize UOM'}de{'Max. Batchgröße (BME)'}")]
         public double BatchSizeMaxUOM
         {
             get
@@ -695,7 +686,7 @@ namespace gip.mes.facility
         }
 
         private double _BatchSizeStandard;
-        [ACPropertyInfo(999, "BatchSizeStandard", "en{'Standard Batchsize'}de{'Standard Batchgröße'}")]
+        [ACPropertyInfo(999, nameof(BatchSizeStandard), "en{'Standard Batchsize'}de{'Standard Batchgröße'}")]
         public double BatchSizeStandard
         {
             get
@@ -705,7 +696,7 @@ namespace gip.mes.facility
         }
 
         private double _BatchSizeStandardUOM;
-        [ACPropertyInfo(999, "BatchSizeStandardUOM", "en{'Standard Batchsize (UOM)'}de{'Standard Batchgröße (BME)'}")]
+        [ACPropertyInfo(999, nameof(BatchSizeStandardUOM), "en{'Standard Batchsize (UOM)'}de{'Standard Batchgröße (BME)'}")]
         public double BatchSizeStandardUOM
         {
             get
@@ -726,13 +717,13 @@ namespace gip.mes.facility
         #endregion
 
 
-        [ACPropertyInfo(999, "PlanModeName", "en{'Batch planning mode'}de{'Batch Planmodus'}")]
+        [ACPropertyInfo(999, nameof(PlanModeName), "en{'Batch planning mode'}de{'Batch Planmodus'}")]
         public string PlanModeName { get; set; }
 
-        [ACPropertyInfo(999, "MDProdOrderState", "en{'MDProdOrderState'}de{'MDProdOrderState'}")]
+        [ACPropertyInfo(999, nameof(MDProdOrderState), "en{'MDProdOrderState'}de{'MDProdOrderState'}")]
         public MDProdOrderState MDProdOrderState { get; set; }
 
-        [ACPropertyInfo(999, "OffsetToEndTime", "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}")]
+        [ACPropertyInfo(999, nameof(OffsetToEndTime), "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}")]
         public TimeSpan? OffsetToEndTime { get; set; }
 
 
@@ -1007,6 +998,80 @@ namespace gip.mes.facility
             PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)mode).ACCaption;
         }
 
+        #endregion
+
+        #region Methods -> Private
+        private void DefineSelectedSchedulingGroup(MDSchedulingGroup selectedSchedulingGroup)
+        {
+            MDSchedulingGroup firstGroupInList = MDSchedulingGroupList.FirstOrDefault();
+            if (
+                firstGroupInList != null
+                && selectedSchedulingGroup != null
+                && MDSchedulingGroupList != null
+                && MDSchedulingGroupList.Select(c => c.MDSchedulingGroupID).Contains(selectedSchedulingGroup.MDSchedulingGroupID))
+            {
+                SelectedMDSchedulingGroup = SortSchedulingGroup(firstGroupInList, selectedSchedulingGroup);
+            }
+            else
+            {
+                SelectedMDSchedulingGroup = firstGroupInList;
+            }
+        }
+
+        private MDSchedulingGroup SortSchedulingGroup(MDSchedulingGroup first, MDSchedulingGroup second)
+        {
+            MDSchedulingGroup selectedGroup = null;
+            int firstOrder = 0;
+            int secondOrder = 0;
+
+            IEnumerable<Tuple<int, Guid>> items =
+                Partslist
+                .PartslistConfig_Partslist
+                .Where(c => !string.IsNullOrEmpty(c.LocalConfigACUrl) && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
+                .ToArray()
+                .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
+                .OrderBy(c => c.Item1)
+                .ToArray();
+
+            if (items.Any())
+            {
+                firstOrder = items.Where(c => first.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == c.Item2)).Select(c => c.Item1).FirstOrDefault();
+                secondOrder = items.Where(c => second.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == c.Item2)).Select(c => c.Item1).FirstOrDefault();
+            }
+
+
+            // #1 case
+            // firstOrder = 0
+            // secondOrder = 2
+
+            // #2 case
+            // firstOrder = 2
+            // secondOrder = 0
+
+            // #3 case
+            // firstOrder = 0
+            // secondOrder = 0
+
+            // #4 case
+            // firstOrder = 1
+            // secondOrder = 2
+
+            // #4 case
+            // firstOrder = 2
+            // secondOrder = 1
+
+            selectedGroup = first;
+            if (firstOrder == 0 && secondOrder != 0)
+            {
+                selectedGroup = second;
+            }
+            else if (firstOrder == secondOrder || firstOrder > secondOrder)
+            {
+                selectedGroup = second;
+            }
+
+            return selectedGroup;
+        }
         #endregion
 
     }

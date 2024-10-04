@@ -959,7 +959,75 @@ namespace gip.mes.facility
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
                 }
-                // Sonst normale Auslagerungsbuchung
+                // Umbuchung auf eine andere Losnummer
+                else if (BP.InwardFacilityLot != null && BP.BookingType == GlobalApp.FacilityBookingType.Reassign_FacilityChargeLot)
+                {
+                    Msg isReassignAllowed = IsAllowedReassignLot(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot, BP.InwardFacilityLot);
+                    if (isReassignAllowed != null)
+                    {
+                        BP.AddBookingMessage(ACMethodBooking.eResultCodes.WrongParameterCombinations, isReassignAllowed.Message);
+                        bookingResult = Global.ACMethodResultState.Notpossible;
+                        return bookingResult;
+                    }
+
+                    // Auslagerungsbuchung auf altem Los
+                    FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
+
+                    BP.ParamsAdjusted.MDBookingNotAvailableMode = DatabaseApp.s_cQry_GetMDBookingNotAvailableMode(BP.DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSetAndReset).FirstOrDefault();
+                    double quantityToBook = BP.OutwardFacilityCharge.StockQuantity;
+                    if (BP.ParamsAdjusted.OutwardQuantity.HasValue)
+                        quantityToBook = BP.ParamsAdjusted.OutwardQuantity.Value;
+                    bookingResult = InitFacilityBookingCharge_FromFacilityCharge_Outward(BP, FBC, BP.OutwardFacilityCharge,
+                                       false,
+                                       quantityToBook, quantityToBook, BP.OutwardFacilityCharge.MDUnit);
+                    if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                        return bookingResult;
+
+                    bookingResult = BookFacilityBookingChargeOut(BP, FBC, null);
+                    if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                        return bookingResult;
+
+
+                    // Einlagerungsbuchung auf neues Material, Suche ob Quant im Lager vorhanden sonst lege neues Quant an
+                    FBC = NewFacilityBookingCharge(BP, false);
+
+                    inwardFacilityCharge = s_cQry_FCList_Fac_Lot_Mat(BP.DatabaseApp,
+                                                BP.OutwardFacilityCharge.FacilityID,
+                                                BP.InwardFacilityLot.FacilityLotID,
+                                                BP.OutwardFacilityCharge.MaterialID,
+                                                BP.OutwardFacilityCharge.SplitNo)
+                                                .FirstOrDefault();
+                    if (inwardFacilityCharge == null)
+                    {
+                        inwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
+                        inwardFacilityCharge.CloneFrom(BP.ParamsAdjusted.OutwardFacilityCharge, false);
+                        inwardFacilityCharge.FacilityLot = BP.InwardFacilityLot;
+                        inwardFacilityCharge.NotAvailable = false;
+                        if (BP.InwardPartslist != null)
+                            inwardFacilityCharge.Partslist = BP.InwardPartslist;
+                        inwardFacilityCharge.AddToParentsList();
+                        UpdateExpirationInfo(BP, inwardFacilityCharge);
+                    }
+                    else if (inwardFacilityCharge.NotAvailable)
+                        inwardFacilityCharge.NotAvailable = false;
+                    if (BP.InwardPartslist != null)
+                        inwardFacilityCharge.Partslist = BP.InwardPartslist;
+                    else
+                        inwardFacilityCharge.Partslist = null;
+
+                    if (inwardFacilityCharge.MDUnit != BP.OutwardFacilityCharge.MDUnit)
+                        quantityToBook = BP.OutwardFacilityCharge.Material.ConvertQuantity(quantityToBook, BP.OutwardFacilityCharge.MDUnit, inwardFacilityCharge.MDUnit);
+
+                    bookingResult = InitFacilityBookingCharge_FromFacilityCharge_Inward(BP, FBC, inwardFacilityCharge,
+                        false,
+                        quantityToBook, quantityToBook, inwardFacilityCharge.MDUnit);
+                    if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                        return bookingResult;
+
+                    bookingResult = BookFacilityBookingChargeIn(BP, FBC, null);
+                    if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                        return bookingResult;
+                }               // Sonst normale Auslagerungsbuchung
                 // FacitlityBookingType.OutwardMovement_FacilityCharge:
                 else
                 {
@@ -1862,7 +1930,7 @@ namespace gip.mes.facility
                             if (facility != null && !facility.ShouldLeaveMaterialOccupation)
                             {
                                 bool isFacilityInUse = CheckIsFacilityInUse(facility);
-                                if(!isFacilityInUse)
+                                if (!isFacilityInUse)
                                 {
                                     facility.Material = null;
                                     facility.Partslist = null;

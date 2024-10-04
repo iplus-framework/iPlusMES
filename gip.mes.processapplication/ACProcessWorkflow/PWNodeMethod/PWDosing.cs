@@ -13,6 +13,7 @@ using static gip.mes.facility.ACPartslistManager.QrySilosResult;
 
 namespace gip.mes.processapplication
 {
+    #region Dosing-Enums
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Start next production stage'}de{'Überspringe nicht dosierbare Komponenten'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.processapplication.ACValueListDosingSkipMode")]
     public enum DosingSkipMode : short
@@ -43,6 +44,39 @@ namespace gip.mes.processapplication
             AddEntry(DosingSkipMode.DifferentWFClasses, "en{'Skip if there are other nodes'}de{'Überspringe wenn es andere WF-Knoten gibt'}");
         }
     }
+
+    [ACSerializeableInfo]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Posting mode'}de{'Buchungsmodus'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.processapplication.ACValueListPostingMode")]
+    public enum PostingMode : short
+    {
+        /// <summary>
+        /// Use Actual quantity from function result
+        /// </summary>
+        False = 0,
+
+        /// <summary>
+        /// If actual quantity is zero then use target Quantity
+        /// </summary>
+        UseTargetQuantity = 1,
+
+        /// <summary>
+        /// Ignore actual quantity and use stock from store (bin)
+        /// </summary>
+        QuantityFromStore = 2,
+    }
+
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Skip not dosable components'}de{'Überspringe nicht dosierbare Komponenten'}", Global.ACKinds.TACEnumACValueList)]
+    public class ACValueListPostingMode : ACValueItemList
+    {
+        public ACValueListPostingMode() : base(nameof(PostingMode))
+        {
+            AddEntry(PostingMode.False, "en{'Use actual quantity from function result'}de{'Verwende Istmenge von der Funktionsrückgabe'}");
+            AddEntry(PostingMode.UseTargetQuantity, "en{'If actual quantity is zero then use target quantity'}de{'Falls Istmenge null ist, dann verwende Sollmenge'}");
+            AddEntry(PostingMode.QuantityFromStore, "en{'Ignore actual quantity and use stock from store (bin)'}de{'Ignoriere Istwert und verwende Lagerbestand'}");
+        }
+    }
+    #endregion
+
 
 
     /// <summary>
@@ -87,18 +121,20 @@ namespace gip.mes.processapplication
             paramTranslation.Add("AdaptToTargetQ", "en{'Adapt to total remaining target quantity'}de{'Anpassung an Gesamtrestsollwert'}");
             method.ParameterValueList.Add(new ACValue("OldestSilo", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OldestSilo", "en{'Dosing from oldest Silo only'}de{'Nur aus ältestem Silo dosieren'}");
-            method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("AutoChangeScale", "en{'Automatically change scale'}de{'Automatischer Waagenwechsel'}");
+            method.ParameterValueList.Add(new ACValue("AutoChangeScale", typeof(double), 0.0, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoChangeScale", "en{'No waiting for potential scale change if stocks are sufficient [+=kg/-=%]'}de{'Kein Warten auf potentiellen Waagenwechsel bei ausreichendem Bestand [+=kg/-=%]'}");
             method.ParameterValueList.Add(new ACValue("CheckScaleEmpty", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("CheckScaleEmpty", "en{'Check if scale empty'}de{'Prüfung Waage leer'}");
-            method.ParameterValueList.Add(new ACValue("BookTargetQIfZero", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("BookTargetQIfZero", "en{'Post target quantity when actual = 0'}de{'Sollmenge buchen wenn Istgewicht = 0'}");
+            method.ParameterValueList.Add(new ACValue(nameof(BookTargetQIfZero), typeof(PostingMode), PostingMode.False, Global.ParamOption.Optional));
+            paramTranslation.Add(nameof(BookTargetQIfZero), "en{'Posting mode'}de{'Buchungsmodus'}");
             method.ParameterValueList.Add(new ACValue("DoseFromFillingSilo", typeof(bool?), null, Global.ParamOption.Optional));
             paramTranslation.Add("DoseFromFillingSilo", "en{'Dose from silo that is filling'}de{'Dosiere aus Silo das befüllt wird'}");
             method.ParameterValueList.Add(new ACValue("FacilityNoSort", typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add("FacilityNoSort", "en{'Priorization order container number'}de{'Priorisierungsreihenfolge Silonummer'}");
             method.ParameterValueList.Add(new ACValue("DoseAllPosFromPicking", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all picking lines at the same time'}de{'Alle Kommissionierpositionen gleichzeitig dosieren'}");
+            paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all picking lines'}de{'Alle Kommissionierpositionen dosieren'}");
+            method.ParameterValueList.Add(new ACValue("EachPosSeparated", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleife verwiegen'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDosing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDosing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWDosing), HandleExecuteACMethod_PWDosing);
@@ -658,20 +694,43 @@ namespace gip.mes.processapplication
             }
         }
 
-        public bool BookTargetQIfZero
+        public PostingMode BookTargetQIfZero
         {
             get
             {
                 var method = MyConfiguration;
                 if (method != null)
                 {
-                    var acValue = method.ParameterValueList.GetACValue("BookTargetQIfZero");
+                    var acValue = method.ParameterValueList.GetACValue(nameof(BookTargetQIfZero));
                     if (acValue != null)
                     {
-                        return acValue.ParamAsBoolean;
+                        try
+                        {
+                            string value = acValue.ParamAsString;
+                            if (String.IsNullOrEmpty(value) || value.ToLower() == "false")
+                                return PostingMode.False;
+                            else if (value.ToLower() == "true")
+                                return PostingMode.UseTargetQuantity;
+                            else
+                                return (PostingMode)acValue.ParamAsInt16;
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
-                return false;
+                return PostingMode.False;
+
+                //var method = MyConfiguration;
+                //if (method != null)
+                //{
+                //    var acValue = method.ParameterValueList.GetACValue("BookTargetQIfZero");
+                //    if (acValue != null)
+                //    {
+                //        return acValue.ParamAsBoolean;
+                //    }
+                //}
+                //return false;
             }
         }
 
@@ -724,7 +783,24 @@ namespace gip.mes.processapplication
             }
         }
         
-        public bool AutoChangeScale
+        /// <summary>
+        /// If set, then dosing node doesn't wait for a completition of the dosing on another process module because there is enough material to complete the weighing
+        /// </summary>
+        public bool DontWaitForChangeScale
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    double factor = StockFactorForChangeScale;
+                    return Math.Abs(factor) <= double.Epsilon ? false : true;
+                }
+                return false;
+            }
+        }
+
+        public double StockFactorForChangeScale
         {
             get
             {
@@ -734,11 +810,59 @@ namespace gip.mes.processapplication
                     var acValue = method.ParameterValueList.GetACValue("AutoChangeScale");
                     if (acValue != null)
                     {
-                        return acValue.ParamAsBoolean;
+                        try
+                        {
+                            string value = acValue.ParamAsString;
+                            if (String.IsNullOrEmpty(value) || value.ToLower() == "false" || value.ToLower() == "true")
+                                return 0.0;
+                            //else if (value.ToLower() == "true")
+                            //    return 2.0;
+                            else
+                            {
+                                double doubleValue = acValue.ParamAsDouble;
+                                if (Math.Abs(doubleValue) <= 0.000001)
+                                    return 0.0;
+                                return doubleValue;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
-                return false;
+                return 0.0;
             }
+        }
+
+        public static double CalcMinStockForScaleChange(double reservValue, double targetQ, double? forceDefaultPerc = 2.0)
+        {
+            double minWeight = targetQ;
+            // Falls Wert negativ, dann ist es ein Prozentwert.
+            if (reservValue < -0.0000001)
+            {
+                if (Math.Abs(targetQ) > Double.Epsilon)
+                {
+                    reservValue = Math.Abs(targetQ) * reservValue * -0.01;
+                    minWeight = Math.Abs(targetQ) + reservValue;
+                }
+                else
+                    minWeight = 0.001;
+            }
+            // Falls Wert == 0, dann verwende 100 % Sicherheitsreserve
+            else if (Math.Abs(reservValue) <= Double.Epsilon && forceDefaultPerc.HasValue)
+            {
+                if (Math.Abs(targetQ) > Double.Epsilon)
+                {
+                    reservValue = Math.Abs(targetQ) * forceDefaultPerc.Value;
+                    minWeight = Math.Abs(targetQ) + reservValue;
+                }
+                else
+                    minWeight = 0.001;
+            }
+            // Sonst absoluter wert, der auf den Sollwert aufaddiert wird
+            else
+                minWeight = Math.Abs(targetQ) + reservValue;
+            return minWeight;
         }
 
         /// <summary>
@@ -841,6 +965,25 @@ namespace gip.mes.processapplication
                     }
                 }
                 return 0;
+            }
+        }
+
+        /// <summary>
+        /// If this Parameter ist set, then only line will be dosed an then this node completes and a outer loop (PWDosingLoop/PWLoadingLoop) will start this node again.
+        /// This is helpful if you want to run some functions between each dosing
+        /// </summary>
+        public bool EachPosSeparated
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("EachPosSeparated");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
             }
         }
 
@@ -1237,6 +1380,13 @@ namespace gip.mes.processapplication
             }
         }
 
+
+        public override void SMCompleted()
+        {
+            OnCompletedPicking();
+            base.SMCompleted();
+        }
+
         protected gip.core.datamodel.ACProgramLog _NewAddedProgramLog = null;
         protected override void OnNewProgramLogAddedToQueue(ACMethod acMethod, gip.core.datamodel.ACProgramLog currentProgramLog)
         {
@@ -1261,13 +1411,14 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c=>c.PickingPosID ==  dosingPosId);
+                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID ==  dosingPosId);
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             if (IsProduction)
                                 orderLog.ProdOrderPartslistPosRelationID = dosingPosId;
                             if (IsTransport)
                             {
                                 dosingPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
+                                dosingPos.ACClassTaskID2 = this.ContentTask.ACClassTaskID;
                                 orderLog.PickingPosID = dosingPosId;
                             }
                            	dbApp.OrderLog.Add(orderLog);
@@ -1680,7 +1831,7 @@ namespace gip.mes.processapplication
             Msg msg = null;
             if (actualQuantity.HasValue && tolerancePlus.HasValue && toleranceMinus.HasValue && targetQuantity.HasValue)
             {
-                if (Math.Abs(actualQuantity.Value - 0) <= Double.Epsilon && BookTargetQIfZero)
+                if (Math.Abs(actualQuantity.Value - 0) <= Double.Epsilon && BookTargetQIfZero == PostingMode.UseTargetQuantity)
                     actualQuantity = targetQuantity;
                 bool thisDosingIsInTol = false;
                 if (reEvaluatePosState 
@@ -1931,7 +2082,7 @@ namespace gip.mes.processapplication
             Route route = dosingRoute != null ? dosingRoute.Clone() as Route : null;
             if (!ValidateRouteForFuncParam(route))
                 return false;
-            acMethod["Route"] = route;
+            acMethod[nameof(Route)] = route;
             return route != null;
         }
         #endregion
@@ -1969,7 +2120,7 @@ namespace gip.mes.processapplication
                 return new List<T>();
             return searchStartsFromNode.FindPredecessors<T>(onlyInSameGroup,
                                                     c => c is T,
-                                                    c => (  (c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
+                                                    c => (  (c is PWNodeOr && !(c is PWDosingDisBypass) && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
                                                          || (!String.IsNullOrEmpty(ignorePredecessorGroups) && c.ACUrl.Contains(ignorePredecessorGroups))),
                                                     maxRecursionDepth);
         }
@@ -2060,6 +2211,7 @@ namespace gip.mes.processapplication
         #region Reset
         public override void Reset()
         {
+            ResetTaskIdFromPickingPos();
             if (CurrentDosingRoute != null)
             {
                 CurrentDosingRoute.Detach();
@@ -2090,9 +2242,9 @@ namespace gip.mes.processapplication
 
 
         #region Planning and Testing
-        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList, ref DumpStats dumpStats)
         {
-            base.DumpPropertyList(doc, xmlACPropertyList);
+            base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
 
             XmlElement xmlChild = xmlACPropertyList["NoSourceWait"];
             if (xmlChild == null)
@@ -2230,7 +2382,7 @@ namespace gip.mes.processapplication
             {
                 xmlChild = doc.CreateElement("AutoChangeScale");
                 if (xmlChild != null)
-                    xmlChild.InnerText = AutoChangeScale.ToString();
+                    xmlChild.InnerText = DontWaitForChangeScale.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 

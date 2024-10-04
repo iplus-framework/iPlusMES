@@ -15,7 +15,8 @@ namespace gip.mes.facility
         public ACVisitorVoucherManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _DeliveryNoteAutoCreatePerOrder = new ACPropertyConfigValue<bool>(this, "DeliveryNoteAutoCreatePerOrder", true);
+            _DeliveryNoteAutoCreatePerOrder = new ACPropertyConfigValue<bool>(this, nameof(DeliveryNoteAutoCreatePerOrder), true);
+            _ClosePickingOnCheckOut = new ACPropertyConfigValue<bool>(this, nameof(ClosePickingOnCheckOut), true);
         }
         #endregion
 
@@ -33,6 +34,20 @@ namespace gip.mes.facility
             set
             {
                 _DeliveryNoteAutoCreatePerOrder.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _ClosePickingOnCheckOut;
+        [ACPropertyConfig("en{'Close Picking Order on Checkout'}de{'Kommissionieraufträge beenden bei Checkout'}", DefaultValue = true)]
+        public bool ClosePickingOnCheckOut
+        {
+            get
+            {
+                return _ClosePickingOnCheckOut.ValueT;
+            }
+            set
+            {
+                _ClosePickingOnCheckOut.ValueT = value;
             }
         }
         #endregion
@@ -59,14 +74,29 @@ namespace gip.mes.facility
         #region Public Methods
 
         #region Checkout
-        public virtual void CheckOut(VisitorVoucher currentVisitorVoucher, DatabaseApp dbApp)
+        public virtual MsgWithDetails CheckOut(VisitorVoucher currentVisitorVoucher, DatabaseApp dbApp, ACPickingManager pickingManager, ACInDeliveryNoteManager inDeliveryNoteManager, ACOutDeliveryNoteManager outDeliveryNoteManager, FacilityManager facilityManager)
         {
+            MsgWithDetails msgWithDetails = null;
             MDVisitorVoucherState state = dbApp.MDVisitorVoucherState.Where(c => c.MDVisitorVoucherStateIndex == (short)MDVisitorVoucherState.VisitorVoucherStates.CheckedOut).FirstOrDefault();
             if (state != null)
             {
                 currentVisitorVoucher.MDVisitorVoucherState = state;
                 currentVisitorVoucher.CheckOutDate = DateTime.Now;
             }
+            if (ClosePickingOnCheckOut && pickingManager != null)
+            {
+                foreach (Picking picking in currentVisitorVoucher.Picking_VisitorVoucher.ToArray())
+                {
+                    if (picking == null || picking.PickingState == PickingStateEnum.Finished || picking.PickingState == PickingStateEnum.Cancelled)
+                        continue;
+                    MsgWithDetails msgWithDetails2 = pickingManager.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facilityManager, true);
+                    if (msgWithDetails == null)
+                        msgWithDetails = msgWithDetails2;
+                    else
+                        msgWithDetails.Append(msgWithDetails2);
+                }
+            }
+            return msgWithDetails;
         }
         #endregion
 

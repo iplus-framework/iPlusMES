@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
@@ -169,6 +172,47 @@ namespace gip.mes.datamodel
         }
 
         #endregion
+
+        #region Additional Members
+
+        /// <summary>
+        /// Picking status info
+        /// </summary>
+        private string _PickingStatusInfo;
+        [ACPropertyInfo(999, nameof(PickingStatusInfo), "en{'Picking status'}de{'Verladestatus'}")]
+        public string PickingStatusInfo
+        {
+            get
+            {
+                return _PickingStatusInfo;
+            }
+            set
+            {
+                if (_PickingStatusInfo != value)
+                {
+                    _PickingStatusInfo = value;
+                    OnPropertyChanged("PickingStatusInfo");
+                }
+            }
+        }
+
+        private string _PreparationStatusInfo;
+        [ACPropertyInfo(999, nameof(PreparationStatusInfo), ConstApp.PickingPreparationStatus)]
+        public string PreparationStatusInfo
+        {
+            get
+            {
+                return _PreparationStatusInfo;
+            }
+            set
+            {
+                _PreparationStatusInfo = value;
+                OnPropertyChanged(nameof(PreparationStatusInfo));
+            }
+        }
+
+        #endregion
+        
     }
 }
 

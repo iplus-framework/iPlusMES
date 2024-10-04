@@ -135,6 +135,13 @@ namespace gip.mes.datamodel
                 unicode: false);
             genericType.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var hasRequiredParams = runtimeEntityType.AddProperty(
+                "HasRequiredParams",
+                typeof(bool),
+                propertyInfo: typeof(ACClassMethod).GetProperty("HasRequiredParams", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClassMethod).GetField("_HasRequiredParams", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            hasRequiredParams.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var insertDate = runtimeEntityType.AddProperty(
                 "InsertDate",
                 typeof(DateTime),

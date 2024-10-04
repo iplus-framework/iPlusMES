@@ -441,6 +441,8 @@ namespace gip.mes.datamodel
             // Umbuchung des Materials auf eine andere Materialnummer von einem Silo/Tank/Container
             Reassign_Facility_BulkMaterial = 301,
 
+            // Umbuchung eines Los auf eine anderes Los
+            Reassign_FacilityChargeLot = 302,
 
             // Abgleich StockQuantityUOM mit StockQuantity von übergebener FacilityCharge
             MatchingFacilityChargeQuantities = 900,
@@ -544,6 +546,7 @@ namespace gip.mes.datamodel
         public const string FBT_ReleaseState_Facility_BulkMaterial = "ReleaseState_Facility_BulkMaterial";
         public const string FBT_Reassign_FacilityCharge = "Reassign_FacilityCharge";
         public const string FBT_Reassign_Facility_BulkMaterial = "Reassign_Facility_BulkMaterial";
+        public const string FBT_Reassign_FacilityChargeLot = "Reassign_FacilityChargeLot";
         public const string FBT_MatchingFacilityChargeQuantities = "MatchingFacilityChargeQuantities";
         public const string FBT_MatchingFacilityChargeQuantitiesAll = "MatchingFacilityChargeQuantitiesAll";
         public const string FBT_MatchingMaterialStock = "MatchingMaterialStock";
@@ -616,6 +619,7 @@ namespace gip.mes.datamodel
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ReleaseState_Facility_BulkMaterial, "en{'Release State Facility Bulk Material'}de{'Freigabe und Sperrung des Materials von einem Silo/Tank/Container'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Reassign_FacilityCharge, "en{'Reassign materialnumber on quant'}de{'Umbuchung Materialnummer auf einem Quant'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Reassign_Facility_BulkMaterial, "en{'Reassign materialnumber Facility Bulk Material'}de{'Umbuchung Materialnummer von einem Silo/Tank/Container'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Reassign_FacilityChargeLot, "en{'Reassign lotnumber on quant'}de{'Umbuchung Losnummer auf einem Quant'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.MatchingFacilityChargeQuantities, "en{'Matching Quantites of quant'}de{'Abgleich StockQuantityUOM mit StockQuantity des Quants'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.MatchingFacilityChargeQuantitiesAll, "en{'Matching over all Quants'}de{'Abgleich über alle Quanten im Lager'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.MatchingMaterialStock, "en{'Matching Material Stock'}de{'Abgleich Stock- und Reserved-Felder mit Summe aus Quanten von dem Material'}");
@@ -1283,9 +1287,11 @@ namespace gip.mes.datamodel
 
         public enum ReservationState : short
         {
+            ObserveQuantity = -1,
             New = 0,
             Active = 1,
             Finished = 2,
+            Validation = 3
         }
 
 #if NETFRAMEWORK
@@ -1302,9 +1308,11 @@ namespace gip.mes.datamodel
                 {
 
                     GlobalApp._ReservationStateList = new ACValueItemList("ReservationStateIndex");
+                    GlobalApp._ReservationStateList.AddEntry((short)ReservationState.ObserveQuantity, "en{'Observe Quantity'}de{'Mengen einhalten'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.New, "en{'New'}de{'Neu'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Active, "en{'Active'}de{'Aktiv'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
+                    GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Validation, "en{'Validation needed'}de{'Validierung erforderlich'}");
                 }
                 return GlobalApp._ReservationStateList;
             }

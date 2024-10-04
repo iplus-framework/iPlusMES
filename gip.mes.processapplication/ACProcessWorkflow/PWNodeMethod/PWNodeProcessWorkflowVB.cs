@@ -100,6 +100,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("ValidationBehaviour", typeof(short), (short)PARole.ValidationBehaviour.Strict, Global.ParamOption.Optional));
             paramTranslation.Add("ValidationBehaviour", "en{'Validationbehaviour'}de{'Validierungsverhalten'}");
 
+            method.ParameterValueList.Add(new ACValue("RunByModuleTrigger", typeof(short), false, Global.ParamOption.Optional));
+            paramTranslation.Add("RunByModuleTrigger", "en{'Run by trigger from process module(Line)'}de{'Aktiviere durch Trigger von Prozessmodul(Linie)'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeProcessWorkflowVB), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeProcessWorkflowVB), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWNodeProcessWorkflowVB), HandleExecuteACMethod_PWNodeProcessWorkflowVB);
@@ -136,6 +139,7 @@ namespace gip.mes.processapplication
                 _ACProgramVB = null;
                 _MDSchedulingGroupLoaded = false;
                 _MDSchedulingGroup = null;
+                _OrderTriggeredFromModule = null;
             }
 
             StartedAnyPickingWF.ValueT = false;
@@ -163,6 +167,7 @@ namespace gip.mes.processapplication
                 _ACProgramVB = null;
                 _MDSchedulingGroupLoaded = false;
                 _MDSchedulingGroup = null;
+                _OrderTriggeredFromModule = null;
             }
 
             StartedAnyPickingWF.ValueT = false;
@@ -324,6 +329,23 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("CompleteIfNotPlan");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool RunByModuleTrigger
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("RunByModuleTrigger");
                     if (acValue != null)
                     {
                         return acValue.ParamAsBoolean;
@@ -1000,6 +1022,35 @@ namespace gip.mes.processapplication
                 return scheduler;
             return schedulers.FirstOrDefault();
         }
+
+        private PAOrderInfoEntry _OrderTriggeredFromModule = null;
+        public PAOrderInfoEntry OrderTriggeredFromModule
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _OrderTriggeredFromModule;
+                }
+            }
+            set
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _OrderTriggeredFromModule = value;
+                }
+            }
+        }
+
+        public void RunNodeOnModuleTrigger(PAOrderInfoEntry pAOrderInfoEntry, PAProcessModuleVB module)
+        {
+            if (!this.RunByModuleTrigger || pAOrderInfoEntry == null || CurrentACState != ACStateEnum.SMStarting || !IsTransport || this.CurrentPicking == null)
+                return;
+            if (pAOrderInfoEntry.EntityName != nameof(Picking) || pAOrderInfoEntry.EntityID != this.CurrentPicking.PickingID)
+                return;
+            OrderTriggeredFromModule = pAOrderInfoEntry;
+            SubscribeToProjectWorkCycle();
+        }
         #endregion
 
         #region Execute-Helper-Handlers
@@ -1268,7 +1319,7 @@ namespace gip.mes.processapplication
             if (idleNodes != null)
                 stats.UnstartedParallelNodes = idleNodes.Count();
             var withBatchPlanningTimes = parallelNodes.Where(c =>   (    (c.IsProduction && c.BatchPlanningTimes != null && c.BatchPlanningTimes.Any())
-                                                                      || (!c.IsProduction && c.IsInPlanningWait))
+                                                                      || (!c.IsProduction && (c.IsInPlanningWait || (c.RunByModuleTrigger && c.IterationCount.ValueT <= 0))))
                                                                   && c.CurrentACState != ACStateEnum.SMIdle);
             if (withBatchPlanningTimes != null)
                 stats.NodesWithBatchPlanningTimes = withBatchPlanningTimes.Count();
@@ -2008,9 +2059,9 @@ namespace gip.mes.processapplication
 #endregion
 
 #region Planning and Testing
-        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList, ref DumpStats dumpStats)
         {
-            base.DumpPropertyList(doc, xmlACPropertyList);
+            base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
 
             XmlElement xmlChild = xmlACPropertyList["MethodPriorisation"];
             if (xmlChild == null)

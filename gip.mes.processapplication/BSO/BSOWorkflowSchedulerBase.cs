@@ -154,6 +154,11 @@ namespace gip.mes.processapplication
             if (refBatchPlanSchedulerComponent != null)
                 _PAWorkflowScheduler = new ACRef<ACComponent>(refBatchPlanSchedulerComponent, this);
 
+            if (PAWorkflowScheduler != null)
+            {
+                PAWorkflowScheduler.SubscribeAllNetPoints();
+            }
+
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
@@ -726,6 +731,8 @@ namespace gip.mes.processapplication
         }
 
         #endregion
+
+
 
         #endregion
 

@@ -286,6 +286,13 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _ExecuteByDoubleClick, value); }
     }
 
+    bool _HasRequiredParams;
+    public bool HasRequiredParams 
+    {
+        get { return _HasRequiredParams; }
+        set { SetProperty<bool>(ref _HasRequiredParams, value); }
+    }
+
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
@@ -484,6 +491,26 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual CollectionEntry DemandOrderPos_VBiProgramACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_VBiProgramACClassMethod); }
+    }
+
+    private ICollection<Facility> _Facility_VBiACClassMethod;
+    public virtual ICollection<Facility> Facility_VBiACClassMethod
+    {
+        get { return LazyLoader.Load(this, ref _Facility_VBiACClassMethod); }
+        set { _Facility_VBiACClassMethod = value; }
+    }
+
+    public bool Facility_VBiACClassMethod_IsLoaded
+    {
+        get
+        {
+            return Facility_VBiACClassMethod != null;
+        }
+    }
+
+    public virtual CollectionEntry Facility_VBiACClassMethodReference
+    {
+        get { return Context.Entry(this).Collection(c => c.Facility_VBiACClassMethod); }
     }
 
     private ICollection<ACClassMethod> _ACClassMethod_ParentACClassMethod;

@@ -1,9 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.core.processapplication;
-using vd = gip.mes.datamodel;
-using System;
 using gip.core.autocomponent;
-using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {

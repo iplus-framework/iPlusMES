@@ -160,6 +160,13 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         set { SetProperty<Guid?>(ref _ACClassTaskID, value); }
     }
 
+    Guid? _ACClassTaskID2;
+    public Guid? ACClassTaskID2 
+    {
+        get { return _ACClassTaskID2; }
+        set { SetProperty<Guid?>(ref _ACClassTaskID2, value); }
+    }
+
     private ACClassTask _ACClassTask;
     public virtual ACClassTask ACClassTask
     { 

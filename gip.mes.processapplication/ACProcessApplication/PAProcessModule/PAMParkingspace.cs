@@ -19,8 +19,8 @@ namespace gip.mes.processapplication
         static PAMParkingspace()
         {
             RegisterExecuteHandler(typeof(PAMParkingspace), HandleExecuteACMethod_PAMParkingspace);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_ParkingSpace, (c, p) => c.Component.ValueT is PAMParkingspace, (c, p) => c.Component.ValueT is PAProcessModule);
-            ACRoutingService.RegisterSelectionQuery(SelRuleID_ParkingSpace_Deselector, null, (c, p) => c.Component.ValueT is PAMParkingspace);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_ParkingSpace, (c, p) => c.ComponentInstance is PAMParkingspace, (c, p) => c.ComponentInstance is PAProcessModule);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_ParkingSpace_Deselector, null, (c, p) => c.ComponentInstance is PAMParkingspace);
         }
 
         public PAMParkingspace(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")

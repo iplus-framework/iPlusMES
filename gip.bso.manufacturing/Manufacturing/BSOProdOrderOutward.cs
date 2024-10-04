@@ -36,7 +36,7 @@ namespace gip.bso.manufacturing
                     && SelectedOutwardPartslistPos.TargetProdOrderPartslistPos != null
                     && (
                          (value == null && SelectedOutwardPartslistPos.SourceProdOrderPartslistPos == null)
-                        ||  (value != null && SelectedOutwardPartslistPos.TargetProdOrderPartslistPos.ProdOrderPartslistID == value.ProdOrderPartslistID)
+                        || (value != null && SelectedOutwardPartslistPos.TargetProdOrderPartslistPos.ProdOrderPartslistID == value.ProdOrderPartslistID)
                        )
                     )
                 {
@@ -283,30 +283,27 @@ namespace gip.bso.manufacturing
                 if (_SelectedOutwardFacilityPreBooking != value)
                 {
                     _SelectedOutwardFacilityPreBooking = value;
-                    if (value != null)
+
+                    RefreshFilterOutFacilityAccess();
+
+                    if (_SelectedOutwardFacilityPreBooking != null)
                     {
-                        if (
-                                _SelectedOutwardFacilityPreBooking.OutwardFacilityLot != null ||
-                                (_SelectedOutwardFacilityPreBooking.OutwardFacility != null &&
-                                !_SelectedOutwardFacilityPreBooking.OutwardFacility.MDFacilityType.AutomaticControlFacilityCharge &&
-                                BookingOutwardFilterMaterial)
-                            )
+                        if(_SelectedOutwardFacilityPreBooking.OutwardFacility != null && !AccessOutBookingFacility.NavList.Contains(_SelectedOutwardFacilityPreBooking.OutwardFacility))
                         {
-                            BookingOutwardFilterMaterial = false;
+                            AccessOutBookingFacility.NavList.Add(_SelectedOutwardFacilityPreBooking.OutwardFacility);
                         }
-                        else
+
+                        if (_SelectedOutwardFacilityPreBooking.ACMethodBooking != null)
                         {
-                            RefreshFilterOutFacilityAccess();
+                            _SelectedOutwardFacilityPreBooking.ACMethodBooking.PropertyChanged += SelectedOutwardACMethodBooking_OnPropertyChanged;
                         }
                     }
-                    if (_SelectedOutwardFacilityPreBooking != null && _SelectedOutwardFacilityPreBooking.ACMethodBooking != null)
-                        _SelectedOutwardFacilityPreBooking.ACMethodBooking.PropertyChanged += SelectedOutwardACMethodBooking_OnPropertyChanged;
-                    OnPropertyChanged("SelectedOutwardFacilityPreBooking");
-                    // OnPropertyChanged("SelectedOutwardFacilityBooking");
-                    OnPropertyChanged("BookingOutwardFacilityList");
-                    OnPropertyChanged("OutwardFacilityChargeList");
-                    OnPropertyChanged("SelectedOutwardACMethodBooking");
-                    OnPropertyChanged("IsEnabledOutwardFacilityChargeSelect");
+                    
+                    OnPropertyChanged(nameof(SelectedOutwardFacilityPreBooking));
+                    OnPropertyChanged(nameof(BookingOutwardFacilityList));
+                    OnPropertyChanged(nameof(OutwardFacilityChargeList));
+                    OnPropertyChanged(nameof(SelectedOutwardACMethodBooking));
+                    OnPropertyChanged(nameof(IsEnabledOutwardFacilityChargeSelect));
                 }
             }
         }

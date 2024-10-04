@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Policy;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.facility
 {
@@ -46,7 +46,8 @@ namespace gip.bso.facility
         public BSOFacilityBookCharge(gip.core.datamodel.ACClass typeACClass, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(typeACClass, content, parentACObject, parameter)
         {
-            _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, "ExpirationDateDayPeriod", 30);
+            _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, nameof(ExpirationDateDayPeriod), 30);
+            _IsCheckPreferredParamsActive = new ACPropertyConfigValue<bool>(this, nameof(IsCheckPreferredParamsActive), false);
         }
 
         /// <summary>
@@ -63,6 +64,7 @@ namespace gip.bso.facility
                 Search();
 
             _ = ExpirationDateDayPeriod;
+            _ = IsCheckPreferredParamsActive;
 
             return true;
         }
@@ -80,6 +82,8 @@ namespace gip.bso.facility
             this._BookParamOutwardMovementClone = null;
             this._BookParamReassignMat = null;
             this._BookParamReassignMatClone = null;
+            this._BookParamReassignLot = null;
+            this._BookParamReassignLotClone = null;
             this._BookParamReleaseAndLock = null;
             this._BookParamReleaseAndLockClone = null;
             this._BookParamRelocation = null;
@@ -117,6 +121,25 @@ namespace gip.bso.facility
                 if (_ExpirationDateDayPeriod.ValueT != value)
                 {
                     _ExpirationDateDayPeriod.ValueT = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private ACPropertyConfigValue<bool> _IsCheckPreferredParamsActive;
+        [ACPropertyConfig("en{'Active check preferred params'}de{'Überprüfung von bevorzugten Parameter aktiv'}")]
+        public bool IsCheckPreferredParamsActive
+        {
+            get
+            {
+                return _IsCheckPreferredParamsActive.ValueT;
+            }
+            set
+            {
+                if (_IsCheckPreferredParamsActive.ValueT != value)
+                {
+                    _IsCheckPreferredParamsActive.ValueT = value;
                     OnPropertyChanged();
                 }
             }
@@ -239,7 +262,7 @@ namespace gip.bso.facility
             }
         }
 
-        public const string _CExternLotNoProperty = FacilityLot.ClassName + "\\ExternLotNo";
+        public const string _CExternLotNoProperty = FacilityLot.ClassName + "\\" + nameof(FacilityLot.ExternLotNo);
         [ACPropertyInfo(715, "Filter", ConstApp.ExternLotNo)]
         public string FilterExternLot
         {
@@ -253,6 +276,25 @@ namespace gip.bso.facility
                 if (tmp != value)
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CExternLotNoProperty, value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public const string _CExternLotNo2Property = FacilityLot.ClassName + "\\" + nameof(FacilityLot.ExternLotNo2);
+        [ACPropertyInfo(715, "Filter", ConstApp.ExternLotNo2)]
+        public string FilterExternLot2
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(_CExternLotNo2Property);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(_CExternLotNo2Property);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CExternLotNo2Property, value);
                     OnPropertyChanged();
                 }
             }
@@ -463,6 +505,25 @@ namespace gip.bso.facility
                 OnPropertyChanged();
             }
         }
+
+
+        /// <summary>
+        /// Gets the current book param matching.
+        /// </summary>
+        /// <value>The current book param matching.</value>
+        [ACPropertyCurrent(708, "CurrentBookParamReassignLot")]
+        public ACMethodBooking CurrentBookParamReassignLot
+        {
+            get
+            {
+                return _BookParamReassignLot;
+            }
+            protected set
+            {
+                _BookParamReassignLot = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region BSO->ACProperty->FacilityCharge
@@ -486,8 +547,6 @@ namespace gip.bso.facility
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter, true, true);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<FacilityCharge>(FacilityCharge.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
@@ -516,6 +575,7 @@ namespace gip.bso.facility
 
                     new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
                     new ACFilterItem(Global.FilterTypes.filter, _CExternLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CExternLotNo2Property, Global.LogicalOperators.contains, Global.Operators.and, "", true),
                     new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.StockQuantityUOM), Global.LogicalOperators.lessThan, Global.Operators.and, "", true),
 
                     new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.ExpirationDate), Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, null, true)
@@ -531,6 +591,10 @@ namespace gip.bso.facility
                 .Include(c => c.Facility)
                 .Include(c => c.FacilityLot)
                 .Include(c => c.Material)
+                .Include(c => c.MDUnit)
+                .Include(c => c.MDReleaseState)
+                .Include(c => c.CompanyMaterial)
+                .Include(c => c.CPartnerCompanyMaterial)
                 //.Include(c => c.FacilityBooking_InwardFacilityCharge)
                 //.Include(c => c.FacilityBookingCharge_InwardFacilityCharge)
                 ;
@@ -607,10 +671,31 @@ namespace gip.bso.facility
                     OnPropertyChanged(nameof(ContractualPartnerList));
                     OnPropertyChanged(nameof(StorageUnitTestList));
                     OnPropertyChanged(nameof(CurrentFacilityLot));
+                    CorrectCurrentFacilityChargeFacilityList();
                     ClearBookingData();
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private void CorrectCurrentFacilityChargeFacilityList()
+        {
+            AccessQuantFacilityFilter.NavSearch();
+
+            if (CurrentFacilityCharge != null && CurrentFacilityCharge.Facility != null && !AccessQuantFacilityFilter.NavList.Contains(CurrentFacilityCharge.Facility))
+            {
+                AccessQuantFacilityFilter.NavList.Add(CurrentFacilityCharge.Facility);
+
+            }
+            if (CurrentFacilityCharge != null)
+            {
+                SelectedQuantFacilityFilter = CurrentFacilityCharge.Facility;
+            }
+            else
+            {
+                SelectedQuantFacilityFilter = null;
+            }
+            OnPropertyChanged(nameof(QuantFacilityFilterList));
         }
 
         public virtual void CurrentFacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -824,6 +909,113 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region AccessNav -> QuantFacilityFilter 
+
+        public const string QuantFacilityFilter = "QuantFacilityFilter";
+
+        ACAccess<Facility> _AccessQuantFacilityFilter;
+        [ACPropertyAccess(9999, nameof(QuantFacilityFilter))]
+        public ACAccess<Facility> AccessQuantFacilityFilter
+        {
+            get
+            {
+                if (_AccessQuantFacilityFilter == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Facility.ClassName, ACType.ACIdentifier);
+
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(QuantFacilityFilterDefaultSort);
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(QuantFacilityFilterDefaultFilter);
+
+                        foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
+                        {
+                            aCFilterItem.PropertyChanged += QuantFacilityFilterDefaultSort_PropertyChanged;
+                        }
+                    }
+
+                    _AccessQuantFacilityFilter = navACQueryDefinition.NewAccessNav<Facility>(nameof(QuantFacilityFilter), this);
+                }
+                return _AccessQuantFacilityFilter;
+            }
+        }
+
+        public virtual List<ACFilterItem> QuantFacilityFilterDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.equal, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.StorageBin).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.StorageBinContainer).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, ((short)FacilityTypesEnum.PreparationBin).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                };
+            }
+        }
+
+        public virtual List<ACSortItem> QuantFacilityFilterDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortPickingNo = new ACSortItem("FacilityNo", SortDirections.ascending, true);
+                acSortItems.Add(acSortPickingNo);
+
+                return acSortItems;
+            }
+        }
+
+        public virtual void QuantFacilityFilterDefaultSort_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ACFilterItem aCFilterItem = sender as ACFilterItem;
+
+        }
+
+        [ACPropertyInfo(9999, nameof(QuantFacilityFilter))]
+        public IEnumerable<Facility> QuantFacilityFilterList
+        {
+            get
+            {
+                return AccessQuantFacilityFilter.NavList;
+            }
+        }
+
+        private Facility _SelectedQuantFacilityFilter;
+        [ACPropertySelected(9999, nameof(QuantFacilityFilter), ConstApp.FacilityNo)]
+        public Facility SelectedQuantFacilityFilter
+        {
+            get
+            {
+                return _SelectedQuantFacilityFilter;
+            }
+            set
+            {
+                if (_SelectedQuantFacilityFilter != value)
+                {
+                    _SelectedQuantFacilityFilter = value;
+                    if (
+                        CurrentFacilityCharge != null
+                        &&
+                            (
+                               (CurrentFacilityCharge.Facility == null && value != null)
+                               || (CurrentFacilityCharge.Facility != null && CurrentFacilityCharge.Facility != value)
+                            )
+                        )
+                    {
+                        CurrentFacilityCharge.Facility = value;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -921,9 +1113,14 @@ namespace gip.bso.facility
         {
             if (!PreExecute("Load"))
                 return;
+            bool isNewDialog = CurrentFacilityCharge == null;
+            if (requery)
+                CurrentFacilityCharge?.ResetCachedValues();
             LoadEntity<FacilityCharge>(requery, () => SelectedFacilityCharge, () => CurrentFacilityCharge, c => CurrentFacilityCharge = c,
                         DatabaseApp.FacilityCharge
                         .Where(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID));
+            if (isNewDialog)
+                CurrentFacilityCharge?.ResetCachedValues();
             PostExecute("Load");
         }
 
@@ -1082,6 +1279,16 @@ namespace gip.bso.facility
             }
             CurrentBookParamSplit = clone;
 
+
+            if (_BookParamReassignLotClone == null)
+                _BookParamReassignLotClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Reassign_FacilityChargeLot, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            clone = _BookParamReassignLotClone.Clone() as ACMethodBooking;
+            if (CurrentFacilityCharge != null)
+            {
+                clone.OutwardFacilityCharge = CurrentFacilityCharge;
+            }
+            CurrentBookParamReassignLot = clone;
+
         }
 
         /// <summary>
@@ -1113,20 +1320,17 @@ namespace gip.bso.facility
                 case "CurrentFacilityCharge\\Material":
                 case "CurrentFacilityCharge\\Facility":
                 case "CurrentFacilityCharge\\SplitNo":
+                case nameof(SelectedQuantFacilityFilter):
                     if (CurrentFacilityCharge == null || CurrentFacilityCharge.EntityState != EntityState.Added)
                         return Global.ControlModes.Disabled;
                     break;
                 case "CurrentFacilityCharge\\FacilityLot":
-                    if (IsFacilityChargeWithFacilityBooking)
-                    {
+                    if (HasFCHadAnyStock)
                         return Global.ControlModes.Disabled;
-                    }
                     break;
                 case nameof(CurrentFacilityLot):
-                    if (IsFacilityChargeWithFacilityBooking)
-                    {
+                    if (HasFCHadAnyStock)
                         return Global.ControlModes.Disabled;
-                    }
                     break;
 
             }
@@ -1299,19 +1503,44 @@ namespace gip.bso.facility
                             return;
                         }
                         Save();
-                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
-                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+
+
+                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
+                        if (!msgDetails.IsSucceded())
                         {
-                            Messages.Msg(msgDetails);
+                            if (String.IsNullOrEmpty(msgDetails.Message))
+                            {
+                                // Der Auftrag kann nicht gestartet werden weil:
+                                msgDetails.Message = Root.Environment.TranslateMessage(this, "Error50643");
+                            }
+                            Messages.Msg(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
                             ClearBookingData();
                             return;
                         }
+                        else if (msgDetails.HasWarnings())
+                        {
+                            if (String.IsNullOrEmpty(msgDetails.Message))
+                            {
+                                //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
+                                msgDetails.Message = Root.Environment.TranslateMessage(this, "Question50108");
+                            }
+                            var userResult = Messages.Msg(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
+                            if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
+                                return;
+                        }
 
                         Global.MsgResult openPicking = Global.MsgResult.No;
-                        if (OpenPickingBeforeStart)
+                        if (IsCheckPreferredParamsActive)
                         {
-                            // Question50035: Do you want to open the picking order before starting the workflow?
-                            openPicking = Messages.Question(this, "Question50106");
+                            openPicking = Global.MsgResult.Yes;
+                        }
+                        else
+                        {
+                            if (OpenPickingBeforeStart)
+                            {
+                                // Question50106: Do you want to open the picking order before starting the workflow?
+                                openPicking = Messages.Question(this, "Question50106");
+                            }
                         }
 
                         bool startWorkflow = true;
@@ -1327,9 +1556,22 @@ namespace gip.bso.facility
                                     EntityID = picking.PickingID,
                                     EntityName = Picking.ClassName
                                 });
+
+                                if(IsCheckPreferredParamsActive)
+                                {
+                                    info.Entities.Add(
+                                        new PAOrderInfoEntry()
+                                        {
+                                            EntityID = Guid.Empty,
+                                            EntityName = nameof(BSOPreferredParameters)
+                                        });
+                                }
+
                                 service.ShowDialogOrder(this, info);
-                                if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
-                                    startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
+                                startWorkflow = 
+                                    info.DialogResult != null 
+                                    && info.DialogResult.SelectedCommand == eMsgButton.OK 
+                                    && picking.PickingState != PickingStateEnum.WFActive;
                             }
                         }
                         if (startWorkflow)
@@ -1346,6 +1588,7 @@ namespace gip.bso.facility
 
             PostExecute("FacilityChargeRelocation");
         }
+
         /// <summary>
         /// Determines whether [is enabled facility charge relocation].
         /// </summary>
@@ -1809,7 +2052,7 @@ namespace gip.bso.facility
 
             MsgWithDetails msgWithDetails = GetBookingMessages(results);
 
-            if(msgWithDetails.MessageLevel >= eMsgLevel.Warning)
+            if (msgWithDetails.MessageLevel >= eMsgLevel.Warning)
             {
                 Messages.Msg(msgWithDetails);
             }
@@ -1859,6 +2102,46 @@ namespace gip.bso.facility
         public bool IsEnabledFacilityReassign()
         {
             bool bRetVal = CurrentBookParamReassignMat.IsEnabled();
+            UpdateBSOMsg();
+            return bRetVal;
+        }
+        #endregion
+
+        #region Lostneuzuordnung (Reassignment Lot)
+        /// <summary>
+        /// Facilities the relocation.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Reassign Lot'}de{'Los neu zuordnen'}", 811, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void FacilityLotReassign()
+        {
+            if (!PreExecute(nameof(FacilityLotReassign)))
+                return;
+
+            CurrentBookParamReassignLot.AutoRefresh = true;
+            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReassignLot, this.DatabaseApp) as ACMethodEventArgs;
+            if (!CurrentBookParamReassignLot.ValidMessage.IsSucceded() || CurrentBookParamReassignLot.ValidMessage.HasWarnings())
+                Messages.Msg(CurrentBookParamReassignLot.ValidMessage);
+            else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                    result.ValidMessage.Message = result.ResultState.ToString();
+                Messages.Msg(result.ValidMessage);
+            }
+            else
+            {
+                ClearBookingData();
+            }
+
+            PostExecute(nameof(FacilityLotReassign));
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled facility relocation].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledFacilityLotReassign()
+        {
+            bool bRetVal = CurrentBookParamReassignLot.IsEnabled();
             UpdateBSOMsg();
             return bRetVal;
         }
@@ -1990,20 +2273,15 @@ namespace gip.bso.facility
 
         public bool IsEnabledFacilityChargeLotGenerateDlg()
         {
-            return CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && !IsFacilityChargeWithFacilityBooking;
+            return CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && !HasFCHadAnyStock;
         }
 
 
-        public bool IsFacilityChargeWithFacilityBooking
+        public bool HasFCHadAnyStock
         {
             get
             {
-                if (CurrentFacilityCharge == null || CurrentFacilityCharge.ACCaption == "0") return false;
-                return
-                    CurrentFacilityCharge.FacilityBooking_InwardFacilityCharge.Any() ||
-                    CurrentFacilityCharge.FacilityBooking_OutwardFacilityCharge.Any() ||
-                    CurrentFacilityCharge.FacilityBookingCharge_InwardFacilityCharge.Any() ||
-                    CurrentFacilityCharge.FacilityBookingCharge_OutwardFacilityCharge.Any();
+                return CurrentFacilityCharge == null || Math.Abs(CurrentFacilityCharge.StockQuantityUOM) >= double.Epsilon || CurrentFacilityCharge.NotAvailable;
             }
         }
         #endregion
@@ -2024,46 +2302,135 @@ namespace gip.bso.facility
         }
         #endregion
 
-        #region ShowOrder
+        #region Dialog Navigate
 
-        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 901, true, nameof(SelectedFacilityCharge))]
-        public void ShowOrder()
+        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 781, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToOrder()
         {
-            if (!IsEnabledShowOrder())
-                return;
-
-            ProdOrderPartslist poPL = DatabaseApp.ProdOrderPartslist.Include(c => c.ProdOrder)
-                                                                    .Include(c => c.Partslist)
-                                                                    .FirstOrDefault(c => c.Partslist.MaterialID == SelectedFacilityCharge.MaterialID
-                                                                                      && c.ProdOrder.ProgramNo == SelectedFacilityCharge.ProdOrderProgramNo);
-
-            if (poPL == null)
+            if (!IsEnabledNavigateToOrder())
                 return;
 
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
             if (service != null)
             {
                 PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslist), poPL.ProdOrderPartslistID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslistPos), SelectedFacilityCharge.FinalPositionFromFbc.ProdOrderPartslistPosID));
                 service.ShowDialogOrder(this, info);
             }
         }
 
-        public bool IsEnabledShowOrder()
+        public bool IsEnabledNavigateToOrder()
         {
-            if (SelectedFacilityCharge != null && !string.IsNullOrEmpty(SelectedFacilityCharge.ProdOrderProgramNo))
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FinalPositionFromFbc != null)
                 return true;
             return false;
         }
 
-        #endregion
 
-        #region ShowFacilityLot
-
-        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 902, true, nameof(SelectedFacilityCharge))]
-        public void ShowFacilityLot()
+        [ACMethodInteraction(nameof(NavigateToFacilityChargeHistory), "en{'Show stock history of quant'}de{'Bestandshistorie des Quants anzeigen'}", 782, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityChargeHistory()
         {
-            if (!IsEnabledShowFacilityLot())
+            if (!IsEnabledNavigateToFacilityChargeHistory())
+            {
+                return;
+            }
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityCharge), SelectedFacilityCharge.FacilityChargeID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+
+                if (SelectedFacilityCharge.FacilityLotID != null)
+                {
+                    info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                }
+
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityChargeHistory()
+        {
+            return SelectedFacilityCharge != null;
+        }
+
+
+        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 783, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToMaterialOverview()
+        {
+            if (!IsEnabledNavigateToMaterialOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToMaterialOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Material != null)
+                return true;
+            return false;
+        }
+
+
+        [ACMethodInteraction("", "en{'Manage Material'}de{'Verwalte Material'}", 784, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToMaterial()
+        {
+            if (!IsEnabledNavigateToMaterial())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToMaterial()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Material != null)
+                return true;
+            return false;
+        }
+
+
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 785, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityLotOverview()
+        {
+            if (!IsEnabledNavigateToFacilityLotOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityLotOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+
+        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 786, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityLot()
+        {
+            if (!IsEnabledNavigateToFacilityLot())
                 return;
 
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
@@ -2075,9 +2442,55 @@ namespace gip.bso.facility
             }
         }
 
-        public bool IsEnabledShowFacilityLot()
+        public bool IsEnabledNavigateToFacilityLot()
         {
             if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityLot != null)
+                return true;
+            return false;
+        }
+
+
+        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 787, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacilityOverview()
+        {
+            if (!IsEnabledNavigateToFacilityOverview())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacilityOverview()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Facility != null && SelectedFacilityCharge.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                return true;
+            return false;
+        }
+
+
+        [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 788, true, nameof(SelectedFacilityCharge))]
+        public void NavigateToFacility()
+        {
+            if (!IsEnabledNavigateToFacility())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToFacility()
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.Facility != null && SelectedFacilityCharge.Facility.MDFacilityType != null && SelectedFacilityCharge.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 return true;
             return false;
         }
@@ -2136,6 +2549,66 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Method -> ShowDialogOrderInfo
+
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+            DialogOrderInfoPrepareFilter(paOrderInfo);
+
+            Search();
+
+            DialogOrderInfoPreSelectCharge(paOrderInfo);
+
+            ShowDialog(this, "ShowDialogOrderInfoDlg");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+        public virtual void DialogOrderInfoPrepareFilter(PAOrderInfo paOrderInfo)
+        {
+            PAOrderInfoEntry materialEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Material)).FirstOrDefault();
+            PAOrderInfoEntry facilityLotEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityLot)).FirstOrDefault();
+
+            if (materialEntry != null)
+            {
+                Material material = DatabaseApp.Material.Where(c => c.MaterialID == materialEntry.EntityID).FirstOrDefault();
+                AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CMaterialNoProperty, material.MaterialNo);
+            }
+
+            if (facilityLotEntry != null)
+            {
+                FacilityLot facilityLot = DatabaseApp.FacilityLot.Where(c => c.FacilityLotID == facilityLotEntry.EntityID).FirstOrDefault();
+                AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CLotNoProperty, facilityLot.LotNo);
+            }
+        }
+
+        public virtual void DialogOrderInfoPreSelectCharge(PAOrderInfo paOrderInfo)
+        {
+            PAOrderInfoEntry facilityChargeEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
+
+            if (facilityChargeEntry != null)
+            {
+                FacilityCharge facilityCharge = DatabaseApp.FacilityCharge.Where(c => c.FacilityChargeID == facilityChargeEntry.EntityID).FirstOrDefault();
+                if (FacilityChargeList == null)
+                {
+                    FacilityChargeList = new List<FacilityCharge>();
+                }
+
+                if (!FacilityChargeList.Contains(facilityCharge))
+                {
+                    FacilityChargeList.Add(facilityCharge);
+                }
+
+                SelectedFacilityCharge = facilityCharge;
+                CurrentFacilityCharge = facilityCharge;
+
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Eventhandling
@@ -2147,6 +2620,7 @@ namespace gip.bso.facility
                 || name == nameof(FilterFacility)
                 || name == nameof(FilterLot)
                 || name == nameof(FilterExternLot)
+                || name == nameof(FilterExternLot2)
                 || name == nameof(FilterExpirationDate))
             {
                 Search();
@@ -2203,6 +2677,10 @@ namespace gip.bso.facility
             else if (page == "ActivateSplitQuant" || page == "SplitQuantTab" || page == "*SplitQuantTab")
             {
                 CurrentBookParam = CurrentBookParamSplit;
+            }
+            else if (page == "ActivateReassignLot" || page == "ReassignLotTab" || page == "*ReassignLotTab")
+            {
+                CurrentBookParam = CurrentBookParamReassignLot;
             }
             PostExecute("OnActivate");
 
@@ -2264,6 +2742,8 @@ namespace gip.bso.facility
         ACMethodBooking _BookParamSplit;
         ACMethodBooking _BookParamSplitClone;
 
+        ACMethodBooking _BookParamReassignLot;
+        ACMethodBooking _BookParamReassignLotClone;
 
         /// <summary>
         /// The _ act booking param
@@ -2378,6 +2858,12 @@ namespace gip.bso.facility
                 case nameof(IsEnabledFacilityReassign):
                     result = IsEnabledFacilityReassign();
                     return true;
+                case nameof(FacilityLotReassign):
+                    FacilityLotReassign();
+                    return true;
+                case nameof(IsEnabledFacilityLotReassign):
+                    result = IsEnabledFacilityLotReassign();
+                    return true;
                 case nameof(SplitQuant):
                     SplitQuant();
                     return true;
@@ -2422,6 +2908,57 @@ namespace gip.bso.facility
                     return true;
                 case nameof(IsEnabledAvailableFacilityChargeAll):
                     result = IsEnabledAvailableFacilityChargeAll();
+                    return true;
+                case nameof(NavigateToOrder):
+                    NavigateToOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToOrder):
+                    result = IsEnabledNavigateToOrder();
+                    return true;
+                case nameof(NavigateToFacilityLot):
+                    NavigateToFacilityLot();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLot):
+                    result = IsEnabledNavigateToFacilityLot();
+                    return true;
+                case nameof(NavigateToFacilityLotOverview):
+                    NavigateToFacilityLotOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    result = IsEnabledNavigateToFacilityLotOverview();
+                    return true;
+                case nameof(NavigateToFacilityChargeHistory):
+                    NavigateToFacilityChargeHistory();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityChargeHistory):
+                    result = IsEnabledNavigateToFacilityChargeHistory();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(NavigateToFacility):
+                    NavigateToFacility();
+                    return true;
+                case nameof(IsEnabledNavigateToFacility):
+                    result = IsEnabledNavigateToFacility();
+                    return true;
+                case nameof(NavigateToFacilityOverview):
+                    NavigateToFacilityOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    result = IsEnabledNavigateToFacilityOverview();
+                    return true;
+                case nameof(NavigateToMaterial):
+                    NavigateToMaterial();
+                    return true;
+                case nameof(IsEnabledNavigateToMaterial):
+                    result = IsEnabledNavigateToMaterial();
+                    return true;
+                case nameof(NavigateToMaterialOverview):
+                    NavigateToMaterialOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    result = IsEnabledNavigateToMaterialOverview();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -2558,11 +3095,11 @@ namespace gip.bso.facility
 
         private MsgWithDetails GetBookingMessages(Dictionary<ACMethodBooking, ACMethodEventArgs> results)
         {
-            MsgWithDetails msgWithDetails  = new MsgWithDetails();
-            foreach(KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            foreach (KeyValuePair<ACMethodBooking, ACMethodEventArgs> item in results)
             {
                 MsgWithDetails msg = GetBookingMessage(item.Key, item.Value);
-                if(msg!= null)
+                if (msg != null)
                 {
                     msgWithDetails.AddDetailMessage(msg);
                 }

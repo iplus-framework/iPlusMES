@@ -1,0 +1,5 @@
+/****** Object:  Index [NCI_FK_Picking_TourplanID]    Script Date: 23.09.2024 14:06:18 ******/
+CREATE NONCLUSTERED INDEX [NCI_FK_Picking_MirroredFromPickingID] ON [dbo].[Picking]
+(
+	[MirroredFromPickingID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]

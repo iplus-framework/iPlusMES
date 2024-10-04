@@ -3,6 +3,7 @@ using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Xml;
 using System;
+using gip.mes.datamodel;
 
 namespace gip.mes.processapplication
 {
@@ -110,6 +111,9 @@ namespace gip.mes.processapplication
                         if (pwDosing.HasOpenDosings(out dosedQuantity))
                         {
                             hasOpenDosings = true;
+                            PWDosing pwDosing2 = pwDosing as PWDosing;
+                            if (pwDosing2 != null && pwDosing2.IsTransport && pwDosing2.ParentPWMethod<PWMethodTransportBase>().CurrentPicking != null)
+                                hasOpenDosings = pwDosing2.HasAndCanProcessAnyMaterialPicking(ParentPWGroup.AccessedProcessModule);
                             break;
                         }
                     }
@@ -162,9 +166,9 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Dumping
-        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList, ref DumpStats dumpStats)
         {
-            base.DumpPropertyList(doc, xmlACPropertyList);
+            base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
 
             XmlElement xmlChild = xmlACPropertyList["_LastSubStateResetCounter"];
             if (xmlChild == null)

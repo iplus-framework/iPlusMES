@@ -14,20 +14,122 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using gip.mes.datamodel; using gip.core.datamodel;
 using gip.mes.datamodel; 
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
-using gip.bso.sales;
-using gip.bso.purchasing;
-using gip.mes.facility;
+
 using Microsoft.EntityFrameworkCore;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.logistics
 {
     public partial class BSOVisitorVoucher : ACBSOvbNav
     {
+        #region Properties
+
+        #region Picking Filter
+        #region Picking -> Filter -> Properties -> Date
+
+        [ACPropertyInfo(301, nameof(FilterPickingDateFrom), "en{'From'}de{'Von'}")]
+        public DateTime? FilterPickingDateFrom
+        {
+            get
+            {
+                string tmp = AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<string>(nameof(Picking.DeliveryDateFrom));
+                if (String.IsNullOrEmpty(tmp))
+                    return null;
+                return AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<DateTime>(nameof(Picking.DeliveryDateFrom));
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    AccessUnAssignedPicking.NavACQueryDefinition.SetSearchValue(nameof(Picking.DeliveryDateFrom), Global.LogicalOperators.greaterThanOrEqual, value.Value);
+                    OnPropertyChanged();
+                    RefreshUnAssignedPickingList();
+                }
+                else
+                {
+                    AccessUnAssignedPicking.NavACQueryDefinition.SetSearchValue(nameof(Picking.DeliveryDateFrom), Global.LogicalOperators.greaterThanOrEqual, "");
+                    OnPropertyChanged();
+                    RefreshUnAssignedPickingList();
+                }
+            }
+        }
+
+        [ACPropertyInfo(302, nameof(FilterPickingDateTo), "en{'to'}de{'bis'}")]
+        public DateTime? FilterPickingDateTo
+        {
+            get
+            {
+                string tmp = AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<string>(nameof(Picking.DeliveryDateTo));
+                if (String.IsNullOrEmpty(tmp))
+                    return null;
+                return AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<DateTime>(nameof(Picking.DeliveryDateTo));
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    AccessUnAssignedPicking.NavACQueryDefinition.SetSearchValue(nameof(Picking.DeliveryDateTo), Global.LogicalOperators.lessThan, value.Value);
+                    OnPropertyChanged();
+                    RefreshUnAssignedPickingList();
+                }
+                else
+                {
+                    AccessUnAssignedPicking.NavACQueryDefinition.SetSearchValue(nameof(Picking.DeliveryDateTo), Global.LogicalOperators.lessThan, "");
+                    OnPropertyChanged();
+                    RefreshUnAssignedPickingList();
+                }
+            }
+        }
+
+        #endregion
+
+        private string _FilterPickingMaterialNo;
+        [ACPropertyInfo(304, nameof(FilterPickingMaterialNo), ConstApp.Material)]
+        public string FilterPickingMaterialNo
+        {
+            get
+            {
+                return _FilterPickingMaterialNo;
+            }
+            set
+            {
+                if (_FilterPickingMaterialNo != value)
+                {
+                    _FilterPickingMaterialNo = value;
+                    OnPropertyChanged();
+                    RefreshUnAssignedPickingList();
+                }
+            }
+        }
+
+        [ACPropertyInfo(305, nameof(FilterPickingKeyOfExternalSys), ConstApp.EntityTranslateKeyOfExtSys)]
+        public virtual string FilterPickingKeyOfExternalSys
+        {
+            get
+            {
+                string tmp = AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<string>(nameof(Picking.KeyOfExtSys));
+                if (String.IsNullOrEmpty(tmp))
+                    return null;
+                return AccessUnAssignedPicking.NavACQueryDefinition.GetSearchValue<string>(nameof(Picking.KeyOfExtSys));
+            }
+            set
+            {
+                AccessUnAssignedPicking.NavACQueryDefinition.SetSearchValue(nameof(Picking.KeyOfExtSys), Global.LogicalOperators.contains, value ?? "");
+                OnPropertyChanged();
+                RefreshUnAssignedPickingList();
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+
         #region BSO->ACProperty
 
         #region Picking assigned
@@ -159,8 +261,33 @@ namespace gip.bso.logistics
             if (query != null)
             {
                 query.Include(c => c.DeliveryCompanyAddress.Company).Include(c => c.MDPickingType);
+
+                if (!string.IsNullOrEmpty(FilterPickingMaterialNo))
+                {
+                    result =
+                        result
+                        .Where(c =>
+                            c.PickingPos_Picking
+                            .Any(x =>
+                                        (
+                                            x.InOrderPos != null
+                                            && (x.InOrderPos.Material.MaterialNo.Contains(FilterPickingMaterialNo) || x.InOrderPos.Material.MaterialName1.Contains(FilterPickingMaterialNo))
+                                        )
+                                        || (
+                                            x.OutOrderPos != null
+                                            && (x.OutOrderPos.Material.MaterialNo.Contains(FilterPickingMaterialNo) || x.OutOrderPos.Material.MaterialName1.Contains(FilterPickingMaterialNo))
+                                        ) || (
+                                            x.PickingMaterial != null
+                                            && (x.PickingMaterial.MaterialNo.Contains(FilterPickingMaterialNo) || x.PickingMaterial.MaterialName1.Contains(FilterPickingMaterialNo))
+                                        )
+
+                            )
+                        );
+                }
+
+
             }
-            return query;
+            return result;
         }
 
         protected virtual List<ACFilterItem> AccessUnAssignedPicking_DefaultFilter
@@ -169,7 +296,10 @@ namespace gip.bso.logistics
             {
                 return new List<ACFilterItem>()
                 {
-                    new ACFilterItem(Global.FilterTypes.filter, "VisitorVoucherID", Global.LogicalOperators.isNull, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.VisitorVoucherID), Global.LogicalOperators.isNull, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.DeliveryDateFrom), Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.DeliveryDateTo), Global.LogicalOperators.lessThan, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(Picking.KeyOfExtSys), Global.LogicalOperators.contains, Global.Operators.and, "", true),
                     new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
                     new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.ReceiptVehicle), true),
                     new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.or, System.Convert.ToString((short)GlobalApp.PickingType.IssueVehicle), true),
@@ -288,8 +418,8 @@ namespace gip.bso.logistics
                 return false;
             if (CurrentUnAssignedPicking.VisitorVoucher != null)
                 return false;
-            if (CurrentVisitorVoucher.Picking_VisitorVoucher.Count > 0)
-                return false;
+            //if (CurrentVisitorVoucher.Picking_VisitorVoucher.Count > 0)
+            //return false;
             if (CurrentVisitorVoucher.Visitor == null)
                 return false;
             return true;
@@ -346,12 +476,38 @@ namespace gip.bso.logistics
 
         #region Refresh Lists
 
+        [ACMethodInfo("", ConstApp.Search, 650, true)]
         public void RefreshUnAssignedPickingList(bool forceQueryFromDb = false)
         {
             if (AccessUnAssignedPicking == null)
                 return;
             AccessUnAssignedPicking.NavSearch(DatabaseApp);
-            OnPropertyChanged("UnAssignedPickingList");
+            OnPropertyChanged(nameof(UnAssignedPickingList));
+        }
+
+        public void CleanFilterPicking()
+        {
+            FilterPickingMaterialNo = null;
+            FilterPickingDateFrom = null;
+            FilterPickingDateTo = null;
+
+        }
+
+        public void LoadPickingRelatedData(IEnumerable<Picking> pickings)
+        {
+            if (pickings != null)
+            {
+                foreach (Picking picking in pickings)
+                {
+                    LoadPickingRelatedData(picking);
+                }
+            }
+        }
+
+        public void LoadPickingRelatedData(Picking picking)
+        {
+            picking.PreparationStatus = PickingManager.GetPickingPreparationStatus(DatabaseApp, picking);
+            picking.PreparationStatusName = PickingManager.GetPickingPreparationStatusName(DatabaseApp, picking.PreparationStatus);
         }
 
         #endregion
@@ -361,7 +517,7 @@ namespace gip.bso.logistics
         public void NavigateToAPicking()
         {
             if (!IsEnabledNavigateToAPicking())
-                return; 
+                return;
             NavigateToPicking(SelectedPicking);
         }
 

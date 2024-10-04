@@ -1,9 +1,8 @@
 ﻿using gip.core.datamodel;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using dbMes = gip.mes.datamodel;
+using VD = gip.mes.datamodel;
 
 namespace gip.bso.masterdata
 {
@@ -15,6 +14,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region ctor's
+
         public RuleGroup(SourceSelectionRulesResult sourceSelectionRulesResult, ACClass refPAACClass)
         {
             SourceSelectionRulesResult = sourceSelectionRulesResult;
@@ -94,13 +94,13 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        public RuleSelection AddRuleSelection(ACClassWF pwNode, dbMes.Material material, ACClass source, ACClass target, string preConfigACUrl)
+        public RuleSelection AddRuleSelection(ACClassWF pwNode, VD.Material material, ACClass source, ACClass target, string preConfigACUrl)
         {
             RuleSelection ruleSelection =
                 RuleSelectionList
                 .Where(c =>
-                            c.MachineItem.Machine == source
-                            && c.Target == target
+                            c.MachineItem.Machine.ACClassID == source.ACClassID
+                            && c.Target.ACClassID == target.ACClassID
                             && (material == null || (c.MachineItem.Material != null && c.MachineItem.Material.MaterialNo == material.MaterialNo))
                 ).FirstOrDefault();
 
@@ -108,13 +108,10 @@ namespace gip.bso.masterdata
             {
                 ruleSelection = new RuleSelection();
                 ruleSelection.RuleGroup = this;
-
                 ruleSelection.MachineItem = new MachineItem(SourceSelectionRulesResult, this, source, material, preConfigACUrl);
                 SourceSelectionRulesResult.MachineItems.Add(ruleSelection.MachineItem);
                 ruleSelection.MachineItem._IsSelected = true;
-
                 ruleSelection.Target = target;
-                
                 RuleSelectionList.Add(ruleSelection);
             }
 

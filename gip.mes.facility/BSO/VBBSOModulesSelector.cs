@@ -229,14 +229,19 @@ namespace gip.mes.facility
             }
             set
             {
+                if (_SelectedTarget != null)
+                    _SelectedTarget.PropertyChanged -= _SelectedTarget_PropertyChanged;
                 bool changed = _SelectedTarget != value;
                 _SelectedTarget = value;
+                if (_SelectedTarget != null)
+                    _SelectedTarget.PropertyChanged += _SelectedTarget_PropertyChanged;
                 if (changed)
                 {
                     OnPropertyChanged("SelectedTarget");
                 }
             }
         }
+
 
         protected BindingList<POPartslistPosReservation> _TargetsList;
         [ACPropertyList(508, "Targets")]
@@ -258,6 +263,10 @@ namespace gip.mes.facility
         }
 
         protected virtual void _Targets_ListChanged(object sender, ListChangedEventArgs e)
+        {
+        }
+
+        protected virtual void _SelectedTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
         }
 

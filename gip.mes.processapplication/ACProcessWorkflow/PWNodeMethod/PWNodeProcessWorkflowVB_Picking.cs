@@ -91,6 +91,11 @@ namespace gip.mes.processapplication
             bool canBeStarted = CheckIfNextBatchCanBeStarted();
             if (!canBeStarted)
                 return StartNextBatchResult.WaitForNextEvent;
+            else if (this.RunByModuleTrigger && OrderTriggeredFromModule == null && CurrentACState == ACStateEnum.SMStarting)
+                return StartNextBatchResult.WaitForNextEvent;
+            PAOrderInfoEntry orderTriggeredFromModule = OrderTriggeredFromModule;
+            if (OrderTriggeredFromModule != null)
+                OrderTriggeredFromModule = null;
 
             if (WillReadAndStartNextBatchCompleteNode_Picking(20))
             {
@@ -98,7 +103,7 @@ namespace gip.mes.processapplication
                 return StartNextBatchResult.Done;
             }
 
-            if (IsThisDesignatedProcessNode.HasValue && !IsThisDesignatedProcessNode.Value)
+            if (IsThisDesignatedProcessNode.HasValue && !IsThisDesignatedProcessNode.Value && !RunByModuleTrigger)
                 return StartNextBatchResult.Done;
 
             using (Database dbiPlus = new Database())
@@ -163,9 +168,43 @@ namespace gip.mes.processapplication
 
                 if (nextPos == null)
                 {
+                    if (!allCompleted)
+                    {
+                        if (RunByModuleTrigger && CurrentACState == ACStateEnum.SMRunning)
+                            CurrentACState = ACStateEnum.SMStarting;
+                        return StartNextBatchResult.WaitForNextEvent;
+                    }
+                    else
+                    {
+                        ParallelNodeStats parallelNodesStat = GetParallelNodeStats();
+                        if (parallelNodesStat.ActiveParallelNodesCount <= 0)
+                        {
+                            var parallelNodes = AllParallelNodes;
+                            if (parallelNodes != null)
+                            {
+                                parallelNodes
+                                    .Where(c => c.RunByModuleTrigger && c.CurrentACState == ACStateEnum.SMStarting && c.IterationCount.ValueT <= 0)
+                                    .ToList()
+                                    .ForEach(c => c.IterationCount.ValueT = 1);
+                            }
+                            if (CurrentACState == ACStateEnum.SMStarting)
+                            {
+                                int countParallelNodes;
+                                CompleteParallelNodes(out countParallelNodes);
+                            }
+                        }
+                    }
                     StartNextPickingWF(detachedPicking);
                     return StartNextBatchResult.Done;
                 }
+
+                if (this.RunByModuleTrigger && orderTriggeredFromModule == null && CurrentACState == ACStateEnum.SMRunning)
+                {
+                    nextPos = null;
+                    CurrentACState = !CompleteIfNotPlan ? ACStateEnum.SMStarting : ACStateEnum.SMCompleted;
+                    return StartNextBatchResult.WaitForNextEvent;
+                }
+
                 if (nextPos.FromFacility != null && nextPos.FromFacility.VBiFacilityACClassID != null)
                 {
                     Guid? classID = nextPos.FromFacility.VBiFacilityACClassID;

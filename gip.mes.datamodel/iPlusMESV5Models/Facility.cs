@@ -363,6 +363,13 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<bool?>(ref _LeaveMaterialOccupation, value); }
     }
 
+    Guid? _VBiACClassMethodID;
+    public Guid? VBiACClassMethodID 
+    {
+        get { return _VBiACClassMethodID; }
+        set { SetProperty<Guid?>(ref _VBiACClassMethodID, value); }
+    }
+
     private Company _Company;
     public virtual Company Company
     { 
@@ -1123,6 +1130,26 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Tourplan_VehicleFacility); }
     }
 
+    private ACClassMethod _VBiACClassMethod;
+    public virtual ACClassMethod VBiACClassMethod
+    { 
+        get { return LazyLoader.Load(this, ref _VBiACClassMethod); } 
+        set { SetProperty<ACClassMethod>(ref _VBiACClassMethod, value); }
+    }
+
+    public bool VBiACClassMethod_IsLoaded
+    {
+        get
+        {
+            return VBiACClassMethod != null;
+        }
+    }
+
+    public virtual ReferenceEntry VBiACClassMethodReference 
+    {
+        get { return Context.Entry(this).Reference("VBiACClassMethod"); }
+    }
+    
     private ACClass _VBiFacilityACClass;
     public virtual ACClass VBiFacilityACClass
     { 

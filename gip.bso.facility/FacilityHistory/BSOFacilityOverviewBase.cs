@@ -477,7 +477,7 @@ namespace gip.bso.facility
 
         #region Methods -> ShowFacilityLot
 
-        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 902, true, nameof(SelectedFacilityBookingChargeOverview))]
+        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 782, true, nameof(SelectedFacilityBookingChargeOverview))]
         public void ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())
@@ -495,12 +495,13 @@ namespace gip.bso.facility
                 {
                     lotNo = SelectedFacilityBookingChargeOverview.InwardFacilityChargeLotNo;
                 }
-                if(!string.IsNullOrEmpty(lotNo))
+
+                if( !string.IsNullOrEmpty(lotNo))
                 {
                     FacilityLot facilityLot = DatabaseApp.FacilityLot.Where(c => c.LotNo == lotNo).FirstOrDefault();
                     if(facilityLot != null)
                     {
-                        PAOrderInfo info = new PAOrderInfo();
+                        PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
                         info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), facilityLot.FacilityLotID));
                         service.ShowDialogOrder(this, info);
                     }

@@ -79,8 +79,14 @@ namespace gip.bso.logistics
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
             if (!base.ACInit(startChildMode))
                 return false;
+
+            CleanFilterPicking();
 
             Search();
             return true;
@@ -96,6 +102,8 @@ namespace gip.bso.logistics
             _VisitorVoucherManager = null;
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+            ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+            _PickingManager = null;
 
             this._AccessUnAssignedDeliveryNote = null;
             this._AccessUnAssignedPicking = null;
@@ -186,6 +194,16 @@ namespace gip.bso.logistics
             }
         }
 
+        protected ACRef<ACPickingManager> _PickingManager = null;
+        protected ACPickingManager PickingManager
+        {
+            get
+            {
+                if (_PickingManager == null)
+                    return null;
+                return _PickingManager.ValueT;
+            }
+        }
         #endregion
 
         #region VisitorVoucher
@@ -243,7 +261,7 @@ namespace gip.bso.logistics
                         }
                     }
                 }
-                OnPropertyChanged("FilterVisitorVouchers");
+                OnPropertyChanged(nameof(FilterVisitorVouchers));
             }
         }
 
@@ -290,9 +308,9 @@ namespace gip.bso.logistics
                     {
                         ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "VisitorVoucherNo").FirstOrDefault();
                         if (sortItem != null && sortItem.IsConfiguration)
+                        {
                             sortItem.SortDirection = Global.SortDirections.descending;
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        }
                     }
 
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<VisitorVoucher>(VisitorVoucher.ClassName, this);
@@ -327,9 +345,28 @@ namespace gip.bso.logistics
                         RebuildAccessPrimary();
                         navACQueryDefinition.SaveConfig(true);
                     }
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
+        }
+
+        private IQueryable<VisitorVoucher> _AccessPrimary_NavSearchExecuting(IQueryable<VisitorVoucher> result)
+        {
+            IQueryable<VisitorVoucher> query = result as IQueryable<VisitorVoucher>;
+            if (query != null)
+            {
+                query
+                    .Include(c => c.MDVisitorVoucherState)
+                    .Include(c => c.Visitor)
+                    .Include(c => c.Picking_VisitorVoucher)
+                    .Include(c => c.DeliveryNote_VisitorVoucher)
+                    .Include(c => c.Tourplan_VisitorVoucher);
+
+                result = query;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -351,9 +388,9 @@ namespace gip.bso.logistics
                     return;
                 TempNewVisitor = null;
                 AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentVisitorVoucher");
+                OnPropertyChanged();
                 EmptyVisitorSearch();
-                OnPropertyChanged("CurrentVisitor");
+                OnPropertyChanged(nameof(CurrentVisitor));
 
                 RefreshLists(true);
             }
@@ -392,9 +429,10 @@ namespace gip.bso.logistics
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedVisitorVoucher");
+                OnPropertyChanged(nameof(SelectedVisitorVoucher));
             }
         }
+
         #endregion
 
         #region Visitor Assignment
@@ -489,9 +527,9 @@ namespace gip.bso.logistics
                 if (CurrentVisitorVoucher != null)
                 {
                     CurrentVisitorVoucher.Visitor = value;
-                    OnPropertyChanged("CurrentVisitorVoucher");
+                    OnPropertyChanged(nameof(CurrentVisitorVoucher));
                 }
-                OnPropertyChanged("CurrentVisitor");
+                OnPropertyChanged(nameof(CurrentVisitor));
             }
         }
 
@@ -548,10 +586,10 @@ namespace gip.bso.logistics
                     AccessVisitor.NavACQueryDefinition.SearchWord = value;
                     AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                     AccessVisitor.NavSearch(this.DatabaseApp);
-                    OnPropertyChanged("VisitorList");
+                    OnPropertyChanged(nameof(VisitorList));
                     CurrentVisitor = VisitorList.FirstOrDefault();
                 }
-                OnPropertyChanged("FindVisitor");
+                OnPropertyChanged(nameof(FindVisitor));
             }
         }
 
@@ -582,11 +620,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorNo");
+                OnPropertyChanged(nameof(FindVisitorNo));
             }
         }
 
@@ -617,11 +655,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorVehicleNo");
+                OnPropertyChanged(nameof(FindVisitorVehicleNo));
             }
         }
 
@@ -652,11 +690,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorCompanyNo");
+                OnPropertyChanged(nameof(FindVisitorCompanyNo));
             }
         }
 
@@ -687,11 +725,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorCompanyName");
+                OnPropertyChanged(nameof(FindVisitorCompanyName));
             }
         }
 
@@ -722,11 +760,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorPersonName");
+                OnPropertyChanged(nameof(FindVisitorPersonName));
             }
         }
 
@@ -757,11 +795,11 @@ namespace gip.bso.logistics
                         filterItem.SearchWord = value;
                         AccessVisitor.NavACQueryDefinition.SaveToACConfigOff = false;
                         AccessVisitor.NavSearch(this.DatabaseApp);
-                        OnPropertyChanged("VisitorList");
+                        OnPropertyChanged(nameof(VisitorList));
                         CurrentVisitor = VisitorList.FirstOrDefault();
                     }
                 }
-                OnPropertyChanged("FindVisitorCardNo");
+                OnPropertyChanged(nameof(FindVisitorCardNo));
             }
         }
 
@@ -830,7 +868,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (   this.SelectedVisitorVoucher == null
+                if (this.SelectedVisitorVoucher == null
                     || this.SelectedVisitorVoucher.EntityState == EntityState.Added
                     || this.SelectedVisitorVoucher.EntityState == EntityState.Detached)
                     return null;
@@ -841,15 +879,74 @@ namespace gip.bso.logistics
             }
         }
 
-        protected void RefreshWeighingList(bool forceRefresh = false)
+        public virtual void RefreshWeighingList(bool forceRefresh = false)
         {
-            if (forceRefresh && SelectedVisitorVoucher !=  null)
+            if (forceRefresh && SelectedVisitorVoucher != null)
             {
                 SelectedVisitorVoucher.Weighing_VisitorVoucher.AutoLoad(SelectedVisitorVoucher.Weighing_VisitorVoucherReference, SelectedVisitorVoucher);
             }
             _WeighingList = null;
             OnPropertyChanged(nameof(WeighingList));
         }
+
+
+        private Weighing _FirstWeighing;
+
+        [ACPropertyInfo(500, nameof(FirstWeighing), "en{'First weighing'}de{'Erstes Wiegen'}")]
+        public Weighing FirstWeighing
+        {
+            get
+            {
+                return _FirstWeighing;
+            }
+            set
+            {
+                if (_FirstWeighing != value)
+                {
+                    _FirstWeighing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Weighing _LastWeighing;
+
+        [ACPropertyInfo(501, nameof(LastWeighing), "en{'Second weighing'}de{'Zweite Wiegen'}")]
+        public Weighing LastWeighing
+        {
+            get
+            {
+                return _LastWeighing;
+            }
+            set
+            {
+                if (_LastWeighing != value)
+                {
+                    _LastWeighing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private double _FLWeigDiff;
+
+        [ACPropertyInfo(502, nameof(FLWeigDiff), "en{'Weighing difference'}de{'Wiegeunterschied'}")]
+        public double FLWeigDiff
+        {
+            get
+            {
+                return _FLWeigDiff;
+            }
+            set
+            {
+                if (_FLWeigDiff != value)
+                {
+                    _FLWeigDiff = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         #endregion
 
@@ -929,6 +1026,8 @@ namespace gip.bso.logistics
             if (CurrentVisitorVoucher != null)
             {
                 CurrentVisitorVoucher.ACProperties.Refresh();
+                LoadRelatedVisitorVoucherData(CurrentVisitorVoucher);
+
             }
             PostExecute("Load");
         }
@@ -957,7 +1056,7 @@ namespace gip.bso.logistics
             DatabaseApp.VisitorVoucher.Add(voucher);
             TempNewVisitor = null;
             AccessPrimary.NavList.Add(voucher);
-            OnPropertyChanged("VisitorVoucherList");
+            OnPropertyChanged(nameof(VisitorVoucherList));
             SelectedVisitorVoucher = voucher;
             CurrentVisitorVoucher = voucher;
 
@@ -1022,7 +1121,8 @@ namespace gip.bso.logistics
             }
             if (isSearchable)
                 AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("VisitorVoucherList");
+            LoadRelatedVisitorVoucherData();
+            OnPropertyChanged(nameof(VisitorVoucherList));
             RefreshLists(true);
         }
 
@@ -1043,28 +1143,42 @@ namespace gip.bso.logistics
             if (acAccess == _AccessVisitor)
             {
                 _AccessVisitor.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("VisitorList");
+                OnPropertyChanged(nameof(VisitorList));
                 return true;
             }
             else if (acAccess == _AccessUnAssignedDeliveryNote)
             {
                 _AccessUnAssignedDeliveryNote.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("UnAssignedDeliveryNoteList");
+                OnPropertyChanged(nameof(UnAssignedDeliveryNoteList));
                 return true;
             }
             else if (acAccess == _AccessUnAssignedPicking)
             {
                 _AccessUnAssignedPicking.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("UnAssignedPickingList");
+                OnPropertyChanged(nameof(UnAssignedPickingList));
                 return true;
             }
             else if (acAccess == _AccessUnAssignedTourplan)
             {
                 _AccessUnAssignedTourplan.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("UnAssignedTourplanList");
+                OnPropertyChanged(nameof(UnAssignedTourplanList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
+        }
+
+        public override object Clone()
+        {
+            object clonedObject = base.Clone();
+
+            if (clonedObject != null && clonedObject is BSOVisitorVoucher)
+            {
+                BSOVisitorVoucher bSOVisitorVoucher = clonedObject as BSOVisitorVoucher;
+                bSOVisitorVoucher.SelectedVisitorVoucher = SelectedVisitorVoucher;
+                LoadFirstLastWeighting(bSOVisitorVoucher);
+            }
+
+            return clonedObject;
         }
 
         #endregion
@@ -1093,7 +1207,7 @@ namespace gip.bso.logistics
                 if (result != null)
                 {
                     result.VisitorVoucher = CurrentVisitorVoucher;
-                    OnPropertyChanged("DeliveryNoteList");
+                    OnPropertyChanged(nameof(DeliveryNoteList));
                 }
             }
         }
@@ -1140,9 +1254,9 @@ namespace gip.bso.logistics
                 if (TempNewVisitor != null)
                 {
                     TempNewVisitor.VisitorVoucher_Visitor.Add(CurrentVisitorVoucher);
-                    OnPropertyChanged("AllVisitorList");
+                    OnPropertyChanged(nameof(AllVisitorList));
                     CurrentVisitorVoucher.Visitor = TempNewVisitor;
-                    OnPropertyChanged("CurrentVisitorVoucher");
+                    OnPropertyChanged(nameof(CurrentVisitorVoucher));
                 }
             }
             childBSO.Stop();
@@ -1192,11 +1306,11 @@ namespace gip.bso.logistics
         [ACMethodCommand(Visitor.ClassName, "en{'Check Out'}de{'Abmelden'}", (short)601, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void CheckOut()
         {
-            if (!PreExecute("CheckOut")) 
+            if (!PreExecute("CheckOut"))
                 return;
             if (this.VisitorVoucherManager == null)
                 return;
-            this.VisitorVoucherManager.CheckOut(CurrentVisitorVoucher, DatabaseApp);
+            this.VisitorVoucherManager.CheckOut(CurrentVisitorVoucher, DatabaseApp, PickingManager, this.InDeliveryNoteManager, this.OutDeliveryNoteManager, this.ACFacilityManager as FacilityManager);
             PostExecute("CheckOut");
         }
 
@@ -1318,10 +1432,29 @@ namespace gip.bso.logistics
             RefreshUnAssignedTourplanList(forceQueryFromDb);
             OnPropertyChanged(nameof(TourplanList));
 
+            LoadPickingRelatedData(PickingList);
+            LoadPickingRelatedData(UnAssignedPickingList);
             RefreshUnAssignedPickingList(forceQueryFromDb);
             OnPropertyChanged(nameof(PickingList));
 
             RefreshWeighingList();
+        }
+
+        public void LoadRelatedVisitorVoucherData()
+        {
+            if (VisitorVoucherList != null)
+            {
+                foreach (VisitorVoucher voucher in VisitorVoucherList)
+                {
+                    LoadRelatedVisitorVoucherData(voucher);
+                }
+            }
+        }
+
+        public void LoadRelatedVisitorVoucherData(VisitorVoucher voucher)
+        {
+            voucher.PickingStatusInfo = PickingManager.GetPickingStatusInfo(DatabaseApp, voucher.Picking_VisitorVoucher);
+            voucher.PreparationStatusInfo = PickingManager.GetMirroredPickingPreparationStatus(DatabaseApp, voucher.Picking_VisitorVoucher);
         }
 
         #endregion
@@ -1358,6 +1491,34 @@ namespace gip.bso.logistics
         {
             return SelectedScale != null;
         }
+
+        private void LoadFirstLastWeighting(BSOVisitorVoucher bSOVisitorVoucher)
+        {
+            bSOVisitorVoucher.FirstWeighing = null;
+            bSOVisitorVoucher.LastWeighing = null;
+            bSOVisitorVoucher.FLWeigDiff = 0;
+
+            if (bSOVisitorVoucher.WeighingList != null && bSOVisitorVoucher.WeighingList.Any())
+            {
+                Dictionary<long, Weighing> weighings = new Dictionary<long, Weighing>();
+                foreach (Weighing weighing in bSOVisitorVoucher.WeighingList)
+                {
+                    if (weighing.WeighingState != WeighingStateEnum.Cancelled)
+                    {
+                        long key = long.Parse(string.Join("", weighing.WeighingNo.Where(c => char.IsDigit(c))));
+                        weighings.Add(key, weighing);
+                    }
+                }
+
+                if (weighings.Any())
+                {
+                    bSOVisitorVoucher.FirstWeighing = weighings.OrderBy(c => c.Key).FirstOrDefault().Value;
+                    bSOVisitorVoucher.LastWeighing = weighings.OrderByDescending(c => c.Key).FirstOrDefault().Value;
+                    bSOVisitorVoucher.FLWeigDiff = Math.Abs(bSOVisitorVoucher.FirstWeighing.Weight - bSOVisitorVoucher.LastWeighing.Weight);
+                }
+            }
+        }
+
         #endregion
 
         #endregion

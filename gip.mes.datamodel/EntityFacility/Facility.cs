@@ -69,7 +69,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(39, nameof(LeaveMaterialOccupation), ConstApp.LeaveMaterialOccupation, "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
-    [ACPropertyEntity(38, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(40, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(41, nameof(Facility.VBiACClassMethod), "en{'Process Workflow'}de{'Zugewiesenen Prozessablauf'}", Const.ContextDatabase + "\\" + nameof(ACClassMethod), "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -550,8 +551,6 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (!this.FacilityCharge_Facility.Any())
-                    return true;
                 try
                 {
                     return !FacilityCharge_Facility.Where(c => !c.NotAvailable).Any();
@@ -609,11 +608,17 @@ namespace gip.mes.datamodel
                 case nameof(VBiStackCalculatorACClassID):
                     base.OnPropertyChanged("StackCalculatorACClass");
                     break;
+                case nameof(VBiACClassMethodID):
+                    OnPropertyChanged(nameof(ACClassMethod));
+                    break;
             }
             base.OnPropertyChanged(propertyName);
         }
 
         #region VBIplus-Context
+
+        #region VBIplus-Context -> FacilityACClass
+
         [NotMapped]
         private gip.core.datamodel.ACClass _FacilityACClass;
         [ACPropertyInfo(9999, "", "en{'Module'}de{'Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
@@ -671,34 +676,9 @@ namespace gip.mes.datamodel
             }
         }
 
-        public gip.core.datamodel.ACClass GetFacilityACClass(Database db)
-        {
-            if (this.VBiFacilityACClassID == null || this.VBiFacilityACClassID == Guid.Empty)
-                return null;
-            if (this.VBiFacilityACClass == null)
-            {
+        #endregion
 
-                using (ACMonitor.Lock(db.QueryLock_1X000))
-                {
-                    return db.ACClass.Where(c => c.ACClassID == this.VBiFacilityACClassID).FirstOrDefault();
-                }
-            }
-            else
-                return this.VBiFacilityACClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
-        }
-
-        [NotMapped]
-        public bool IsMirroredOnMoreDatabases
-        {
-            get
-            {
-                if (!VBiFacilityACClassID.HasValue
-                    || FacilityACClass == null
-                    || FacilityACClass.ObjectType == null)
-                    return false;
-                return FacilityACClass.ObjectType.FullName.Contains("RemoteStore");
-            }
-        }
+        #region VBIplus-Context -> StackCalculatorACClass
 
         [NotMapped]
         private gip.core.datamodel.ACClass _StackCalculatorACClass;
@@ -750,6 +730,92 @@ namespace gip.mes.datamodel
                         return;
                     this.VBiStackCalculatorACClass = value2;
                 }
+            }
+        }
+
+        #endregion
+
+        #region VBIplus-Context -> ACClassMethod
+
+        private gip.core.datamodel.ACClassMethod _ACClassMethod;
+        [ACPropertyInfo(9999, "", "en{'WF Method'}de{'WF Methode'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClassMethod.ClassName)]
+        public gip.core.datamodel.ACClassMethod ACClassMethod
+        {
+            get
+            {
+                if (this.VBiACClassMethodID == null || this.VBiACClassMethodID == Guid.Empty)
+                    return null;
+                if (_ACClassMethod != null)
+                    return _ACClassMethod;
+                if (this.VBiACClassMethod == null)
+                {
+                    DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                    _ACClassMethod = dbApp.ContextIPlus.ACClassMethod.Where(c => c.ACClassMethodID == this.VBiACClassMethodID).FirstOrDefault();
+                    return _ACClassMethod;
+                }
+                else
+                {
+                    _ACClassMethod = this.VBiACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>();
+                    return _ACClassMethod;
+                }
+            }
+            set
+            {
+                if (value == null)
+                {
+                    if (this.VBiACClassMethod == null)
+                        return;
+                    _ACClassMethod = null;
+                    this.VBiACClassMethod = null;
+                }
+                else
+                {
+                    if (_ACClassMethod != null && value == _ACClassMethod)
+                        return;
+                    gip.mes.datamodel.ACClassMethod value2 = value.FromAppContext<gip.mes.datamodel.ACClassMethod>(this.GetObjectContext<DatabaseApp>());
+                    // Neu angelegtes Objekt, das im AppContext noch nicht existiert
+                    if (value2 == null)
+                    {
+                        this.VBiACClassMethodID = value.ACClassMethodID;
+                        throw new NullReferenceException("Value doesn't exist in Application-Context. Please save new value in iPlusContext before setting this property!");
+                        //return;
+                    }
+                    _ACClassMethod = value;
+                    if (value2 == this.VBiACClassMethod)
+                        return;
+                    this.VBiACClassMethod = value2;
+                }
+            }
+        }
+        #endregion
+
+        public gip.core.datamodel.ACClass GetFacilityACClass(Database db)
+        {
+            if (this.VBiFacilityACClassID == null || this.VBiFacilityACClassID == Guid.Empty)
+                return null;
+            if (this.VBiFacilityACClass == null)
+            {
+
+                using (ACMonitor.Lock(db.QueryLock_1X000))
+                {
+                    return db.ACClass.Where(c => c.ACClassID == this.VBiFacilityACClassID).FirstOrDefault();
+                }
+            }
+            else
+                return this.VBiFacilityACClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
+        }
+
+
+        [NotMapped]
+        public bool IsMirroredOnMoreDatabases
+        {
+            get
+            {
+                if (!VBiFacilityACClassID.HasValue
+                    || FacilityACClass == null
+                    || FacilityACClass.ObjectType == null)
+                    return false;
+                return FacilityACClass.ObjectType.FullName.Contains("RemoteStore");
             }
         }
 
@@ -960,12 +1026,12 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if(_ShouldLeaveMaterialOccupation == null)
+                if (_ShouldLeaveMaterialOccupation == null)
                 {
                     Facility facility = this;
-                    while(facility != null)
+                    while (facility != null)
                     {
-                        if(facility.LeaveMaterialOccupation != null)
+                        if (facility.LeaveMaterialOccupation != null)
                         {
                             _ShouldLeaveMaterialOccupation = facility.LeaveMaterialOccupation.Value;
                             break;
@@ -973,7 +1039,7 @@ namespace gip.mes.datamodel
                         facility = facility.Facility1_ParentFacility;
                     }
 
-                    if(_ShouldLeaveMaterialOccupation == null)
+                    if (_ShouldLeaveMaterialOccupation == null)
                     {
                         _ShouldLeaveMaterialOccupation = false;
                     }
@@ -1042,6 +1108,7 @@ namespace gip.mes.datamodel
                 CompanyID = from.CompanyID;
                 CompanyPersonID = from.CompanyPersonID;
                 MDFacilityVehicleTypeID = from.MDFacilityVehicleTypeID;
+                VBiACClassMethodID = from.VBiACClassMethodID;
             }
 
             FacilityNo = from.FacilityNo;

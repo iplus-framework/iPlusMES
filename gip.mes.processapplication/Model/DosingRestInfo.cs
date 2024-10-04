@@ -1,9 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.core.processapplication;
-using gip.mes.datamodel;
 using System;
-using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace gip.mes.processapplication

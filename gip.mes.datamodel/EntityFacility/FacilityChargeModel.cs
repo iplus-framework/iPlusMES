@@ -47,14 +47,6 @@ namespace gip.mes.datamodel
 
         #region overrides
 
-        public void RoundDosedQuantity(string mdUnitForRounding = null)
-        {
-            if (mdUnitForRounding == null || mdUnitForRounding.Contains(MDUnitName))
-            {
-                DosedQuantity = (int)Math.Round(DosedQuantity);
-            }
-        }
-
         public override string ToString()
         {
             return string.Format(@"{0} | {1} {2} | {3} {4}", LotNo, MaterialNo, MaterialName1, FacilityNo, FacilityName);

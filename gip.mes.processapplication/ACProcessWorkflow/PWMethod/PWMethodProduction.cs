@@ -6,6 +6,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
+using System.Reflection;
 
 namespace gip.mes.processapplication
 {
@@ -230,6 +231,17 @@ namespace gip.mes.processapplication
 
         //#endregion
 
+        public bool IsLastBatchRunning
+        {
+            get
+            {
+                return IsLastBatch == PADosingLastBatchEnum.LastBatch
+                    || IsLastBatch == PADosingLastBatchEnum.LastBatchAndComponent
+                    || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                    || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
+            }
+        }
+
         #region IACConfigStoreSelection
         protected override void OnRebuildMandatoryConfigStoresCache(IACComponentPWNode invoker, List<IACConfigStore> mandatoryConfigStores, bool recalcExpectedConfigStoresCount)
         {
@@ -285,6 +297,25 @@ namespace gip.mes.processapplication
         #region Methods
 
         #region overrides
+        public override void UnloadWorkflow()
+        {
+            if (IsLastBatchRunning && CurrentACProgram != null)
+            {
+                string programNo = CurrentACProgram.ProgramNo;
+                PWGroupVB[] groupsWithReservedModules = FindChildComponents<PWGroupVB>(c => c is PWGroupVB && (c as PWGroupVB).ReserveModule == 1).ToArray();
+                if (groupsWithReservedModules != null && groupsWithReservedModules.Any())
+                {
+                    foreach (PWGroupVB group in groupsWithReservedModules)
+                    {
+                        PAProcessModule prevModule = group.PreviousAccessedPM;
+                        if (prevModule != null && prevModule.ReservationInfo != null && String.IsNullOrEmpty(prevModule.ReservationInfo.ValueT) && prevModule.ReservationInfo.ValueT == programNo)
+                            prevModule.ReservationInfo.ValueT = null;
+                    }
+                }
+            }
+            base.UnloadWorkflow();
+        }
+
         protected override bool OnWorkflowUnloading(int retryUnloadCountDown)
         {
             try
@@ -477,7 +508,7 @@ namespace gip.mes.processapplication
                                     e.Message, e.InnerException != null ? e.InnerException.Message : "", e.StackTrace);
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 Messages.LogException(this.GetACUrl(), "Start(0)", msg.Message);
-                throw e;
+                throw new Exception(msg.Message, e);
             }
             finally
             {

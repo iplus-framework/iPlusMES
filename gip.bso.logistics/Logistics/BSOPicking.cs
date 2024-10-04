@@ -27,6 +27,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
@@ -68,6 +69,9 @@ namespace gip.bso.logistics
         {
             //DatabaseMode = DatabaseModes.OwnDB;
             _ForwardToRemoteStores = new ACPropertyConfigValue<bool>(this, nameof(ForwardToRemoteStores), false);
+            _NavigateOnGenRelated = new ACPropertyConfigValue<bool>(this, nameof(NavigateOnGenRelated), false);
+            _DefaultReservationState = new ACPropertyConfigValue<ReservationState>(this, nameof(DefaultReservationState), ReservationState.New);
+            _RMISubscr = new ACPointAsyncRMISubscr(this, "RMISubscr", 1);
         }
 
         /// <summary>
@@ -96,6 +100,11 @@ namespace gip.bso.logistics
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+
+            _ = ForwardToRemoteStores;
+            _ = NavigateOnGenRelated;
+            _ = DefaultReservationState;
+
             bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
             if (!skipSearchOnStart)
             {
@@ -110,8 +119,20 @@ namespace gip.bso.logistics
 
             if (BSOFacilityReservation_Child != null && BSOFacilityReservation_Child.Value != null)
             {
+                BSOFacilityReservation_Child.Value.DefaultReservationState = GetDefaultReservationState();
                 BSOFacilityReservation_Child.Value.OnReservationChanged += BSOFacilityReservation_Changed;
+
+                if (SelectedFilterMDPickingType != null)
+                {
+                    BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(SelectedFilterMDPickingType.MDKey);
+                }
+                else
+                {
+                    BSOFacilityReservation_Child.Value.LoadFilterFacilityLists(null);
+                }
             }
+
+            _MainSyncContext = SynchronizationContext.Current;
 
             return true;
         }
@@ -174,7 +195,8 @@ namespace gip.bso.logistics
                 ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
             _OutDeliveryNoteManager = null;
 
-            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            if (_ACFacilityManager != null)
+                FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
 
             this._AccessBookingFacility = null;
@@ -270,6 +292,8 @@ namespace gip.bso.logistics
             {
                 BSOFacilityReservation_Child.Value.OnReservationChanged -= BSOFacilityReservation_Changed;
             }
+
+            _MainSyncContext = null;
 
             return b;
         }
@@ -765,8 +789,6 @@ namespace gip.bso.logistics
                     ACQueryDefinition acQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + CompanyAddress.ClassName, ACType.ACIdentifier);
 
                     acQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterDeliveryAddressDefaultSort);
-                    if (acQueryDefinition.TakeCount == 0)
-                        acQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     acQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterDeliveryAddressDefaultFilter);
 
                     _AccessFilterDeliveryAddress = acQueryDefinition.NewAccessNav<CompanyAddress>("FilterDeliveryAddress", this);
@@ -846,8 +868,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -901,8 +921,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -994,8 +1012,6 @@ namespace gip.bso.logistics
                     if (navACQueryDefinition != null)
                     {
                         navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
 
                         foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
@@ -1225,11 +1241,8 @@ namespace gip.bso.logistics
                     return;
                 AccessPrimary.Current = value;
 
-                if (ProcessWorkflowList != null && ProcessWorkflowList.Any() && value != null && value.ACClassMethodID != null)
-                    SelectedProcessWorkflow = ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == CurrentPicking.ACClassMethodID);
-                else
-                    SelectedProcessWorkflow = null;
-                CurrentProcessWorkflow = SelectedProcessWorkflow;
+                LoadSelectedProcessWorkflow(CurrentPicking);
+                LoadProcessWorkflowPresenter(CurrentPicking);
 
                 OnPropertyChanged(nameof(CurrentPicking));
                 if (value != null && _InLoad)
@@ -1320,7 +1333,7 @@ namespace gip.bso.logistics
 
         public virtual bool IsEnabledFinishOrder()
         {
-            return CurrentPicking != null && CurrentPicking.PickingStateIndex < (short)PickingStateEnum.Finished;
+            return CurrentPicking != null && (CurrentPicking.PickingState < PickingStateEnum.Finished || CurrentPicking.PickingState == PickingStateEnum.WaitOnManualClosing);
         }
 
         #endregion
@@ -1329,9 +1342,9 @@ namespace gip.bso.logistics
 
         #region PickingPos -> PositionFacilityFrom
 
-        private bool _FilterPositionFacilityFrom = true;
+        private bool? _FilterPositionFacilityFrom = null;
         [ACPropertyInfo(814, "", "en{'Only show source bins with material'}de{'Zeige Quelle-Lagerplätze mit Material'}")]
-        public bool FilterPositionFacilityFrom
+        public bool? FilterPositionFacilityFrom
         {
             get
             {
@@ -1372,7 +1385,43 @@ namespace gip.bso.logistics
         {
             get
             {
+                // Manage case if CurrentPickingPos.FromFacility is not in filtered set:
+                // if not add to list to display value and prevent delete initial value
+                if (CurrentPickingPos != null && CurrentPickingPos.FromFacility != null)
+                {
+                    if (!AccessPositionFacilityFrom?.NavList.Contains(CurrentPickingPos.FromFacility) ?? false)
+                    {
+                        AccessPositionFacilityFrom?.NavList.Add(CurrentPickingPos.FromFacility);
+                    }
+                }
+
+                if (AccessPositionFacilityFrom != null && AccessPositionFacilityFrom.NavList != null)
+                {
+                    // add child facilities
+                    foreach (Facility facility in AccessPositionFacilityFrom?.NavList)
+                    {
+                        AddChidFacilityToPosFacilityFormList(facility);
+                    }
+                }
+
+                // Order list
+
                 return AccessPositionFacilityFrom?.NavList;
+            }
+        }
+
+        private void AddChidFacilityToPosFacilityFormList(Facility facility)
+        {
+            if (!AccessPositionFacilityFrom?.NavList.Contains(facility) ?? false)
+            {
+                AccessPositionFacilityFrom?.NavList.Add(facility);
+            }
+            if (facility.Facility_ParentFacility.Any())
+            {
+                foreach (Facility childFacility in facility.Facility_ParentFacility)
+                {
+                    AddChidFacilityToPosFacilityFormList(childFacility);
+                }
             }
         }
 
@@ -1448,7 +1497,10 @@ namespace gip.bso.logistics
                         SelectedFacilityPreBooking = null;
                     RefreshBookingFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
                     RefreshBookingFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+
                     RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                    OnPropertyChanged(nameof(PositionFacilityFromList));
+
                     if (AccessBookingFacilityLot != null)
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                     OnPropertyChanged(nameof(BookingFacilityList));
@@ -1473,10 +1525,8 @@ namespace gip.bso.logistics
             {
                 case nameof(CurrentPickingPos.PickingMaterialID):
                     OnPropertyChanged(nameof(MDUnitList));
-                    if (FilterPositionFacilityFrom)
-                    {
-                        RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
-                    }
+                    RefreshFilterFacilityAccess(AccessPositionFacilityFrom, FilterPositionFacilityFrom);
+                    OnPropertyChanged(nameof(PositionFacilityFromList));
                     break;
             }
         }
@@ -1792,7 +1842,7 @@ namespace gip.bso.logistics
             }
         }
 
-        private bool _BookingFilterMaterial = true;
+        private bool _BookingFilterMaterial = false;
         [ACPropertyInfo(9999, "", "en{'Only show source bins with material'}de{'Zeige Quell-Lagerplätze mit Material'}")]
         public bool BookingFilterMaterial
         {
@@ -1917,6 +1967,18 @@ namespace gip.bso.logistics
             }
         }
 
+        private List<ACFilterItem> AccessBookingFacilityDefaultFilter_StorageAll
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.equal, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.and, "", true),
+                };
+            }
+        }
+
         private List<ACSortItem> AccessBookingFacilityDefaultSort
         {
             get
@@ -1957,9 +2019,13 @@ namespace gip.bso.logistics
             RefreshFilterFacilityAccess(accessNavFacility, bookingFilterMaterial);
         }
 
-        private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool filterMaterial)
+        private void RefreshFilterFacilityAccess(ACAccessNav<Facility> accessNavFacility, bool? filterMaterial)
         {
-            if (filterMaterial)
+            if (!filterMaterial.HasValue)
+            {
+                accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_StorageAll, AccessBookingFacilityDefaultSort);
+            }
+            else if (filterMaterial.Value)
             {
                 accessNavFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
                 var acFilter = accessNavFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
@@ -2147,7 +2213,7 @@ namespace gip.bso.logistics
                 .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
                 .OrderBy(c => c.ExpirationDate)
                 .ThenBy(c => c.FillingDate)
-                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .Take(Root.Environment.AccessDefaultTakeCount)
                 .ToList();
         }
 
@@ -2284,6 +2350,34 @@ namespace gip.bso.logistics
             set
             {
                 _ForwardToRemoteStores.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<bool> _NavigateOnGenRelated;
+        [ACPropertyConfig("en{'Navigate to ne generated picking order'}de{'Navigiere zu generiertem Kommissionierauftrag'}")]
+        public bool NavigateOnGenRelated
+        {
+            get
+            {
+                return _NavigateOnGenRelated.ValueT;
+            }
+            set
+            {
+                _NavigateOnGenRelated.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<ReservationState> _DefaultReservationState;
+        [ACPropertyConfig("en{'Def. Batch plannning state'}de{'Def. Reservierungssstatus'}")]
+        public ReservationState DefaultReservationState
+        {
+            get
+            {
+                return _DefaultReservationState.ValueT;
+            }
+            set
+            {
+                _DefaultReservationState.ValueT = value;
             }
         }
 
@@ -2445,6 +2539,34 @@ namespace gip.bso.logistics
         }
         private List<ForwardToMirroredStore> _ForwardPlan;
         private List<Picking> _VisitedPickings = null;
+        #endregion
+
+        #region Properties => RMI and Routing
+
+        ACPointAsyncRMISubscr _RMISubscr;
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        public ACPointAsyncRMISubscr RMISubscr
+        {
+            get
+            {
+                return _RMISubscr;
+            }
+        }
+
+        private string _CalculateRouteResult;
+        [ACPropertyInfo(9999, "", "")]
+        public string CalculateRouteResult
+        {
+            get => _CalculateRouteResult;
+            set
+            {
+                _CalculateRouteResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private SynchronizationContext _MainSyncContext;
+
         #endregion
 
         #endregion
@@ -2691,7 +2813,7 @@ namespace gip.bso.logistics
             RefreshOutOrderPosList(false);
             RefreshProdOrderPartslistPosList(false);
 
-            LoadProcessWorkflowPresenter();
+            LoadProcessWorkflowPresenter(CurrentPicking);
         }
 
 
@@ -2826,6 +2948,7 @@ namespace gip.bso.logistics
             if (SelectedFilterDeliveryAddress != null)
                 newPicking.DeliveryCompanyAddress = SelectedFilterDeliveryAddress;
             CurrentPicking = newPicking;
+            OnNewPicking(newPicking);
             if (PickingList == null)
             {
                 PickingList = new List<Picking>();
@@ -2834,6 +2957,10 @@ namespace gip.bso.logistics
             SelectedPicking = newPicking;
             ACState = Const.SMNew;
             PostExecute("New");
+        }
+
+        protected virtual void OnNewPicking(Picking newPicking)
+        {
         }
 
         /// <summary>
@@ -2869,6 +2996,7 @@ namespace gip.bso.logistics
             }
             AccessPrimary.NavList.Remove(CurrentPicking);
             _PickingList = AccessPrimary.NavList.ToList();
+            SetPreparationStatusInList();
             Picking firstPicking = AccessPrimary.NavList.FirstOrDefault();
             OnPropertyChanged(nameof(PickingList));
             CurrentPicking = firstPicking;
@@ -2899,6 +3027,7 @@ namespace gip.bso.logistics
             {
                 AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
                 _PickingList = AccessPrimary.NavList.ToList();
+                SetPreparationStatusInList();
             }
 
             OnPropertyChanged(nameof(PickingList));
@@ -2995,11 +3124,20 @@ namespace gip.bso.logistics
         {
             if (!IsEnabledMirrorPicking())
                 return;
+            Picking currentPicking = CurrentPicking;
             Picking mirroredPicking = PickingManager.MirrorPicking(DatabaseApp, CurrentPicking);
             AccessPrimary.NavList.Add(mirroredPicking);
             OnPropertyChanged(nameof(PickingList));
-            CurrentPicking = mirroredPicking;
-            SelectedPicking = mirroredPicking;
+            if (NavigateOnGenRelated && mirroredPicking != null)
+            {
+                CurrentPicking = mirroredPicking;
+                SelectedPicking = mirroredPicking;
+            }
+            else
+            {
+                CurrentPicking = currentPicking;
+                CurrentPicking = currentPicking;
+            }
         }
 
         public bool IsEnabledMirrorPicking()
@@ -3014,21 +3152,38 @@ namespace gip.bso.logistics
             if (!IsEnabledGenerateSubPickingsForSupply())
                 return;
             Picking mirroredPicking = null;
-            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, CurrentPicking);
+            Picking currentPicking = CurrentPicking;
+            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, currentPicking);
             if (mirroredPickings != null && mirroredPickings.Any())
             {
                 foreach (var picking in mirroredPickings)
                 {
                     if (mirroredPicking == null)
+                    {
                         mirroredPicking = picking;
-                    AccessPrimary.NavList.Add(picking);
+                    }
+
+                    if (!AccessPrimary.NavList.Contains(picking))
+                    {
+                        AccessPrimary.NavList.Add(picking);
+                    }
+                    if (!PickingList.Contains(picking))
+                    {
+                        PickingList.Add(picking);
+                    }
                 }
             }
+
             OnPropertyChanged(nameof(PickingList));
-            if (mirroredPicking != null)
+            if (NavigateOnGenRelated && mirroredPicking != null)
             {
                 CurrentPicking = mirroredPicking;
                 SelectedPicking = mirroredPicking;
+            }
+            else
+            {
+                CurrentPicking = currentPicking;
+                CurrentPicking = currentPicking;
             }
         }
 
@@ -3040,6 +3195,38 @@ namespace gip.bso.logistics
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.InternalRelocation
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.Receipt
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.ReceiptVehicle;
+        }
+
+
+        [ACMethodInteraction(nameof(RecalcActualQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking))]
+        public void RecalcActualQuantity()
+        {
+            if (!IsEnabledRecalcActualQuantity())
+            {
+                return;
+            }
+
+            PickingPos[] pickingPositions = SelectedPicking.PickingPos_Picking.ToArray();
+            foreach (PickingPos pos in pickingPositions)
+            {
+                pos.RecalcActualQuantity();
+            }
+        }
+
+        public bool IsEnabledRecalcActualQuantity()
+        {
+            return
+                SelectedPicking != null
+                && SelectedPicking.PickingPos_Picking.Any();
+        }
+
+
+        public virtual string GetPWClassNameOfRoot()
+        {
+            if (this.ACFacilityManager != null)
+                return this.ACFacilityManager.C_PWMethodRelocClass;
+            else
+                return nameof(PWMethodRelocation);
         }
 
         #endregion
@@ -4079,7 +4266,8 @@ namespace gip.bso.logistics
                 {
                     msg = this.PickingManager.ValidateStart(this.DatabaseApp, dbIPlus, CurrentPicking,
                                                                 MandatoryConfigStores,
-                                                                PARole.ValidationBehaviour.Strict);
+                                                                PARole.ValidationBehaviour.Strict,
+                                                                SelectedPWNodeProcessWorkflow, true);
                     if (msg != null)
                     {
                         if (!msg.IsSucceded())
@@ -4087,7 +4275,7 @@ namespace gip.bso.logistics
                             if (String.IsNullOrEmpty(msg.Message))
                             {
                                 // Der Auftrag kann nicht gestartet werden weil:
-                                msg.Message = Root.Environment.TranslateMessage(this, "Question50027");
+                                msg.Message = Root.Environment.TranslateMessage(this, "Error50642");
                             }
                             Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
                             return;
@@ -4097,7 +4285,7 @@ namespace gip.bso.logistics
                             if (String.IsNullOrEmpty(msg.Message))
                             {
                                 //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
-                                msg.Message = Root.Environment.TranslateMessage(this, "Question50028");
+                                msg.Message = Root.Environment.TranslateMessage(this, "Question50107");
                             }
                             var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
                             if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
@@ -4247,7 +4435,7 @@ namespace gip.bso.logistics
         #region Show order dialog
 
         [ACMethodInfo("Dialog", "en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string pickingNo, Guid pickingPosID)
+        public void ShowDialogOrder(string pickingNo, Guid pickingPosID, bool showPreferredParam = false)
         {
             if (AccessPrimary == null)
                 return;
@@ -4273,7 +4461,27 @@ namespace gip.bso.logistics
                         SelectedPickingPos = pickingPos;
                 }
             }
+
+            if (showPreferredParam && ProcessWorkflowPresenter != null)
+            {
+                //ProcessWorkflowPresenter.SelectedWFNode
+                IACComponent firstNode = 
+                    ProcessWorkflowPresenter
+                    .SelectedRootWFNode
+                    .ACComponentChilds
+                    .Where(c => c.ACIdentifier != "Start" && c.ACIdentifier != "End")
+                    .FirstOrDefault();
+                
+                IACComponentPWNode firstPWNode = firstNode as IACComponentPWNode;
+                bool setupParam = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                firstPWNode.ContentACClassWF.ACClassWFID,
+                null,
+                null,
+                CurrentPicking.PickingID);
+            }
+
             ShowDialog(this, "DisplayOrderDialog");
+
             this.ParentACComponent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
@@ -4287,6 +4495,7 @@ namespace gip.bso.logistics
             // Falls Produktionsauftrag
             PickingPos pickingPos = null;
             Picking picking = null;
+            bool showPreferredParams = false;
             foreach (var entry in paOrderInfo.Entities)
             {
                 if (entry.EntityName == Picking.ClassName)
@@ -4313,12 +4522,17 @@ namespace gip.bso.logistics
                     pickingPos = currentOrderLog.PickingPos;
                     picking = pickingPos.Picking;
                 }
+                else if (entry.EntityName == nameof(BSOPreferredParameters))
+                {
+                    showPreferredParams = true;
+                }
             }
+
 
             if (picking == null)
                 return;
 
-            ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty);
+            ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty, showPreferredParams);
             paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
@@ -4458,13 +4672,7 @@ namespace gip.bso.logistics
 
         public bool IsEnabledCreateNewLabOrder()
         {
-            if (SelectedPickingPos != null)
-            {
-                if (SelectedPickingPos.LabOrder_PickingPos.Any())
-                    return false;
-            }
-
-            return true;
+            return SelectedPickingPos != null;
         }
 
         [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606)]
@@ -4547,6 +4755,274 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Facility Reservation
+
+        public virtual ReservationState GetDefaultReservationState()
+        {
+            return DefaultReservationState;
+        }
+
+        #endregion
+
+        #region Methods => Routing
+
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        public void RunPossibleRoutesCheck()
+        {
+            MsgList.Clear();
+            CalculateRouteResult = null;
+            CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
+            bool invoked = InvokeCalculateRoutesAsync();
+            if (!invoked)
+            {
+                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                return;
+            }
+
+            ShowDialog(this, "CalculatedRouteDialog");
+        }
+
+        public bool IsEnabledPossibleRoutesCheck()
+        {
+            return PickingList != null && PickingList.Any();
+        }
+
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
+        {
+            // The callback-method can be called
+            if (e != null)
+            {
+                IACTask taskEntry = wrapObject as IACTask;
+                ACPointAsyncRMIWrap<ACComponent> taskEntryMoreConcrete = wrapObject as ACPointAsyncRMIWrap<ACComponent>;
+                ACMethodEventArgs eM = e as ACMethodEventArgs;
+                if (taskEntry.State == PointProcessingState.Deleted)
+                {
+                    // Compare RequestID to identify your asynchronus invocation
+                    if (taskEntry.RequestID == myTestRequestID)
+                    {
+                        OnCalculateRoutesCallback();
+                    }
+                }
+                if (taskEntryMoreConcrete.Result.ResultState == Global.ACMethodResultState.Succeeded)
+                {
+                    bool wasMyAsynchronousRequest = false;
+                    if (myRequestEntryA != null && myRequestEntryA.CompareTo(taskEntryMoreConcrete) == 0)
+                        wasMyAsynchronousRequest = true;
+                    System.Diagnostics.Trace.WriteLine(wasMyAsynchronousRequest.ToString());
+                }
+            }
+        }
+
+        Guid myTestRequestID;
+        ACPointAsyncRMISubscrWrap<ACComponent> myRequestEntryA;
+        public bool InvokeCalculateRoutesAsync()
+        {
+            ACComponent paWorkflowScheduler = null;
+            if (paWorkflowScheduler == null)
+            {
+                string acUrl = @"\Planning\PickingScheduler";
+                using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                {
+                    core.datamodel.ACClass paClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == nameof(PABatchPlanScheduler) && !c.ACProject.IsProduction);
+                    while (paClass != null)
+                    {
+                        acUrl = paClass.ACURLComponentCached;
+                        paClass = paClass.ACClass_BasedOnACClass.Where(c => c.ACProject.IsProduction).FirstOrDefault();
+                    }
+                }
+
+                paWorkflowScheduler = Root.ACUrlCommand(acUrl) as ACComponent;
+            }
+
+            if (paWorkflowScheduler == null)
+            {
+                Messages.Msg(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
+                return false;
+            }
+
+            // 1. Invoke ACUrlACTypeSignature for getting a default-ACMethod-Instance
+            ACMethod acMethod = paWorkflowScheduler.ACUrlACTypeSignature("!RunRouteCalculation", gip.core.datamodel.Database.GlobalDatabase);
+
+            // 2. Fill out all important parameters
+            acMethod.ParameterValueList.GetACValue("RouteCalculation").Value = true;
+
+
+
+            myRequestEntryA = RMISubscr.InvokeAsyncMethod(paWorkflowScheduler, "RMIPoint", acMethod, RMICallback);
+            if (myRequestEntryA != null)
+                myTestRequestID = myRequestEntryA.RequestID;
+            return myRequestEntryA != null;
+        }
+
+        public void OnCalculateRoutesCallback()
+        {
+            try
+            {
+                var pickings = PickingManager.GetScheduledPickings(DatabaseApp, PickingStateEnum.WaitOnManualClosing, PickingStateEnum.InProcess, null, null, null, null).ToArray();
+
+                List<FacilityReservation> reservations = new List<FacilityReservation>();
+
+                foreach (Picking picking in pickings)
+                {
+                    //if (PickingList.Where(c => c.PickingID == picking.PickingID).Any())
+                    //    continue;
+
+                    foreach (PickingPos pPos in picking.PickingPos_Picking)
+                    {
+                        reservations.AddRange(pPos.FacilityReservation_PickingPos);
+                    }
+                }
+
+                var myReservations = SelectedPicking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+
+                ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                var prodOrderBatchPlans = prodOrderManager.GetProductionLinieBatchPlansWithPWNode(DatabaseApp, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused,
+                                                                                                         null, null, null, null, null, null, null);
+
+                reservations.AddRange(prodOrderBatchPlans.SelectMany(c => c.FacilityReservation_ProdOrderBatchPlan.Where(x => x.FacilityID.HasValue)));
+
+                List<Tuple<FacilityReservation, string>> result = new List<Tuple<FacilityReservation, string>>();
+
+                foreach (FacilityReservation reservation in myReservations)
+                {
+                    if (reservation.CalculatedRoute != null)
+                    {
+                        string[] splitedRoute = reservation.CalculatedRoute.Split(new char[] { ',' });
+
+                        foreach (string guid in splitedRoute)
+                        {
+                            if (string.IsNullOrEmpty(guid))
+                                continue;
+
+                            IEnumerable<Tuple<FacilityReservation, string>> items = reservations.Where(c => c.CalculatedRoute != null && c.CalculatedRoute.Contains(guid)).Select(c => new Tuple<FacilityReservation, string>(c, guid));
+                            if (items.Any())
+                                result.AddRange(items);
+                        }
+                    }
+                }
+
+                if (result.Any())
+                {
+                    var groupedByPickings = result.Where(c => c.Item1.PickingPos != null).GroupBy(x => x.Item1.PickingPos.Picking);
+                    var groupedByBatchPlan = result.Where(c => c.Item1.ProdOrderBatchPlan != null).GroupBy(x => x.Item1.ProdOrderBatchPlan);
+
+                    List<core.datamodel.ACClass> tempList = new List<core.datamodel.ACClass>();
+                    //List<Msg> msgs = new List<Msg>();
+
+                    foreach (var pickingItem in groupedByPickings)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", pickingItem.Key.PickingNo, pickingItem.Key.MDPickingType.ACCaption, pickingItem.Key.InsertDate);
+
+                        var groupByReservation = pickingItem.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    ";
+                            message += reservationItem.Key.PickingPos.Material.MaterialName1;
+                            message += " (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        _MainSyncContext?.Send((object state) =>
+                        {
+                            MsgList.Add(new Msg(eMsgLevel.Info, message));
+                        }, new object());
+                    }
+
+                    foreach (var batchPlan in groupedByBatchPlan)
+                    {
+                        string message = string.Format("{0} ({1}) - {2}", batchPlan.Key.ProdOrderPartslist.ProdOrder.ProgramNo, batchPlan.Key.ProdOrderPartslist.InsertDate, batchPlan.Key.ProdOrderPartslist.Partslist.Material.MaterialName1);
+
+                        var groupByReservation = batchPlan.GroupBy(c => c.Item1);
+
+                        foreach (var reservationItem in groupByReservation)
+                        {
+                            message += System.Environment.NewLine;
+                            message += "    (";
+
+                            foreach (var routeItem in reservationItem)
+                            {
+                                Guid acClassID = Guid.Empty;
+                                if (Guid.TryParse(routeItem.Item2, out acClassID))
+                                {
+                                    core.datamodel.ACClass acComp = tempList.FirstOrDefault(c => c.ACClassID == acClassID);
+                                    if (acComp == null)
+                                    {
+                                        acComp = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACClassID == acClassID).FirstOrDefault();
+                                        if (acComp == null)
+                                            continue;
+
+                                        tempList.Add(acComp);
+                                    }
+
+                                    message += acComp.ACIdentifier + ", ";
+                                }
+                            }
+
+                            message = message.TrimEnd(new char[] { ',', ' ' });
+                            message += ")";
+                        }
+
+                        _MainSyncContext?.Send((object state) =>
+                        {
+                            MsgList.Add(new Msg(eMsgLevel.Info, message));
+                        }, new object());
+                    }
+
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50099");
+                }
+                else
+                    CalculateRouteResult = Root.Environment.TranslateMessage(this, "Info50098");
+
+                CurrentProgressInfo.ProgressInfoIsIndeterminate = false;
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(OnCalculateRoutesCallback), e);
+            }
+        }
+
+        #endregion
+
+        #region Methods -> Other
+
+        public void SetPreparationStatusInList()
+        {
+            if (_PickingList != null)
+            {
+                foreach (Picking picking in _PickingList)
+                {
+                    picking.PreparationStatus = PickingManager.GetPickingPreparationStatus(DatabaseApp, picking);
+                    picking.PreparationStatusName = PickingManager.GetPickingPreparationStatusName(DatabaseApp, picking.PreparationStatus);
+                }
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -4611,7 +5087,12 @@ namespace gip.bso.logistics
                     DialogCancel();
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1]);
+                    bool showPreferredParams = false;
+                    if (acParameter.Length == 3)
+                    {
+                        showPreferredParams = (bool)acParameter[2];
+                    }
+                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], showPreferredParams);
                     return true;
                 case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
@@ -4841,6 +5322,12 @@ namespace gip.bso.logistics
                 case nameof(IsEnabledNavigateToVisitorVoucher):
                     result = IsEnabledNavigateToVisitorVoucher();
                     return true;
+                case nameof(RecalcActualQuantity):
+                    RecalcActualQuantity();
+                    return true;
+                case nameof(IsEnabledRecalcActualQuantity):
+                    result = IsEnabledRecalcActualQuantity();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -4919,13 +5406,7 @@ namespace gip.bso.logistics
                 if (_SelectedProcessWorkflow != value)
                 {
                     _SelectedProcessWorkflow = value;
-                    if (ProcessWorkflowPresenter != null)
-                    {
-                        if (CurrentPicking != null)
-                        {
-                            LoadProcessWorkflowPresenter();
-                        }
-                    }
+                    LoadProcessWorkflowPresenter(CurrentPicking);
                     OnPropertyChanged(nameof(SelectedProcessWorkflow));
                 }
             }
@@ -5020,17 +5501,29 @@ namespace gip.bso.logistics
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
             OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
 
-            LoadProcessWorkflowPresenter();
+            LoadProcessWorkflowPresenter(CurrentPicking);
             CloseTopDialog();
         }
 
-        private void LoadProcessWorkflowPresenter()
+        private void LoadSelectedProcessWorkflow(Picking picking)
+        {
+            if (ProcessWorkflowList != null && ProcessWorkflowList.Any() && picking != null && picking.ACClassMethodID != null)
+            {
+                _SelectedProcessWorkflow = ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == picking.ACClassMethodID);
+            }
+            else
+            {
+                _SelectedProcessWorkflow = null;
+            }
+            OnPropertyChanged(nameof(SelectedProcessWorkflow));
+            CurrentProcessWorkflow = SelectedProcessWorkflow;
+        }
+
+        private void LoadProcessWorkflowPresenter(Picking picking)
         {
             if (ProcessWorkflowPresenter != null)
             {
-                gipCoreData.ACClassMethod method = (CurrentPicking != null && CurrentPicking.ACClassMethod != null) ?
-                                                   CurrentPicking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) :
-                                                   null;
+                gipCoreData.ACClassMethod method = (picking != null && picking.ACClassMethod != null) ? picking.ACClassMethod.FromIPlusContext<gipCoreData.ACClassMethod>(DatabaseApp.ContextIPlus) : null;
                 ProcessWorkflowPresenter.Load(method);
             }
         }
