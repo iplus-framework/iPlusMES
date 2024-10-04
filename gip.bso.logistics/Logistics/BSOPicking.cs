@@ -365,6 +365,9 @@ namespace gip.bso.logistics
 
         #region BSO->ACProperty
 
+        public int SelectedTab { get; set; }
+        public bool IsShowingPreferredParams { get; set; }
+
         #region Picking -> Filter
 
         #region Picking -> Filter -> Default filters
@@ -4465,20 +4468,8 @@ namespace gip.bso.logistics
 
             if (showPreferredParam && ProcessWorkflowPresenter != null)
             {
-                //ProcessWorkflowPresenter.SelectedWFNode
-                IACComponent firstNode = 
-                    ProcessWorkflowPresenter
-                    .SelectedRootWFNode
-                    .ACComponentChilds
-                    .Where(c => c.ACIdentifier != "Start" && c.ACIdentifier != "End")
-                    .FirstOrDefault();
-                
-                IACComponentPWNode firstPWNode = firstNode as IACComponentPWNode;
-                bool setupParam = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
-                firstPWNode.ContentACClassWF.ACClassWFID,
-                null,
-                null,
-                CurrentPicking.PickingID);
+                SelectedTab = 2;
+                IsShowingPreferredParams = true;
             }
 
             ShowDialog(this, "DisplayOrderDialog");
