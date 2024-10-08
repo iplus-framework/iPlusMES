@@ -32,7 +32,7 @@ namespace gip.mes.facility
         #endregion
 
         #region Result
-        public class QrySilosResult
+        public class QrySilosResult : ICloneable
         {
             public QrySilosResult()
             {
@@ -406,6 +406,14 @@ namespace gip.mes.facility
                 }
                 if (allowedFacilities != null && allowedFacilities.Any())
                     _FilteredResult = _FilteredResult.Where(c => allowedFacilities.Contains(c.StorageBin.FacilityID)).ToList();
+            }
+
+            public object Clone()
+            {
+                QrySilosResult result = new QrySilosResult();
+                result._GroupedStoresWithQuants = this.GroupedStoresWithQuants.ToList();
+                result._FilteredResult = this._FilteredResult.ToList();
+                return result;
             }
 
             #endregion
@@ -1594,6 +1602,7 @@ namespace gip.mes.facility
                                                 SearchMode searchMode,
                                                 DateTime? filterTimeOlderThan,
                                                 Guid? ignoreFacilityID,
+                                                out QrySilosResult allSilos,
                                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                                 ACValueList projSpecificParams = null,
                                                 bool onlyContainer = true,
@@ -1608,6 +1617,7 @@ namespace gip.mes.facility
             // 1. Suche freie Silos, mit dem zu dosierenden Material + die Freigegeben sind + die keine gesperrte Chargen haben
             // soriert nach der ältesten eingelagerten Charge
             QrySilosResult facilityQuery = null;
+            allSilos = null;
 
             //using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.ReadUncommitted}))
             //{
@@ -1705,6 +1715,8 @@ namespace gip.mes.facility
 
             facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
 
+            allSilos = facilityQuery.Clone() as QrySilosResult;
+
             if (routableSilos != null && routableSilos.Any())
                 facilityQuery.ApplyRoutableSilos(routableSilos);
 
@@ -1741,14 +1753,14 @@ namespace gip.mes.facility
                     }
                     ApplyLotReservationFilter(facilityQuery, poRelation, reservationMode);
 
-
-
                     if (onlyContainer)
                         facilityQuery.ApplyBlockedQuantsFilter();
                     else
                         facilityQuery.ApplyFreeQuantsInBinFilter();
 
                     facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+
+                    allSilos = facilityQuery.Clone() as QrySilosResult;
 
                     if (routableSilos != null && routableSilos.Any())
                         facilityQuery.ApplyRoutableSilos(routableSilos);
@@ -1810,6 +1822,9 @@ namespace gip.mes.facility
                         facilityQuery.ApplyFreeQuantsInBinFilter();
 
                     facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+
+                    allSilos = facilityQuery.Clone() as QrySilosResult;
+
                     return facilityQuery;
                 }
             }
@@ -1845,7 +1860,11 @@ namespace gip.mes.facility
                         facilityQuery.ApplyBlockedQuantsFilter();
                     else
                         facilityQuery.ApplyFreeQuantsInBinFilter();
+
                     facilityQuery.RemoveFacility(ignoreFacilityID, exclusionList);
+
+                    allSilos = facilityQuery.Clone() as QrySilosResult;
+
                     return facilityQuery;
                 }
             }
@@ -1899,9 +1918,14 @@ namespace gip.mes.facility
             if (routableSilos != null && routableSilos.Routes != null && routableSilos.Routes.Any())
                 routableSilosACClass = routableSilos.Routes.Select(c => c.GetRouteSource().Source);
 
-            possibleSilos = FindSilos(relation, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer, reservationMode, routableSilosACClass);
+            QrySilosResult allSilos;
+
+            possibleSilos = FindSilos(relation, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, out allSilos, exclusionList, projSpecificParams, onlyContainer, reservationMode, routableSilosACClass);
             if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
+            {
+                possibleSilos = allSilos;
                 return null;
+            }
 
             ACRoutingParameters routingParameters = new ACRoutingParameters()
             {
