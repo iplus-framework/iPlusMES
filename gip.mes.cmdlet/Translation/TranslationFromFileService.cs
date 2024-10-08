@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace gip.mes.cmdlet.Translation
 {
     public class TranslationFromFileService
     {
         #region const
-        public string[] begins = new string[] { "Error", "Info", "Warning" };
+        public string[] begins = new string[] { @"\sError(\d\d\d\d\d)", @"\sInfo(\d\d\d\d\d)", @"\sWarning(\d\d\d\d\d)" };
         #endregion
 
         public TranslationFromFileService() { }
@@ -56,11 +57,7 @@ namespace gip.mes.cmdlet.Translation
             foreach (string line in allLines)
             {
                 int lineNr = allLines.IndexOf(line) + 1;
-                if (
-                        line.Contains($"// {begins[0]}")
-                        || line.Contains($"// {begins[1]}")
-                        || line.Contains($"// {begins[2]}")
-                  )
+                if (LineMatch(line))
                 {
                     inLines = 0;
                     tempList = new List<string>();
@@ -87,6 +84,15 @@ namespace gip.mes.cmdlet.Translation
             return translationPairs;
         }
 
+        private bool LineMatch(string line)
+        {
+            bool lineMatch = false;
+            foreach (string begin in begins)
+            {
+                lineMatch = lineMatch || Regex.IsMatch(line, begin);
+            }
+            return lineMatch;
+        }
 
         private Msg UpdateDefinition(Database database, FileTranslationDefinition definition, ACProject project, string updateName)
         {
@@ -242,11 +248,12 @@ namespace gip.mes.cmdlet.Translation
         private string ParseID(string line)
         {
             string id = null;
-            string content = GetLineContent(line);
-            if (content != null)
+            if (LineMatch(line))
             {
-                if (content.StartsWith(begins[0]) || content.StartsWith(begins[1]) || content.StartsWith(begins[2]))
+                string content = GetLineContent(line);
+                if (content != null)
                 {
+
                     id = content;
                 }
             }
