@@ -13,7 +13,15 @@ namespace gip.mes.webservices
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Scan-Controller for PAFWorkTaskScanBase'}de{'Scan-Controller für PAFWorkTaskScanBase'}", Global.ACKinds.TPABGModule, Global.ACStorableTypes.Required, false, false)]
     public class PAFWorkTaskScanBaseSC : PAScannedCompContrBase
     {
-    
+        #region c'tors
+        new public const string ClassName = "PAFWorkTaskScanBaseSC";
+
+        public PAFWorkTaskScanBaseSC(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+            : base(acType, content, parentACObject, parameter, acIdentifier)
+        {
+        }
+        #endregion
+
 
         #region Properties
         protected override Type OnGetControlledType()
@@ -23,7 +31,7 @@ namespace gip.mes.webservices
         #endregion 
 
 
-     #region Methods
+        #region Methods
         public override bool CanHandleBarcodeSequence(ACComponent component, BarcodeSequence sequence)
         {
             return true;
