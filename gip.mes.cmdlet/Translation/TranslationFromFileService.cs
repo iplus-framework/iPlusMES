@@ -253,7 +253,6 @@ namespace gip.mes.cmdlet.Translation
                 string content = GetLineContent(line);
                 if (content != null)
                 {
-
                     id = content;
                 }
             }
