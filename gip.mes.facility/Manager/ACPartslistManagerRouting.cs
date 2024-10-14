@@ -411,8 +411,10 @@ namespace gip.mes.facility
             public object Clone()
             {
                 QrySilosResult result = new QrySilosResult();
-                result._GroupedStoresWithQuants = this.GroupedStoresWithQuants.ToList();
-                result._FilteredResult = this._FilteredResult.ToList();
+                if (this.GroupedStoresWithQuants != null)
+                    result._GroupedStoresWithQuants = this.GroupedStoresWithQuants.ToList();
+                if (this._FilteredResult != null)
+                    result._FilteredResult = this._FilteredResult.ToList();
                 return result;
             }
 
