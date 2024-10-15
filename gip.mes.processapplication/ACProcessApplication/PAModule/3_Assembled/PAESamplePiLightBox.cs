@@ -104,6 +104,7 @@ namespace gip.mes.processapplication
         private const string C_ToleranceBelowString = "TolB";
         private const string C_UpdateDateTime = "UpdateTime";
         private const string C_CurrrentTime = "CurrentTime";
+        private const string C_ResetToleranceCycle = "ResetToleranceCycle";
 
         private ACRef<ACRestClient> _Client;
         public ACRestClient Client
@@ -764,6 +765,17 @@ namespace gip.mes.processapplication
                 }
             }
         }
+
+        [ACMethodInfo("","",9999)]
+        public void ResetWeighingCycle()
+        {
+            WSResponse<string> response = this.Client.Get(C_ResetToleranceCycle);
+            if (!response.Suceeded)
+            {
+                //TODO alarm
+            }
+        }
+
 
         public static bool HandleExecuteACMethod_PAESamplePiLightBox(out object result, IACComponent acComponent, string acMethodName, core.datamodel.ACClassMethod acClassMethod, object[] acParameter)
         {

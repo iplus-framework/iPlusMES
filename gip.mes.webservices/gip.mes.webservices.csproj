@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Controller\PAESamplePiLightBoxSC.cs" />
     <Compile Include="Components\Controller\PAFDischargingSC.cs" />
     <Compile Include="Components\Controller\PAFInOutOperationOnScanSC.cs" />
     <Compile Include="Components\Controller\PAFPickingByMaterialSC.cs" />
