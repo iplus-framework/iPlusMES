@@ -109,6 +109,13 @@ namespace gip.mes.processapplication
         {
             get; set;
         }
+
+        [IgnoreDataMember]
+        public int MinIntermediateSequence
+        {
+            get;
+            set;
+        }
     }
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Register work task'}de{'Erfassung Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWWorkTaskScanBase.PWClassName, true)]
@@ -210,7 +217,6 @@ namespace gip.mes.processapplication
                         ordersForOccupation.RemoveAll(c => c.ACClassWFId == info.ACClassWFId && c.POPPosId == info.POPPosId);
                     }
                 }
-                
 
                 int releaseableOrderCount = ordersForRelease != null ? ordersForRelease.Count() : 0;
                 int occupyableOrderCount = ordersForOccupation != null ? ordersForOccupation.Count() : 0;
@@ -397,7 +403,18 @@ namespace gip.mes.processapplication
                                     pwNode,
                                     false);
             }
-            return infoList;
+
+            List<PAProdOrderPartslistWFInfo> resultList = new List<PAProdOrderPartslistWFInfo>();
+
+            foreach (PAProdOrderPartslistWFInfo info in infoList.OrderBy(c => c.MinIntermediateSequence))
+            {
+                if (resultList.Any(x => x.POPPosId == info.POPPosId))
+                    continue;
+
+                resultList.Add(info);
+            }
+
+            return resultList;
         }
 
         protected List<PAProdOrderPartslistWFInfo> GetActivatedProdOrderPartslistWFInfo()
@@ -427,13 +444,14 @@ namespace gip.mes.processapplication
             Guid intermediatePosID, intermediateChildPosID;
             short connMode = 0;
             IEnumerable<Guid> intermediateChildPosIDs;
+            int minIntermediateSequence = 0;
 
-            pwNode.GetAssignedIntermediate(out intermediatePosID, out intermediateChildPosID, out connMode, out intermediateChildPosIDs);
-            infoList.Add(OnCreateNewWFInfo(infoList, activeWorkflow, pwNode, forRelease, intermediatePosID, intermediateChildPosID, connMode, intermediateChildPosIDs)); 
+            pwNode.GetAssignedIntermediate(out intermediatePosID, out intermediateChildPosID, out connMode, out intermediateChildPosIDs, out minIntermediateSequence);
+            infoList.Add(OnCreateNewWFInfo(infoList, activeWorkflow, pwNode, forRelease, intermediatePosID, intermediateChildPosID, connMode, intermediateChildPosIDs, minIntermediateSequence)); 
         }
 
         protected virtual PAProdOrderPartslistWFInfo OnCreateNewWFInfo(List<PAProdOrderPartslistWFInfo> infoList, PWMethodProduction activeWorkflow, PWWorkTaskScanBase pwNode, bool forRelease, 
-                                                                       Guid intermediatePosID, Guid intermediateChildPosID, short materialWFConnectionMode, IEnumerable<Guid> intermediateChildPosIDs)
+                                                                       Guid intermediatePosID, Guid intermediateChildPosID, short materialWFConnectionMode, IEnumerable<Guid> intermediateChildPosIDs, int minIntermediateSequence)
         {
             return new PAProdOrderPartslistWFInfo()
             {
@@ -447,7 +465,8 @@ namespace gip.mes.processapplication
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
                 WFMethod = pwNode.CurrentACMethod.ValueT,
                 MaterialWFConnectionMode = materialWFConnectionMode,
-                IntermediateChildPOPosIDs = intermediateChildPosIDs
+                IntermediateChildPOPosIDs = intermediateChildPosIDs,
+                MinIntermediateSequence = minIntermediateSequence
             };
         }
 
