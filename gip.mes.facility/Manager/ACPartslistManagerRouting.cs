@@ -1888,6 +1888,7 @@ namespace gip.mes.facility
                                                 SearchMode searchMode,
                                                 DateTime? filterTimeOlderThan,
                                                 out QrySilosResult possibleSilos,
+                                                out QrySilosResult allSilos,
                                                 Guid? ignoreFacilityID,
                                                 IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
                                                 ACValueList projSpecificParams = null,
@@ -1919,8 +1920,6 @@ namespace gip.mes.facility
             IEnumerable<core.datamodel.ACClass> routableSilosACClass = null;
             if (routableSilos != null && routableSilos.Routes != null && routableSilos.Routes.Any())
                 routableSilosACClass = routableSilos.Routes.Select(c => c.GetRouteSource().Source);
-
-            QrySilosResult allSilos;
 
             possibleSilos = FindSilos(relation, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, out allSilos, exclusionList, projSpecificParams, onlyContainer, reservationMode, routableSilosACClass);
             if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())

@@ -646,7 +646,8 @@ namespace gip.mes.facility
                                             foreach (var acClassPM in pwGroup2Check.ProcessModuleList)
                                             {
                                                 facility.ACPartslistManager.QrySilosResult possibleSilos;
-                                                routes = GetRoutes(mat4Dosing, dbApp, dbIPlus, acClassPM, SearchMode.AllSilos, null, out possibleSilos, null, null);
+                                                facility.ACPartslistManager.QrySilosResult allSilos;
+                                                routes = GetRoutes(mat4Dosing, dbApp, dbIPlus, acClassPM, SearchMode.AllSilos, null, out possibleSilos, out allSilos, null, null);
                                                 if (routes != null && routes.Any())
                                                 {
                                                     dosableRelations.Add(mat4Dosing);

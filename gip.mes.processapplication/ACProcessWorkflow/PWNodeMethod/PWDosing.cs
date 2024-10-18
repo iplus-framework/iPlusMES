@@ -1940,12 +1940,14 @@ namespace gip.mes.processapplication
 
             // FacilityNoSort
 
+            QrySilosResult allSilos;
             core.datamodel.ACClass accessAClass = pAProcessModule.ComponentClass;
             IEnumerable<Route> routes = PartslistManager.GetRoutes(relation, dbApp, dbIPlus,
                                         accessAClass,
                                         queryParams.SearchMode,
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
+                                        out allSilos,
                                         queryParams.IgnoreFacilityID,
                                         queryParams.ExclusionList,
                                         null,
@@ -1960,6 +1962,10 @@ namespace gip.mes.processapplication
 
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
+
+            if (allSilos != null && allSilos.FilteredResult != null && allSilos.FilteredResult.Any())
+                ApplyPriorizationRules(allSilos);
+
             return routes;
         }
 
@@ -1992,6 +1998,7 @@ namespace gip.mes.processapplication
                                         selectionRuleID);
             if (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())
                 ApplyPriorizationRules(possibleSilos);
+
             return routes;
         }
 
