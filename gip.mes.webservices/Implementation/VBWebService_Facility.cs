@@ -144,7 +144,7 @@ namespace gip.mes.webservices
 
         public WSResponse<List<FacilityCharge>> GetFacilityCharges()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             using (DatabaseApp dbApp = new DatabaseApp())
@@ -175,7 +175,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityChargeID, out guid))
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityChargeID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -202,7 +202,7 @@ namespace gip.mes.webservices
         {
             if (string.IsNullOrEmpty(barcodeID))
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "barcodeID is empty"));
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -243,7 +243,7 @@ namespace gip.mes.webservices
                 return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "workplaceID is not valid GUID."));
             }
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -296,7 +296,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrWhiteSpace(dateTo) || !DateTime.TryParseExact(dateTo, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
                 dtTo = DateTime.Now;
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -367,7 +367,7 @@ namespace gip.mes.webservices
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "splitNo is invalid"));
             }
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -461,7 +461,7 @@ namespace gip.mes.webservices
 
         public WSResponse<FacilityCharge> CreateFacilityCharge(FacilityChargeParamItem facilityCharge)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -617,7 +617,7 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
             }
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -684,7 +684,7 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
             }
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -768,7 +768,7 @@ namespace gip.mes.webservices
 
         public WSResponse<List<FacilityLot>> GetFacilityLots()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -841,7 +841,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityLotID, out guid))
                 return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Error, "facilityLotID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -870,7 +870,7 @@ namespace gip.mes.webservices
             if (string.IsNullOrEmpty(term) || term == CoreWebServiceConst.EmptyParam)
                 term = null;
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -898,7 +898,7 @@ namespace gip.mes.webservices
             if (string.IsNullOrEmpty(materialNo) || materialNo == CoreWebServiceConst.EmptyParam)
                 return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, "materialNo is empty."));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -926,7 +926,7 @@ namespace gip.mes.webservices
         {
             if (string.IsNullOrEmpty(barcodeID))
                 return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Error, "barcodeID is empty"));
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -966,7 +966,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityLotID, out guid))
                 return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Error, "facilityLotID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1025,7 +1025,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrWhiteSpace(dateTo) || !DateTime.TryParseExact(dateTo, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
                 dtTo = DateTime.Now;
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1100,7 +1100,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(materialID, out guid))
                 return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Error, "materialID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1158,7 +1158,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrWhiteSpace(dateTo) || !DateTime.TryParseExact(dateTo, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
                 dtTo = DateTime.Now;
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1231,7 +1231,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityID, out guid))
                 return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Error, "facilityID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1286,7 +1286,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrWhiteSpace(dateTo) || !DateTime.TryParseExact(dateTo, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
                 dtTo = DateTime.Now;
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1339,7 +1339,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityID, out guid))
                 return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Error, "facilityID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1394,7 +1394,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrWhiteSpace(dateTo) || !DateTime.TryParseExact(dateTo, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
                 dtTo = DateTime.Now;
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1439,7 +1439,7 @@ namespace gip.mes.webservices
         #region Booking
         public WSResponse<MsgWithDetails> BookFacility(ACMethodBooking bpParam)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1790,7 +1790,7 @@ namespace gip.mes.webservices
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1838,7 +1838,7 @@ namespace gip.mes.webservices
         #region Inventory -> MD
         public WSResponse<List<MDFacilityInventoryState>> GetMDFacilityInventoryStates()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<MDFacilityInventoryState>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1878,7 +1878,7 @@ namespace gip.mes.webservices
 
         public WSResponse<List<MDFacilityInventoryPosState>> GetMDFacilityInventoryPosStates()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<MDFacilityInventoryPosState>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -1964,7 +1964,7 @@ namespace gip.mes.webservices
 
         public WSResponse<List<FacilityInventory>> GetFacilityInventories(string inventoryState, string dateFrom, string dateTo)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityInventory>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2006,7 +2006,7 @@ namespace gip.mes.webservices
         #region Inventory -> New
         public WSResponse<string> GetFacilityInventoryNo()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<string>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2031,7 +2031,7 @@ namespace gip.mes.webservices
 
         public WSResponse<bool> NewFacilityInventory(string facilityInventoryNo, string facilityInventoryName)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(NewFacilityInventory));
@@ -2059,7 +2059,7 @@ namespace gip.mes.webservices
         #region Inventory -> Lifecycle
         public WSResponse<bool> StartFacilityInventory(string facilityInventoryNo)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2105,7 +2105,7 @@ namespace gip.mes.webservices
 
         public WSResponse<bool> CloseFacilityInventory(string facilityInventoryNo)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(CloseFacilityInventory));
@@ -2196,7 +2196,7 @@ namespace gip.mes.webservices
         public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo,
             string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityInventoryPos>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2324,7 +2324,7 @@ namespace gip.mes.webservices
 
         public WSResponse<bool> UpdateFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2426,7 +2426,7 @@ namespace gip.mes.webservices
             if (!string.IsNullOrEmpty(emptyErrorMessage))
                 return new WSResponse<SearchFacilityCharge>(null, new Msg(eMsgLevel.Error, emptyErrorMessage));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<SearchFacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2508,7 +2508,7 @@ namespace gip.mes.webservices
             if (!string.IsNullOrEmpty(emptyErrorMessage))
                 return new WSResponse<FacilityInventoryPos>(null, new Msg(eMsgLevel.Error, emptyErrorMessage));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<FacilityInventoryPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -2606,7 +2606,7 @@ namespace gip.mes.webservices
 
         public virtual WSResponse<List<MDMovementReason>> GetMovementReasons()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<MDMovementReason>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMovementReasons));

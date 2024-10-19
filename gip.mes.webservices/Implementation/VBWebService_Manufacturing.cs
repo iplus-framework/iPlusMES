@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.webservices;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
@@ -85,7 +86,7 @@ namespace gip.mes.webservices
 
         public WSResponse<List<ProdOrderPartslist>> GetProdOrderPartslists()
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<ProdOrderPartslist>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslists));
@@ -118,7 +119,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(prodOrderPartslistID, out guid))
                 return new WSResponse<ProdOrderPartslist>(null, new Msg(eMsgLevel.Error, "prodOrderPartslistID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<ProdOrderPartslist>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslist));
@@ -259,7 +260,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(prodOrderPartslistID, out guid))
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "prodOrderPartslistID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPLIntermediates));
@@ -292,7 +293,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(intermediateID, out guid))
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "intermediateID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPLIntermediate));
@@ -414,7 +415,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(targetPOPLPosID, out guid))
                 return new WSResponse<List<ProdOrderPartslistPosRelation>>(null, new Msg(eMsgLevel.Error, "targetPOPLPosID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<ProdOrderPartslistPosRelation>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderInputMaterials));
@@ -554,7 +555,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(parentIntermediateID, out guid))
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "parentIntermediateID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderIntermBatches));
@@ -587,7 +588,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(intermediateID, out guid))
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "intermediateID is invalid"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderIntermBatch));
@@ -643,7 +644,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(POPLPosRelID, out poPLPosRelID))
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "The given parameter POPLPosRelID is incorrect!"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -703,7 +704,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(POPLPosID, out poPLPosID))
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "The given parameter POPLPosRelID is incorrect!"));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -763,7 +764,7 @@ namespace gip.mes.webservices
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "The given parameter machineID is incorrect!"));
 
             ProdOrderPartslistPos result = null;
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderIntermOrIntermBatchByMachine));
@@ -844,7 +845,7 @@ namespace gip.mes.webservices
                 return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "The given parameter intermBatchID is incorrect!"));
 
             List<Facility> result = new List<Facility>();
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPOBatchTargetFacilities));
@@ -897,7 +898,7 @@ namespace gip.mes.webservices
             }
             else
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
                 if (myServiceHost == null)
                     return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
                 PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetNFBatchTargetFacility));
@@ -976,7 +977,7 @@ namespace gip.mes.webservices
 
         public WSResponse<ProdOrderPartslistPos> GetProdOrderPartslistPos(string POPLPosID)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslistPos));
@@ -1083,7 +1084,7 @@ namespace gip.mes.webservices
 
         public WSResponse<ProdOrderPartslistPosRelation> GetProdOrderPartslistPosRel(string POPLPosRelID)
         {
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<ProdOrderPartslistPosRelation>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslistPosRel));
@@ -1189,7 +1190,7 @@ namespace gip.mes.webservices
             if (entity == null)
                 return new WSResponse<Msg>(null, new Msg(eMsgLevel.Error, "entity is null."));
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<Msg>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
