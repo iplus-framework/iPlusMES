@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MaterialSumOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDReleaseState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\SearchFacilityCharge.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeEntityCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeSequence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\PrintEntity.cs" />

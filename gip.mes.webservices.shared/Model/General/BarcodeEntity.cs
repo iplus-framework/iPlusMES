@@ -104,6 +104,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember]
+        public BarcodeEntityCommand Command
+        {
+            get;set;
+        }
+
         public object ValidEntity
         {
             get
@@ -128,6 +134,8 @@ namespace gip.mes.webservices
                     return WFMethod;
                 else if (MsgResult != null)
                     return MsgResult;
+                else if (Command != null)
+                    return Command;
                 return null;
             }
         }
