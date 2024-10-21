@@ -24,7 +24,9 @@ namespace gip.mes.webservices
             get
             {
                 if (_WeighingSequenceString == null)
-                    _WeighingSequenceString = "weighing sequence";
+                {
+                    _WeighingSequenceString = Root.Environment.TranslateText(this, "WeighingSequence");
+                }
 
                 return _WeighingSequenceString;
             }
@@ -38,7 +40,13 @@ namespace gip.mes.webservices
 
             PAESamplePiLightBox lightBox = component as PAESamplePiLightBox;
             if (lightBox == null)
-                sequence.Message = new Msg(eMsgLevel.Error, "The scanned code is not from Sample Pi Light box!");
+            {
+                //Error50656: The scanned code is not sample box!
+                sequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAESamplePiLightBoxSC), nameof(HandleBarcodeSequence), 43, "Error50656");
+                return;
+            }
+
+            sequence.Message = new Msg();
 
             if (lightBox.IsRecording.ValueT > 0)
             {
@@ -49,7 +57,8 @@ namespace gip.mes.webservices
                     {
                         ResetWeighingCycle(component);
                         sequence.Sequence.Remove(commandEntity);
-                        sequence.Message = new Msg(eMsgLevel.Info, "The weighing sequence restart is invoked!");
+                        //Info50102: The restart of the weighing sequence is invoked!
+                        sequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAESamplePiLightBoxSC), nameof(HandleBarcodeSequence), 58, "Info50102");
                     }
                 }
 
@@ -97,14 +106,15 @@ namespace gip.mes.webservices
                 }
 
                 barcodeEntity = new BarcodeEntity();
-                barcodeEntity.Command = new BarcodeEntityCommand() { ACMethodName = nameof(ResetWeighingCycle), ACCaption = "Reset weighing cycle", ACMethodInvoked = false };
+                barcodeEntity.Command = new BarcodeEntityCommand() { ACMethodName = nameof(ResetWeighingCycle), ACCaption = Root.Environment.TranslateText(this, "ResetWeighingCycle"), ACMethodInvoked = false };
                 sequence.AddSequence(barcodeEntity);
 
                 sequence.State = datamodel.BarcodeSequenceBase.ActionState.Completed;
             }
             else
             {
-                sequence.Message = new Msg(eMsgLevel.Info, "The light box has not any active order!");
+                //Info50103: The sample light box is not active!
+                sequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAESamplePiLightBoxSC), nameof(HandleBarcodeSequence), 114, "Info50103");
                 sequence.State = datamodel.BarcodeSequenceBase.ActionState.Completed;
             }
         }
