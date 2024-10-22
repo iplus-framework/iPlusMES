@@ -2587,6 +2587,7 @@ namespace gip.mes.processapplication
             }
 
             facility.ACPartslistManager.QrySilosResult facilities;
+            QrySilosResult allSilos;
 
             core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
             IEnumerable<Route> routes = PartslistManager.GetRoutes(posRel, dbApp, dbApp.ContextIPlus,
@@ -2594,6 +2595,7 @@ namespace gip.mes.processapplication
                                                                     ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                                                     null,
                                                                     out facilities,
+                                                                    out allSilos,
                                                                     null,
                                                                     null,
                                                                     null,
@@ -2608,6 +2610,7 @@ namespace gip.mes.processapplication
                                                                     ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                                                     null,
                                                                     out facilities,
+                                                                    out allSilos,
                                                                     null,
                                                                     null,
                                                                     null,
@@ -2621,6 +2624,7 @@ namespace gip.mes.processapplication
                                                                         ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                                                         null,
                                                                         out facilities,
+                                                                        out allSilos,
                                                                         null,
                                                                         null,
                                                                         null,

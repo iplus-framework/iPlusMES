@@ -2395,7 +2395,8 @@ namespace gip.mes.facility
                             continue;
                         double postingQuantity = relationForRPost.TargetQuantityUOM * factor;
                         facility.ACPartslistManager.QrySilosResult possibleSourceFacilities;
-                        IEnumerable<Route> routes = PartslistManager.GetRoutes(relationForRPost, BP.DatabaseApp, iPlusDB, workplaceClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSourceFacilities, null, null, null, false);
+                        facility.ACPartslistManager.QrySilosResult allSilos;
+                        IEnumerable<Route> routes = PartslistManager.GetRoutes(relationForRPost, BP.DatabaseApp, iPlusDB, workplaceClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSourceFacilities, out allSilos, null, null, null, false);
                         if (routes != null && routes.Any())
                         {
                             Route dosingRoute = null;

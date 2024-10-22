@@ -126,7 +126,12 @@ namespace gip.mes.webservices
 
         public double CompleteFactor
         {
-            get => (ActualQuantity / TargetQuantity) * 100;
+            get
+            {
+                if (Math.Abs(ActualQuantity) <= double.Epsilon || Math.Abs(TargetQuantity) <= double.Epsilon)
+                    return 0.0;
+                return (ActualQuantity / TargetQuantity) * 100;
+            }
         }
 
         public void OnActualQuantityChanged()

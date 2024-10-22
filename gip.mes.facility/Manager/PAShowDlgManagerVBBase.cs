@@ -528,6 +528,24 @@ namespace gip.mes.facility
                                 return;
                             }
                         }
+                        else
+                        {
+                            DeliveryNote dNote = dbApp.DeliveryNote.Where(c => c.DeliveryNoteID == noteEntry.EntityID).FirstOrDefault();
+                            if (dNote != null)
+                            {
+                                string bsoName = BSONameForShowInDeliveryNote;
+                                if (String.IsNullOrEmpty(bsoName))
+                                    bsoName = "BSOInDeliveryNote(Dialog)";
+                                ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                                if (childBSO == null)
+                                    childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                                if (childBSO == null)
+                                    return;
+                                childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                                childBSO.Stop();
+                                return;
+                            }
+                        }
                     }
                 }
                 // Falls Besucherbeleg

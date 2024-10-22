@@ -80,12 +80,13 @@ namespace gip.mes.processapplication
             return pafClass.ObjectType.IsAssignableFrom(pafTSC.ComponentClass.ObjectType);
         }
 
-        public void GetAssignedIntermediate(out Guid intermediatePosID, out Guid intermediateChildPosID, out short materialWFConnectionMode, out IEnumerable<Guid> intermediateChildPosIDs)
+        public void GetAssignedIntermediate(out Guid intermediatePosID, out Guid intermediateChildPosID, out short materialWFConnectionMode, out IEnumerable<Guid> intermediateChildPosIDs, out int minIntermediateSequence)
         {
             intermediatePosID = Guid.Empty;
             intermediateChildPosID = Guid.Empty;
             materialWFConnectionMode = 0;
             intermediateChildPosIDs = null;
+            minIntermediateSequence = 0;
 
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
@@ -109,7 +110,8 @@ namespace gip.mes.processapplication
                         intermediatePosID = intermediatePos.ProdOrderPartslistPosID;
                         intermediateChildPosID = intermediateChildPos.ProdOrderPartslistPosID;
                         
-                        materialWFConnectionMode = OnDetermineMaterialWFConnectionMode(dbApp, matWFConnections, endBatchPos, pwMethodProduction, out intermediateChildPosIDs);
+                        minIntermediateSequence = intermediatePos.Sequence;
+                        materialWFConnectionMode = OnDetermineMaterialWFConnectionMode(dbApp, matWFConnections, endBatchPos, pwMethodProduction, out intermediateChildPosIDs, out minIntermediateSequence);
 
                         if (materialWFConnectionMode == 1 && intermediateChildPosIDs != null)
                         {
@@ -123,10 +125,11 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual short OnDetermineMaterialWFConnectionMode(DatabaseApp dbApp, MaterialWFConnection[] matWFConnections, ProdOrderPartslistPos endBatchPos, PWMethodProduction pwMethodProduction, out IEnumerable<Guid> intermediateChildPosIDs)
+        public virtual short OnDetermineMaterialWFConnectionMode(DatabaseApp dbApp, MaterialWFConnection[] matWFConnections, ProdOrderPartslistPos endBatchPos, PWMethodProduction pwMethodProduction, out IEnumerable<Guid> intermediateChildPosIDs, out int minSequence)
         {
             short mode = 0;
             intermediateChildPosIDs = null;
+            minSequence = 0; 
 
             if (matWFConnections.Count() > 1)
             {
@@ -143,6 +146,9 @@ namespace gip.mes.processapplication
 
                     if (intermediatePosition == null)
                         continue;
+
+                    if (intermediatePosition.Sequence < minSequence || minSequence == 0)
+                        minSequence = intermediatePosition.Sequence;
 
                     var intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
                     .Where(c => c.ProdOrderBatchID.HasValue

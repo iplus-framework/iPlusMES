@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioCompany, ConstApp.Company, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOCompany")]
-    [ACPropertyEntity(1, nameof(CompanyName), ConstApp.CompanyNo, "", "Name of Company", MinLength = 1)]
-    [ACPropertyEntity(2, nameof(CompanyNo), ConstApp.CompanyName, "", "Number of Company", MinLength = 1)]
+    [ACPropertyEntity(1, nameof(CompanyNo), ConstApp.CompanyNo, "", "", MinLength = 1)]
+    [ACPropertyEntity(2, nameof(CompanyName), ConstApp.CompanyName, "", "", MinLength = 1)]
     [ACPropertyEntity(3, "IsCustomer", "en{'Customer'}de{'Kunde'}", "", "", true)]
     [ACPropertyEntity(4, "IsDistributor", "en{'Distributor'}de{'Lieferant'}", "", "", true)]
     [ACPropertyEntity(5, "IsDistributorLead", "en{'Lead Distributor'}de{'Hauptlieferant'}", "", "", true)]

@@ -3678,7 +3678,8 @@ namespace gip.mes.facility
 
         private static void CalculateStatisticProdPlPerAvg(ProdOrderPartslist prodOrderPartslist, IEnumerable<ProdOrderPartslistPos> batches)
         {
-            prodOrderPartslist.InputQForActualOutputPer = batches.Where(c => c.InputQForActualOutputPer.HasValue).Select(c => c.InputQForActualOutputPer).Average();
+            var query = batches.Select(c => c.InputQForActualOutputPer);
+            prodOrderPartslist.InputQForActualOutputPer = batches.Where(c => c.InputQForActualOutputPer.HasValue).Select(c => c.InputQForActualOutputPer).DefaultIfEmpty().Average();
             prodOrderPartslist.InputQForGoodActualOutputPer = batches.Where(c => c.InputQForGoodActualOutputPer.HasValue).Select(c => c.InputQForGoodActualOutputPer).Average();
             prodOrderPartslist.InputQForScrapActualOutputPer = batches.Where(c => c.InputQForScrapActualOutputPer.HasValue).Select(c => c.InputQForScrapActualOutputPer).Average();
 
@@ -3710,24 +3711,41 @@ namespace gip.mes.facility
             ProdOrderPartslist partslist = prodOrderPartslistPos.ProdOrderPartslist;
             double targetQForRatio = lastIntermediatePos != null ? lastIntermediatePos.TargetQuantityUOM : partslist.TargetQuantity;
 
-            prodOrderPartslistPos.InputQForActualOutput =
+            if(targetQForRatio > 0)
+            {
+                prodOrderPartslistPos.InputQForActualOutput =
                 (partslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
 
-            prodOrderPartslistPos.InputQForScrapActualOutput =
-              (partslist.ActualQuantityScrapUOM / targetQForRatio) * prodOrderPartslistPos.TargetQuantity;
+                prodOrderPartslistPos.InputQForScrapActualOutput =
+                  (partslist.ActualQuantityScrapUOM / targetQForRatio) * prodOrderPartslistPos.TargetQuantity;
 
-            prodOrderPartslistPos.InputQForGoodActualOutput = prodOrderPartslistPos.InputQForActualOutput - prodOrderPartslistPos.InputQForScrapActualOutput;
-
-
+                prodOrderPartslistPos.InputQForGoodActualOutput = prodOrderPartslistPos.InputQForActualOutput - prodOrderPartslistPos.InputQForScrapActualOutput;
+            }
+            else
+            {
+                prodOrderPartslistPos.InputQForActualOutput = null;
+                prodOrderPartslistPos.InputQForScrapActualOutput = null;
+                prodOrderPartslistPos.InputQForGoodActualOutput = null;
+            }
+            
             targetQForRatio = lastIntermediatePosOfFinalPL != null ? lastIntermediatePosOfFinalPL.TargetQuantityUOM : finalPartslist.TargetQuantity;
 
-            prodOrderPartslistPos.InputQForFinalActualOutput =
+            if(targetQForRatio > 0)
+            {
+                prodOrderPartslistPos.InputQForFinalActualOutput =
                  (finalPartslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
 
-            prodOrderPartslistPos.InputQForFinalScrapActualOutput =
-                 (finalPartslist.ActualQuantityScrapUOM / targetQForRatio) * prodOrderPartslistPos.TargetQuantity;
+                prodOrderPartslistPos.InputQForFinalScrapActualOutput =
+                     (finalPartslist.ActualQuantityScrapUOM / targetQForRatio) * prodOrderPartslistPos.TargetQuantity;
 
-            prodOrderPartslistPos.InputQForFinalGoodActualOutput = prodOrderPartslistPos.InputQForFinalActualOutput - prodOrderPartslistPos.InputQForFinalScrapActualOutput;
+                prodOrderPartslistPos.InputQForFinalGoodActualOutput = prodOrderPartslistPos.InputQForFinalActualOutput - prodOrderPartslistPos.InputQForFinalScrapActualOutput;
+            }
+            else
+            {
+                prodOrderPartslistPos.InputQForFinalActualOutput = null;
+                prodOrderPartslistPos.InputQForFinalScrapActualOutput = null;
+                prodOrderPartslistPos.InputQForFinalGoodActualOutput = null;
+            }
 
 
             return msg;

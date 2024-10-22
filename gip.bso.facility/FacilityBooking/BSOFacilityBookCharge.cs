@@ -47,7 +47,7 @@ namespace gip.bso.facility
             : base(typeACClass, content, parentACObject, parameter)
         {
             _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, nameof(ExpirationDateDayPeriod), 30);
-            _IsCheckPreferredParamsActive = new ACPropertyConfigValue<bool>(this, nameof(IsCheckPreferredParamsActive), false);
+            _IsCheckPreferredParamsActive = new ACPropertyConfigValue<bool>(this, nameof(IsCheckPreferredParamsActive), true);
         }
 
         /// <summary>
@@ -1530,7 +1530,8 @@ namespace gip.bso.facility
                         }
 
                         Global.MsgResult openPicking = Global.MsgResult.No;
-                        if (IsCheckPreferredParamsActive)
+                        bool checkPrefferedParams = IsCheckPreferredParamsActive && (picking?.ACClassMethod.HasRequiredParams ?? false);
+                        if (checkPrefferedParams)
                         {
                             openPicking = Global.MsgResult.Yes;
                         }
@@ -1557,7 +1558,7 @@ namespace gip.bso.facility
                                     EntityName = Picking.ClassName
                                 });
 
-                                if(IsCheckPreferredParamsActive)
+                                if(checkPrefferedParams)
                                 {
                                     info.Entities.Add(
                                         new PAOrderInfoEntry()
@@ -1576,7 +1577,11 @@ namespace gip.bso.facility
                         }
                         if (startWorkflow)
                         {
-                            StartWorkflow(acClassMethod, picking);
+                            bool startWFSuccess = StartWorkflow(acClassMethod, picking);
+                            if(startWFSuccess)
+                            {
+                                ClearBookingData();
+                            }
                         }
                     }
                 }

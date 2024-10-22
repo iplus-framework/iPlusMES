@@ -116,7 +116,7 @@ namespace gip.mes.webservices
                 }
             }
 
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             if (myServiceHost == null)
                 return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
@@ -131,7 +131,7 @@ namespace gip.mes.webservices
         {
             if (printEntity.Sequence == null || !printEntity.Sequence.Any())
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "No elements in Barcode Entity sequence!"));
-            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
             ACPrintManager printManager = ACPrintManager.GetServiceInstance(myServiceHost);
             if (printManager == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PrintManager instance is null!"));
@@ -213,7 +213,7 @@ namespace gip.mes.webservices
 
             try
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
                 Guid? currentSessionID = WSRestAuthorizationManager.CurrentSessionID;
                 if (currentSessionID.HasValue && myServiceHost != null)
                 {
@@ -312,7 +312,7 @@ namespace gip.mes.webservices
 
             try
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
                 Guid? currentSessionID = WSRestAuthorizationManager.CurrentSessionID;
                 if (currentSessionID.HasValue && myServiceHost != null)
                 {
