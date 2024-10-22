@@ -105,6 +105,16 @@ namespace gip.mes.webservices
                     sequence.AddSequence(barcodeEntity);
                 }
 
+                double setPoint5 = lightBox.SetPoint5.ValueT;
+                if (setPoint5 > double.Epsilon)
+                {
+                    wfMethod = new ACMethod("LightBoxParam");
+                    wfMethod.ParameterValueList.Add(new ACValue(string.Format("5. {0}", WeighingSequenceString), string.Format("T: {0} kg  Tol +: {1} kg  Tol -: {2} kg", setPoint5, lightBox.TolPlus5.ValueT, lightBox.TolMinus5.ValueT)));
+                    barcodeEntity = new BarcodeEntity();
+                    barcodeEntity.WFMethod = wfMethod;
+                    sequence.AddSequence(barcodeEntity);
+                }
+
                 barcodeEntity = new BarcodeEntity();
                 barcodeEntity.Command = new BarcodeEntityCommand() { ACMethodName = nameof(ResetWeighingCycle), ACCaption = Root.Environment.TranslateText(this, "ResetWeighingCycle"), ACMethodInvoked = false };
                 sequence.AddSequence(barcodeEntity);
