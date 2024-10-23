@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package>
+	<metadata>
+		<id>gip.bso.purchasing</id>
+		<version>1.0.0</version>
+		<authors>gipSoft</authors>
+		<owners></owners>
+		<license type="expression">MIT</license>
+		<projectUrl>https://github.com/iplus-framework/test-iplus</projectUrl>
+		<icon>icons\icon.png</icon>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>gip.bso.purchasing</description>
+		<releaseNotes></releaseNotes>
+		<tags>core archiver</tags>
+		<readme>docs\gip.bso.purchasing.readme.md</readme>
+		<dependencies>
+			<group targetFramework=".NETCoreApp7.0">
+				<dependency id=".." version="1.0.0" />
+				<dependency id=".." version="1.0.0" />
+				<dependency id="gip.bso.masterdata" version="1.0.0" />
+				<dependency id="gip.mes.autocomponent" version="1.0.0" />
+				<dependency id="gip.mes.datamodel" version="1.0.0" />
+				<dependency id="gip.mes.facility" version="1.0.0" />
+			</group>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\bin\Release\net7.0\gip.bso.purchasing.dll" target="lib\net7.0" />
+		<file src="..\bin\Release\net7.0\gip.bso.purchasing.pdb" target="lib\net7.0" />
+		<file src="gip.bso.purchasing.readme.md" target="docs\" />
+		<file src="icon.png" target="icons\" />
+	</files>
+</package>

@@ -1,0 +1,1 @@
+## gip.bso.masterdata
