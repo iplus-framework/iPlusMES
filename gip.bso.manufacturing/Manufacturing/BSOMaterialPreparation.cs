@@ -48,6 +48,10 @@ namespace gip.bso.manufacturing
             if (_PickingManager == null)
                 throw new Exception("PickingManager not configured");
 
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
             MediaController = ACMediaController.GetServiceInstance(this);
 
             return true;
@@ -140,6 +144,17 @@ namespace gip.bso.manufacturing
                 if (_PickingManager == null)
                     return null;
                 return _PickingManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        protected ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
             }
         }
 
@@ -600,6 +615,37 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSearchStockMaterial()
         {
             return OnSearchStockMaterial != null;
+        }
+
+        [ACMethodInfo("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 9999, true)]
+        public void GenerateProductionOrder()
+        {
+            Partslist partsList = SelectedPreparedMaterial.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
+            if (partsList == null)
+            {
+                Messages.Error(this, "Error50657");
+                return;
+            }
+
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
+            ProdOrder prodOrder = ProdOrder.NewACObject(DatabaseApp, null, secondaryKey);
+
+            ProdOrderPartslist prodOrderPartslist;
+            Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partsList, 1, SelectedPreparedMaterial.TargetQuantityUOM, out prodOrderPartslist);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+            ACSaveChanges();
+
+            Messages.Info(this, "Info50104");
+
+        }
+
+        public bool IsEnabledGenerateProductionOrder()
+        {
+            return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null && SelectedPreparedMaterial.Material.Partslist_Material.Any();
         }
 
         #endregion
