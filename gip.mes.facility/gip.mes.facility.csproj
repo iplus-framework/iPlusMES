@@ -39,6 +39,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="gip.core.media, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\iPlus\bin\Debug\gip.core.media.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
@@ -58,6 +62,7 @@
     <Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
     <Compile Include="Helperclasses\MsgBooking.cs" />
     <Compile Include="Manager\ACFacilityOEEManager.cs" />
+    <Compile Include="Manager\FacilityManagerMaterialPreparation.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
     <Compile Include="Manager\RemoteFacilityManagerInfo.cs" />
     <Compile Include="Manager\RemoteFMHelper.cs" />
@@ -132,11 +137,17 @@
     <Compile Include="Model\FacilityReservationModelBase.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationAllowedInstances.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationBatchModel.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationResult.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationWFGroup.cs" />
+    <Compile Include="Model\MaterialPreparation\PickingRelationTypeEnum.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationModel.cs" />
     <Compile Include="Model\PartslistValidationInfo.cs" />
     <Compile Include="Model\OEE\FacilityOEEAvg.cs" />
     <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
     <Compile Include="Model\FacilityReservationRoutes.cs" />
-    <Compile Include="Model\PlanningTargetStockPreview.cs" />
+    <Compile Include="Model\MaterialPreparation\PlanningTargetStockPreview.cs" />
     <Compile Include="Model\ProdOrderPartslistOverview.cs" />
     <Compile Include="Model\RemotePickingInfo.cs" />
     <Compile Include="Model\RemoteStoreConfig.cs" />
