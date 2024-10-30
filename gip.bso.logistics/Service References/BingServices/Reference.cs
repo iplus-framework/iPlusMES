@@ -2784,17 +2784,17 @@ namespace gip.bso.logistics.BingServices {
         public GeocodeServiceClient() {
         }
         
-        public GeocodeServiceClient(string endpointConfigurationName) : 
-                base(endpointConfigurationName) {
-        }
+        //public GeocodeServiceClient(string endpointConfigurationName) : 
+        //        base(endpointConfigurationName) {
+        //}
         
-        public GeocodeServiceClient(string endpointConfigurationName, string remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress) {
-        }
+        //public GeocodeServiceClient(string endpointConfigurationName, string remoteAddress) : 
+        //        base(endpointConfigurationName, remoteAddress) {
+        //}
         
-        public GeocodeServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress) {
-        }
+        //public GeocodeServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        //        base(endpointConfigurationName, remoteAddress) {
+        //}
         
         public GeocodeServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
@@ -2999,17 +2999,17 @@ namespace gip.bso.logistics.BingServices {
         public RouteServiceClient() {
         }
         
-        public RouteServiceClient(string endpointConfigurationName) : 
-                base(endpointConfigurationName) {
-        }
+        //public RouteServiceClient(string endpointConfigurationName) : 
+        //        base(endpointConfigurationName) {
+        //}
         
-        public RouteServiceClient(string endpointConfigurationName, string remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress) {
-        }
+        //public RouteServiceClient(string endpointConfigurationName, string remoteAddress) : 
+        //        base(endpointConfigurationName, remoteAddress) {
+        //}
         
-        public RouteServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress) {
-        }
+        //public RouteServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        //        base(endpointConfigurationName, remoteAddress) {
+        //}
         
         public RouteServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
