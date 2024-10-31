@@ -2,10 +2,10 @@
 using gip.core.datamodel;
 using gip.mes.facility;
 using System;
-using CoreWCF;
-using CoreWCF.Web;
 using System.Collections.Generic;
 #if NETFRAMEWORK
+using CoreWCF;
+using CoreWCF.Web;
 //using System.ServiceModel;
 #elif NETSTANDARD
 using System.Threading.Tasks;
@@ -243,7 +243,7 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<MsgWithDetails>> BookFacilitiesAsync(ACMethodBookingList bpParams);
 #endif
-        #endregion
+#endregion
 
         #region Inventory
 
@@ -275,7 +275,7 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<List<MDFacilityInventoryPosState>>> GetMDFacilityInventoryPosStatesAsync();
 #endif
-        #endregion
+#endregion
 
         #region Inventory -> Get
 
@@ -335,7 +335,7 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<FacilityInventoryPos>> SetFacilityInventoryChargeAvailable(string facilityInventoryNo, string facilityChargeID);
 #endif
-        #endregion
+#endregion
 
         #endregion
 
