@@ -5,7 +5,7 @@
 		<version>1.0.0</version>
 		<authors>gipSoft</authors>
 		<owners></owners>
-		<license type="expression">MIT</license>
+		<license type="expression">GPL-3.0-or-later</license>
 		<projectUrl>https://github.com/iplus-framework/test-iplus</projectUrl>
 		<icon>icons\icon.png</icon>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
