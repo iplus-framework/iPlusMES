@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿// gipSoft d.o.o. Copyright (c) for iplus-framework. This code is distributed under GPLv3.
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -9,9 +10,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Dummy assembly for testing accomponents")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("gipSoft d.o.o.")]
-[assembly: AssemblyProduct("gip.bso.test")]
-[assembly: AssemblyCopyright("Copyright ©  2011")]
-[assembly: AssemblyTrademark("IPlus")]
+[assembly: AssemblyProduct("iplus-framework MES")]
+[assembly: AssemblyCopyright("GPLv3 iplus-framework")]
+[assembly: AssemblyTrademark("iplus-framework")]
 [assembly: AssemblyCulture("")]
 
 // Durch Festlegen von ComVisible auf "false" werden die Typen in dieser Assembly unsichtbar 

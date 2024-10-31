@@ -1,16 +1,10 @@
-﻿// gipSoft d.o.o. Copyright (c) for iplus-framework. This code is distributed under GPLv3.
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("gip.mes.webservices")]
-[assembly: AssemblyDescription("Components for integration of external systems with MES")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("gipSoft d.o.o.")]
-[assembly: AssemblyProduct("iplus-framework MES")]
 [assembly: AssemblyCopyright("GPLv3 iplus-framework")]
 [assembly: AssemblyTrademark("iplus-framework")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
-[assembly: Guid("099caf77-67a9-4ed5-b5d9-8709796f3628")]
+[assembly: Guid("7931a65b-3c2a-4db9-a5a6-4bc5b4d12c00")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
 //
@@ -33,5 +27,3 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
 // indem Sie "*" wie unten gezeigt eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
