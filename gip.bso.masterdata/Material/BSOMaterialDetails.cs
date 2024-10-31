@@ -560,9 +560,7 @@ namespace gip.bso.masterdata
         {
             return
                 !BackgroundWorker.IsBusy
-                && CurrentMaterialID != null
-                && FBSearchFrom != null
-                && FBSearchTo != null;
+                && CurrentMaterialID != null;
         }
 
         /// <summary>
