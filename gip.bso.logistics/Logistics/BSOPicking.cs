@@ -4351,7 +4351,7 @@ namespace gip.bso.logistics
                 || this.CurrentPicking.PickingState > PickingStateEnum.InProcess
                 || PickingPosList == null
                 || !PickingPosList.Any()
-                || !PickingPosList.Where(c => c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any()
+                || !PickingPosList.Where(c => c.MDDelivPosLoadState != null && c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any()
                 || PickingManager == null)
                 return false;
 

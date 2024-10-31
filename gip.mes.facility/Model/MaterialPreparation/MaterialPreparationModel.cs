@@ -1,13 +1,14 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'PreparedMaterial'}de{'PreparedMaterial.'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
-    public class PreparedMaterial
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'PreparedMaterial'}de{'PreparedMaterial.'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
+    public class MaterialPreparationModel
     {
         public Material Material { get; set; }
 
@@ -51,5 +52,13 @@ namespace gip.bso.manufacturing
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Guid[] MDSchedulingGroupIDs { get; set; }
+        public Guid[] FacilityIDsOnRoute { get; set; }
+
+
+        public List<FacilityChargeSumFacilityHelper> SourceStorageBinList { get; set; }
+
+        public List<PlanningTargetStockPreview> TargetStorageBinList { get; set; }
+
+
     }
 }

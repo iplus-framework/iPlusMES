@@ -78,6 +78,14 @@ namespace gip.mes.processapplication
             TolMinus4.ForceBroadcast = true;
             (ActualValue4 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
 
+            (SetPoint5 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            SetPoint5.ForceBroadcast = true;
+            (TolPlus5 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus5.ForceBroadcast = true;
+            (TolMinus5 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolMinus5.ForceBroadcast = true;
+            (ActualValue5 as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+
             if (ApplicationManager != null)
                 ApplicationManager.ProjectWorkCycleR5min += ApplicationManager_ProjectWorkCycleR5min;
             return base.ACPostInit();
@@ -142,6 +150,9 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(201, "Values", "en{'Setpoint 4'}de{'Sollwert 4'}", "", false, true)]
         public IACContainerTNet<double> SetPoint4 { get; set; }
 
+        [ACPropertyBindingSource(201, "Values", "en{'Setpoint 5'}de{'Sollwert 5'}", "", false, true)]
+        public IACContainerTNet<double> SetPoint5 { get; set; }
+
         [ACPropertyBindingSource(202, "Values", "en{'Tolerance +'}de{'Toleranz +'}", "", false, true)]
         public IACContainerTNet<double> TolPlus { get; set; }
 
@@ -153,6 +164,9 @@ namespace gip.mes.processapplication
 
         [ACPropertyBindingSource(202, "Values", "en{'Tolerance 4 +'}de{'Toleranz 4 +'}", "", false, true)]
         public IACContainerTNet<double> TolPlus4 { get; set; }
+
+        [ACPropertyBindingSource(202, "Values", "en{'Tolerance 5 +'}de{'Toleranz 5 +'}", "", false, true)]
+        public IACContainerTNet<double> TolPlus5 { get; set; }
 
 
         [ACPropertyBindingSource(203, "Values", "en{'Tolerance -'}de{'Toleranz -'}", "", false, true)]
@@ -166,6 +180,9 @@ namespace gip.mes.processapplication
 
         [ACPropertyBindingSource(203, "Values", "en{'Tolerance 4 -'}de{'Toleranz 4 -'}", "", false, true)]
         public IACContainerTNet<double> TolMinus4 { get; set; }
+
+        [ACPropertyBindingSource(203, "Values", "en{'Tolerance 5 -'}de{'Toleranz 5 -'}", "", false, true)]
+        public IACContainerTNet<double> TolMinus5 { get; set; }
 
         private string _LastResultValues;
         [ACPropertyInfo(true, 204, "", "en{'Last results'}de{'Letztes Ergebnis'}", "", false)]
@@ -210,6 +227,9 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(206, "Values", "en{'Actual Value 4'}de{'Aktueller Wert 4'}", "", false, true)]
         public IACContainerTNet<double> ActualValue4 { get; set; }
 
+        [ACPropertyBindingSource(206, "Values", "en{'Actual Value 5'}de{'Aktueller Wert 5'}", "", false, true)]
+        public IACContainerTNet<double> ActualValue5 { get; set; }
+
         [ACPropertyBindingSource(207, "Values", "en{'Average Value'}de{'Mittelwert'}", "", false, true)]
         public IACContainerTNet<double> AverageValue { get; set; }
 
@@ -222,6 +242,9 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(207, "Values", "en{'Average Value 4'}de{'Mittelwert 4'}", "", false, true)]
         public IACContainerTNet<double> AverageValue4 { get; set; }
 
+        [ACPropertyBindingSource(207, "Values", "en{'Average Value 5'}de{'Mittelwert 5'}", "", false, true)]
+        public IACContainerTNet<double> AverageValue5 { get; set; }
+
         [ACPropertyBindingSource(208, "Values", "en{'Average-State'}de{'Mittelwert-Status'}", "", false, true)]
         public IACContainerTNet<short> AverageState { get; set; }
 
@@ -233,6 +256,9 @@ namespace gip.mes.processapplication
 
         [ACPropertyBindingSource(208, "Values", "en{'Average-State 4'}de{'Mittelwert-Status 4'}", "", false, true)]
         public IACContainerTNet<short> AverageState4 { get; set; }
+
+        [ACPropertyBindingSource(208, "Values", "en{'Average-State 5'}de{'Mittelwert-Status 5'}", "", false, true)]
+        public IACContainerTNet<short> AverageState5 { get; set; }
 
         [ACPropertyBindingSource(208, "Values", "en{'Update time'}de{'Updatezeit'}", "", true, true)]
         public IACContainerTNet<bool> UpdateTime { get; set; }
@@ -303,6 +329,12 @@ namespace gip.mes.processapplication
                 TolPlus4.ValueT = tolPlus;
                 TolMinus4.ValueT = tolMinus;
             }
+            else if (sequence == 5)
+            {
+                SetPoint5.ValueT = setPoint;
+                TolPlus5.ValueT = tolPlus;
+                TolMinus5.ValueT = tolMinus;
+            }
 
             bool started = StartOrder();
             if (started)
@@ -345,7 +377,7 @@ namespace gip.mes.processapplication
             else if (SetPointSequence.ValueT == 2)
             {
                 AverageValue2.ValueT = 0;
-                AverageState.ValueT = 0;
+                AverageState2.ValueT = 0;
             }
             else if (SetPointSequence.ValueT == 3)
             {
@@ -356,6 +388,11 @@ namespace gip.mes.processapplication
             {
                 AverageValue4.ValueT = 0;
                 AverageState4.ValueT = 0;
+            }
+            else if (SetPointSequence.ValueT == 5)
+            {
+                AverageValue5.ValueT = 0;
+                AverageState5.ValueT = 0;
             }
 
             UriBuilder uriBuilder = new UriBuilder(C_ActivateOrderString + "?");
@@ -384,6 +421,12 @@ namespace gip.mes.processapplication
                 parameters[C_WeightSetpointString] = SetPoint4.ValueT.ToString("0.######").Replace(",", ".");
                 parameters[C_ToleranceAboveString] = TolPlus4.ValueT.ToString("0.######").Replace(",", ".");
                 parameters[C_ToleranceBelowString] = TolMinus4.ValueT.ToString("0.######").Replace(",", ".");
+            }
+            else if (SetPointSequence.ValueT == 5)
+            {
+                parameters[C_WeightSetpointString] = SetPoint5.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceAboveString] = TolPlus5.ValueT.ToString("0.######").Replace(",", ".");
+                parameters[C_ToleranceBelowString] = TolMinus5.ValueT.ToString("0.######").Replace(",", ".");
             }
 
             uriBuilder.Query = parameters.ToString();
@@ -468,6 +511,10 @@ namespace gip.mes.processapplication
                     else if (resultBySetPoint.Key == SetPoint4.ValueT)
                     {
                         LogPropertyValues(resStats, resultBySetPoint.ToList(), ActualValue4, SetPoint4, TolPlus4, TolMinus4, AverageValue4, AverageState4);
+                    }
+                    else if (resultBySetPoint.Key == SetPoint5.ValueT)
+                    {
+                        LogPropertyValues(resStats, resultBySetPoint.ToList(), ActualValue5, SetPoint5, TolPlus5, TolMinus5, AverageValue5, AverageState5);
                     }
 
                     result.Add(resStats);
@@ -591,6 +638,10 @@ namespace gip.mes.processapplication
             double tolPlus4 = 0.0;
             double tolMinus4 = 0.0;
 
+            double setPoint5 = 0.0;
+            double tolPlus5 = 0.0;
+            double tolMinus5 = 0.0;
+
             if (useCurrentSetPoints)
             {
                 setPoint = SetPoint.ValueT;
@@ -608,6 +659,10 @@ namespace gip.mes.processapplication
                 setPoint4 = SetPoint4.ValueT;
                 tolPlus4 = TolPlus4.ValueT;
                 tolMinus4 = TolMinus4.ValueT;
+
+                setPoint5 = SetPoint5.ValueT;
+                tolPlus5 = TolPlus5.ValueT;
+                tolMinus5 = TolMinus5.ValueT;
             }
             if (!useCurrentSetPoints || setPoint <= double.Epsilon || tolPlus <= double.Epsilon || tolMinus <= double.Epsilon)
             {
@@ -629,6 +684,11 @@ namespace gip.mes.processapplication
             if (!useCurrentSetPoints || setPoint4 <= double.Epsilon || tolPlus4 <= double.Epsilon || tolMinus4 <= double.Epsilon)
             {
                 GetValuesFromArchive(SetPoint4, TolPlus4, TolMinus4, from, to, ref setPoint4, ref tolPlus4, ref tolMinus4);
+            }
+
+            if (!useCurrentSetPoints || setPoint5 <= double.Epsilon || tolPlus5 <= double.Epsilon || tolMinus5 <= double.Epsilon)
+            {
+                GetValuesFromArchive(SetPoint5, TolPlus5, TolMinus5, from, to, ref setPoint5, ref tolPlus5, ref tolMinus5);
             }
 
             SamplePiStatsCollection resultStats = new SamplePiStatsCollection();
@@ -664,6 +724,15 @@ namespace gip.mes.processapplication
                 if (actValueSeries4 != null && actValueSeries4.PropertyLogList != null && actValueSeries4.PropertyLogList.Any())
                     stats4.Values.AddRange(actValueSeries4.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
                 resultStats.Add(stats4);
+            }
+
+            if (setPoint5 > double.Epsilon)
+            {
+                SamplePiStats stats5 = new SamplePiStats(setPoint5, tolPlus5, tolMinus5);
+                var actValueSeries5 = (ActualValue5 as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
+                if (actValueSeries5 != null && actValueSeries5.PropertyLogList != null && actValueSeries5.PropertyLogList.Any())
+                    stats5.Values.AddRange(actValueSeries5.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
+                resultStats.Add(stats5);
             }
 
             return resultStats;
