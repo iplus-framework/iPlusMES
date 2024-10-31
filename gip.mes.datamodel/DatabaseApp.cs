@@ -3817,8 +3817,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private ACValueItemList _WeighingStateList;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public ACValueItemList WeighingStateList
         {
             get
@@ -3835,8 +3837,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         ACValueItemList _PreferredParamStateList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public ACValueItemList PreferredParamStateList
         {
             get

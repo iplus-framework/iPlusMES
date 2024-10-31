@@ -98,7 +98,7 @@ namespace gip.mes.datamodel
         /// <returns>NULL if sucessful otherwise a Message-List</returns>
         public override IList<Msg> EntityCheckAdded(string user, IACEntityObjectContext context)
         {
-            if (CalendarDate == DateTime.MinValue)
+            if (CalendarDate == DateOnly.MinValue)
             {
                 List<Msg> messages = new List<Msg>();
                 messages.Add(new Msg

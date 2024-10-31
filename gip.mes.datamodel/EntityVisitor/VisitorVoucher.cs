@@ -178,8 +178,10 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Picking status info
         /// </summary>
+        [NotMapped]
         private string _PickingStatusInfo;
         [ACPropertyInfo(999, nameof(PickingStatusInfo), "en{'Picking status'}de{'Verladestatus'}")]
+        [NotMapped]
         public string PickingStatusInfo
         {
             get
@@ -196,8 +198,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _PreparationStatusInfo;
         [ACPropertyInfo(999, nameof(PreparationStatusInfo), ConstApp.PickingPreparationStatus)]
+        [NotMapped]
         public string PreparationStatusInfo
         {
             get

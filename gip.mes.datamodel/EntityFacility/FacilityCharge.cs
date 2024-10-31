@@ -444,6 +444,7 @@ namespace gip.mes.datamodel
 
 
         // avoid handling IsSelected for others when one is treated
+        [NotMapped]
         public bool InIsSelectedProcess { get; set; }
 
         #endregion
@@ -525,11 +526,13 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private double _RelocationQuantity;
         /// <summary>
         /// Quantity at default is AvailableQuantity
         /// used by relocation quant dialog
         /// </summary>
+        [NotMapped]
         [ACPropertyInfo(15, "", "en{'Relocation Quantity'}de{'Umlagerung Menge'}")]
         public double RelocationQuantity
         {
@@ -548,6 +551,7 @@ namespace gip.mes.datamodel
 
         #region Additional Properties -> FacilityCharge Origin
 
+        [NotMapped]
         private bool? _IsInputOutside;
         /// <summary>
         /// Charge is direct input into stock from outside
@@ -830,6 +834,7 @@ namespace gip.mes.datamodel
 
         #region Additional Properties -> ReservationState
 
+        [NotMapped]
         public ReservationState ReservationState
         {
             get
@@ -847,8 +852,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         ACValueItem _SelectedReservationState;
         [ACPropertySelected(9999, nameof(ReservationState), ConstApp.FacilityReservation)]
+        [NotMapped]
         public ACValueItem SelectedReservationState
         {
             get
@@ -869,6 +876,7 @@ namespace gip.mes.datamodel
         /// Gibt eine Liste aller Enums zurück, damit die Gui
         /// damit arbeiten kann.
         /// </summary>
+        [NotMapped]
         [ACPropertyList(9999, nameof(ReservationState))]
         public IEnumerable<ACValueItem> ReservationStateList
         {
@@ -937,7 +945,9 @@ namespace gip.mes.datamodel
         //    }
         //}
 
+        [NotMapped]
         bool _FinalRootPositionFromFBRead = false;
+        [NotMapped]
         ProdOrderPartslistPos _FinalRootPositionFromFB = null;
         public ProdOrderPartslistPos GetFinalRootPositionFromFB()
         {
@@ -951,7 +961,9 @@ namespace gip.mes.datamodel
             return _FinalRootPositionFromFB;
         }
 
+        [NotMapped]
         bool _FinalPositionFromFBRead = false;
+        [NotMapped]
         ProdOrderPartslistPos _FinalPositionFromFB = null;
         public ProdOrderPartslistPos GetFinalPositionFromFB()
         {

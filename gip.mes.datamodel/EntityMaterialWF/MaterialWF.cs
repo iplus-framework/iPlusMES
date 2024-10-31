@@ -196,6 +196,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(9999)]
         public override string ACCaption
         {

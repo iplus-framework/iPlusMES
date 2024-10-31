@@ -45,8 +45,8 @@ namespace gip.mes.datamodel
                 entity.IsShiftModel = true;
             }
 
-            entity.TimeFrom = TimeSpan.FromHours(8);
-            entity.TimeTo = TimeSpan.FromHours(16);
+            entity.TimeFrom = TimeOnly.MinValue;
+            entity.TimeTo = TimeOnly.MaxValue;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }

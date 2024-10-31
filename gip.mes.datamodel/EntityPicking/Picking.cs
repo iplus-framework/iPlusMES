@@ -393,8 +393,10 @@ namespace gip.mes.datamodel
 
         #region Param State
 
+        [NotMapped]
         private PreferredParamStateEnum _ParamState;
         [ACPropertyInfo(999, nameof(ParamState), ConstApp.PrefParam)]
+        [NotMapped]
         public PreferredParamStateEnum ParamState
         {
             get
@@ -411,6 +413,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(999, nameof(ParamStateName), "en{'Param state name'}de{'Parameterstatusname'}")]
         public string ParamStateName
         {
