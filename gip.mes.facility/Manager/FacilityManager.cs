@@ -117,7 +117,6 @@ namespace gip.mes.facility
         static FacilityManager()
         {
             #region FacilityCharge
-
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementFacilityChargeMethod(GlobalApp.FBT_InwardMovement_FacilityCharge, GlobalApp.FacilityBookingType.InwardMovement_FacilityCharge));
 
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementFacilityChargeMethod(GlobalApp.FBT_InwardMovement_FacilityCharge, GlobalApp.FacilityBookingType.InwardMovement_FacilityCharge));
