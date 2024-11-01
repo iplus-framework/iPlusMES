@@ -36,7 +36,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageTags>iplus-framework;iplus-MES</PackageTags>
     <PackageProjectUrl>https://github.com/iplus-framework</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/iplus-framework/iPlus.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/iplus-framework/iPlusMES.git</RepositoryUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
