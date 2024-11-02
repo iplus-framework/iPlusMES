@@ -30,7 +30,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES Manufacturing</Title>
     <Description>Businessobjects for manufacturing</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

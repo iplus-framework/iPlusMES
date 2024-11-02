@@ -26,7 +26,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework BSO Test</Title>
     <Description>Businessobjexts just for testing purposes</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

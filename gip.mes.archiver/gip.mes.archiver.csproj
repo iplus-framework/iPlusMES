@@ -22,7 +22,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES archiver</Title>
     <Description>Extends archiving of Programs which are related to MES-Dat</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

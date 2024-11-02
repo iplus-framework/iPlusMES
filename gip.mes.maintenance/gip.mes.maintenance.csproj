@@ -22,7 +22,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES maintenance</Title>
     <Description>Components and business objects for maintenance</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

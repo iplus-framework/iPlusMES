@@ -6,6 +6,14 @@
 	  <UseWPF>true</UseWPF>
 	  <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
+    <NoWarn>CA1416</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <None Update="readme.md">
       <Pack>True</Pack>
@@ -21,7 +29,7 @@
     </None>
   </ItemGroup>
   <PropertyGroup>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES wpfservices</Title>
     <Description>Mediator for seperation of WPF and MES manager components</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

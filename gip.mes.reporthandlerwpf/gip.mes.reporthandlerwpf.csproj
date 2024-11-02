@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
@@ -16,7 +16,7 @@
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Title>iplus-framework BSO Wpf</Title>
+    <Title>iplus-framework reporthandler Wpf</Title>
     <Description>WPF report handler for MES</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -25,21 +25,18 @@
     <RepositoryUrl>https://github.com/iplus-framework/iPlusMES.git</RepositoryUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandlerwpf\gip.core.reporthandlerwpf.csproj" />
-    <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
+    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
   </ItemGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-		<DocumentationFile>
-		</DocumentationFile>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-		<DocumentationFile>$(SolutionDir)bin\Release\gip.bso.saleswpf.XML</DocumentationFile>
-		<NoWarn>1591</NoWarn>
-	</PropertyGroup>
 
 </Project>

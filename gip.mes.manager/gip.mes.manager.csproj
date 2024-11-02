@@ -27,7 +27,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES manager</Title>
     <Description>Components for MES designer</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

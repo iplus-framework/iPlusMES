@@ -1,14 +1,13 @@
-using gip.core.autocomponent;
+﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.reporthandler;
+using gip.core.reporthandlerwpf;
 using gip.mes.datamodel;
-using System;
+using gip.mes.facility;
 using System.ComponentModel;
-using System.Linq;
 
-namespace gip.bso.masterdata
+namespace gip.mes.reporthandlerwpf
 {
-    /*
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Printer settings MES'}de{'Drucker-Einstellungen MES'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOPrinterSettingsMES : BSOPrinterSettings
     {
@@ -181,11 +180,11 @@ namespace gip.bso.masterdata
             if (ConfiguredPrinterList == null)
                 return false;
             return
-                   (!String.IsNullOrEmpty(LocationName) || SelectedFacility != null || SelectedVBUser != null)
+                    (!String.IsNullOrEmpty(LocationName) || SelectedFacility != null || SelectedVBUser != null)
                 && (SelectedWindowsPrinter != null || SelectedPrintServer != null)
                 && !ConfiguredPrinterList.Any(c =>
                     (
-                           (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
+                            (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
                         || (SelectedPrintServer != null && c.PrinterACUrl == SelectedPrintServer.PrinterACUrl)
                     )
                     && ((!String.IsNullOrEmpty(LocationName) && c.MachineACUrl == LocationName)
@@ -210,5 +209,4 @@ namespace gip.bso.masterdata
         #endregion
 
     }
-    */
 }

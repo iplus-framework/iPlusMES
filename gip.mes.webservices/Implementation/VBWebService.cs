@@ -277,7 +277,12 @@ namespace gip.mes.webservices
 
             try
             {
-                List<PrinterInfo> windowsPrinters = ACPrintManager.GetWindowsPrinters();
+                ACRoot root = gip.core.datamodel.Database.Root as ACRoot;
+
+                List<PrinterInfo> windowsPrinters = new List<PrinterInfo>();
+                var printers = root?.WPFServices?.VBMediaControllerService?.GetWindowsPrinters();
+                if (printers != null)
+                    windowsPrinters = ACPrintManager.GetPrinters(printers);
                 if (windowsPrinters != null)
                 {
                     PrinterInfo pInfo = windowsPrinters.FirstOrDefault(c => c.PrinterName == printerID);

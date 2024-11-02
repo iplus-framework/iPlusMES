@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>Console to run MES</Title>
     <Description>Console to tun MES</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

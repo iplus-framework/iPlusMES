@@ -24,7 +24,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES webservices</Title>
     <Description>Components for integration of external systems with MES</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

@@ -47,7 +47,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES WPF App</Title>
     <Description>WPF Program to start MES</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

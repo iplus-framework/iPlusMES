@@ -23,6 +23,9 @@
     <AssemblyOriginatorKeyFile>..\..\GIP-SNKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DbScripts\iPlusMES\dbsync_2024-11-02_14-00_dlisak.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\GIP-SNKey.snk">
       <Link>GIP-SNKey.snk</Link>
     </None>
@@ -39,7 +42,7 @@
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>iplus-framework MES datamodel</Title>
     <Description>MES datamodel</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
@@ -239,6 +242,9 @@
     <None Include="DbScripts\iPlusMES\dbsync_2024-09-13_11-07_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="DbScripts\iPlusMES\dbsync_2024-11-02_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DbScripts\iPlusMES\dbsync_2024-09-23_14-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

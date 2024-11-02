@@ -3486,7 +3486,7 @@ namespace gip.bso.manufacturing
             catch (Exception ex)
             {
                 IsWizard = false;
-                throw ex;
+                throw new Exception(ex.Message, ex);
             }
             OnPropertyChanged(nameof(CurrentLayout));
         }
