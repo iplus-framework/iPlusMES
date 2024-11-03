@@ -348,6 +348,87 @@ namespace gip.mes.datamodel
 
         #region public
         /// <summary>
+        /// UNSAFE. Use QueryLock_1X000 outside
+        /// </summary>
+        /// <returns></returns>
+        public void DetachAllEntitiesAndDispose(bool detach = false, bool dispose = true)
+        {
+            if (_ObjectContextHelper != null && detach)
+                _ObjectContextHelper.DetachAllEntities();
+            if (dispose)
+                Dispose();
+        }
+
+        public void Detach(object entity)
+        {
+            _ObjectContextHelper.Detach(entity);
+        }
+
+        public override EntityEntry Attach(object entity)
+        {
+            VBEntityObject vbobj = entity as VBEntityObject;
+            vbobj.Context = this;
+            return base.Attach(entity);
+        }
+
+        public override EntityEntry<TEntity> Attach<TEntity>(TEntity entity)
+        {
+            VBEntityObject vbobj = entity as VBEntityObject;
+            vbobj.Context = this;
+            return base.Attach(entity);
+        }
+
+        public override void AttachRange(IEnumerable<object> entities)
+        {
+            foreach (var entity in entities)
+            {
+                VBEntityObject vbobj = entity as VBEntityObject;
+                vbobj.Context = this;
+            }
+            base.AttachRange(entities);
+        }
+
+        public override void AttachRange(params object[] entities)
+        {
+            foreach (var entity in entities)
+            {
+                VBEntityObject vbobj = entity as VBEntityObject;
+                vbobj.Context = this;
+            }
+            base.AttachRange(entities);
+        }
+
+        public void AcceptAllChanges()
+        {
+            ((IACEntityObjectContext)ContextIPlus).ChangeTracker.AcceptAllChanges();
+        }
+
+        public DbSet<TEntity> CreateObjectSet<TEntity>() where TEntity : class
+        {
+            return ((IACEntityObjectContext)ContextIPlus).CreateObjectSet<TEntity>();
+        }
+
+        public DbSet<TEntity> CreateObjectSet<TEntity>(string entitySetName) where TEntity : class
+        {
+            return ((IACEntityObjectContext)ContextIPlus).CreateObjectSet<TEntity>(entitySetName);
+        }
+
+        public object GetObjectByKey(EntityKey key)
+        {
+            return _ObjectContextHelper.GetObjectByKey(key);
+        }
+
+        public bool TryGetObjectByKey(EntityKey key, out object entity)
+        {
+            return _ObjectContextHelper.TryGetObjectByKey(key, out entity);
+        }
+
+        public void Refresh(RefreshMode refreshMode, object entity)
+        {
+            _ObjectContextHelper.Refresh(refreshMode, entity);
+        }
+
+        /// <summary>
         /// Saves all changes in this DatabaseApp-Context as well as in the iPlus-Context
         /// If ContextIPlus is not seperate  (Property IsSeperateIPlusContext == false / ContextIPlus == Database.GlobalDatabase) then SaveChanges will not be invoked for the global database.
         /// If you wan't that, then you have to pass an new iPlus-Context-Instance to the constructor of the DatabaseApp-Context!
@@ -3917,46 +3998,5 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        /// <summary>
-        /// UNSAFE. Use QueryLock_1X000 outside
-        /// </summary>
-        /// <returns></returns>
-        public void DetachAllEntitiesAndDispose(bool detach = false, bool dispose = true)
-        {
-            if (_ObjectContextHelper != null && detach)
-                _ObjectContextHelper.DetachAllEntities();
-            if (dispose)
-                Dispose();
-        }
-
-        public void Detach(object entity)
-        {
-            _ObjectContextHelper.Detach(entity);
-        }
-
-        public void AcceptAllChanges()
-        {
-            ((IACEntityObjectContext)ContextIPlus).ChangeTracker.AcceptAllChanges();
-        }
-
-        public DbSet<TEntity> CreateObjectSet<TEntity>() where TEntity : class
-        {
-            return ((IACEntityObjectContext)ContextIPlus).CreateObjectSet<TEntity>();
-        }
-
-        public DbSet<TEntity> CreateObjectSet<TEntity>(string entitySetName) where TEntity : class
-        {
-            return ((IACEntityObjectContext)ContextIPlus).CreateObjectSet<TEntity>(entitySetName);
-        }
-
-        public object GetObjectByKey(EntityKey key)
-        {
-            return _ObjectContextHelper.GetObjectByKey(key);
-        }
-
-        public bool TryGetObjectByKey(EntityKey key, out object entity)
-        {
-            return _ObjectContextHelper.TryGetObjectByKey(key, out entity);
-        }
     }
 }
