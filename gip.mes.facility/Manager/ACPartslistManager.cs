@@ -971,6 +971,7 @@ namespace gip.mes.facility
                             targetMwf = MaterialWFConnection.NewACObject(databaseApp, targetConnection.MaterialWFACClassMethod);
                             targetMwf.ACClassWF = targetConnection.WF;
                             targetMwf.Material = mwf.Material;
+                            databaseApp.MaterialWFConnection.Add(targetMwf);
                             targetConnection.MaterialWFACClassMethod.MaterialWFConnection_MaterialWFACClassMethod.Add(targetMwf);
                             targetConnection.WFConnection.Add(targetMwf);
                         }

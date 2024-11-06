@@ -153,10 +153,15 @@ namespace gip.mes.datamodel
 
         public IACWorkflowEdge CreateNewEdge(IACEntityObjectContext database)
         {
+            DatabaseApp dpApp = database as DatabaseApp;
             if (FromNode != null && ToNode != null)
                 return this.MaterialWFRelation_MaterialWF.FirstOrDefault(c => c.SourceMaterial == FromNode && c.TargetMaterial == ToNode);
-            else if (database is DatabaseApp)
-                return MaterialWFRelation.NewACObject(database as DatabaseApp, this); 
+            else if (dpApp != null)
+            {
+                MaterialWFRelation newRelation = MaterialWFRelation.NewACObject(dpApp, this);
+                dpApp.MaterialWFRelation.Add(newRelation);
+                return newRelation;
+            }
             return null;
         }
 
