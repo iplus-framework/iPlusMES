@@ -515,7 +515,7 @@ namespace gip.mes.processapplication
                 logicalRelation.SourceACClass = sourceRouteItem.Source;
                 logicalRelation.SourceACClassProperty = sourceRouteItem.SourceProperty;
                 logicalRelation.TargetACClass = targetRouteItem.Target;
-                logicalRelation.TargetACClassPropertyID = targetRouteItem.TargetProperty.ACClassPropertyID;
+                logicalRelation.TargetACClassProperty = targetRouteItem.TargetProperty;
                 logicalRelation.ConnectionType = Global.ConnectionTypes.DynamicConnection;
             }
             else
