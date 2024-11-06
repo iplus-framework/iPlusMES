@@ -496,7 +496,12 @@ namespace gip.mes.facility
             }
 
             // Delete reference to ProdorderPartslistPos witch this ProdOrderPartslist produced
-            List<ProdOrderPartslistPos> prodOrderPosProducedWithThisProdPartList = dbApp.ProdOrderPartslistPos.Where(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID).ToList();
+            List<ProdOrderPartslistPos> prodOrderPosProducedWithThisProdPartList = 
+                dbApp
+                .ProdOrderPartslistPos
+                .Where(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
+                .ToList();
+
             prodOrderPosProducedWithThisProdPartList.Where(c => c.EntityState != EntityState.Deleted).ToList().ForEach(x => x.SourceProdOrderPartslistID = null);
 
             List<ProdOrderPartslistPos> items =
@@ -504,6 +509,9 @@ namespace gip.mes.facility
                 .ProdOrderPartslistPos
                 .Where(x => x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
                 .ToList();
+
+            List<FacilityReservation> reservations = items.SelectMany(c=>c.FacilityReservation_ProdOrderPartslistPos).ToList();
+
             List<Guid> itemIDs = items.Select(x => x.ProdOrderPartslistPosID).ToList();
 
             List<ProdOrderPartslistPosRelation> relations =
@@ -533,6 +541,7 @@ namespace gip.mes.facility
             preBookings.ForEach(x => x.DeleteACObject(dbApp, false));
 
             relations.ForEach(x => x.DeleteACObject(dbApp, false));
+            reservations.ForEach(x => x.DeleteACObject(dbApp, false));
             items.ForEach(x => x.DeleteACObject(dbApp, false));
 
             batches.ForEach(x => x.DeleteACObject(dbApp, false));
