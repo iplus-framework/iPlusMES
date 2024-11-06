@@ -826,7 +826,7 @@ namespace gip.bso.masterdata
                 case "CurrentMaterial\\BaseMDUnitID":
                 case "CurrentMaterial\\BaseMDUnit":
                     {
-                        if (CurrentMaterial.FacilityCharge_Material != null && CurrentMaterial != null && CurrentMaterial.FacilityCharge_Material.Count > 0)
+                        if (CurrentMaterial != null && CurrentMaterial.FacilityCharge_Material != null && CurrentMaterial.FacilityCharge_Material.Count > 0)
                             return Global.ControlModes.Disabled;
                         return result;
                     }
