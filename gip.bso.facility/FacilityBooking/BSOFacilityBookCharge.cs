@@ -702,7 +702,7 @@ namespace gip.bso.facility
 
         public virtual void CurrentFacilityCharge_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(FacilityCharge.MaterialID))
+            if (e.PropertyName == nameof(FacilityCharge.Material))
             {
                 OnPropertyChanged(nameof(StorageUnitTestList));
                 OnPropertyChanged(nameof(ContractualPartnerList));
