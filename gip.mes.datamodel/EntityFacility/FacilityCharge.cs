@@ -843,6 +843,26 @@ namespace gip.mes.datamodel
 
         #region Methods
 
+        protected override void OnPropertyChanged(string property)
+        {
+            if (property == nameof(StockQuantity))
+                OnPropertyChanged(nameof(AvailableQuantity));
+
+            if (property == nameof(ReservedOutwardQuantity))
+            {
+                OnPropertyChanged(nameof(ReservedQuantity));
+                OnPropertyChanged(nameof(AvailableQuantity));
+            }
+
+            if (property == nameof(ReservedInwardQuantity))
+            {
+                OnPropertyChanged(nameof(ReservedQuantity));
+                OnPropertyChanged(nameof(AvailableQuantity));
+            }
+
+            base.OnPropertyChanged(property);
+        }
+
         //public void RecalcReservedInwardQuantity()
         //{
         //    if (this.Material == null)
