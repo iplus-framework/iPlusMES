@@ -48,6 +48,7 @@ namespace gip.mes.datamodel
             return entity;
         }
 
+        [NotMapped]
         [ACPropertyInfo(9999, "", "en{'Planned duration'}de{'Geplante Dauer'}")]
         public TimeSpan PlannedDurationTS
         {
@@ -64,6 +65,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
         public TimeSpan MaintOrderTaskDuration
         {
@@ -77,6 +79,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(9999, "", "en{'Task name'}de{'Task name'}")]
         public string MaintTaskName
         {
@@ -114,6 +117,7 @@ namespace gip.mes.datamodel
             newTask.PlannedDuration = PlannedDuration;
         }
 
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get
