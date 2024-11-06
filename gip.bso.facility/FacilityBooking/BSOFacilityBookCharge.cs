@@ -1051,8 +1051,7 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            if (OnSave())
-                Search();
+            OnSave();
         }
 
         protected override Msg OnPreSave()

@@ -6,6 +6,7 @@ using System.Linq;
 using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.datamodel
 {
@@ -471,6 +472,26 @@ namespace gip.mes.datamodel
                 }
             }
             base.OnPropertyChanging(newValue, propertyName, afterChange);
+        }
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (propertyName == nameof(StockQuantity))
+                OnPropertyChanged(nameof(AvailableQuantity));
+
+            if (propertyName == nameof(ReservedOutwardQuantity))
+            {
+                OnPropertyChanged(nameof(ReservedQuantity));
+                OnPropertyChanged(nameof(AvailableQuantity));
+            }
+
+            if (propertyName == nameof(ReservedInwardQuantity))
+            {
+                OnPropertyChanged(nameof(ReservedQuantity));
+                OnPropertyChanged(nameof(AvailableQuantity));
+            }
+
+            base.OnPropertyChanged(propertyName);
         }
 
         #endregion
