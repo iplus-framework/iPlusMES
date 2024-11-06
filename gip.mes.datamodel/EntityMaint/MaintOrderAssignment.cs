@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,6 +44,7 @@ namespace gip.mes.datamodel
             return entity;
         }
 
+        [NotMapped]
         [ACPropertyInfo(999)]
         public core.datamodel.VBGroup VBGroupTask
         {
@@ -52,6 +54,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(999)]
         public string AssignmentName
         {
@@ -68,6 +71,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(999)]
         public string AssignmentType
         {

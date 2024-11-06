@@ -642,7 +642,9 @@ namespace gip.mes.maintenance
             }
 
             //CurrentMaintOrder.TempACClass = tempACClass.FromIPlusContext<core.datamodel.ACClass>(Database.ContextIPlus);
-            CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
+            MaintACClass maintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
+            DatabaseApp.MaintACClass.Add(maintACClass);
+            CurrentMaintOrder.MaintACClass = maintACClass;
             SearchProperties();
 
             CurrentWizzardStep = MaintenanceWizzardStepsEnum.TimeEvent;
@@ -714,7 +716,9 @@ namespace gip.mes.maintenance
                     {
                         mes.datamodel.ACClass tempACClass = compSel.CurrentProjectItemCS.ValueT.FromAppContext<mes.datamodel.ACClass>(DatabaseApp);
                         //CurrentMaintOrder.TempACClass = compSel.CurrentProjectItemCS.ValueT;
-                        CurrentMaintOrder.MaintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
+                        MaintACClass maintACClass = MaintACClass.NewACObject(DatabaseApp, tempACClass);
+                        DatabaseApp.MaintACClass.Add(maintACClass);
+                        CurrentMaintOrder.MaintACClass = maintACClass;
                     }    
                 }
 
@@ -879,6 +883,7 @@ namespace gip.mes.maintenance
             if (maintACClassProperty == null)
             {
                 maintACClassProperty = MaintACClassProperty.NewACObject(DatabaseApp, maintACClass);
+                DatabaseApp.MaintACClassProperty.Add(maintACClassProperty);
                 maintACClassProperty.VBiACClassProperty = DatabaseApp.ACClassProperty.FirstOrDefault(c => c.ACClassPropertyID == SelectedACClassProperty.ACClassPropertyID);
                 maintACClass.MaintACClassProperty_MaintACClass.Add(maintACClassProperty);
             }
@@ -927,6 +932,7 @@ namespace gip.mes.maintenance
         public void AddNewTask()
         {
             SelectedMaintOrderTask = MaintOrderTask.NewACObject(DatabaseApp, CurrentMaintOrder);
+            this.DatabaseApp.MaintOrderTask.Add(SelectedMaintOrderTask);
 
             List<MaintOrderTask> tempList = CurrentMaintOrder.MaintOrderTask_MaintOrder.ToList();
 
@@ -948,7 +954,7 @@ namespace gip.mes.maintenance
         public void AddNewMaintAssignment()
         {
             SelectedMaintOrderAssignment = MaintOrderAssignment.NewACObject(DatabaseApp, CurrentMaintOrder);
-
+            DatabaseApp.MaintOrderAssignment.Add(SelectedMaintOrderAssignment);
             List<MaintOrderAssignment> tempList = CurrentMaintOrder.MaintOrderAssignment_MaintOrder.ToList();
 
             MaintOrderAssignmentList = tempList;

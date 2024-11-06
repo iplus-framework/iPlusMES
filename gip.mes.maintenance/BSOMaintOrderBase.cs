@@ -133,9 +133,9 @@ namespace gip.mes.maintenance
 
                 if (value != null)
                 {
-                    MaintOrderTaskList = value.MaintOrderTask_MaintOrder.ToList();
+                    MaintOrderTaskList = value.MaintOrderTask_MaintOrder?.ToList();
                     SelectedMaintOrderTask = MaintOrderTaskList?.FirstOrDefault();
-                    MaintOrderAssignmentList = value.MaintOrderAssignment_MaintOrder.ToList();
+                    MaintOrderAssignmentList = value.MaintOrderAssignment_MaintOrder?.ToList();
                 }
                 else
                 {

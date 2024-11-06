@@ -42,6 +42,7 @@ namespace gip.mes.datamodel
         public const string NoColumnName = "MaintOrderNo";
         [NotMapped]
         public const string FormatNewNo = "MO{0}";
+        [NotMapped]
         public const string FormatNewNoTemplate = "MOT{0}";
 
         #region New/Delete
@@ -163,6 +164,7 @@ namespace gip.mes.datamodel
         //    set;
         //}
 
+        [NotMapped]
         [ACPropertyInfo(999, "", "en{'Next Maintenance on'}de{'N�chste Wartung am'}")]
         public DateTime? NextMaintTerm
         {
@@ -179,6 +181,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(9999)]
         public string ComponentACCaption
         {
@@ -197,6 +200,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(999, "", "en{'Duration'}de{'Dauer'}")]
         public TimeSpan MaintOrderDuration
         {
