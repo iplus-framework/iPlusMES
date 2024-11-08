@@ -341,3 +341,5 @@ healthchecksdb
 /trunk/Mobile/Archives
 /TwinCAT/V1/projects/TCatExample/TCatExample/PLC1/_CompileInfo/*.compileinfo
 /TwinCAT/V1/projects/TCatExample/*.~u
+
+.vscode/
