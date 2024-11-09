@@ -34,22 +34,23 @@ iPlus-MES is a highly configurable, extendable and adaptable Manufacturing Execu
 To get started with the iPlus-MES, follow these steps:
 
 1. **Clone the Repository:**
-You need [iplus-framework](https://github.com/iplus-framework/iPlus) first. Read and clone it.
-Then: git clone https://github.com/iplus-framework/iPlusMES.git
+  - You need [iplus-framework](https://github.com/iplus-framework/iPlus) first. Read and clone it.
+  - Then: git clone https://github.com/iplus-framework/iPlusMES.git
+  - Make sure to clone this repository into the same root path as iplus-framework. (So that our repositories are all in a common directory, so that the specified relative paths match.)
 
-2. **Install a Microsoft SQL-Server Edition:**  
+3. **Install a Microsoft SQL-Server Edition:**  
 https://learn.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver16
 
-3. **Restore a MES-database file:**  
+4. **Restore a MES-database file:**  
 Restore the SQL Server backup file located in the "Database" folder. Use the IPCDrivesV5-database for playing and exploring features. Use iplusMESV5 for starting building you own MES from scratch.
 
-4. **Open project in Microsoft Visual Studio:**
-Modify the ConnectionStrings.config file, Follow the instructions on [gipSoft's documentation site](https://iplus-framework.com/en/documentation/Read/Index/View/b00675a8-718c-4c13-9d6d-5e751397ac5f?chapterID=193d292e-df31-405e-a3e9-f1116846bf86#ItemTextTranslationID_d0551cc7-f767-4790-8ecb-8771836ebac7)
-Compile the solution an set gip.mes.client.exe as start project.
+5. **Open project in Microsoft Visual Studio:**
+  - Modify the ConnectionStrings.config file, Follow the instructions on [gipSoft's documentation site](https://iplus-framework.com/en/documentation/Read/Index/View/b00675a8-718c-4c13-9d6d-5e751397ac5f?chapterID=193d292e-df31-405e-a3e9-f1116846bf86#ItemTextTranslationID_d0551cc7-f767-4790-8ecb-8771836ebac7)
+  - Compile the solution an set gip.mes.client.exe as start project.
 
-5. **Execute gip.mes.client.exe:**
-Login with "superuser":"superuser".
-🤗 Have fun trying it out and watch our videos to get started. However, we recommend [online training](https://iplus-framework.com/en?section=Support%20%26%20Training#d57ccb45-9050-41cb-a177-9e8c05028931).
+6. **Execute gip.mes.client.exe:**
+  - Login with "superuser":"superuser".
+  - 🤗 Have fun trying it out and watch our videos to get started. However, we recommend [online training](https://iplus-framework.com/en?section=Support%20%26%20Training#d57ccb45-9050-41cb-a177-9e8c05028931).
 
 ## Contributing
 
