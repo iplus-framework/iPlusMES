@@ -22,7 +22,7 @@ namespace gip.mes.webservices
 
 #if NETFRAMEWORK
         [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UriBarcodeEntity_BarcodeID, ResponseFormat = WebMessageFormat.Json)]
+        //[WebGet(UriTemplate = VBWebServiceConst.UriBarcodeEntity_BarcodeID, ResponseFormat = WebMessageFormat.Json)]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriBarcodeEntity, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<BarcodeEntity> GetBarcodeEntity(string barcodeID);
 #elif NETSTANDARD
