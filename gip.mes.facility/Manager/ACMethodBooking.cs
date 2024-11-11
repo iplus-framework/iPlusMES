@@ -2075,7 +2075,7 @@ namespace gip.mes.facility
                         facility2Check = facility2Check.Facility1_ParentFacility;
                     }
 
-                    if (    (behaviour == PostingBehaviourEnum.ZeroStockAlways)
+                    if ((behaviour == PostingBehaviourEnum.ZeroStockAlways)
                          || (isRelocation && (behaviour == PostingBehaviourEnum.BlockOnRelocation || behaviour == PostingBehaviourEnum.ZeroStockOnRelocation))
                          || (isProdInward && (behaviour == PostingBehaviourEnum.ZeroStockOnProduction || behaviour == PostingBehaviourEnum.ZeroStockOnProductionIfNoBOMUsage)))
                         return behaviour;
@@ -2674,10 +2674,10 @@ namespace gip.mes.facility
                         AddBookingMessage(eResultCodes.DependingParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50010"));
                 }
             }
-            else if (material != null 
-                        && material.MDFacilityManagementType != null 
-                        && (    material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility))
-                            //|| (BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge && material.MDFacilityManagementType.FacilityManagementType != MDFacilityManagementType.FacilityManagementTypes.FacilityCharge)))
+            else if (material != null
+                        && material.MDFacilityManagementType != null
+                        && (material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility))
+                //|| (BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge && material.MDFacilityManagementType.FacilityManagementType != MDFacilityManagementType.FacilityManagementTypes.FacilityCharge)))
                 AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50011"));
             else if (this.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
                 && (this.InwardFacilityLot == null && this.InwardFacilityCharge == null)
@@ -2857,7 +2857,7 @@ namespace gip.mes.facility
             {
                 if (ParamsAdjusted.OutwardFacilityCharge != null)
                 {
-                    if (   ParamsAdjusted.InwardMaterial != null 
+                    if (ParamsAdjusted.InwardMaterial != null
                         && ParamsAdjusted.InwardMaterial.BaseMDUnit != ParamsAdjusted.OutwardFacilityCharge.MDUnit
                         && !ParamsAdjusted.OutwardFacilityCharge.Material.IsConvertableToUnit(ParamsAdjusted.OutwardFacilityCharge.MDUnit, ParamsAdjusted.InwardMaterial.BaseMDUnit))
                     {
@@ -2926,11 +2926,9 @@ namespace gip.mes.facility
                     && ParamsAdjusted.OutwardFacility.MDFacilityType != null
                     && ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.OutwardFacility.Material != null
-                    && ((ParamsAdjusted.OutwardMaterial == null)
-                                || (ParamsAdjusted.OutwardMaterial == ParamsAdjusted.OutwardFacility.Material)
-                                || (ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && ParamsAdjusted.OutwardMaterial.ProductionMaterialID == ParamsAdjusted.OutwardFacility.MaterialID)))
+                    && (ParamsAdjusted.OutwardMaterial == null || !ParamsAdjusted.OutwardMaterial.IsMaterialEqual(ParamsAdjusted.OutwardFacility.Material)))
                 {
-                    if (   ParamsAdjusted.OutwardMaterial == null 
+                    if (ParamsAdjusted.OutwardMaterial == null
                         && ParamsAdjusted.OutwardFacilityLot != null
                         && ParamsAdjusted.OutwardFacilityLot.Material != null
                         && ParamsAdjusted.OutwardFacilityLot.Material != ParamsAdjusted.OutwardFacility.Material
@@ -2945,13 +2943,11 @@ namespace gip.mes.facility
                     && ParamsAdjusted.InwardFacility.MDFacilityType != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.InwardFacility.Material != null
-                    && ((ParamsAdjusted.InwardMaterial == null)
-                                || (ParamsAdjusted.InwardMaterial == ParamsAdjusted.InwardFacility.Material)
-                                || (ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && ParamsAdjusted.InwardMaterial.ProductionMaterialID == ParamsAdjusted.InwardFacility.MaterialID)))
+                    && (ParamsAdjusted.InwardMaterial == null || !ParamsAdjusted.InwardMaterial.IsMaterialEqual(ParamsAdjusted.InwardFacility.Material)))
                 {
-                    if (   ParamsAdjusted.InwardMaterial == null
-                        && ParamsAdjusted.InwardFacilityLot != null 
-                        && ParamsAdjusted.InwardFacilityLot.Material != null 
+                    if (ParamsAdjusted.InwardMaterial == null
+                        && ParamsAdjusted.InwardFacilityLot != null
+                        && ParamsAdjusted.InwardFacilityLot.Material != null
                         && ParamsAdjusted.InwardFacilityLot.Material != ParamsAdjusted.InwardFacility.Material
                         && ParamsAdjusted.InwardFacilityLot.Material.IsMaterialEqual(ParamsAdjusted.InwardFacility.Material))
                     {
@@ -3074,7 +3070,7 @@ namespace gip.mes.facility
             else if (ParamsAdjusted.OutOrderPos != null)
             {
                 if (ParamsAdjusted.OutwardFacility != null)
-                { 
+                {
                     ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutOrderPos.Material;
                     return true;
                 }
@@ -3082,7 +3078,7 @@ namespace gip.mes.facility
             else if (ParamsAdjusted.PartslistPosRelation != null)
             {
                 if (ParamsAdjusted.OutwardFacility != null)
-                { 
+                {
                     ParamsAdjusted.OutwardMaterial = ParamsAdjusted.PartslistPosRelation.SourceProdOrderPartslistPos.Material;
                     return true;
                 }
@@ -3090,7 +3086,7 @@ namespace gip.mes.facility
             else if (ParamsAdjusted.PartslistPos != null)
             {
                 if (ParamsAdjusted.InwardFacility != null)
-                { 
+                {
                     ParamsAdjusted.InwardMaterial = ParamsAdjusted.PartslistPos.Material;
                     return true;
                 }
@@ -3100,7 +3096,7 @@ namespace gip.mes.facility
                 return true;
 
             if (ParamsAdjusted.MDZeroStockState != null && ParamsAdjusted.InwardFacility != null
-                                                        && (ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility 
+                                                        && (ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility
                                                          || ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable))
             {
                 FacilityCharge lastQuant = FacilityManager.s_cQry_FCList_Fac_LastAvailable(ParamsAdjusted.DatabaseApp, ParamsAdjusted.InwardFacility.FacilityID)?.FirstOrDefault();
@@ -3240,13 +3236,13 @@ namespace gip.mes.facility
             // Überprüfe Unterschiede zwischen Material, Rezept und Materialindentifikation auf Quelle und Ziel
             if ((ParamsAdjusted.OutwardFacility != null) && (ParamsAdjusted.InwardFacility != null))
             {
-                if (   (ParamsAdjusted.OutwardFacility.MDFacilityType != null) 
+                if ((ParamsAdjusted.OutwardFacility.MDFacilityType != null)
                     && (ParamsAdjusted.InwardFacility.MDFacilityType != null))
                 {
                     // Lagerplatztypen müssen auf beiden Seiten gleich sein
-                    if (    ParamsAdjusted.OutwardFacility.MDFacilityType != ParamsAdjusted.InwardFacility.MDFacilityType
-                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBin 
-                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
+                    if (ParamsAdjusted.OutwardFacility.MDFacilityType != ParamsAdjusted.InwardFacility.MDFacilityType
+                        && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBin
+                        && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                     {
                         AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00060"));
                         return false;
@@ -3306,10 +3302,10 @@ namespace gip.mes.facility
             }
 
             // Überprüfe Material, Rezept und Materialindentifikation auf Quelle
-            if (   ParamsAdjusted.OutwardFacility != null
+            if (ParamsAdjusted.OutwardFacility != null
                 && ParamsAdjusted.OutwardFacility.MDFacilityType != null)
-            { 
-                if (    ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
+            {
+                if (ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBin))
                 {
                     // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
@@ -3340,8 +3336,8 @@ namespace gip.mes.facility
             }
 
             // Überprüfe Material, Rezept und Materialindentifikation auf Ziel
-           if (    ParamsAdjusted.InwardFacility != null
-                && ParamsAdjusted.InwardFacility.MDFacilityType != null)
+            if (ParamsAdjusted.InwardFacility != null
+                 && ParamsAdjusted.InwardFacility.MDFacilityType != null)
             {
                 if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
@@ -3679,9 +3675,9 @@ namespace gip.mes.facility
             }
             if (InwardFacilityCharge != null)
             {
-                if (   (InwardFacility != null && InwardFacility.FacilityID != InwardFacilityCharge.FacilityID) 
-                    || (InwardFacilityLocation != null && InwardFacilityLocation != InwardFacilityCharge.Facility.GetFirstParentOfType(FacilityTypesEnum.StorageLocation)) 
-                    || (InwardFacilityLot != null && InwardFacilityLot.FacilityLotID != InwardFacilityCharge.FacilityLotID) 
+                if ((InwardFacility != null && InwardFacility.FacilityID != InwardFacilityCharge.FacilityID)
+                    || (InwardFacilityLocation != null && InwardFacilityLocation != InwardFacilityCharge.Facility.GetFirstParentOfType(FacilityTypesEnum.StorageLocation))
+                    || (InwardFacilityLot != null && InwardFacilityLot.FacilityLotID != InwardFacilityCharge.FacilityLotID)
                     || (InwardMaterial != null && InwardMaterial.MaterialID != InwardFacilityCharge.MaterialID))
                 {
                     AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00111"));
@@ -4334,7 +4330,7 @@ namespace gip.mes.facility
                 }
                 if (InwardFacility == null)
                 {
-                    if (IsLotManaged 
+                    if (IsLotManaged
                         && OutwardFacilityChargeList == null
                         && OutwardFacilityLot == null
                         && (!OutwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any()
