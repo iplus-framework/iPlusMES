@@ -19,10 +19,7 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
 namespace gip.bso.facility
 {
@@ -46,7 +43,6 @@ namespace gip.bso.facility
         public const string BGWorkerMehtod_YearClosing = @"YearClosing";
 
         #endregion
-
 
         #region c´tors
 
@@ -359,7 +355,6 @@ namespace gip.bso.facility
         }
 
         #endregion
-
 
         #region Execute-Helper-Handlers
 

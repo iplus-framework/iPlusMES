@@ -7,6 +7,7 @@ using System.Xml;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using System.Diagnostics.Eventing.Reader;
 
 namespace gip.mes.processapplication
 {
@@ -26,7 +27,7 @@ namespace gip.mes.processapplication
             ACMethod TMP;
             TMP = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> translation = new Dictionary<string, string>();
-            
+
             TMP.ParameterValueList.Add(new ACValue("PiCommand", typeof(SamplePiCommand), (short)SamplePiCommand.SendOrder, Global.ParamOption.Required));
             translation.Add("PiCommand", "en{'Sample command'}de{'Stichproben Kommando'}");
             TMP.ParameterValueList.Add(new ACValue("TolerancePlus", typeof(Double), (Double)0.0, Global.ParamOption.Required));
@@ -62,7 +63,7 @@ namespace gip.mes.processapplication
 
         public override bool ACPostInit()
         {
-            if (    Root != null
+            if (Root != null
                 && !Root.Initialized
                 && ParentPWGroup != null)
             {
@@ -85,7 +86,7 @@ namespace gip.mes.processapplication
                 {
                     var acValue = method.ParameterValueList.GetACValue("PiCommand");
                     if (acValue != null)
-                        return (SamplePiCommand) acValue.ParamAsInt16;
+                        return (SamplePiCommand)acValue.ParamAsInt16;
                 }
                 return SamplePiCommand.SendOrder;
             }
@@ -312,7 +313,7 @@ namespace gip.mes.processapplication
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
                 return;
-            if (   ParentPWGroup.TimeInfo.ValueT.ActualTimes == null
+            if (ParentPWGroup.TimeInfo.ValueT.ActualTimes == null
                 || ParentPWGroup.TimeInfo.ValueT.ActualTimes.IsNull
                 || !ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.HasValue)
                 return;
@@ -346,7 +347,9 @@ namespace gip.mes.processapplication
                     material = intermediatePosition.BookingMaterial;
                 if (material == null)
                 {
-                    // TODO Error:
+                    // Error50659 The posting material is not defined!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(PWSamplePiLightBox), nameof(StartAndStopLightBoxes) + "(10)", 365, "Error50659");
+                    OnNewAlarmOccurred(ProcessAlarm, msg);
                     return;
                 }
 
@@ -360,35 +363,46 @@ namespace gip.mes.processapplication
 
                 if (setPoint <= Double.Epsilon)
                 {
-                    // TODO Error:
+                    // Error50658 The material has not defined a production weight! Please define a production weight in the Material master!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(PWSamplePiLightBox), nameof(StartAndStopLightBoxes) + "(10)", 365, "Error50658");
+                    OnNewAlarmOccurred(ProcessAlarm, msg);
                     return;
                 }
 
                 tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
                 tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
 
-                
-                setPoints.Add(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus));
+                // setPoints.Add(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus));
 
                 if (matWFConnections.Count() > 1)
                 {
-                    List<ProdOrderPartslistPos> relatedIntermediateChildren =  GetReleatedIntermediates(matWFConnections, endBatchPos, intermediateChildPos, intermediatePosition);
+                    setPoints.Clear();
+
+                    List<ProdOrderPartslistPos> relatedIntermediateChildren = GetReleatedIntermediates(matWFConnections, endBatchPos, intermediateChildPos, intermediatePosition);
 
                     foreach (ProdOrderPartslistPos relatedPos in relatedIntermediateChildren)
                     {
-                        if (relatedPos == endBatchPos || relatedPos.MDUnit == null || relatedPos.MDUnit.SIDimension != GlobalApp.SIDimensions.Mass)
+                        if (relatedPos == endBatchPos)
+                        {
+                            setPoints.Add(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus));
+                            continue;
+                        }
+
+                        if (relatedPos.MDUnit == null || relatedPos.MDUnit.SIDimension != GlobalApp.SIDimensions.Mass)
                             continue;
 
                         if (relatedPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any(x => !x.SourceProdOrderPartslistPos.Material.IsIntermediate))
                         {
-                            setPoint = relatedPos.TargetQuantityUOM / endBatchPos.TargetQuantityUOM;
-                            tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
-                            tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
-
-                            setPoints.Insert(0, (new Tuple<double, double, double>(setPoint, tolPlus, tolMinus)));
+                            double setPointPos = relatedPos.TargetQuantityUOM / endBatchPos.TargetQuantityUOM;
+                            double tolPlusPos = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
+                            double tolMinusPos = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
+                            setPoints.Insert(0, (new Tuple<double, double, double>(setPointPos, tolPlusPos, tolMinusPos)));
                         }
                     }
                 }
+
+                if (!setPoints.Any())
+                    setPoints.Add(new Tuple<double, double, double>(setPoint, tolPlus, tolMinus));
             }
 
             string labOrderTemplateName = LabOrderTemplateName;
@@ -429,7 +443,7 @@ namespace gip.mes.processapplication
 
                                         LabOrderPos labOrderPos = null;
                                         msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.PositionForEachWeighing, out labOrderPos);
-                                        
+
                                         if (msg == null && labOrderPos == null)
                                         {
                                             //Error50323: The LabOrder position Sample weight not exist.
@@ -477,7 +491,7 @@ namespace gip.mes.processapplication
                                 bool result = box.StopOrder();
                                 if (!result)
                                 {
-                                    Messages.LogError(this.GetACUrl(), nameof(StartAndStopLightBoxes)+"(10)", "Error with stop order!");
+                                    Messages.LogError(this.GetACUrl(), nameof(StartAndStopLightBoxes) + "(10)", "Error with stop order!");
                                     result = box.StopOrder();
                                     if (!result)
                                     {
@@ -494,7 +508,7 @@ namespace gip.mes.processapplication
                                     break;
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -528,7 +542,7 @@ namespace gip.mes.processapplication
                 return false;
             PAProcessModule paModule = ParentPWGroup.AccessedProcessModule;
             List<PAESamplePiLightBox> boxes = paModule.FindChildComponents<PAESamplePiLightBox>();
-            if (    boxes == null
+            if (boxes == null
                 || !boxes.Any()
                 || !boxes.Where(c => c.IsEnabledGetValues()).Any())
                 return false;
