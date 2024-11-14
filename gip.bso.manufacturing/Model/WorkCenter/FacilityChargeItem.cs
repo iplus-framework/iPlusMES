@@ -24,6 +24,7 @@ namespace gip.bso.manufacturing
             this.FillingDate = facilityChargeItem.FillingDate;
             this.MDUnit = facilityChargeItem.MDUnit;
             this.FacilityType = facilityChargeItem.FacilityType;
+            this.Comment = facilityChargeItem.Comment;
         }
 
         public FacilityChargeItem(FacilityCharge facilityCharge, double? targetQuantity)
@@ -41,6 +42,7 @@ namespace gip.bso.manufacturing
             FacilityNo = facilityCharge.Facility.FacilityNo;
             FacilityName = facilityCharge.Facility.FacilityName;
             FacilityType = facilityCharge.Facility.MDFacilityType.FacilityType;
+            Comment = facilityCharge.Comment;
 
             if (targetQuantity.HasValue && targetQuantity.Value > StockQuantityUOM)
             {
@@ -117,6 +119,13 @@ namespace gip.bso.manufacturing
 
         [ACPropertyInfo(9999)]
         public MDUnit MDUnit
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(9999)]
+        public string Comment
         {
             get;
             set;
