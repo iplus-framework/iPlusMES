@@ -314,6 +314,11 @@ namespace gip.bso.masterdata
             return OnIsEnabledSave();
         }
 
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
+        }
+
         /// <summary>
         /// News this instance.
         /// </summary>
@@ -2462,6 +2467,9 @@ namespace gip.bso.masterdata
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
                     return true;
                 case nameof(New):
                     New();
