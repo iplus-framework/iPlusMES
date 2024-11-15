@@ -607,7 +607,7 @@
           <Property Name="CompanyID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ParentCompanyID" Type="uniqueidentifier" />
           <Property Name="CompanyNo" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="CompanyName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CompanyName" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="BillingMDTermOfPaymentID" Type="uniqueidentifier" />
           <Property Name="ShippingMDTermOfPaymentID" Type="uniqueidentifier" />
           <Property Name="VBUserID" Type="uniqueidentifier" />
@@ -645,11 +645,11 @@
           <Property Name="IsDeliveryCompanyAddress" Type="bit" Nullable="false" />
           <Property Name="IsFactory" Type="bit" Nullable="false" />
           <Property Name="InvoiceIssuerNo" Type="nvarchar" MaxLength="50" />
-          <Property Name="Name1" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Name2" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Name3" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Street" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="City" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="Name1" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name2" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name3" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Street" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="City" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Postcode" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="PostOfficeBox" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="Phone" Type="varchar" MaxLength="20" Nullable="false" />
@@ -842,11 +842,11 @@
           </Key>
           <Property Name="CompanyPersonID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CompanyID" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Name1" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Name2" Type="varchar" MaxLength="40" />
-          <Property Name="Name3" Type="varchar" MaxLength="40" />
-          <Property Name="Street" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="City" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="Name1" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name2" Type="varchar" MaxLength="250" />
+          <Property Name="Name3" Type="varchar" MaxLength="250" />
+          <Property Name="Street" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="City" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Postcode" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="PostOfficeBox" Type="varchar" MaxLength="10" />
           <Property Name="Phone" Type="varchar" MaxLength="20" />
@@ -20637,7 +20637,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="CompanyID" Type="Guid" Nullable="false" />
           <Property Name="ParentCompanyID" Type="Guid" />
           <Property Name="CompanyNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="BillingMDTermOfPaymentID" Type="Guid" />
           <Property Name="ShippingMDTermOfPaymentID" Type="Guid" />
           <Property Name="VBUserID" Type="Guid" />
@@ -20702,11 +20702,11 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="IsDeliveryCompanyAddress" Type="Boolean" Nullable="false" />
           <Property Name="IsFactory" Type="Boolean" Nullable="false" />
           <Property Name="InvoiceIssuerNo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Name1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name2" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name3" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Street" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="City" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Name1" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name2" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name3" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Street" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Postcode" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="PostOfficeBox" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Phone" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
@@ -20952,11 +20952,11 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           </Key>
           <Property Name="CompanyPersonID" Type="Guid" Nullable="false" />
           <Property Name="CompanyID" Type="Guid" Nullable="false" />
-          <Property Name="Name1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name2" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name3" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Street" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="City" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Name1" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name2" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name3" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Street" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Postcode" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="PostOfficeBox" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Phone" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
