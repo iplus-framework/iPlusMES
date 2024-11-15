@@ -108,7 +108,7 @@ public partial class MDMaintOrderState : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return MaintOrder_MDMaintOrderState != null;
+            return _MaintOrder_MDMaintOrderState != null;
         }
     }
 

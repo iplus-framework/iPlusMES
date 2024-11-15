@@ -108,7 +108,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return CompanyAddress_MDDelivType != null;
+            return _CompanyAddress_MDDelivType != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return InOrder_MDDelivType != null;
+            return _InOrder_MDDelivType != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return InRequest_MDDelivType != null;
+            return _InRequest_MDDelivType != null;
         }
     }
 
@@ -168,7 +168,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return OutOffer_MDDelivType != null;
+            return _OutOffer_MDDelivType != null;
         }
     }
 
@@ -188,7 +188,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return OutOrder_MDDelivType != null;
+            return _OutOrder_MDDelivType != null;
         }
     }
 

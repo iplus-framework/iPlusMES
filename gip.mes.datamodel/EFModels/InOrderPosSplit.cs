@@ -101,7 +101,7 @@ public partial class InOrderPosSplit : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 

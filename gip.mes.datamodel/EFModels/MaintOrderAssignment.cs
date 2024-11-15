@@ -115,7 +115,7 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MaintOrder != null;
+            return _MaintOrder != null;
         }
     }
 
@@ -155,7 +155,7 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return VBGroup != null;
+            return _VBGroup != null;
         }
     }
 
@@ -175,7 +175,7 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 

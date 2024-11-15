@@ -108,7 +108,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return Company_BillingMDTermOfPayment != null;
+            return _Company_BillingMDTermOfPayment != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return Company_ShippingMDTermOfPayment != null;
+            return _Company_ShippingMDTermOfPayment != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return InOrder_MDTermOfPayment != null;
+            return _InOrder_MDTermOfPayment != null;
         }
     }
 
@@ -168,7 +168,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return InRequest_MDTermOfPayment != null;
+            return _InRequest_MDTermOfPayment != null;
         }
     }
 
@@ -188,7 +188,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return Invoice_MDTermOfPayment != null;
+            return _Invoice_MDTermOfPayment != null;
         }
     }
 
@@ -208,7 +208,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOffer_MDTermOfPayment != null;
+            return _OutOffer_MDTermOfPayment != null;
         }
     }
 
@@ -228,7 +228,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOrder_MDTermOfPayment != null;
+            return _OutOrder_MDTermOfPayment != null;
         }
     }
 

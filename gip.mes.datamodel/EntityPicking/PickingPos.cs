@@ -90,7 +90,7 @@ namespace gip.mes.datamodel
             Picking picking = Picking;
             if (picking != null && picking.PickingPos_Picking_IsLoaded)
                 picking.PickingPos_Picking.Remove(this);
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             if (picking != null)
             {
                 PickingPos.RenumberSequence(picking, sequence);

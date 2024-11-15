@@ -192,7 +192,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -212,7 +212,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return FacilityCharge != null;
+            return _FacilityCharge != null;
         }
     }
 
@@ -232,7 +232,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return FacilityLot != null;
+            return _FacilityLot != null;
         }
     }
 
@@ -252,7 +252,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -272,7 +272,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return FacilityReservation_ParentFacilityReservation != null;
+            return _FacilityReservation_ParentFacilityReservation != null;
         }
     }
 
@@ -292,7 +292,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -312,7 +312,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -332,7 +332,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return FacilityReservation1_ParentFacilityReservation != null;
+            return _FacilityReservation1_ParentFacilityReservation != null;
         }
     }
 
@@ -352,7 +352,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -372,7 +372,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return ProdOrderBatchPlan != null;
+            return _ProdOrderBatchPlan != null;
         }
     }
 
@@ -392,7 +392,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 
@@ -412,7 +412,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return ProdOrderPartslistPosRelation != null;
+            return _ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -432,7 +432,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 

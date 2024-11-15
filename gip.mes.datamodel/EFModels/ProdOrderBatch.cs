@@ -108,7 +108,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDProdOrderState != null;
+            return _MDProdOrderState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderBatchPlan != null;
+            return _ProdOrderBatchPlan != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslist != null;
+            return _ProdOrderPartslist != null;
         }
     }
 
@@ -168,7 +168,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPos_ProdOrderBatch != null;
+            return _ProdOrderPartslistPos_ProdOrderBatch != null;
         }
     }
 
@@ -188,7 +188,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPosRelation_ProdOrderBatch != null;
+            return _ProdOrderPartslistPosRelation_ProdOrderBatch != null;
         }
     }
 

@@ -202,7 +202,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPos1_AlternativePartslistPos != null;
+            return _PartslistPos1_AlternativePartslistPos != null;
         }
     }
 
@@ -222,7 +222,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPos_AlternativePartslistPos != null;
+            return _PartslistPos_AlternativePartslistPos != null;
         }
     }
 
@@ -242,7 +242,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPos_ParentPartslistPos != null;
+            return _PartslistPos_ParentPartslistPos != null;
         }
     }
 
@@ -262,7 +262,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -282,7 +282,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -302,7 +302,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return ParentPartslist != null;
+            return _ParentPartslist != null;
         }
     }
 
@@ -322,7 +322,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPos1_ParentPartslistPos != null;
+            return _PartslistPos1_ParentPartslistPos != null;
         }
     }
 
@@ -342,7 +342,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return Partslist != null;
+            return _Partslist != null;
         }
     }
 
@@ -362,7 +362,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPosRelation_SourcePartslistPos != null;
+            return _PartslistPosRelation_SourcePartslistPos != null;
         }
     }
 
@@ -382,7 +382,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPosRelation_TargetPartslistPos != null;
+            return _PartslistPosRelation_TargetPartslistPos != null;
         }
     }
 
@@ -402,7 +402,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return PartslistPosSplit_PartslistPos != null;
+            return _PartslistPosSplit_PartslistPos != null;
         }
     }
 
@@ -422,7 +422,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return ProdOrderPartslistPos_BasedOnPartslistPos != null;
+            return _ProdOrderPartslistPos_BasedOnPartslistPos != null;
         }
     }
 

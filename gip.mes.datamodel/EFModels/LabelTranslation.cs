@@ -66,7 +66,7 @@ public partial class LabelTranslation : VBEntityObject
     {
         get
         {
-            return Label != null;
+            return _Label != null;
         }
     }
 
@@ -86,7 +86,7 @@ public partial class LabelTranslation : VBEntityObject
     {
         get
         {
-            return VBLanguage != null;
+            return _VBLanguage != null;
         }
     }
 

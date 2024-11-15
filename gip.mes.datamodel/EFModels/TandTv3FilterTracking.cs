@@ -108,7 +108,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     {
         get
         {
-            return TandTv3FilterTrackingMaterial_TandTv3FilterTracking != null;
+            return _TandTv3FilterTrackingMaterial_TandTv3FilterTracking != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     {
         get
         {
-            return TandTv3MDTrackingDirection != null;
+            return _TandTv3MDTrackingDirection != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     {
         get
         {
-            return TandTv3MDTrackingStartItemType != null;
+            return _TandTv3MDTrackingStartItemType != null;
         }
     }
 
@@ -168,7 +168,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     {
         get
         {
-            return TandTv3Step_TandTv3FilterTracking != null;
+            return _TandTv3Step_TandTv3FilterTracking != null;
         }
     }
 

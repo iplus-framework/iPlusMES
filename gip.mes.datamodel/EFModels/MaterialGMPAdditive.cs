@@ -94,7 +94,7 @@ public partial class MaterialGMPAdditive : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return MDGMPAdditive != null;
+            return _MDGMPAdditive != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MaterialGMPAdditive : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

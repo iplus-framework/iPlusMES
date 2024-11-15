@@ -129,7 +129,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return CalendarShift_MDTimeRange != null;
+            return _CalendarShift_MDTimeRange != null;
         }
     }
 
@@ -149,7 +149,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return CompanyPerson_MDTimeRange != null;
+            return _CompanyPerson_MDTimeRange != null;
         }
     }
 
@@ -169,7 +169,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return InOrderPos_MDTimeRange != null;
+            return _InOrderPos_MDTimeRange != null;
         }
     }
 
@@ -189,7 +189,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return InOrder_MDTimeRange != null;
+            return _InOrder_MDTimeRange != null;
         }
     }
 
@@ -209,7 +209,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return InRequestPos_MDTimeRange != null;
+            return _InRequestPos_MDTimeRange != null;
         }
     }
 
@@ -229,7 +229,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return InRequest_MDTimeRange != null;
+            return _InRequest_MDTimeRange != null;
         }
     }
 
@@ -249,7 +249,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return MDTimeRange_ParentMDTimeRange != null;
+            return _MDTimeRange_ParentMDTimeRange != null;
         }
     }
 
@@ -269,7 +269,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return OutOfferPos_MDTimeRange != null;
+            return _OutOfferPos_MDTimeRange != null;
         }
     }
 
@@ -289,7 +289,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return OutOffer_MDTimeRange != null;
+            return _OutOffer_MDTimeRange != null;
         }
     }
 
@@ -309,7 +309,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return OutOrderPos_MDTimeRange != null;
+            return _OutOrderPos_MDTimeRange != null;
         }
     }
 
@@ -329,7 +329,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return OutOrder_MDTimeRange != null;
+            return _OutOrder_MDTimeRange != null;
         }
     }
 
@@ -349,7 +349,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return MDTimeRange1_ParentMDTimeRange != null;
+            return _MDTimeRange1_ParentMDTimeRange != null;
         }
     }
 
@@ -369,7 +369,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     {
         get
         {
-            return TourplanPos_MDTimeRange != null;
+            return _TourplanPos_MDTimeRange != null;
         }
     }
 

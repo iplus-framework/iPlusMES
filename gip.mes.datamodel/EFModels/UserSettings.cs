@@ -66,7 +66,7 @@ public partial class UserSettings : VBEntityObject
     {
         get
         {
-            return InvoiceCompanyAddress != null;
+            return _InvoiceCompanyAddress != null;
         }
     }
 
@@ -86,7 +86,7 @@ public partial class UserSettings : VBEntityObject
     {
         get
         {
-            return InvoiceCompanyPerson != null;
+            return _InvoiceCompanyPerson != null;
         }
     }
 
@@ -106,7 +106,7 @@ public partial class UserSettings : VBEntityObject
     {
         get
         {
-            return TenantCompany != null;
+            return _TenantCompany != null;
         }
     }
 
@@ -126,7 +126,7 @@ public partial class UserSettings : VBEntityObject
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 

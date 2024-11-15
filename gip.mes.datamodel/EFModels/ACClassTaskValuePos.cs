@@ -150,7 +150,7 @@ public partial class ACClassTaskValuePos : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return ACClassTaskValue != null;
+            return _ACClassTaskValue != null;
         }
     }
 

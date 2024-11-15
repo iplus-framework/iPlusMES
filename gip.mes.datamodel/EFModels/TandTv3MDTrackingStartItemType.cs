@@ -45,7 +45,7 @@ public partial class TandTv3MDTrackingStartItemType : VBEntityObject
     {
         get
         {
-            return TandTv3FilterTracking_TandTv3MDTrackingStartItemType != null;
+            return _TandTv3FilterTracking_TandTv3MDTrackingStartItemType != null;
         }
     }
 

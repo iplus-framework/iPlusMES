@@ -108,7 +108,7 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCurrency != null;
+            return _MDCurrency != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PriceListMaterial_PriceList != null;
+            return _PriceListMaterial_PriceList != null;
         }
     }
 

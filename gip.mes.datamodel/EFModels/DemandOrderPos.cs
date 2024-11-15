@@ -164,7 +164,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return ACProgram != null;
+            return _ACProgram != null;
         }
     }
 
@@ -184,7 +184,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return DemandOrder != null;
+            return _DemandOrder != null;
         }
     }
 
@@ -204,7 +204,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -224,7 +224,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return Partslist != null;
+            return _Partslist != null;
         }
     }
 
@@ -244,7 +244,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return VBiProgramACClassMethod != null;
+            return _VBiProgramACClassMethod != null;
         }
     }
 

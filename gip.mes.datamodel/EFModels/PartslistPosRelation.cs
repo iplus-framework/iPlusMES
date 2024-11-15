@@ -122,7 +122,7 @@ public partial class PartslistPosRelation : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MaterialWFRelation != null;
+            return _MaterialWFRelation != null;
         }
     }
 
@@ -142,7 +142,7 @@ public partial class PartslistPosRelation : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return SourcePartslistPos != null;
+            return _SourcePartslistPos != null;
         }
     }
 
@@ -162,7 +162,7 @@ public partial class PartslistPosRelation : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return TargetPartslistPos != null;
+            return _TargetPartslistPos != null;
         }
     }
 

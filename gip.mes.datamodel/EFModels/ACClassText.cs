@@ -101,7 +101,7 @@ public partial class ACClassText : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass != null;
+            return _ACClass != null;
         }
     }
 

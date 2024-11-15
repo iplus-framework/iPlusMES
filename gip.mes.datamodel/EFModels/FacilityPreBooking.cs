@@ -101,7 +101,7 @@ public partial class FacilityPreBooking : VBEntityObject
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class FacilityPreBooking : VBEntityObject
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class FacilityPreBooking : VBEntityObject
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -161,7 +161,7 @@ public partial class FacilityPreBooking : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 
@@ -181,7 +181,7 @@ public partial class FacilityPreBooking : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPosRelation != null;
+            return _ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -201,7 +201,7 @@ public partial class FacilityPreBooking : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacilityPreBooking_FacilityPreBooking != null;
+            return _TandTv3MixPointFacilityPreBooking_FacilityPreBooking != null;
         }
     }
 

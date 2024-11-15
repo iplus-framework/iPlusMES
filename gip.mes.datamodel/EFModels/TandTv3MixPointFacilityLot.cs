@@ -59,7 +59,7 @@ public partial class TandTv3MixPointFacilityLot : VBEntityObject
     {
         get
         {
-            return FacilityLot != null;
+            return _FacilityLot != null;
         }
     }
 
@@ -79,7 +79,7 @@ public partial class TandTv3MixPointFacilityLot : VBEntityObject
     {
         get
         {
-            return TandTv3MDBookingDirection != null;
+            return _TandTv3MDBookingDirection != null;
         }
     }
 
@@ -99,7 +99,7 @@ public partial class TandTv3MixPointFacilityLot : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint != null;
+            return _TandTv3MixPoint != null;
         }
     }
 

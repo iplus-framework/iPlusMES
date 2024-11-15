@@ -241,7 +241,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MDProdOrderState != null;
+            return _MDProdOrderState != null;
         }
     }
 
@@ -261,7 +261,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return Partslist != null;
+            return _Partslist != null;
         }
     }
 
@@ -281,7 +281,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return PlanningMRProposal_ProdOrderPartslist != null;
+            return _PlanningMRProposal_ProdOrderPartslist != null;
         }
     }
 
@@ -301,7 +301,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrder != null;
+            return _ProdOrder != null;
         }
     }
 
@@ -321,7 +321,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderBatchPlan_ProdOrderPartslist != null;
+            return _ProdOrderBatchPlan_ProdOrderPartslist != null;
         }
     }
 
@@ -341,7 +341,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderBatch_ProdOrderPartslist != null;
+            return _ProdOrderBatch_ProdOrderPartslist != null;
         }
     }
 
@@ -361,7 +361,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderPartslistConfig_ProdOrderPartslist != null;
+            return _ProdOrderPartslistConfig_ProdOrderPartslist != null;
         }
     }
 
@@ -381,7 +381,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderPartslistPos_ProdOrderPartslist != null;
+            return _ProdOrderPartslistPos_ProdOrderPartslist != null;
         }
     }
 
@@ -401,7 +401,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderPartslistPos_SourceProdOrderPartslist != null;
+            return _ProdOrderPartslistPos_SourceProdOrderPartslist != null;
         }
     }
 
@@ -421,7 +421,7 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return VBiACProgram != null;
+            return _VBiACProgram != null;
         }
     }
 

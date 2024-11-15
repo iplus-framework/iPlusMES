@@ -94,7 +94,7 @@ public partial class MaintOrderProperty : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MaintACClassProperty != null;
+            return _MaintACClassProperty != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MaintOrderProperty : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MaintOrder != null;
+            return _MaintOrder != null;
         }
     }
 

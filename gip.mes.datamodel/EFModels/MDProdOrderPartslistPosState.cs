@@ -108,7 +108,7 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
     {
         get
         {
-            return ProdOrderPartslistPos_MDProdOrderPartslistPosState != null;
+            return _ProdOrderPartslistPos_MDProdOrderPartslistPosState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
     {
         get
         {
-            return ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState != null;
+            return _ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState != null;
         }
     }
 

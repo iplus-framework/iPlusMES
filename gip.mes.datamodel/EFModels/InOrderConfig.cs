@@ -157,7 +157,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder != null;
+            return _InOrder != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderConfig_ParentInOrderConfig != null;
+            return _InOrderConfig_ParentInOrderConfig != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderConfig1_ParentInOrderConfig != null;
+            return _InOrderConfig1_ParentInOrderConfig != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -297,7 +297,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

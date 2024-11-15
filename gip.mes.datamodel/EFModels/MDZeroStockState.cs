@@ -108,7 +108,7 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_MDZeroStockState != null;
+            return _FacilityBookingCharge_MDZeroStockState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_MDZeroStockState != null;
+            return _FacilityBooking_MDZeroStockState != null;
         }
     }
 

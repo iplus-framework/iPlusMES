@@ -108,7 +108,7 @@ public partial class MDInventoryManagementType : VBEntityObject, IInsertInfo, IU
     {
         get
         {
-            return Material_MDInventoryManagementType != null;
+            return _Material_MDInventoryManagementType != null;
         }
     }
 

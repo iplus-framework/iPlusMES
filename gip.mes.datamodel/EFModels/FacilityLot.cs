@@ -157,7 +157,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_InwardFacilityLot != null;
+            return _FacilityBookingCharge_InwardFacilityLot != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_OutwardFacilityLot != null;
+            return _FacilityBookingCharge_OutwardFacilityLot != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_InwardFacilityLot != null;
+            return _FacilityBooking_InwardFacilityLot != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_OutwardFacilityLot != null;
+            return _FacilityBooking_OutwardFacilityLot != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityCharge_FacilityLot != null;
+            return _FacilityCharge_FacilityLot != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityLotStock_FacilityLot != null;
+            return _FacilityLotStock_FacilityLot != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityReservation_FacilityLot != null;
+            return _FacilityReservation_FacilityLot != null;
         }
     }
 
@@ -297,7 +297,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabOrder_FacilityLot != null;
+            return _LabOrder_FacilityLot != null;
         }
     }
 
@@ -317,7 +317,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDReleaseState != null;
+            return _MDReleaseState != null;
         }
     }
 
@@ -337,7 +337,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -357,7 +357,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPos_FacilityLot != null;
+            return _ProdOrderPartslistPos_FacilityLot != null;
         }
     }
 
@@ -377,7 +377,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPosFacilityLot_FacilityLot != null;
+            return _ProdOrderPartslistPosFacilityLot_FacilityLot != null;
         }
     }
 
@@ -397,7 +397,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TandTv3MixPoint_InwardLot != null;
+            return _TandTv3MixPoint_InwardLot != null;
         }
     }
 
@@ -417,7 +417,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TandTv3MixPointFacilityLot_FacilityLot != null;
+            return _TandTv3MixPointFacilityLot_FacilityLot != null;
         }
     }
 

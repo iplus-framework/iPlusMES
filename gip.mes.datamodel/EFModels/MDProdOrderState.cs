@@ -108,7 +108,7 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderBatch_MDProdOrderState != null;
+            return _ProdOrderBatch_MDProdOrderState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslist_MDProdOrderState != null;
+            return _ProdOrderPartslist_MDProdOrderState != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrder_MDProdOrderState != null;
+            return _ProdOrder_MDProdOrderState != null;
         }
     }
 

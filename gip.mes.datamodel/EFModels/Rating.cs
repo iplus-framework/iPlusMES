@@ -94,7 +94,7 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyPerson != null;
+            return _CompanyPerson != null;
         }
     }
 
@@ -134,7 +134,7 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote != null;
+            return _DeliveryNote != null;
         }
     }
 
@@ -154,7 +154,7 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return RatingComplaint_Rating != null;
+            return _RatingComplaint_Rating != null;
         }
     }
 

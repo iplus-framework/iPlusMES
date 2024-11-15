@@ -108,7 +108,7 @@ public partial class MDInRequestState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequest_MDInRequestState != null;
+            return _InRequest_MDInRequestState != null;
         }
     }
 

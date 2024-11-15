@@ -234,7 +234,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return BillingMDTermOfPayment != null;
+            return _BillingMDTermOfPayment != null;
         }
     }
 
@@ -254,7 +254,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyAddress_Company != null;
+            return _CompanyAddress_Company != null;
         }
     }
 
@@ -274,7 +274,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterial_Company != null;
+            return _CompanyMaterial_Company != null;
         }
     }
 
@@ -294,7 +294,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyPerson_Company != null;
+            return _CompanyPerson_Company != null;
         }
     }
 
@@ -314,7 +314,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility_Company != null;
+            return _Facility_Company != null;
         }
     }
 
@@ -334,7 +334,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_CPartnerCompany != null;
+            return _FacilityBooking_CPartnerCompany != null;
         }
     }
 
@@ -354,7 +354,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder_CPartnerCompany != null;
+            return _InOrder_CPartnerCompany != null;
         }
     }
 
@@ -374,7 +374,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder_DistributorCompany != null;
+            return _InOrder_DistributorCompany != null;
         }
     }
 
@@ -394,7 +394,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequest_DistributorCompany != null;
+            return _InRequest_DistributorCompany != null;
         }
     }
 
@@ -414,7 +414,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company_ParentCompany != null;
+            return _Company_ParentCompany != null;
         }
     }
 
@@ -434,7 +434,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Invoice_CustomerCompany != null;
+            return _Invoice_CustomerCompany != null;
         }
     }
 
@@ -454,7 +454,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCurrency != null;
+            return _MDCurrency != null;
         }
     }
 
@@ -474,7 +474,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderAssignment_Company != null;
+            return _MaintOrderAssignment_Company != null;
         }
     }
 
@@ -494,7 +494,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOffer_CustomerCompany != null;
+            return _OutOffer_CustomerCompany != null;
         }
     }
 
@@ -514,7 +514,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_CPartnerCompany != null;
+            return _OutOrder_CPartnerCompany != null;
         }
     }
 
@@ -534,7 +534,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_CustomerCompany != null;
+            return _OutOrder_CustomerCompany != null;
         }
     }
 
@@ -554,7 +554,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company1_ParentCompany != null;
+            return _Company1_ParentCompany != null;
         }
     }
 
@@ -574,7 +574,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrder_CPartnerCompany != null;
+            return _ProdOrder_CPartnerCompany != null;
         }
     }
 
@@ -594,7 +594,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Rating_Company != null;
+            return _Rating_Company != null;
         }
     }
 
@@ -614,7 +614,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ShippingMDTermOfPayment != null;
+            return _ShippingMDTermOfPayment != null;
         }
     }
 
@@ -634,7 +634,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanPos_Company != null;
+            return _TourplanPos_Company != null;
         }
     }
 
@@ -654,7 +654,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Tourplan_Company != null;
+            return _Tourplan_Company != null;
         }
     }
 
@@ -674,7 +674,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return UserSettings_TenantCompany != null;
+            return _UserSettings_TenantCompany != null;
         }
     }
 
@@ -694,7 +694,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 
@@ -714,7 +714,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Visitor_VisitedCompany != null;
+            return _Visitor_VisitedCompany != null;
         }
     }
 
@@ -734,7 +734,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Visitor_VisitorCompany != null;
+            return _Visitor_VisitorCompany != null;
         }
     }
 
@@ -754,7 +754,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher_VisitorCompany != null;
+            return _VisitorVoucher_VisitorCompany != null;
         }
     }
 

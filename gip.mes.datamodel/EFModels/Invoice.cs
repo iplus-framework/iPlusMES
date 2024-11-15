@@ -213,7 +213,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return BillingCompanyAddress != null;
+            return _BillingCompanyAddress != null;
         }
     }
 
@@ -233,7 +233,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CustomerCompany != null;
+            return _CustomerCompany != null;
         }
     }
 
@@ -253,7 +253,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryCompanyAddress != null;
+            return _DeliveryCompanyAddress != null;
         }
     }
 
@@ -273,7 +273,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InvoicePos_Invoice != null;
+            return _InvoicePos_Invoice != null;
         }
     }
 
@@ -293,7 +293,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return IssuerCompanyAddress != null;
+            return _IssuerCompanyAddress != null;
         }
     }
 
@@ -313,7 +313,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return IssuerCompanyPerson != null;
+            return _IssuerCompanyPerson != null;
         }
     }
 
@@ -333,7 +333,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCurrency != null;
+            return _MDCurrency != null;
         }
     }
 
@@ -353,7 +353,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCurrencyExchange != null;
+            return _MDCurrencyExchange != null;
         }
     }
 
@@ -373,7 +373,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDInvoiceState != null;
+            return _MDInvoiceState != null;
         }
     }
 
@@ -393,7 +393,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDInvoiceType != null;
+            return _MDInvoiceType != null;
         }
     }
 
@@ -413,7 +413,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTermOfPayment != null;
+            return _MDTermOfPayment != null;
         }
     }
 
@@ -433,7 +433,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder != null;
+            return _OutOrder != null;
         }
     }
 

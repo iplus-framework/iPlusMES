@@ -59,7 +59,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     {
         get
         {
-            return InvoicePos_MDCountrySalesTaxMaterial != null;
+            return _InvoicePos_MDCountrySalesTaxMaterial != null;
         }
     }
 
@@ -79,7 +79,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     {
         get
         {
-            return MDCountrySalesTax != null;
+            return _MDCountrySalesTax != null;
         }
     }
 
@@ -99,7 +99,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -119,7 +119,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     {
         get
         {
-            return OutOfferPos_MDCountrySalesTaxMaterial != null;
+            return _OutOfferPos_MDCountrySalesTaxMaterial != null;
         }
     }
 
@@ -139,7 +139,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     {
         get
         {
-            return OutOrderPos_MDCountrySalesTaxMaterial != null;
+            return _OutOrderPos_MDCountrySalesTaxMaterial != null;
         }
     }
 

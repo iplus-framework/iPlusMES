@@ -94,7 +94,7 @@ public partial class VBUserACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProject != null;
+            return _ACProject != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class VBUserACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 

@@ -311,7 +311,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CPartnerCompanyMaterial != null;
+            return _CPartnerCompanyMaterial != null;
         }
     }
 
@@ -331,7 +331,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterial != null;
+            return _CompanyMaterial != null;
         }
     }
 
@@ -351,7 +351,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -371,7 +371,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_InwardFacilityCharge != null;
+            return _FacilityBookingCharge_InwardFacilityCharge != null;
         }
     }
 
@@ -391,7 +391,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_OutwardFacilityCharge != null;
+            return _FacilityBookingCharge_OutwardFacilityCharge != null;
         }
     }
 
@@ -411,7 +411,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_InwardFacilityCharge != null;
+            return _FacilityBooking_InwardFacilityCharge != null;
         }
     }
 
@@ -431,7 +431,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_OutwardFacilityCharge != null;
+            return _FacilityBooking_OutwardFacilityCharge != null;
         }
     }
 
@@ -451,7 +451,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityInventoryPos_FacilityCharge != null;
+            return _FacilityInventoryPos_FacilityCharge != null;
         }
     }
 
@@ -471,7 +471,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityLot != null;
+            return _FacilityLot != null;
         }
     }
 
@@ -491,7 +491,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityReservation_FacilityCharge != null;
+            return _FacilityReservation_FacilityCharge != null;
         }
     }
 
@@ -511,7 +511,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDReleaseState != null;
+            return _MDReleaseState != null;
         }
     }
 
@@ -531,7 +531,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -551,7 +551,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -571,7 +571,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OperationLog_FacilityCharge != null;
+            return _OperationLog_FacilityCharge != null;
         }
     }
 
@@ -591,7 +591,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Partslist != null;
+            return _Partslist != null;
         }
     }
 

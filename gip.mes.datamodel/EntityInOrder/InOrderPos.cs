@@ -136,12 +136,21 @@ namespace gip.mes.datamodel
 
             InOrder inOrder = InOrder;
             if (inOrder != null)
+            {
                 if (inOrder.InOrderPos_InOrder_IsLoaded)
                     inOrder.InOrderPos_InOrder.Remove(this);
-            database.Remove(this);
+            }
+            base.DeleteACObject(database, withCheck, softDelete);
             if (inOrder != null)
                 InOrderPos.RenumberSequence(inOrder, sequence);
             return null;
+        }
+
+        public override void RevertDeleteACObject(IACEntityObjectContext database)
+        {
+            base.RevertDeleteACObject(database);
+            if (InOrder != null && InOrder.InOrderPos_InOrder_IsLoaded)
+                InOrder.InOrderPos_InOrder.Add(this);
         }
 
         /// <summary>

@@ -108,7 +108,7 @@ public partial class MDLabTag : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTra
     {
         get
         {
-            return LabOrderPos_MDLabTag != null;
+            return _LabOrderPos_MDLabTag != null;
         }
     }
 

@@ -108,7 +108,7 @@ public partial class MDVisitorCardState : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MDVisitorCard_MDVisitorCardState != null;
+            return _MDVisitorCard_MDVisitorCardState != null;
         }
     }
 

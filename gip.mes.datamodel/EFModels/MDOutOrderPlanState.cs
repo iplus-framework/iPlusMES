@@ -108,7 +108,7 @@ public partial class MDOutOrderPlanState : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return OutOrderPos_MDOutOrderPlanState != null;
+            return _OutOrderPos_MDOutOrderPlanState != null;
         }
     }
 

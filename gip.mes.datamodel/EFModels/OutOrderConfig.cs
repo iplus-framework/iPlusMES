@@ -157,7 +157,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderConfig_ParentOutOrderConfig != null;
+            return _OutOrderConfig_ParentOutOrderConfig != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder != null;
+            return _OutOrder != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderConfig1_ParentOutOrderConfig != null;
+            return _OutOrderConfig1_ParentOutOrderConfig != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -297,7 +297,7 @@ public partial class OutOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

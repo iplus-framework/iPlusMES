@@ -150,7 +150,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequest != null;
+            return _InRequest != null;
         }
     }
 
@@ -170,7 +170,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestConfig_ParentInRequestConfig != null;
+            return _InRequestConfig_ParentInRequestConfig != null;
         }
     }
 
@@ -190,7 +190,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -210,7 +210,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestConfig1_ParentInRequestConfig != null;
+            return _InRequestConfig1_ParentInRequestConfig != null;
         }
     }
 
@@ -230,7 +230,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -250,7 +250,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -270,7 +270,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

@@ -108,7 +108,7 @@ public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return FacilityBookingCharge_MDReservationMode != null;
+            return _FacilityBookingCharge_MDReservationMode != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return FacilityBooking_MDReservationMode != null;
+            return _FacilityBooking_MDReservationMode != null;
         }
     }
 

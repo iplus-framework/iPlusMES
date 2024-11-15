@@ -101,7 +101,7 @@ public partial class OutOrderPosSplit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 

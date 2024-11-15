@@ -171,7 +171,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabOrder1_BasedOnTemplate != null;
+            return _LabOrder1_BasedOnTemplate != null;
         }
     }
 
@@ -191,7 +191,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityLot != null;
+            return _FacilityLot != null;
         }
     }
 
@@ -211,7 +211,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -231,7 +231,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabOrder_BasedOnTemplate != null;
+            return _LabOrder_BasedOnTemplate != null;
         }
     }
 
@@ -251,7 +251,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabOrderPos_LabOrder != null;
+            return _LabOrderPos_LabOrder != null;
         }
     }
 
@@ -271,7 +271,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDLabOrderState != null;
+            return _MDLabOrderState != null;
         }
     }
 
@@ -291,7 +291,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -311,7 +311,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -331,7 +331,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -351,7 +351,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 

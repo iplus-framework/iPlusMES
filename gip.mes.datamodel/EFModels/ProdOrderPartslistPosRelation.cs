@@ -136,7 +136,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return FacilityBookingCharge_ProdOrderPartslistPosRelation != null;
+            return _FacilityBookingCharge_ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -156,7 +156,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return FacilityBooking_ProdOrderPartslistPosRelation != null;
+            return _FacilityBooking_ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -176,7 +176,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return FacilityPreBooking_ProdOrderPartslistPosRelation != null;
+            return _FacilityPreBooking_ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -196,7 +196,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return FacilityReservation_ProdOrderPartslistPosRelation != null;
+            return _FacilityReservation_ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -216,7 +216,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation != null;
+            return _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -236,7 +236,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return MDProdOrderPartslistPosState != null;
+            return _MDProdOrderPartslistPosState != null;
         }
     }
 
@@ -256,7 +256,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return MDToleranceState != null;
+            return _MDToleranceState != null;
         }
     }
 
@@ -276,7 +276,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return OrderLog_ProdOrderPartslistPosRelation != null;
+            return _OrderLog_ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -296,7 +296,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation != null;
+            return _ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -316,7 +316,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return ProdOrderBatch != null;
+            return _ProdOrderBatch != null;
         }
     }
 
@@ -336,7 +336,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return SourceProdOrderPartslistPos != null;
+            return _SourceProdOrderPartslistPos != null;
         }
     }
 
@@ -356,7 +356,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation != null;
+            return _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -376,7 +376,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     {
         get
         {
-            return TargetProdOrderPartslistPos != null;
+            return _TargetProdOrderPartslistPos != null;
         }
     }
 

@@ -234,7 +234,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Delivery2CompanyAddress != null;
+            return _Delivery2CompanyAddress != null;
         }
     }
 
@@ -254,7 +254,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryCompanyAddress != null;
+            return _DeliveryCompanyAddress != null;
         }
     }
 
@@ -274,7 +274,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNotePos_DeliveryNote != null;
+            return _DeliveryNotePos_DeliveryNote != null;
         }
     }
 
@@ -294,7 +294,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDDelivNoteState != null;
+            return _MDDelivNoteState != null;
         }
     }
 
@@ -314,7 +314,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Rating_DeliveryNote != null;
+            return _Rating_DeliveryNote != null;
         }
     }
 
@@ -334,7 +334,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ShipperCompanyAddress != null;
+            return _ShipperCompanyAddress != null;
         }
     }
 
@@ -354,7 +354,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanPos != null;
+            return _TourplanPos != null;
         }
     }
 
@@ -374,7 +374,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher != null;
+            return _VisitorVoucher != null;
         }
     }
 

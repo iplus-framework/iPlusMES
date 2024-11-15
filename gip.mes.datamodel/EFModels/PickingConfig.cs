@@ -157,7 +157,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingConfig_ParentPickingConfig != null;
+            return _PickingConfig_ParentPickingConfig != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingConfig1_ParentPickingConfig != null;
+            return _PickingConfig1_ParentPickingConfig != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Picking != null;
+            return _Picking != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -297,7 +297,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

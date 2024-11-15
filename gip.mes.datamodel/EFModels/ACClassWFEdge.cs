@@ -115,7 +115,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return ACClassMethod != null;
+            return _ACClassMethod != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return SourceACClassMethod != null;
+            return _SourceACClassMethod != null;
         }
     }
 
@@ -155,7 +155,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return SourceACClassProperty != null;
+            return _SourceACClassProperty != null;
         }
     }
 
@@ -175,7 +175,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return SourceACClassWF != null;
+            return _SourceACClassWF != null;
         }
     }
 
@@ -195,7 +195,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return TargetACClassMethod != null;
+            return _TargetACClassMethod != null;
         }
     }
 
@@ -215,7 +215,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return TargetACClassProperty != null;
+            return _TargetACClassProperty != null;
         }
     }
 
@@ -235,7 +235,7 @@ public partial class ACClassWFEdge : VBEntityObject
     {
         get
         {
-            return TargetACClassWF != null;
+            return _TargetACClassWF != null;
         }
     }
 

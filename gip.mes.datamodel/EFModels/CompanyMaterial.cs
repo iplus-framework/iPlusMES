@@ -164,7 +164,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -184,7 +184,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterialHistory_CompanyMaterial != null;
+            return _CompanyMaterialHistory_CompanyMaterial != null;
         }
     }
 
@@ -204,7 +204,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterialPickup_CompanyMaterial != null;
+            return _CompanyMaterialPickup_CompanyMaterial != null;
         }
     }
 
@@ -224,7 +224,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterialStock_CompanyMaterial != null;
+            return _CompanyMaterialStock_CompanyMaterial != null;
         }
     }
 
@@ -244,7 +244,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_InwardCPartnerCompMat != null;
+            return _FacilityBookingCharge_InwardCPartnerCompMat != null;
         }
     }
 
@@ -264,7 +264,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_InwardCompanyMaterial != null;
+            return _FacilityBookingCharge_InwardCompanyMaterial != null;
         }
     }
 
@@ -284,7 +284,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_OutwardCPartnerCompMat != null;
+            return _FacilityBookingCharge_OutwardCPartnerCompMat != null;
         }
     }
 
@@ -304,7 +304,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_OutwardCompanyMaterial != null;
+            return _FacilityBookingCharge_OutwardCompanyMaterial != null;
         }
     }
 
@@ -324,7 +324,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_InwardCompanyMaterial != null;
+            return _FacilityBooking_InwardCompanyMaterial != null;
         }
     }
 
@@ -344,7 +344,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_OutwardCompanyMaterial != null;
+            return _FacilityBooking_OutwardCompanyMaterial != null;
         }
     }
 
@@ -364,7 +364,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityCharge_CPartnerCompanyMaterial != null;
+            return _FacilityCharge_CPartnerCompanyMaterial != null;
         }
     }
 
@@ -384,7 +384,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityCharge_CompanyMaterial != null;
+            return _FacilityCharge_CompanyMaterial != null;
         }
     }
 
@@ -404,7 +404,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderPos_PickupCompanyMaterial != null;
+            return _InOrderPos_PickupCompanyMaterial != null;
         }
     }
 
@@ -424,7 +424,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -444,7 +444,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -464,7 +464,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos_PickupCompanyMaterial != null;
+            return _OutOrderPos_PickupCompanyMaterial != null;
         }
     }
 

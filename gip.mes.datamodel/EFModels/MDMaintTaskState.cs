@@ -87,7 +87,7 @@ public partial class MDMaintTaskState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderTask_MDMaintTaskState != null;
+            return _MaintOrderTask_MDMaintTaskState != null;
         }
     }
 

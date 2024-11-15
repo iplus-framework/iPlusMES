@@ -276,7 +276,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return CompanyMaterialPickup_InOrderPos != null;
+            return _CompanyMaterialPickup_InOrderPos != null;
         }
     }
 
@@ -296,7 +296,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return DeliveryNotePos_InOrderPos != null;
+            return _DeliveryNotePos_InOrderPos != null;
         }
     }
 
@@ -316,7 +316,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityBookingCharge_InOrderPos != null;
+            return _FacilityBookingCharge_InOrderPos != null;
         }
     }
 
@@ -336,7 +336,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityBooking_InOrderPos != null;
+            return _FacilityBooking_InOrderPos != null;
         }
     }
 
@@ -356,7 +356,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityPreBooking_InOrderPos != null;
+            return _FacilityPreBooking_InOrderPos != null;
         }
     }
 
@@ -376,7 +376,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityReservation_InOrderPos != null;
+            return _FacilityReservation_InOrderPos != null;
         }
     }
 
@@ -396,7 +396,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return InOrder != null;
+            return _InOrder != null;
         }
     }
 
@@ -416,7 +416,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return InOrderPosSplit_InOrderPos != null;
+            return _InOrderPosSplit_InOrderPos != null;
         }
     }
 
@@ -436,7 +436,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return InOrderPos_ParentInOrderPos != null;
+            return _InOrderPos_ParentInOrderPos != null;
         }
     }
 
@@ -456,7 +456,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return LabOrder_InOrderPos != null;
+            return _LabOrder_InOrderPos != null;
         }
     }
 
@@ -476,7 +476,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDCountrySalesTax != null;
+            return _MDCountrySalesTax != null;
         }
     }
 
@@ -496,7 +496,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDDelivPosLoadState != null;
+            return _MDDelivPosLoadState != null;
         }
     }
 
@@ -516,7 +516,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDDelivPosState != null;
+            return _MDDelivPosState != null;
         }
     }
 
@@ -536,7 +536,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDInOrderPosState != null;
+            return _MDInOrderPosState != null;
         }
     }
 
@@ -556,7 +556,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -576,7 +576,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDTransportMode != null;
+            return _MDTransportMode != null;
         }
     }
 
@@ -596,7 +596,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -616,7 +616,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -636,7 +636,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return InOrderPos1_ParentInOrderPos != null;
+            return _InOrderPos1_ParentInOrderPos != null;
         }
     }
 
@@ -656,7 +656,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return PickingPos_InOrderPos != null;
+            return _PickingPos_InOrderPos != null;
         }
     }
 
@@ -676,7 +676,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return PickupCompanyMaterial != null;
+            return _PickupCompanyMaterial != null;
         }
     }
 
@@ -696,7 +696,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return TandTv3MixPointInOrderPos_InOrderPos != null;
+            return _TandTv3MixPointInOrderPos_InOrderPos != null;
         }
     }
 
@@ -716,7 +716,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return Weighing_InOrderPos != null;
+            return _Weighing_InOrderPos != null;
         }
     }
 

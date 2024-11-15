@@ -52,7 +52,7 @@ public partial class TandTv3MixPointRelation : VBEntityObject
     {
         get
         {
-            return SourceTandTv3MixPoint != null;
+            return _SourceTandTv3MixPoint != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3MixPointRelation : VBEntityObject
     {
         get
         {
-            return TargetTandTv3MixPoint != null;
+            return _TargetTandTv3MixPoint != null;
         }
     }
 

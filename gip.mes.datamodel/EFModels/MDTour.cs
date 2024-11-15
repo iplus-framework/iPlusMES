@@ -150,7 +150,7 @@ public partial class MDTour : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
     {
         get
         {
-            return Tourplan_MDTour != null;
+            return _Tourplan_MDTour != null;
         }
     }
 

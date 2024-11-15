@@ -171,7 +171,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CalendarShiftPerson_CompanyPerson != null;
+            return _CalendarShiftPerson_CompanyPerson != null;
         }
     }
 
@@ -191,7 +191,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -211,7 +211,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyPersonRole_CompanyPerson != null;
+            return _CompanyPersonRole_CompanyPerson != null;
         }
     }
 
@@ -231,7 +231,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility_CompanyPerson != null;
+            return _Facility_CompanyPerson != null;
         }
     }
 
@@ -251,7 +251,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder_IssuerCompanyPerson != null;
+            return _InOrder_IssuerCompanyPerson != null;
         }
     }
 
@@ -271,7 +271,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Invoice_IssuerCompanyPerson != null;
+            return _Invoice_IssuerCompanyPerson != null;
         }
     }
 
@@ -291,7 +291,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCountry != null;
+            return _MDCountry != null;
         }
     }
 
@@ -311,7 +311,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -331,7 +331,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOffer_IssuerCompanyPerson != null;
+            return _OutOffer_IssuerCompanyPerson != null;
         }
     }
 
@@ -351,7 +351,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_IssuerCompanyPerson != null;
+            return _OutOrder_IssuerCompanyPerson != null;
         }
     }
 
@@ -371,7 +371,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Rating_CompanyPerson != null;
+            return _Rating_CompanyPerson != null;
         }
     }
 
@@ -391,7 +391,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return UserSettings_InvoiceCompanyPerson != null;
+            return _UserSettings_InvoiceCompanyPerson != null;
         }
     }
 
@@ -411,7 +411,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher_VisitorCompanyPerson != null;
+            return _VisitorVoucher_VisitorCompanyPerson != null;
         }
     }
 
@@ -431,7 +431,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Visitor_VisitorCompanyPerson != null;
+            return _Visitor_VisitorCompanyPerson != null;
         }
     }
 

@@ -52,7 +52,7 @@ public partial class TandTv3MixPointPickingPos : VBEntityObject
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3MixPointPickingPos : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint != null;
+            return _TandTv3MixPoint != null;
         }
     }
 

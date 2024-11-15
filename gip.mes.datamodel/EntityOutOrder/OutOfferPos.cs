@@ -114,7 +114,7 @@ namespace gip.mes.datamodel
             int sequence = Sequence;
             OutOffer outOffer = OutOffer;
             OutOfferPos groupPos = OutOfferPos1_GroupOutOfferPos;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             OutOfferPos.RenumberSequence(outOffer, sequence, groupPos);
             return null;
         }

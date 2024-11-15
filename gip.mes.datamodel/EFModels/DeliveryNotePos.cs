@@ -115,7 +115,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return DeliveryNote != null;
+            return _DeliveryNote != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -155,7 +155,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OrderLog_DeliveryNotePos != null;
+            return _OrderLog_DeliveryNotePos != null;
         }
     }
 
@@ -175,7 +175,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -195,7 +195,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return TandTv3MixPointDeliveryNotePos_DeliveryNotePos != null;
+            return _TandTv3MixPointDeliveryNotePos_DeliveryNotePos != null;
         }
     }
 

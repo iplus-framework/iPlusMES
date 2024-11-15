@@ -38,7 +38,7 @@ public partial class TandTv3MDBookingDirection : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacility_TandTv3MDBookingDirection != null;
+            return _TandTv3MixPointFacility_TandTv3MDBookingDirection != null;
         }
     }
 
@@ -58,7 +58,7 @@ public partial class TandTv3MDBookingDirection : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacilityLot_TandTv3MDBookingDirection != null;
+            return _TandTv3MixPointFacilityLot_TandTv3MDBookingDirection != null;
         }
     }
 

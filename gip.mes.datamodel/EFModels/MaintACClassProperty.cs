@@ -108,7 +108,7 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MaintACClass != null;
+            return _MaintACClass != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MaintOrderProperty_MaintACClassProperty != null;
+            return _MaintOrderProperty_MaintACClassProperty != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return VBiACClassProperty != null;
+            return _VBiACClassProperty != null;
         }
     }
 

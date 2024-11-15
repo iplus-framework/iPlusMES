@@ -360,7 +360,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return BaseMDUnit != null;
+            return _BaseMDUnit != null;
         }
     }
 
@@ -380,7 +380,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterial_Material != null;
+            return _CompanyMaterial_Material != null;
         }
     }
 
@@ -400,7 +400,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DemandOrderPos_Material != null;
+            return _DemandOrderPos_Material != null;
         }
     }
 
@@ -420,7 +420,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DemandPrimary_Material != null;
+            return _DemandPrimary_Material != null;
         }
     }
 
@@ -440,7 +440,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility_Material != null;
+            return _Facility_Material != null;
         }
     }
 
@@ -460,7 +460,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_InwardMaterial != null;
+            return _FacilityBookingCharge_InwardMaterial != null;
         }
     }
 
@@ -480,7 +480,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_OutwardMaterial != null;
+            return _FacilityBookingCharge_OutwardMaterial != null;
         }
     }
 
@@ -500,7 +500,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_InwardMaterial != null;
+            return _FacilityBooking_InwardMaterial != null;
         }
     }
 
@@ -520,7 +520,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_OutwardMaterial != null;
+            return _FacilityBooking_OutwardMaterial != null;
         }
     }
 
@@ -540,7 +540,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityCharge_Material != null;
+            return _FacilityCharge_Material != null;
         }
     }
 
@@ -560,7 +560,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityLot_Material != null;
+            return _FacilityLot_Material != null;
         }
     }
 
@@ -580,7 +580,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityMaterial_Material != null;
+            return _FacilityMaterial_Material != null;
         }
     }
 
@@ -600,7 +600,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityReservation_Material != null;
+            return _FacilityReservation_Material != null;
         }
     }
 
@@ -620,7 +620,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InFacility != null;
+            return _InFacility != null;
         }
     }
 
@@ -640,7 +640,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderConfig_Material != null;
+            return _InOrderConfig_Material != null;
         }
     }
 
@@ -660,7 +660,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderPos_Material != null;
+            return _InOrderPos_Material != null;
         }
     }
 
@@ -680,7 +680,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestConfig_Material != null;
+            return _InRequestConfig_Material != null;
         }
     }
 
@@ -700,7 +700,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestPos_Material != null;
+            return _InRequestPos_Material != null;
         }
     }
 
@@ -720,7 +720,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material_ProductionMaterial != null;
+            return _Material_ProductionMaterial != null;
         }
     }
 
@@ -740,7 +740,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InvoicePos_Material != null;
+            return _InvoicePos_Material != null;
         }
     }
 
@@ -760,7 +760,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabOrder_Material != null;
+            return _LabOrder_Material != null;
         }
     }
 
@@ -780,7 +780,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Label != null;
+            return _Label != null;
         }
     }
 
@@ -800,7 +800,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCountrySalesTaxMaterial_Material != null;
+            return _MDCountrySalesTaxMaterial_Material != null;
         }
     }
 
@@ -820,7 +820,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDFacilityManagementType != null;
+            return _MDFacilityManagementType != null;
         }
     }
 
@@ -840,7 +840,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDGMPMaterialGroup != null;
+            return _MDGMPMaterialGroup != null;
         }
     }
 
@@ -860,7 +860,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDInventoryManagementType != null;
+            return _MDInventoryManagementType != null;
         }
     }
 
@@ -880,7 +880,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDMaterialGroup != null;
+            return _MDMaterialGroup != null;
         }
     }
 
@@ -900,7 +900,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDMaterialType != null;
+            return _MDMaterialType != null;
         }
     }
 
@@ -920,7 +920,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderPos_Material != null;
+            return _MaintOrderPos_Material != null;
         }
     }
 
@@ -940,7 +940,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialCalculation_Material != null;
+            return _MaterialCalculation_Material != null;
         }
     }
 
@@ -960,7 +960,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialConfig_Material != null;
+            return _MaterialConfig_Material != null;
         }
     }
 
@@ -980,7 +980,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialGMPAdditive_Material != null;
+            return _MaterialGMPAdditive_Material != null;
         }
     }
 
@@ -1000,7 +1000,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialHistory_Material != null;
+            return _MaterialHistory_Material != null;
         }
     }
 
@@ -1020,7 +1020,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialStock_Material != null;
+            return _MaterialStock_Material != null;
         }
     }
 
@@ -1040,7 +1040,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialUnit_Material != null;
+            return _MaterialUnit_Material != null;
         }
     }
 
@@ -1060,7 +1060,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFConnection_Material != null;
+            return _MaterialWFConnection_Material != null;
         }
     }
 
@@ -1080,7 +1080,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFRelation_SourceMaterial != null;
+            return _MaterialWFRelation_SourceMaterial != null;
         }
     }
 
@@ -1100,7 +1100,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFRelation_TargetMaterial != null;
+            return _MaterialWFRelation_TargetMaterial != null;
         }
     }
 
@@ -1120,7 +1120,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutFacility != null;
+            return _OutFacility != null;
         }
     }
 
@@ -1140,7 +1140,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferConfig_Material != null;
+            return _OutOfferConfig_Material != null;
         }
     }
 
@@ -1160,7 +1160,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferPos_Material != null;
+            return _OutOfferPos_Material != null;
         }
     }
 
@@ -1180,7 +1180,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderConfig_Material != null;
+            return _OutOrderConfig_Material != null;
         }
     }
 
@@ -1200,7 +1200,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos_Material != null;
+            return _OutOrderPos_Material != null;
         }
     }
 
@@ -1220,7 +1220,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPosUtilization_Material != null;
+            return _OutOrderPosUtilization_Material != null;
         }
     }
 
@@ -1240,7 +1240,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PartslistConfig_Material != null;
+            return _PartslistConfig_Material != null;
         }
     }
 
@@ -1260,7 +1260,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PartslistPos_Material != null;
+            return _PartslistPos_Material != null;
         }
     }
 
@@ -1280,7 +1280,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Partslist_Material != null;
+            return _Partslist_Material != null;
         }
     }
 
@@ -1300,7 +1300,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingConfig_Material != null;
+            return _PickingConfig_Material != null;
         }
     }
 
@@ -1320,7 +1320,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingPos_PickingMaterial != null;
+            return _PickingPos_PickingMaterial != null;
         }
     }
 
@@ -1340,7 +1340,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PriceListMaterial_Material != null;
+            return _PriceListMaterial_Material != null;
         }
     }
 
@@ -1360,7 +1360,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistConfig_Material != null;
+            return _ProdOrderPartslistConfig_Material != null;
         }
     }
 
@@ -1380,7 +1380,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPos_Material != null;
+            return _ProdOrderPartslistPos_Material != null;
         }
     }
 
@@ -1400,7 +1400,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material1_ProductionMaterial != null;
+            return _Material1_ProductionMaterial != null;
         }
     }
 
@@ -1420,7 +1420,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TandTv3FilterTrackingMaterial_Material != null;
+            return _TandTv3FilterTrackingMaterial_Material != null;
         }
     }
 
@@ -1440,7 +1440,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TandTv3MixPoint_InwardMaterial != null;
+            return _TandTv3MixPoint_InwardMaterial != null;
         }
     }
 
@@ -1460,7 +1460,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanConfig_Material != null;
+            return _TourplanConfig_Material != null;
         }
     }
 
@@ -1480,7 +1480,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiProgramACClassMethod != null;
+            return _VBiProgramACClassMethod != null;
         }
     }
 
@@ -1500,7 +1500,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiStackCalculatorACClass != null;
+            return _VBiStackCalculatorACClass != null;
         }
     }
 
@@ -1520,7 +1520,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Visitor_Material != null;
+            return _Visitor_Material != null;
         }
     }
 

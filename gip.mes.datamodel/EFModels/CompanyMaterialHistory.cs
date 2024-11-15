@@ -199,7 +199,7 @@ public partial class CompanyMaterialHistory : VBEntityObject
     {
         get
         {
-            return CompanyMaterial != null;
+            return _CompanyMaterial != null;
         }
     }
 
@@ -219,7 +219,7 @@ public partial class CompanyMaterialHistory : VBEntityObject
     {
         get
         {
-            return History != null;
+            return _History != null;
         }
     }
 

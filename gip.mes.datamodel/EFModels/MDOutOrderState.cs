@@ -108,7 +108,7 @@ public partial class MDOutOrderState : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOrder_MDOutOrderState != null;
+            return _OutOrder_MDOutOrderState != null;
         }
     }
 

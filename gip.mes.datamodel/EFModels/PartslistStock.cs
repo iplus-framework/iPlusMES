@@ -325,7 +325,7 @@ public partial class PartslistStock : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDReleaseState != null;
+            return _MDReleaseState != null;
         }
     }
 
@@ -345,7 +345,7 @@ public partial class PartslistStock : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Partslist != null;
+            return _Partslist != null;
         }
     }
 

@@ -94,7 +94,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFACClassMethod_MaterialWF != null;
+            return _MaterialWFACClassMethod_MaterialWF != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFRelation_MaterialWF != null;
+            return _MaterialWFRelation_MaterialWF != null;
         }
     }
 
@@ -134,7 +134,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Partslist_MaterialWF != null;
+            return _Partslist_MaterialWF != null;
         }
     }
 

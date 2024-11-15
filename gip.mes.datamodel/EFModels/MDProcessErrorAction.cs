@@ -108,7 +108,7 @@ public partial class MDProcessErrorAction : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MDGMPAdditive_MDProcessErrorAction != null;
+            return _MDGMPAdditive_MDProcessErrorAction != null;
         }
     }
 

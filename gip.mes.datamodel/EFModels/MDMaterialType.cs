@@ -108,7 +108,7 @@ public partial class MDMaterialType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return Material_MDMaterialType != null;
+            return _Material_MDMaterialType != null;
         }
     }
 

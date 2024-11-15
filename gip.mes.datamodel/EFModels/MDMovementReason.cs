@@ -108,7 +108,7 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_MDMovementReason != null;
+            return _FacilityBookingCharge_MDMovementReason != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_MDMovementReason != null;
+            return _FacilityBooking_MDMovementReason != null;
         }
     }
 

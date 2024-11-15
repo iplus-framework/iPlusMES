@@ -178,7 +178,7 @@ public partial class MaterialCalculation : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

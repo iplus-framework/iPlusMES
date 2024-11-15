@@ -59,7 +59,7 @@ namespace gip.mes.datamodel
                     return msg;
             }
             CompanyPerson companyPerson = CompanyPerson;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

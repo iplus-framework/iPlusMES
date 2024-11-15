@@ -52,7 +52,7 @@ public partial class TandTv3MixPointDeliveryNotePos : VBEntityObject
     {
         get
         {
-            return DeliveryNotePos != null;
+            return _DeliveryNotePos != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3MixPointDeliveryNotePos : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint != null;
+            return _TandTv3MixPoint != null;
         }
     }
 

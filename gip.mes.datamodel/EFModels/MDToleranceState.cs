@@ -108,7 +108,7 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos_MDToleranceState != null;
+            return _OutOrderPos_MDToleranceState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPos_MDToleranceState != null;
+            return _ProdOrderPartslistPos_MDToleranceState != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPosRelation_MDToleranceState != null;
+            return _ProdOrderPartslistPosRelation_MDToleranceState != null;
         }
     }
 

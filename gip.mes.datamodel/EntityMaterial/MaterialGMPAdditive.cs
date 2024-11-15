@@ -75,7 +75,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             Material material = Material;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             MaterialGMPAdditive.RenumberSequence(material, sequence);
             return null;
         }

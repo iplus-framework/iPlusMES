@@ -108,7 +108,7 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
     {
         get
         {
-            return FacilityBookingCharge_MDBookingNotAvailableMode != null;
+            return _FacilityBookingCharge_MDBookingNotAvailableMode != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
     {
         get
         {
-            return FacilityBooking_MDBookingNotAvailableMode != null;
+            return _FacilityBooking_MDBookingNotAvailableMode != null;
         }
     }
 

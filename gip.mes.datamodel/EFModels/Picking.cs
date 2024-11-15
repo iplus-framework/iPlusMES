@@ -206,7 +206,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return ACClassMethod != null;
+            return _ACClassMethod != null;
         }
     }
 
@@ -226,7 +226,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return DeliveryCompanyAddress != null;
+            return _DeliveryCompanyAddress != null;
         }
     }
 
@@ -246,7 +246,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return MDPickingType != null;
+            return _MDPickingType != null;
         }
     }
 
@@ -266,7 +266,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return MaintOrder_Picking != null;
+            return _MaintOrder_Picking != null;
         }
     }
 
@@ -286,7 +286,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return PickingConfig_Picking != null;
+            return _PickingConfig_Picking != null;
         }
     }
 
@@ -306,7 +306,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return PickingPos_Picking != null;
+            return _PickingPos_Picking != null;
         }
     }
 
@@ -326,7 +326,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return Tourplan != null;
+            return _Tourplan != null;
         }
     }
 
@@ -346,7 +346,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -366,7 +366,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get
         {
-            return VisitorVoucher != null;
+            return _VisitorVoucher != null;
         }
     }
 

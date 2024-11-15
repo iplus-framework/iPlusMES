@@ -94,7 +94,7 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return CompanyAddressDepartment != null;
+            return _CompanyAddressDepartment != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return CompanyPerson != null;
+            return _CompanyPerson != null;
         }
     }
 
@@ -134,7 +134,7 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return VBiRoleACClass != null;
+            return _VBiRoleACClass != null;
         }
     }
 

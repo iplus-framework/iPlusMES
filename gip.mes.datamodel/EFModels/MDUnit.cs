@@ -143,7 +143,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterial_MDUnit != null;
+            return _CompanyMaterial_MDUnit != null;
         }
     }
 
@@ -163,7 +163,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility_MDUnit != null;
+            return _Facility_MDUnit != null;
         }
     }
 
@@ -183,7 +183,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_MDUnit != null;
+            return _FacilityBookingCharge_MDUnit != null;
         }
     }
 
@@ -203,7 +203,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_MDUnit != null;
+            return _FacilityBooking_MDUnit != null;
         }
     }
 
@@ -223,7 +223,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityCharge_MDUnit != null;
+            return _FacilityCharge_MDUnit != null;
         }
     }
 
@@ -243,7 +243,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderPos_MDUnit != null;
+            return _InOrderPos_MDUnit != null;
         }
     }
 
@@ -263,7 +263,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestPos_MDUnit != null;
+            return _InRequestPos_MDUnit != null;
         }
     }
 
@@ -283,7 +283,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InvoicePos_MDUnit != null;
+            return _InvoicePos_MDUnit != null;
         }
     }
 
@@ -303,7 +303,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDGMPAdditive_MDQuantityUnit != null;
+            return _MDGMPAdditive_MDQuantityUnit != null;
         }
     }
 
@@ -323,7 +323,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDUnitConversion_MDUnit != null;
+            return _MDUnitConversion_MDUnit != null;
         }
     }
 
@@ -343,7 +343,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDUnitConversion_ToMDUnit != null;
+            return _MDUnitConversion_ToMDUnit != null;
         }
     }
 
@@ -363,7 +363,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialUnit_ToMDUnit != null;
+            return _MaterialUnit_ToMDUnit != null;
         }
     }
 
@@ -383,7 +383,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material_BaseMDUnit != null;
+            return _Material_BaseMDUnit != null;
         }
     }
 
@@ -403,7 +403,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferPos_MDUnit != null;
+            return _OutOfferPos_MDUnit != null;
         }
     }
 
@@ -423,7 +423,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos_MDUnit != null;
+            return _OutOrderPos_MDUnit != null;
         }
     }
 
@@ -443,7 +443,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PartslistPos_MDUnit != null;
+            return _PartslistPos_MDUnit != null;
         }
     }
 
@@ -463,7 +463,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Partslist_MDUnit != null;
+            return _Partslist_MDUnit != null;
         }
     }
 
@@ -483,7 +483,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistPos_MDUnit != null;
+            return _ProdOrderPartslistPos_MDUnit != null;
         }
     }
 

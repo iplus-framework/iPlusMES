@@ -164,7 +164,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass_ACProject != null;
+            return _ACClass_ACProject != null;
         }
     }
 
@@ -184,7 +184,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProject1_BasedOnACProject != null;
+            return _ACProject1_BasedOnACProject != null;
         }
     }
 
@@ -204,7 +204,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CalendarShift_VBiACProject != null;
+            return _CalendarShift_VBiACProject != null;
         }
     }
 
@@ -224,7 +224,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProject_BasedOnACProject != null;
+            return _ACProject_BasedOnACProject != null;
         }
     }
 
@@ -244,7 +244,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PAAppClassAssignmentACClass != null;
+            return _PAAppClassAssignmentACClass != null;
         }
     }
 
@@ -264,7 +264,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBUserACProject_ACProject != null;
+            return _VBUserACProject_ACProject != null;
         }
     }
 

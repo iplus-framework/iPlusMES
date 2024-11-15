@@ -150,7 +150,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return History != null;
+            return _History != null;
         }
     }
 
@@ -170,7 +170,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return HistoryConfig_ParentHistoryConfig != null;
+            return _HistoryConfig_ParentHistoryConfig != null;
         }
     }
 
@@ -190,7 +190,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return HistoryConfig1_ParentHistoryConfig != null;
+            return _HistoryConfig1_ParentHistoryConfig != null;
         }
     }
 
@@ -210,7 +210,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -230,7 +230,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -250,7 +250,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -270,7 +270,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

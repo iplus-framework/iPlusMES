@@ -213,7 +213,7 @@ public partial class MaterialHistory : VBEntityObject
     {
         get
         {
-            return History != null;
+            return _History != null;
         }
     }
 
@@ -233,7 +233,7 @@ public partial class MaterialHistory : VBEntityObject
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

@@ -80,7 +80,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             MDGMPMaterialGroup mdGMPMaterialGroup = MDGMPMaterialGroup;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             MDGMPMaterialGroupPos.RenumberSequence(mdGMPMaterialGroup, sequence);
             return null;
         }

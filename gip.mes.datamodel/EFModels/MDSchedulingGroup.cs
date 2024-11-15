@@ -94,7 +94,7 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return FacilityMDSchedulingGroup_MDSchedulingGroup != null;
+            return _FacilityMDSchedulingGroup_MDSchedulingGroup != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return MDSchedulingGroupWF_MDSchedulingGroup != null;
+            return _MDSchedulingGroupWF_MDSchedulingGroup != null;
         }
     }
 

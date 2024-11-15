@@ -136,7 +136,7 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return MDMaintTaskState != null;
+            return _MDMaintTaskState != null;
         }
     }
 
@@ -156,7 +156,7 @@ public partial class MaintOrderTask : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return MaintOrder != null;
+            return _MaintOrder != null;
         }
     }
 

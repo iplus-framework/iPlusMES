@@ -206,7 +206,7 @@ public partial class VBUserInstance : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 

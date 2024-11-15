@@ -248,7 +248,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return FacilityReservation_ProdOrderBatchPlan != null;
+            return _FacilityReservation_ProdOrderBatchPlan != null;
         }
     }
 
@@ -268,7 +268,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MDBatchPlanGroup != null;
+            return _MDBatchPlanGroup != null;
         }
     }
 
@@ -288,7 +288,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MaterialWFACClassMethod != null;
+            return _MaterialWFACClassMethod != null;
         }
     }
 
@@ -308,7 +308,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderBatch_ProdOrderBatchPlan != null;
+            return _ProdOrderBatch_ProdOrderBatchPlan != null;
         }
     }
 
@@ -328,7 +328,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderPartslist != null;
+            return _ProdOrderPartslist != null;
         }
     }
 
@@ -348,7 +348,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 
@@ -368,7 +368,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 

@@ -87,7 +87,7 @@ public partial class ACPackage : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass_ACPackage != null;
+            return _ACClass_ACPackage != null;
         }
     }
 

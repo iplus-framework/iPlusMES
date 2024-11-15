@@ -528,7 +528,7 @@ public partial class MaterialStock : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDReleaseState != null;
+            return _MDReleaseState != null;
         }
     }
 
@@ -548,7 +548,7 @@ public partial class MaterialStock : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

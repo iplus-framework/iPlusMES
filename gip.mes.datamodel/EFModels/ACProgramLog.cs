@@ -157,7 +157,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgram != null;
+            return _ACProgram != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgramLogTask_ACProgramLog != null;
+            return _ACProgramLogTask_ACProgramLog != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgramLog_ParentACProgramLog != null;
+            return _ACProgramLog_ParentACProgramLog != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MsgAlarmLog_ACProgramLog != null;
+            return _MsgAlarmLog_ACProgramLog != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OperationLog_ACProgramLog != null;
+            return _OperationLog_ACProgramLog != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OrderLog_VBiACProgramLog != null;
+            return _OrderLog_VBiACProgramLog != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgramLog1_ParentACProgramLog != null;
+            return _ACProgramLog1_ParentACProgramLog != null;
         }
     }
 

@@ -192,7 +192,7 @@ public partial class FacilityMaterialOEE : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return FacilityMaterial != null;
+            return _FacilityMaterial != null;
         }
     }
 

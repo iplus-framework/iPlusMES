@@ -73,7 +73,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     {
         get
         {
-            return ACClassMethod != null;
+            return _ACClassMethod != null;
         }
     }
 
@@ -93,7 +93,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     {
         get
         {
-            return MaterialWF != null;
+            return _MaterialWF != null;
         }
     }
 
@@ -113,7 +113,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     {
         get
         {
-            return MaterialWFACClassMethodConfig_MaterialWFACClassMethod != null;
+            return _MaterialWFACClassMethodConfig_MaterialWFACClassMethod != null;
         }
     }
 
@@ -133,7 +133,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     {
         get
         {
-            return MaterialWFConnection_MaterialWFACClassMethod != null;
+            return _MaterialWFConnection_MaterialWFACClassMethod != null;
         }
     }
 
@@ -153,7 +153,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     {
         get
         {
-            return PartslistACClassMethod_MaterialWFACClassMethod != null;
+            return _PartslistACClassMethod_MaterialWFACClassMethod != null;
         }
     }
 
@@ -173,7 +173,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     {
         get
         {
-            return ProdOrderBatchPlan_MaterialWFACClassMethod != null;
+            return _ProdOrderBatchPlan_MaterialWFACClassMethod != null;
         }
     }
 

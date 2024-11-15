@@ -108,7 +108,7 @@ public partial class MDFacilityInventoryState : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return FacilityInventory_MDFacilityInventoryState != null;
+            return _FacilityInventory_MDFacilityInventoryState != null;
         }
     }
 

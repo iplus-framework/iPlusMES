@@ -108,7 +108,7 @@ public partial class MDInvoiceState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return Invoice_MDInvoiceState != null;
+            return _Invoice_MDInvoiceState != null;
         }
     }
 

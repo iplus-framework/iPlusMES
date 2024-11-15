@@ -101,7 +101,7 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return Invoice_MDCurrencyExchange != null;
+            return _Invoice_MDCurrencyExchange != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MDCurrency != null;
+            return _MDCurrency != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ToMDCurrency != null;
+            return _ToMDCurrency != null;
         }
     }
 

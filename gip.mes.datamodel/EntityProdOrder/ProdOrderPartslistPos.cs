@@ -97,7 +97,7 @@ namespace gip.mes.datamodel
                     return msg;
             }
             int sequence = Sequence;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

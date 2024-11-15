@@ -115,7 +115,7 @@ public partial class CalendarShiftPerson : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return CalendarShift != null;
+            return _CalendarShift != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class CalendarShiftPerson : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return CompanyPerson != null;
+            return _CompanyPerson != null;
         }
     }
 

@@ -157,7 +157,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return ProdOrderPartslistConfig_ParentProdOrderPartslistConfig != null;
+            return _ProdOrderPartslistConfig_ParentProdOrderPartslistConfig != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig != null;
+            return _ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return ProdOrderPartslist != null;
+            return _ProdOrderPartslist != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -297,7 +297,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

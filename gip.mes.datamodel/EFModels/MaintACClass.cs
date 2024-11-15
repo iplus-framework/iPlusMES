@@ -73,7 +73,7 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintACClassProperty_MaintACClass != null;
+            return _MaintACClassProperty_MaintACClass != null;
         }
     }
 
@@ -93,7 +93,7 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrder_MaintACClass != null;
+            return _MaintOrder_MaintACClass != null;
         }
     }
 
@@ -113,7 +113,7 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 

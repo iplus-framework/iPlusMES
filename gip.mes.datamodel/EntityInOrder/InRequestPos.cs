@@ -91,7 +91,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             InRequest inRequest = InRequest;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             InRequestPos.RenumberSequence(inRequest, sequence);
             return null;
         }

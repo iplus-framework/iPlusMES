@@ -101,7 +101,7 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Calendar != null;
+            return _Calendar != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCountry != null;
+            return _MDCountry != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCountryLand != null;
+            return _MDCountryLand != null;
         }
     }
 

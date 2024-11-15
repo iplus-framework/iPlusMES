@@ -143,7 +143,7 @@ public partial class OutOrderPosUtilization : VBEntityObject, IInsertInfo, IUpda
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -163,7 +163,7 @@ public partial class OutOrderPosUtilization : VBEntityObject, IInsertInfo, IUpda
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 

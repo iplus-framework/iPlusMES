@@ -87,7 +87,7 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return CompanyAddress != null;
+            return _CompanyAddress != null;
         }
     }
 
@@ -107,7 +107,7 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return CompanyPersonRole_CompanyAddressDepartment != null;
+            return _CompanyPersonRole_CompanyAddressDepartment != null;
         }
     }
 

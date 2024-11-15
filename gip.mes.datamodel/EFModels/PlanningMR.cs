@@ -115,7 +115,7 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PlanningMRProposal_PlanningMR != null;
+            return _PlanningMRProposal_PlanningMR != null;
         }
     }
 

@@ -77,7 +77,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             ProdOrderPartslistPos outOrderPos = ProdOrderPartslistPos;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             ProdOrderPartslistPosSplit.RenumberSequence(outOrderPos, sequence);
             return null;
         }

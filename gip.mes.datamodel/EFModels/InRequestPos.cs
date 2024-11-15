@@ -206,7 +206,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return InRequest != null;
+            return _InRequest != null;
         }
     }
 
@@ -226,7 +226,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return InRequestPos_ParentInRequestPos != null;
+            return _InRequestPos_ParentInRequestPos != null;
         }
     }
 
@@ -246,7 +246,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return MDCountrySalesTax != null;
+            return _MDCountrySalesTax != null;
         }
     }
 
@@ -266,7 +266,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -286,7 +286,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -306,7 +306,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -326,7 +326,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     {
         get
         {
-            return InRequestPos1_ParentInRequestPos != null;
+            return _InRequestPos1_ParentInRequestPos != null;
         }
     }
 

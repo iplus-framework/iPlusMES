@@ -80,7 +80,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderAssignment_VBGroup != null;
+            return _MaintOrderAssignment_VBGroup != null;
         }
     }
 
@@ -100,7 +100,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBGroupRight_VBGroup != null;
+            return _VBGroupRight_VBGroup != null;
         }
     }
 
@@ -120,7 +120,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBUserGroup_VBGroup != null;
+            return _VBUserGroup_VBGroup != null;
         }
     }
 

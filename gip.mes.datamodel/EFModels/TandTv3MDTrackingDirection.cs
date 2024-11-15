@@ -38,7 +38,7 @@ public partial class TandTv3MDTrackingDirection : VBEntityObject
     {
         get
         {
-            return TandTv3FilterTracking_TandTv3MDTrackingDirection != null;
+            return _TandTv3FilterTracking_TandTv3MDTrackingDirection != null;
         }
     }
 

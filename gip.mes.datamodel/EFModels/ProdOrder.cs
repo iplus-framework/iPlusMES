@@ -101,7 +101,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CPartnerCompany != null;
+            return _CPartnerCompany != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDProdOrderState != null;
+            return _MDProdOrderState != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PlanningMRProposal_ProdOrder != null;
+            return _PlanningMRProposal_ProdOrder != null;
         }
     }
 
@@ -161,7 +161,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslist_ProdOrder != null;
+            return _ProdOrderPartslist_ProdOrder != null;
         }
     }
 

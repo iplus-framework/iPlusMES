@@ -101,7 +101,7 @@ public partial class MDGMPMaterialGroupPos : VBEntityObject, IInsertInfo, IUpdat
     {
         get
         {
-            return MDGMPAdditive != null;
+            return _MDGMPAdditive != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class MDGMPMaterialGroupPos : VBEntityObject, IInsertInfo, IUpdat
     {
         get
         {
-            return MDGMPMaterialGroup != null;
+            return _MDGMPMaterialGroup != null;
         }
     }
 

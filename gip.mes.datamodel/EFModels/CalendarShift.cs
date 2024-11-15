@@ -108,7 +108,7 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Calendar != null;
+            return _Calendar != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CalendarShiftPerson_CalendarShift != null;
+            return _CalendarShiftPerson_CalendarShift != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -168,7 +168,7 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACProject != null;
+            return _VBiACProject != null;
         }
     }
 

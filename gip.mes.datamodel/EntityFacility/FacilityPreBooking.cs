@@ -95,7 +95,7 @@ namespace gip.mes.datamodel
 
             if (_ACMethodBooking != null)
                 _ACMethodBooking.PropertyChanged -= _ACMethodBooking_PropertyChanged;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

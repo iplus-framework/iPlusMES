@@ -73,7 +73,7 @@ public partial class OrderLog : VBEntityObject
     {
         get
         {
-            return DeliveryNotePos != null;
+            return _DeliveryNotePos != null;
         }
     }
 
@@ -93,7 +93,7 @@ public partial class OrderLog : VBEntityObject
     {
         get
         {
-            return FacilityBooking != null;
+            return _FacilityBooking != null;
         }
     }
 
@@ -113,7 +113,7 @@ public partial class OrderLog : VBEntityObject
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -133,7 +133,7 @@ public partial class OrderLog : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 
@@ -153,7 +153,7 @@ public partial class OrderLog : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPosRelation != null;
+            return _ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -173,7 +173,7 @@ public partial class OrderLog : VBEntityObject
     {
         get
         {
-            return VBiACProgramLog != null;
+            return _VBiACProgramLog != null;
         }
     }
 

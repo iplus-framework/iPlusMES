@@ -165,7 +165,7 @@ namespace gip.mes.datamodel
 
             // 2. Referenzen auflösen
 
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

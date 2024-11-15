@@ -52,7 +52,7 @@ public partial class TandTv3MixPointFacilityBookingCharge : VBEntityObject
     {
         get
         {
-            return FacilityBookingCharge != null;
+            return _FacilityBookingCharge != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3MixPointFacilityBookingCharge : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint != null;
+            return _TandTv3MixPoint != null;
         }
     }
 

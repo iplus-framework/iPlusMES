@@ -94,7 +94,7 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return InOrder != null;
+            return _InOrder != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return PlanningMR != null;
+            return _PlanningMR != null;
         }
     }
 
@@ -134,7 +134,7 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrder != null;
+            return _ProdOrder != null;
         }
     }
 
@@ -154,7 +154,7 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return ProdOrderPartslist != null;
+            return _ProdOrderPartslist != null;
         }
     }
 

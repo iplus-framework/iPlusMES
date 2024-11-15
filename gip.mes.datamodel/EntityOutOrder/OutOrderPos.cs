@@ -162,7 +162,7 @@ namespace gip.mes.datamodel
             if (outOrder != null)
                 if (outOrder.OutOrderPos_OutOrder_IsLoaded)
                     outOrder.OutOrderPos_OutOrder.Remove(this);
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             if (outOrder != null)
                 OutOrderPos.RenumberSequence(outOrder, sequence);
             return null;

@@ -108,7 +108,7 @@ public partial class MDFacilityInventoryPosState : VBEntityObject, IInsertInfo, 
     {
         get
         {
-            return FacilityInventoryPos_MDFacilityInventoryPosState != null;
+            return _FacilityInventoryPos_MDFacilityInventoryPosState != null;
         }
     }
 

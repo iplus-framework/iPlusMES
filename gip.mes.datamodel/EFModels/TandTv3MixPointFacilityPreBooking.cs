@@ -52,7 +52,7 @@ public partial class TandTv3MixPointFacilityPreBooking : VBEntityObject
     {
         get
         {
-            return FacilityPreBooking != null;
+            return _FacilityPreBooking != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3MixPointFacilityPreBooking : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint != null;
+            return _TandTv3MixPoint != null;
         }
     }
 

@@ -52,7 +52,7 @@ public partial class Label : VBEntityObject
     {
         get
         {
-            return LabelTranslation_Label != null;
+            return _LabelTranslation_Label != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class Label : VBEntityObject
     {
         get
         {
-            return Material_Label != null;
+            return _Material_Label != null;
         }
     }
 

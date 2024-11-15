@@ -108,7 +108,7 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return InOrderPos_MDTransportMode != null;
+            return _InOrderPos_MDTransportMode != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOrderPos_MDTransportMode != null;
+            return _OutOrderPos_MDTransportMode != null;
         }
     }
 

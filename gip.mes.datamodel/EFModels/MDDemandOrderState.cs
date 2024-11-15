@@ -108,7 +108,7 @@ public partial class MDDemandOrderState : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return DemandOrder_MDDemandOrderState != null;
+            return _DemandOrder_MDDemandOrderState != null;
         }
     }
 

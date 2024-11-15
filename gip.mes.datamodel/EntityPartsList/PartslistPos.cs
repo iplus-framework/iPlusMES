@@ -88,7 +88,7 @@ namespace gip.mes.datamodel
             {
                 basedPos.BasedOnPartslistPosID = null;
             }
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

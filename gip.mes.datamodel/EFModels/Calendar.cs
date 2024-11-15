@@ -80,7 +80,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CalendarHoliday_Calendar != null;
+            return _CalendarHoliday_Calendar != null;
         }
     }
 
@@ -100,7 +100,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CalendarShift_Calendar != null;
+            return _CalendarShift_Calendar != null;
         }
     }
 
@@ -120,7 +120,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DemandPrimary_Calendar != null;
+            return _DemandPrimary_Calendar != null;
         }
     }
 

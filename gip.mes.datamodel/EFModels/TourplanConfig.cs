@@ -150,7 +150,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanConfig_ParentTourplanConfig != null;
+            return _TourplanConfig_ParentTourplanConfig != null;
         }
     }
 
@@ -170,7 +170,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -190,7 +190,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanConfig1_ParentTourplanConfig != null;
+            return _TourplanConfig1_ParentTourplanConfig != null;
         }
     }
 
@@ -210,7 +210,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Tourplan != null;
+            return _Tourplan != null;
         }
     }
 
@@ -230,7 +230,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -250,7 +250,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -270,7 +270,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

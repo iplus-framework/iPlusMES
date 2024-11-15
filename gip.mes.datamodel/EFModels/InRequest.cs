@@ -192,7 +192,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return BillingCompanyAddress != null;
+            return _BillingCompanyAddress != null;
         }
     }
 
@@ -212,7 +212,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryCompanyAddress != null;
+            return _DeliveryCompanyAddress != null;
         }
     }
 
@@ -232,7 +232,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DistributorCompany != null;
+            return _DistributorCompany != null;
         }
     }
 
@@ -252,7 +252,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder_BasedOnInRequest != null;
+            return _InOrder_BasedOnInRequest != null;
         }
     }
 
@@ -272,7 +272,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestConfig_InRequest != null;
+            return _InRequestConfig_InRequest != null;
         }
     }
 
@@ -292,7 +292,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestPos_InRequest != null;
+            return _InRequestPos_InRequest != null;
         }
     }
 
@@ -312,7 +312,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDDelivType != null;
+            return _MDDelivType != null;
         }
     }
 
@@ -332,7 +332,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDInOrderType != null;
+            return _MDInOrderType != null;
         }
     }
 
@@ -352,7 +352,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDInRequestState != null;
+            return _MDInRequestState != null;
         }
     }
 
@@ -372,7 +372,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTermOfPayment != null;
+            return _MDTermOfPayment != null;
         }
     }
 
@@ -392,7 +392,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 

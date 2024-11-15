@@ -234,7 +234,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return BillingCompanyAddress != null;
+            return _BillingCompanyAddress != null;
         }
     }
 
@@ -254,7 +254,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CustomerCompany != null;
+            return _CustomerCompany != null;
         }
     }
 
@@ -274,7 +274,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryCompanyAddress != null;
+            return _DeliveryCompanyAddress != null;
         }
     }
 
@@ -294,7 +294,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return IssuerCompanyAddress != null;
+            return _IssuerCompanyAddress != null;
         }
     }
 
@@ -314,7 +314,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return IssuerCompanyPerson != null;
+            return _IssuerCompanyPerson != null;
         }
     }
 
@@ -334,7 +334,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCurrency != null;
+            return _MDCurrency != null;
         }
     }
 
@@ -354,7 +354,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDDelivType != null;
+            return _MDDelivType != null;
         }
     }
 
@@ -374,7 +374,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDOutOfferState != null;
+            return _MDOutOfferState != null;
         }
     }
 
@@ -394,7 +394,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDOutOrderType != null;
+            return _MDOutOrderType != null;
         }
     }
 
@@ -414,7 +414,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTermOfPayment != null;
+            return _MDTermOfPayment != null;
         }
     }
 
@@ -434,7 +434,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -454,7 +454,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferConfig_OutOffer != null;
+            return _OutOfferConfig_OutOffer != null;
         }
     }
 
@@ -474,7 +474,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferPos_OutOffer != null;
+            return _OutOfferPos_OutOffer != null;
         }
     }
 
@@ -494,7 +494,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_BasedOnOutOffer != null;
+            return _OutOrder_BasedOnOutOffer != null;
         }
     }
 

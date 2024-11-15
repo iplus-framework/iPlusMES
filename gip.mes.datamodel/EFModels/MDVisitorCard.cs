@@ -94,7 +94,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDVisitorCardState != null;
+            return _MDVisitorCardState != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher_MDVisitorCard != null;
+            return _VisitorVoucher_MDVisitorCard != null;
         }
     }
 
@@ -134,7 +134,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Visitor_MDVisitorCard != null;
+            return _Visitor_MDVisitorCard != null;
         }
     }
 

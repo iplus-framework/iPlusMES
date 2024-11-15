@@ -150,7 +150,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig != null;
+            return _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig != null;
         }
     }
 
@@ -170,7 +170,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return MaterialWFACClassMethod != null;
+            return _MaterialWFACClassMethod != null;
         }
     }
 
@@ -190,7 +190,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig != null;
+            return _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig != null;
         }
     }
 
@@ -210,7 +210,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -230,7 +230,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -250,7 +250,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -270,7 +270,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

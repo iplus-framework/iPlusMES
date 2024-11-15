@@ -326,7 +326,7 @@ namespace gip.mes.datamodel
             }
             this.VisitorVoucher_VehicleFacility.Clear();
 
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
 
             return null;
         }

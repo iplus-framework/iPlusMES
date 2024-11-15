@@ -87,7 +87,7 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return ACClassWF != null;
+            return _ACClassWF != null;
         }
     }
 
@@ -107,7 +107,7 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -127,7 +127,7 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MaterialWFACClassMethod != null;
+            return _MaterialWFACClassMethod != null;
         }
     }
 

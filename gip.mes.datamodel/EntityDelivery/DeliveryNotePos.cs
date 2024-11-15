@@ -86,7 +86,7 @@ namespace gip.mes.datamodel
                 if (inDeliveryNote.DeliveryNotePos_DeliveryNote_IsLoaded)
                     inDeliveryNote.DeliveryNotePos_DeliveryNote.Remove(this);
             }
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             if (inDeliveryNote != null)
                 DeliveryNotePos.RenumberSequence(inDeliveryNote, sequence);
             return null;

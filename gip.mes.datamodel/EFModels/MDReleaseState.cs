@@ -108,7 +108,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return CompanyMaterialStock_MDReleaseState != null;
+            return _CompanyMaterialStock_MDReleaseState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return FacilityBookingCharge_MDReleaseState != null;
+            return _FacilityBookingCharge_MDReleaseState != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return FacilityBooking_MDReleaseState != null;
+            return _FacilityBooking_MDReleaseState != null;
         }
     }
 
@@ -168,7 +168,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return FacilityCharge_MDReleaseState != null;
+            return _FacilityCharge_MDReleaseState != null;
         }
     }
 
@@ -188,7 +188,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return FacilityLotStock_MDReleaseState != null;
+            return _FacilityLotStock_MDReleaseState != null;
         }
     }
 
@@ -208,7 +208,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return FacilityLot_MDReleaseState != null;
+            return _FacilityLot_MDReleaseState != null;
         }
     }
 
@@ -228,7 +228,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return FacilityStock_MDReleaseState != null;
+            return _FacilityStock_MDReleaseState != null;
         }
     }
 
@@ -248,7 +248,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return MaterialStock_MDReleaseState != null;
+            return _MaterialStock_MDReleaseState != null;
         }
     }
 
@@ -268,7 +268,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return PartslistStock_MDReleaseState != null;
+            return _PartslistStock_MDReleaseState != null;
         }
     }
 

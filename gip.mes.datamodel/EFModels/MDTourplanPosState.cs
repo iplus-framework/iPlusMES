@@ -108,7 +108,7 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return OutOrderPos_MDTourplanPosState != null;
+            return _OutOrderPos_MDTourplanPosState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return TourplanPos_MDTourplanPosState != null;
+            return _TourplanPos_MDTourplanPosState != null;
         }
     }
 

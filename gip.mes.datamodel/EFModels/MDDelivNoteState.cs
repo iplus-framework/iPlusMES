@@ -108,7 +108,7 @@ public partial class MDDelivNoteState : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote_MDDelivNoteState != null;
+            return _DeliveryNote_MDDelivNoteState != null;
         }
     }
 

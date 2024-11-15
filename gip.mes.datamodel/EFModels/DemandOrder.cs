@@ -101,7 +101,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DemandOrderPos_DemandOrder != null;
+            return _DemandOrderPos_DemandOrder != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DemandProdOrder_DemandOrder != null;
+            return _DemandProdOrder_DemandOrder != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDDemandOrderState != null;
+            return _MDDemandOrderState != null;
         }
     }
 

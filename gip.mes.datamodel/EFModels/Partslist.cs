@@ -255,7 +255,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return DemandOrderPos_Partslist != null;
+            return _DemandOrderPos_Partslist != null;
         }
     }
 
@@ -275,7 +275,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return Facility_Partslist != null;
+            return _Facility_Partslist != null;
         }
     }
 
@@ -295,7 +295,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return FacilityBookingCharge_InwardPartslist != null;
+            return _FacilityBookingCharge_InwardPartslist != null;
         }
     }
 
@@ -315,7 +315,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return FacilityBookingCharge_OutwardPartslist != null;
+            return _FacilityBookingCharge_OutwardPartslist != null;
         }
     }
 
@@ -335,7 +335,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return FacilityBooking_InwardPartslist != null;
+            return _FacilityBooking_InwardPartslist != null;
         }
     }
 
@@ -355,7 +355,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return FacilityBooking_OutwardPartslist != null;
+            return _FacilityBooking_OutwardPartslist != null;
         }
     }
 
@@ -375,7 +375,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return FacilityCharge_Partslist != null;
+            return _FacilityCharge_Partslist != null;
         }
     }
 
@@ -395,7 +395,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return Partslist_PreviousPartslist != null;
+            return _Partslist_PreviousPartslist != null;
         }
     }
 
@@ -415,7 +415,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -435,7 +435,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -455,7 +455,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return MaterialWF != null;
+            return _MaterialWF != null;
         }
     }
 
@@ -475,7 +475,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return PartslistACClassMethod_Partslist != null;
+            return _PartslistACClassMethod_Partslist != null;
         }
     }
 
@@ -495,7 +495,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return PartslistConfig_Partslist != null;
+            return _PartslistConfig_Partslist != null;
         }
     }
 
@@ -515,7 +515,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return PartslistPos_ParentPartslist != null;
+            return _PartslistPos_ParentPartslist != null;
         }
     }
 
@@ -535,7 +535,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return PartslistPos_Partslist != null;
+            return _PartslistPos_Partslist != null;
         }
     }
 
@@ -555,7 +555,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return PartslistStock_Partslist != null;
+            return _PartslistStock_Partslist != null;
         }
     }
 
@@ -575,7 +575,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return Partslist1_PreviousPartslist != null;
+            return _Partslist1_PreviousPartslist != null;
         }
     }
 
@@ -595,7 +595,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
     {
         get
         {
-            return ProdOrderPartslist_Partslist != null;
+            return _ProdOrderPartslist_Partslist != null;
         }
     }
 

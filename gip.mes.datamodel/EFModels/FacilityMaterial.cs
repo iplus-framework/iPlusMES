@@ -129,7 +129,7 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -149,7 +149,7 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityMaterialOEE_FacilityMaterial != null;
+            return _FacilityMaterialOEE_FacilityMaterial != null;
         }
     }
 
@@ -169,7 +169,7 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

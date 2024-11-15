@@ -101,7 +101,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return FacilityInventoryPos_FacilityInventory != null;
+            return _FacilityInventoryPos_FacilityInventory != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return MDFacilityInventoryState != null;
+            return _MDFacilityInventoryState != null;
         }
     }
 

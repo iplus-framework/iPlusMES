@@ -234,7 +234,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -254,7 +254,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyAddressDepartment_CompanyAddress != null;
+            return _CompanyAddressDepartment_CompanyAddress != null;
         }
     }
 
@@ -274,7 +274,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyAddressUnloadingpoint_CompanyAddress != null;
+            return _CompanyAddressUnloadingpoint_CompanyAddress != null;
         }
     }
 
@@ -294,7 +294,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote_Delivery2CompanyAddress != null;
+            return _DeliveryNote_Delivery2CompanyAddress != null;
         }
     }
 
@@ -314,7 +314,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote_DeliveryCompanyAddress != null;
+            return _DeliveryNote_DeliveryCompanyAddress != null;
         }
     }
 
@@ -334,7 +334,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote_ShipperCompanyAddress != null;
+            return _DeliveryNote_ShipperCompanyAddress != null;
         }
     }
 
@@ -354,7 +354,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder_BillingCompanyAddress != null;
+            return _InOrder_BillingCompanyAddress != null;
         }
     }
 
@@ -374,7 +374,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrder_DeliveryCompanyAddress != null;
+            return _InOrder_DeliveryCompanyAddress != null;
         }
     }
 
@@ -394,7 +394,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequest_BillingCompanyAddress != null;
+            return _InRequest_BillingCompanyAddress != null;
         }
     }
 
@@ -414,7 +414,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequest_DeliveryCompanyAddress != null;
+            return _InRequest_DeliveryCompanyAddress != null;
         }
     }
 
@@ -434,7 +434,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Invoice_BillingCompanyAddress != null;
+            return _Invoice_BillingCompanyAddress != null;
         }
     }
 
@@ -454,7 +454,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Invoice_DeliveryCompanyAddress != null;
+            return _Invoice_DeliveryCompanyAddress != null;
         }
     }
 
@@ -474,7 +474,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Invoice_IssuerCompanyAddress != null;
+            return _Invoice_IssuerCompanyAddress != null;
         }
     }
 
@@ -494,7 +494,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCountry != null;
+            return _MDCountry != null;
         }
     }
 
@@ -514,7 +514,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDCountryLand != null;
+            return _MDCountryLand != null;
         }
     }
 
@@ -534,7 +534,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDDelivType != null;
+            return _MDDelivType != null;
         }
     }
 
@@ -554,7 +554,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOffer_BillingCompanyAddress != null;
+            return _OutOffer_BillingCompanyAddress != null;
         }
     }
 
@@ -574,7 +574,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOffer_DeliveryCompanyAddress != null;
+            return _OutOffer_DeliveryCompanyAddress != null;
         }
     }
 
@@ -594,7 +594,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOffer_IssuerCompanyAddress != null;
+            return _OutOffer_IssuerCompanyAddress != null;
         }
     }
 
@@ -614,7 +614,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_BillingCompanyAddress != null;
+            return _OutOrder_BillingCompanyAddress != null;
         }
     }
 
@@ -634,7 +634,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_DeliveryCompanyAddress != null;
+            return _OutOrder_DeliveryCompanyAddress != null;
         }
     }
 
@@ -654,7 +654,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrder_IssuerCompanyAddress != null;
+            return _OutOrder_IssuerCompanyAddress != null;
         }
     }
 
@@ -674,7 +674,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Picking_DeliveryCompanyAddress != null;
+            return _Picking_DeliveryCompanyAddress != null;
         }
     }
 
@@ -694,7 +694,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanPos_CompanyAddress != null;
+            return _TourplanPos_CompanyAddress != null;
         }
     }
 
@@ -714,7 +714,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return UserSettings_InvoiceCompanyAddress != null;
+            return _UserSettings_InvoiceCompanyAddress != null;
         }
     }
 

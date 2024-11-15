@@ -241,7 +241,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -261,7 +261,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTour != null;
+            return _MDTour != null;
         }
     }
 
@@ -281,7 +281,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTourplanState != null;
+            return _MDTourplanState != null;
         }
     }
 
@@ -301,7 +301,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Picking_Tourplan != null;
+            return _Picking_Tourplan != null;
         }
     }
 
@@ -321,7 +321,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanConfig_Tourplan != null;
+            return _TourplanConfig_Tourplan != null;
         }
     }
 
@@ -341,7 +341,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanPos_Tourplan != null;
+            return _TourplanPos_Tourplan != null;
         }
     }
 
@@ -361,7 +361,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TrailerFacility != null;
+            return _TrailerFacility != null;
         }
     }
 
@@ -381,7 +381,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VehicleFacility != null;
+            return _VehicleFacility != null;
         }
     }
 
@@ -401,7 +401,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher != null;
+            return _VisitorVoucher != null;
         }
     }
 

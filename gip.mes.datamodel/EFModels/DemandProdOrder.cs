@@ -87,7 +87,7 @@ public partial class DemandProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DemandOrder != null;
+            return _DemandOrder != null;
         }
     }
 

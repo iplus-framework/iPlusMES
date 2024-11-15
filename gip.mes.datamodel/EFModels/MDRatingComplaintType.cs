@@ -101,7 +101,7 @@ public partial class MDRatingComplaintType : VBEntityObject, IInsertInfo, IUpdat
     {
         get
         {
-            return RatingComplaint_MDRatingComplaintType != null;
+            return _RatingComplaint_MDRatingComplaintType != null;
         }
     }
 

@@ -157,7 +157,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return LabOrder != null;
+            return _LabOrder != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDLabOrderPosState != null;
+            return _MDLabOrderPosState != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDLabTag != null;
+            return _MDLabTag != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return Weighing_LabOrderPos != null;
+            return _Weighing_LabOrderPos != null;
         }
     }
 

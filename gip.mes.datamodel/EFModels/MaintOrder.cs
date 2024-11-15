@@ -192,7 +192,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrder1_BasedOnMaintOrder != null;
+            return _MaintOrder1_BasedOnMaintOrder != null;
         }
     }
 
@@ -212,7 +212,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -232,7 +232,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrder_BasedOnMaintOrder != null;
+            return _MaintOrder_BasedOnMaintOrder != null;
         }
     }
 
@@ -252,7 +252,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDMaintOrderState != null;
+            return _MDMaintOrderState != null;
         }
     }
 
@@ -272,7 +272,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintACClass != null;
+            return _MaintACClass != null;
         }
     }
 
@@ -292,7 +292,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderAssignment_MaintOrder != null;
+            return _MaintOrderAssignment_MaintOrder != null;
         }
     }
 
@@ -312,7 +312,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderPos_MaintOrder != null;
+            return _MaintOrderPos_MaintOrder != null;
         }
     }
 
@@ -332,7 +332,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderProperty_MaintOrder != null;
+            return _MaintOrderProperty_MaintOrder != null;
         }
     }
 
@@ -352,7 +352,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrderTask_MaintOrder != null;
+            return _MaintOrderTask_MaintOrder != null;
         }
     }
 
@@ -372,7 +372,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Picking != null;
+            return _Picking != null;
         }
     }
 
@@ -392,7 +392,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiPAACClass != null;
+            return _VBiPAACClass != null;
         }
     }
 

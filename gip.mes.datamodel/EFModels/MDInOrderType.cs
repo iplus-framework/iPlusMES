@@ -108,7 +108,7 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return InOrder_MDInOrderType != null;
+            return _InOrder_MDInOrderType != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return InRequest_MDInOrderType != null;
+            return _InRequest_MDInOrderType != null;
         }
     }
 

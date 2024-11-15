@@ -108,7 +108,7 @@ public partial class MDOutOfferState : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOffer_MDOutOfferState != null;
+            return _OutOffer_MDOutOfferState != null;
         }
     }
 

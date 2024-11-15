@@ -178,7 +178,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return Invoice != null;
+            return _Invoice != null;
         }
     }
 
@@ -198,7 +198,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDCountrySalesTax != null;
+            return _MDCountrySalesTax != null;
         }
     }
 
@@ -218,7 +218,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDCountrySalesTaxMDMaterialGroup != null;
+            return _MDCountrySalesTaxMDMaterialGroup != null;
         }
     }
 
@@ -238,7 +238,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDCountrySalesTaxMaterial != null;
+            return _MDCountrySalesTaxMaterial != null;
         }
     }
 
@@ -258,7 +258,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -278,7 +278,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -298,7 +298,7 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 

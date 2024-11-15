@@ -164,7 +164,7 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -184,7 +184,7 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabOrderPos != null;
+            return _LabOrderPos != null;
         }
     }
 
@@ -204,7 +204,7 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -224,7 +224,7 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -244,7 +244,7 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher != null;
+            return _VisitorVoucher != null;
         }
     }
 

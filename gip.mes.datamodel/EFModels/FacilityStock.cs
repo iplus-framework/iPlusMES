@@ -549,7 +549,7 @@ public partial class FacilityStock : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -569,7 +569,7 @@ public partial class FacilityStock : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDReleaseState != null;
+            return _MDReleaseState != null;
         }
     }
 

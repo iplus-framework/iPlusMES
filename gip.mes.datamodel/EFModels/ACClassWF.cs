@@ -143,7 +143,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethod != null;
+            return _ACClassMethod != null;
         }
     }
 
@@ -163,7 +163,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethodConfig_ACClassWF != null;
+            return _ACClassMethodConfig_ACClassWF != null;
         }
     }
 
@@ -183,7 +183,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassTask_ContentACClassWF != null;
+            return _ACClassTask_ContentACClassWF != null;
         }
     }
 
@@ -203,7 +203,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassWFEdge_SourceACClassWF != null;
+            return _ACClassWFEdge_SourceACClassWF != null;
         }
     }
 
@@ -223,7 +223,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassWFEdge_TargetACClassWF != null;
+            return _ACClassWFEdge_TargetACClassWF != null;
         }
     }
 
@@ -243,7 +243,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return HistoryConfig_VBiACClassWF != null;
+            return _HistoryConfig_VBiACClassWF != null;
         }
     }
 
@@ -263,7 +263,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderConfig_VBiACClassWF != null;
+            return _InOrderConfig_VBiACClassWF != null;
         }
     }
 
@@ -283,7 +283,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassWF_ParentACClassWF != null;
+            return _ACClassWF_ParentACClassWF != null;
         }
     }
 
@@ -303,7 +303,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDSchedulingGroupWF_VBiACClassWF != null;
+            return _MDSchedulingGroupWF_VBiACClassWF != null;
         }
     }
 
@@ -323,7 +323,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialConfig_VBiACClassWF != null;
+            return _MaterialConfig_VBiACClassWF != null;
         }
     }
 
@@ -343,7 +343,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFACClassMethodConfig_VBiACClassWF != null;
+            return _MaterialWFACClassMethodConfig_VBiACClassWF != null;
         }
     }
 
@@ -363,7 +363,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFConnection_ACClassWF != null;
+            return _MaterialWFConnection_ACClassWF != null;
         }
     }
 
@@ -383,7 +383,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderConfig_VBiACClassWF != null;
+            return _OutOrderConfig_VBiACClassWF != null;
         }
     }
 
@@ -403,7 +403,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PWACClass != null;
+            return _PWACClass != null;
         }
     }
 
@@ -423,7 +423,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassWF1_ParentACClassWF != null;
+            return _ACClassWF1_ParentACClassWF != null;
         }
     }
 
@@ -443,7 +443,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PartslistConfig_VBiACClassWF != null;
+            return _PartslistConfig_VBiACClassWF != null;
         }
     }
 
@@ -463,7 +463,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingConfig_VBiACClassWF != null;
+            return _PickingConfig_VBiACClassWF != null;
         }
     }
 
@@ -483,7 +483,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Picking_VBiACClassWF != null;
+            return _Picking_VBiACClassWF != null;
         }
     }
 
@@ -503,7 +503,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderBatchPlan_VBiACClassWF != null;
+            return _ProdOrderBatchPlan_VBiACClassWF != null;
         }
     }
 
@@ -523,7 +523,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistConfig_VBiACClassWF != null;
+            return _ProdOrderPartslistConfig_VBiACClassWF != null;
         }
     }
 
@@ -543,7 +543,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return RefPAACClass != null;
+            return _RefPAACClass != null;
         }
     }
 
@@ -563,7 +563,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return RefPAACClassMethod != null;
+            return _RefPAACClassMethod != null;
         }
     }
 

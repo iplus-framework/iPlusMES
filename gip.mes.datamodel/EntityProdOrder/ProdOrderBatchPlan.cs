@@ -112,7 +112,7 @@ namespace gip.mes.datamodel
                 FacilityReservation_ProdOrderBatchPlan.Remove(reservation);
             }
             int sequence = Sequence;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

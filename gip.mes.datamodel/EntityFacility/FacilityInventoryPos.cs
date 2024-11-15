@@ -69,7 +69,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             FacilityInventory facilityInventory = this.FacilityInventory;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             FacilityInventoryPos.RenumberSequence(facilityInventory, sequence);
             return null;
         }

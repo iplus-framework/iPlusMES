@@ -94,7 +94,7 @@ public partial class VBUserACClassDesign : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return ACClassDesign != null;
+            return _ACClassDesign != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class VBUserACClassDesign : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 

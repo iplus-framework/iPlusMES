@@ -108,7 +108,7 @@ public partial class MDBatchPlanGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderBatchPlan_MDBatchPlanGroup != null;
+            return _ProdOrderBatchPlan_MDBatchPlanGroup != null;
         }
     }
 

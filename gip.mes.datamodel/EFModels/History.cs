@@ -101,7 +101,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyMaterialHistory_History != null;
+            return _CompanyMaterialHistory_History != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_History != null;
+            return _FacilityBooking_History != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityHistory_History != null;
+            return _FacilityHistory_History != null;
         }
     }
 
@@ -161,7 +161,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return HistoryConfig_History != null;
+            return _HistoryConfig_History != null;
         }
     }
 
@@ -181,7 +181,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialHistory_History != null;
+            return _MaterialHistory_History != null;
         }
     }
 

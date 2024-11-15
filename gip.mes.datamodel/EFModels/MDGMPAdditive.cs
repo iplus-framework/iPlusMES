@@ -129,7 +129,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return MDGMPMaterialGroupPos_MDGMPAdditive != null;
+            return _MDGMPMaterialGroupPos_MDGMPAdditive != null;
         }
     }
 
@@ -149,7 +149,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return MDProcessErrorAction != null;
+            return _MDProcessErrorAction != null;
         }
     }
 
@@ -169,7 +169,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return MDQuantityUnit != null;
+            return _MDQuantityUnit != null;
         }
     }
 
@@ -189,7 +189,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return MaterialGMPAdditive_MDGMPAdditive != null;
+            return _MaterialGMPAdditive_MDGMPAdditive != null;
         }
     }
 

@@ -122,7 +122,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return InOrderPos_MDCountrySalesTax != null;
+            return _InOrderPos_MDCountrySalesTax != null;
         }
     }
 
@@ -142,7 +142,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return InRequestPos_MDCountrySalesTax != null;
+            return _InRequestPos_MDCountrySalesTax != null;
         }
     }
 
@@ -162,7 +162,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return InvoicePos_MDCountrySalesTax != null;
+            return _InvoicePos_MDCountrySalesTax != null;
         }
     }
 
@@ -182,7 +182,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return MDCountry != null;
+            return _MDCountry != null;
         }
     }
 
@@ -202,7 +202,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax != null;
+            return _MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax != null;
         }
     }
 
@@ -222,7 +222,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return MDCountrySalesTaxMaterial_MDCountrySalesTax != null;
+            return _MDCountrySalesTaxMaterial_MDCountrySalesTax != null;
         }
     }
 
@@ -242,7 +242,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return OutOfferPos_MDCountrySalesTax != null;
+            return _OutOfferPos_MDCountrySalesTax != null;
         }
     }
 
@@ -262,7 +262,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return OutOrderPos_MDCountrySalesTax != null;
+            return _OutOrderPos_MDCountrySalesTax != null;
         }
     }
 

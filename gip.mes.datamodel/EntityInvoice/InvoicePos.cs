@@ -75,7 +75,7 @@ namespace gip.mes.datamodel
             Invoice invoice = Invoice;
             if (invoice.InvoicePos_Invoice_IsLoaded)
                 invoice.InvoicePos_Invoice.Remove(this);
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

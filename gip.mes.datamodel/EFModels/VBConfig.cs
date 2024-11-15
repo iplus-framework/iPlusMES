@@ -136,7 +136,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass != null;
+            return _ACClass != null;
         }
     }
 
@@ -156,7 +156,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassPropertyRelation != null;
+            return _ACClassPropertyRelation != null;
         }
     }
 
@@ -176,7 +176,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBConfig_ParentVBConfig != null;
+            return _VBConfig_ParentVBConfig != null;
         }
     }
 
@@ -196,7 +196,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBConfig1_ParentVBConfig != null;
+            return _VBConfig1_ParentVBConfig != null;
         }
     }
 
@@ -216,7 +216,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ValueTypeACClass != null;
+            return _ValueTypeACClass != null;
         }
     }
 

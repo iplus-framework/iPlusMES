@@ -157,7 +157,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDVisitorCard != null;
+            return _MDVisitorCard != null;
         }
     }
 
@@ -177,7 +177,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -197,7 +197,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TrailerFacility != null;
+            return _TrailerFacility != null;
         }
     }
 
@@ -217,7 +217,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VehicleFacility != null;
+            return _VehicleFacility != null;
         }
     }
 
@@ -237,7 +237,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitedCompany != null;
+            return _VisitedCompany != null;
         }
     }
 
@@ -257,7 +257,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorCompany != null;
+            return _VisitorCompany != null;
         }
     }
 
@@ -277,7 +277,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorCompanyPerson != null;
+            return _VisitorCompanyPerson != null;
         }
     }
 
@@ -297,7 +297,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorVoucher_Visitor != null;
+            return _VisitorVoucher_Visitor != null;
         }
     }
 

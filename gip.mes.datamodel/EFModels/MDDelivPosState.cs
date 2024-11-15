@@ -108,7 +108,7 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return InOrderPos_MDDelivPosState != null;
+            return _InOrderPos_MDDelivPosState != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return OutOrderPos_MDDelivPosState != null;
+            return _OutOrderPos_MDDelivPosState != null;
         }
     }
 

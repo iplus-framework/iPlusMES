@@ -108,7 +108,7 @@ public partial class MDVisitorVoucherState : VBEntityObject, IInsertInfo, IUpdat
     {
         get
         {
-            return VisitorVoucher_MDVisitorVoucherState != null;
+            return _VisitorVoucher_MDVisitorVoucherState != null;
         }
     }
 

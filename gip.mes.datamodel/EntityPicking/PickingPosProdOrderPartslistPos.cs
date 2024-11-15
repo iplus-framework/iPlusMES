@@ -40,7 +40,7 @@ namespace gip.mes.datamodel
                 if (msg != null)
                     return msg;
             }
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

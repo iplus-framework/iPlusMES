@@ -73,7 +73,7 @@ public partial class PartslistACClassMethod : VBEntityObject
     {
         get
         {
-            return MaterialWFACClassMethod != null;
+            return _MaterialWFACClassMethod != null;
         }
     }
 
@@ -93,7 +93,7 @@ public partial class PartslistACClassMethod : VBEntityObject
     {
         get
         {
-            return Partslist != null;
+            return _Partslist != null;
         }
     }
 

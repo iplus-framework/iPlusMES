@@ -194,7 +194,7 @@ namespace gip.mes.datamodel
             }
             this.VisitorVoucher_VisitorCompany.Clear();
 
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }
 

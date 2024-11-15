@@ -73,7 +73,7 @@ public partial class CompanyMaterialPickup : VBEntityObject
     {
         get
         {
-            return CompanyMaterial != null;
+            return _CompanyMaterial != null;
         }
     }
 
@@ -93,7 +93,7 @@ public partial class CompanyMaterialPickup : VBEntityObject
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -113,7 +113,7 @@ public partial class CompanyMaterialPickup : VBEntityObject
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 

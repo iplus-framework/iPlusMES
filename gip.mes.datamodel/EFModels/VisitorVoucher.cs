@@ -178,7 +178,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote_VisitorVoucher != null;
+            return _DeliveryNote_VisitorVoucher != null;
         }
     }
 
@@ -198,7 +198,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDVisitorCard != null;
+            return _MDVisitorCard != null;
         }
     }
 
@@ -218,7 +218,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDVisitorVoucherState != null;
+            return _MDVisitorVoucherState != null;
         }
     }
 
@@ -238,7 +238,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Picking_VisitorVoucher != null;
+            return _Picking_VisitorVoucher != null;
         }
     }
 
@@ -258,7 +258,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Tourplan_VisitorVoucher != null;
+            return _Tourplan_VisitorVoucher != null;
         }
     }
 
@@ -278,7 +278,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TrailerFacility != null;
+            return _TrailerFacility != null;
         }
     }
 
@@ -298,7 +298,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VehicleFacility != null;
+            return _VehicleFacility != null;
         }
     }
 
@@ -318,7 +318,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Visitor != null;
+            return _Visitor != null;
         }
     }
 
@@ -338,7 +338,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorCompany != null;
+            return _VisitorCompany != null;
         }
     }
 
@@ -358,7 +358,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VisitorCompanyPerson != null;
+            return _VisitorCompanyPerson != null;
         }
     }
 
@@ -378,7 +378,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Weighing_VisitorVoucher != null;
+            return _Weighing_VisitorVoucher != null;
         }
     }
 

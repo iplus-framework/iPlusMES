@@ -59,7 +59,7 @@ public partial class PriceListMaterial : VBEntityObject
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -79,7 +79,7 @@ public partial class PriceListMaterial : VBEntityObject
     {
         get
         {
-            return PriceList != null;
+            return _PriceList != null;
         }
     }
 

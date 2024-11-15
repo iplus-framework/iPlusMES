@@ -108,7 +108,7 @@ public partial class MDLabOrderState : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return LabOrder_MDLabOrderState != null;
+            return _LabOrder_MDLabOrderState != null;
         }
     }
 

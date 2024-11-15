@@ -150,7 +150,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialConfig_ParentMaterialConfig != null;
+            return _MaterialConfig_ParentMaterialConfig != null;
         }
     }
 
@@ -170,7 +170,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -190,7 +190,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialConfig1_ParentMaterialConfig != null;
+            return _MaterialConfig1_ParentMaterialConfig != null;
         }
     }
 
@@ -210,7 +210,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClass != null;
+            return _VBiACClass != null;
         }
     }
 
@@ -230,7 +230,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassPropertyRelation != null;
+            return _VBiACClassPropertyRelation != null;
         }
     }
 
@@ -250,7 +250,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 
@@ -270,7 +270,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBiValueTypeACClass != null;
+            return _VBiValueTypeACClass != null;
         }
     }
 

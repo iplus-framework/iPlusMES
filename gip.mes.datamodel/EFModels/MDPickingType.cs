@@ -108,7 +108,7 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return FacilityMDSchedulingGroup_MDPickingType != null;
+            return _FacilityMDSchedulingGroup_MDPickingType != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return Picking_MDPickingType != null;
+            return _Picking_MDPickingType != null;
         }
     }
 

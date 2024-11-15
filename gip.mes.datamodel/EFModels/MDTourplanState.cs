@@ -108,7 +108,7 @@ public partial class MDTourplanState : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return Tourplan_MDTourplanState != null;
+            return _Tourplan_MDTourplanState != null;
         }
     }
 

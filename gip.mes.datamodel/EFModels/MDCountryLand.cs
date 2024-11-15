@@ -108,7 +108,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return CalendarHoliday_MDCountryLand != null;
+            return _CalendarHoliday_MDCountryLand != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return CompanyAddress_MDCountryLand != null;
+            return _CompanyAddress_MDCountryLand != null;
         }
     }
 
@@ -148,7 +148,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return MDCountry != null;
+            return _MDCountry != null;
         }
     }
 

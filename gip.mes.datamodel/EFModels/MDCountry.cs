@@ -122,7 +122,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     {
         get
         {
-            return CalendarHoliday_MDCountry != null;
+            return _CalendarHoliday_MDCountry != null;
         }
     }
 
@@ -142,7 +142,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     {
         get
         {
-            return CompanyAddress_MDCountry != null;
+            return _CompanyAddress_MDCountry != null;
         }
     }
 
@@ -162,7 +162,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     {
         get
         {
-            return CompanyPerson_MDCountry != null;
+            return _CompanyPerson_MDCountry != null;
         }
     }
 
@@ -182,7 +182,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     {
         get
         {
-            return MDCountryLand_MDCountry != null;
+            return _MDCountryLand_MDCountry != null;
         }
     }
 
@@ -202,7 +202,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     {
         get
         {
-            return MDCountrySalesTax_MDCountry != null;
+            return _MDCountrySalesTax_MDCountry != null;
         }
     }
 
@@ -222,7 +222,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     {
         get
         {
-            return MDCurrency != null;
+            return _MDCurrency != null;
         }
     }
 

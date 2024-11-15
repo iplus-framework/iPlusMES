@@ -87,7 +87,7 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -107,7 +107,7 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     {
         get
         {
-            return MDPickingType != null;
+            return _MDPickingType != null;
         }
     }
 
@@ -127,7 +127,7 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     {
         get
         {
-            return MDSchedulingGroup != null;
+            return _MDSchedulingGroup != null;
         }
     }
 

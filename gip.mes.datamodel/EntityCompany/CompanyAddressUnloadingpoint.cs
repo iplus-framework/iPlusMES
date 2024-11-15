@@ -80,7 +80,7 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             CompanyAddress address = CompanyAddress;
-            database.Remove(this);
+            base.DeleteACObject(database, withCheck, softDelete);
             CompanyAddressUnloadingpoint.RenumberSequence(address, sequence);
             return null;
         }

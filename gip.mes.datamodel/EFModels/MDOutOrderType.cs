@@ -108,7 +108,7 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return OutOffer_MDOutOrderType != null;
+            return _OutOffer_MDOutOrderType != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return OutOrder_MDOutOrderType != null;
+            return _OutOrder_MDOutOrderType != null;
         }
     }
 

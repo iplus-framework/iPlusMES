@@ -52,7 +52,7 @@ public partial class TandTv3FilterTrackingMaterial : VBEntityObject
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3FilterTrackingMaterial : VBEntityObject
     {
         get
         {
-            return TandTv3FilterTracking != null;
+            return _TandTv3FilterTracking != null;
         }
     }
 

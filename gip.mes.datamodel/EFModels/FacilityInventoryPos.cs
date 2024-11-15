@@ -129,7 +129,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return FacilityBookingCharge_FacilityInventoryPos != null;
+            return _FacilityBookingCharge_FacilityInventoryPos != null;
         }
     }
 
@@ -149,7 +149,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return FacilityBooking_FacilityInventoryPos != null;
+            return _FacilityBooking_FacilityInventoryPos != null;
         }
     }
 
@@ -169,7 +169,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return FacilityCharge != null;
+            return _FacilityCharge != null;
         }
     }
 
@@ -189,7 +189,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return FacilityInventory != null;
+            return _FacilityInventory != null;
         }
     }
 
@@ -209,7 +209,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     {
         get
         {
-            return MDFacilityInventoryPosState != null;
+            return _MDFacilityInventoryPosState != null;
         }
     }
 

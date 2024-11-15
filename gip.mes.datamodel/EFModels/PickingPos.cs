@@ -178,7 +178,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return ACClassTask != null;
+            return _ACClassTask != null;
         }
     }
 
@@ -198,7 +198,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityBookingCharge_PickingPos != null;
+            return _FacilityBookingCharge_PickingPos != null;
         }
     }
 
@@ -218,7 +218,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityBooking_PickingPos != null;
+            return _FacilityBooking_PickingPos != null;
         }
     }
 
@@ -238,7 +238,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityPreBooking_PickingPos != null;
+            return _FacilityPreBooking_PickingPos != null;
         }
     }
 
@@ -258,7 +258,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FacilityReservation_PickingPos != null;
+            return _FacilityReservation_PickingPos != null;
         }
     }
 
@@ -278,7 +278,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return FromFacility != null;
+            return _FromFacility != null;
         }
     }
 
@@ -298,7 +298,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -318,7 +318,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return LabOrder_PickingPos != null;
+            return _LabOrder_PickingPos != null;
         }
     }
 
@@ -338,7 +338,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return MDDelivPosLoadState != null;
+            return _MDDelivPosLoadState != null;
         }
     }
 
@@ -358,7 +358,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return OrderLog_PickingPos != null;
+            return _OrderLog_PickingPos != null;
         }
     }
 
@@ -378,7 +378,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -398,7 +398,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return Picking != null;
+            return _Picking != null;
         }
     }
 
@@ -418,7 +418,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return PickingMaterial != null;
+            return _PickingMaterial != null;
         }
     }
 
@@ -438,7 +438,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return PickingPosProdOrderPartslistPos_PickingPos != null;
+            return _PickingPosProdOrderPartslistPos_PickingPos != null;
         }
     }
 
@@ -458,7 +458,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return TandTv3MixPointPickingPos_PickingPos != null;
+            return _TandTv3MixPointPickingPos_PickingPos != null;
         }
     }
 
@@ -478,7 +478,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return ToFacility != null;
+            return _ToFacility != null;
         }
     }
 
@@ -498,7 +498,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     {
         get
         {
-            return Weighing_PickingPos != null;
+            return _Weighing_PickingPos != null;
         }
     }
 

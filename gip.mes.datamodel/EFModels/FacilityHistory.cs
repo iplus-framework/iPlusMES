@@ -199,7 +199,7 @@ public partial class FacilityHistory : VBEntityObject
     {
         get
         {
-            return Facility != null;
+            return _Facility != null;
         }
     }
 
@@ -219,7 +219,7 @@ public partial class FacilityHistory : VBEntityObject
     {
         get
         {
-            return History != null;
+            return _History != null;
         }
     }
 

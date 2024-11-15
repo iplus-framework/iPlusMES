@@ -108,7 +108,7 @@ public partial class MDInOrderPosState : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return InOrderPos_MDInOrderPosState != null;
+            return _InOrderPos_MDInOrderPosState != null;
         }
     }
 

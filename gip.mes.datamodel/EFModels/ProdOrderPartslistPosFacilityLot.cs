@@ -87,7 +87,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     {
         get
         {
-            return FacilityBookingCharge_ProdOrderPartslistPosFacilityLot != null;
+            return _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot != null;
         }
     }
 
@@ -107,7 +107,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     {
         get
         {
-            return FacilityBooking_ProdOrderPartslistPosFacilityLot != null;
+            return _FacilityBooking_ProdOrderPartslistPosFacilityLot != null;
         }
     }
 
@@ -127,7 +127,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     {
         get
         {
-            return FacilityLot != null;
+            return _FacilityLot != null;
         }
     }
 
@@ -147,7 +147,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 

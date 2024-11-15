@@ -94,7 +94,7 @@ public partial class MaintOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrder != null;
+            return _MaintOrder != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MaintOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

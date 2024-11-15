@@ -108,7 +108,7 @@ public partial class MDFacilityType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     {
         get
         {
-            return Facility_MDFacilityType != null;
+            return _Facility_MDFacilityType != null;
         }
     }
 

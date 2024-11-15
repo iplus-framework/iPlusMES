@@ -493,7 +493,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return CPartnerCompany != null;
+            return _CPartnerCompany != null;
         }
     }
 
@@ -513,7 +513,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return FacilityBookingCharge_FacilityBooking != null;
+            return _FacilityBookingCharge_FacilityBooking != null;
         }
     }
 
@@ -533,7 +533,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return FacilityInventoryPos != null;
+            return _FacilityInventoryPos != null;
         }
     }
 
@@ -553,7 +553,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return History != null;
+            return _History != null;
         }
     }
 
@@ -573,7 +573,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -593,7 +593,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardCompanyMaterial != null;
+            return _InwardCompanyMaterial != null;
         }
     }
 
@@ -613,7 +613,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardFacility != null;
+            return _InwardFacility != null;
         }
     }
 
@@ -633,7 +633,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardFacilityCharge != null;
+            return _InwardFacilityCharge != null;
         }
     }
 
@@ -653,7 +653,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardFacilityLocation != null;
+            return _InwardFacilityLocation != null;
         }
     }
 
@@ -673,7 +673,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardFacilityLot != null;
+            return _InwardFacilityLot != null;
         }
     }
 
@@ -693,7 +693,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardMaterial != null;
+            return _InwardMaterial != null;
         }
     }
 
@@ -713,7 +713,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return InwardPartslist != null;
+            return _InwardPartslist != null;
         }
     }
 
@@ -733,7 +733,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDBalancingMode != null;
+            return _MDBalancingMode != null;
         }
     }
 
@@ -753,7 +753,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDBookingNotAvailableMode != null;
+            return _MDBookingNotAvailableMode != null;
         }
     }
 
@@ -773,7 +773,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDMovementReason != null;
+            return _MDMovementReason != null;
         }
     }
 
@@ -793,7 +793,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDReleaseState != null;
+            return _MDReleaseState != null;
         }
     }
 
@@ -813,7 +813,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDReservationMode != null;
+            return _MDReservationMode != null;
         }
     }
 
@@ -833,7 +833,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -853,7 +853,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return MDZeroStockState != null;
+            return _MDZeroStockState != null;
         }
     }
 
@@ -873,7 +873,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OrderLog_FacilityBooking != null;
+            return _OrderLog_FacilityBooking != null;
         }
     }
 
@@ -893,7 +893,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutOrderPos != null;
+            return _OutOrderPos != null;
         }
     }
 
@@ -913,7 +913,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardCompanyMaterial != null;
+            return _OutwardCompanyMaterial != null;
         }
     }
 
@@ -933,7 +933,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardFacility != null;
+            return _OutwardFacility != null;
         }
     }
 
@@ -953,7 +953,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardFacilityCharge != null;
+            return _OutwardFacilityCharge != null;
         }
     }
 
@@ -973,7 +973,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardFacilityLocation != null;
+            return _OutwardFacilityLocation != null;
         }
     }
 
@@ -993,7 +993,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardFacilityLot != null;
+            return _OutwardFacilityLot != null;
         }
     }
 
@@ -1013,7 +1013,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardMaterial != null;
+            return _OutwardMaterial != null;
         }
     }
 
@@ -1033,7 +1033,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return OutwardPartslist != null;
+            return _OutwardPartslist != null;
         }
     }
 
@@ -1053,7 +1053,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -1073,7 +1073,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 
@@ -1093,7 +1093,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPosFacilityLot != null;
+            return _ProdOrderPartslistPosFacilityLot != null;
         }
     }
 
@@ -1113,7 +1113,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return ProdOrderPartslistPosRelation != null;
+            return _ProdOrderPartslistPosRelation != null;
         }
     }
 
@@ -1133,7 +1133,7 @@ public partial class FacilityBooking : VBEntityObject
     {
         get
         {
-            return VBiStackCalculatorACClass != null;
+            return _VBiStackCalculatorACClass != null;
         }
     }
 

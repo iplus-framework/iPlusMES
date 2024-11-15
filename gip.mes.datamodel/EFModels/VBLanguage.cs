@@ -115,7 +115,7 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return LabelTranslation_VBLanguage != null;
+            return _LabelTranslation_VBLanguage != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBUser_VBLanguage != null;
+            return _VBUser_VBLanguage != null;
         }
     }
 

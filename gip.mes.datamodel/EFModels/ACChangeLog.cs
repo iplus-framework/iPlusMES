@@ -87,7 +87,7 @@ public partial class ACChangeLog : VBEntityObject
     {
         get
         {
-            return ACClass != null;
+            return _ACClass != null;
         }
     }
 
@@ -107,7 +107,7 @@ public partial class ACChangeLog : VBEntityObject
     {
         get
         {
-            return ACClassProperty != null;
+            return _ACClassProperty != null;
         }
     }
 
@@ -127,7 +127,7 @@ public partial class ACChangeLog : VBEntityObject
     {
         get
         {
-            return VBUser != null;
+            return _VBUser != null;
         }
     }
 

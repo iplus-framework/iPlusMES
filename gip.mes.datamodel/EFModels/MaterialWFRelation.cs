@@ -66,7 +66,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     {
         get
         {
-            return MaterialWF != null;
+            return _MaterialWF != null;
         }
     }
 
@@ -86,7 +86,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     {
         get
         {
-            return PartslistPosRelation_MaterialWFRelation != null;
+            return _PartslistPosRelation_MaterialWFRelation != null;
         }
     }
 
@@ -106,7 +106,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     {
         get
         {
-            return SourceMaterial != null;
+            return _SourceMaterial != null;
         }
     }
 
@@ -126,7 +126,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     {
         get
         {
-            return TargetMaterial != null;
+            return _TargetMaterial != null;
         }
     }
 

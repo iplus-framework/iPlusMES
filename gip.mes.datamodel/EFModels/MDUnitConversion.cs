@@ -94,7 +94,7 @@ public partial class MDUnitConversion : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class MDUnitConversion : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ToMDUnit != null;
+            return _ToMDUnit != null;
         }
     }
 

@@ -59,7 +59,7 @@ public partial class TandTv3Step : VBEntityObject
     {
         get
         {
-            return TandTv3FilterTracking != null;
+            return _TandTv3FilterTracking != null;
         }
     }
 
@@ -79,7 +79,7 @@ public partial class TandTv3Step : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint_TandTv3Step != null;
+            return _TandTv3MixPoint_TandTv3Step != null;
         }
     }
 

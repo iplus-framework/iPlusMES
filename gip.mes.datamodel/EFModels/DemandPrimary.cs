@@ -108,7 +108,7 @@ public partial class DemandPrimary : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return Calendar != null;
+            return _Calendar != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class DemandPrimary : VBEntityObject, IInsertInfo, IUpdateInfo, I
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 

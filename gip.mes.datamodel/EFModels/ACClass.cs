@@ -269,7 +269,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACChangeLog_ACClass != null;
+            return _ACChangeLog_ACClass != null;
         }
     }
 
@@ -289,7 +289,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassConfig_ACClass != null;
+            return _ACClassConfig_ACClass != null;
         }
     }
 
@@ -309,7 +309,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassConfig_ValueTypeACClass != null;
+            return _ACClassConfig_ValueTypeACClass != null;
         }
     }
 
@@ -329,7 +329,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassDesign_ACClass != null;
+            return _ACClassDesign_ACClass != null;
         }
     }
 
@@ -349,7 +349,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassDesign_ValueTypeACClass != null;
+            return _ACClassDesign_ValueTypeACClass != null;
         }
     }
 
@@ -369,7 +369,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMessage_ACClass != null;
+            return _ACClassMessage_ACClass != null;
         }
     }
 
@@ -389,7 +389,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethod_ACClass != null;
+            return _ACClassMethod_ACClass != null;
         }
     }
 
@@ -409,7 +409,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethod_AttachedFromACClass != null;
+            return _ACClassMethod_AttachedFromACClass != null;
         }
     }
 
@@ -429,7 +429,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethodConfig_VBiACClass != null;
+            return _ACClassMethodConfig_VBiACClass != null;
         }
     }
 
@@ -449,7 +449,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethodConfig_ValueTypeACClass != null;
+            return _ACClassMethodConfig_ValueTypeACClass != null;
         }
     }
 
@@ -469,7 +469,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethod_PWACClass != null;
+            return _ACClassMethod_PWACClass != null;
         }
     }
 
@@ -489,7 +489,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassMethod_ValueTypeACClass != null;
+            return _ACClassMethod_ValueTypeACClass != null;
         }
     }
 
@@ -509,7 +509,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassProperty_ACClass != null;
+            return _ACClassProperty_ACClass != null;
         }
     }
 
@@ -529,7 +529,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassProperty_ConfigACClass != null;
+            return _ACClassProperty_ConfigACClass != null;
         }
     }
 
@@ -549,7 +549,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassPropertyRelation_SourceACClass != null;
+            return _ACClassPropertyRelation_SourceACClass != null;
         }
     }
 
@@ -569,7 +569,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassPropertyRelation_TargetACClass != null;
+            return _ACClassPropertyRelation_TargetACClass != null;
         }
     }
 
@@ -589,7 +589,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassProperty_ValueTypeACClass != null;
+            return _ACClassProperty_ValueTypeACClass != null;
         }
     }
 
@@ -609,7 +609,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassTask_TaskTypeACClass != null;
+            return _ACClassTask_TaskTypeACClass != null;
         }
     }
 
@@ -629,7 +629,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassText_ACClass != null;
+            return _ACClassText_ACClass != null;
         }
     }
 
@@ -649,7 +649,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassWF_PWACClass != null;
+            return _ACClassWF_PWACClass != null;
         }
     }
 
@@ -669,7 +669,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClassWF_RefPAACClass != null;
+            return _ACClassWF_RefPAACClass != null;
         }
     }
 
@@ -689,7 +689,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACPackage != null;
+            return _ACPackage != null;
         }
     }
 
@@ -709,7 +709,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgramConfig_ACClass != null;
+            return _ACProgramConfig_ACClass != null;
         }
     }
 
@@ -729,7 +729,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgramConfig_ValueTypeACClass != null;
+            return _ACProgramConfig_ValueTypeACClass != null;
         }
     }
 
@@ -749,7 +749,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgram_WorkflowTypeACClass != null;
+            return _ACProgram_WorkflowTypeACClass != null;
         }
     }
 
@@ -769,7 +769,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProject != null;
+            return _ACProject != null;
         }
     }
 
@@ -789,7 +789,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProject_PAAppClassAssignmentACClass != null;
+            return _ACProject_PAAppClassAssignmentACClass != null;
         }
     }
 
@@ -809,7 +809,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACPropertyLogRule_ACClass != null;
+            return _ACPropertyLogRule_ACClass != null;
         }
     }
 
@@ -829,7 +829,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACPropertyLog_ACClass != null;
+            return _ACPropertyLog_ACClass != null;
         }
     }
 
@@ -849,7 +849,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass1_BasedOnACClass != null;
+            return _ACClass1_BasedOnACClass != null;
         }
     }
 
@@ -869,7 +869,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyPersonRole_VBiRoleACClass != null;
+            return _CompanyPersonRole_VBiRoleACClass != null;
         }
     }
 
@@ -889,7 +889,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBookingCharge_VBiStackCalculatorACClass != null;
+            return _FacilityBookingCharge_VBiStackCalculatorACClass != null;
         }
     }
 
@@ -909,7 +909,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityBooking_VBiStackCalculatorACClass != null;
+            return _FacilityBooking_VBiStackCalculatorACClass != null;
         }
     }
 
@@ -929,7 +929,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityReservation_VBiACClass != null;
+            return _FacilityReservation_VBiACClass != null;
         }
     }
 
@@ -949,7 +949,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility_VBiFacilityACClass != null;
+            return _Facility_VBiFacilityACClass != null;
         }
     }
 
@@ -969,7 +969,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Facility_VBiStackCalculatorACClass != null;
+            return _Facility_VBiStackCalculatorACClass != null;
         }
     }
 
@@ -989,7 +989,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return HistoryConfig_VBiACClass != null;
+            return _HistoryConfig_VBiACClass != null;
         }
     }
 
@@ -1009,7 +1009,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return HistoryConfig_VBiValueTypeACClass != null;
+            return _HistoryConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1029,7 +1029,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderConfig_VBiACClass != null;
+            return _InOrderConfig_VBiACClass != null;
         }
     }
 
@@ -1049,7 +1049,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InOrderConfig_VBiValueTypeACClass != null;
+            return _InOrderConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1069,7 +1069,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestConfig_VBiACClass != null;
+            return _InRequestConfig_VBiACClass != null;
         }
     }
 
@@ -1089,7 +1089,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return InRequestConfig_VBiValueTypeACClass != null;
+            return _InRequestConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1109,7 +1109,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass_BasedOnACClass != null;
+            return _ACClass_BasedOnACClass != null;
         }
     }
 
@@ -1129,7 +1129,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass_PWACClass != null;
+            return _ACClass_PWACClass != null;
         }
     }
 
@@ -1149,7 +1149,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass_PWMethodACClass != null;
+            return _ACClass_PWMethodACClass != null;
         }
     }
 
@@ -1169,7 +1169,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass_ParentACClass != null;
+            return _ACClass_ParentACClass != null;
         }
     }
 
@@ -1189,7 +1189,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintACClass_VBiACClass != null;
+            return _MaintACClass_VBiACClass != null;
         }
     }
 
@@ -1209,7 +1209,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaintOrder_VBiPAACClass != null;
+            return _MaintOrder_VBiPAACClass != null;
         }
     }
 
@@ -1229,7 +1229,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialConfig_VBiACClass != null;
+            return _MaterialConfig_VBiACClass != null;
         }
     }
 
@@ -1249,7 +1249,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialConfig_VBiValueTypeACClass != null;
+            return _MaterialConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1269,7 +1269,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFACClassMethodConfig_VBiACClass != null;
+            return _MaterialWFACClassMethodConfig_VBiACClass != null;
         }
     }
 
@@ -1289,7 +1289,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MaterialWFACClassMethodConfig_VBiValueTypeACClass != null;
+            return _MaterialWFACClassMethodConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1309,7 +1309,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material_VBiStackCalculatorACClass != null;
+            return _Material_VBiStackCalculatorACClass != null;
         }
     }
 
@@ -1329,7 +1329,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MsgAlarmLog_ACClass != null;
+            return _MsgAlarmLog_ACClass != null;
         }
     }
 
@@ -1349,7 +1349,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OperationLog_RefACClass != null;
+            return _OperationLog_RefACClass != null;
         }
     }
 
@@ -1369,7 +1369,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferConfig_VBiACClass != null;
+            return _OutOfferConfig_VBiACClass != null;
         }
     }
 
@@ -1389,7 +1389,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOfferConfig_VBiValueTypeACClass != null;
+            return _OutOfferConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1409,7 +1409,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderConfig_VBiACClass != null;
+            return _OutOrderConfig_VBiACClass != null;
         }
     }
 
@@ -1429,7 +1429,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return OutOrderConfig_VBiValueTypeACClass != null;
+            return _OutOrderConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1449,7 +1449,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass1_PWACClass != null;
+            return _ACClass1_PWACClass != null;
         }
     }
 
@@ -1469,7 +1469,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass1_PWMethodACClass != null;
+            return _ACClass1_PWMethodACClass != null;
         }
     }
 
@@ -1489,7 +1489,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACClass1_ParentACClass != null;
+            return _ACClass1_ParentACClass != null;
         }
     }
 
@@ -1509,7 +1509,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PartslistConfig_VBiACClass != null;
+            return _PartslistConfig_VBiACClass != null;
         }
     }
 
@@ -1529,7 +1529,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PartslistConfig_VBiValueTypeACClass != null;
+            return _PartslistConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1549,7 +1549,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingConfig_VBiACClass != null;
+            return _PickingConfig_VBiACClass != null;
         }
     }
 
@@ -1569,7 +1569,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return PickingConfig_VBiValueTypeACClass != null;
+            return _PickingConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1589,7 +1589,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistConfig_VBiACClass != null;
+            return _ProdOrderPartslistConfig_VBiACClass != null;
         }
     }
 
@@ -1609,7 +1609,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ProdOrderPartslistConfig_VBiValueTypeACClass != null;
+            return _ProdOrderPartslistConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1629,7 +1629,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanConfig_VBiACClass != null;
+            return _TourplanConfig_VBiACClass != null;
         }
     }
 
@@ -1649,7 +1649,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return TourplanConfig_VBiValueTypeACClass != null;
+            return _TourplanConfig_VBiValueTypeACClass != null;
         }
     }
 
@@ -1669,7 +1669,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBConfig_ACClass != null;
+            return _VBConfig_ACClass != null;
         }
     }
 
@@ -1689,7 +1689,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBConfig_ValueTypeACClass != null;
+            return _VBConfig_ValueTypeACClass != null;
         }
     }
 
@@ -1709,7 +1709,7 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return VBGroupRight_ACClass != null;
+            return _VBGroupRight_ACClass != null;
         }
     }
 

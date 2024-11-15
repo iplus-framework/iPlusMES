@@ -129,7 +129,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Company != null;
+            return _Company != null;
         }
     }
 
@@ -149,7 +149,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyAddress != null;
+            return _CompanyAddress != null;
         }
     }
 
@@ -169,7 +169,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return CompanyAddressUnloadingpoint != null;
+            return _CompanyAddressUnloadingpoint != null;
         }
     }
 
@@ -189,7 +189,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return DeliveryNote_TourplanPos != null;
+            return _DeliveryNote_TourplanPos != null;
         }
     }
 
@@ -209,7 +209,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -229,7 +229,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDTourplanPosState != null;
+            return _MDTourplanPosState != null;
         }
     }
 
@@ -249,7 +249,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Tourplan != null;
+            return _Tourplan != null;
         }
     }
 

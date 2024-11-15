@@ -101,7 +101,7 @@ public partial class ProdOrderPartslistPosSplit : VBEntityObject, IInsertInfo, I
     {
         get
         {
-            return ProdOrderPartslistPos != null;
+            return _ProdOrderPartslistPos != null;
         }
     }
 

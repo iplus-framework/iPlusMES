@@ -73,7 +73,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return InwardLot != null;
+            return _InwardLot != null;
         }
     }
 
@@ -93,7 +93,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return InwardMaterial != null;
+            return _InwardMaterial != null;
         }
     }
 
@@ -113,7 +113,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointDeliveryNotePos_TandTv3MixPoint != null;
+            return _TandTv3MixPointDeliveryNotePos_TandTv3MixPoint != null;
         }
     }
 
@@ -133,7 +133,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacility_TandTv3MixPoint != null;
+            return _TandTv3MixPointFacility_TandTv3MixPoint != null;
         }
     }
 
@@ -153,7 +153,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacilityBookingCharge_TandTv3MixPoint != null;
+            return _TandTv3MixPointFacilityBookingCharge_TandTv3MixPoint != null;
         }
     }
 
@@ -173,7 +173,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacilityLot_TandTv3MixPoint != null;
+            return _TandTv3MixPointFacilityLot_TandTv3MixPoint != null;
         }
     }
 
@@ -193,7 +193,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointFacilityPreBooking_TandTv3MixPoint != null;
+            return _TandTv3MixPointFacilityPreBooking_TandTv3MixPoint != null;
         }
     }
 
@@ -213,7 +213,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointInOrderPos_TandTv3MixPoint != null;
+            return _TandTv3MixPointInOrderPos_TandTv3MixPoint != null;
         }
     }
 
@@ -233,7 +233,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointOutOrderPos_TandTv3MixPoint != null;
+            return _TandTv3MixPointOutOrderPos_TandTv3MixPoint != null;
         }
     }
 
@@ -253,7 +253,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointPickingPos_TandTv3MixPoint != null;
+            return _TandTv3MixPointPickingPos_TandTv3MixPoint != null;
         }
     }
 
@@ -273,7 +273,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint != null;
+            return _TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint != null;
         }
     }
 
@@ -293,7 +293,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint != null;
+            return _TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint != null;
         }
     }
 
@@ -313,7 +313,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointRelation_SourceTandTv3MixPoint != null;
+            return _TandTv3MixPointRelation_SourceTandTv3MixPoint != null;
         }
     }
 
@@ -333,7 +333,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3MixPointRelation_TargetTandTv3MixPoint != null;
+            return _TandTv3MixPointRelation_TargetTandTv3MixPoint != null;
         }
     }
 
@@ -353,7 +353,7 @@ public partial class TandTv3MixPoint : VBEntityObject
     {
         get
         {
-            return TandTv3Step != null;
+            return _TandTv3Step != null;
         }
     }
 

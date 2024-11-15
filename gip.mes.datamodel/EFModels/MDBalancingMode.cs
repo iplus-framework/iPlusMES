@@ -108,7 +108,7 @@ public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return FacilityBookingCharge_MDBalancingMode != null;
+            return _FacilityBookingCharge_MDBalancingMode != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return FacilityBooking_MDBalancingMode != null;
+            return _FacilityBooking_MDBalancingMode != null;
         }
     }
 

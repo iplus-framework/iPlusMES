@@ -241,7 +241,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOfferPos1_GroupOutOfferPos != null;
+            return _OutOfferPos1_GroupOutOfferPos != null;
         }
     }
 
@@ -261,7 +261,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOfferPos_GroupOutOfferPos != null;
+            return _OutOfferPos_GroupOutOfferPos != null;
         }
     }
 
@@ -281,7 +281,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOfferPos_ParentOutOfferPos != null;
+            return _OutOfferPos_ParentOutOfferPos != null;
         }
     }
 
@@ -301,7 +301,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDCountrySalesTax != null;
+            return _MDCountrySalesTax != null;
         }
     }
 
@@ -321,7 +321,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDCountrySalesTaxMDMaterialGroup != null;
+            return _MDCountrySalesTaxMDMaterialGroup != null;
         }
     }
 
@@ -341,7 +341,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDCountrySalesTaxMaterial != null;
+            return _MDCountrySalesTaxMaterial != null;
         }
     }
 
@@ -361,7 +361,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -381,7 +381,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -401,7 +401,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -421,7 +421,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOffer != null;
+            return _OutOffer != null;
         }
     }
 
@@ -441,7 +441,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOfferPos1_ParentOutOfferPos != null;
+            return _OutOfferPos1_ParentOutOfferPos != null;
         }
     }
 

@@ -94,7 +94,7 @@ public partial class RatingComplaint : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return MDRatingComplaintType != null;
+            return _MDRatingComplaintType != null;
         }
     }
 
@@ -114,7 +114,7 @@ public partial class RatingComplaint : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Rating != null;
+            return _Rating != null;
         }
     }
 

@@ -115,7 +115,7 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ACProgramLog != null;
+            return _ACProgramLog != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return FacilityCharge != null;
+            return _FacilityCharge != null;
         }
     }
 
@@ -155,7 +155,7 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return RefACClass != null;
+            return _RefACClass != null;
         }
     }
 

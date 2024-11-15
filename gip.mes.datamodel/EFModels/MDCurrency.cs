@@ -101,7 +101,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return Company_MDCurrency != null;
+            return _Company_MDCurrency != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return InOrder_MDCurrency != null;
+            return _InOrder_MDCurrency != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return Invoice_MDCurrency != null;
+            return _Invoice_MDCurrency != null;
         }
     }
 
@@ -161,7 +161,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return MDCountry_MDCurrency != null;
+            return _MDCountry_MDCurrency != null;
         }
     }
 
@@ -181,7 +181,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return MDCurrencyExchange_MDCurrency != null;
+            return _MDCurrencyExchange_MDCurrency != null;
         }
     }
 
@@ -201,7 +201,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return MDCurrencyExchange_ToMDCurrency != null;
+            return _MDCurrencyExchange_ToMDCurrency != null;
         }
     }
 
@@ -221,7 +221,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return OutOffer_MDCurrency != null;
+            return _OutOffer_MDCurrency != null;
         }
     }
 
@@ -241,7 +241,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return OutOrder_MDCurrency != null;
+            return _OutOrder_MDCurrency != null;
         }
     }
 
@@ -261,7 +261,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
     {
         get
         {
-            return PriceList_MDCurrency != null;
+            return _PriceList_MDCurrency != null;
         }
     }
 

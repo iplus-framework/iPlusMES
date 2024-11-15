@@ -199,7 +199,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return ACClassConfig_ACClassPropertyRelation != null;
+            return _ACClassConfig_ACClassPropertyRelation != null;
         }
     }
 
@@ -219,7 +219,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return ACClassMethodConfig_VBiACClassPropertyRelation != null;
+            return _ACClassMethodConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -239,7 +239,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return ACProgramConfig_ACClassPropertyRelation != null;
+            return _ACProgramConfig_ACClassPropertyRelation != null;
         }
     }
 
@@ -259,7 +259,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return HistoryConfig_VBiACClassPropertyRelation != null;
+            return _HistoryConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -279,7 +279,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return InOrderConfig_VBiACClassPropertyRelation != null;
+            return _InOrderConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -299,7 +299,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return InRequestConfig_VBiACClassPropertyRelation != null;
+            return _InRequestConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -319,7 +319,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return MaterialConfig_VBiACClassPropertyRelation != null;
+            return _MaterialConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -339,7 +339,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return MaterialWFACClassMethodConfig_VBiACClassPropertyRelation != null;
+            return _MaterialWFACClassMethodConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -359,7 +359,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return OutOfferConfig_VBiACClassPropertyRelation != null;
+            return _OutOfferConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -379,7 +379,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return OutOrderConfig_VBiACClassPropertyRelation != null;
+            return _OutOrderConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -399,7 +399,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return PartslistConfig_VBiACClassPropertyRelation != null;
+            return _PartslistConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -419,7 +419,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return PickingConfig_VBiACClassPropertyRelation != null;
+            return _PickingConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -439,7 +439,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return ProdOrderPartslistConfig_VBiACClassPropertyRelation != null;
+            return _ProdOrderPartslistConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -459,7 +459,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return SourceACClass != null;
+            return _SourceACClass != null;
         }
     }
 
@@ -479,7 +479,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return SourceACClassProperty != null;
+            return _SourceACClassProperty != null;
         }
     }
 
@@ -499,7 +499,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return TargetACClass != null;
+            return _TargetACClass != null;
         }
     }
 
@@ -519,7 +519,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return TargetACClassProperty != null;
+            return _TargetACClassProperty != null;
         }
     }
 
@@ -539,7 +539,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return TourplanConfig_VBiACClassPropertyRelation != null;
+            return _TourplanConfig_VBiACClassPropertyRelation != null;
         }
     }
 
@@ -559,7 +559,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
     {
         get
         {
-            return VBConfig_ACClassPropertyRelation != null;
+            return _VBConfig_ACClassPropertyRelation != null;
         }
     }
 

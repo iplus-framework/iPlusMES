@@ -360,7 +360,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return CompanyAddressUnloadingpoint != null;
+            return _CompanyAddressUnloadingpoint != null;
         }
     }
 
@@ -380,7 +380,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return CompanyMaterialPickup_OutOrderPos != null;
+            return _CompanyMaterialPickup_OutOrderPos != null;
         }
     }
 
@@ -400,7 +400,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return DeliveryNotePos_OutOrderPos != null;
+            return _DeliveryNotePos_OutOrderPos != null;
         }
     }
 
@@ -420,7 +420,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return FacilityBookingCharge_OutOrderPos != null;
+            return _FacilityBookingCharge_OutOrderPos != null;
         }
     }
 
@@ -440,7 +440,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return FacilityBooking_OutOrderPos != null;
+            return _FacilityBooking_OutOrderPos != null;
         }
     }
 
@@ -460,7 +460,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return FacilityPreBooking_OutOrderPos != null;
+            return _FacilityPreBooking_OutOrderPos != null;
         }
     }
 
@@ -480,7 +480,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return FacilityReservation_OutOrderPos != null;
+            return _FacilityReservation_OutOrderPos != null;
         }
     }
 
@@ -500,7 +500,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrderPos1_GroupOutOrderPos != null;
+            return _OutOrderPos1_GroupOutOrderPos != null;
         }
     }
 
@@ -520,7 +520,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrderPos_GroupOutOrderPos != null;
+            return _OutOrderPos_GroupOutOrderPos != null;
         }
     }
 
@@ -540,7 +540,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrderPos_ParentOutOrderPos != null;
+            return _OutOrderPos_ParentOutOrderPos != null;
         }
     }
 
@@ -560,7 +560,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return InvoicePos_OutOrderPos != null;
+            return _InvoicePos_OutOrderPos != null;
         }
     }
 
@@ -580,7 +580,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return LabOrder_OutOrderPos != null;
+            return _LabOrder_OutOrderPos != null;
         }
     }
 
@@ -600,7 +600,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDCountrySalesTax != null;
+            return _MDCountrySalesTax != null;
         }
     }
 
@@ -620,7 +620,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDCountrySalesTaxMDMaterialGroup != null;
+            return _MDCountrySalesTaxMDMaterialGroup != null;
         }
     }
 
@@ -640,7 +640,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDCountrySalesTaxMaterial != null;
+            return _MDCountrySalesTaxMaterial != null;
         }
     }
 
@@ -660,7 +660,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDDelivPosLoadState != null;
+            return _MDDelivPosLoadState != null;
         }
     }
 
@@ -680,7 +680,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDDelivPosState != null;
+            return _MDDelivPosState != null;
         }
     }
 
@@ -700,7 +700,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDOutOrderPlanState != null;
+            return _MDOutOrderPlanState != null;
         }
     }
 
@@ -720,7 +720,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDOutOrderPosState != null;
+            return _MDOutOrderPosState != null;
         }
     }
 
@@ -740,7 +740,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDTimeRange != null;
+            return _MDTimeRange != null;
         }
     }
 
@@ -760,7 +760,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDToleranceState != null;
+            return _MDToleranceState != null;
         }
     }
 
@@ -780,7 +780,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDTourplanPosState != null;
+            return _MDTourplanPosState != null;
         }
     }
 
@@ -800,7 +800,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDTransportMode != null;
+            return _MDTransportMode != null;
         }
     }
 
@@ -820,7 +820,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return MDUnit != null;
+            return _MDUnit != null;
         }
     }
 
@@ -840,7 +840,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -860,7 +860,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrder != null;
+            return _OutOrder != null;
         }
     }
 
@@ -880,7 +880,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrderPosSplit_OutOrderPos != null;
+            return _OutOrderPosSplit_OutOrderPos != null;
         }
     }
 
@@ -900,7 +900,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrderPosUtilization_OutOrderPos != null;
+            return _OutOrderPosUtilization_OutOrderPos != null;
         }
     }
 
@@ -920,7 +920,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return OutOrderPos1_ParentOutOrderPos != null;
+            return _OutOrderPos1_ParentOutOrderPos != null;
         }
     }
 
@@ -940,7 +940,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return PickingPos_OutOrderPos != null;
+            return _PickingPos_OutOrderPos != null;
         }
     }
 
@@ -960,7 +960,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return PickupCompanyMaterial != null;
+            return _PickupCompanyMaterial != null;
         }
     }
 
@@ -980,7 +980,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return TandTv3MixPointOutOrderPos_OutOrderPos != null;
+            return _TandTv3MixPointOutOrderPos_OutOrderPos != null;
         }
     }
 
@@ -1000,7 +1000,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     {
         get
         {
-            return Weighing_OutOrderPos != null;
+            return _Weighing_OutOrderPos != null;
         }
     }
 

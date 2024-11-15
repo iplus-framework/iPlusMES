@@ -80,7 +80,7 @@ public partial class ACPropertyLogRule : VBEntityObject, IInsertInfo, IUpdateInf
     {
         get
         {
-            return ACClass != null;
+            return _ACClass != null;
         }
     }
 

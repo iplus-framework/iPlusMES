@@ -129,7 +129,7 @@ public partial class MaterialUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return Material != null;
+            return _Material != null;
         }
     }
 
@@ -149,7 +149,7 @@ public partial class MaterialUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get
         {
-            return ToMDUnit != null;
+            return _ToMDUnit != null;
         }
     }
 

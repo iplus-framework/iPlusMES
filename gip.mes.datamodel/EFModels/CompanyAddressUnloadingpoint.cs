@@ -101,7 +101,7 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
     {
         get
         {
-            return CompanyAddress != null;
+            return _CompanyAddress != null;
         }
     }
 
@@ -121,7 +121,7 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
     {
         get
         {
-            return OutOrderPos_CompanyAddressUnloadingpoint != null;
+            return _OutOrderPos_CompanyAddressUnloadingpoint != null;
         }
     }
 
@@ -141,7 +141,7 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
     {
         get
         {
-            return TourplanPos_CompanyAddressUnloadingpoint != null;
+            return _TourplanPos_CompanyAddressUnloadingpoint != null;
         }
     }
 

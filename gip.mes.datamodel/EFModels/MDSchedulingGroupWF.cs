@@ -80,7 +80,7 @@ public partial class MDSchedulingGroupWF : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return MDSchedulingGroup != null;
+            return _MDSchedulingGroup != null;
         }
     }
 
@@ -100,7 +100,7 @@ public partial class MDSchedulingGroupWF : VBEntityObject, IInsertInfo, IUpdateI
     {
         get
         {
-            return VBiACClassWF != null;
+            return _VBiACClassWF != null;
         }
     }
 

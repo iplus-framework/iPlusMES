@@ -108,7 +108,7 @@ public partial class MDFacilityManagementType : VBEntityObject, IInsertInfo, IUp
     {
         get
         {
-            return Material_MDFacilityManagementType != null;
+            return _Material_MDFacilityManagementType != null;
         }
     }
 

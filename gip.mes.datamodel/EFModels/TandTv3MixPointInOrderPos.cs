@@ -52,7 +52,7 @@ public partial class TandTv3MixPointInOrderPos : VBEntityObject
     {
         get
         {
-            return InOrderPos != null;
+            return _InOrderPos != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class TandTv3MixPointInOrderPos : VBEntityObject
     {
         get
         {
-            return TandTv3MixPoint != null;
+            return _TandTv3MixPoint != null;
         }
     }
 

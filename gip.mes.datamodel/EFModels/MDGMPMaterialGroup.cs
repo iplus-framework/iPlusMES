@@ -108,7 +108,7 @@ public partial class MDGMPMaterialGroup : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return MDGMPMaterialGroupPos_MDGMPMaterialGroup != null;
+            return _MDGMPMaterialGroupPos_MDGMPMaterialGroup != null;
         }
     }
 
@@ -128,7 +128,7 @@ public partial class MDGMPMaterialGroup : VBEntityObject, IInsertInfo, IUpdateIn
     {
         get
         {
-            return Material_MDGMPMaterialGroup != null;
+            return _Material_MDGMPMaterialGroup != null;
         }
     }
 

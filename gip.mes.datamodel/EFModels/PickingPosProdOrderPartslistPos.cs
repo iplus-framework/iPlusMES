@@ -52,7 +52,7 @@ public partial class PickingPosProdOrderPartslistPos : VBEntityObject
     {
         get
         {
-            return PickingPos != null;
+            return _PickingPos != null;
         }
     }
 
@@ -72,7 +72,7 @@ public partial class PickingPosProdOrderPartslistPos : VBEntityObject
     {
         get
         {
-            return ProdorderPartslistPos != null;
+            return _ProdorderPartslistPos != null;
         }
     }
 

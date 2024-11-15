@@ -115,7 +115,7 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup != null;
+            return _MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup != null;
         }
     }
 
@@ -135,7 +135,7 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
     {
         get
         {
-            return Material_MDMaterialGroup != null;
+            return _Material_MDMaterialGroup != null;
         }
     }
 
