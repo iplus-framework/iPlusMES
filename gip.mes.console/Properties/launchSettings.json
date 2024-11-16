@@ -2,6 +2,7 @@
   "profiles": {
     "gip.mes.console": {
       "commandName": "Project",
+      "commandLineArgs": "/U00 /P00",
       "remoteDebugEnabled": false
     },
     "WSL": {
