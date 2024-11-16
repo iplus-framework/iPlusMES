@@ -20,17 +20,25 @@ namespace gip.mes.console
         public static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+//#if DEBUG
+//            if (!System.Diagnostics.Debugger.IsAttached)
+//            {
+//                Console.WriteLine("Wait for attaching debugger");
+//                Console.ReadLine();
+//            }
+//#endif
             CommandLineHelper cmdHelper = new CommandLineHelper(args);
             bool WCFOff = args.Contains("/WCFOff");
             bool simulation = args.Contains("/Simulation");
 
-            // TODO: Two different Implementaions for Linux or Windows-Platform
-            //ACStartUpRoot startUpManager = new ACStartUpRoot(new WPFServices());
-            // If Linux, then pass null
+            // Install sdk for linux first to be able to debug
+            // https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?pivots=os-linux-ubuntu-2004&tabs=dotnet8
+            // https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver16&tabs=ubuntu-install#ubuntu
+            // ./sqlcmd -S 192.168.178.123\\SQLEXP16 -U gip -P netspirit -C
+
             ACStartUpRoot startUpManager = new ACStartUpRoot(null);
             String errorMsg = "";
-            // 1. Datenbankverbindung herstellen
-            Thread.Sleep(5000);
+
             if (startUpManager.LoginUser(cmdHelper.LoginUser, cmdHelper.LoginPassword, false, false, ref errorMsg, WCFOff, simulation) != 1)
             {
                 Messages.ConsoleMsg("System", "Login Error.");
@@ -45,23 +53,12 @@ namespace gip.mes.console
             Console.ReadLine();
             Messages.ConsoleMsg("System", "Closing service...");
             ACRoot.SRoot.ACDeInit();
-            Messages.ConsoleMsg("System", "Service beendet...");
+            Messages.ConsoleMsg("System", "Service shutdown...");
             Console.ReadLine();
         }
 
-        /// <summary>
-        /// Methode liest die Aktuelle Ip des Servers aus und vergleicht diese mit der Ip in der Datenbank.
-        /// Falls die Aktuelle Ip von der In der Datenbank abweicht, wird die Ip der Datenbank überschrieben.
-        /// Nun werden die Ports Ausgelesen.
-        /// Falls in der Datenbank keine Ports vorhanden sind werden die Defaultports, welche Hardcoded 
-        /// in dieser Klasse als property vorhanden sind genommen und in die DB geschrieben.
-        /// Ansonsten werden die Ports aus der Datenbank genommen.
-        /// </summary>
-
         private static void MainThread(object data)
         {
-            //int interval = Program._Random.Next(2000, 7000);
-            //_Timer.Change(interval, Timeout.Infinite);
         }
 
         #region Global Exception-Handler

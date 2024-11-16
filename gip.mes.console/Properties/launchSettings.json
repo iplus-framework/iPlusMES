@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "gip.mes.console": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "executablePath": "dotnet",
+      "commandLineArgs": "\"{OutDir}/gip.mes.console.dll\" /U00 /P00",
+      "workingDirectory": "{OutDir}",
+      "distributionName": ""
+    }
+  }
+}

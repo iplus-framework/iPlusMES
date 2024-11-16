@@ -20,11 +20,19 @@
     <PackageTags>iplus-framework;iplus-MES</PackageTags>
     <PackageProjectUrl>https://github.com/iplus-framework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/iplus-framework/iPlusMES.git</RepositoryUrl>
+    <UserSecretsId>25f6ec7f-193e-433e-b145-eb0a64724dd0</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
+    <ProjectReference Include="..\gip.bso.facility\gip.bso.facility.csproj" />
+    <ProjectReference Include="..\gip.bso.logistics\gip.bso.logistics.csproj" />
+    <ProjectReference Include="..\gip.bso.manufacturing\gip.bso.manufacturing.csproj" />
+    <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj" />
+    <ProjectReference Include="..\gip.bso.purchasing\gip.bso.purchasing.csproj" />
+    <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
+    <ProjectReference Include="..\gip.mes.webservices\gip.mes.webservices.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ConnectionStrings.config">
