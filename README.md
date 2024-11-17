@@ -49,7 +49,7 @@ Restore the SQL Server backup file located in the "Database" folder. Use the IPC
   - Compile the solution an set gip.mes.client.exe as start project.
 
 6. **Execute gip.mes.client.exe:**
-  - Login with user "superuser" and password "superuser" to **start as a client**. Login with user "00" and password "00" to **start as a service**. After starting the service, your local IP is remembered and you can start a second instance an logon as client to establish the Client-Server-Connection.
+  - Login with user "superuser" and password "superuser" to **start as a client**. Login with user "00" and password "00" to **start as a service**. After starting the service, your local IP is remembered and you can start a second instance an logon as client to establish the Client-Server-Connection. If you have problems, that the Client doesn't connect with the server read the [network configuration section](https://iplus-framework.com/en/documentation/Read/Index/View/b00675a8-718c-4c13-9d6d-5e751397ac5f?chapterID=a7424f03-cbff-4f68-90eb-262b3fdcba1c#ItemTextTranslationID_bf788469-8a2f-4a7c-ad78-2710960096dc).
   - 🤗 Have fun trying it out and watch our videos to get started. However, we recommend [online training](https://iplus-framework.com/en?section=Support%20%26%20Training#d57ccb45-9050-41cb-a177-9e8c05028931).
 
 ## Contributing
