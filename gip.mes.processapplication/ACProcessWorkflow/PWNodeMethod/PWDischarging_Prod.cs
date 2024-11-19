@@ -9,6 +9,7 @@ using gip.mes.facility;
 using System.Threading;
 using System.Reflection.Emit;
 using System.Net;
+using System.Web.UI;
 
 namespace gip.mes.processapplication
 {
@@ -1531,6 +1532,11 @@ namespace gip.mes.processapplication
                         bookingParam.PostingBehaviour = PostingBehaviour;
                     else if (isFinalMixture && currentBatchPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
                         bookingParam.PostingBehaviour = PostingBehaviourEnum.DoNothing;
+
+                    int inwardAutoSplitQuantIncNo = InwardAutoSplitQuant;
+                    if (inwardAutoSplitQuantIncNo > 0)
+                        bookingParam.InwardAutoSplitQuant = inwardAutoSplitQuantIncNo;
+
                     OnPrepareInwardBooking(actualWeight, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
                     msg = dbApp.ACSaveChangesWithRetry();
 
