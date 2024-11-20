@@ -3157,7 +3157,7 @@ namespace gip.bso.logistics
                 return;
             Picking mirroredPicking = null;
             Picking currentPicking = CurrentPicking;
-            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, currentPicking);
+            IEnumerable<Picking> mirroredPickings = PickingManager.CreateSupplyPickings(DatabaseApp, currentPicking, this.SelectedPWNodeProcessWorkflow?.ACClassWFID, this);
             if (mirroredPickings != null && mirroredPickings.Any())
             {
                 foreach (var picking in mirroredPickings)
@@ -3195,8 +3195,8 @@ namespace gip.bso.logistics
         {
             return CurrentPicking != null
                 && CurrentPicking.PickingState < PickingStateEnum.Finished
-                && CurrentPicking.MDPickingType?.PickingType != PickingType.AutomaticRelocation
-                && CurrentPicking.MDPickingType?.PickingType != PickingType.InternalRelocation
+                //&& CurrentPicking.MDPickingType?.PickingType != PickingType.AutomaticRelocation
+                //&& CurrentPicking.MDPickingType?.PickingType != PickingType.InternalRelocation
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.Receipt
                 && CurrentPicking.MDPickingType?.PickingType != PickingType.ReceiptVehicle;
         }

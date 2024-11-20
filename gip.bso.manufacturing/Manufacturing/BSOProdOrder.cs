@@ -2532,7 +2532,7 @@ namespace gip.bso.manufacturing
                     return;
             }
 
-            Picking picking = PickingManager.CreateSupplyPicking(DatabaseApp, SelectedProdOrderPartslistPos);
+            Picking picking = PickingManager.CreateSupplyPicking(DatabaseApp, SelectedProdOrderPartslistPos, ProcessWorkflowPresenter?.SelectedWFNode?.ContentACClassWF.ACClassWFID, this);
             if (picking != null)
             {
                 Save();

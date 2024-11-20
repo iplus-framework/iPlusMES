@@ -2440,10 +2440,8 @@ namespace gip.mes.facility
             return String.Format(formatNewNo, from.ProdOrder.ProgramNo, from.Sequence, newSequence);
         }
 
-        public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, Picking from, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForSupply)
+        public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, Picking from, Guid? selectedWFID, ACBSO caller, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForSupply)
         {
-            int storedMirroredPickingsCount = databaseApp.Picking.Where(c => c.MirroredFromPickingID == from.PickingID).Count();
-
             if (!separatePickingForEachPos.HasValue)
             {
                 if (from.ACClassMethod != null)
@@ -2452,8 +2450,11 @@ namespace gip.mes.facility
                     separatePickingForEachPos = false;
             }
 
-            MDPickingType pickingType = databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
-            MDDelivPosLoadState loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(databaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
+            int storedMirroredPickingsCount = 0;
+            MDPickingType pickingType;
+            MDDelivPosLoadState loadState;
+            datamodel.ACClassMethod workflowPL;
+            PrepareParamsForNewSupplyPicking(databaseApp, from, selectedWFID, caller, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
 
             List<Picking> mirroredPickings = new List<Picking>();
             Picking mirroredPicking = null;
@@ -2468,8 +2469,8 @@ namespace gip.mes.facility
                     mirroredPicking.CopyFrom(from, true);
                     if (pickingType != null)
                         mirroredPicking.MDPickingType = pickingType;
-                    if (from.ACClassMethod != null && from.ACClassMethod.ACClassMethod1_ParentACClassMethod != null)
-                        mirroredPicking.ACClassMethod = from.ACClassMethod.ACClassMethod1_ParentACClassMethod;
+                    if (workflowPL != null)
+                        mirroredPicking.ACClassMethod = workflowPL;
                     mirroredPicking.MirroredFromPickingID = from.PickingID;
                     mirroredPickings.Add(mirroredPicking);
                 }
@@ -2495,13 +2496,21 @@ namespace gip.mes.facility
             return mirroredPickings;
         }
 
-        public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, ProdOrderPartslist from, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForOrderSupply)
+        protected virtual void PrepareParamsForNewSupplyPicking(DatabaseApp databaseApp, Picking from, Guid? selectedWFID, ACBSO caller, out int storedMirroredPickingsCount, out datamodel.ACClassMethod workflowPL, out MDPickingType pickingType, out MDDelivPosLoadState loadState)
+        {
+            storedMirroredPickingsCount = databaseApp.Picking.Where(c => c.MirroredFromPickingID == from.PickingID).Count();
+            workflowPL = from.ACClassMethod?.ACClassMethod1_ParentACClassMethod;
+            pickingType = databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
+            loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(databaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
+        }
+
+        public virtual IEnumerable<Picking> CreateSupplyPickings(DatabaseApp databaseApp, ProdOrderPartslist from, Guid? selectedWFID, ACBSO caller, bool? separatePickingForEachPos = null, string formatNewNo = Picking.FormatNoForOrderSupply)
         {
             int storedMirroredPickingsCount = 0;
             datamodel.ACClassMethod workflowPL = null;
             MDPickingType pickingType = null;
             MDDelivPosLoadState loadState = null;
-            PrepareParamsForNewSupplyPicking(databaseApp, from, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
+            PrepareParamsForNewSupplyPicking(databaseApp, from, selectedWFID, caller, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
             if (!separatePickingForEachPos.HasValue)
             {
                 if (workflowPL != null)
@@ -2525,23 +2534,23 @@ namespace gip.mes.facility
             return mirroredPickings;
         }
 
-        public virtual Picking CreateSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslistPos fromPos, string formatNewNo = Picking.FormatNoForOrderSupply)
+        public virtual Picking CreateSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslistPos fromPos, Guid? selectedWFID, ACBSO caller, string formatNewNo = Picking.FormatNoForOrderSupply)
         {
             int storedMirroredPickingsCount = 0;
             datamodel.ACClassMethod workflowPL = null;
             MDPickingType pickingType = null;
             MDDelivPosLoadState loadState = null;
             ProdOrderPartslist from = fromPos.ProdOrderPartslist;
-            PrepareParamsForNewSupplyPicking(databaseApp, from, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
+            PrepareParamsForNewSupplyPicking(databaseApp, from, selectedWFID, caller, out storedMirroredPickingsCount, out workflowPL, out pickingType, out loadState);
             Picking picking = CreateNewSupplyPicking(databaseApp, from, new List<Picking>(), storedMirroredPickingsCount, workflowPL, pickingType, formatNewNo);
             AddSupplyPickingPos(databaseApp, from, fromPos, picking, loadState, formatNewNo);
             return picking;
         }
 
-        protected virtual void PrepareParamsForNewSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslist from, out int storedMirroredPickingsCount, out datamodel.ACClassMethod workflowPL, out MDPickingType pickingType, out MDDelivPosLoadState loadState)
+        protected virtual void PrepareParamsForNewSupplyPicking(DatabaseApp databaseApp, ProdOrderPartslist from, Guid? selectedWFID, ACBSO caller, out int storedMirroredPickingsCount, out datamodel.ACClassMethod workflowPL, out MDPickingType pickingType, out MDDelivPosLoadState loadState)
         {
             storedMirroredPickingsCount = databaseApp.Picking.Where(c => c.MirroredFromPickingID == from.ProdOrderID).Count();
-            workflowPL = workflowPL = from.Partslist?.PartslistACClassMethod_Partslist.FirstOrDefault()?.MaterialWFACClassMethod?.ACClassMethod;
+            workflowPL = from.Partslist?.PartslistACClassMethod_Partslist.FirstOrDefault()?.MaterialWFACClassMethod?.ACClassMethod;
             pickingType = databaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.AutomaticRelocation);
             loadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(databaseApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
         }
@@ -2555,8 +2564,8 @@ namespace gip.mes.facility
             //mirroredPicking.CopyFrom(from, true);
             if (pickingType != null)
                 mirroredPicking.MDPickingType = pickingType;
-            if (workflowPL != null && workflowPL.ACClassMethod1_ParentACClassMethod != null)
-                mirroredPicking.ACClassMethod = workflowPL.ACClassMethod1_ParentACClassMethod;
+            if (workflowPL != null)
+                mirroredPicking.ACClassMethod = workflowPL;
             mirroredPicking.MirroredFromPickingID = from.ProdOrderID;
             mirroredPickings.Add(mirroredPicking);
             return mirroredPicking;
