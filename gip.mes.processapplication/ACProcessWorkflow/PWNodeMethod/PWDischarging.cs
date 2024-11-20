@@ -61,6 +61,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("SWTOn", "en{'SWT On'}de{'SWT An'}");
             method.ParameterValueList.Add(new ACValue("KeepSameRoute", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("KeepSameRoute", "en{'Keep same Route'}de{'Gleiche Route beibehalten'}");
+            method.ParameterValueList.Add(new ACValue(nameof(InwardAutoSplitQuant), typeof(int), 0, Global.ParamOption.Optional));
+            paramTranslation.Add(nameof(InwardAutoSplitQuant), "en{'Auto split quant on inward posting increment num.'}de{'Splitte quant bei Zugangsbuchung mit fortlaufender Nummer'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
@@ -596,7 +598,22 @@ namespace gip.mes.processapplication
                 return false;
             }
         }
-        
+
+        public int InwardAutoSplitQuant
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue(nameof(InwardAutoSplitQuant));
+                    if (acValue != null)
+                        return (int)acValue.Value;
+                }
+                return 0;
+            }
+        }
+
         #endregion
 
         #region Methods
