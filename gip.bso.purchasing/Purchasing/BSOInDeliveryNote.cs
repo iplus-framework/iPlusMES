@@ -2398,7 +2398,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInteraction("FacilityPreBooking", "en{'Post Item'}de{'Buche Position'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
-        public void BookDeliveryPos()
+        public virtual void BookDeliveryPos()
         {
             if (!PreExecute("BookDeliveryPos")) return;
             PostExecute("BookDeliveryPos");
@@ -2410,7 +2410,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInteraction("FacilityPreBooking", "en{'Post'}de{'Buchen'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
-        public void BookCurrentACMethodBooking()
+        public virtual void BookCurrentACMethodBooking()
         {
             if (!IsEnabledBookCurrentACMethodBooking())
                 return;
@@ -2473,7 +2473,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodCommand("DeliveryNotePos", "en{'Post all'}de{'Buche alle'}", (short)MISort.Cancel)]
-        public void BookAllACMethodBookings()
+        public virtual void BookAllACMethodBookings()
         {
             if (!IsEnabledBookAllACMethodBookings())
                 return;
