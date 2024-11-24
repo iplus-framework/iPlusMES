@@ -1,6 +1,6 @@
 // Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -16,6 +16,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Diagnostics;
 using gip.mes.datamodel;
+using gip.core.wpfservices;
+using gip.mes.wpfservices;
 
 namespace gip.mes.client.mobile
 {
@@ -30,7 +32,7 @@ namespace gip.mes.client.mobile
     /// Interaktionslogik für "App.xaml"
     /// </summary>
     public partial class App : Application
-    {
+    { 
         static ACStartUpRoot _StartUpManager = null;
         public static App _GlobalApp = null;
 
@@ -69,7 +71,7 @@ namespace gip.mes.client.mobile
             ApplicationInitialize = applicationInitialize;
 
             _GlobalApp = this;
-            _StartUpManager = new ACStartUpRoot();
+            _StartUpManager = new ACStartUpRoot(new WPFServicesMES());
             //this.Startup += new StartupEventHandler(App_Startup);
 
             // Add the event handler for handling non-UI thread exceptions to the event. 

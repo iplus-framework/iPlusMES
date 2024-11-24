@@ -61,17 +61,6 @@
     <ApplicationIcon>Images\iPlusIconDesktop.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Update="System.Xml.Linq">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Update="UIAutomationProvider">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <None Update="ConnectionStrings.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -96,43 +85,6 @@
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
     <ProjectReference Include="..\gip.mes.webservices\gip.mes.webservices.csproj" />
     <ProjectReference Include="..\gip.mes.wpfservices\gip.mes.wpfservices.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
-      <Visible>False</Visible>
-      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="_task\CommitPrepare.txt" />
@@ -164,7 +116,7 @@
     <Copy SourceFiles="..\..\..\packages\Matrix\MATRIX64.dll" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
     <Copy SourceFiles="..\..\..\packages\Matrix\matrix.ini" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
-	<Target Name="CopyToNet7Windows" AfterTargets="Build">
-		<Exec Command="xcopy &quot;$(SolutionDir)bin\Debug\net7.0\*.*&quot; &quot;$(SolutionDir)bin\Debug\net7.0-windows\&quot; /Y /I /E" />
-	</Target>
+	<!--<Target Name="CopyToNet7Windows" AfterTargets="Build">
+		<Exec Command="xcopy &quot;$(SolutionDir)bin\$(Configuration)\net7.0\*.*&quot; &quot;$(SolutionDir)bin\$(Configuration)\net7.0-windows\&quot; /Y /I /E" />
+	</Target>-->
 </Project>

@@ -42,6 +42,7 @@ namespace gip.mes.client.mobile
             _FractalImagePresenter = new FractalImagePresenter(this);
             _FractalImagePresenter.Generator.Completed += new EventHandler<FractalImageCompletedEventArgs>(Generator_Completed);
 
+            // TODO MainMenu is no longer supported. Use MenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
             MainMenu.Margin = new Thickness(-MainMenu.ActualWidth, 0, 0, 0);
 
             HamburgerButton.Click += (sender, e) => ToggleMenuVisibility();
@@ -86,6 +87,7 @@ namespace gip.mes.client.mobile
             }
 
             if (mainMenu != null)
+                // TODO MainMenu is no longer supported. Use MenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
                 CreateMenu(mainMenu.Items, MainMenu.Items);
 
             InitAppCommands();
@@ -96,11 +98,13 @@ namespace gip.mes.client.mobile
         {
             if (Submenu.Visibility == Visibility.Visible)
             {
+                // TODO MainMenu is no longer supported. Use MenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
                 MainMenu.SwitchActiveMenuItems();
                 Submenu.ToggleMenu();
             }
             else
             {
+                // TODO MainMenu is no longer supported. Use MenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
                 MainMenu.ToggleMenu();
             }
         }

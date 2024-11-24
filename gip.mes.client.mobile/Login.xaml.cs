@@ -1,6 +1,6 @@
 // Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -13,6 +13,7 @@ using gip.core.datamodel;
 using gip.core.layoutengine;
 using gip.core.autocomponent;
 using gip.core.datamodel.Licensing;
+using System.Threading.Tasks;
 
 namespace gip.mes.client.mobile
 {
@@ -38,6 +39,7 @@ namespace gip.mes.client.mobile
             this.Unloaded += new RoutedEventHandler(Login_Unloaded);
 
             // Screen manipulation
+            /*
             WindowStateHandleSettings windowStateHandleSettings = WindowStateHandleSettings.Factory();
             System.Windows.Forms.Screen usedScreen = System.Windows.Forms.Screen.AllScreens.FirstOrDefault(x => x.DeviceName == windowStateHandleSettings.ScreenName);
 
@@ -51,40 +53,57 @@ namespace gip.mes.client.mobile
             {
                 WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
             }
+            */
+
         }
 
         void Login_LocationChanged(object sender, EventArgs e)
         {
-            WindowStateHandle.Save(this, 0, true);
+            //WindowStateHandle.Save(this, 0, true);
         }
 
         #region Eventhandler
 
-        private void Login_Loaded(object sender, RoutedEventArgs e)
+        private async void Login_Loaded(object sender, RoutedEventArgs e)
         {
             Monitor.Enter(_WaitOnOkClick);
             // eine IAsyncResult-Instanz für die Initialisierung
             // der Anwendung erzeugen
-            IAsyncResult result = null;
-
-            // dieser anonyme Delegat wird aufgerufen, wenn die
-            // Initialisierung abgeschlossen wurde
-            AsyncCallback initCompleted = delegate(IAsyncResult ar)
-            {
-                if ((App.Current != null) && (App.Current.ApplicationInitialize != null))
-                    App.Current.ApplicationInitialize.EndInvoke(result);
-
-                // Sicherstellen das Close auf dem UI Thread ausgeführt wird.
-                // Deshalb wird auf den anwendungsweiten Delegaten Invoker gecastet.
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate { Close(); });
-            };
-
+            Task result = null;
             // die Initialisierung der Anwendung starten
             if ((App.Current != null) && (App.Current.ApplicationInitialize != null))
-                result = App.Current.ApplicationInitialize.BeginInvoke(this, initCompleted, null);
+            {
+                //result = App.Current.ApplicationInitialize.BeginInvoke(this, initCompleted, null);
+                result = Task.Run(() => App.Current.ApplicationInitialize(this));
 
-            // als behandelt markieren  
-            e.Handled = true;
+                // als behandelt markieren  
+                e.Handled = true;
+            }
+
+            await result;
+            await Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate { Close(); });
+
+            //IAsyncResult result = null;
+
+            //// dieser anonyme Delegat wird aufgerufen, wenn die
+            //// Initialisierung abgeschlossen wurde
+            //AsyncCallback initCompleted = delegate(IAsyncResult ar)
+            //{
+            //    if ((App.Current != null) && (App.Current.ApplicationInitialize != null))
+            //        App.Current.ApplicationInitialize.EndInvoke(result);
+
+            //    // Sicherstellen das Close auf dem UI Thread ausgeführt wird.
+            //    // Deshalb wird auf den anwendungsweiten Delegaten Invoker gecastet.
+            //    Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate { Close(); });
+            //};
+
+            //// die Initialisierung der Anwendung starten
+            //if ((App.Current != null) && (App.Current.ApplicationInitialize != null))
+            //    result = Task.Run(() => App.Current.ApplicationInitialize(this));
+            //    //result = App.Current.ApplicationInitialize.BeginInvoke(this, initCompleted, null);
+
+            //// als behandelt markieren  
+            //e.Handled = true;
         }
 
         private void Login_Unloaded(object sender, RoutedEventArgs e)
