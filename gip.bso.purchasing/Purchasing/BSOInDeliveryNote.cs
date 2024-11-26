@@ -3147,6 +3147,12 @@ namespace gip.bso.purchasing
                 case nameof(DlgAvailableQuantsCancel):
                     DlgAvailableQuantsCancel();
                     return true;
+                case nameof(CreateOrUpdatePicking):
+                    CreateOrUpdatePicking();
+                    return true;
+                case nameof(IsEnabledCreateOrUpdatePicking):
+                    result = IsEnabledCreateOrUpdatePicking();
+                    return true;
                 default:
                     break;
             }
