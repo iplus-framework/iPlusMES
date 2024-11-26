@@ -26,6 +26,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(18, MDDelivType.ClassName, "en{'Delivery Type'}de{'Lieferart'}", Const.ContextDatabase + "\\" + MDDelivType.ClassName, "", true)]
     [ACPropertyEntity(19, "EMail", "en{'E-Mail'}de{'E-Mail'}", "", "", true)]
     [ACPropertyEntity(20, "InvoiceIssuerNo", "en{'Invoice Issuer No.'}de{'Rechnungsaussteller-Nr.'}", "", "", true)]
+    [ACPropertyEntity(21, nameof(WebUrl), "en{'Web address'}de{'Webadresse'}", "", "", true)]
     [ACPropertyEntity(9999, Company.ClassName, ConstApp.Company, Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
     [ACPropertyEntity(9999, "GEO_x", "en{'GEO_x'}de{'GEO_x'}", "", "", true)]
     [ACPropertyEntity(9999, "GEO_y", "en{'GEO_y'}de{'GEO_y'}", "", "", true)]

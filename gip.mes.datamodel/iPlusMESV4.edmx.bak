@@ -182,6 +182,7 @@
           <Property Name="AttachedFromACClassID" Type="uniqueidentifier" />
           <Property Name="IsStatic" Type="bit" Nullable="false" />
           <Property Name="ExecuteByDoubleClick" Type="bit" Nullable="false" />
+          <Property Name="HasRequiredParams" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="ACClassMethodConfig">
           <Key>
@@ -606,7 +607,7 @@
           <Property Name="CompanyID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ParentCompanyID" Type="uniqueidentifier" />
           <Property Name="CompanyNo" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="CompanyName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CompanyName" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="BillingMDTermOfPaymentID" Type="uniqueidentifier" />
           <Property Name="ShippingMDTermOfPaymentID" Type="uniqueidentifier" />
           <Property Name="VBUserID" Type="uniqueidentifier" />
@@ -632,6 +633,7 @@
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="IsTenant" Type="bit" Nullable="false" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
+          <Property Name="WebUrl" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -644,11 +646,11 @@
           <Property Name="IsDeliveryCompanyAddress" Type="bit" Nullable="false" />
           <Property Name="IsFactory" Type="bit" Nullable="false" />
           <Property Name="InvoiceIssuerNo" Type="nvarchar" MaxLength="50" />
-          <Property Name="Name1" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Name2" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Name3" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Street" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="City" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="Name1" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name2" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name3" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Street" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="City" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Postcode" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="PostOfficeBox" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="Phone" Type="varchar" MaxLength="20" Nullable="false" />
@@ -666,6 +668,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="WebUrl" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
@@ -841,11 +844,11 @@
           </Key>
           <Property Name="CompanyPersonID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CompanyID" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Name1" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="Name2" Type="varchar" MaxLength="40" />
-          <Property Name="Name3" Type="varchar" MaxLength="40" />
-          <Property Name="Street" Type="varchar" MaxLength="40" Nullable="false" />
-          <Property Name="City" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="Name1" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Name2" Type="varchar" MaxLength="250" />
+          <Property Name="Name3" Type="varchar" MaxLength="250" />
+          <Property Name="Street" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="City" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Postcode" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="PostOfficeBox" Type="varchar" MaxLength="10" />
           <Property Name="Phone" Type="varchar" MaxLength="20" />
@@ -859,6 +862,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="CompanyPersonNo" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="EMail" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -3935,12 +3939,12 @@
           <Property Name="DeliveryCompanyAddressID" Type="uniqueidentifier" />
           <Property Name="MirroredFromPickingID" Type="uniqueidentifier" />
           <Property Name="Comment2" Type="varchar(max)" />
+          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
           <Property Name="ScheduledOrder" Type="int" />
           <Property Name="ScheduledStartDate" Type="datetime" />
           <Property Name="ScheduledEndDate" Type="datetime" />
           <Property Name="CalculatedStartDate" Type="datetime" />
           <Property Name="CalculatedEndDate" Type="datetime" />
-          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="PickingConfig">
           <Key>
@@ -4818,7 +4822,7 @@
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4839,7 +4843,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ACProgramLogView' does not have
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4851,7 +4855,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ACProgramLogView' does not have
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4875,7 +4879,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialPosView' does no
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4899,7 +4903,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialRelView' does no
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4924,7 +4928,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialView' does not h
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4953,7 +4957,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosMachines' does not h
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4983,7 +4987,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosView' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5033,7 +5037,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogRelView' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5053,7 +5057,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsDetailView'
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5067,7 +5071,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsView' does 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5089,7 +5093,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderInwardsView' does not 
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5113,7 +5117,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderOutwardsView' does not
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5126,7 +5130,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBSystemColumns' does not have 
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -19967,7 +19971,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="MaintACClass_VBiACClass" Relationship="iPlusMESV4_Model.FK_MaintACClass_ACClassID" FromRole="ACClass" ToRole="MaintACClass" />
           <NavigationProperty Name="ACClassTask_TaskTypeACClass" Relationship="iPlusMESV4_Model.FK_ACClassTask_TaskTypeACClassID" FromRole="ACClass" ToRole="ACClassTask" />
           <NavigationProperty Name="MaintOrder_VBiPAACClass" Relationship="iPlusMESV4_Model.FK_MaintOrder_PAACClassID" FromRole="ACClass" ToRole="MaintOrder" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ACClassID" FromRole="ACClass" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_VBiACClass" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ACClassID" FromRole="ACClass" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="ACClassConfig">
           <Key>
@@ -20091,6 +20095,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="AttachedFromACClassID" Type="Guid" />
           <Property Name="IsStatic" Type="Boolean" Nullable="false" />
           <Property Name="ExecuteByDoubleClick" Type="Boolean" Nullable="false" />
+          <Property Name="HasRequiredParams" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="ACClass" Relationship="iPlusMESV4_Model.FK_ACClassMethod_ACClassID" FromRole="ACClassMethod" ToRole="ACClass" />
           <NavigationProperty Name="AttachedFromACClass" Relationship="iPlusMESV4_Model.FK_ACClassMethod_AttachedFromACClass" FromRole="ACClassMethod" ToRole="ACClass" />
           <NavigationProperty Name="PWACClass" Relationship="iPlusMESV4_Model.FK_ACClassMethod_PWACClassID" FromRole="ACClassMethod" ToRole="ACClass" />
@@ -20634,7 +20639,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="CompanyID" Type="Guid" Nullable="false" />
           <Property Name="ParentCompanyID" Type="Guid" />
           <Property Name="CompanyNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="BillingMDTermOfPaymentID" Type="Guid" />
           <Property Name="ShippingMDTermOfPaymentID" Type="Guid" />
           <Property Name="VBUserID" Type="Guid" />
@@ -20687,6 +20692,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="VisitorVoucher_VisitorCompany" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyID" FromRole="Company" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Company" ToRole="Facility" />
           <NavigationProperty Name="MaintOrderAssignment_Company" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" FromRole="Company" ToRole="MaintOrderAssignment" />
+          <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -20699,11 +20705,11 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="IsDeliveryCompanyAddress" Type="Boolean" Nullable="false" />
           <Property Name="IsFactory" Type="Boolean" Nullable="false" />
           <Property Name="InvoiceIssuerNo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Name1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name2" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name3" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Street" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="City" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Name1" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name2" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name3" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Street" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Postcode" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="PostOfficeBox" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Phone" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
@@ -20746,6 +20752,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="Picking_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Picking_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="Picking" />
           <NavigationProperty Name="TourplanPos_CompanyAddress" Relationship="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID" FromRole="CompanyAddress" ToRole="TourplanPos" />
           <NavigationProperty Name="UserSettings_InvoiceCompanyAddress" Relationship="iPlusMESV4_Model.FK_UserSettings_CompanyAddress" FromRole="CompanyAddress" ToRole="UserSettings" />
+          <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
@@ -20949,11 +20956,11 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           </Key>
           <Property Name="CompanyPersonID" Type="Guid" Nullable="false" />
           <Property Name="CompanyID" Type="Guid" Nullable="false" />
-          <Property Name="Name1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name2" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Name3" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="Street" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="City" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Name1" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name2" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Name3" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Street" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Postcode" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="PostOfficeBox" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Phone" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
@@ -20981,6 +20988,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="Visitor_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="CompanyPerson" ToRole="Facility" />
+          <Property Name="EMail" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -21407,7 +21415,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="FacilityInventoryPos_FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityInventoryPos" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityID" FromRole="FacilityCharge" ToRole="Facility" />
           <NavigationProperty Name="OperationLog_FacilityCharge" Relationship="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" FromRole="FacilityCharge" ToRole="OperationLog" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="FacilityHistory">
           <Key>
@@ -21499,7 +21507,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="TandTv3MixPointFacilityLot_FacilityLot" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointFacilityLot_FacilityLotID" FromRole="FacilityLot" ToRole="TandTv3MixPointFacilityLot" />
           <NavigationProperty Name="ProdOrderPartslistPos_FacilityLot" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_FacilityLot" FromRole="FacilityLot" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="TandTv3MixPoint_InwardLot" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_FacilityLotID" FromRole="FacilityLot" ToRole="TandTv3MixPoint" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityLotID" FromRole="FacilityLot" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_FacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityLotID" FromRole="FacilityLot" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="FacilityLotStock">
           <Key>
@@ -21868,7 +21876,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="TandTv3MixPointInOrderPos_InOrderPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointInOrderPos_InOrderPosID" FromRole="InOrderPos" ToRole="TandTv3MixPointInOrderPos" />
           <NavigationProperty Name="Weighing_InOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_InOrderPosID" FromRole="InOrderPos" ToRole="Weighing" />
           <NavigationProperty Name="PickingPos_InOrderPos" Relationship="iPlusMESV4_Model.FK_PickingPos_InOrderPosID" FromRole="InOrderPos" ToRole="PickingPos" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_InOrderPosID" FromRole="InOrderPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_InOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_InOrderPosID" FromRole="InOrderPos" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="InOrderPosSplit">
           <Key>
@@ -22269,7 +22277,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="MaintOrderPos_Material" Relationship="iPlusMESV4_Model.FK_MaintOrderPos_ParentMaintOrderPosID" FromRole="Material" ToRole="MaintOrderPos" />
           <NavigationProperty Name="PickingPos_PickingMaterial" Relationship="iPlusMESV4_Model.FK_PickingPos_MaterialID" FromRole="Material" ToRole="PickingPos" />
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -24149,7 +24157,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="TandTv3MixPointOutOrderPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointOutOrderPos_OutOrderPosID" FromRole="OutOrderPos" ToRole="TandTv3MixPointOutOrderPos" />
           <NavigationProperty Name="Weighing_OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="OutOrderPos" ToRole="Weighing" />
           <NavigationProperty Name="PickingPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_PickingPos_OutOrderPosID" FromRole="OutOrderPos" ToRole="PickingPos" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_OutOrderPosID" FromRole="OutOrderPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_OutOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_OutOrderPosID" FromRole="OutOrderPos" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="OutOrderPosSplit">
           <Key>
@@ -24580,7 +24588,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="ProdOrderBatch_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderBatch" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="ProdOrderBatchPlan" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="ProdOrderBatchPlan" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -24661,7 +24669,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="Anterograde" Type="Boolean" />
           <NavigationProperty Name="TargetProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPosRelation" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="SourceProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPos1" FromRole="ProdOrderPartslistPosRelation" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID" FromRole="ProdOrderPartslistPosRelation" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID" FromRole="ProdOrderPartslistPosRelation" ToRole="FacilityReservation" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosSplit">
           <Key>
@@ -31864,7 +31872,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -32248,7 +32256,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="PickingPos_ToFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_ToFacilityID" FromRole="Facility" ToRole="PickingPos" />
           <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
           <NavigationProperty Name="VBiACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="Facility" ToRole="ACClassMethod" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="Facility" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_Facility" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="Facility" ToRole="FacilityReservation" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -33056,7 +33064,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="ProdOrderPartslistPosSplit_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosSplit_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPosSplit" />
           <NavigationProperty Name="TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv3MixPointProdOrderPartslistPos" />
           <NavigationProperty Name="ACClassTask" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ACClassTask" FromRole="ProdOrderPartslistPos" ToRole="ACClassTask" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityReservation" />
         </EntityType>
         <Association Name="FK_ProdOrderPartslist_ACProgramID">
           <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
@@ -33806,7 +33814,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="TandTv3MixPointPickingPos_PickingPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointPickingPos_PickingPosID" FromRole="PickingPos" ToRole="TandTv3MixPointPickingPos" />
           <NavigationProperty Name="LabOrder_PickingPos" Relationship="iPlusMESV4_Model.FK_LabOrder_PickingPosID" FromRole="PickingPos" ToRole="LabOrder" />
           <Property Name="ACClassTaskID2" Type="Guid" />
-          <NavigationProperty Name="FacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" FromRole="PickingPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" FromRole="PickingPos" ToRole="FacilityReservation" />
         </EntityType>
         <Association Name="FK_ACClassTask_TaskTypeACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="1">
@@ -34595,15 +34603,15 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="PickingPosID" Type="Guid" />
           <Property Name="ReservedQuantityUOM" Type="Double" />
           <Property Name="CalculatedRoute" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="ACClass" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ACClassID" FromRole="FacilityReservation" ToRole="ACClass" />
+          <NavigationProperty Name="VBiACClass" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ACClassID" FromRole="FacilityReservation" ToRole="ACClass" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="FacilityReservation" ToRole="Facility" />
           <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" FromRole="FacilityReservation" ToRole="FacilityCharge" />
           <NavigationProperty Name="FacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityLotID" FromRole="FacilityReservation" ToRole="FacilityLot" />
           <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_InOrderPosID" FromRole="FacilityReservation" ToRole="InOrderPos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="FacilityReservation" ToRole="Material" />
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_OutOrderPosID" FromRole="FacilityReservation" ToRole="OutOrderPos" />
-          <NavigationProperty Name="FacilityReservation1" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" FromRole="FacilityReservation" ToRole="FacilityReservation1" />
-          <NavigationProperty Name="FacilityReservation2" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" FromRole="FacilityReservation1" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityReservation_ParentFacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" FromRole="FacilityReservation" ToRole="FacilityReservation1" />
+          <NavigationProperty Name="FacilityReservation1_ParentFacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" FromRole="FacilityReservation1" ToRole="FacilityReservation" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" FromRole="FacilityReservation" ToRole="PickingPos" />
           <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="FacilityReservation" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="FacilityReservation" ToRole="ProdOrderPartslistPos" />
@@ -34907,6 +34915,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="ACClassMethod">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ACClassMethod">
               <MappingFragment StoreEntitySet="ACClassMethod">
+                <ScalarProperty Name="HasRequiredParams" ColumnName="HasRequiredParams" />
                 <ScalarProperty Name="ExecuteByDoubleClick" ColumnName="ExecuteByDoubleClick" />
                 <ScalarProperty Name="IsStatic" ColumnName="IsStatic" />
                 <ScalarProperty Name="AttachedFromACClassID" ColumnName="AttachedFromACClassID" />
@@ -35367,6 +35376,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="Company">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Company">
               <MappingFragment StoreEntitySet="Company">
+                <ScalarProperty Name="WebUrl" ColumnName="WebUrl" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
                 <ScalarProperty Name="IsTenant" ColumnName="IsTenant" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
@@ -35402,6 +35412,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="CompanyAddress">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.CompanyAddress">
               <MappingFragment StoreEntitySet="CompanyAddress">
+                <ScalarProperty Name="WebUrl" ColumnName="WebUrl" />
                 <ScalarProperty Name="InsertName" ColumnName="InsertName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
@@ -35611,6 +35622,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="CompanyPerson">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.CompanyPerson">
               <MappingFragment StoreEntitySet="CompanyPerson">
+                <ScalarProperty Name="EMail" ColumnName="EMail" />
                 <ScalarProperty Name="CompanyPersonNo" ColumnName="CompanyPersonNo" />
                 <ScalarProperty Name="InsertName" ColumnName="InsertName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />

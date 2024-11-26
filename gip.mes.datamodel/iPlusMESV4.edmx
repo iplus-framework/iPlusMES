@@ -633,6 +633,7 @@
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="IsTenant" Type="bit" Nullable="false" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
+          <Property Name="WebUrl" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -667,6 +668,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="WebUrl" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
@@ -860,6 +862,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="CompanyPersonNo" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="EMail" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -3936,12 +3939,12 @@
           <Property Name="DeliveryCompanyAddressID" Type="uniqueidentifier" />
           <Property Name="MirroredFromPickingID" Type="uniqueidentifier" />
           <Property Name="Comment2" Type="varchar(max)" />
+          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
           <Property Name="ScheduledOrder" Type="int" />
           <Property Name="ScheduledStartDate" Type="datetime" />
           <Property Name="ScheduledEndDate" Type="datetime" />
           <Property Name="CalculatedStartDate" Type="datetime" />
           <Property Name="CalculatedEndDate" Type="datetime" />
-          <Property Name="VBiACClassWFID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="PickingConfig">
           <Key>
@@ -4819,7 +4822,7 @@
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4840,7 +4843,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ACProgramLogView' does not have
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4852,7 +4855,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ACProgramLogView' does not have
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4876,7 +4879,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialPosView' does no
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4900,7 +4903,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialRelView' does no
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4925,7 +4928,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.MachineMaterialView' does not h
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4954,7 +4957,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosMachines' does not h
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4984,7 +4987,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogPosView' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5034,7 +5037,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.OrderLogRelView' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5054,7 +5057,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsDetailView'
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5068,7 +5071,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderConnectionsView' does 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5090,7 +5093,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderInwardsView' does not 
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5114,7 +5117,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.ProdOrderOutwardsView' does not
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5127,7 +5130,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBSystemColumns' does not have 
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -20690,6 +20693,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="VisitorVoucher_VisitorCompany" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyID" FromRole="Company" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Company" ToRole="Facility" />
           <NavigationProperty Name="MaintOrderAssignment_Company" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" FromRole="Company" ToRole="MaintOrderAssignment" />
+          <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -20749,6 +20753,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="Picking_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Picking_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="Picking" />
           <NavigationProperty Name="TourplanPos_CompanyAddress" Relationship="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID" FromRole="CompanyAddress" ToRole="TourplanPos" />
           <NavigationProperty Name="UserSettings_InvoiceCompanyAddress" Relationship="iPlusMESV4_Model.FK_UserSettings_CompanyAddress" FromRole="CompanyAddress" ToRole="UserSettings" />
+          <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
@@ -20984,6 +20989,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <NavigationProperty Name="Visitor_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="CompanyPerson" ToRole="Facility" />
+          <Property Name="EMail" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -31867,7 +31873,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -35371,6 +35377,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="Company">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Company">
               <MappingFragment StoreEntitySet="Company">
+                <ScalarProperty Name="WebUrl" ColumnName="WebUrl" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
                 <ScalarProperty Name="IsTenant" ColumnName="IsTenant" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
@@ -35406,6 +35413,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="CompanyAddress">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.CompanyAddress">
               <MappingFragment StoreEntitySet="CompanyAddress">
+                <ScalarProperty Name="WebUrl" ColumnName="WebUrl" />
                 <ScalarProperty Name="InsertName" ColumnName="InsertName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
@@ -35615,6 +35623,7 @@ warning 6002: The table/view 'IPlusMESV4demo.dbo.VBTranslationView' does not hav
           <EntitySetMapping Name="CompanyPerson">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.CompanyPerson">
               <MappingFragment StoreEntitySet="CompanyPerson">
+                <ScalarProperty Name="EMail" ColumnName="EMail" />
                 <ScalarProperty Name="CompanyPersonNo" ColumnName="CompanyPersonNo" />
                 <ScalarProperty Name="InsertName" ColumnName="InsertName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
