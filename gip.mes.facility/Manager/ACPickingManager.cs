@@ -864,6 +864,63 @@ namespace gip.mes.facility
             return null;
         }
 
+        public Msg CreateOrUpdatePickingFromOutDeliveryNote(DeliveryNote deliveryNote, DatabaseApp dbApp, out Picking picking, bool dnNoInPickingComment2 = true)
+        {
+            picking = null;
+
+            if (!deliveryNote.DeliveryNotePos_DeliveryNote.Any() || deliveryNote == null)
+                return null;
+
+            OutOrderPos outOrderPos = deliveryNote.DeliveryNotePos_DeliveryNote.Select(c => c.OutOrderPos).Where(c => c.OutOrderPos_ParentOutOrderPos.Any()).FirstOrDefault();
+            picking = outOrderPos?.OutOrderPos_ParentOutOrderPos.FirstOrDefault()?.PickingPos_OutOrderPos.FirstOrDefault()?.Picking;
+
+            if (picking == null)
+            {
+                string secKey = Root.NoManager.GetNewNo(dbApp, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo);
+                picking = Picking.NewACObject(dbApp, null, secKey);
+                picking.MDPickingType = dbApp.MDPickingType.FirstOrDefault(c => c.MDKey == nameof(GlobalApp.PickingType.Issue));
+                if (dnNoInPickingComment2)
+                    picking.Comment2 = deliveryNote.DeliveryNoteNo;
+            }
+
+            List<PickingPos> existingPickingPosList = picking.PickingPos_Picking.ToList();
+
+            MsgWithDetails msgDet = new MsgWithDetails();
+
+            foreach (DeliveryNotePos dnPos in deliveryNote.DeliveryNotePos_DeliveryNote)
+            {
+                OutOrderPos pickingOutOrderPos = dnPos.OutOrderPos.OutOrderPos_ParentOutOrderPos.FirstOrDefault();
+                if (pickingOutOrderPos != null)
+                {
+                    PickingPos pPos = existingPickingPosList.FirstOrDefault(c => c.OutOrderPosID == pickingOutOrderPos.OutOrderPosID);
+                    if (pPos != null)
+                        existingPickingPosList.Remove(pPos);
+
+                    if (pickingOutOrderPos.TargetQuantityUOM != dnPos.OutOrderPos.TargetQuantityUOM)
+                        pickingOutOrderPos.TargetQuantityUOM = dnPos.OutOrderPos.TargetQuantityUOM;
+                }
+                else
+                {
+                    List<object> resultNewEntites = new List<object>();
+                    Msg msgAssign = AssignDNoteOutOrderPos(picking, dnPos.OutOrderPos, null, dbApp, resultNewEntites);
+                    if (msgAssign != null)
+                        msgDet.AddDetailMessage(msgAssign);
+                }
+            }
+
+            foreach (PickingPos pPos in existingPickingPosList)
+            {
+                Msg msgUnassign = UnassignPickingPos(pPos, dbApp);
+                if (msgUnassign != null)
+                    msgDet.AddDetailMessage(msgUnassign);
+            }
+
+            if (msgDet.MsgDetailsCount > 0)
+                return msgDet;
+
+            return null;
+        }
+
         #endregion
 
         #region ProdOrderPartslist

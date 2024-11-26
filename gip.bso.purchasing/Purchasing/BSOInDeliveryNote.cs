@@ -19,6 +19,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
 using System.Linq;
@@ -95,6 +96,11 @@ namespace gip.bso.purchasing
             if (_LabOrderManager == null)
                 throw new Exception("LabOrderManager not configured");
 
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
+
             if (Parameters != null && Parameters.Any())
                 InitParams();
 
@@ -110,6 +116,12 @@ namespace gip.bso.purchasing
             _ACFacilityManager = null;
             ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
             _LabOrderManager = null;
+
+            if (_PickingManager != null)
+            {
+                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+                _PickingManager = null;
+            }
 
             this._AccessBookingFacility = null;
             this._AccessDeliveryNotePos = null;
@@ -220,6 +232,15 @@ namespace gip.bso.purchasing
                 if (_LabOrderManager == null)
                     return null;
                 return _LabOrderManager.ValueT;
+            }
+        }
+
+        private ACRef<ACPickingManager> _PickingManager;
+        protected ACPickingManager PickingManager
+        {
+            get
+            {
+                return _PickingManager?.ValueT;
             }
         }
 
@@ -2308,6 +2329,79 @@ namespace gip.bso.purchasing
             if (this.CurrentInOrderPosFromPicking == null || CurrentDeliveryNote == null)
                 return false;
             return true;
+        }
+
+        [ACMethodInfo("", "en{'Create or update picking'}de{'Kommissionierung erstellen oder aktualisieren'}", 9999)]
+        public void CreateOrUpdatePicking()
+        {
+            ACPickingManager pickingManager = PickingManager;
+            if (pickingManager == null)
+            {
+                Messages.Error(this, "Der Kommissioniermanager ist nicht verfügbar!", true);
+                return;
+            }
+
+            Picking picking = null;
+            Msg msg = pickingManager.CreateOrUpdatePickingFromInDeliveryNote(CurrentDeliveryNote, DatabaseApp, out picking);
+
+            if (picking == null)
+                return;
+
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+
+            string facilityNo = OnGetFacilityNoForPicking(DatabaseApp, picking);
+            if (facilityNo == null)
+                return;
+
+            foreach (PickingPos pPos in picking.PickingPos_Picking)
+            {
+                ProcessPickingPos(DatabaseApp, pPos, facilityNo);
+            }
+
+            CurrentDeliveryNote.MDDelivNoteState = DatabaseApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
+            ACSaveChanges();
+        }
+
+        public bool IsEnabledCreateOrUpdatePicking()
+        {
+            return CurrentDeliveryNote != null;
+        }
+
+        public virtual void ProcessPickingPos(DatabaseApp databaseApp, PickingPos pickingPos, string targetFacilityNo)
+        {
+            if (pickingPos.EntityState == System.Data.EntityState.Added)
+                pickingPos.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(databaseApp);
+
+            pickingPos.ToFacility = databaseApp.Facility.FirstOrDefault(c => c.FacilityNo == targetFacilityNo);
+        }
+
+        public virtual string OnGetFacilityNoForPicking(DatabaseApp dbApp, Picking picking)
+        {
+            string facilityNo = null;
+
+            Picking oldPicking = dbApp.Picking.Where(c => c.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                                                       && c.PickingStateIndex >= (short)PickingStateEnum.Finished 
+                                                       && c.PickingPos_Picking.Any(x => x.ToFacilityID.HasValue)).FirstOrDefault();
+
+            if (oldPicking != null)
+            {
+                PickingPos pPos = oldPicking.PickingPos_Picking.Where(c => c.ToFacilityID.HasValue).FirstOrDefault();
+                if (pPos != null)
+                {
+                    facilityNo = pPos.ToFacility.FacilityNo;
+                }
+            }
+
+            if (facilityNo == null)
+            {
+                facilityNo = dbApp.Facility.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).FirstOrDefault()?.FacilityNo;
+            }
+
+            return facilityNo;
         }
 
         #endregion

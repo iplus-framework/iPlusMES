@@ -42,6 +42,10 @@ namespace gip.bso.sales
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
             Search();
             return true;
         }
@@ -52,6 +56,12 @@ namespace gip.bso.sales
             _OutDeliveryNoteManager = null;
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+
+            if (_PickingManager != null)
+            {
+                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+                _PickingManager = null;
+            }
 
             this._AccessBookingFacility = null;
             this._AccessDeliveryNotePos = null;
@@ -130,6 +140,15 @@ namespace gip.bso.sales
                 if (_ACFacilityManager == null)
                     return null;
                 return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        private ACRef<ACPickingManager> _PickingManager;
+        protected ACPickingManager PickingManager
+        {
+            get
+            {
+                return _PickingManager?.ValueT;
             }
         }
 
@@ -846,7 +865,7 @@ namespace gip.bso.sales
         {
             get
             {
-                if (CurrentACMethodBooking == null || CurrentACMethodBooking.OutwardFacility == null || CurrentDeliveryNotePos.Material == null)
+                if (CurrentACMethodBooking == null || CurrentACMethodBooking.OutwardFacility == null || CurrentDeliveryNotePos == null || CurrentDeliveryNotePos.Material == null)
                     return null;
                 return CurrentACMethodBooking.OutwardFacility.FacilityCharge_Facility
                     .Where(x => x.MaterialID == CurrentDeliveryNotePos.Material.MaterialID && !x.NotAvailable).OrderByDescending(x => x.InsertDate);
@@ -1877,6 +1896,79 @@ namespace gip.bso.sales
             if (this.CurrentOutOrderPosFromPicking == null || CurrentDeliveryNote == null)
                 return false;
             return true;
+        }
+
+        [ACMethodInfo("", "en{'Create or update picking'}de{'Kommissionierung erstellen oder aktualisieren'}", 9999)]
+        public void CreateOrUpdatePicking()
+        {
+            ACPickingManager pickingManager = PickingManager;
+            if (pickingManager == null)
+            {
+                Messages.Error(this, "Der Kommissioniermanager ist nicht verfügbar!", true);
+                return;
+            }
+
+            Picking picking = null;
+            Msg msg = pickingManager.CreateOrUpdatePickingFromOutDeliveryNote(CurrentDeliveryNote, DatabaseApp, out picking);
+
+            if (picking == null)
+                return;
+
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+
+            string facilityNo = OnGetFacilityNoForPicking(DatabaseApp, picking);
+            if (facilityNo == null)
+                return;
+
+            foreach (PickingPos pPos in picking.PickingPos_Picking)
+            {
+                ProcessPickingPos(DatabaseApp, pPos, facilityNo);
+            }
+
+            CurrentDeliveryNote.MDDelivNoteState = DatabaseApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
+            ACSaveChanges();
+        }
+
+        public bool IsEnabledCreateOrUpdatePicking()
+        {
+            return CurrentDeliveryNote != null;
+        }
+
+        public virtual void ProcessPickingPos(DatabaseApp databaseApp, PickingPos pickingPos, string sourceFacilityNo)
+        {
+            if (pickingPos.EntityState == System.Data.EntityState.Added)
+                pickingPos.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(databaseApp);
+
+            pickingPos.FromFacility = databaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo);
+        }
+
+        public virtual string OnGetFacilityNoForPicking(DatabaseApp dbApp, Picking picking)
+        {
+            string facilityNo = null;
+
+            Picking oldPicking = dbApp.Picking.Where(c => c.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
+                                                       && c.PickingStateIndex >= (short)PickingStateEnum.Finished
+                                                       && c.PickingPos_Picking.Any(x => x.ToFacilityID.HasValue)).FirstOrDefault();
+
+            if (oldPicking != null)
+            {
+                PickingPos pPos = oldPicking.PickingPos_Picking.Where(c => c.ToFacilityID.HasValue).FirstOrDefault();
+                if (pPos != null)
+                {
+                    facilityNo = pPos.ToFacility.FacilityNo;
+                }
+            }
+
+            if (facilityNo == null)
+            {
+                facilityNo = dbApp.Facility.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).FirstOrDefault()?.FacilityNo;
+            }
+
+            return facilityNo;
         }
 
         #endregion
