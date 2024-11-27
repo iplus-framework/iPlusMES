@@ -2239,7 +2239,7 @@ namespace gip.mes.facility
 
         #region FinishOrder
 
-        public MsgWithDetails FinishOrder(
+        public virtual MsgWithDetails FinishOrder(
             DatabaseApp dbApp,
             Picking picking,
             ACInDeliveryNoteManager inDeliveryNoteManager,
