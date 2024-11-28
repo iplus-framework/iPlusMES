@@ -1952,14 +1952,14 @@ namespace gip.bso.sales
 
             Picking oldPicking = dbApp.Picking.Where(c => c.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
                                                        && c.PickingStateIndex >= (short)PickingStateEnum.Finished
-                                                       && c.PickingPos_Picking.Any(x => x.ToFacilityID.HasValue)).FirstOrDefault();
+                                                       && c.PickingPos_Picking.Any(x => x.FromFacilityID.HasValue)).FirstOrDefault();
 
             if (oldPicking != null)
             {
-                PickingPos pPos = oldPicking.PickingPos_Picking.Where(c => c.ToFacilityID.HasValue).FirstOrDefault();
+                PickingPos pPos = oldPicking.PickingPos_Picking.Where(c => c.FromFacilityID.HasValue).FirstOrDefault();
                 if (pPos != null)
                 {
-                    facilityNo = pPos.ToFacility.FacilityNo;
+                    facilityNo = pPos.FromFacility.FacilityNo;
                 }
             }
 
@@ -2280,8 +2280,6 @@ namespace gip.bso.sales
 
 
         #endregion
-
-
 
         #region Tracking
 
