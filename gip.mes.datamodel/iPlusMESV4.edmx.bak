@@ -294,6 +294,35 @@
           <Property Name="GroupName" Type="varchar(max)" />
           <Property Name="StateName" Type="varchar(max)" />
         </EntityType>
+        <EntityType Name="ACClassRouteUsage">
+          <Key>
+            <PropertyRef Name="ACClassRouteUsageID" />
+          </Key>
+          <Property Name="ACClassRouteUsageID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UseFactor" Type="int" Nullable="false" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ACClassRouteUsageGroup">
+          <Key>
+            <PropertyRef Name="ACClassRouteUsageGroupID" />
+          </Key>
+          <Property Name="ACClassRouteUsageGroupID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ACClassRouteUsageID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="GroupID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UseFactor" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ACClassRouteUsagePos">
+          <Key>
+            <PropertyRef Name="ACClassRouteUsagePosID" />
+          </Key>
+          <Property Name="ACClassRouteUsagePosID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ACClassRouteUsageID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="HashCode" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="ACClassTask">
           <Key>
             <PropertyRef Name="ACClassTaskID" />
@@ -2111,6 +2140,7 @@
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
           <Property Name="Anterograde" Type="bit" />
           <Property Name="ExcludeFromSumCalc" Type="bit" Nullable="false" />
+          <Property Name="MRPProcedureIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -4020,6 +4050,41 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="PlanningMRCons">
+          <Key>
+            <PropertyRef Name="PlanningMRConsID" />
+          </Key>
+          <Property Name="PlanningMRConsID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="PlanningMRID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MaterialID" Type="uniqueidentifier" />
+          <Property Name="ConsumptionDate" Type="datetime" Nullable="false" />
+          <Property Name="EstimatedQuantityUOM" Type="float" Nullable="false" />
+          <Property Name="ReqCorrectionQuantityUOM" Type="float" Nullable="false" />
+          <Property Name="RequiredQuantityUOM" Type="float" Nullable="false" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PlanningMRPos">
+          <Key>
+            <PropertyRef Name="PlanningMRPosID" />
+          </Key>
+          <Property Name="PlanningMRPosID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="PlanningMRID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="PlanningMRProposalID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MaterialID" Type="uniqueidentifier" />
+          <Property Name="OutOrderPosID" Type="uniqueidentifier" />
+          <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
+          <Property Name="InOrderPosID" Type="uniqueidentifier" />
+          <Property Name="ProdOrderPartslistID" Type="uniqueidentifier" />
+          <Property Name="StoreQuantityUOM" Type="float" Nullable="false" />
+          <Property Name="ExpectedPostingDate" Type="datetime" Nullable="false" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="PlanningMRProposal">
           <Key>
             <PropertyRef Name="PlanningMRProposalID" />
@@ -5598,6 +5663,30 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="ACClassPropertyRelation">
               <PropertyRef Name="TargetACClassPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ACClassRouteUsageGroup_ACClassRouteUsage">
+          <End Role="ACClassRouteUsage" Type="Self.ACClassRouteUsage" Multiplicity="1" />
+          <End Role="ACClassRouteUsageGroup" Type="Self.ACClassRouteUsageGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassRouteUsage">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Principal>
+            <Dependent Role="ACClassRouteUsageGroup">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ACClassRouteUsagePos_ACClassRouteUsage">
+          <End Role="ACClassRouteUsage" Type="Self.ACClassRouteUsage" Multiplicity="1" />
+          <End Role="ACClassRouteUsagePos" Type="Self.ACClassRouteUsagePos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassRouteUsage">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Principal>
+            <Dependent Role="ACClassRouteUsagePos">
+              <PropertyRef Name="ACClassRouteUsageID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -11797,6 +11886,118 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_PlanningMRCons_Material">
+          <End Role="Material" Type="Self.Material" Multiplicity="0..1" />
+          <End Role="PlanningMRCons" Type="Self.PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRCons_PlanningMR">
+          <End Role="PlanningMR" Type="Self.PlanningMR" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="PlanningMRCons" Type="Self.PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_InOrderPos">
+          <End Role="InOrderPos" Type="Self.InOrderPos" Multiplicity="0..1" />
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InOrderPos">
+              <PropertyRef Name="InOrderPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="InOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_Material">
+          <End Role="Material" Type="Self.Material" Multiplicity="0..1" />
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_OutOrderPos">
+          <End Role="OutOrderPos" Type="Self.OutOrderPos" Multiplicity="0..1" />
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_PlanningMR">
+          <End Role="PlanningMR" Type="Self.PlanningMR" Multiplicity="1" />
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_PlanningMRProposal">
+          <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMRProposal">
+              <PropertyRef Name="PlanningMRProposalID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="PlanningMRProposalID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_ProdOrderPartslist">
+          <End Role="ProdOrderPartslist" Type="Self.ProdOrderPartslist" Multiplicity="0..1" />
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_ProdOrderPartslistPos">
+          <End Role="ProdOrderPartslistPos" Type="Self.ProdOrderPartslistPos" Multiplicity="0..1" />
+          <End Role="PlanningMRPos" Type="Self.PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslistPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_PlanningMRProposal_InOrderID">
           <End Role="InOrder" Type="Self.InOrder" Multiplicity="0..1" />
           <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
@@ -11810,7 +12011,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_PlanningMRProposal_PlanningMR">
-          <End Role="PlanningMR" Type="Self.PlanningMR" Multiplicity="1" />
+          <End Role="PlanningMR" Type="Self.PlanningMR" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="PlanningMR">
@@ -13634,6 +13837,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="ACClassMethodConfig" EntityType="Self.ACClassMethodConfig" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ACClassProperty" EntityType="Self.ACClassProperty" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ACClassPropertyRelation" EntityType="Self.ACClassPropertyRelation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ACClassRouteUsage" EntityType="Self.ACClassRouteUsage" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ACClassRouteUsageGroup" EntityType="Self.ACClassRouteUsageGroup" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ACClassRouteUsagePos" EntityType="Self.ACClassRouteUsagePos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ACClassTask" EntityType="Self.ACClassTask" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ACClassTaskValue" EntityType="Self.ACClassTaskValue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ACClassTaskValuePos" EntityType="Self.ACClassTaskValuePos" Schema="dbo" store:Type="Tables" />
@@ -13809,6 +14015,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="PickingPos" EntityType="Self.PickingPos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PickingPosProdOrderPartslistPos" EntityType="Self.PickingPosProdOrderPartslistPos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PlanningMR" EntityType="Self.PlanningMR" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PlanningMRCons" EntityType="Self.PlanningMRCons" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PlanningMRPos" EntityType="Self.PlanningMRPos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PlanningMRProposal" EntityType="Self.PlanningMRProposal" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PriceList" EntityType="Self.PriceList" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PriceListMaterial" EntityType="Self.PriceListMaterial" Schema="dbo" store:Type="Tables" />
@@ -14205,6 +14413,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_ACClassPropertyRelation_TargetACClassPropertyID" Association="Self.FK_ACClassPropertyRelation_TargetACClassPropertyID">
             <End Role="ACClassProperty" EntitySet="ACClassProperty" />
             <End Role="ACClassPropertyRelation" EntitySet="ACClassPropertyRelation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ACClassRouteUsageGroup_ACClassRouteUsage" Association="Self.FK_ACClassRouteUsageGroup_ACClassRouteUsage">
+            <End Role="ACClassRouteUsage" EntitySet="ACClassRouteUsage" />
+            <End Role="ACClassRouteUsageGroup" EntitySet="ACClassRouteUsageGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ACClassRouteUsagePos_ACClassRouteUsage" Association="Self.FK_ACClassRouteUsagePos_ACClassRouteUsage">
+            <End Role="ACClassRouteUsage" EntitySet="ACClassRouteUsage" />
+            <End Role="ACClassRouteUsagePos" EntitySet="ACClassRouteUsagePos" />
           </AssociationSet>
           <AssociationSet Name="FK_ACClassTask_ACProgramID" Association="Self.FK_ACClassTask_ACProgramID">
             <End Role="ACProgram" EntitySet="ACProgram" />
@@ -16217,6 +16433,42 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" Association="Self.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos">
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
             <End Role="PickingPosProdOrderPartslistPos" EntitySet="PickingPosProdOrderPartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRCons_Material" Association="Self.FK_PlanningMRCons_Material">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRCons_PlanningMR" Association="Self.FK_PlanningMRCons_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_InOrderPos" Association="Self.FK_PlanningMRPos_InOrderPos">
+            <End Role="InOrderPos" EntitySet="InOrderPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_Material" Association="Self.FK_PlanningMRPos_Material">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_OutOrderPos" Association="Self.FK_PlanningMRPos_OutOrderPos">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_PlanningMR" Association="Self.FK_PlanningMRPos_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_PlanningMRProposal" Association="Self.FK_PlanningMRPos_PlanningMRProposal">
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslist" Association="Self.FK_PlanningMRPos_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslistPos" Association="Self.FK_PlanningMRPos_ProdOrderPartslistPos">
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
           </AssociationSet>
           <AssociationSet Name="FK_PlanningMRProposal_InOrderID" Association="Self.FK_PlanningMRProposal_InOrderID">
             <End Role="InOrder" EntitySet="InOrder" />
@@ -19830,6 +20082,55 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             <End Role="ProdOrderPartslistPosRelation" EntitySet="ProdOrderPartslistPosRelation" />
             <End Role="FacilityReservation" EntitySet="FacilityReservation" />
           </AssociationSet>
+          <EntitySet Name="ACClassRouteUsage" EntityType="iPlusMESV4_Model.ACClassRouteUsage" />
+          <EntitySet Name="ACClassRouteUsageGroup" EntityType="iPlusMESV4_Model.ACClassRouteUsageGroup" />
+          <EntitySet Name="ACClassRouteUsagePos" EntityType="iPlusMESV4_Model.ACClassRouteUsagePos" />
+          <EntitySet Name="PlanningMRCons" EntityType="iPlusMESV4_Model.PlanningMRCons" />
+          <EntitySet Name="PlanningMRPos" EntityType="iPlusMESV4_Model.PlanningMRPos" />
+          <AssociationSet Name="FK_ACClassRouteUsageGroup_ACClassRouteUsage" Association="iPlusMESV4_Model.FK_ACClassRouteUsageGroup_ACClassRouteUsage">
+            <End Role="ACClassRouteUsage" EntitySet="ACClassRouteUsage" />
+            <End Role="ACClassRouteUsageGroup" EntitySet="ACClassRouteUsageGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ACClassRouteUsagePos_ACClassRouteUsage" Association="iPlusMESV4_Model.FK_ACClassRouteUsagePos_ACClassRouteUsage">
+            <End Role="ACClassRouteUsage" EntitySet="ACClassRouteUsage" />
+            <End Role="ACClassRouteUsagePos" EntitySet="ACClassRouteUsagePos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_InOrderPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos">
+            <End Role="InOrderPos" EntitySet="InOrderPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRCons_Material" Association="iPlusMESV4_Model.FK_PlanningMRCons_Material">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_Material" Association="iPlusMESV4_Model.FK_PlanningMRPos_Material">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_OutOrderPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRCons_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_PlanningMRProposal" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal">
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslistPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos">
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -21877,6 +22178,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Weighing_InOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_InOrderPosID" FromRole="InOrderPos" ToRole="Weighing" />
           <NavigationProperty Name="PickingPos_InOrderPos" Relationship="iPlusMESV4_Model.FK_PickingPos_InOrderPosID" FromRole="InOrderPos" ToRole="PickingPos" />
           <NavigationProperty Name="FacilityReservation_InOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_InOrderPosID" FromRole="InOrderPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="InOrderPos" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="InOrderPosSplit">
           <Key>
@@ -22278,6 +22580,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PickingPos_PickingMaterial" Relationship="iPlusMESV4_Model.FK_PickingPos_MaterialID" FromRole="Material" ToRole="PickingPos" />
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="FacilityReservation_Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
+          <Property Name="MRPProcedureIndex" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="Material" ToRole="PlanningMRCons" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_Material" FromRole="Material" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -24158,6 +24463,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Weighing_OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="OutOrderPos" ToRole="Weighing" />
           <NavigationProperty Name="PickingPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_PickingPos_OutOrderPosID" FromRole="OutOrderPos" ToRole="PickingPos" />
           <NavigationProperty Name="FacilityReservation_OutOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_OutOrderPosID" FromRole="OutOrderPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="OutOrderPos" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="OutOrderPosSplit">
           <Key>
@@ -24459,6 +24765,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="PlanningMRProposal_PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRCons" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="PlanningMRProposal">
           <Key>
@@ -24477,6 +24785,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMRProposal" ToRole="PlanningMR" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="PlanningMRProposal" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="PlanningMRProposal" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRProposal" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="PriceList">
           <Key>
@@ -32995,6 +33304,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
           <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPos">
           <Key>
@@ -33065,6 +33375,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv3MixPointProdOrderPartslistPos" />
           <NavigationProperty Name="ACClassTask" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ACClassTask" FromRole="ProdOrderPartslistPos" ToRole="ACClassTask" />
           <NavigationProperty Name="FacilityReservation_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityReservation" />
+          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_ProdOrderPartslist_ACProgramID">
           <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
@@ -34758,6 +35069,219 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="FacilityReservation">
               <PropertyRef Name="ProdOrderPartslistPosRelationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ACClassRouteUsage">
+          <Key>
+            <PropertyRef Name="ACClassRouteUsageID" />
+          </Key>
+          <Property Name="ACClassRouteUsageID" Type="Guid" Nullable="false" />
+          <Property Name="ACClassID" Type="Guid" Nullable="false" />
+          <Property Name="UseFactor" Type="Int32" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="ACClassRouteUsageGroup" Relationship="iPlusMESV4_Model.FK_ACClassRouteUsageGroup_ACClassRouteUsage" FromRole="ACClassRouteUsage" ToRole="ACClassRouteUsageGroup" />
+          <NavigationProperty Name="ACClassRouteUsagePos" Relationship="iPlusMESV4_Model.FK_ACClassRouteUsagePos_ACClassRouteUsage" FromRole="ACClassRouteUsage" ToRole="ACClassRouteUsagePos" />
+        </EntityType>
+        <EntityType Name="ACClassRouteUsageGroup">
+          <Key>
+            <PropertyRef Name="ACClassRouteUsageGroupID" />
+          </Key>
+          <Property Name="ACClassRouteUsageGroupID" Type="Guid" Nullable="false" />
+          <Property Name="ACClassRouteUsageID" Type="Guid" Nullable="false" />
+          <Property Name="GroupID" Type="Guid" Nullable="false" />
+          <Property Name="UseFactor" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ACClassRouteUsage" Relationship="iPlusMESV4_Model.FK_ACClassRouteUsageGroup_ACClassRouteUsage" FromRole="ACClassRouteUsageGroup" ToRole="ACClassRouteUsage" />
+        </EntityType>
+        <EntityType Name="ACClassRouteUsagePos">
+          <Key>
+            <PropertyRef Name="ACClassRouteUsagePosID" />
+          </Key>
+          <Property Name="ACClassRouteUsagePosID" Type="Guid" Nullable="false" />
+          <Property Name="ACClassRouteUsageID" Type="Guid" Nullable="false" />
+          <Property Name="HashCode" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ACClassRouteUsage" Relationship="iPlusMESV4_Model.FK_ACClassRouteUsagePos_ACClassRouteUsage" FromRole="ACClassRouteUsagePos" ToRole="ACClassRouteUsage" />
+        </EntityType>
+        <EntityType Name="PlanningMRCons">
+          <Key>
+            <PropertyRef Name="PlanningMRConsID" />
+          </Key>
+          <Property Name="PlanningMRConsID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
+          <Property Name="MaterialID" Type="Guid" />
+          <Property Name="ConsumptionDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EstimatedQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="ReqCorrectionQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="RequiredQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="PlanningMRCons" ToRole="Material" />
+          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMRCons" ToRole="PlanningMR" />
+        </EntityType>
+        <EntityType Name="PlanningMRPos">
+          <Key>
+            <PropertyRef Name="PlanningMRPosID" />
+          </Key>
+          <Property Name="PlanningMRPosID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRProposalID" Type="Guid" Nullable="false" />
+          <Property Name="MaterialID" Type="Guid" />
+          <Property Name="OutOrderPosID" Type="Guid" />
+          <Property Name="ProdOrderPartslistPosID" Type="Guid" />
+          <Property Name="InOrderPosID" Type="Guid" />
+          <Property Name="ProdOrderPartslistID" Type="Guid" />
+          <Property Name="StoreQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="ExpectedPostingDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="PlanningMRPos" ToRole="InOrderPos" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_Material" FromRole="PlanningMRPos" ToRole="Material" />
+          <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="PlanningMRPos" ToRole="OutOrderPos" />
+          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMR" FromRole="PlanningMRPos" ToRole="PlanningMR" />
+          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRPos" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="PlanningMRPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="PlanningMRPos" ToRole="ProdOrderPartslistPos" />
+        </EntityType>
+        <Association Name="FK_ACClassRouteUsageGroup_ACClassRouteUsage">
+          <End Type="iPlusMESV4_Model.ACClassRouteUsage" Role="ACClassRouteUsage" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.ACClassRouteUsageGroup" Role="ACClassRouteUsageGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassRouteUsage">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Principal>
+            <Dependent Role="ACClassRouteUsageGroup">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ACClassRouteUsagePos_ACClassRouteUsage">
+          <End Type="iPlusMESV4_Model.ACClassRouteUsage" Role="ACClassRouteUsage" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.ACClassRouteUsagePos" Role="ACClassRouteUsagePos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassRouteUsage">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Principal>
+            <Dependent Role="ACClassRouteUsagePos">
+              <PropertyRef Name="ACClassRouteUsageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_InOrderPos">
+          <End Type="iPlusMESV4_Model.InOrderPos" Role="InOrderPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InOrderPos">
+              <PropertyRef Name="InOrderPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="InOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRCons_Material">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_Material">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_OutOrderPos">
+          <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRCons_PlanningMR">
+          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_PlanningMR">
+          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_PlanningMRProposal">
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMRProposal">
+              <PropertyRef Name="PlanningMRProposalID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="PlanningMRProposalID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_ProdOrderPartslist">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_ProdOrderPartslistPos">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslistPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -36599,6 +37123,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="Material">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Material">
               <MappingFragment StoreEntitySet="Material">
+                <ScalarProperty Name="MRPProcedureIndex" ColumnName="MRPProcedureIndex" />
                 <ScalarProperty Name="ExcludeFromSumCalc" ColumnName="ExcludeFromSumCalc" />
                 <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
@@ -40051,6 +40576,75 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ACClassRouteUsage">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.ACClassRouteUsage">
+              <MappingFragment StoreEntitySet="ACClassRouteUsage">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="UseFactor" ColumnName="UseFactor" />
+                <ScalarProperty Name="ACClassID" ColumnName="ACClassID" />
+                <ScalarProperty Name="ACClassRouteUsageID" ColumnName="ACClassRouteUsageID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACClassRouteUsageGroup">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.ACClassRouteUsageGroup">
+              <MappingFragment StoreEntitySet="ACClassRouteUsageGroup">
+                <ScalarProperty Name="UseFactor" ColumnName="UseFactor" />
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+                <ScalarProperty Name="ACClassRouteUsageID" ColumnName="ACClassRouteUsageID" />
+                <ScalarProperty Name="ACClassRouteUsageGroupID" ColumnName="ACClassRouteUsageGroupID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACClassRouteUsagePos">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.ACClassRouteUsagePos">
+              <MappingFragment StoreEntitySet="ACClassRouteUsagePos">
+                <ScalarProperty Name="HashCode" ColumnName="HashCode" />
+                <ScalarProperty Name="ACClassRouteUsageID" ColumnName="ACClassRouteUsageID" />
+                <ScalarProperty Name="ACClassRouteUsagePosID" ColumnName="ACClassRouteUsagePosID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMRCons">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRCons">
+              <MappingFragment StoreEntitySet="PlanningMRCons">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="RequiredQuantityUOM" ColumnName="RequiredQuantityUOM" />
+                <ScalarProperty Name="ReqCorrectionQuantityUOM" ColumnName="ReqCorrectionQuantityUOM" />
+                <ScalarProperty Name="EstimatedQuantityUOM" ColumnName="EstimatedQuantityUOM" />
+                <ScalarProperty Name="ConsumptionDate" ColumnName="ConsumptionDate" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
+                <ScalarProperty Name="PlanningMRConsID" ColumnName="PlanningMRConsID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMRPos">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRPos">
+              <MappingFragment StoreEntitySet="PlanningMRPos">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="ExpectedPostingDate" ColumnName="ExpectedPostingDate" />
+                <ScalarProperty Name="StoreQuantityUOM" ColumnName="StoreQuantityUOM" />
+                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
+                <ScalarProperty Name="InOrderPosID" ColumnName="InOrderPosID" />
+                <ScalarProperty Name="ProdOrderPartslistPosID" ColumnName="ProdOrderPartslistPosID" />
+                <ScalarProperty Name="OutOrderPosID" ColumnName="OutOrderPosID" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="PlanningMRProposalID" ColumnName="PlanningMRProposalID" />
+                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
+                <ScalarProperty Name="PlanningMRPosID" ColumnName="PlanningMRPosID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -41008,6 +41602,22 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.ACClassRouteUsage" Width="1.5" PointX="14.375" PointY="12.875" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.ACClassRouteUsageGroup" Width="1.5" PointX="16.625" PointY="12" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.ACClassRouteUsagePos" Width="1.5" PointX="16.625" PointY="14.75" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRCons" Width="1.5" PointX="51.75" PointY="331.5" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRPos" Width="1.5" PointX="86" PointY="325.625" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ACClassRouteUsageGroup_ACClassRouteUsage" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ACClassRouteUsagePos_ACClassRouteUsage" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_Material" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_Material" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMR" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" />
       </Diagram>
     </Diagrams>
   </Designer>

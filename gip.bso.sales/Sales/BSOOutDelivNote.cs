@@ -1632,12 +1632,12 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung machen'}", (short)MISort.Cancel)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung erstellen'}", (short)MISort.Cancel)]
         public void CreateInvoice()
         {
             if (!PreExecute("CreateInvoice"))
                 return;
-            if (Root.Messages.Question(this, "Question50058", Global.MsgResult.Yes, false, CurrentDeliveryNote.DeliveryNoteNo) == Global.MsgResult.Yes)
+            if (Root.Messages.Question(this, "Question50114", Global.MsgResult.Yes, false, CurrentDeliveryNote.DeliveryNoteNo) == Global.MsgResult.Yes)
             {
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
                 if (msg != null)

@@ -120,6 +120,8 @@
     <Compile Include="EntityOperation\OperationLogItemList.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
+    <Compile Include="EntityPlanningMR\PlanningMRPos.cs" />
+    <Compile Include="EntityPlanningMR\PlanningMRCons.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
@@ -529,6 +531,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2024-11-28_12-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2024-11-26_14-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -58,6 +58,11 @@ namespace gip.bso.sales
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
+
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
             CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
 
             Search();
@@ -83,6 +88,8 @@ namespace gip.bso.sales
             _OutDeliveryNoteManager = null;
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+            ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
 
             this._AccessOutOrderPos = null;
             this._ChangeTargetQuantity = null;
@@ -1143,6 +1150,17 @@ namespace gip.bso.sales
             {
                 _PriceListMaterialItems = value;
                 OnPropertyChanged("PriceListMaterialItems");
+            }
+        }
+
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        protected ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
             }
         }
 
@@ -2259,7 +2277,7 @@ namespace gip.bso.sales
 
         #region Invoice
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung machen'}", (short)MISort.Cancel)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung erstellen'}", (short)MISort.Cancel)]
         public void CreateInvoice()
         {
             if (!PreExecute("CreateInvoice"))
@@ -2285,6 +2303,35 @@ namespace gip.bso.sales
         {
             return CurrentOutOrder != null && OutDeliveryNoteManager != null;
         }
+
+        [ACMethodCommand("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 800, true)]
+        public void CreateProductionOrder()
+        {
+            foreach (OutOrderPos pos in this.OutOrderPosList)
+            {
+                Partslist partsList = pos.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
+                if (partsList == null)
+                    continue;
+
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
+                ProdOrder prodOrder = ProdOrder.NewACObject(DatabaseApp, null, secondaryKey);
+
+                ProdOrderPartslist prodOrderPartslist;
+                Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partsList, 1, pos.TargetQuantity, out prodOrderPartslist);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    continue;
+                }
+            }
+            ACSaveChanges();
+        }
+
+        public bool IsEnabledCreateProductionOrder()
+        {
+            return CurrentOutOrder != null && ProdOrderManager != null;
+        }
+
         #endregion
 
         #endregion
@@ -2296,95 +2343,101 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "NewOutOrderPos":
+                case nameof(NewOutOrderPos):
                     NewOutOrderPos();
                     return true;
-                case "IsEnabledNewOutOrderPos":
+                case nameof(IsEnabledNewOutOrderPos):
                     result = IsEnabledNewOutOrderPos();
                     return true;
-                case "DeleteOutOrderPos":
+                case nameof(DeleteOutOrderPos):
                     DeleteOutOrderPos();
                     return true;
-                case "IsEnabledDeleteOutOrderPos":
+                case nameof(IsEnabledDeleteOutOrderPos):
                     result = IsEnabledDeleteOutOrderPos();
                     return true;
-                case "LoadCompanyMaterialPickup":
+                case nameof(LoadCompanyMaterialPickup):
                     LoadCompanyMaterialPickup();
                     return true;
-                case "IsEnabledLoadCompanyMaterialPickup":
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
                     result = IsEnabledLoadCompanyMaterialPickup();
                     return true;
-                case "NewCompanyMaterialPickup":
+                case nameof(NewCompanyMaterialPickup):
                     NewCompanyMaterialPickup();
                     return true;
-                case "IsEnabledNewCompanyMaterialPickup":
+                case nameof(IsEnabledNewCompanyMaterialPickup):
                     result = IsEnabledNewCompanyMaterialPickup();
                     return true;
-                case "DeleteCompanyMaterialPickup":
+                case nameof(DeleteCompanyMaterialPickup):
                     DeleteCompanyMaterialPickup();
                     return true;
-                case "IsEnabledDeleteCompanyMaterialPickup":
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
                     result = IsEnabledDeleteCompanyMaterialPickup();
                     return true;
-                case "AssignContractPos":
+                case nameof(AssignContractPos):
                     AssignContractPos();
                     return true;
-                case "IsEnabledAssignContractPos":
+                case nameof(IsEnabledAssignContractPos):
                     result = IsEnabledAssignContractPos();
                     return true;
-                case "UnAssignContractPos":
+                case nameof(UnAssignContractPos):
                     UnAssignContractPos();
                     return true;
-                case "IsEnabledUnAssignContractPos":
+                case nameof(IsEnabledUnAssignContractPos):
                     result = IsEnabledUnAssignContractPos();
                     return true;
-                case "RefreshOpenContractPosList":
+                case nameof(RefreshOpenContractPosList):
                     RefreshOpenContractPosList();
                     return true;
-                case "FilterDialogContractPos":
+                case nameof(FilterDialogContractPos):
                     FilterDialogContractPos();
                     return true;
-                case "ShowDialogOrder":
+                case nameof(ShowDialogOrder):
                     ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
                     return true;
-                case "CreateInvoice":
+                case nameof(CreateInvoice):
                     CreateInvoice();
                     return true;
-                case "IsEnabledCreateInvoice":
+                case nameof(IsEnabledCreateInvoice):
                     result = IsEnabledCreateInvoice();
+                    return true;
+                case nameof(CreateProductionOrder):
+                    CreateProductionOrder();
+                    return true;
+                case nameof(IsEnabledCreateProductionOrder):
+                    result = IsEnabledCreateProductionOrder();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

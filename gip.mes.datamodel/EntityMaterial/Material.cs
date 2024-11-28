@@ -72,6 +72,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(42, "SpecHeatCapacity", "en{'Specific heat capacity J/kgK'}de{'Spezifische Wärmekapazität J/kgK'}", "", "", true)]
     [ACPropertyEntity(43, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACPropertyEntity(44, "ExcludeFromSumCalc", "en{'Exclude from sum calculation'}de{'Aus Summenberechnung ausschließen'}", "", "", true)]
+    [ACPropertyEntity(46, "MRPProcedureIndex", "en{'MRP procedure'}de{'MRP Verfahren'}", typeof(GlobalApp.MRPProcedure), Const.ContextDatabase + "\\MRPProcedureList", "", true)]
     //QRYMaterialCalculation", "en{'MaterialCalculation'}de{'Materialkalkulation'}", typeof(MaterialCalculation), "MaterialCalculation", "Material\\MaterialName1", "Material\\MaterialName1")]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + Material.ClassName, ConstApp.Material, typeof(Material), Material.ClassName, "MaterialNo,MaterialName1", "MaterialNo", new object[]
         {
