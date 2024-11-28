@@ -29,12 +29,22 @@ namespace gip.bso.purchasing
             }
             if (!base.ACInit(startChildMode))
                 return false;
+
+
+            _InDeliveryNoteManager = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_InDeliveryNoteManager == null)
+                throw new Exception("InDeliveryNoteManager not configured");
+
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             this._CurrentDeliveryNotePos = null;
+
+            ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
+            _InDeliveryNoteManager = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -78,6 +88,21 @@ namespace gip.bso.purchasing
             //        break;
             //}
             return base.OnGetControlModes(vbControl);
+        }
+
+        #endregion
+
+        #region Manager
+
+        protected ACRef<ACInDeliveryNoteManager> _InDeliveryNoteManager = null;
+        public ACInDeliveryNoteManager InDeliveryNoteManager
+        {
+            get
+            {
+                if (_InDeliveryNoteManager == null)
+                    return null;
+                return _InDeliveryNoteManager.ValueT;
+            }
         }
 
         #endregion

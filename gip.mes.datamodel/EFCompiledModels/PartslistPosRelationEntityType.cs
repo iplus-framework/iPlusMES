@@ -87,7 +87,11 @@ namespace gip.mes.datamodel
                 providerValueComparer: new ValueComparer<DateTime>(
                     (DateTime v1, DateTime v2) => v1.Equals(v2),
                     (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v));
+                    (DateTime v) => v),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "datetime",
+                    dbType: System.Data.DbType.DateTime));
+            insertDate.AddAnnotation("Relational:ColumnType", "datetime");
             insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertName = runtimeEntityType.AddProperty(
@@ -95,7 +99,8 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(PartslistPosRelation).GetProperty("InsertName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PartslistPosRelation).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
+                maxLength: 20,
+                unicode: false);
             insertName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
                 comparer: new ValueComparer<string>(
                     (string v1, string v2) => v1 == v2,
@@ -110,10 +115,8 @@ namespace gip.mes.datamodel
                     (string v) => v.GetHashCode(),
                     (string v) => v),
                 mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "nvarchar(max)",
-                    unicode: true,
-                    dbType: System.Data.DbType.String),
-                storeTypePostfix: StoreTypePostfix.None);
+                    storeTypeName: "varchar(20)",
+                    size: 20));
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var materialWFRelationID = runtimeEntityType.AddProperty(
@@ -287,7 +290,11 @@ namespace gip.mes.datamodel
                 providerValueComparer: new ValueComparer<DateTime>(
                     (DateTime v1, DateTime v2) => v1.Equals(v2),
                     (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v));
+                    (DateTime v) => v),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "datetime",
+                    dbType: System.Data.DbType.DateTime));
+            updateDate.AddAnnotation("Relational:ColumnType", "datetime");
             updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateName = runtimeEntityType.AddProperty(
@@ -295,7 +302,8 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(PartslistPosRelation).GetProperty("UpdateName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PartslistPosRelation).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
+                maxLength: 20,
+                unicode: false);
             updateName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
                 comparer: new ValueComparer<string>(
                     (string v1, string v2) => v1 == v2,
@@ -310,10 +318,8 @@ namespace gip.mes.datamodel
                     (string v) => v.GetHashCode(),
                     (string v) => v),
                 mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "nvarchar(max)",
-                    unicode: true,
-                    dbType: System.Data.DbType.String),
-                storeTypePostfix: StoreTypePostfix.None);
+                    storeTypeName: "varchar(20)",
+                    size: 20));
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(

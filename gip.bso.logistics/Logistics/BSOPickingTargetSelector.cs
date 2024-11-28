@@ -824,7 +824,7 @@ namespace gip.bso.logistics
                 || PickingBSO == null
                 || PickingBSO.PickingPosList == null
                 || !PickingBSO.PickingPosList.Any()
-                || !PickingBSO.PickingPosList.Where(c => c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any()
+                || !PickingBSO.PickingPosList.Where(c => c.MDDelivPosLoadState != null && c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).Any()
                 || PickingManager == null
                 || CurrentACClassWF == null)
                 return false;

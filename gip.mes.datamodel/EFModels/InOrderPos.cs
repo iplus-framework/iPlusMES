@@ -685,6 +685,26 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         get { return Context.Entry(this).Reference("PickupCompanyMaterial"); }
     }
     
+    private ICollection<PlanningMRPos> _PlanningMRPos_InOrderPos;
+    public virtual ICollection<PlanningMRPos> PlanningMRPos_InOrderPos
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRPos_InOrderPos); }
+        set { _PlanningMRPos_InOrderPos = value; }
+    }
+
+    public bool PlanningMRPos_InOrderPos_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRPos_InOrderPos != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRPos_InOrderPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_InOrderPos); }
+    }
+
     private ICollection<TandTv3MixPointInOrderPos> _TandTv3MixPointInOrderPos_InOrderPos;
     public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_InOrderPos
     {

@@ -38,6 +38,10 @@ namespace gip.bso.sales
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
             Search();
             return true;
         }
@@ -48,6 +52,12 @@ namespace gip.bso.sales
             _OutDeliveryNoteManager = null;
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+
+            if (_PickingManager != null)
+            {
+                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+                _PickingManager = null;
+            }
 
             this._AccessBookingFacility = null;
             this._AccessDeliveryNotePos = null;
@@ -126,6 +136,15 @@ namespace gip.bso.sales
                 if (_ACFacilityManager == null)
                     return null;
                 return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        private ACRef<ACPickingManager> _PickingManager;
+        protected ACPickingManager PickingManager
+        {
+            get
+            {
+                return _PickingManager?.ValueT;
             }
         }
 
@@ -842,7 +861,7 @@ namespace gip.bso.sales
         {
             get
             {
-                if (CurrentACMethodBooking == null || CurrentACMethodBooking.OutwardFacility == null || CurrentDeliveryNotePos.Material == null)
+                if (CurrentACMethodBooking == null || CurrentACMethodBooking.OutwardFacility == null || CurrentDeliveryNotePos == null || CurrentDeliveryNotePos.Material == null)
                     return null;
                 return CurrentACMethodBooking.OutwardFacility.FacilityCharge_Facility
                     .Where(x => x.MaterialID == CurrentDeliveryNotePos.Material.MaterialID && !x.NotAvailable).OrderByDescending(x => x.InsertDate);
@@ -1609,12 +1628,12 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung machen'}", (short)MISort.Cancel)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung erstellen'}", (short)MISort.Cancel)]
         public void CreateInvoice()
         {
             if (!PreExecute("CreateInvoice"))
                 return;
-            if (Root.Messages.Question(this, "Question50058", Global.MsgResult.Yes, false, CurrentDeliveryNote.DeliveryNoteNo) == Global.MsgResult.Yes)
+            if (Root.Messages.Question(this, "Question50114", Global.MsgResult.Yes, false, CurrentDeliveryNote.DeliveryNoteNo) == Global.MsgResult.Yes)
             {
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
                 if (msg != null)
@@ -1873,6 +1892,79 @@ namespace gip.bso.sales
             if (this.CurrentOutOrderPosFromPicking == null || CurrentDeliveryNote == null)
                 return false;
             return true;
+        }
+
+        [ACMethodInfo("", "en{'Create or update picking'}de{'Kommissionierung erstellen oder aktualisieren'}", 9999)]
+        public void CreateOrUpdatePicking()
+        {
+            ACPickingManager pickingManager = PickingManager;
+            if (pickingManager == null)
+            {
+                Messages.Error(this, "Der Kommissioniermanager ist nicht verfügbar!", true);
+                return;
+            }
+
+            Picking picking = null;
+            Msg msg = pickingManager.CreateOrUpdatePickingFromOutDeliveryNote(CurrentDeliveryNote, DatabaseApp, out picking);
+
+            if (picking == null)
+                return;
+
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+
+            string facilityNo = OnGetFacilityNoForPicking(DatabaseApp, picking);
+            if (facilityNo == null)
+                return;
+
+            foreach (PickingPos pPos in picking.PickingPos_Picking)
+            {
+                ProcessPickingPos(DatabaseApp, pPos, facilityNo);
+            }
+
+            CurrentDeliveryNote.MDDelivNoteState = DatabaseApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
+            ACSaveChanges();
+        }
+
+        public bool IsEnabledCreateOrUpdatePicking()
+        {
+            return CurrentDeliveryNote != null;
+        }
+
+        public virtual void ProcessPickingPos(DatabaseApp databaseApp, PickingPos pickingPos, string sourceFacilityNo)
+        {
+            if (pickingPos.EntityState == EntityState.Added)
+                pickingPos.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(databaseApp);
+
+            pickingPos.FromFacility = databaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo);
+        }
+
+        public virtual string OnGetFacilityNoForPicking(DatabaseApp dbApp, Picking picking)
+        {
+            string facilityNo = null;
+
+            Picking oldPicking = dbApp.Picking.Where(c => c.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
+                                                       && c.PickingStateIndex >= (short)PickingStateEnum.Finished
+                                                       && c.PickingPos_Picking.Any(x => x.FromFacilityID.HasValue)).FirstOrDefault();
+
+            if (oldPicking != null)
+            {
+                PickingPos pPos = oldPicking.PickingPos_Picking.Where(c => c.FromFacilityID.HasValue).FirstOrDefault();
+                if (pPos != null)
+                {
+                    facilityNo = pPos.FromFacility.FacilityNo;
+                }
+            }
+
+            if (facilityNo == null)
+            {
+                facilityNo = dbApp.Facility.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).FirstOrDefault()?.FacilityNo;
+            }
+
+            return facilityNo;
         }
 
         #endregion
@@ -2185,8 +2277,6 @@ namespace gip.bso.sales
 
         #endregion
 
-
-
         #region Tracking
 
         public override ACMenuItemList GetMenu(string vbContent, string vbControl)
@@ -2430,179 +2520,185 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case "IsEnabledShowLabOrderFromOutOrder":
+                case nameof(IsEnabledShowLabOrderFromOutOrder):
                     result = IsEnabledShowLabOrderFromOutOrder();
                     return true;
-                case "AssignPicking":
+                case nameof(AssignPicking):
                     AssignPicking();
                     return true;
-                case "IsEnabledAssignPicking":
+                case nameof(IsEnabledAssignPicking):
                     result = IsEnabledAssignPicking();
                     return true;
-                case "NewFacilityPreBooking":
+                case nameof(NewFacilityPreBooking):
                     NewFacilityPreBooking();
                     return true;
-                case "IsEnabledNewFacilityPreBooking":
+                case nameof(IsEnabledNewFacilityPreBooking):
                     result = IsEnabledNewFacilityPreBooking();
                     return true;
-                case "CancelFacilityPreBooking":
+                case nameof(CancelFacilityPreBooking):
                     CancelFacilityPreBooking();
                     return true;
-                case "IsEnabledCancelFacilityPreBooking":
+                case nameof(IsEnabledCancelFacilityPreBooking):
                     result = IsEnabledCancelFacilityPreBooking();
                     return true;
-                case "DeleteFacilityPreBooking":
+                case nameof(DeleteFacilityPreBooking):
                     DeleteFacilityPreBooking();
                     return true;
-                case "IsEnabledDeleteFacilityPreBooking":
+                case nameof(IsEnabledDeleteFacilityPreBooking):
                     result = IsEnabledDeleteFacilityPreBooking();
                     return true;
-                case "BookDeliveryPos":
+                case nameof(BookDeliveryPos):
                     BookDeliveryPos();
                     return true;
-                case "IsEnabledBookDeliveryPos":
+                case nameof(IsEnabledBookDeliveryPos):
                     result = IsEnabledBookDeliveryPos();
                     return true;
-                case "BookCurrentACMethodBooking":
+                case nameof(BookCurrentACMethodBooking):
                     BookCurrentACMethodBooking();
                     return true;
-                case "IsEnabledBookCurrentACMethodBooking":
+                case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
-                case "BookAllACMethodBookings":
+                case nameof(BookAllACMethodBookings):
                     BookAllACMethodBookings();
                     return true;
-                case "IsEnabledBookAllACMethodBookings":
+                case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
-                case "NewFacilityLot":
+                case nameof(NewFacilityLot):
                     NewFacilityLot();
                     return true;
-                case "IsEnabledNewFacilityLot":
+                case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
-                case "ShowFacilityLot":
+                case nameof(ShowFacilityLot):
                     ShowFacilityLot();
                     return true;
-                case "IsEnabledShowFacilityLot":
+                case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
                     return true;
-                case "ShowDialogNewDeliveryNote":
+                case nameof(ShowDialogNewDeliveryNote):
                     result = ShowDialogNewDeliveryNote(acParameter.Count() == 1 ? (System.String)acParameter[0] : "");
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "OnActivate":
+                case nameof(OnActivate):
                     OnActivate((System.String)acParameter[0]);
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "DeliveryNoteReady":
+                case nameof(DeliveryNoteReady):
                     DeliveryNoteReady();
                     return true;
-                case "IsEnabledDeliveryNoteReady":
+                case nameof(IsEnabledDeliveryNoteReady):
                     result = IsEnabledDeliveryNoteReady();
                     return true;
-                case "Delivered":
+                case nameof(Delivered):
                     Delivered();
                     return true;
-                case "IsEnabledDelivered":
+                case nameof(IsEnabledDelivered):
                     result = IsEnabledDelivered();
                     return true;
-                case "CancelDelivery":
+                case nameof(CancelDelivery):
                     CancelDelivery();
                     return true;
-                case "IsEnabledCancelDelivery":
+                case nameof(IsEnabledCancelDelivery):
                     result = IsEnabledCancelDelivery();
                     return true;
-                case "AssignOutOrderPos":
+                case nameof(AssignOutOrderPos):
                     AssignOutOrderPos();
                     return true;
-                case "IsEnabledAssignOutOrderPos":
+                case nameof(IsEnabledAssignOutOrderPos):
                     result = IsEnabledAssignOutOrderPos();
                     return true;
-                case "UnassignOutOrderPos":
+                case nameof(UnassignOutOrderPos):
                     UnassignOutOrderPos();
                     return true;
-                case "IsEnabledUnassignOutOrderPos":
+                case nameof(IsEnabledUnassignOutOrderPos):
                     result = IsEnabledUnassignOutOrderPos();
                     return true;
-                case "FilterDialogOutOrderPos":
+                case nameof(FilterDialogOutOrderPos):
                     result = FilterDialogOutOrderPos();
                     return true;
-                case "RefreshOutOrderPosList":
+                case nameof(RefreshOutOrderPosList):
                     RefreshOutOrderPosList();
                     return true;
-                case "CreateNewLabOrderFromOutOrder":
+                case nameof(CreateNewLabOrderFromOutOrder):
                     CreateNewLabOrderFromOutOrder();
                     return true;
-                case "IsEnabledCreateNewLabOrderFromOutOrder":
+                case nameof(IsEnabledCreateNewLabOrderFromOutOrder):
                     result = IsEnabledCreateNewLabOrderFromOutOrder();
                     return true;
-                case "ShowLabOrderFromOutOrder":
+                case nameof(ShowLabOrderFromOutOrder):
                     ShowLabOrderFromOutOrder();
                     return true;
-                case "ShowDialogOrder":
+                case nameof(ShowDialogOrder):
                     ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
-                case "ShowDialogOrderInfo":
+                case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
-                case "CreateInvoice":
+                case nameof(CreateInvoice):
                     CreateInvoice();
                     return true;
-                case "IsEnabledCreateInvoice":
+                case nameof(IsEnabledCreateInvoice):
                     result = IsEnabledCreateInvoice();
                     return true;
-                case "ShowDlgOutwardAvailableQuants":
+                case nameof(ShowDlgOutwardAvailableQuants):
                     ShowDlgOutwardAvailableQuants();
                     return true;
-                case "IsEnabledShowDlgOutwardAvailableQuants":
+                case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();
                     return true;
-                case "DlgAvailableQuantsOk":
+                case nameof(DlgAvailableQuantsOk):
                     DlgAvailableQuantsOk();
                     return true;
-                case "IsEnabledDlgAvailableQuantsOk":
+                case nameof(IsEnabledDlgAvailableQuantsOk):
                     result = IsEnabledDlgAvailableQuantsOk();
                     return true;
-                case "DlgAvailableQuantsCancel":
+                case nameof(DlgAvailableQuantsCancel):
                     DlgAvailableQuantsCancel();
+                    return true;
+                case nameof(CreateOrUpdatePicking):
+                    CreateOrUpdatePicking();
+                    return true;
+                case nameof(IsEnabledCreateOrUpdatePicking):
+                    result = IsEnabledCreateOrUpdatePicking();
                     return true;
                 default:
                     break;

@@ -8,7 +8,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'PlanningMRProposal'}de{'PlanningMRProposal'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPlanningMR")]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Planning proposal'}de{'Planungsvorschlag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPlanningMR")]
 
     [ACPropertyEntity(1, PlanningMR.ClassName, ConstApp.PlanningMR, Const.ContextDatabase + "\\" + PlanningMR.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(2, ProdOrder.ClassName, ConstApp.ProdOrder, Const.ContextDatabase + "\\" + ProdOrder.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]

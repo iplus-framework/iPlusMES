@@ -1286,7 +1286,7 @@ namespace gip.bso.sales
 
         #region Methods -> Invoice
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Create Order'}de{'Angebot machen'}", (short)MISort.Cancel)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Create Order'}de{'Auftrag generieren'}", (short)MISort.Cancel)]
         public void CreateOutOrder()
         {
             if (!IsEnabledCreateOutOrder())

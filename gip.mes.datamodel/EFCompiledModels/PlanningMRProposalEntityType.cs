@@ -295,6 +295,7 @@ namespace gip.mes.datamodel
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PlanningMRID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PlanningMRID") }),
                 principalEntityType,
+                deleteBehavior: DeleteBehavior.Cascade,
                 required: true);
 
             var planningMR = declaringEntityType.AddNavigation("PlanningMR",

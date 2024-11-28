@@ -160,6 +160,13 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _CompanyPersonNo, value); }
     }
 
+    string _EMail;
+    public string EMail 
+    {
+        get { return _EMail; }
+        set { SetProperty<string>(ref _EMail, value); }
+    }
+
     private ICollection<CalendarShiftPerson> _CalendarShiftPerson_CompanyPerson;
     public virtual ICollection<CalendarShiftPerson> CalendarShiftPerson_CompanyPerson
     {

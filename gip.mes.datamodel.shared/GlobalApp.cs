@@ -1445,5 +1445,49 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region MRPProcedure
+        /// <summary>
+        /// Enum CompanyMaterialTypes
+        /// </summary>
+#if NETFRAMEWORK
+        [ACSerializeableInfo]
+        [ACClassInfo(Const.PackName_VarioSystem, "en{'MRP procedure'}de{'MRP Verfahren'}", Global.ACKinds.TACEnum)]
+#else
+        [DataContract]
+#endif
+
+        public enum MRPProcedure : short
+        {
+            /// <summary>
+            /// Requirement based => According orders
+            /// </summary>
+            RequirementBased = 0,
+
+            /// <summary>
+            /// According stock history
+            /// </summary>
+            ConsumptionBased = 1,
+        }
+
+#if NETFRAMEWORK
+        static ACValueItemList _MRPProcedureList = null;
+        static public ACValueItemList MRPProcedureList
+        {
+            get
+            {
+                if (GlobalApp._MRPProcedureList == null)
+                {
+
+                    GlobalApp._MRPProcedureList = new ACValueItemList("MRPProcedureIndex");
+
+                    GlobalApp._MRPProcedureList.AddEntry((short)MRPProcedure.RequirementBased, "en{'Requirement based'}de{'Bedarfsgesteuert'}");
+                    GlobalApp._MRPProcedureList.AddEntry((short)MRPProcedure.ConsumptionBased, "en{'Consumption based (According stock history)'}de{'Verbrauchsgesteuert (Nach Lagerhistorie)'}");
+                }
+                return GlobalApp._MRPProcedureList;
+            }
+        }
+#endif
+        #endregion
+
     }
 }

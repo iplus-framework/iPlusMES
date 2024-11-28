@@ -80,6 +80,10 @@ namespace gip.bso.manufacturing
                 ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
             _PickingManager = null;
 
+            if (_ProdOrderManager != null)
+                ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
+
             CleanUp();
 
             MediaController = null;
@@ -644,16 +648,18 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("NewPicking", "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)MISort.Search)]
         public void SearchStockMaterial()
         {
-            if (!IsEnabledSearchStockMaterial()) return;
+            if (!IsEnabledSearchStockMaterial()) 
+                return;
             OnSearchStockMaterial(this, new EventArgs());
         }
 
+        #region Production-Order
         public bool IsEnabledSearchStockMaterial()
         {
             return OnSearchStockMaterial != null;
         }
 
-        [ACMethodInfo("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 9999, true)]
+        [ACMethodCommand("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 800, true)]
         public void GenerateProductionOrder()
         {
             Partslist partsList = SelectedPreparedMaterial.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
@@ -683,6 +689,11 @@ namespace gip.bso.manufacturing
         {
             return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null && SelectedPreparedMaterial.Material.Partslist_Material.Any();
         }
+        #endregion
+
+        #region InOrder
+
+        #endregion
 
         #endregion
 

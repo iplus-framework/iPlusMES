@@ -701,42 +701,46 @@ namespace gip.mes.facility
             }
             try
             {
-                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
-                Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
+                var groupedByOrder = deliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.OutOrderPos != null).ToList().GroupBy(c => c.OutOrderPos.OutOrderID);
 
-                // Selected first outorder but can be many
-                OutOrder outOrder =
-                    deliveryNote
-                    .DeliveryNotePos_DeliveryNote
-                    .OrderBy(c => c.Sequence)
-                    .FirstOrDefault()
-                    .OutOrderPos
-                    .OutOrder;
-                invoice.OutOrder = outOrder;
-
-                invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
-                invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
-                invoice.InvoiceDate = DateTime.Now;
-                invoice.CustomerCompany = outOrder.CustomerCompany;
-                invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
-                invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
-
-                List<OutOrderPos> items =
-                    deliveryNote
-                    .DeliveryNotePos_DeliveryNote
-                    .OrderBy(c => c.Sequence)
-                    .Select(c => c.OutOrderPos)
-                    .ToList();
-
-                int nr = 0;
-                foreach (OutOrderPos outOrderPos in items)
+                foreach (var grp in groupedByOrder)
                 {
-                    nr++;
-                    InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
-                    invoice.InvoicePos_Invoice.Add(invoicePos);
+                    OutOrder outOrder = null;
+                    Invoice invoice = null;
+                    foreach (var dnPos in grp)
+                    {
+                        int nr = 0;
+                        if (outOrder == null || dnPos.OutOrderPos.OutOrder != outOrder)
+                        {
+                            nr = 0;
+                            outOrder = dnPos.OutOrderPos.OutOrder;
+                            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
+                            invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
+                            invoice.OutOrder = outOrder;
+                            invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
+                            invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
+                            invoice.InvoiceDate = DateTime.Now;
+                            invoice.CustomerCompany = outOrder.CustomerCompany;
+                            invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
+                            invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
+                            invoice.IssuerCompanyAddress = outOrder.IssuerCompanyAddress;
+                            invoice.Comment = outOrder.Comment;
+
+                            invoice.MDCurrency = invoice.IssuerCompanyAddress?.MDCountry.MDCurrency;
+                            invoice.UpdateExchangeRate();
+
+                            invoice.IssuerCompanyPerson = outOrder.IssuerCompanyPerson;
+                            invoice.MDTermOfPayment = outOrder.MDTermOfPayment;
+                            invoice.XMLDesignStart = outOrder.XMLDesignStart;
+                            invoice.XMLDesignEnd = outOrder.XMLDesignEnd;
+                        }
+                        nr++;
+                        InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, dnPos.OutOrderPos);
+                        invoice.InvoicePos_Invoice.Add(invoicePos);
+                    }
                 }
                 databaseApp.ACSaveChanges();
-                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", invoice.InvoiceNo) };
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", deliveryNote.DeliveryNoteNo) };
             }
             catch (Exception ec)
             {
@@ -968,15 +972,17 @@ namespace gip.mes.facility
                                     if (billingCompanyAddress != null)
                                     {
                                         callerObject.PriceListMaterialItems =
-                                      databaseApp
-                                      .PriceListMaterial
-                                      .Where(c =>
-                                                  c.PriceList.MDCurrencyID == billingCompanyAddress.Company.MDCurrencyID
-                                                  && c.MaterialID == posItem.Material.MaterialID
-                                                  && c.PriceList.DateFrom < now
-                                                  && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)
-                                             )
-                                      .ToList();
+                                        databaseApp
+                                        .PriceListMaterial
+                                        .Where(c =>
+                                                    c.PriceList.MDCurrencyID == billingCompanyAddress.Company.MDCurrencyID
+                                                    && c.MaterialID == posItem.Material.MaterialID
+                                                    && c.PriceList.DateFrom < now
+                                                    && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)
+                                                )
+                                        .ToList();
+                                        if (callerObject.PriceListMaterialItems.Any())
+                                            callerObject.SelectedPriceListMaterial = callerObject.PriceListMaterialItems.FirstOrDefault();
 
                                         ActualSalesTax countrySalesTaxModel = null;
                                         // Fetch sales tax for same country if Tendant 
@@ -1148,7 +1154,7 @@ namespace gip.mes.facility
 
             invoicePos.Material = outOrderPos.Material;
             invoicePos.MDUnit = outOrderPos.MDUnit;
-            invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
+            invoicePos.TargetQuantityUOM = outOrderPos.ActualQuantityUOM;
             invoicePos.TargetQuantity = invoicePos.MDUnit != null ?
                 invoicePos.MDUnit.ConvertToUnit(invoicePos.TargetQuantityUOM, invoicePos.Material.BaseMDUnit)
                 : invoicePos.TargetQuantityUOM;
@@ -1170,8 +1176,7 @@ namespace gip.mes.facility
             invoicePos.MDCountrySalesTaxMaterial = outOrderPos.MDCountrySalesTaxMaterial;
 
             OutOrderPos topPos = outOrderPos.TopParentOutOrderPos;
-            OutOrderPos invoicePosRelation =
-                OutOrderPos.NewACObject(databaseApp, topPos);
+            OutOrderPos invoicePosRelation = OutOrderPos.NewACObject(databaseApp, topPos);
 
             invoicePosRelation.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
             invoicePosRelation.TargetQuantity = outOrderPos.TargetQuantity;

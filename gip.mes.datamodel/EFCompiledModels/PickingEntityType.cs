@@ -92,7 +92,11 @@ namespace gip.mes.datamodel
                 providerValueComparer: new ValueComparer<DateTime?>(
                     (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
                     (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)));
+                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "datetime",
+                    dbType: System.Data.DbType.DateTime));
+            calculatedEndDate.AddAnnotation("Relational:ColumnType", "datetime");
             calculatedEndDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var calculatedStartDate = runtimeEntityType.AddProperty(
@@ -113,7 +117,11 @@ namespace gip.mes.datamodel
                 providerValueComparer: new ValueComparer<DateTime?>(
                     (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
                     (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)));
+                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "datetime",
+                    dbType: System.Data.DbType.DateTime));
+            calculatedStartDate.AddAnnotation("Relational:ColumnType", "datetime");
             calculatedStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var comment = runtimeEntityType.AddProperty(
@@ -501,7 +509,11 @@ namespace gip.mes.datamodel
                 providerValueComparer: new ValueComparer<DateTime?>(
                     (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
                     (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)));
+                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "datetime",
+                    dbType: System.Data.DbType.DateTime));
+            scheduledEndDate.AddAnnotation("Relational:ColumnType", "datetime");
             scheduledEndDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var scheduledOrder = runtimeEntityType.AddProperty(
@@ -543,7 +555,11 @@ namespace gip.mes.datamodel
                 providerValueComparer: new ValueComparer<DateTime?>(
                     (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
                     (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)));
+                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "datetime",
+                    dbType: System.Data.DbType.DateTime));
+            scheduledStartDate.AddAnnotation("Relational:ColumnType", "datetime");
             scheduledStartDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var tourplanID = runtimeEntityType.AddProperty(
@@ -711,6 +727,10 @@ namespace gip.mes.datamodel
             var index2 = runtimeEntityType.AddIndex(
                 new[] { vBiACClassWFID });
 
+            var nCI_FK_Picking_MirroredFromPickingID = runtimeEntityType.AddIndex(
+                new[] { mirroredFromPickingID },
+                name: "NCI_FK_Picking_MirroredFromPickingID");
+
             var nCI_FK_Picking_TourplanID = runtimeEntityType.AddIndex(
                 new[] { tourplanID },
                 name: "NCI_FK_Picking_TourplanID");
@@ -854,6 +874,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassWF).GetField("_Picking_VBiACClassWF", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_Picking_ACClassWFID");
             return runtimeForeignKey;
         }
 

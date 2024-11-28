@@ -223,6 +223,13 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _InsertName, value); }
     }
 
+    string _WebUrl;
+    public string WebUrl 
+    {
+        get { return _WebUrl; }
+        set { SetProperty<string>(ref _WebUrl, value); }
+    }
+
     private Company _Company;
     public virtual Company Company
     { 

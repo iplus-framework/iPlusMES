@@ -123,6 +123,26 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
         get { return Context.Entry(this).Reference("PlanningMR"); }
     }
     
+    private ICollection<PlanningMRPos> _PlanningMRPos_PlanningMRProposal;
+    public virtual ICollection<PlanningMRPos> PlanningMRPos_PlanningMRProposal
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRPos_PlanningMRProposal); }
+        set { _PlanningMRPos_PlanningMRProposal = value; }
+    }
+
+    public bool PlanningMRPos_PlanningMRProposal_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRPos_PlanningMRProposal != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRPos_PlanningMRProposalReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_PlanningMRProposal); }
+    }
+
     private ProdOrder _ProdOrder;
     public virtual ProdOrder ProdOrder
     { 

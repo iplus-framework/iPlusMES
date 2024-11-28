@@ -349,6 +349,13 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _ExcludeFromSumCalc, value); }
     }
 
+    short _MRPProcedureIndex;
+    public short MRPProcedureIndex 
+    {
+        get { return _MRPProcedureIndex; }
+        set { SetProperty<short>(ref _MRPProcedureIndex, value); }
+    }
+
     private MDUnit _BaseMDUnit;
     public virtual MDUnit BaseMDUnit
     { 
@@ -1327,6 +1334,46 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual CollectionEntry PickingPos_PickingMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_PickingMaterial); }
+    }
+
+    private ICollection<PlanningMRCons> _PlanningMRCons_Material;
+    public virtual ICollection<PlanningMRCons> PlanningMRCons_Material
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRCons_Material); }
+        set { _PlanningMRCons_Material = value; }
+    }
+
+    public bool PlanningMRCons_Material_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRCons_Material != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRCons_MaterialReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRCons_Material); }
+    }
+
+    private ICollection<PlanningMRPos> _PlanningMRPos_Material;
+    public virtual ICollection<PlanningMRPos> PlanningMRPos_Material
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRPos_Material); }
+        set { _PlanningMRPos_Material = value; }
+    }
+
+    public bool PlanningMRPos_Material_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRPos_Material != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRPos_MaterialReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_Material); }
     }
 
     private ICollection<PriceListMaterial> _PriceListMaterial_Material;

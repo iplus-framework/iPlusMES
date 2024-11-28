@@ -1106,23 +1106,19 @@ namespace gip.bso.masterdata
                 configs.Remove(existing);
             }
 
+            if (FilterFacilityModel == null)
+                return;
+
             if(FilterFacilityIncludedList != null)
-            {
                 FilterFacilityModel.IncludedFacilities = FilterFacilityIncludedList.Select(c => c.FacilityNo).ToArray();
-            }
             else
-            {
                 FilterFacilityModel.IncludedFacilities = null;
-            }
 
             if(FilterFacilityExcludedList != null)
-            {
                 FilterFacilityModel.ExcludedFacilities = FilterFacilityExcludedList.Select(c => c.FacilityNo).ToArray();
-            }
             else
-            {
                 FilterFacilityModel.ExcludedFacilities =null;
-            }
+
             configs.Add(FilterFacilityModel);
 
             FilterFacilityConfig = JsonConvert.SerializeObject(configs);

@@ -18,6 +18,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(6, "DepartmentUserName", ConstApp.DepartmentUserName, "", "", true)]
     [ACPropertyEntity(7, "StartDate", ConstApp.ProductionStart, "", "", true)]
     [ACPropertyEntity(8, "EndDate", ConstApp.ProductionEnd, "", "", true)]
+    [ACPropertyEntity(8, nameof(ProdUserEndDate), "en{'Delivery time'}de{'Faelligkeitsdatum'}", "", "", true)]
+    [ACPropertyEntity(8, nameof(ProdUserEndName), "en{'Planner'}de{'Planer'}", "", "", true)]
     [ACPropertyEntity(9, Const.IsEnabled, "en{'Enabled'}de{'Freigegeben'}", "", "", true)]
     [ACPropertyEntity(11, "LossComment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]
     [ACPropertyEntity(12, "TargetQuantity", ConstApp.TargetQuantity, "", "", true)]

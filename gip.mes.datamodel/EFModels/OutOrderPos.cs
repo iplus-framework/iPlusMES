@@ -969,6 +969,26 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Reference("PickupCompanyMaterial"); }
     }
     
+    private ICollection<PlanningMRPos> _PlanningMRPos_OutOrderPos;
+    public virtual ICollection<PlanningMRPos> PlanningMRPos_OutOrderPos
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRPos_OutOrderPos); }
+        set { _PlanningMRPos_OutOrderPos = value; }
+    }
+
+    public bool PlanningMRPos_OutOrderPos_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRPos_OutOrderPos != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRPos_OutOrderPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_OutOrderPos); }
+    }
+
     private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
     public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
     {

@@ -646,6 +646,26 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         get { return Context.Entry(this).Collection(c => c.PickingPosProdOrderPartslistPos_ProdorderPartslistPos); }
     }
 
+    private ICollection<PlanningMRPos> _PlanningMRPos_ProdOrderPartslistPos;
+    public virtual ICollection<PlanningMRPos> PlanningMRPos_ProdOrderPartslistPos
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRPos_ProdOrderPartslistPos); }
+        set { _PlanningMRPos_ProdOrderPartslistPos = value; }
+    }
+
+    public bool PlanningMRPos_ProdOrderPartslistPos_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRPos_ProdOrderPartslistPos != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRPos_ProdOrderPartslistPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_ProdOrderPartslistPos); }
+    }
+
     private ProdOrderBatch _ProdOrderBatch;
     public virtual ProdOrderBatch ProdOrderBatch
     { 

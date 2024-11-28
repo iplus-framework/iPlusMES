@@ -41,7 +41,7 @@ namespace gip.mes.datamodel
         readonly IEnumerable<string> _knownPluralWords;
         readonly CultureInfo _culture = new CultureInfo("en-US");
 
-        readonly IEnumerable<string> _uninflectiveSuffixes = new[] { "fish", "ois", "sheep", "deer", "pos", "itis", "ism", "Machines", "Settings", "Columns" };
+        readonly IEnumerable<string> _uninflectiveSuffixes = new[] { "fish", "ois", "sheep", "deer", "pos", "itis", "ism", "Machines", "Settings", "Columns", "cons", };
 
         readonly IEnumerable<string> _uninflectiveWords = new HashSet<string>
         {

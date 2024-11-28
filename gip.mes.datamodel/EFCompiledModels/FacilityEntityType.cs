@@ -1524,6 +1524,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassMethod).GetField("_Facility_VBiACClassMethod", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_Facility_ACClassMethodID");
             return runtimeForeignKey;
         }
 

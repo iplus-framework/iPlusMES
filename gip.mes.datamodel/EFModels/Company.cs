@@ -223,6 +223,13 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _KeyOfExtSys, value); }
     }
 
+    string _WebUrl;
+    public string WebUrl 
+    {
+        get { return _WebUrl; }
+        set { SetProperty<string>(ref _WebUrl, value); }
+    }
+
     private MDTermOfPayment _BillingMDTermOfPayment;
     public virtual MDTermOfPayment BillingMDTermOfPayment
     { 

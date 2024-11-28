@@ -66,7 +66,6 @@ namespace gip.mes.datamodel
                     (DateOnly v1, DateOnly v2) => v1.Equals(v2),
                     (DateOnly v) => v.GetHashCode(),
                     (DateOnly v) => v));
-            calendarDate.AddAnnotation("Relational:ColumnType", "date");
             calendarDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(

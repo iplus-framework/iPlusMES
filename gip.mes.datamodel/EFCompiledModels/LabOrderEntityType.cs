@@ -736,6 +736,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_LabOrder_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_LabOrder_PickingPosID");
             return runtimeForeignKey;
         }
 

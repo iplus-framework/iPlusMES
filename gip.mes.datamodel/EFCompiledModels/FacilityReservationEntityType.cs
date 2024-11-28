@@ -54,7 +54,8 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(FacilityReservation).GetProperty("CalculatedRoute", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityReservation).GetField("_CalculatedRoute", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
+                nullable: true,
+                unicode: false);
             calculatedRoute.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
                 comparer: new ValueComparer<string>(
                     (string v1, string v2) => v1 == v2,
@@ -69,9 +70,7 @@ namespace gip.mes.datamodel
                     (string v) => v.GetHashCode(),
                     (string v) => v),
                 mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "nvarchar(max)",
-                    unicode: true,
-                    dbType: System.Data.DbType.String),
+                    storeTypeName: "varchar(max)"),
                 storeTypePostfix: StoreTypePostfix.None);
             calculatedRoute.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -840,6 +839,7 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PickingPos).GetField("_FacilityReservation_PickingPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_FacilityReservation_PickingPos");
             return runtimeForeignKey;
         }
 

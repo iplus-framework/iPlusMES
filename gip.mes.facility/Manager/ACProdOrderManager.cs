@@ -1542,8 +1542,6 @@ namespace gip.mes.facility
                                 if (showSelectedCells)
                                     continue;
                                 unselFacility = queryUnselFacilities.Where(c => c.VBiFacilityACClassID == routeItem.Target.ACClassID).FirstOrDefault();
-                                if (unselFacility == null)
-                                    continue;
                                 if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
                                     continue;
                                 bool ifMaterialMatch =
@@ -1557,7 +1555,7 @@ namespace gip.mes.facility
                                 // );
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
-                                if (destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
+                                if (unselFacility != null && destinationFilterClassCode.HasValue && unselFacility.ClassCode > 0)
                                 {
                                     uint bitCmpResult = ((uint)unselFacility.ClassCode) & ((uint)destinationFilterClassCode.Value);
                                     if (bitCmpResult == 0)

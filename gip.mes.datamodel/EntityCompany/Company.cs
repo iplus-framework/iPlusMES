@@ -32,6 +32,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(20, "VATNumber", "en{'VAT-Number'}de{'USt.-Identifikationsnummer'}", "", "", true)]
     [ACPropertyEntity(21, "IsTenant", "en{'Client/Contract Partner'}de{'Mandant/Vertragspartner'}", "", "", true)]
     [ACPropertyEntity(22, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(23, nameof(WebUrl), "en{'Web address'}de{'Webadresse'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

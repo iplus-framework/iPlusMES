@@ -11,7 +11,7 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.sales
 {
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechunungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechnung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName)]
     public class BSOInvoice : ACBSOvbNav, IOutOrderPosBSO
     {
 

@@ -544,6 +544,27 @@ namespace gip.mes.datamodel
                     storeTypeName: "uniqueidentifier"));
             mDMaterialTypeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var mRPProcedureIndex = runtimeEntityType.AddProperty(
+                "MRPProcedureIndex",
+                typeof(short),
+                propertyInfo: typeof(Material).GetProperty("MRPProcedureIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Material).GetField("_MRPProcedureIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: (short)0);
+            mRPProcedureIndex.TypeMapping = SqlServerShortTypeMapping.Default.Clone(
+                comparer: new ValueComparer<short>(
+                    (short v1, short v2) => v1 == v2,
+                    (short v) => (int)v,
+                    (short v) => v),
+                keyComparer: new ValueComparer<short>(
+                    (short v1, short v2) => v1 == v2,
+                    (short v) => (int)v,
+                    (short v) => v),
+                providerValueComparer: new ValueComparer<short>(
+                    (short v1, short v2) => v1 == v2,
+                    (short v) => (int)v,
+                    (short v) => v));
+            mRPProcedureIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var materialName1 = runtimeEntityType.AddProperty(
                 "MaterialName1",
                 typeof(string),

@@ -4,16 +4,15 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPlanningMR")]
+    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOTemplateSchedule")]
     
-    [ACPropertyEntity(1, "PlanningMRNo", "en{'Schedule number'}de{'Plannummer'}", "", "", true)]
-    [ACPropertyEntity(2, "PlanningName", "en{'Name'}de{'Name'}", "", "", true)]
-    [ACPropertyEntity(3, "RangeFrom", "en{'Valid From'}de{'Gültig von'}", "", "", true)]
-    [ACPropertyEntity(4, "RangeTo", "en{'Valid To'}de{'Gültig bis'}", "", "", true)]
-    [ACPropertyEntity(5, "Template", "en{'Is template'}de{'Ist Vorlage'}", "", "", true)]
-    [ACPropertyEntity(6, "Comment", ConstApp.Comment, "", "", true)]
+    [ACPropertyEntity(1, nameof(PlanningMRNo), "en{'Schedule number'}de{'Plannummer'}", "", "", true)]
+    [ACPropertyEntity(2, nameof(PlanningName), "en{'Name'}de{'Name'}", "", "", true)]
+    [ACPropertyEntity(3, nameof(RangeFrom), "en{'Valid From'}de{'Gültig von'}", "", "", true)]
+    [ACPropertyEntity(4, nameof(RangeTo), "en{'Valid To'}de{'Gültig bis'}", "", "", true)]
+    [ACPropertyEntity(5, nameof(Template), "en{'Is template'}de{'Ist Vorlage'}", "", "", true)]
+    [ACPropertyEntity(6, nameof(Comment), ConstApp.Comment, "", "", true)]
     
-    [ACPropertyEntity(493, "XMLComment", ConstApp.XMLComment, "", "", true)]
     [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]
     [ACPropertyEntity(495, Const.EntityDeleteName, Const.EntityTransDeleteName)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
