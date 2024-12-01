@@ -89,35 +89,89 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case "NewPicking":
+                case nameof(NewPicking):
                     NewPicking();
                     return true;
-                case "IsEnabledNewPicking":
+                case nameof(IsEnabledNewPicking):
                     result = IsEnabledNewPicking();
                     return true;
-                case "DeletePicking":
+                case nameof(DeletePicking):
                     DeletePicking();
                     return true;
-                case "IsEnabledDeletePicking":
+                case nameof(IsEnabledDeletePicking):
                     result = IsEnabledDeletePicking();
                     return true;
-                case "NewPickingPos":
+                case nameof(NewPickingPos):
                     NewPickingPos();
                     return true;
-                case "DeletePickingPos":
+                case nameof(DeletePickingPos):
                     DeletePickingPos();
                     return true;
-                case "IsEnabledDeletePickingPos":
+                case nameof(IsEnabledDeletePickingPos):
                     result = IsEnabledDeletePickingPos();
                     return true;
-                case "SearchStockMaterial":
+                case nameof(SearchStockMaterial):
                     SearchStockMaterial();
                     return true;
-                case "IsEnabledSearchStockMaterial":
+                case nameof(IsEnabledSearchStockMaterial):
                     result = IsEnabledSearchStockMaterial();
                     return true;
-                case "IsEnabledNewPickingPos":
+                case nameof(IsEnabledNewPickingPos):
                     result = IsEnabledNewPickingPos();
+                    return true;
+                case nameof(ShowPicking):
+                    ShowPicking();
+                    return true;
+                case nameof(IsEnabledShowPicking):
+                    result = IsEnabledShowPicking();
+                    return true;
+                case nameof(GenerateProductionOrder):
+                    GenerateProductionOrder();
+                    return true;
+                case nameof(IsEnabledGenerateProductionOrder):
+                    result = IsEnabledGenerateProductionOrder();
+                    return true;
+                case nameof(DeleteProductionOrder):
+                    DeleteProductionOrder();
+                    return true;
+                case nameof(IsEnabledDeleteProductionOrder):
+                    result = IsEnabledDeleteProductionOrder();
+                    return true;
+                case nameof(ShowProductionOrder):
+                    ShowProductionOrder();
+                    return true;
+                case nameof(IsEnabledProductionOrder):
+                    result = IsEnabledProductionOrder();
+                    return true;
+                case nameof(NewInOrder):
+                    NewInOrder();
+                    return true;
+                case nameof(IsEnabledNewInOrder):
+                    result = IsEnabledNewInOrder();
+                    return true;
+                case nameof(DeleteInOrder):
+                    DeleteInOrder();
+                    return true;
+                case nameof(IsEnabledDeleteInOrder):
+                    result = IsEnabledDeleteInOrder();
+                    return true;
+                case nameof(NewInOrderPos):
+                    NewInOrderPos();
+                    return true;
+                case nameof(IsEnabledNewInOrderPos):
+                    result = IsEnabledNewInOrderPos();
+                    return true;
+                case nameof(DeleteInOrderPos):
+                    DeleteInOrderPos();
+                    return true;
+                case nameof(IsEnabledDeleteInOrderPos):
+                    result = IsEnabledDeleteInOrderPos();
+                    return true;
+                case nameof(ShowInOrder):
+                    ShowInOrder();
+                    return true;
+                case nameof(IsEnabledShowInOrder):
+                    result = IsEnabledShowInOrder();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -162,7 +216,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public ACMediaController MediaController { get;set;}
+        public ACMediaController MediaController { get; set; }
 
         #endregion
 
@@ -264,7 +318,7 @@ namespace gip.bso.manufacturing
         /// Selected property for FacilityChargeSumFacilityHelper
         /// </summary>
         /// <value>The selected TargetStorageBin</value>
-        [ACPropertySelected(504, "TargetStorageBin", "en{'TODO: TargetStorageBin'}de{'TODO: TargetStorageBin'}")]
+        [ACPropertySelected(504, "TargetStorageBin", "en{'Target store'}de{'Ziellagerplatz'}")]
         public PlanningTargetStockPreview SelectedTargetStorageBin
         {
             get
@@ -350,7 +404,6 @@ namespace gip.bso.manufacturing
                 return _PickingList;
             }
         }
-
         #endregion
 
         // PickingPos
@@ -394,8 +447,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        #endregion
-
         private double _PickingQuantityUOM;
         [ACPropertyInfo(510, "PickingQuantityUOM", "en{'Picking quantity'}de{'Komissioniermenge'}")]
         public double PickingQuantityUOM
@@ -436,16 +487,169 @@ namespace gip.bso.manufacturing
                 }
             }
         }
+        #endregion
+
+        #region InOrder
+        private VD.InOrder _SelectedInOrder;
+        [ACPropertySelected(526, "InOrder", "en{'Purchase Order'}de{'Bestellung'}")]
+        public VD.InOrder SelectedInOrder
+        {
+            get
+            {
+                return _SelectedInOrder;
+            }
+            set
+            {
+                if (_SelectedInOrder != value)
+                {
+                    _SelectedInOrder = value;
+                    LoadInOrderPositions();
+                    OnPropertyChanged(nameof(SelectedInOrder));
+                }
+            }
+        }
+
+
+        private List<VD.InOrder> _InOrderList;
+        [ACPropertyList(527, "InOrder")]
+        public List<VD.InOrder> InOrderList
+        {
+            get
+            {
+                if (_InOrderList == null)
+                    _InOrderList = new List<InOrder>();
+                return _InOrderList;
+            }
+        }
+
+        private VD.InOrderPos _SelectedInOrderPos;
+        [ACPropertySelected(528, "InOrderPos", "en{'Orde line'}de{'Bestellpositionen'}")]
+        public VD.InOrderPos SelectedInOrderPos
+        {
+            get
+            {
+                return _SelectedInOrderPos;
+            }
+            set
+            {
+                if (_SelectedInOrderPos != value)
+                {
+                    _SelectedInOrderPos = value;
+                    OnPropertyChanged(nameof(SelectedInOrderPos));
+                }
+            }
+        }
+
+
+        private List<VD.InOrderPos> _InOrderPosList;
+        [ACPropertyList(529, "InOrderPos")]
+        public List<VD.InOrderPos> InOrderPosList
+        {
+            get
+            {
+                if (_InOrderPosList == null)
+                    _InOrderPosList = new List<InOrderPos>();
+                return _InOrderPosList;
+            }
+        }
+
+        private bool _ShowAllInOrderLines;
+        [ACPropertyInfo(511, "ShowAllInOrderLines", "en{'Show of all Purchase orders'}de{'Von allen Bestellungen anzeigen'}")]
+        public bool ShowAllInOrderLines
+        {
+            get
+            {
+                return _ShowAllInOrderLines;
+            }
+            set
+            {
+                if (_ShowAllInOrderLines != value)
+                {
+                    _ShowAllInOrderLines = value;
+                    LoadInOrderPositions();
+                    OnPropertyChanged(nameof(ShowAllInOrderLines));
+                }
+            }
+        }
+
+        private double _InOrderQuantityUOM;
+        [ACPropertyInfo(530, "InOrderQuantityUOM", "en{'Purchase quantity'}de{'Bestellmenge'}")]
+        public double InOrderQuantityUOM
+        {
+            get
+            {
+                return _InOrderQuantityUOM;
+            }
+            set
+            {
+                if (_InOrderQuantityUOM != value)
+                {
+                    _InOrderQuantityUOM = value;
+                    OnPropertyChanged(nameof(InOrderQuantityUOM));
+                }
+            }
+        }
+        #endregion
+
+
+        #region Production Order
+        private VD.ProdOrderPartslist _SelectedProdOrderPartslist;
+        [ACPropertySelected(506, "ProdOrderPartslist", "en{'Purchase Order'}de{'Bestellung'}")]
+        public VD.ProdOrderPartslist SelectedProdOrderPartslist
+        {
+            get
+            {
+                return _SelectedProdOrderPartslist;
+            }
+            set
+            {
+                if (_SelectedProdOrderPartslist != value)
+                {
+                    _SelectedProdOrderPartslist = value;
+                    OnPropertyChanged(nameof(SelectedProdOrderPartslist));
+                }
+            }
+        }
+
+
+        private List<VD.ProdOrderPartslist> _ProdOrderPartslistList;
+        [ACPropertyList(507, "ProdOrderPartslist")]
+        public List<VD.ProdOrderPartslist> ProdOrderPartslistList
+        {
+            get
+            {
+                if (_ProdOrderPartslistList == null)
+                    _ProdOrderPartslistList = new List<ProdOrderPartslist>();
+                return _ProdOrderPartslistList;
+            }
+        }
+
+        private double _ProdOrderPartslistQuantityUOM;
+        [ACPropertyInfo(510, "ProdOrderPartslistQuantityUOM", "en{'Production order size'}de{'Auftragsgröße'}")]
+        public double ProdOrderPartslistQuantityUOM
+        {
+            get
+            {
+                return _ProdOrderPartslistQuantityUOM;
+            }
+            set
+            {
+                if (_ProdOrderPartslistQuantityUOM != value)
+                {
+                    _ProdOrderPartslistQuantityUOM = value;
+                    OnPropertyChanged(nameof(ProdOrderPartslistQuantityUOM));
+                }
+            }
+        }
+
+        #endregion
 
         #endregion
 
         #region Methods 
 
         #region Method -> Picking
-        /// <summary>
-        /// Method NewPicking
-        /// </summary>78--
-        [ACMethodInfo("NewPicking", "en{'New'}de{'Neu'}", (short)MISort.New, false, false, true)]
+        [ACMethodCommand("SelectedPicking", "en{'New picking order'}de{'Neuer Kommissionierauftrag'}", (short)800, true)]
         public void NewPicking()
         {
             if (!IsEnabledNewPicking()) return;
@@ -458,15 +662,13 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(PickingList));
             SelectedPicking = picking;
         }
+        
         public bool IsEnabledNewPicking()
         {
             return SelectedTargetStorageBin != null && SelectedTargetStorageBin.MDPickingType != null;
         }
 
-        /// <summary>
-        /// Method DeletePicking
-        /// </summary>
-        [ACMethodInfo("DeletePicking", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, false, false, true)]
+        [ACMethodCommand("SelectedPicking", "en{'Delete picking order'}de{'Lösche Kommissionierauftrag'}", (short)801, true)]
         public void DeletePicking()
         {
             if (!IsEnabledDeletePicking()) return;
@@ -483,15 +685,13 @@ namespace gip.bso.manufacturing
                 Messages.Msg(msg);
             }
         }
+
         public bool IsEnabledDeletePicking()
         {
             return SelectedPicking != null;
         }
 
-        /// <summary>
-        /// Method NewPickingPos
-        /// </summary>
-        [ACMethodInfo("NewPickingPos", "en{'Take'}de{'Übernehmen'}", (short)MISort.New, false, false, true)]
+        [ACMethodCommand("SelectedPickingPos", "en{'Take over into picking order'}de{'Übernehme in Kommissionierauftrag'}", (short)802, true)]
         public void NewPickingPos()
         {
             VD.PickingPos pickingPos = VD.PickingPos.NewACObject(DatabaseApp, SelectedPicking);
@@ -538,10 +738,7 @@ namespace gip.bso.manufacturing
                 && SelectedTargetStorageBin != null;
         }
 
-        /// <summary>
-        /// Method DeletePickingPos
-        /// </summary>
-        [ACMethodInfo("DeletePickingPos", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, false, false, true)]
+        [ACMethodCommand("SelectedPickingPos", "en{'Delete picking line'}de{'Lösche Kommissionierposition'}", (short)803, true)]
         public void DeletePickingPos()
         {
             if (!IsEnabledDeletePickingPos()) return;
@@ -565,7 +762,7 @@ namespace gip.bso.manufacturing
             return SelectedPickingPos != null && SelectedPreparedMaterial != null; ;
         }
 
-        [ACMethodInteraction("", "en{'Show picking'}de{'Kommission öffnen'}", 781, true, nameof(SelectedPicking))]
+        [ACMethodInteraction("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 804, true, nameof(SelectedPicking))]
         public void ShowPicking()
         {
             if (!IsEnabledShowPicking())
@@ -605,25 +802,36 @@ namespace gip.bso.manufacturing
 
             _SelectedPickingPos = null;
             _PickingPosList = null;
+
+            _SelectedInOrder = null;
+            _InOrderList = null;
+
+            _SelectedInOrderPos = null;
+            _InOrderPosList = null;
+
+            _SelectedProdOrderPartslist = null;
+            _ProdOrderPartslistList = null;
         }
 
         #endregion
 
-        [ACMethodInfo("NewPicking", "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)MISort.Search)]
+        #region Search
+        [ACMethodCommand("NewPicking", "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)805, true)]
         public void SearchStockMaterial()
         {
-            if (!IsEnabledSearchStockMaterial()) 
+            if (!IsEnabledSearchStockMaterial())
                 return;
             OnSearchStockMaterial(this, new EventArgs());
         }
 
-        #region Production-Order
         public bool IsEnabledSearchStockMaterial()
         {
             return OnSearchStockMaterial != null;
         }
+        #endregion
 
-        [ACMethodCommand("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 800, true)]
+        #region Production-Order
+        [ACMethodCommand("SelectedProdOrderPartslist", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 810, true)]
         public void GenerateProductionOrder()
         {
             Partslist partsList = SelectedPreparedMaterial.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
@@ -637,13 +845,30 @@ namespace gip.bso.manufacturing
             ProdOrder prodOrder = ProdOrder.NewACObject(DatabaseApp, null, secondaryKey);
 
             ProdOrderPartslist prodOrderPartslist;
-            Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partsList, 1, SelectedPreparedMaterial.TargetQuantityUOM, out prodOrderPartslist);
+            Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partsList, 1, ProdOrderPartslistQuantityUOM, out prodOrderPartslist);
             if (msg != null)
             {
                 Messages.Msg(msg);
                 return;
             }
             ACSaveChanges();
+            ProdOrderPartslistList.Add(prodOrderPartslist);
+
+            // Update SelectedPreparedMaterial
+            SelectedPreparedMaterial.PickingPosQuantityUOM += prodOrderPartslist.TargetQuantity;
+            SelectedPreparedMaterial.MissingQuantityUOM = ProdOrderPartslistQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
+            _PreparedMaterialList = _PreparedMaterialList.ToList();
+
+            // Update SelectedTargetStorageBin
+            _SourceStorageBinList = _SourceStorageBinList.ToList();
+            _TargetStorageBinList = _TargetStorageBinList.ToList();
+
+            OnPropertyChanged(nameof(PreparedMaterialList));
+            OnPropertyChanged(nameof(SourceStorageBinList));
+            OnPropertyChanged(nameof(TargetStorageBinList));
+
+            OnPropertyChanged(nameof(ProdOrderPartslistList));
+            SelectedProdOrderPartslist = prodOrderPartslist;
 
             Messages.Info(this, "Info50104");
 
@@ -651,11 +876,199 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledGenerateProductionOrder()
         {
-            return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null && SelectedPreparedMaterial.Material.Partslist_Material.Any();
+            return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null 
+                && ProdOrderPartslistQuantityUOM > double.Epsilon && SelectedPreparedMaterial.Material.Partslist_Material.Any();
+        }
+
+        [ACMethodCommand("SelectedProdOrderPartslist", "en{'Delete production order'}de{'Lösche Produktionsauftrag'}", (short)811, true)]
+        public void DeleteProductionOrder()
+        {
+            if (!IsEnabledDeleteProductionOrder())
+                return;
+            ProdOrderPartslist prodOrderPartslist = SelectedProdOrderPartslist;
+            Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, prodOrderPartslist.ProdOrder, prodOrderPartslist);
+            if (msg == null || msg.IsSucceded())
+            {
+                if (SelectedPreparedMaterial != null)
+                {
+                    SelectedPreparedMaterial.PickingPosQuantityUOM -= prodOrderPartslist.TargetQuantity;
+                    SelectedPreparedMaterial.MissingQuantityUOM = SelectedPreparedMaterial.TargetQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
+                }
+                ProdOrderPartslistList.Remove(prodOrderPartslist);
+                SelectedProdOrderPartslist = ProdOrderPartslistList.FirstOrDefault();
+                OnPropertyChanged(nameof(SelectedProdOrderPartslist));
+            }
+            else
+            {
+                Messages.Msg(msg);
+            }
+        }
+
+        public bool IsEnabledDeleteProductionOrder()
+        {
+            return SelectedProdOrderPartslist != null && SelectedProdOrderPartslist.MDProdOrderState.ProdOrderState == MDProdOrderState.ProdOrderStates.NewCreated;
+        }
+
+
+        [ACMethodInteraction("SelectedProdOrderPartslist", "en{'Show production order'}de{'Produktionsauftrag anzeigen'}", 812, true, nameof(SelectedProdOrderPartslist))]
+        public void ShowProductionOrder()
+        {
+            if (!IsEnabledProductionOrder())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslist), SelectedProdOrderPartslist.ProdOrderPartslistID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledProductionOrder()
+        {
+            return SelectedProdOrderPartslist != null;
         }
         #endregion
 
         #region InOrder
+        [ACMethodCommand("SelectedInOrder", "en{'New purchase order'}de{'Neue Bestellung'}", (short)820, true)]
+        public void NewInOrder()
+        {
+            if (!IsEnabledNewInOrder()) 
+                return;
+            //string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(InOrder), InOrder.NoColumnName, InOrder.FormatNewNo, this);
+            //var inOrder = InOrder.NewACObject(DatabaseApp, null, secondaryKey);
+            //DatabaseApp.InOrder.AddObject(inOrder);
+            //ACSaveChanges();
+
+            if (!ACSaveChanges())
+                return;
+            ACComponent childBSO = ACUrlCommand("?BSOInOrder_Child") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("BSOInOrder_Child", null, new object[] { }) as ACComponent;
+            if (childBSO == null) return;
+            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewInOrder", SelectedPreparedMaterial.Material, InOrderQuantityUOM);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                InOrder inOrder = dlgResult.ReturnValue as InOrder;
+                if (inOrder != null)
+                {
+                    InOrderList.Add(inOrder);
+                    OnPropertyChanged(nameof(InOrderList));
+                    SelectedInOrder = inOrder;
+                }
+            }
+            if (childBSO != null)
+                childBSO.Stop();
+        }
+
+        public bool IsEnabledNewInOrder()
+        {
+            return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null && InOrderQuantityUOM > double.Epsilon;
+        }
+
+        [ACMethodCommand("SelectedInOrder", "en{'Delete purchase order'}de{'Lösche Bestellung'}", (short)821, true)]
+        public void DeleteInOrder()
+        {
+            if (!IsEnabledDeleteInOrder()) 
+                return;
+            InOrder inOrder = SelectedInOrder;
+            InOrderList.Remove(SelectedInOrder);
+            Msg msg = inOrder.DeleteACObject(DatabaseApp, true);
+            if (msg == null || msg.IsSucceded())
+            {
+                SelectedInOrder = InOrderList.FirstOrDefault();
+                OnPropertyChanged(nameof(InOrderList));
+            }
+            else
+            {
+                Messages.Msg(msg);
+            }
+        }
+        
+        public bool IsEnabledDeleteInOrder()
+        {
+            return SelectedInOrder != null && SelectedInOrder.MDInOrderState.InOrderState == MDInOrderState.InOrderStates.Created;
+        }
+
+        [ACMethodCommand("SelectedInOrderPos", "en{'Take over into purchase order'}de{'Übernehme in Bestellung'}", (short)822, true)]
+        public void NewInOrderPos()
+        {
+            VD.InOrderPos inOrderPos = VD.InOrderPos.NewACObject(DatabaseApp, SelectedInOrder);
+            inOrderPos.TargetQuantity = InOrderQuantityUOM;
+            VD.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedPreparedMaterial.MaterialNo);
+            inOrderPos.Material = material;
+            InOrderPosList.Add(inOrderPos);
+
+            // Update SelectedPreparedMaterial
+            SelectedPreparedMaterial.PickingPosQuantityUOM += inOrderPos.TargetQuantityUOM;
+            SelectedPreparedMaterial.MissingQuantityUOM = SelectedPreparedMaterial.TargetQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
+            _PreparedMaterialList = _PreparedMaterialList.ToList();
+
+            // Update SelectedTargetStorageBin
+            _SourceStorageBinList = _SourceStorageBinList.ToList();
+            _TargetStorageBinList = _TargetStorageBinList.ToList();
+
+            OnPropertyChanged(nameof(PreparedMaterialList));
+            OnPropertyChanged(nameof(SourceStorageBinList));
+            OnPropertyChanged(nameof(TargetStorageBinList));
+
+            OnPropertyChanged(nameof(InOrderPosList));
+        }
+
+        public bool IsEnabledNewInOrderPos()
+        {
+            return
+                SelectedInOrder != null
+                && InOrderQuantityUOM > 0
+                && SelectedPreparedMaterial != null
+                && SelectedPreparedMaterial.Material != null;
+        }
+
+        [ACMethodCommand("SelectedInOrderPos", "en{'Delete order lin'}de{'Lösche Bestellposition'}", (short)823, true)]
+        public void DeleteInOrderPos()
+        {
+            if (!IsEnabledDeleteInOrderPos()) return;
+            VD.InOrderPos inOrderPos = SelectedInOrderPos;
+            InOrderPosList.Remove(inOrderPos);
+            if (SelectedPreparedMaterial != null)
+            {
+                SelectedPreparedMaterial.PickingPosQuantityUOM -= inOrderPos.TargetQuantityUOM;
+                SelectedPreparedMaterial.MissingQuantityUOM = SelectedPreparedMaterial.TargetQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
+            }
+            _PreparedMaterialList = PreparedMaterialList.ToList();
+            OnPropertyChanged(nameof(PreparedMaterialList));
+            inOrderPos.DeleteACObject(DatabaseApp, false);
+            OnPropertyChanged(nameof(InOrderPosList));
+            SelectedInOrderPos = InOrderPosList.FirstOrDefault();
+            ACSaveChanges();
+        }
+
+        public bool IsEnabledDeleteInOrderPos()
+        {
+            return SelectedInOrderPos != null && SelectedPreparedMaterial != null;
+        }
+
+        [ACMethodInteraction("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 824, true, nameof(SelectedInOrder))]
+        public void ShowInOrder()
+        {
+            if (!IsEnabledShowInOrder())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(InOrder), SelectedInOrder.InOrderID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowInOrder()
+        {
+            return SelectedInOrder != null;
+        }
 
         #endregion
 
@@ -789,7 +1202,26 @@ namespace gip.bso.manufacturing
                     .DefaultIfEmpty()
                     .Sum(c => c);
 
-                preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM;
+                double inOrderQuantityUOM = 
+                    DatabaseApp
+                    .InOrder
+                    .Where(c => c.MDInOrderState.MDInOrderStateIndex <= (short)MDInOrderState.InOrderStates.InProcess)
+                    .SelectMany(c => c.InOrderPos_InOrder)
+                    .Where(c => c.MaterialID == materialID)
+                    .Select(c => c.TargetQuantityUOM)
+                    .DefaultIfEmpty()
+                    .Sum(c => c);
+
+                double prodOrderQuantityUOM =
+                    DatabaseApp
+                    .ProdOrderPartslist
+                    .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.InProduction)
+                    .Where(c => c.Partslist.MaterialID == materialID)
+                    .Select(c => c.TargetQuantity)
+                    .DefaultIfEmpty()
+                    .Sum(c => c);
+
+                preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM + inOrderQuantityUOM + prodOrderQuantityUOM;
 
                 preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
 
@@ -822,6 +1254,11 @@ namespace gip.bso.manufacturing
             {
                 SelectedSourceStorageBin = _SourceStorageBinList.OrderByDescending(c => c.SumTotal).FirstOrDefault();
             }
+
+            InOrderQuantityUOM = preparedMaterial.MissingQuantityUOM.HasValue ? preparedMaterial.MissingQuantityUOM.Value : preparedMaterial.TargetQuantityUOM;
+            ProdOrderPartslistQuantityUOM = preparedMaterial.MissingQuantityUOM.HasValue ? preparedMaterial.MissingQuantityUOM.Value : preparedMaterial.TargetQuantityUOM;
+            LoadInOrder();
+            LoadProdOrderPartslist();
 
             OnPropertyChanged(nameof(SourceStorageBinList));
             OnPropertyChanged(nameof(TargetStorageBinList));
@@ -953,6 +1390,7 @@ namespace gip.bso.manufacturing
             return list;
         }
 
+        #region Pickings
         private void LoadPickings(MDPickingType mdPickingType)
         {
             SelectedPicking = null;
@@ -993,6 +1431,96 @@ namespace gip.bso.manufacturing
             SelectedPickingPos = _PickingPosList.FirstOrDefault();
             OnPropertyChanged(nameof(PickingPosList));
         }
+        #endregion
+
+        #region InOrder
+        private void LoadInOrder()
+        {
+            SelectedInOrder = null;
+            _InOrderList = null;
+            if (SelectedPreparedMaterial != null)
+            {
+                Guid materialID = SelectedPreparedMaterial.Material.MaterialID;
+                _InOrderList = DatabaseApp
+                                .InOrderPos.Where(c => c.InOrder.MDInOrderState.MDInOrderStateIndex <= (short)MDInOrderState.InOrderStates.InProcess
+                                                    && c.MaterialID == materialID)
+                                .Select(c => c.InOrder)
+                                .OrderByDescending(c => c.InsertDate)
+                                .ToList();
+            }
+            else
+            {
+                _InOrderList = new List<InOrder>();
+            }
+            _SelectedInOrder = _InOrderList.FirstOrDefault();
+            OnPropertyChanged(nameof(SelectedInOrder));
+            OnPropertyChanged(nameof(InOrderList));
+            LoadInOrderPositions();
+        }
+
+        private void LoadInOrderPositions()
+        {
+            SelectedInOrderPos = null;
+            _InOrderPosList = null;
+            if (SelectedInOrder != null)
+            {
+                Guid inOrderID = SelectedInOrder.InOrderID;
+                if (SelectedPreparedMaterial != null)
+                {
+                    Guid materialID = SelectedPreparedMaterial.Material.MaterialID;
+                    _InOrderPosList = DatabaseApp
+                       .InOrderPos
+                       .Where(c => c.InOrderID == inOrderID
+                                && (ShowAllInOrderLines || c.MaterialID == materialID)
+                        )
+                       .OrderByDescending(c => c.Sequence)
+                       .ToList();
+                }
+                else
+                {
+                    _InOrderPosList = DatabaseApp
+                       .InOrderPos
+                       .Where(c => c.InOrderID == inOrderID)
+                       .OrderByDescending(c => c.Sequence)
+                       .ToList();
+
+                }
+            }
+            else
+            {
+                _InOrderPosList = new List<InOrderPos>();
+            }
+            SelectedInOrderPos = _InOrderPosList.FirstOrDefault();
+            OnPropertyChanged(nameof(InOrderPosList));
+        }
+        #endregion
+
+
+        #region ProdOrderPartslist
+        private void LoadProdOrderPartslist()
+        {
+            SelectedProdOrderPartslist = null;
+            _ProdOrderPartslistList = null;
+            if (SelectedPreparedMaterial != null)
+            {
+                Guid materialID = SelectedPreparedMaterial.Material.MaterialID;
+                _ProdOrderPartslistList = DatabaseApp
+                            .ProdOrderPartslist
+                            .Where(c =>    c.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.InProduction
+                                        && c.Partslist.MaterialID == materialID)
+                            .OrderByDescending(c => c.InsertDate)
+                            .ToList();
+            }
+            else
+            {
+                _ProdOrderPartslistList = new List<ProdOrderPartslist>();
+            }
+            _SelectedProdOrderPartslist = _ProdOrderPartslistList.FirstOrDefault();
+            OnPropertyChanged(nameof(SelectedProdOrderPartslist));
+            OnPropertyChanged(nameof(ProdOrderPartslistList));
+        }
+
+        #endregion
 
         #endregion
 
