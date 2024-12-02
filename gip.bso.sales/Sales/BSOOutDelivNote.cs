@@ -1639,7 +1639,8 @@ namespace gip.bso.sales
                 return;
             if (Root.Messages.Question(this, "Question50114", Global.MsgResult.Yes, false, CurrentDeliveryNote.DeliveryNoteNo) == Global.MsgResult.Yes)
             {
-                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
+                List<Invoice> invoices = new List<Invoice>();
+                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote, ref invoices);
                 if (msg != null)
                     Messages.Msg(msg);
             }
@@ -1652,6 +1653,24 @@ namespace gip.bso.sales
                 && OutDeliveryNoteManager != null
                 && !CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null)
                 && !CurrentDeliveryNote
+                    .DeliveryNotePos_DeliveryNote
+                    .Select(c => c.OutOrderPos.OutOrder)
+                    .SelectMany(c => c.OutOrderPos_OutOrder)
+                    .SelectMany(c => c.InvoicePos_OutOrderPos)
+                    .Any();
+        }
+
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Show Invoice'}de{'Rechnung anzeigen'}", (short)MISort.Cancel)]
+        public void ShowInvoice()
+        {
+        }
+
+        public bool IsEnabledShowInvoice()
+        {
+            return CurrentDeliveryNote != null
+                && OutDeliveryNoteManager != null
+                && CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null)
+                && CurrentDeliveryNote
                     .DeliveryNotePos_DeliveryNote
                     .Select(c => c.OutOrderPos.OutOrder)
                     .SelectMany(c => c.OutOrderPos_OutOrder)

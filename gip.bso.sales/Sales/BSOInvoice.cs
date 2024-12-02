@@ -1958,6 +1958,49 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Dialog
+        [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(string invoiceNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "InvoiceNo").FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, "InvoiceNo", Global.LogicalOperators.contains, Global.Operators.and, invoiceNo, false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = invoiceNo;
+
+            this.Search();
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+        [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            Invoice invoice = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == Invoice.ClassName)
+                {
+                    invoice = this.DatabaseApp.Invoice
+                        .Where(c => c.InvoiceID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+            }
+
+            if (invoice == null)
+                return;
+
+            ShowDialogOrder(invoice.InvoiceNo);
+        }
+        #endregion
 
         #region Execute-Helper-Handlers
 
@@ -1966,61 +2009,61 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "AssignContractPos":
+                case nameof(AssignContractPos):
                     AssignContractPos();
                     return true;
-                case "IsEnabledAssignContractPos":
+                case nameof(IsEnabledAssignContractPos):
                     result = IsEnabledAssignContractPos();
                     return true;
-                case "UnAssignContractPos":
+                case nameof(UnAssignContractPos):
                     UnAssignContractPos();
                     return true;
-                case "IsEnabledUnAssignContractPos":
+                case nameof(IsEnabledUnAssignContractPos):
                     result = IsEnabledUnAssignContractPos();
                     return true;
-                case "RefreshOpenContractPosList":
+                case nameof(RefreshOpenContractPosList):
                     RefreshOpenContractPosList();
                     return true;
-                case "FilterDialogContractPos":
+                case nameof(FilterDialogContractPos):
                     FilterDialogContractPos();
                     return true;
-                case "UpdateExchangeRate":
+                case nameof(UpdateExchangeRate):
                     UpdateExchangeRate();
                     return true;
-                case "IsEnabledUpdateExchangeRate":
+                case nameof(IsEnabledUpdateExchangeRate):
                     result = IsEnabledUpdateExchangeRate();
                     return true;
                 case nameof(AssignAlternativeCurrency):
@@ -2034,6 +2077,12 @@ namespace gip.bso.sales
                     return true;
                 case nameof(DialogAssignAlternativeCurrencyCancel):
                     DialogAssignAlternativeCurrencyCancel();
+                    return true;
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((String)acParameter[0]);
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

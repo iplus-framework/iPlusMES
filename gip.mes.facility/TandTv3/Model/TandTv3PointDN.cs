@@ -64,7 +64,8 @@ namespace gip.mes.facility
                        OutOrderNo = c.OutOrder.OutOrderNo,
                        MaterialNo = c.Material.MaterialNo,
                        MaterialName = c.Material.MaterialName1,
-                       TargetQuantity = c.TargetQuantity
+                       TargetQuantity = c.TargetQuantity,
+                       ID = c.OutOrderPosID
                    })
                    .GroupBy(c => new { c.OutOrderNo, c.MaterialNo, c.MaterialName })
                    .ToList()
@@ -74,7 +75,7 @@ namespace gip.mes.facility
                        MaterialNo = c.Key.MaterialNo,
                        MaterialName = c.Key.MaterialName,
                        TargetQuantity = c.Sum(x => x.TargetQuantity),
-                       ID = Guid.NewGuid()
+                       ID = c.Select(x => x.ID).FirstOrDefault()
                    })
                    .ToList();
 
@@ -91,7 +92,8 @@ namespace gip.mes.facility
                             PickingNo = c.Picking.PickingNo,
                             MaterialNo = c.Material.MaterialNo,
                             MaterialName = c.Material.MaterialName1,
-                            TargetQuantity = c.TargetQuantityUOM
+                            TargetQuantity = c.TargetQuantityUOM,
+                            ID = c.PickingPosID
                         })
                     .GroupBy(c => new { c.PickingNo, c.MaterialNo, c.MaterialName })
                     .ToList()
@@ -101,7 +103,7 @@ namespace gip.mes.facility
                         MaterialNo = c.Key.MaterialNo,
                         MaterialName = c.Key.MaterialName,
                         TargetQuantity = c.Sum(x => x.TargetQuantity),
-                        ID = Guid.NewGuid()
+                        ID = c.Select(x => x.ID).FirstOrDefault()
                     })
                     .ToList();
             }
