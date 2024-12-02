@@ -2148,7 +2148,7 @@ namespace gip.bso.purchasing
                     ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
                     return true;
                 case nameof(ShowDialogNewInOrder):
-                    ShowDialogNewInOrder(acParameter.Count() >= 1 ? (Material)acParameter[0] : null, acParameter.Count() >= 2 ? (double?)acParameter[1] : null);
+                    result = ShowDialogNewInOrder(acParameter.Count() >= 1 ? (Material)acParameter[0] : null, acParameter.Count() >= 2 ? (double?)acParameter[1] : null);
                     return true;
                 case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);

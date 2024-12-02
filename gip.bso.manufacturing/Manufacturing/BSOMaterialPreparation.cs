@@ -949,7 +949,7 @@ namespace gip.bso.manufacturing
                 childBSO = StartComponent("BSOInOrder_Child", null, new object[] { }) as ACComponent;
             if (childBSO == null) return;
             VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewInOrder", SelectedPreparedMaterial.Material, InOrderQuantityUOM);
-            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            if (dlgResult != null && dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 InOrder inOrder = dlgResult.ReturnValue as InOrder;
                 if (inOrder != null)

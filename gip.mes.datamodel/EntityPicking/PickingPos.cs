@@ -256,21 +256,21 @@ namespace gip.mes.datamodel
                 }
                 else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                 {
-                    var pickingPos = this.PickingPosProdOrderPartslistPos_PickingPos.FirstOrDefault();
-                    if (pickingPos == null)
-                    {
-                        ProdOrderPartslistPos pos = pickingPos.ProdorderPartslistPos;
-                        if (pos != null)
-                        {
-                            pos.MDUnit = value;
-                            if (pos.MDUnit != null)
-                            {
-                                pos.TargetQuantity = pos.Material.ConvertQuantity(pos.TargetQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
-                                pos.ActualQuantity = pos.Material.ConvertQuantity(pos.ActualQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
-                                pos.CalledUpQuantity = pos.Material.ConvertQuantity(pos.CalledUpQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
-                            }
-                        }
-                    }
+                    //var pickingPos = this.PickingPosProdOrderPartslistPos_PickingPos.FirstOrDefault();
+                    //if (pickingPos == null)
+                    //{
+                    //    ProdOrderPartslistPos pos = pickingPos.ProdorderPartslistPos;
+                    //    if (pos != null)
+                    //    {
+                    //        pos.MDUnit = value;
+                    //        if (pos.MDUnit != null)
+                    //        {
+                    //            pos.TargetQuantity = pos.Material.ConvertQuantity(pos.TargetQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                    //            pos.ActualQuantity = pos.Material.ConvertQuantity(pos.ActualQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                    //            pos.CalledUpQuantity = pos.Material.ConvertQuantity(pos.CalledUpQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                    //        }
+                    //    }
+                    //}
                 }
                 else if (this.PickingMaterial != null)
                 {
@@ -366,8 +366,8 @@ namespace gip.mes.datamodel
                     return InOrderPos.ActualQuantity;
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.ActualQuantity;
-                else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
-                    return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantity);
+                //else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                //    return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantity);
                 else if (PickingActualUOM.HasValue)
                     return PickingActualUOM.Value;
                 return 0;
@@ -383,8 +383,8 @@ namespace gip.mes.datamodel
                     return InOrderPos.ActualQuantityUOM;
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.ActualQuantityUOM;
-                else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
-                    return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantityUOM);
+                //else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                //    return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantityUOM);
                 else if (PickingActualUOM.HasValue)
                     return PickingActualUOM.Value;
                 return 0;
