@@ -1990,6 +1990,32 @@ namespace gip.bso.sales
             return facilityNo;
         }
 
+        [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true)]
+        public void ShowPickingOrder()
+        {
+            if (!CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
+                return;
+
+            OutOrderPos outOrderPos = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Select(c => c.OutOrderPos).Where(c => c.OutOrderPos_ParentOutOrderPos.Any()).FirstOrDefault();
+            Picking picking = outOrderPos?.OutOrderPos_ParentOutOrderPos.FirstOrDefault()?.PickingPos_OutOrderPos.FirstOrDefault()?.Picking;
+
+            if (picking == null)
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Picking), picking.PickingID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowPickingOrder()
+        {
+            return CurrentDeliveryNote != null;
+        }
+
         #endregion
 
         #region OutOrderPos
@@ -2722,6 +2748,12 @@ namespace gip.bso.sales
                     return true;
                 case nameof(IsEnabledCreateOrUpdatePicking):
                     result = IsEnabledCreateOrUpdatePicking();
+                    return true;
+                case nameof(ShowPickingOrder):
+                    ShowPickingOrder();
+                    return true;
+                case nameof(IsEnabledShowPickingOrder):
+                    result = IsEnabledShowPickingOrder();
                     return true;
                 default:
                     break;
