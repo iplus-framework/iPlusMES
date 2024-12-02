@@ -2730,6 +2730,12 @@ namespace gip.bso.sales
                 case nameof(IsEnabledCreateOrUpdatePicking):
                     result = IsEnabledCreateOrUpdatePicking();
                     return true;
+                case nameof(ShowPickingOrder):
+                    ShowPickingOrder();
+                    return true;
+                case nameof(IsEnabledShowPickingOrder):
+                    result = IsEnabledShowPickingOrder();
+                    return true;
                 default:
                     break;
             }
