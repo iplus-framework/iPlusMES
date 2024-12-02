@@ -2000,6 +2000,23 @@ namespace gip.bso.sales
 
             ShowDialogOrder(invoice.InvoiceNo);
         }
+
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        public void DialogOK()
+        {
+            //DialogResult = new VBDialogResult();
+            //DialogResult.SelectedCommand = eMsgButton.OK;
+            //DialogResult.ReturnValue = CurrentDeliveryNote;
+            CloseTopDialog();
+        }
+
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        public void DialogCancel()
+        {
+            //DialogResult = new VBDialogResult();
+            //DialogResult.SelectedCommand = eMsgButton.Cancel;
+            CloseTopDialog();
+        }
         #endregion
 
         #region Execute-Helper-Handlers
@@ -2083,6 +2100,12 @@ namespace gip.bso.sales
                     return true;
                 case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

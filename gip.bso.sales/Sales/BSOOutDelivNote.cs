@@ -1663,13 +1663,33 @@ namespace gip.bso.sales
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Show Invoice'}de{'Rechnung anzeigen'}", (short)MISort.Cancel)]
         public void ShowInvoice()
         {
+            if (!IsEnabledShowInvoice())
+                return;
+
+            InvoicePos invoicePos = 
+                CurrentDeliveryNote
+                    .DeliveryNotePos_DeliveryNote
+                    .Select(c => c.OutOrderPos.OutOrder)
+                    .SelectMany(c => c.OutOrderPos_OutOrder)
+                    .SelectMany(c => c.InvoicePos_OutOrderPos)
+                    .FirstOrDefault();
+            if (invoicePos == null)
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Invoice), invoicePos.InvoiceID));
+                service.ShowDialogOrder(this, info);
+            }
         }
 
         public bool IsEnabledShowInvoice()
         {
             return CurrentDeliveryNote != null
                 && OutDeliveryNoteManager != null
-                && CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null)
+                && !CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null)
                 && CurrentDeliveryNote
                     .DeliveryNotePos_DeliveryNote
                     .Select(c => c.OutOrderPos.OutOrder)
