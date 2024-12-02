@@ -2404,6 +2404,32 @@ namespace gip.bso.purchasing
             return facilityNo;
         }
 
+        [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true)]
+        public void ShowPickingOrder()
+        {
+            if (!CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
+                return;
+
+            InOrderPos inOrderPos = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Select(c => c.InOrderPos).Where(c => c.InOrderPos_ParentInOrderPos.Any()).FirstOrDefault();
+            Picking picking = inOrderPos?.InOrderPos_ParentInOrderPos.FirstOrDefault()?.PickingPos_InOrderPos.FirstOrDefault()?.Picking;
+
+            if (picking == null)
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Picking), picking.PickingID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowPickingOrder()
+        {
+            return CurrentDeliveryNote != null;
+        }
+
         #endregion
 
         #region InOrderPos
