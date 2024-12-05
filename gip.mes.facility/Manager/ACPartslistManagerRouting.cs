@@ -1946,16 +1946,24 @@ namespace gip.mes.facility
             {
                 QrySilosResult.FacilitySumByLots oldestSilo = possibleSilos.FilteredResult.FirstOrDefault();
                 if (oldestSilo == null)
+                {
+                    possibleSilos = allSilos;
                     return null;
+                }
                 if (!oldestSilo.StorageBin.VBiFacilityACClassID.HasValue)
+                {
+                    possibleSilos = allSilos;
                     return null;
+                }
                 var oldestSiloClass = oldestSilo.StorageBin.GetFacilityACClass(dbIPlus);
-
                 routingParameters.DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.StorageBin.VBiFacilityACClassID == c.ACClassID;
 
                 result = ACRoutingService.SelectRoutes(scaleACClass, oldestSiloClass, routingParameters);
                 if (result.Routes == null || !result.Routes.Any())
+                {
+                    possibleSilos = allSilos;
                     return null;
+                }
             }
             else
             {
@@ -1968,8 +1976,13 @@ namespace gip.mes.facility
                 result = ACRoutingService.SelectRoutes(scaleACClass, possibleSilosACUrl, routingParameters);
 
                 if (result.Routes == null || !result.Routes.Any())
+                {
+                    possibleSilos = allSilos;
                     return null;
+                }
             }
+
+            possibleSilos = allSilos;
             return result.Routes;
         }
         #endregion
