@@ -413,7 +413,7 @@ namespace gip.bso.purchasing
                 OnPropertyChanged("DeliveryCompanyAddressList");
                 OnPropertyChanged("DistributorCompanyList");
                 OnPropertyChanged("ContractualCompanyList");
-
+                OnCurrentInOrderChanged();
                 ResetAccessTenantCompanyFilter(value);
             }
         }
@@ -1225,6 +1225,11 @@ namespace gip.bso.purchasing
             AccessTenantCompany.NavSearch();
         }
 
+        public virtual void OnCurrentInOrderChanged()
+        {
+
+        }
+
         public void ResetAccessTenantCompanyFilter(InOrder inOrder)
         {
             ResetAccessTenantCompanyFilter();
@@ -1551,7 +1556,7 @@ namespace gip.bso.purchasing
         /// Loads this instance.
         /// </summary>
         [ACMethodInteraction(InOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
-        public void Load(bool requery = false)
+        public virtual void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
                 return;
