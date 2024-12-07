@@ -7,9 +7,6 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
 using static gip.mes.facility.ACPartslistManager.QrySilosResult;
-using DocumentFormat.OpenXml.Vml.Office;
-using DocumentFormat.OpenXml.Drawing;
-
 
 namespace gip.mes.processapplication
 {
