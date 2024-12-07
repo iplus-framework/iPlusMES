@@ -201,6 +201,7 @@
     <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest2.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\PartslistConfigExtract.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\WizardPlanStatusEnum.cs" />
     <Compile Include="Model\WizardSchedulerPartslist\WizardSchedulerPartslist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stackbooking\ACStackCalculatorBase.cs" />

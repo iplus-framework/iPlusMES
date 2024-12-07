@@ -52,7 +52,7 @@ namespace gip.bso.purchasing
     [ACClassConstructorInfo(
        new object[]
        {
-            new object[] { "DelivNoteStateIndex", Global.ParamOption.Optional, typeof(short) } 
+            new object[] { "DelivNoteStateIndex", Global.ParamOption.Optional, typeof(short) }
        }
        )
     ]
@@ -595,7 +595,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (SelectedFilterDelivNoteState == null) 
+                if (SelectedFilterDelivNoteState == null)
                     return null;
                 return (gip.mes.datamodel.MDDelivNoteState.DelivNoteStates)Enum.Parse(typeof(gip.mes.datamodel.MDDelivNoteState.DelivNoteStates), SelectedFilterDelivNoteState.Value.ToString());
             }
@@ -1569,7 +1569,6 @@ namespace gip.bso.purchasing
 
         #endregion
 
-
         #region FacilityBooking
         FacilityBooking _CurrentFacilityBooking;
         [ACPropertyCurrent(632, FacilityBooking.ClassName)]
@@ -2081,6 +2080,27 @@ namespace gip.bso.purchasing
             return true;
         }
 
+
+        /// <summary>
+        /// Source Property: CompleteInDeliveryNote
+        /// </summary>
+        [ACMethodCommand(nameof(CompleteInDeliveryNote), "en{'Finish'}de{'Beenden'}", 501)]
+        public virtual void CompleteInDeliveryNote()
+        {
+            if (!IsEnabledCompleteInDeliveryNote())
+                return;
+            InDeliveryNoteManager.CompleteInDeliveryNote(DatabaseApp, CurrentDeliveryNote);
+            ACSaveChanges();
+        }
+
+        public bool IsEnabledCompleteInDeliveryNote()
+        {
+            return CurrentDeliveryNote != null
+                && CurrentDeliveryNote.MDDelivNoteState != null
+                && CurrentDeliveryNote.MDDelivNoteState.MDDelivNoteStateIndex < (short)MDDelivNoteState.DelivNoteStates.Completed;
+        }
+
+
         #endregion
 
         #endregion
@@ -2383,8 +2403,8 @@ namespace gip.bso.purchasing
         {
             string facilityNo = null;
 
-            Picking oldPicking = dbApp.Picking.Where(c => c.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
-                                                       && c.PickingStateIndex >= (short)PickingStateEnum.Finished 
+            Picking oldPicking = dbApp.Picking.Where(c => c.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
+                                                       && c.PickingStateIndex >= (short)PickingStateEnum.Finished
                                                        && c.PickingPos_Picking.Any(x => x.ToFacilityID.HasValue)).FirstOrDefault();
 
             if (oldPicking != null)

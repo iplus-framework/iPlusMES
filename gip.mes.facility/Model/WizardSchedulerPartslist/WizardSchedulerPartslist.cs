@@ -30,7 +30,8 @@ namespace gip.mes.facility
         #endregion
 
         #region ctor's
-        private WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager, double roundingQuantity)
+        private WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, 
+            ConfigManagerIPlus configManager, double roundingQuantity)
         {
             DatabaseApp = databaseApp;
             ProdOrderManager = prodOrderManager;
@@ -104,6 +105,8 @@ namespace gip.mes.facility
 
                     MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
                     SelectedBatchPlanGroup = gr;
+
+                    LoadAlreadyPlannedBatchPlans(prodOrderPartslist, bp);
                 }
 
                 ProdOrderPartslistPos = finalMix;
@@ -122,6 +125,7 @@ namespace gip.mes.facility
             // for now only check if exist any defined param
             IsRequiredParamsSolved = prodOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any();
         }
+
         #endregion
 
         #region Properties
@@ -196,6 +200,22 @@ namespace gip.mes.facility
                 _IsSolved = value;
             }
         }
+
+        private string _AlreadyPlannedBatchPlans { get; set; }
+        [ACPropertyInfo(102, nameof(AlreadyPlannedBatchPlans), "en{'Batch planned'}de{'Charge geplant'}")]
+        public string AlreadyPlannedBatchPlans
+        {
+            get
+            {
+                return _AlreadyPlannedBatchPlans;
+            }
+            set
+            {
+                _AlreadyPlannedBatchPlans = value;
+            }
+        }
+
+        public WizardPlanStatusEnum WizardPlanStatus { get; set; }
 
         private bool _HasRequiredParams { get; set; }
         [ACPropertyInfo(104, nameof(HasRequiredParams), "en{'Has requiered params'}de{'Hat erforderliche Parameter'}")]
@@ -1071,6 +1091,20 @@ namespace gip.mes.facility
             }
 
             return selectedGroup;
+        }
+
+        private void LoadAlreadyPlannedBatchPlans(ProdOrderPartslist prodOrderPartslist, ProdOrderBatchPlan bp)
+        {
+            AlreadyPlannedBatchPlans = $"{bp.BatchTargetCount} x {bp.BatchSize.ToString("#0.00")}";
+            WizardPlanStatus = WizardPlanStatusEnum.Partial;
+            if(prodOrderPartslist.TargetQuantity > 0)
+            {
+                double diff = Math.Abs(prodOrderPartslist.TargetQuantity - (bp.BatchSize * bp.BatchTargetCount));
+                if ((diff / prodOrderPartslist.TargetQuantity) < 0.05)
+                {
+                    WizardPlanStatus = WizardPlanStatusEnum.Full;
+                }
+            }
         }
         #endregion
 
