@@ -42,10 +42,6 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
 
-            _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
-            if (_VarioConfigManager == null)
-                throw new Exception("VarioConfigManager not configured");
-
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
@@ -60,7 +56,13 @@ namespace gip.bso.manufacturing
 
             MediaController = ACMediaController.GetServiceInstance(this);
 
+            _ConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
+            if (_ConfigManager == null)
+                throw new Exception("ConfigManager not configured");
+
             _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
+            if (_RoutingService == null)
+                throw new Exception("ACRoutingService not configured");
 
             return true;
         }
@@ -68,9 +70,6 @@ namespace gip.bso.manufacturing
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             var b = base.ACDeInit(deleteACClassTask);
-
-            ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
-            _RoutingService = null;
 
             if (_ACFacilityManager != null)
                 FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
@@ -88,8 +87,13 @@ namespace gip.bso.manufacturing
 
             MediaController = null;
 
-            ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
+            if (_RoutingService != null)
+                ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
             _RoutingService = null;
+
+            if (_ConfigManager != null)
+                ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _ConfigManager);
+            _ConfigManager = null;
 
             return b;
         }
@@ -243,14 +247,14 @@ namespace gip.bso.manufacturing
             }
         }
 
-        protected ACRef<ConfigManagerIPlus> _VarioConfigManager = null;
-        public ConfigManagerIPlus VarioConfigManager
+        protected ACRef<ConfigManagerIPlus> _ConfigManager = null;
+        public ConfigManagerIPlus ConfigManager
         {
             get
             {
-                if (_VarioConfigManager == null)
+                if (_ConfigManager == null)
                     return null;
-                return _VarioConfigManager.ValueT;
+                return _ConfigManager.ValueT;
             }
         }
 
@@ -1131,10 +1135,48 @@ namespace gip.bso.manufacturing
                 ResultMode = RouteResultMode.ShortRoute
             };
             MaterialPreparationResult materialPreparationResult =
-                ACFacilityManager.GetMaterialPreparationModel(DatabaseApp.ContextIPlus, DatabaseApp, MediaController, VarioConfigManager, routingParameters, selectedBatchPlans);
+                ACFacilityManager.GetMaterialPreparationModel(DatabaseApp.ContextIPlus, DatabaseApp, MediaController, ConfigManager, routingParameters, selectedBatchPlans);
             return materialPreparationResult.PreparedMaterials;
         }
 
+
+        //private void GetPositionsForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
+        //{
+        //    foreach (ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+        //    {
+        //        if (prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot)
+        //        {
+        //            SearchBatchMaterialModel searchBatchMaterialModel = GetRelationForBatchMaterialModel(batchPlan, prodOrderPartslistPosRelation, posTargetQuantityUOM);
+        //            searchResult.Add(searchBatchMaterialModel);
+        //        }
+        //        else
+        //        {
+        //            double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
+        //            double subPosTargetQuantity = posTargetQuantityUOM * factor;
+        //            GetPositionsForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
+        //        }
+        //    }
+        //}
+
+        //private SearchBatchMaterialModel GetRelationForBatchMaterialModel(ProdOrderBatchPlan batchPlan, ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
+        //{
+        //    SearchBatchMaterialModel searchBatchMaterialModel = new SearchBatchMaterialModel();
+        //    searchBatchMaterialModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
+        //    searchBatchMaterialModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
+        //    searchBatchMaterialModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
+        //    searchBatchMaterialModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
+
+        //    if (batchPlan.VBiACClassWF != null && batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
+        //    {
+        //        searchBatchMaterialModel.MDSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroupID).FirstOrDefault();
+        //    }
+        //    //if (posTargetQuantityUOM  > Double.Epsilon)
+        //    //{
+        //    //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
+        //    //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
+        //    //}
+        //    return searchBatchMaterialModel;
+        //}
 
         #endregion
 
@@ -1151,89 +1193,89 @@ namespace gip.bso.manufacturing
             SelectedPreparedMaterial = _PreparedMaterialList.FirstOrDefault();
         }
 
-        public List<PreparedMaterial> GetPreparedMaterials(List<SearchBatchMaterialModel> researchedFacilities)
+        //public List<PreparedMaterial> GetPreparedMaterials(List<SearchBatchMaterialModel> researchedFacilities)
+        //{
+        //    List<PreparedMaterial> preparedMaterials = new List<PreparedMaterial>();
+        //    var queryResearchedFacilities = researchedFacilities.GroupBy(c => c.MaterialID);
+        //    Guid[] materialIDs = queryResearchedFacilities.Select(c => c.Key).ToArray();
+        //    List<VD.Material> materials = DatabaseApp.Material.Where(c => materialIDs.Contains(c.MaterialID)).ToList();
+        //    int nr = 0;
+        //    foreach (var item in queryResearchedFacilities)
+        //    {
+        //        Guid materialID = item.Key;
+        //        Material material = materials.FirstOrDefault(c => c.MaterialID == materialID);
+        //        MediaController.LoadIImageInfo(material);
+        //        Guid[] posIDs = item.Select(c => c.SourcePosID).Distinct().ToArray();
+        //        nr++;
+        //        PreparedMaterial preparedMaterial = new PreparedMaterial() { Sn = nr, PickingRelationType = PickingRelationTypeEnum.ProductionLine };
+        //        preparedMaterial.Material = material;
+        //        preparedMaterial.MaterialNo = material.MaterialNo;
+        //        preparedMaterial.MaterialName = material.MaterialName1;
+
+        //        preparedMaterial.DefaultThumbImage = material.DefaultThumbImage;
+        //        preparedMaterial.TargetQuantityUOM = item.Sum(x => x.TargetQuantityUOM);
+        //        preparedMaterial.RelatedIDs = item.Select(c => c.SourcePosID).Distinct().ToArray();
+
+        //        double availableQuantity =
+        //            DatabaseApp
+        //            .FacilityCharge
+        //            .Where(c =>
+        //                !c.NotAvailable
+        //                && c.MaterialID == materialID
+        //               )
+        //            .Select(c => c.StockQuantityUOM)
+        //            .DefaultIfEmpty()
+        //            .Sum(c => c);
+        //        preparedMaterial.AvailableQuantityUOM = availableQuantity;
+
+        //        double pickingPosQuantityUOM =
+        //            DatabaseApp
+        //            .Picking
+        //            .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished)
+        //            .SelectMany(c => c.PickingPos_Picking)
+        //            .Where(c => c.PickingMaterialID == materialID && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x => posIDs.Contains(x.ProdorderPartslistPosID)))
+        //            .Select(c => c.PickingQuantityUOM ?? 0)
+        //            .DefaultIfEmpty()
+        //            .Sum(c => c);
+
+        //        double inOrderQuantityUOM = 
+        //            DatabaseApp
+        //            .InOrder
+        //            .Where(c => c.MDInOrderState.MDInOrderStateIndex <= (short)MDInOrderState.InOrderStates.InProcess)
+        //            .SelectMany(c => c.InOrderPos_InOrder)
+        //            .Where(c => c.MaterialID == materialID)
+        //            .Select(c => c.TargetQuantityUOM)
+        //            .DefaultIfEmpty()
+        //            .Sum(c => c);
+
+        //        double prodOrderQuantityUOM =
+        //            DatabaseApp
+        //            .ProdOrderPartslist
+        //            .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.InProduction)
+        //            .Where(c => c.Partslist.MaterialID == materialID)
+        //            .Select(c => c.TargetQuantity)
+        //            .DefaultIfEmpty()
+        //            .Sum(c => c);
+
+        //        preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM + inOrderQuantityUOM + prodOrderQuantityUOM;
+
+        //        preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
+
+        //        preparedMaterial.MDSchedulingGroupIDs =
+        //            item
+        //            .Where(c => c.MDSchedulingGroupID != null)
+        //            .Select(c => c.MDSchedulingGroupID ?? Guid.Empty)
+        //            .Distinct()
+        //            .ToArray();
+
+        //        preparedMaterials.Add(preparedMaterial);
+        //    }
+        //    return preparedMaterials;
+        //}
+
+        private void LoadPreparedMaterial(MaterialPreparationModel preparedMaterial)
         {
-            List<PreparedMaterial> preparedMaterials = new List<PreparedMaterial>();
-            var queryResearchedFacilities = researchedFacilities.GroupBy(c => c.MaterialID);
-            Guid[] materialIDs = queryResearchedFacilities.Select(c => c.Key).ToArray();
-            List<VD.Material> materials = DatabaseApp.Material.Where(c => materialIDs.Contains(c.MaterialID)).ToList();
-            int nr = 0;
-            foreach (var item in queryResearchedFacilities)
-            {
-                Guid materialID = item.Key;
-                Material material = materials.FirstOrDefault(c => c.MaterialID == materialID);
-                MediaController.LoadIImageInfo(material);
-                Guid[] posIDs = item.Select(c => c.SourcePosID).Distinct().ToArray();
-                nr++;
-                PreparedMaterial preparedMaterial = new PreparedMaterial() { Sn = nr, PickingRelationType = PickingRelationTypeEnum.ProductionLine };
-                preparedMaterial.Material = material;
-                preparedMaterial.MaterialNo = material.MaterialNo;
-                preparedMaterial.MaterialName = material.MaterialName1;
-
-                preparedMaterial.DefaultThumbImage = material.DefaultThumbImage;
-                preparedMaterial.TargetQuantityUOM = item.Sum(x => x.TargetQuantityUOM);
-                preparedMaterial.RelatedIDs = item.Select(c => c.SourcePosID).Distinct().ToArray();
-
-                double availableQuantity =
-                    DatabaseApp
-                    .FacilityCharge
-                    .Where(c =>
-                        !c.NotAvailable
-                        && c.MaterialID == materialID
-                       )
-                    .Select(c => c.StockQuantityUOM)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-                preparedMaterial.AvailableQuantityUOM = availableQuantity;
-
-                double pickingPosQuantityUOM =
-                    DatabaseApp
-                    .Picking
-                    .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished)
-                    .SelectMany(c => c.PickingPos_Picking)
-                    .Where(c => c.PickingMaterialID == materialID && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x => posIDs.Contains(x.ProdorderPartslistPosID)))
-                    .Select(c => c.PickingQuantityUOM ?? 0)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-
-                double inOrderQuantityUOM = 
-                    DatabaseApp
-                    .InOrder
-                    .Where(c => c.MDInOrderState.MDInOrderStateIndex <= (short)MDInOrderState.InOrderStates.InProcess)
-                    .SelectMany(c => c.InOrderPos_InOrder)
-                    .Where(c => c.MaterialID == materialID)
-                    .Select(c => c.TargetQuantityUOM)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-
-                double prodOrderQuantityUOM =
-                    DatabaseApp
-                    .ProdOrderPartslist
-                    .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.InProduction)
-                    .Where(c => c.Partslist.MaterialID == materialID)
-                    .Select(c => c.TargetQuantity)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-
-                preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM + inOrderQuantityUOM + prodOrderQuantityUOM;
-
-                preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
-
-                preparedMaterial.MDSchedulingGroupIDs =
-                    item
-                    .Where(c => c.MDSchedulingGroupID != null)
-                    .Select(c => c.MDSchedulingGroupID ?? Guid.Empty)
-                    .Distinct()
-                    .ToArray();
-
-                preparedMaterials.Add(preparedMaterial);
-            }
-            return preparedMaterials;
-        }
-
-        private void LoadPreparedMaterial(PreparedMaterial preparedMaterial)
-        {
-            _TargetStorageBinList = LoadTargetStorageBins(preparedMaterial);
+            _TargetStorageBinList = ACFacilityManager.LoadTargetStorageBins(DatabaseApp, preparedMaterial);
             if (_TargetStorageBinList != null && _TargetStorageBinList.Any())
             {
                 SelectedTargetStorageBin = _TargetStorageBinList.Where(c => c.MDPickingType != null).FirstOrDefault();
@@ -1243,7 +1285,8 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            _SourceStorageBinList = LoadSourceStorageBins(preparedMaterial);
+            string[] targetsNotShownAsSource = TargetStorageBinList.Where(c => c.MDPickingType != null).Select(c => c.FacilityNo).ToArray();
+            _SourceStorageBinList = ACFacilityManager.LoadSourceStorageBins(DatabaseApp, preparedMaterial, targetsNotShownAsSource);
             if (_SourceStorageBinList != null && _SourceStorageBinList.Any())
             {
                 SelectedSourceStorageBin = _SourceStorageBinList.OrderByDescending(c => c.SumTotal).FirstOrDefault();
@@ -1258,6 +1301,131 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(TargetStorageBinList));
         }
 
+        //private List<FacilityChargeSumFacilityHelper> LoadSourceStorageBins(PreparedMaterial preparedMaterial)
+        //{
+        //    FacilityCharge[] facilityCharges =
+        //        FacilityManager
+        //        .s_cQry_MatOverviewFacilityCharge(this.DatabaseApp, preparedMaterial.Material.MaterialID, false)
+        //        .Where(c => c.Facility != null && c.Facility.FacilityNo != ProdMatStorage)
+        //        .ToArray();
+        //    List<FacilityChargeSumFacilityHelper> list = ACFacilityManager.GetFacilityChargeSumFacilityHelperList(facilityCharges, new FacilityQueryFilter()).ToList();
+
+        //    string[] targetsNotShownAsSource = TargetStorageBinList.Where(c => c.MDPickingType != null).Select(c => c.FacilityNo).ToArray();
+        //    list = list.Where(c => !targetsNotShownAsSource.Contains(c.FacilityNo)).ToList();
+
+        //    foreach (FacilityChargeSumFacilityHelper item in list)
+        //    {
+        //        item.NewPlannedStock = DatabaseApp
+        //                .PickingPos
+        //                .Where(c =>
+        //                        c.PickingMaterialID == preparedMaterial.Material.MaterialID
+        //                        && (c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished)
+        //                        && c.FromFacility.FacilityNo == item.FacilityNo
+        //                       )
+        //                .Select(c => c.PickingQuantityUOM ?? 0)
+        //                .DefaultIfEmpty()
+        //                .Sum();
+        //    }
+        //    return list;
+        //}
+
+        //private List<PlanningTargetStockPreview> LoadTargetStorageBins(PreparedMaterial preparedMaterial)
+        //{
+        //    List<PlanningTargetStockPreview> list = new List<PlanningTargetStockPreview>();
+
+        //    List<FacilityMDSchedulingGroup> schGroupFacility =
+        //        DatabaseApp
+        //        .MDSchedulingGroup
+        //        .Where(c => preparedMaterial.MDSchedulingGroupIDs.Contains(c.MDSchedulingGroupID))
+        //        .SelectMany(c => c.FacilityMDSchedulingGroup_MDSchedulingGroup)
+        //        .ToList();
+
+        //    foreach (FacilityMDSchedulingGroup schGroup in schGroupFacility)
+        //    {
+        //        PlanningTargetStockPreview item = list.FirstOrDefault(c => c.FacilityNo == schGroup.Facility.FacilityNo);
+        //        if (item == null)
+        //        {
+        //            item = new PlanningTargetStockPreview();
+        //            item.Facility = schGroup.Facility;
+        //            item.FacilityNo = schGroup.Facility.FacilityNo;
+        //            item.FacilityName = schGroup.Facility.FacilityName;
+        //            item.MDPickingType = schGroup.MDPickingType;
+        //            if (preparedMaterial.Material.FacilityMaterial_Material.Any())
+        //            {
+        //                item.OptStockQuantity =
+        //                    preparedMaterial
+        //                    .Material
+        //                    .FacilityMaterial_Material
+        //                    .Where(c => c.FacilityID == schGroup.Facility.FacilityID)
+        //                    .Select(c => c.OptStockQuantity)
+        //                    .FirstOrDefault();
+        //            }
+        //            list.Add(item);
+        //        }
+        //    }
+
+        //    var testConistentQuery =
+        //        schGroupFacility
+        //        .Where(c => c.MDPickingTypeID != null)
+        //        .Select(c => new { c.Facility.FacilityNo, c.Facility.FacilityName, SchedulingGroup_MDKey = c.MDSchedulingGroup.MDKey, c.MDPickingType.MDKey })
+        //        .GroupBy(c => new { c.FacilityNo, c.FacilityName, c.SchedulingGroup_MDKey });
+
+        //    if (testConistentQuery.Any(c => c.Count() > 1))
+        //    {
+        //        string pickingTypes = string.Join(",", testConistentQuery.Select(c => c));
+        //        Messages.Warning(this, "Warning50054", false, pickingTypes);
+        //    }
+        //    else
+        //    {
+        //        foreach (PlanningTargetStockPreview item in list)
+        //        {
+        //            item.ActualStockQuantity =
+        //                DatabaseApp
+        //                .FacilityCharge
+        //                .Where(c => c.MaterialID == preparedMaterial.Material.MaterialID && !c.NotAvailable && c.Facility.FacilityNo == item.FacilityNo)
+        //                .Select(c => c.StockQuantity)
+        //                .DefaultIfEmpty()
+        //                .Sum();
+
+        //            item.OrderedQuantity =
+        //                DatabaseApp
+        //                .PickingPos
+        //                .Where(c =>
+        //                        c.PickingMaterialID == preparedMaterial.Material.MaterialID
+        //                        && (c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished)
+        //                       )
+        //                .AsEnumerable()
+        //                .Select(c => c.TargetQuantityUOM - c.ActualQuantityUOM)
+        //                .DefaultIfEmpty()
+        //                .Sum();
+        //        }
+        //    }
+
+        //    foreach (var item in list)
+        //    {
+        //        if (item.MDPickingType != null)
+        //        {
+        //            item.NewPlannedStockQuantity = 0;
+        //            if (preparedMaterial.TargetQuantityUOM > item.ActualStockQuantity)
+        //                item.NewPlannedStockQuantity = preparedMaterial.TargetQuantityUOM - item.ActualStockQuantity;
+        //            if (item.OptStockQuantity != null && (item.OptStockQuantity ?? 0) > item.ActualStockQuantity)
+        //                item.NewPlannedStockQuantity += (item.OptStockQuantity ?? 0) - item.ActualStockQuantity;
+        //            if (item.OptStockQuantity != null)
+        //            {
+        //                if (item.NewPlannedStockQuantity > Const_RangeStockQuantityTolerance)
+        //                {
+        //                    item.IsInRange = -1;
+        //                }
+        //                else if (item.NewPlannedStockQuantity == 0)
+        //                {
+        //                    item.IsInRange = 1;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return list;
+        //}
 
         #region Pickings
         private void LoadPickings(MDPickingType mdPickingType)
@@ -1396,6 +1564,7 @@ namespace gip.bso.manufacturing
         #region Private 
 
         #endregion
+
 
     }
 }

@@ -11,6 +11,7 @@ namespace gip.mes.facility
         public Guid ProdOrderBatchPlanID { get; set; }
         public ProdOrderPartslistPos SourceProdOrderPartslistPos { get; set; }
         public string MaterialNo { get; set; }
+        public Guid MaterialID { get; set; }
         public double TargetQuantityUOM { get; set; }
 
         public Guid? MDSchedulingGroupID { get; set; }

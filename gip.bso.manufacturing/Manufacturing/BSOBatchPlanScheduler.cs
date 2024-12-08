@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.bso.masterdata;
 using gip.core.autocomponent;
@@ -4983,7 +4983,6 @@ namespace gip.bso.manufacturing
         {
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
             {
-                List<MaterialPreparationBatchModel> searchModel = new List<MaterialPreparationBatchModel>();
                 List<ProdOrderBatchPlan> selectedBatchPlans = new List<ProdOrderBatchPlan>();
                 if (ScheduleForPWNodeList != null
                     && ScheduleForPWNodeList.Where(c => c.IsSelected).Any())
