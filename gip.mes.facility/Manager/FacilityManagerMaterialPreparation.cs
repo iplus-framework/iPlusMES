@@ -81,6 +81,7 @@ namespace gip.mes.facility
         {
             MaterialPreparationBatchModel searchBatchMaterialModel = new MaterialPreparationBatchModel();
             searchBatchMaterialModel.MaterialNo = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialNo;
+            searchBatchMaterialModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialID.Value;
             searchBatchMaterialModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
             searchBatchMaterialModel.SourceProdOrderPartslistPos = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos;
             searchBatchMaterialModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
@@ -174,7 +175,26 @@ namespace gip.mes.facility
                     .DefaultIfEmpty()
                     .Sum(c => c);
 
-                preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM;
+                double inOrderQuantityUOM =
+                    databaseApp
+                    .InOrder
+                    .Where(c => c.MDInOrderState.MDInOrderStateIndex <= (short)VD.MDInOrderState.InOrderStates.InProcess)
+                    .SelectMany(c => c.InOrderPos_InOrder)
+                    .Where(c => c.Material.MaterialNo == materialNo)
+                    .Select(c => c.TargetQuantityUOM)
+                    .DefaultIfEmpty()
+                    .Sum(c => c);
+
+                double prodOrderQuantityUOM =
+                    databaseApp
+                    .ProdOrderPartslist
+                    .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)VD.MDProdOrderState.ProdOrderStates.InProduction)
+                    .Where(c => c.Partslist.Material.MaterialNo == materialNo)
+                    .Select(c => c.TargetQuantity)
+                    .DefaultIfEmpty()
+                    .Sum(c => c);
+
+                preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM + inOrderQuantityUOM + prodOrderQuantityUOM;
 
                 preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
 

@@ -4902,7 +4902,7 @@ namespace gip.bso.manufacturing
                     }
                     break;
                 case BGWorkerMehtod_DoSearchStockMaterial:
-                    List<PreparedMaterial> preparedMaterials = DoSearchStockMaterial();
+                    List<MaterialPreparationModel> preparedMaterials = DoSearchStockMaterial();
                     e.Result = preparedMaterials;
                     break;
             }
@@ -4928,7 +4928,7 @@ namespace gip.bso.manufacturing
             {
                 if (command == BGWorkerMehtod_DoSearchStockMaterial)
                 {
-                    List<PreparedMaterial> preparedMaterials = e.Result as List<PreparedMaterial>;
+                    List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel>;
                     BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
                 }
                 else
@@ -4975,11 +4975,10 @@ namespace gip.bso.manufacturing
 
         #region BackgroundWorker -> DoMehtods -> SearchStockMaterial
 
-        private List<PreparedMaterial> DoSearchStockMaterial()
+        private List<MaterialPreparationModel> DoSearchStockMaterial()
         {
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
             {
-                List<SearchBatchMaterialModel> searchModel = new List<SearchBatchMaterialModel>();
                 List<ProdOrderBatchPlan> selectedBatchPlans = new List<ProdOrderBatchPlan>();
                 if (ScheduleForPWNodeList != null
                     && ScheduleForPWNodeList.Where(c => c.IsSelected).Any())
